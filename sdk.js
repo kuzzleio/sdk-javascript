@@ -6,7 +6,7 @@ function kuzzleSDK(socketUrl) {
   this.socket = io(socketUrl);
 
   this.subscribe = function(collection, filters, callback) {
-    var requestId = Math.round(Math.random() * Date.now());
+    var requestId = Math.uuid();
 
     // subscribe to feedback and map to callback function when receive a message :
     this.socket.once(requestId, function(result){
