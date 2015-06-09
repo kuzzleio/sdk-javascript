@@ -5,6 +5,12 @@ function kuzzleSDK(socketUrl) {
 
   this.socket = io(socketUrl);
 
+  /**
+   * Subscribe to a filter
+   * @param {String} collection
+   * @param {Object} filters
+   * @param {Function} callback
+   */
   this.subscribe = function(collection, filters, callback) {
     var requestId = Math.uuid();
 
@@ -25,12 +31,18 @@ function kuzzleSDK(socketUrl) {
       requestId: requestId,
       action: 'on',
       collection: collection,
-      content: filters
+      body: filters
     });
   };
 
-  // write a message to kuzzle :
-  this.write = function(collection, action, content, persist) {
+  /**
+   * Write message to kuzzle
+   * @param {String} collection
+   * @param {String} action
+   * @param {Object} body
+   * @param {Boolean} persist
+   */
+  this.write = function(collection, action, body, persist) {
     if (persist === undefined) {
       persist = false;
     }
@@ -38,8 +50,33 @@ function kuzzleSDK(socketUrl) {
     var msg = { action: action,
       persist: persist,
       collection: collection,
-      content: content };
+      body: body };
     this.socket.emit('write', msg );
   };
 
+  /**
+   * Read document from ES according to a filter
+   * @param {String} collection
+   * @param {Object} filters
+   * @param {Function} callback
+   */
+  this.read = function(collection, filters, callback) {
+    var requestId = Math.uuid();
+
+    this.socket.once(requestId, function(result) {
+      if (result.error) {
+        console.error(result.error);
+        return false;
+      }
+
+      callback(result);
+    });
+
+    this.socket.emit('read', {
+      requestId: requestId,
+      action: 'search',
+      collection: collection,
+      body: filters
+    });
+  }
 }
