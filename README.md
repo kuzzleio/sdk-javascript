@@ -18,7 +18,7 @@ You are now ready for:
 
 ```
 // Init kuzzle object
-var kuzzle = new kuzzleSDK('http://localhost:8081');
+var kuzzle = new Kuzzle('http://localhost:8081');
 
 // Create a new user
 kuzzle.write('user', 'create', {username: 'Grace'});
