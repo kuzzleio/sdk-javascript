@@ -1,6 +1,12 @@
-function kuzzleSDK(socketUrl) {
-  if (!(this instanceof kuzzleSDK)) {
-    return new kuzzleSDK(socketUrl);
+function Kuzzle(socketUrl) {
+
+  if (!socketUrl || socketUrl === '') {
+    console.error('Url to Kuzzle can\'t be empty');
+    return false;
+  }
+
+  if (!(this instanceof Kuzzle)) {
+    return new Kuzzle(socketUrl);
   }
 
   this.socket = io(socketUrl);
