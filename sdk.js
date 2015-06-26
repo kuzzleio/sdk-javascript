@@ -35,6 +35,20 @@ function Kuzzle(socketUrl) {
       collection: collection,
       body: filters
     });
+
+    return requestId;
+  };
+
+  /**
+   * Unsubscribe to a room
+   * @param {String} requestId
+   */
+  this.unsubscribe = function(requestId) {
+    // Send information about unsubscribe to Kuzzle
+    this.socket.emit('subscribe', {
+      requestId: requestId,
+      action: 'off'
+    });
   };
 
   /**
