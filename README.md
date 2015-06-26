@@ -30,3 +30,7 @@ kuzzle.subscribe('user', {term: {username: 'Ada'}}, function (data) {
 ```
     
 Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) for more information about running Kuzzle, filter format, ...
+
+# License
+
+See [License](LICENSE.md)
