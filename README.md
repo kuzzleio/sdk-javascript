@@ -6,7 +6,7 @@ For UI and linked objects developers, Kuzzle is an open-source solution that han
 
 # How to use this javascript sdk ?
 
-* Download the file kuzzle.min.js
+* Download the file kuzzle.min.js at COMPLETE_URL
 * Add to your HTML file those lines:
 
     ```
@@ -21,7 +21,7 @@ You are now ready for:
 var kuzzle = new Kuzzle('http://localhost:8081');
 
 // Create a new user
-kuzzle.write('user', 'create', {username: 'Grace'});
+kuzzle.create('user', {username: 'Grace'}, true);
 
 // Subscribe to collection user and be notified when a user with username 'Ada' is saved
 kuzzle.subscribe('user', {term: {username: 'Ada'}}, function (data) {
