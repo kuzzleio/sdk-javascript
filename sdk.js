@@ -18,10 +18,10 @@ function Kuzzle(socketUrl) {
    * @param {Function} callback
    */
   this.subscribe = function(collection, filters, callback) {
-    var requestId = Math.uuid();
+    var roomId = Math.uuid();
 
     // subscribe to feedback and map to callback function when receive a message :
-    this.socket.once(requestId, function(response) {
+    this.socket.once(roomId, function(response) {
       this.socket.off(response.result);
       this.socket.on(response.result, function(data){
         callback(data);
@@ -30,23 +30,23 @@ function Kuzzle(socketUrl) {
 
     // create the feedback room :
     this.socket.emit('subscribe', {
-      requestId: requestId,
+      requestId: roomId,
       action: 'on',
       collection: collection,
       body: filters
     });
 
-    return requestId;
+    return roomId;
   };
 
   /**
    * Unsubscribe to a room
-   * @param {String} requestId
+   * @param {String} roomId
    */
-  this.unsubscribe = function(requestId) {
+  this.unsubscribe = function(roomId) {
     // Send information about unsubscribe to Kuzzle
     this.socket.emit('subscribe', {
-      requestId: requestId,
+      requestId: roomId,
       action: 'off'
     });
   };
@@ -96,11 +96,10 @@ function Kuzzle(socketUrl) {
    * Shortcut for access to the write controller and update a new document
    * @param {String} collection
    * @param {Object} body
-   * @param {Boolean} persist
    * @param {Function} callback
    */
-  this.update = function (collection, body, persist, callback) {
-    this.write(collection, 'update', body, persist, callback);
+  this.update = function (collection, body, callback) {
+    this.write(collection, 'update', body, true, callback);
   };
 
   /**
@@ -142,6 +141,26 @@ function Kuzzle(socketUrl) {
       action: 'get',
       collection: collection,
       _id: id
+    });
+  };
+
+  /**
+   * Count document from Kuzzle for a specific filter
+   * @param {String} collection
+   * @param {Object} filters
+   * @param {Function} callback
+   */
+  this.count = function (collection, filters, callback) {
+    var requestId = Math.uuid();
+
+    this.socket.once(requestId, function(response) {
+      callback(response);
+    });
+
+    this.socket.emit('read', {
+      requestId: requestId,
+      action: 'count',
+      collection: collection
     });
   };
 }
