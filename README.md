@@ -28,8 +28,25 @@ kuzzle.subscribe('user', {term: {username: 'Ada'}}, function (data) {
     console.log(data);
 });
 ```
-    
+
+# API
+
 Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) for more information about running Kuzzle, filter format, ...
+
+* [`create`](#create)
+
+<a names="create"/>
+## create(collection, document, [persist, callback])
+
+Create a new `document` for the `collection` in kuzzle.
+
+__Arguments__
+
+* `collection` - A string corresponding to the collection name
+* `document` - An object with attributes
+* `persist` - A boolean specifies if the document must be save. If true, the document is saved in Kuzzle, if not, the document is just used for real-time
+* `callback(response)` - A function to execute when create is done with the response from Kuzzle 
+
 
 # License
 
