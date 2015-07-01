@@ -39,6 +39,8 @@ Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) fo
 
 * [`create`](#create)
 * [`update`](#update)
+* [`delete`](#delete)
+* [`deleteByQuery`](#deleteByQuery)
 * [`search`](#search)
 * [`get`](#get)
 * [`count`](#count)
@@ -93,6 +95,60 @@ kuzzle.update("user", {_id: "firstUserId", username: "Ada"}, function(response) 
     }
     
     console.log(response);
+});
+```
+
+<a names="delete"/>
+### delete(collection, id, [callback])
+
+Delete the document with `id` in the `collection` in kuzzle.
+
+__Arguments__
+
+* `collection` - A string corresponding to the collection name
+* `id` - A string corresponding to the document `id` to delete
+* `callback(response)` - A function to execute when delete is done with the response from Kuzzle
+
+__Examples__
+
+```js
+kuzzle.delete("user", "firstUserId", function(response) {
+    if(response.error) {
+        console.error(response.error);
+    }
+    
+    console.log(response.result);
+});
+```
+
+<a names="deleteByQuery"/>
+### deleteByQuery(collection, filters, [callback])
+
+Delete all documents that match `filters` in the `collection` in kuzzle.
+
+__Arguments__
+
+* `collection` - A string corresponding to the collection name
+* `filters` - An object filters. Internally we use the [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
+* `callback(response)` - A function to execute when deleteByQuery is done with the response from Kuzzle. `response` contains an attribute `ids` that contains an array with all deleted ids. 
+
+__Examples__
+
+```js
+var filters = {
+    "filter": {
+        "term": {
+            "username": "Ada"
+        }
+    }
+}
+
+kuzzle.deleteByQuery("user", filters, function(response) {
+    if(response.error) {
+        console.error(response.error);
+    }
+    
+    console.log(response.result.ids);
 });
 ```
 

@@ -103,6 +103,30 @@ function Kuzzle(socketUrl) {
   };
 
   /**
+   * Shortcut for access to the write controller and delete a document by its id
+   * @param {String} collection
+   * @param {Object} id
+   * @param {Function} callback
+   */
+  this.delete = function (collection, id, callback) {
+    var body = {
+      _id: id
+    };
+
+    this.write(collection, 'delete', body, true, callback);
+  };
+
+  /**
+   * Shortcut for access to the write controller and delete documents by query
+   * @param {String} collection
+   * @param {Object} filters
+   * @param {Function} callback
+   */
+  this.deleteByQuery = function (collection, filters, callback) {
+    this.write(collection, 'deleteByQuery', filters, true, callback);
+  };
+
+  /**
    * Search document from Kuzzle according to a filter
    * @param {String} collection
    * @param {Object} filters
