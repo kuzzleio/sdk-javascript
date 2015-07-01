@@ -64,7 +64,7 @@ __Examples__
 
 ```js
 // Persist a new document in the collection user
-kuzzle.create("user", {_id: "firstUserId", username: "Grace"}, true, function(response) {
+kuzzle.create("user", {username: "Grace"}, true, function(response) {
     if(response.error) {
         console.error(response.error);
     }
