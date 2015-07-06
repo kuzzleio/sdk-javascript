@@ -58,6 +58,8 @@ function Kuzzle(socketUrl) {
     });
     
     this.socket.off(subscribedRooms[roomId]);
+    
+    delete subscribedRooms[roomId];
   };
 
   /**
