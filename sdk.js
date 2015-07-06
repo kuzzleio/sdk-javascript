@@ -1,5 +1,7 @@
 function Kuzzle(socketUrl) {
-
+  var
+    subscribedRooms = {};
+  
   if (!socketUrl || socketUrl === '') {
     console.error('Url to Kuzzle can\'t be empty');
     return false;
@@ -22,6 +24,7 @@ function Kuzzle(socketUrl) {
 
     // subscribe to feedback and map to callback function when receive a message :
     this.socket.once(roomId, function(response) {
+      subscribedRooms[roomId] = response.result;
       this.socket.off(response.result);
       this.socket.on(response.result, function(data){
         callback(data);
@@ -44,11 +47,19 @@ function Kuzzle(socketUrl) {
    * @param {String} roomId
    */
   this.unsubscribe = function(roomId) {
-    // Send information about unsubscribe to Kuzzle
+    if (!subscribedRooms[roomId]) {
+      return false;
+    }
+    
+    // Unsubscribes from Kuzzle & closes the socket
     this.socket.emit('subscribe', {
       requestId: roomId,
       action: 'off'
     });
+    
+    this.socket.off(subscribedRooms[roomId]);
+    
+    delete subscribedRooms[roomId];
   };
 
   /**
