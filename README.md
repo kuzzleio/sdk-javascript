@@ -257,10 +257,8 @@ __Examples__
 
 ```js
 var filters = {
-    "filter": {
-        "term": {
-            "username": "Ada"
-        }
+    "term": {
+        "username": "Ada"
     }
 }
 
@@ -292,10 +290,8 @@ var global = {
 }
 
 var filters = {
-    "filter": {
-        "term": {
-            "username": "Ada"
-        }
+    "term": {
+        "username": "Ada"
     }
 }
 
