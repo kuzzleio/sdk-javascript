@@ -195,7 +195,8 @@ function Kuzzle(socketUrl) {
     this.socket.emit('read', {
       requestId: requestId,
       action: 'count',
-      collection: collection
+      collection: collection,
+      body: filters
     });
   };
 }
