@@ -310,7 +310,7 @@ kuzzle.subscribe("user", filters, function(response) {
 ```
 
 <a names="unsubscribe"/>
-### unsubscribe(roomId)
+### unsubscribe(roomName)
 
 Unubscribe to a specific room. Allow to stop listening a room.
 
@@ -349,7 +349,7 @@ var stopListeningUsers = function() {
 ```
 
 <a names="countSubscription"/>
-### countSubscription(roomId)
+### countSubscription(roomName)
 
 Count how many users have subscribe to a specific room.
 
