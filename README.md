@@ -207,7 +207,7 @@ var data = {
   "sort": "username.raw"
 }
 
-// Get all documents in "user" ordered by username with a pagination
+// Get all documents in "user" ordered by username
 kuzzle.search("user", data, function(response) {
     if(response.error) {
         console.error(response.error);
