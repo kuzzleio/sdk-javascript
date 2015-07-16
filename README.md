@@ -46,6 +46,7 @@ Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) fo
 * [`count`](#count)
 * [`subscribe`](#subscribe)
 * [`unsubscribe`](#unsubscribe)
+* [`countUnsubscribe`](#countUnsubscribe)
 
 
 ## Definitions
@@ -287,7 +288,7 @@ __Arguments__
 
 __Return__
 
-* `roomId` - A string that identify the room listening. Used for unsubscribe to this room.
+* `roomName` - A string that identify the room listening. Used to unsubscribe to this room.
 
 __Examples__
 
@@ -315,14 +316,14 @@ Unubscribe to a specific room. Allow to stop listening a room.
 
 __Arguments__
 
-* `roomId` - A string corresponding to the room to stop listening
+* `roomName` - A string corresponding to the room to stop listening
 
 __Examples__
 
 ```js
 
 var global = {
-    roomId: null;
+    roomName: null;
 }
 
 var filters = {
@@ -332,7 +333,7 @@ var filters = {
 }
 
 // Every times a document user with username "Ada" is created/updated/deleted we'll display it in console log
-global.roomId = kuzzle.subscribe("user", filters, function(response) {
+global.roomName = kuzzle.subscribe("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
@@ -342,7 +343,50 @@ global.roomId = kuzzle.subscribe("user", filters, function(response) {
 
 // This function can be executed when the user click on a button "stop to follow"
 var stopListeningUsers = function() {
-    kuzzle.unsubscribe(global.roomId);
+    kuzzle.unsubscribe(global.roomName);
+}
+
+```
+
+<a names="countSubscription"/>
+### countSubscription(roomId)
+
+Count how many users have subscribe to a specific room.
+
+__Arguments__
+
+* `roomName` - A string corresponding to the room to stop listening
+
+__Examples__
+
+```js
+
+var global = {
+    roomName: null;
+}
+
+var filters = {
+    "term": {
+        "username": "Ada"
+    }
+}
+
+// Every times a document user with username "Ada" is created/updated/deleted we'll display it in console log
+global.roomName = kuzzle.subscribe("user", filters, function(response) {
+    if(response.error) {
+        console.error(response.error);
+    }
+    
+    console.log(response);
+});
+
+// Get how many user have subscribe to the same room about Ada
+kuzzle.countSubscription(global.roomName, function (response) {
+    if(reponse.error) {
+        console.error(response.error)
+    }
+    
+    console.log(response)
 }
 
 ```
