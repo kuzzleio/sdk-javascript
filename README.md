@@ -214,14 +214,14 @@ Count documents matching `filters` for the `collection` in kuzzle.
 __Arguments__
 
 * `collection` - A string corresponding to the collection name
-* `filters` - An object filters. Internally we use the [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
+* `filters` - An object filters. Internally we use the [Elasticsearch query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/1.3/query-dsl-queries.html)
 * `callback(response)` - A function to execute when count is done with the response from Kuzzle
 
 __Examples__
 
 ```js
 var filters = {
-    "filter": {
+    "query": {
         "term": {
             "username": "Ada"
         }
