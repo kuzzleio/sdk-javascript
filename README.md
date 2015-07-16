@@ -216,7 +216,8 @@ kuzzle.search("user", data, function(response) {
     console.log("First twenty documents", response.result.hits.hits);
 });
 ```
-** Note:** For execute a sorting, you must define a mapping before. Check [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-fields.html)
+
+**Note:** For execute a sorting, you must define a mapping before. Check [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-fields.html)
 
 <a names="get"/>
 ### get(collection, id, [callback])
