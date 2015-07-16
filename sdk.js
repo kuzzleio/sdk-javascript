@@ -140,22 +140,11 @@ function Kuzzle(socketUrl) {
   /**
    * Search document from Kuzzle according to a filter
    * @param {String} collection
-   * @param {Object} filters
+   * @param {Object} data
    * @param {Function} callback
    */
-  this.search = function(collection, filters, callback) {
-    var requestId = Math.uuid();
-
-    this.socket.once(requestId, function(response) {
-      callback(response);
-    });
-
-    this.socket.emit('read', {
-      requestId: requestId,
-      action: 'search',
-      collection: collection,
-      body: filters
-    });
+  this.search = function(collection, data, callback) {
+    this.readWithQuery(collection, data, 'search', callback);
   };
 
   /**
@@ -199,4 +188,33 @@ function Kuzzle(socketUrl) {
       body: filters
     });
   };
+
+  this.readWithQuery = function (collection, data, action, callback) {
+    var requestId = Math.uuid();
+
+    this.socket.once(requestId, function(response) {
+      callback(response);
+    });
+
+    var object = {
+      requestId: requestId,
+      action: action,
+      collection: collection
+    };
+
+    if (Object.keys(data).length > 1) {
+      var attr;
+
+      for(attr in data) {
+        if (data.hasOwnProperty(attr)) {
+          object[attr] = data[attr];
+        }
+      }
+    }
+    else {
+      object.body = data;
+    }
+
+    this.socket.emit('read', object);
+  }
 }

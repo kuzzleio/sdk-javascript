@@ -174,14 +174,49 @@ var filters = {
     }
 }
 
+// Get all "user" with "Ada" in attribute "username"
 kuzzle.search("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
     
-    console.log("This is the document for user Ada", response.result.hits.hits[0]);
+    console.log("This is the document for user Ada", response.result.hits.hits);
 });
 ```
+
+```js
+var data = {
+    "from": 0,
+    "size": 20,
+    "query": {}
+}
+
+// Get all documents in "user" with a pagination
+kuzzle.search("user", data, function(response) {
+    if(response.error) {
+        console.error(response.error);
+    }
+    
+    console.log("First twenty documents", response.result.hits.hits);
+});
+```
+
+```js
+var data = {
+  "query": {},
+  "sort": "username.raw"
+}
+
+// Get all documents in "user" ordered by username with a pagination
+kuzzle.search("user", data, function(response) {
+    if(response.error) {
+        console.error(response.error);
+    }
+    
+    console.log("First twenty documents", response.result.hits.hits);
+});
+```
+** Note:** For execute a sorting, you must define a mapping before. Check [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-fields.html)
 
 <a names="get"/>
 ### get(collection, id, [callback])
