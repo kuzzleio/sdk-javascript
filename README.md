@@ -355,7 +355,7 @@ Count how many users have subscribe to a specific room.
 
 __Arguments__
 
-* `roomName` - A string corresponding to the room to stop listening
+* `roomName` - A string corresponding to the room
 
 __Examples__
 
