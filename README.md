@@ -213,7 +213,7 @@ kuzzle.search("user", data, function(response) {
         console.error(response.error);
     }
     
-    console.log("First twenty documents", response.result.hits.hits);
+    console.log("User sorted by username", response.result.hits.hits);
 });
 ```
 
