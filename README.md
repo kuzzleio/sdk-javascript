@@ -46,7 +46,7 @@ Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) fo
 * [`count`](#count)
 * [`subscribe`](#subscribe)
 * [`unsubscribe`](#unsubscribe)
-* [`countUnsubscribe`](#countUnsubscribe)
+* [`countSubscription`](#countSubscription)
 
 
 ## Definitions
