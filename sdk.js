@@ -24,6 +24,11 @@ function Kuzzle(socketUrl) {
 
     // subscribe to feedback and map to callback function when receive a message :
     this.socket.once(roomId, function(response) {
+      if (response.error) {
+        console.error(response.error);
+        return false;
+      }
+
       subscribedRooms[roomId] = response.result;
       this.socket.off(response.result);
       this.socket.on(response.result, function(data){
