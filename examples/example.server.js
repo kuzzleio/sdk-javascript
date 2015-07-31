@@ -49,7 +49,7 @@ app.use("*socket.io-1.3.4.js", function(req, res, next) {
 });
 
 app.use("*require.js", function(req, res, next) {
-  res.sendFile(path.join(__dirname,  "amd", "require.js"));
+  res.sendFile(path.join(__dirname, "amd", "require.js"));
 });
 
 app.use(function(req, res, next) {

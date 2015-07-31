@@ -111,7 +111,7 @@ kuzzle
 
 #### Vanilla
 
-Download the file kuzzle.min.js at COMPLETE_URL and the following to your HTML file:
+Download the file [kuzzle.min.js](kuzzle.min.js) at TODO: COMPLETE_URL and the following to your HTML file:
 
 ```
 <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
