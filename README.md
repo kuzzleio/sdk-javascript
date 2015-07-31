@@ -1,39 +1,174 @@
-# About Kuzzle
+Kuzzle
+======
+
+## About Kuzzle
 
 For UI and linked objects developers, Kuzzle is an open-source solution that handles all the data management (CRUD, real-time storage, search, high-level features, etc).
 
 [You can access to the Kuzzle repository here](https://github.com/kuzzleio/kuzzle)
 
-# How to use this javascript sdk ?
+A connector to the Kuzzle API
 
-* Download the file kuzzle.min.js at COMPLETE_URL
-* Add to your HTML file those lines:
+## Installation
 
-    ```
-    <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
-    <script type="text/javascript" src="path/to/kuzzle.min.js"></script>
-    ```
-    
+### nodeJs
+
+```
+npm install node-kuzzle --save
+```
+
+#### Basic usage
+
+```javascript
+var kuzzleUrl = 'http://localhost:7512',
+  kuzzle = require('node-kuzzle')(kuzzleUrl);
+
+var myDoc = {
+  name: 'Rick Astley',
+  birthDate: '1966/02/06',
+  mainActivity: 'Singer',
+  website: 'http://www.rickastley.co.uk',
+  comment: 'Never gonna give you up, never gonna let you down'
+};
+
+kuzzle.create('people', myDoc, true, function(error, response) {
+  if (error) {
+    // handle error...
+  }
+  /*
+  If everything is ok, response should contain :
+  { _index: 'mainindex',
+     _type: 'people',
+     _id: 'AU7V79B426DqjnR4i97D',
+     _version: 1,
+     created: true,
+     requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
+     controller: 'write',
+     action: 'create',
+     collection: 'people',
+     _source: {
+        name: 'Rick Astley',
+        birthDate: '1966/02/06',
+        mainActivity: 'Singer',
+        website: 'http://www.rickastley.co.uk',
+        comment: 'Never gonna give you up, never gonna let you down'
+      }
+  }
+  */
+});
+
+```
+
+#### Hate callbacks & love promises ?
+
+All the kuzzle member functions are available using promises, just suffix them with ```Promise``` like ```createPromise```.
+With promises, the above example become:
+
+```javascript
+var kuzzleUrl = 'http://localhost:7512',
+  kuzzle = require('node-kuzzle')(kuzzleUrl);
+
+var myDoc = {
+  name: 'Rick Astley',
+  birthDate: '1966/02/06',
+  mainActivity: 'Singer',
+  website: 'http://www.rickastley.co.uk',
+  comment: 'Never gonna give you up, never gonna let you down'
+};
+
+kuzzle
+  .createPromise('people', myDoc, true)
+  .then(function(response) {
+  /*
+  If everything is ok, response should contain :
+  { _index: 'mainindex',
+     _type: 'people',
+     _id: 'AU7V79B426DqjnR4i97D',
+     _version: 1,
+     created: true,
+     requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
+     controller: 'write',
+     action: 'create',
+     collection: 'people',
+     _source: {
+        name: 'Rick Astley',
+        birthDate: '1966/02/06',
+        mainActivity: 'Singer',
+        website: 'http://www.rickastley.co.uk',
+        comment: 'Never gonna give you up, never gonna let you down'
+      }
+  }
+  */
+  })
+  .catch(function(error){
+    // handle the error...
+  })
+  ;
+
+```
+
+### HTML
+
+#### Vanilla
+
+Download the file kuzzle.min.js at COMPLETE_URL and the following to your HTML file:
+
+```
+<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+<script type="text/javascript" src="path/to/kuzzle.min.js"></script>
+```
 You are now ready for:
 
-```
+```javascript
 // Init kuzzle object
-var kuzzle = new Kuzzle('http://localhost:8081');
+var kuzzle = Kuzzle.init('http://localhost:7512');
 
-// Create a new user
-kuzzle.create("user", {username: "Grace"}, true);
+var myDoc = {
+  name: 'Rick Astley',
+  birthDate: '1966/02/06',
+  mainActivity: 'Singer',
+  website: 'http://www.rickastley.co.uk',
+  comment: 'Never gonna give you up, never gonna let you down'
+};
 
-// Subscribe to collection user and be notified when a user with username 'Ada' is saved
-kuzzle.subscribe('user', {term: {username: 'Ada'}}, function (data) {
-    console.log(data);
+kuzzle.create('people', myDoc, true, function(error, response) {
+  if (error) {
+    // handle error...
+  }
+  /*
+  If everything is ok, response should contain :
+  { _index: 'mainindex',
+     _type: 'people',
+     _id: 'AU7V79B426DqjnR4i97D',
+     _version: 1,
+     created: true,
+     requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
+     controller: 'write',
+     action: 'create',
+     collection: 'people',
+     _source: {
+        name: 'Rick Astley',
+        birthDate: '1966/02/06',
+        mainActivity: 'Singer',
+        website: 'http://www.rickastley.co.uk',
+        comment: 'Never gonna give you up, never gonna let you down'
+      }
+  }
+  */
 });
+
 ```
 
-# API
+### AMD / Require.js
 
-## Note
+TODO
 
-Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) for more information about running Kuzzle, filter format, ...
+
+## API overview
+
+### Note
+
+Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) for more information about running Kuzzle, filter format...
 
 ## List
 
@@ -71,7 +206,7 @@ kuzzle.create("user", {username: "Grace"}, true, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-        
+
     console.log(response);
 });
 ```
@@ -94,7 +229,7 @@ kuzzle.update("user", {_id: "firstUserId", username: "Ada"}, function(response) 
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response);
 });
 ```
@@ -117,7 +252,7 @@ kuzzle.delete("user", "firstUserId", function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response.result);
 });
 ```
@@ -131,7 +266,7 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `filters` - An object filters. Internally we use the [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
-* `callback(response)` - A function to execute when deleteByQuery is done with the response from Kuzzle. `response` contains an attribute `ids` that contains an array with all deleted ids. 
+* `callback(response)` - A function to execute when deleteByQuery is done with the response from Kuzzle. `response` contains an attribute `ids` that contains an array with all deleted ids.
 
 __Examples__
 
@@ -148,7 +283,7 @@ kuzzle.deleteByQuery("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response.result.ids);
 });
 ```
@@ -180,7 +315,7 @@ kuzzle.search("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log("This is the document for user Ada", response.result.hits.hits);
 });
 ```
@@ -197,7 +332,7 @@ kuzzle.search("user", data, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log("First twenty documents", response.result.hits.hits);
 });
 ```
@@ -213,7 +348,7 @@ kuzzle.search("user", data, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log("User sorted by username", response.result.hits.hits);
 });
 ```
@@ -238,7 +373,7 @@ kuzzle.get("user", "firstUserId", function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log("This is the document for the first user", response.result);
 });
 ```
@@ -269,7 +404,7 @@ kuzzle.count("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response.result.count);
 });
 ```
@@ -304,7 +439,7 @@ kuzzle.subscribe("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response);
 });
 ```
@@ -337,7 +472,7 @@ global.roomName = kuzzle.subscribe("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response);
 });
 
@@ -376,7 +511,7 @@ global.roomName = kuzzle.subscribe("user", filters, function(response) {
     if(response.error) {
         console.error(response.error);
     }
-    
+
     console.log(response);
 });
 
@@ -385,7 +520,7 @@ kuzzle.countSubscription(global.roomName, function (response) {
     if(reponse.error) {
         console.error(response.error)
     }
-    
+
     console.log(response)
 }
 
@@ -394,4 +529,4 @@ kuzzle.countSubscription(global.roomName, function (response) {
 
 # License
 
-See [License](LICENSE.md)
+[Apache 2](LICENSE.md)
