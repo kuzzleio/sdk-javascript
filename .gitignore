@@ -2,10 +2,12 @@
 .idea
 
 # Node
-npm-debug.log
+*.log
+node_modules/
+examples/node_modules/
 
 # Docker
-docker-compose-custom.yml
+
 
 # Other
 .DS_STORE
