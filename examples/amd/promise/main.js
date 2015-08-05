@@ -24,14 +24,18 @@ require(['bluebird', 'kuzzle'], function(Promise, Kuzzle) {
     suffix: 'Promise'
   });
 
-  Kuzzle.init(kuzzleUrl)
-    .createPromise('people', myDoc, true)
+  Kuzzle.init(kuzzleUrl);
+
+  setTimeout(function(){
+    Kuzzle.createPromise('people', myDoc, true)
     .then(function(response) {
-      console.log("kuzzle with promise is ok");
-      // console.log(response);
+      console.log('doc created into Kuzzle');
+      document.querySelector("#kuzzle").innerHTML = "ok";
     })
     .catch(function(error) {
       console.log(error);
     });
+
+},2000);
 
 });
