@@ -19,10 +19,10 @@ require(['kuzzle'], function(Kuzzle) {
 
   var kuzzle = Kuzzle.init(kuzzleUrl);
 
-    // with callback
-    kuzzle.create('people', myDoc, true, function(error, response) {
-      console.log('doc created into Kuzzle');
-      document.querySelector("#kuzzle").innerHTML = "ok";
-    });
+  // with callback
+  kuzzle.create('people', myDoc, true, function(error, response) {
+    console.log('doc created into Kuzzle');
+    document.querySelector("#kuzzle").innerHTML = "ok";
+  });
 
 });

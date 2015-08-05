@@ -36,11 +36,11 @@ app.get('/amd/promise/main.js', function(req, res) {
 
 
 app.get('/inline/promise', function(req, res) {
-  res.sendFile(path.join(__dirname, "inlinescript","promise", "index.html"));
+  res.sendFile(path.join(__dirname, "inlinescript", "promise", "index.html"));
 });
 
 app.get('/inline/callback', function(req, res) {
-  res.sendFile(path.join(__dirname, "inlinescript","callback", "index.html"));
+  res.sendFile(path.join(__dirname, "inlinescript", "callback", "index.html"));
 });
 
 ///////////////////////////// Lib require //////////////////////////

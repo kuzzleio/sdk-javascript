@@ -26,16 +26,16 @@ require(['bluebird', 'kuzzle'], function(Promise, Kuzzle) {
 
   Kuzzle.init(kuzzleUrl);
 
-  setTimeout(function(){
+  setTimeout(function() {
     Kuzzle.createPromise('people', myDoc, true)
-    .then(function(response) {
-      console.log('doc created into Kuzzle');
-      document.querySelector("#kuzzle").innerHTML = "ok";
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
+      .then(function(response) {
+        console.log('doc created into Kuzzle');
+        document.querySelector("#kuzzle").innerHTML = "ok";
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
 
-},2000);
+  }, 2000);
 
 });
