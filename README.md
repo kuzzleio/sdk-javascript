@@ -186,7 +186,7 @@ Please, refer to [main Kuzzle repository](https://github.com/kuzzleio/kuzzle) fo
 
 ## Definitions
 
-<a names="create"/>
+<a name="create"/>
 ### create(collection, document, [persist, callback])
 
 Create a new `document` for the `collection` in kuzzle.
@@ -211,7 +211,7 @@ kuzzle.create("user", {username: "Grace"}, true, function(response) {
 });
 ```
 
-<a names="update"/>
+<a name="update"/>
 ### update(collection, document, [callback])
 
 Update a new `document` for the `collection` in kuzzle.
@@ -234,7 +234,7 @@ kuzzle.update("user", {_id: "firstUserId", username: "Ada"}, function(response) 
 });
 ```
 
-<a names="delete"/>
+<a name="delete"/>
 ### delete(collection, id, [callback])
 
 Delete the document with `id` in the `collection` in kuzzle.
@@ -257,7 +257,7 @@ kuzzle.delete("user", "firstUserId", function(response) {
 });
 ```
 
-<a names="deleteByQuery"/>
+<a name="deleteByQuery"/>
 ### deleteByQuery(collection, filters, [callback])
 
 Delete all documents that match `filters` in the `collection` in kuzzle.
@@ -288,7 +288,7 @@ kuzzle.deleteByQuery("user", filters, function(response) {
 });
 ```
 
-<a names="search"/>
+<a name="search"/>
 ### search(collection, filters, [callback])
 
 Search all documents matching `filters` for the `collection` in kuzzle.
@@ -355,7 +355,7 @@ kuzzle.search("user", data, function(response) {
 
 **Note:** For execute a sorting, you must define a mapping before. Check [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-fields.html)
 
-<a names="get"/>
+<a name="get"/>
 ### get(collection, id, [callback])
 
 Search a specific document by its `id` for the `collection` in kuzzle.
@@ -378,7 +378,7 @@ kuzzle.get("user", "firstUserId", function(response) {
 });
 ```
 
-<a names="count"/>
+<a name="count"/>
 ### count(collection, filters, [callback])
 
 Count documents matching `filters` for the `collection` in kuzzle.
@@ -409,7 +409,7 @@ kuzzle.count("user", filters, function(response) {
 });
 ```
 
-<a names="subscribe"/>
+<a name="subscribe"/>
 ### subscribe(collection, filters, [callback])
 
 Subscribe to a specific `filters` for the `collection` in kuzzle.
@@ -444,7 +444,7 @@ kuzzle.subscribe("user", filters, function(response) {
 });
 ```
 
-<a names="unsubscribe"/>
+<a name="unsubscribe"/>
 ### unsubscribe(roomName)
 
 Unubscribe to a specific room. Allow to stop listening a room.
@@ -483,7 +483,7 @@ var stopListeningUsers = function() {
 
 ```
 
-<a names="countSubscription"/>
+<a name="countSubscription"/>
 ### countSubscription(roomName)
 
 Count how many users have subscribe to a specific room.
