@@ -4,8 +4,6 @@
   "description": "A connector for the Kuzzle API",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:babel/register tests/*",
-    "run": "babel-node --stage 0 examples/example.server.js"
   },
   "license": "Apache-2.0",
   "dependencies": {
