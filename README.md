@@ -196,15 +196,15 @@ __Arguments__
 * `collection` - A string corresponding to the collection name
 * `document` - An object with attributes
 * `persist` - A boolean specifies if the document must be save. If true, the document is saved in Kuzzle, if not, the document is just used for real-time
-* `callback(response)` - A function to execute when create is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when create is done with the response from Kuzzle
 
 __Examples__
 
 ```js
 // Persist a new document in the collection user
-kuzzle.create("user", {username: "Grace"}, true, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.create("user", {username: "Grace"}, true, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
     console.log(response);
@@ -220,14 +220,14 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `document` - An object with attributes. This object must contains an attribute `_id`, corresponding to document id to update.
-* `callback(response)` - A function to execute when update is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when update is done with the response from Kuzzle
 
 __Examples__
 
 ```js
-kuzzle.update("user", {_id: "firstUserId", username: "Ada"}, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.update("user", {_id: "firstUserId", username: "Ada"}, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
     console.log(response);
@@ -243,17 +243,17 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `id` - A string corresponding to the document `id` to delete
-* `callback(response)` - A function to execute when delete is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when delete is done with the response from Kuzzle
 
 __Examples__
 
 ```js
-kuzzle.delete("user", "firstUserId", function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.delete("user", "firstUserId", function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log(response.result);
+    console.log(response);
 });
 ```
 
@@ -279,12 +279,12 @@ var filters = {
     }
 }
 
-kuzzle.deleteByQuery("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.deleteByQuery("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log(response.result.ids);
+    console.log(response.ids);
 });
 ```
 
@@ -297,7 +297,7 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `filters` - An object filters. Internally we use the [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
-* `callback(response)` - A function to execute when search is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when search is done with the response from Kuzzle
 
 __Examples__
 
@@ -311,12 +311,12 @@ var filters = {
 }
 
 // Get all "user" with "Ada" in attribute "username"
-kuzzle.search("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.search("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log("This is the document for user Ada", response.result.hits.hits);
+    console.log("This is the document for user Ada", response.hits.hits);
 });
 ```
 
@@ -328,12 +328,12 @@ var data = {
 }
 
 // Get all documents in "user" with a pagination
-kuzzle.search("user", data, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.search("user", data, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log("First twenty documents", response.result.hits.hits);
+    console.log("First twenty documents", response.hits.hits);
 });
 ```
 
@@ -344,12 +344,12 @@ var data = {
 }
 
 // Get all documents in "user" ordered by username
-kuzzle.search("user", data, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.search("user", data, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log("User sorted by username", response.result.hits.hits);
+    console.log("User sorted by username", response.hits.hits);
 });
 ```
 
@@ -364,17 +364,17 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `id` - A string corresponding to the document id
-* `callback(response)` - A function to execute when get is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when get is done with the response from Kuzzle
 
 __Examples__
 
 ```js
-kuzzle.get("user", "firstUserId", function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.get("user", "firstUserId", function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log("This is the document for the first user", response.result);
+    console.log("This is the document for the first user", response);
 });
 ```
 
@@ -387,7 +387,7 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `filters` - An object filters. Internally we use the [Elasticsearch query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/1.3/query-dsl-queries.html)
-* `callback(response)` - A function to execute when count is done with the response from Kuzzle
+* `callback(error, response)` - A function to execute when count is done with the response from Kuzzle
 
 __Examples__
 
@@ -400,12 +400,12 @@ var filters = {
     }
 }
 
-kuzzle.count("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.count("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
-    console.log(response.result.count);
+    console.log(response.count);
 });
 ```
 
@@ -419,7 +419,7 @@ __Arguments__
 
 * `collection` - A string corresponding to the collection name
 * `filters` - An object filters. Internally we use the [Elasticsearch DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html)
-* `callback(response)` - A function to execute every times we get a response from Kuzzle
+* `callback(error, response)` - A function to execute every times we get a response from Kuzzle
 
 __Return__
 
@@ -435,9 +435,9 @@ var filters = {
 }
 
 // Every times a document user with username "Ada" is created/updated/deleted we'll display it in console log
-kuzzle.subscribe("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+kuzzle.subscribe("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
     console.log(response);
@@ -468,9 +468,9 @@ var filters = {
 }
 
 // Every times a document user with username "Ada" is created/updated/deleted we'll display it in console log
-global.roomName = kuzzle.subscribe("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+global.roomName = kuzzle.subscribe("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
     console.log(response);
@@ -507,18 +507,18 @@ var filters = {
 }
 
 // Every times a document user with username "Ada" is created/updated/deleted we'll display it in console log
-global.roomName = kuzzle.subscribe("user", filters, function(response) {
-    if(response.error) {
-        console.error(response.error);
+global.roomName = kuzzle.subscribe("user", filters, function(error, response) {
+    if(error) {
+        console.error(error);
     }
 
     console.log(response);
 });
 
 // Get how many user have subscribe to the same room about Ada
-kuzzle.countSubscription(global.roomName, function (response) {
-    if(reponse.error) {
-        console.error(response.error)
+kuzzle.countSubscription(global.roomName, function (error, response) {
+    if(error) {
+        console.error(error)
     }
 
     console.log(response)
