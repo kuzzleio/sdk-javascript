@@ -14,7 +14,7 @@ A connector to the Kuzzle API
 ### nodeJs
 
 ```
-npm install node-kuzzle --save
+npm install kuzzle-sdk --save
 ```
 
 #### Basic usage
