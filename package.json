@@ -1,9 +1,23 @@
 {
   "name": "kuzzle-sdk",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "A connector for the Kuzzle API",
+  "author": "The Kuzzle Team <support@kuzzle.io>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kuzzleio/sdk-javascript.git"
+  },
+  "issues":"https://github.com/kuzzleio/sdk-javascript/issues",
+  "keywords": [
+    "kuzzle",
+    "baas",
+    "real-time",
+    "advanced-search",
+    "bulk"
+  ],
   "main": "index.js",
   "scripts": {
+    "prepublish": "grunt"
   },
   "license": "Apache-2.0",
   "dependencies": {

@@ -23,7 +23,7 @@ module.exports = function(grunt) {
         options: {
           'sourceMap': true, 
           'sourceMapName': 'kuzzle.min.map',
-          'banner': '// This is the Kuzzle SDK - Licenced under the Apache 2.0 Licence'
+          'banner': '// This is the Kuzzle SDK version 0.2.0 - Licenced under the Apache 2.0 Licence'
         },
         files: {
           './kuzzle.min.js': ['./lib/kuzzle.js']
