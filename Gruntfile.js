@@ -1,8 +1,11 @@
 module.exports = function(grunt) {
   var path = require('path');
 
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-jsbeautifier');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+
 
   grunt.initConfig({
     jsbeautifier: {
@@ -17,7 +20,13 @@ module.exports = function(grunt) {
           indentWithTabs: false
         }
       }
-    }, 
+    },
+    jshint: {
+      all: ['Gruntfile.js', 'tests/**/*.js', 'features/**/*.js']
+    },
+    eslint: {
+      src: ['lib/**/*.js', 'examples/**/*.js', '!examples/amd/require.js', '!examples/lib/*']
+    },
     uglify: {
       kuzzle: {
         options: {
@@ -32,5 +41,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['jsbeautifier', 'uglify']);
+  grunt.registerTask('default', ['jsbeautifier', 'jshint', 'eslint', 'uglify']);
 };

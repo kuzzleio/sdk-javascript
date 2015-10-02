@@ -79,7 +79,7 @@ describe('Subscription JS Flavor SDK', function() {
       this.timeout(15000);
       browserA.url(KUZZLE_URL + '/subscribe')
         .then(function() {
-          browserB.url(KUZZLE_URL + "/" + test.args[0] + '/' + test.args[1])
+          browserB.url(KUZZLE_URL + "/" + test.args[0] + '/' + test.args[1]);
         }).
       pause(4000)
         .getText('#kuzzle-subscription*=Never gonna give you up, never gonna let you down').then(function(message) {
