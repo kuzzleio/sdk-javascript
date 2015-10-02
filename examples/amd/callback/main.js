@@ -1,12 +1,12 @@
 require.config({
   paths: {
     // Kuzzle has only one dependency : socket.io
-    "socket.io": '../lib/socket.io-1.3.4',
-    "kuzzle": "../lib/kuzzle"
+    'socket.io': '../lib/socket.io-1.3.4',
+    'kuzzle': '../lib/kuzzle'
   }
 });
 
-require(['kuzzle'], function(Kuzzle) {
+require(['kuzzle'], function (Kuzzle) {
 
   var myDoc = {
       name: 'Rick Astley',
@@ -20,9 +20,9 @@ require(['kuzzle'], function(Kuzzle) {
   var kuzzle = Kuzzle.init(kuzzleUrl);
 
   // with callback
-  kuzzle.create('people', myDoc, true, function(error, response) {
-    console.log('doc created into Kuzzle');
-    document.querySelector("#kuzzle").innerHTML = "ok";
+  kuzzle.create('people', myDoc, true, function (error, response) {
+    console.log('Document created in Kuzzle: ', response);
+    document.querySelector('#kuzzle').innerHTML = 'ok';
   });
 
 });
