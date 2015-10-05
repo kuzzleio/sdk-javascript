@@ -12,16 +12,16 @@ var myDoc = {
 };
 
 // with callback
-kuzzle.create('people', myDoc, true, function (error, response) {
+kuzzle.create('people', myDoc, true, function(error, response) {
   console.log('Error:', error, 'Response:', response);
 });
 
 // with promise
 kuzzle
   .createPromise('people', myDoc, true)
-  .then(function (response) {
+  .then(function(response) {
     console.log(response);
   })
-  .catch(function (error) {
+  .catch(function(error) {
     console.error(error);
   });

@@ -18,12 +18,12 @@ var
 
 kuzzle
   .createPromise('people', myDoc, true)
-  .then(function (response) {
+  .then(function(response) {
     console.log('Document created in Kuzzle:', response);
   })
-  .catch(function (error) {
+  .catch(function(error) {
     console.error(error);
   })
-  .finally(function () {
+  .finally(function() {
     kuzzle.close();
   });
