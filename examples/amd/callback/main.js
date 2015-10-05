@@ -6,7 +6,7 @@ require.config({
   }
 });
 
-require(['kuzzle'], function(Kuzzle) {
+require(['kuzzle'], function (Kuzzle) {
 
   var myDoc = {
       name: 'Rick Astley',
@@ -20,7 +20,7 @@ require(['kuzzle'], function(Kuzzle) {
   var kuzzle = Kuzzle.init(kuzzleUrl);
 
   // with callback
-  kuzzle.create('people', myDoc, true, function(error, response) {
+  kuzzle.create('people', myDoc, true, function (error, response) {
     console.log('Document created in Kuzzle: ', response);
     document.querySelector('#kuzzle').innerHTML = 'ok';
   });

@@ -8,7 +8,7 @@ require.config({
   }
 });
 
-require(['bluebird', 'kuzzle'], function(Promise, Kuzzle) {
+require(['bluebird', 'kuzzle'], function (Promise, Kuzzle) {
 
   var myDoc = {
       name: 'Rick Astley',
@@ -25,13 +25,13 @@ require(['bluebird', 'kuzzle'], function(Promise, Kuzzle) {
 
   Kuzzle.init(kuzzleUrl);
 
-  setTimeout(function() {
+  setTimeout(function () {
     Kuzzle.createPromise('people', myDoc, true)
-      .then(function(response) {
+      .then(function (response) {
         console.log('Document created in Kuzzle:', response);
         document.querySelector('#kuzzle').innerHTML = 'ok';
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.error(error);
       });
 

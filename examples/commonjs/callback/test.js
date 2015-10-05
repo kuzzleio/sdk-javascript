@@ -12,7 +12,7 @@ var
   kuzzle = Kuzzle.init(kuzzleUrl);
 
 // with callback
-kuzzle.create('people', myDoc, true, function(error, response) {
+kuzzle.create('people', myDoc, true, function (error, response) {
   if (error) {
     console.error('An error occured: ', error);
     return false;
