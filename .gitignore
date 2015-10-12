@@ -8,6 +8,9 @@ examples/node_modules/
 
 # Docker
 
+# Project
+build/
+
 
 # Other
 .DS_STORE
