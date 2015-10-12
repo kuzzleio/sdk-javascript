@@ -315,24 +315,3 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
 };
 
 module.exports = Kuzzle;
-
-/*
-    bulk: function (collection, body, callback) {
-      var requestId = UUID();
-
-      if (callback) {
-        this.socket.once(requestId, function (response) {
-          callback(response.error, response.result);
-        });
-      }
-
-      this.socket.emit('bulk', {
-        requestId: requestId,
-        action: 'import',
-        persist: true,
-        collection: collection,
-        body: body
-      });
-    },
-*/
-
