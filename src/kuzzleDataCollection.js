@@ -234,10 +234,10 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
  * @param {object} [options] - subscriptions options
- * @param {readyCallback} [ready] - executed once the subscription is finished
+ * @param {readyCallback} [ready] - called once the subscription is finished
  * @returns {*} KuzzleRoom object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready) {
+KuzzleDataCollection.prototype.subscribe = function (filters, options, cb, ready) {
   var room;
 
   this.kuzzle.isValid();

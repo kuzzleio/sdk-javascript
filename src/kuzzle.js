@@ -102,6 +102,8 @@ module.exports = Kuzzle = function (url, options, cb) {
  * @returns {Object} this
  */
 function construct(url, cb) {
+  var self = this;
+
   if (!url || url === '') {
     throw new Error('URL to Kuzzle can\'t be empty');
   }
@@ -111,13 +113,13 @@ function construct(url, cb) {
   this.socket.once('connect', function () {
     // TODO: initialize kuzzle-provided properties (applicationId, connectionId, connectionTimestamp)
     if (cb) {
-      cb(null, this);
+      cb(null, self);
     }
   });
 
   this.socket.once('error', function (error) {
     // TODO: Invalidate this object for now. Should handle the autoReconnect flag later
-    this.logout();
+    self.logout();
 
     if (cb) {
       cb(error);
@@ -125,7 +127,7 @@ function construct(url, cb) {
   });
 
   this.socket.on('disconnect', function () {
-    this.eventListeners.disconnected.forEach(function (listener) {
+    self.eventListeners.disconnected.forEach(function (listener) {
       listener();
     });
   });
