@@ -237,7 +237,7 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
  * @param {readyCallback} [ready] - called once the subscription is finished
  * @returns {*} KuzzleRoom object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, options, cb, ready) {
+KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready) {
   var room;
 
   this.kuzzle.isValid();
