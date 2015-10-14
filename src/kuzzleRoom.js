@@ -87,6 +87,12 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       writable: true
     }
   });
+
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this);
+  }
+
+  return this;
 }
 
 /**

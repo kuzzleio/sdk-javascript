@@ -86,6 +86,12 @@ module.exports = Kuzzle = function (url, options, cb) {
   });
 
   construct.call(this, url, cb);
+
+  if (this.bluebird) {
+    return this.bluebird.promisifyAll(this);
+  }
+
+  return this;
 };
 
 
@@ -96,10 +102,6 @@ module.exports = Kuzzle = function (url, options, cb) {
  * @returns {Object} this
  */
 function construct(url, cb) {
-  if (this.socket) {
-    return this;
-  }
-
   if (!url || url === '') {
     throw new Error('URL to Kuzzle can\'t be empty');
   }

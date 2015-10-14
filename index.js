@@ -1,5 +1,8 @@
-var Promise = require('bluebird');
+var
+  bluebird = require('bluebird'),
+  Kuzzle = require('./src/kuzzle');
 
-module.exports = Promise.promisifyAll(require('./src/kuzzle'), {
-  suffix: 'Promise'
-});
+// Adds on the fly methods promisification
+Kuzzle.prototype.bluebird = bluebird;
+
+module.exports = Kuzzle;
