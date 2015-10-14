@@ -26,7 +26,7 @@ var
  * @param {Kuzzle~constructorCallback} [cb] - Handles connection response
  * @constructor
  */
-function Kuzzle(url, options, cb) {
+module.exports = Kuzzle = function (url, options, cb) {
   Object.defineProperties(this, {
     // 'private' properties
     eventListeners: {
@@ -37,12 +37,14 @@ function Kuzzle(url, options, cb) {
       }
     },
     socket: {
-      value: null
+      value: null,
+      writable: true
     },
     // read-only properties
     collections: {
       value: {},
-      enumerable: true
+      enumerable: true,
+      writable: true
     },
     // writable properties
     autoReconnect: {
@@ -84,7 +86,8 @@ function Kuzzle(url, options, cb) {
   });
 
   construct.call(this, url, cb);
-}
+};
+
 
 /**
  * Connects to a Kuzzle instance using the provided URL.
@@ -105,7 +108,6 @@ function construct(url, cb) {
 
   this.socket.once('connect', function () {
     // TODO: initialize kuzzle-provided properties (applicationId, connectionId, connectionTimestamp)
-
     if (cb) {
       cb(null, this);
     }
@@ -186,7 +188,7 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, headers) {
   this.isValid();
 
   if (!this.collections[collection]) {
-    this.collections[collection] = new KuzzleDataCollection(this.kuzzle, collection, headers);
+    this.collections[collection] = new KuzzleDataCollection(this, collection, headers);
   }
 
   return this.collections[collection];
@@ -314,4 +316,4 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
   });
 };
 
-module.exports = Kuzzle;
+

@@ -1,6 +1,7 @@
 var
   KuzzleDocument = require('./kuzzleDocument'),
-  KuzzleDataMapping = require('./kuzzleDataMapping');
+  KuzzleDataMapping = require('./kuzzleDataMapping'),
+  KuzzleRoom = require('./kuzzleRoom');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -8,6 +9,12 @@ var
  * @callback responseCallback
  * @param {Object} err - Error object, NULL if the query is successful
  * @param {Object} data - The content of the query response
+ */
+
+/**
+ * Callback pattern: simple callback called when an async processus is finished
+ *
+ * @callback readyCallback
  */
 
 /**
@@ -212,6 +219,27 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
   this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
 
   return this;
+};
+
+/**
+ * Subscribes to this data collection with a set of filters.
+ * To subscribe to the entire data collection, simply provide an empty filter.
+ *
+ * @param {object} filters - Filters in Kuzzle DSL format
+ * @param {responseCallback} cb - called for each new notification
+ * @param {object} [options] - subscriptions options
+ * @param {readyCallback} [ready] - executed once the subscription is finished
+ * @returns {*} KuzzleRoom object
+ */
+KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready) {
+  var room;
+
+  this.kuzzle.isValid();
+  this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
+
+  room = new KuzzleRoom(this, options);
+
+  return room.renew(filters, cb, ready);
 };
 
 /**

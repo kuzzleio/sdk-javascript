@@ -7,6 +7,13 @@
  */
 
 /**
+ * Callback pattern: simple callback called when an async processus is finished
+ *
+ * @callback readyCallback
+ */
+
+
+/**
  * This object is the result of a subscription request, allowing to manipulate the subscription itself.
  *
  * In Kuzzle, you don’t exactly subscribe to a room or a topic but, instead, you subscribe to documents.
@@ -15,41 +22,33 @@
  * Once you have subscribed, if a pub/sub message is published matching your filters, or if a matching stored
  * document change (because it is created, updated or deleted), then you’ll receive a notification about it.
  *
- * @param {object} kuzzle - an instantiated and valid kuzzle object
- * @param {object} filters - set of filters to subscribe to
- * @param {responseCallback} callback - callback to call every time a notification is received
+ * @param {object} kuzzleDataCollection - an instantiated and valid kuzzle object
  * @param {object} [options] - subscription optional configuration
  * @constructor
  */
-function KuzzleRoom(kuzzle, filters, callback, options) {
-  var self = this;
-
-  if (!kuzzle || !filters || !callback) {
+function KuzzleRoom(kuzzleDataCollection, options) {
+  if (!kuzzleDataCollection) {
     throw new Error('KuzzleRoom: missing parameters');
   }
 
-  kuzzle.isValid();
+  kuzzleDataCollection.kuzzle.isValid();
 
   // Define properties
   Object.defineProperties(this, {
-    // private properties
-    callback: {
-      value: callback,
-      writable: true
-    },
     // read-only properties
+    collection: {
+      value: kuzzleDataCollection.collection,
+      enumerable: true
+    },
     kuzzle: {
-      value: kuzzle,
+      value: kuzzleDataCollection.kuzzle,
       enumerable: true
     },
     // writable properties
     filters: {
-      value: filters,
+      value: null,
       enumerable: true,
-      writable: true,
-      set: function (f) {
-        return self.renew(f);
-      }
+      writable: true
     },
     listeningToConnections: {
       value: (options && options.listeningToConnections) ? options.listeningToConnections : false,
@@ -74,7 +73,8 @@ function KuzzleRoom(kuzzle, filters, callback, options) {
     subscriptionId: {
       value: null,
       enumerable: true,
-      writable: true
+      writable: true,
+      configurable: true
     },
     subscriptionTimestamp: {
       value: null,
@@ -87,9 +87,6 @@ function KuzzleRoom(kuzzle, filters, callback, options) {
       writable: true
     }
   });
-
-  // Subscribe to Kuzzle using the provided filters
-  this.renew(filters);
 }
 
 /**
@@ -100,7 +97,7 @@ function KuzzleRoom(kuzzle, filters, callback, options) {
 KuzzleRoom.prototype.count = function (cb) {
   this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
 
-  this.kuzzle.query(null, 'subscribe', 'count', {body: {roomId: this.subscriptionID}}, cb);
+  this.kuzzle.query(this.collection, 'subscribe', 'count', {body: {roomId: this.roomId}}, cb);
 
   return this;
 };
@@ -109,37 +106,37 @@ KuzzleRoom.prototype.count = function (cb) {
  * Renew the subscription using new filters
  *
  * @param {object} filters - Filters in Kuzzle DSL format
- * @param {responseCallback} [cb] - called for each new notification
+ * @param {responseCallback} cb - called for each new notification
+ * @param {readyCallback} [ready] - called once the subscription is finished
  */
-KuzzleRoom.prototype.renew = function (filters, cb) {
+KuzzleRoom.prototype.renew = function (filters, cb, ready) {
   var self = this;
 
-  if (cb) {
-    this.callback = cb;
-  }
-
+  this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+  this.filters = filters;
   this.unsubscribe();
 
-  self.kuzzle.query(null, 'subscribe', 'on', {body: filters}, function (error, response) {
+  self.kuzzle.query(this.collection, 'subscribe', 'on', {body: filters}, function (error, response) {
     if (error) {
       throw new Error('Error during Kuzzle subscription: ' + error);
     }
 
-    self.roomId = response.result.roomId;
-    self.susbcriptionId = response.result.roomName;
+    self.roomId = response.roomId;
+    self.subscriptionId = response.roomName;
+    self.foo = response.roomName;
     self.subscriptionTimestamp = Date.now();
 
-    self.kuzzle.socket.on(self.roomId, function (err, data) {
+    self.kuzzle.socket.on(self.roomId, function (data) {
       var
         globalEvent,
         listening;
 
-      if (err) {
-        return self.callback(err);
+      if (data.error) {
+        return cb(data.error);
       }
 
-      if (data.action === 'on' || data.action === 'off') {
-        if (data.action === 'on') {
+      if (data.result.action === 'on' || data.result.action === 'off') {
+        if (data.result.action === 'on') {
           globalEvent = 'subscribed';
           listening = self.listeningToConnections;
         } else {
@@ -151,26 +148,34 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
           self.count(function (countError, countResult) {
             if (countError) {
               if (listening) {
-                self.callback(countError);
+                cb(countError);
               }
               return false;
             }
 
-            data.count = countResult;
+            data.result.count = countResult;
 
             if (listening) {
-              self.callback(null, data);
+              cb(null, data.result);
             }
 
             self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
-              listener(self.subscriptionId, data);
+              listener(self.subscriptionId, data.result);
             });
           });
         }
       } else {
-        self.callback(null, data);
+        cb(null, data.result);
       }
     });
+
+    if (ready) {
+      if (typeof ready === 'function') {
+        ready();
+      } else {
+        throw new Error('Expected the "ready" argument to be a callback function, got a ' + typeof ready + ' (value: ' + ready + ')');
+      }
+    }
   });
 
   return this;
@@ -183,13 +188,12 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
  */
 KuzzleRoom.prototype.unsubscribe = function () {
   if (this.roomId) {
+    this.kuzzle.query(this.collection, 'subscribe', 'off', {requestId: this.subscriptionId});
     this.kuzzle.socket.off(this.roomId);
     this.roomId = null;
     this.subscriptionId = null;
     this.subscriptionTimestamp = null;
   }
-
-  return this;
 };
 
 module.exports = KuzzleRoom;
