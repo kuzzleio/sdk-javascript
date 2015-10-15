@@ -53,7 +53,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: true
     },
     headers: {
-      value: {},
+      value: (options && options.headers) ? options. headers : {},
       enumerable: true,
       writable: true
     },
@@ -70,6 +70,19 @@ module.exports = Kuzzle = function (url, options, cb) {
       if (this.socket === null) {
         throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a logout call?');
       }
+    }
+  });
+
+  // Helper function copying headers to the query data
+  Object.defineProperty(this, 'addHeaders', {
+    value: function (query, headers) {
+      Object.keys(headers).forEach(function (header) {
+        if (!query[header]) {
+          query[header] = headers[header];
+        }
+      });
+
+      return query;
     }
   });
 
@@ -265,6 +278,8 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
       object[attr] = query[attr];
     }
   }
+
+  object = this.addHeaders(object, this.headers);
 
   this.socket.emit(controller, object);
 

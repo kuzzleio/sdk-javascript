@@ -42,7 +42,7 @@ function KuzzleDocument(kuzzleDataCollection) {
       }
     },
     headers: {
-      value: kuzzleDataCollection.headers,
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
       enumerable: true,
       writable: true
     }
@@ -62,20 +62,14 @@ function KuzzleDocument(kuzzleDataCollection) {
  */
 KuzzleDocument.prototype.toJSON = function () {
   var
-    data = {},
-    self = this;
+    data = {};
 
   if (this.id) {
     data._id = this.id;
   }
 
   data.body = this.content;
-
-  Object.keys(this.headers).forEach(function (key) {
-    if (!data.body[key]) {
-      data.body[key] = self.headers[key];
-    }
-  });
+  data = this.kuzzle.addHeaders(data, this.headers);
 
   return data;
 };

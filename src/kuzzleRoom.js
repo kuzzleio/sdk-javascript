@@ -50,6 +50,11 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       enumerable: true,
       writable: true
     },
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
     listeningToConnections: {
       value: (options && options.listeningToConnections) ? options.listeningToConnections : false,
       enumerable: true,
@@ -101,9 +106,12 @@ function KuzzleRoom(kuzzleDataCollection, options) {
  * @param {responseCallback} cb - Handles the query response
  */
 KuzzleRoom.prototype.count = function (cb) {
-  this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+  var data;
 
-  this.kuzzle.query(this.collection, 'subscribe', 'count', {body: {roomId: this.roomId}}, cb);
+  this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+  data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
+
+  this.kuzzle.query(this.collection, 'subscribe', 'count', data, cb);
 
   return this;
 };
@@ -116,13 +124,16 @@ KuzzleRoom.prototype.count = function (cb) {
  * @param {readyCallback} [ready] - called once the subscription is finished
  */
 KuzzleRoom.prototype.renew = function (filters, cb, ready) {
-  var self = this;
+  var
+    subscribeQuery,
+    self = this;
 
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
   this.filters = filters;
   this.unsubscribe();
+  subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  self.kuzzle.query(this.collection, 'subscribe', 'on', {body: filters}, function (error, response) {
+  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
     if (error) {
       throw new Error('Error during Kuzzle subscription: ' + error);
     }
@@ -193,8 +204,11 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
  * @return {*} this
  */
 KuzzleRoom.prototype.unsubscribe = function () {
+  var data;
+
   if (this.roomId) {
-    this.kuzzle.query(this.collection, 'subscribe', 'off', {requestId: this.subscriptionId});
+    data = this.kuzzle.addHeaders({requestId: this.subscriptionId}, this.headers);
+    this.kuzzle.query(this.collection, 'subscribe', 'off', data);
     this.kuzzle.socket.off(this.roomId);
     this.roomId = null;
     this.subscriptionId = null;

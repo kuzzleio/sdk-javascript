@@ -25,7 +25,7 @@ var
  * @param {object} [headers] - default document headers
  * @constructor
  */
-function KuzzleDataCollection(kuzzle, collection, headers) {
+function KuzzleDataCollection(kuzzle, collection) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -38,7 +38,7 @@ function KuzzleDataCollection(kuzzle, collection, headers) {
     },
     // writable properties
     headers: {
-      value: headers,
+      value: JSON.parse(JSON.stringify(kuzzle.headers)),
       enumerable: true,
       writable: true
     }
@@ -63,9 +63,13 @@ function KuzzleDataCollection(kuzzle, collection, headers) {
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
+  var query;
+
   this.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
 
-  this.kuzzle.query(this.collection, 'read', 'search', {body: filters}, cb);
+  query = this.kuzzle.addHeaders({body: filters}, this.headers);
+
+  this.kuzzle.query(this.collection, 'read', 'search', query, cb);
 
   return this;
 };
@@ -82,9 +86,13 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.count = function (filters, cb) {
+  var query;
+
   this.kuzzle.callbackRequired('KuzzleDataCollection.count', cb);
 
-  this.kuzzle.query(this.collection, 'read', 'count', {body: filters}, cb);
+  query = this.kuzzle.addHeaders({body: filters}, this.headers);
+
+  this.kuzzle.query(this.collection, 'read', 'count', query, cb);
 
   return this;
 };
@@ -118,6 +126,8 @@ KuzzleDataCollection.prototype.create = function (document, options, cb) {
     data.body = document;
   }
 
+  data = this.kuzzle.addHeaders(data, this.headers);
+
   if (options && options.updateIfExist) {
     this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
   } else {
@@ -147,6 +157,7 @@ KuzzleDataCollection.prototype.delete = function (arg, cb) {
     data.body = arg;
   }
 
+  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'delete', data, cb);
 
   return this;
@@ -163,6 +174,7 @@ KuzzleDataCollection.prototype.get = function (documentId, cb) {
   var data = {_id: documentId};
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.get', cb);
+  data = this.kuzzle.addHeaders(data, this.headers);
 
   this.kuzzle.query(this.collection, 'read', 'get', data, cb);
 
@@ -222,6 +234,7 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
     data.body = content;
   }
 
+  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
 
   return this;
@@ -267,6 +280,7 @@ KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
     data.body = content;
   }
 
+  data = this.kuzzle.addHeaders(data, headers);
   this.kuzzle.query(this.collection, 'write', 'update', data, cb);
 
   return this;
