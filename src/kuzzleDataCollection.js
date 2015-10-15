@@ -283,7 +283,7 @@ KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
     data.body = content;
   }
 
-  data = this.kuzzle.addHeaders(data, headers);
+  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'update', data, cb);
 
   return this;
