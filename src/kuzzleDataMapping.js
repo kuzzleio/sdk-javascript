@@ -30,6 +30,11 @@ function KuzzleDataMapping(kuzzleDataCollection) {
       enumerable: true
     },
     // writable properties
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
     mapping: {
       value: {},
       enumerable: true,
@@ -50,10 +55,69 @@ function KuzzleDataMapping(kuzzleDataCollection) {
  * @param {responseCallback} [cb] - Handles the query response
  */
 KuzzleDataMapping.prototype.apply = function (cb) {
-  this.kuzzle.query(this.collection, 'admin', 'putMapping', {body: {properties: this.mapping}}, cb);
+  var data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
+
+  this.kuzzle.query(this.collection, 'admin', 'putMapping', data, cb);
 
   return this;
 };
 
+/**
+ * Replaces the current content with the mapping stored in Kuzzle
+ *
+ * Calling this function will discard any uncommited changes. You can commit changes by calling the “apply” function
+ *
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+KuzzleDataMapping.prototype.refresh = function (cb) {
+  var
+    self = this,
+    data = this.kuzzle.addHeaders({}, this.headers);
+
+  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, function (error, data) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    self.mapping = data.mainindex.mappings[self.collection].properties;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Removes a field mapping.
+ *
+ * Changes made by this function won’t be applied until you call the apply method
+ *
+ * @param {string} field - Name of the field from which the mapping is to be removed
+ * @returns {KuzzleDataMapping}
+ */
+KuzzleDataMapping.prototype.remove = function (field) {
+  if (this.mapping[field]) {
+    delete this.mapping[field];
+  }
+
+  return this;
+};
+
+/**
+ * Adds or updates a field mapping.
+ *
+ * Changes made by this function won’t be applied until you call the apply method
+ *
+ * @param {string} field - Name of the field from which the mapping is to be added or updated
+ * @returns {KuzzleDataMapping}
+ */
+KuzzleDataMapping.prototype.set = function (field, mapping) {
+  this.mapping[field] = mapping;
+
+  return this;
+};
 
 module.exports = KuzzleDataMapping;

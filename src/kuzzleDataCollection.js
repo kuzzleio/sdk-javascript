@@ -207,10 +207,13 @@ KuzzleDataCollection.prototype.fetchAll = KuzzleDataCollection.prototype.getAll;
  * @return {object} this
  */
 KuzzleDataCollection.prototype.getMapping = function (cb) {
+  var kuzzleMapping;
+
   this.kuzzle.callbackRequired('KuzzleDataCollection.getMapping', cb);
 
   // TODO: implement the getMapping method
-  cb(null, new KuzzleDataMapping(this));
+  kuzzleMapping = new KuzzleDataMapping(this);
+  kuzzleMapping.refresh(cb);
 
   return this;
 };
