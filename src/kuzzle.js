@@ -1,7 +1,8 @@
 var
   uuid = require('node-uuid'),
   io = require('socket.io-client'),
-  KuzzleDataCollection = require('./kuzzleDataCollection');
+  KuzzleDataCollection = require('./kuzzleDataCollection'),
+  KuzzleDocument = require('./kuzzleDocument');
 
 /**
  * This callback is called by the Kuzzle constructor once connection to a Kuzzle instance has been established.
@@ -27,6 +28,11 @@ var
  * @constructor
  */
 module.exports = Kuzzle = function (url, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   Object.defineProperties(this, {
     // 'private' properties
     eventListeners: {
@@ -180,17 +186,77 @@ Kuzzle.prototype.addListener = function(event, listener) {
   return listenerId;
 };
 
+
 /**
- * Count the number of other connected clients to Kuzzle
+ * Kuzzle monitors active connections, and ongoing/completed/failed requests.
+ * This method returns all available statistics from Kuzzle.
+ *
  * @param {responseCallback} cb - Handles the query response
  * @returns {object} this
  */
-Kuzzle.prototype.count = function (cb) {
+Kuzzle.prototype.getAllStatistics = function (cb) {
   this.isValid();
-  this.callbackRequired('Kuzzle.count', cb);
+  this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
-  // TODO
-  cb(null, {count: 0});
+  this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+    cb(null, res.statistics);
+  });
+
+  return this;
+};
+
+/**
+ * Kuzzle monitors active connections, and ongoing/completed/failed requests.
+ * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
+ *
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getStatistics = function (timestamp, cb) {
+  if (!cb && typeof timestamp === 'function') {
+    cb = timestamp;
+    timestamp = null;
+  }
+
+  this.isValid();
+  this.callbackRequired('Kuzzle.getStatistics', cb);
+
+  if (!timestamp) {
+    this.query(null, 'admin', 'getStats', {}, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.statistics);
+    });
+  } else {
+    if (typeof timestamp !== 'number') {
+      throw new Error('Timestamp number expected, received a ' + typeof timestamp);
+    }
+
+    this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
+      var
+        stats = {},
+        frames;
+
+      if (err) {
+        return cb(err);
+      }
+
+      frames = Object.keys(res.statistics).filter(function (element) {
+        return (new Date(element).getTime()) >= timestamp;
+      });
+
+      frames.forEach(function (frame) {
+        stats[frame] = res.statistics[frame];
+      });
+
+      cb(null, stats);
+    });
+  }
 
   return this;
 };
