@@ -278,6 +278,27 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, headers) {
 };
 
 /**
+ * Returns the list of known persisted data collections.
+ *
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.listCollections = function (cb) {
+  this.isValid();
+  this.callbackRequired('Kuzzle.listCollections', cb);
+
+  this.query(null, 'read', 'listCollections', {}, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    return cb(null, res.collections);
+  });
+
+  return this;
+};
+
+/**
  * Disconnects from Kuzzle and invalidate this instance.
  */
 Kuzzle.prototype.logout = function () {
