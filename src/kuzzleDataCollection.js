@@ -69,7 +69,13 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'search', query, cb);
+  this.kuzzle.query(this.collection, 'read', 'search', query, function (error, result) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, result.hits.hits);
+  });
 
   return this;
 };
@@ -114,16 +120,16 @@ KuzzleDataCollection.prototype.count = function (filters, cb) {
 KuzzleDataCollection.prototype.create = function (document, options, cb) {
   var data = {};
 
+  if (document instanceof KuzzleDocument) {
+    data = document.toJSON();
+  } else {
+    data.body = document;
+  }
+
   if (options && options.persist) {
     data.persist = options.persist;
   } else {
     data.persist = false;
-  }
-
-  if (document instanceof KuzzleDocument) {
-    // TODO: manage KuzzleDocument document argument
-  } else {
-    data.body = document;
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
@@ -192,8 +198,6 @@ KuzzleDataCollection.prototype.fetch = KuzzleDataCollection.prototype.get;
 KuzzleDataCollection.prototype.getAll = function (cb) {
   this.kuzzle.callbackRequired('KuzzleDataCollection.getAll', cb);
 
-  //TODO: implement getAll method
-
   return this;
 };
 
@@ -211,7 +215,6 @@ KuzzleDataCollection.prototype.getMapping = function (cb) {
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.getMapping', cb);
 
-  // TODO: implement the getMapping method
   kuzzleMapping = new KuzzleDataMapping(this);
   kuzzleMapping.refresh(cb);
 
@@ -227,16 +230,15 @@ KuzzleDataCollection.prototype.getMapping = function (cb) {
  * @return {object} this
  */
 KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
-  var data = {
-    _id: documentId
-  };
+  var data = {};
 
   if (content instanceof KuzzleDocument) {
-    // TODO: handle KuzzleDocument argument
+    data = content.toJSON();
   } else {
     data.body = content;
   }
 
+  data._id = documentId;
   data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
 
@@ -273,16 +275,15 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready
  * @return {object} this
  */
 KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
-  var data = {
-    _id: documentId
-  };
+  var data = {};
 
   if (content instanceof KuzzleDocument) {
-    // TODO: handle KuzzleDocument argument
+    data = content.toJSON();
   } else {
     data.body = content;
   }
 
+  data._id = documentId;
   data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'update', data, cb);
 
