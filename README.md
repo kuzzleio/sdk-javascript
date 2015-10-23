@@ -114,7 +114,7 @@ kuzzle
 
 #### Vanilla
 
-Download the file [kuzzle.min.js](kuzzle.min.js) at TODO: COMPLETE_URL and the following to your HTML file:
+Download the file [kuzzle.min.js](./browser/kuzzle.min.js) available in the ``browser`` directory of this project.
 
 ```html
 <script type="text/javascript" src="path/to/kuzzle.min.js"></script>
