@@ -1,8 +1,7 @@
 var
   uuid = require('node-uuid'),
   io = require('socket.io-client'),
-  KuzzleDataCollection = require('./kuzzleDataCollection'),
-  KuzzleDocument = require('./kuzzleDocument');
+  KuzzleDataCollection = require('./kuzzleDataCollection');
 
 /**
  * This callback is called by the Kuzzle constructor once connection to a Kuzzle instance has been established.

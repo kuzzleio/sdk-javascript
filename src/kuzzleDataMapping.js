@@ -75,12 +75,12 @@ KuzzleDataMapping.prototype.refresh = function (cb) {
     self = this,
     data = this.kuzzle.addHeaders({}, this.headers);
 
-  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, function (error, data) {
-    if (error) {
-      return cb ? cb(error) : false;
+  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, function (err, res) {
+    if (err) {
+      return cb ? cb(err) : false;
     }
 
-    self.mapping = data.mainindex.mappings[self.collection].properties;
+    self.mapping = res.mainindex.mappings[self.collection].properties;
 
     if (cb) {
       cb(null, self);

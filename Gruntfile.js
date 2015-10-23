@@ -17,18 +17,18 @@ module.exports = function(grunt) {
     browserify: {
       kuzzle: {
         src: ['src/kuzzle.js'],
-        dest: 'build/kuzzle.js'
+        dest: 'browser/kuzzle.js'
       }
     },
     uglify: {
       kuzzle: {
         options: {
           'sourceMap': true,
-          'sourceMapName': 'build/kuzzle.min.map',
+          'sourceMapName': 'browser/kuzzle.min.map',
           'banner': '// This is the Kuzzle SDK version 1.0 - Licenced under the Apache 2.0 Licence'
         },
         files: {
-          'build/kuzzle.min.js': ['build/kuzzle.js']
+          'browser/kuzzle.min.js': ['browser/kuzzle.js']
         }
       }
     }
