@@ -367,7 +367,6 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
   }
 
   object = this.addHeaders(object, this.headers);
-
   this.socket.emit(controller, object);
 
   return this;

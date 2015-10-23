@@ -22,7 +22,6 @@ var
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @param {string} collection - name of the data collection to handle
- * @param {object} [headers] - default document headers
  * @constructor
  */
 function KuzzleDataCollection(kuzzle, collection) {
@@ -63,18 +62,26 @@ function KuzzleDataCollection(kuzzle, collection) {
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
-  var query;
+  var
+    query,
+    self = this;
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
+  self.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
 
-  query = this.kuzzle.addHeaders({body: filters}, this.headers);
+  query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'search', query, function (error, result) {
+  self.kuzzle.query(this.collection, 'read', 'search', query, function (error, result) {
+    var documents = [];
+
     if (error) {
       return cb(error);
     }
 
-    cb(null, result.hits.hits);
+    result.hits.hits.forEach(function (doc) {
+      documents.push(new KuzzleDocument(self, doc._id, doc._source));
+    });
+
+    cb(null, documents);
   });
 
   return this;
@@ -98,27 +105,39 @@ KuzzleDataCollection.prototype.count = function (filters, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'count', query, cb);
+  this.kuzzle.query(this.collection, 'read', 'count', query, function (error, result) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, result.count);
+  });
 
   return this;
 };
 
 /**
- * Store a document or publish a realtime message.
+ * Create a new document in Kuzzle.
  *
- * Available options:
- *   - persist (boolean - default: false): Indicates if this is a realtime message or a persistent document
- *   - updateIfExist (boolean - default: false):
- *       If the same document already exists: returns an error if sets to false.
- *       Update the existing document otherwise.
+ * By default, the updateIfExist argument is set to false
  *
  * @param {object} document - either an instance of a KuzzleDocument object, or a document
- * @param {object} [options] - optional configuration for this document creation
+ * @param {boolean} [updateIfExist] - (true)throw an error if document already exists (false)updates the existing document
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.create = function (document, options, cb) {
-  var data = {};
+KuzzleDataCollection.prototype.create = function (document, updateIfExist, cb) {
+  var
+    self = this,
+    data = {},
+    action;
+
+  if (!cb && updateIfExist) {
+    if (typeof updateIfExist === 'function') {
+      cb = updateIfExist;
+      updateIfExist = false;
+    }
+  }
 
   if (document instanceof KuzzleDocument) {
     data = document.toJSON();
@@ -126,18 +145,20 @@ KuzzleDataCollection.prototype.create = function (document, options, cb) {
     data.body = document;
   }
 
-  if (options && options.persist) {
-    data.persist = options.persist;
-  } else {
-    data.persist = false;
-  }
+  data.persist = true;
+  data = self.kuzzle.addHeaders(data, self.headers);
+  action = updateIfExist ? 'createOrUpdate' : 'create';
 
-  data = this.kuzzle.addHeaders(data, this.headers);
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', action, data, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
 
-  if (options && options.updateIfExist) {
-    this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
+      cb(null, new KuzzleDocument(self, res._id, res._source));
+    });
   } else {
-    this.kuzzle.query(this.collection, 'write', 'create', data, cb);
+    this.kuzzle.query(this.collection, 'write', action, data);
   }
 
   return this;
@@ -155,16 +176,35 @@ KuzzleDataCollection.prototype.create = function (document, options, cb) {
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.delete = function (arg, cb) {
-  var data = {};
+  var
+    action,
+    data = {};
 
   if (typeof arg === 'string') {
     data._id = arg;
+    action = 'delete';
   } else {
     data.body = arg;
+    action = 'deleteByQuery';
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'delete', data, cb);
+
+  if (cb) {
+    this.kuzzle.query(this.collection, 'write', action, data, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      if (action === 'delete') {
+        cb(null, [data._id]);
+      } else {
+        cb(null, res.ids);
+      }
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', action, data);
+  }
 
   return this;
 };
@@ -176,18 +216,24 @@ KuzzleDataCollection.prototype.delete = function (arg, cb) {
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.get = function (documentId, cb) {
-  var data = {_id: documentId};
+KuzzleDataCollection.prototype.fetch = function (documentId, cb) {
+  var
+    data = {_id: documentId},
+    self = this;
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.get', cb);
-  data = this.kuzzle.addHeaders(data, this.headers);
+  self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'get', data, cb);
+  self.kuzzle.query(this.collection, 'read', 'get', data, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, new KuzzleDocument(self, res._id, res._source));
+  });
 
   return this;
 };
-
-KuzzleDataCollection.prototype.fetch = KuzzleDataCollection.prototype.get;
 
 /**
  * Retrieves all documents stored in this data collection
@@ -195,13 +241,13 @@ KuzzleDataCollection.prototype.fetch = KuzzleDataCollection.prototype.get;
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.getAll = function (cb) {
-  this.kuzzle.callbackRequired('KuzzleDataCollection.getAll', cb);
+KuzzleDataCollection.prototype.fetchAll = function (cb) {
+  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
+
+  this.advancedSearch({}, cb);
 
   return this;
 };
-
-KuzzleDataCollection.prototype.fetchAll = KuzzleDataCollection.prototype.getAll;
 
 
 /**
@@ -222,6 +268,27 @@ KuzzleDataCollection.prototype.getMapping = function (cb) {
 };
 
 /**
+ * Publish a realtime message
+ * @param {object} document - either a KuzzleDocument instance or a JSON object
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.publish = function (document) {
+  var data = {};
+
+  if (document instanceof KuzzleDocument) {
+    data = document.toJSON();
+  } else {
+    data.body = document;
+  }
+
+  data.persist = false;
+  data = this.kuzzle.addHeaders(data, self.headers);
+  this.kuzzle.query(this.collection, 'write', 'create', data);
+
+  return this;
+};
+
+/**
  * Replace an existing document with a new one.
  *
  * @param {string} documentId - Unique document identifier of the document to replace
@@ -230,7 +297,9 @@ KuzzleDataCollection.prototype.getMapping = function (cb) {
  * @return {object} this
  */
 KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
-  var data = {};
+  var
+    self = this,
+    data = {};
 
   if (content instanceof KuzzleDocument) {
     data = content.toJSON();
@@ -239,8 +308,19 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
   }
 
   data._id = documentId;
-  data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, new KuzzleDocument(self, res._id, res._source));
+    });
+  } else {
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data);
+  }
 
   return this;
 };
@@ -271,11 +351,13 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready
  *
  * @param {string} documentId - Unique document identifier of the document to update
  * @param {object} content - Either a KuzzleDocument or a JSON object representing the new document version
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
 KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
-  var data = {};
+  var
+    data = {},
+    self = this;
 
   if (content instanceof KuzzleDocument) {
     data = content.toJSON();
@@ -284,10 +366,23 @@ KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
   }
 
   data._id = documentId;
-  data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'update', data, cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
 
-  return this;
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', 'update', data, function (err, res) {
+      var doc;
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleDocument(self, res._id);
+      doc.refresh(cb);
+    });
+  } else {
+    self.kuzzle.query(this.collection, 'write', 'update', data);
+  }
+
+  return self;
 };
 
 module.exports = KuzzleDataCollection;

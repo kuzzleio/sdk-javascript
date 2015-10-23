@@ -16,10 +16,17 @@
  * Kuzzle handles documents either as realtime messages or as stored documents.
  * KuzzleDocument is the object representation of one of these documents.
  *
+ * Notes:
+ *   - this constructor may be called either with a documentId, a content, neither or both.
+ *   - providing a documentID to the constructor will automatically call refresh, unless a content is also provided
+ *
+ *
  * @param {object} kuzzleDataCollection - an instanciated KuzzleDataCollection object
+ * @param {string} [documentId] - ID of an existing document
+ * @param {object} [content] - Initializes this document with the provided content
  * @constructor
  */
-function KuzzleDocument(kuzzleDataCollection) {
+function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -44,11 +51,16 @@ function KuzzleDocument(kuzzleDataCollection) {
     },
     // writable properties
     content: {
-      value: {},
       enumerable: true,
-      writable: true,
       set: function (data) {
-        return this.setContent(data);
+        if (!content) {
+          content = {};
+        }
+
+        return this.setContent(data, false);
+      },
+      get: function () {
+        return content;
       }
     },
     headers: {
@@ -58,6 +70,24 @@ function KuzzleDocument(kuzzleDataCollection) {
     }
   });
 
+  // handling provided arguments
+  if (!content && documentId && typeof documentId === 'object') {
+    content = documentId;
+    documentId = null;
+  }
+
+  if (content) {
+    this.setContent(content, true);
+  }
+
+  if (documentId) {
+    Object.defineProperty(this, 'id', {
+      value: documentId,
+      enumerable: true
+    });
+  }
+
+  // promisifying
   if (this.kuzzle.bluebird) {
     return this.kuzzle.bluebird.promisifyAll(this);
   }
@@ -85,6 +115,15 @@ KuzzleDocument.prototype.toJSON = function () {
 };
 
 /**
+ * Overrides the toString() method in order to return a serialized version of the document
+ *
+ * @return {string} serialized version of this object
+ */
+KuzzleDocument.prototype.toString = function () {
+  return JSON.stringify(this.toJSON());
+};
+
+/**
  * Deletes this document in Kuzzle.
  *
  * @param {responseCallback} [cb] - Handles the query response
@@ -92,7 +131,7 @@ KuzzleDocument.prototype.toJSON = function () {
  */
 KuzzleDocument.prototype.delete = function (cb) {
   if (!this.id) {
-    return this;
+    throw new Error('KuzzleDocument.delete: cannot delete a document that has not been saved into Kuzzle');
   }
 
   this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), cb);
@@ -110,7 +149,7 @@ KuzzleDocument.prototype.refresh = function (cb) {
   var self = this;
 
   if (!self.id) {
-    return self;
+    throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
   }
 
   self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, function (error, result) {
@@ -119,7 +158,7 @@ KuzzleDocument.prototype.refresh = function (cb) {
     }
 
     self.content = result._source;
-    cb(null, result);
+    cb(null, self);
   });
 
   return this;
@@ -171,7 +210,7 @@ KuzzleDocument.prototype.save = function (replace, cb) {
  *
  * @returns {*} this
  */
-KuzzleDocument.prototype.send = function () {
+KuzzleDocument.prototype.publish = function () {
   var data = this.toJSON();
 
   data.persist = false;
@@ -216,7 +255,7 @@ KuzzleDocument.prototype.subscribe = function (cb, ready) {
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
 
   if (!this.id) {
-    cb(new Error('Cannot subscribe to a document that has not been created into Kuzzle'));
+    throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
 
   filters = { term: { _id: this.id } };
