@@ -81,7 +81,7 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
       documents.push(new KuzzleDocument(self, doc._id, doc._source));
     });
 
-    cb(null, documents);
+    cb(null, { total: result.hits.total, documents: documents });
   });
 
   return this;
