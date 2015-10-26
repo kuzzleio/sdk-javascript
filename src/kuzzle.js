@@ -198,10 +198,20 @@ Kuzzle.prototype.getAllStatistics = function (cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
+    var result = [];
+
     if (err) {
       return cb(err);
     }
-    cb(null, res.statistics);
+
+    Object.keys(res.statistics).forEach(function (key) {
+      var frame = res.statistics[key];
+      frame.timestamp = key;
+
+      result.push(frame);
+    });
+
+    cb(null, result);
   });
 
   return this;
@@ -225,11 +235,15 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
 
   if (!timestamp) {
     this.query(null, 'admin', 'getStats', {}, function (err, res) {
+      var frame = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.statistics);
+      frame = res.statistics[Object.keys(res.statistics)[0]];
+      frame.timestamp = Object.keys(res.statistics)[0];
+      cb(null, frame);
     });
   } else {
     if (typeof timestamp !== 'number') {
@@ -238,7 +252,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
 
     this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
       var
-        stats = {},
+        stats = [],
         frames;
 
       if (err) {
@@ -250,7 +264,8 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
       });
 
       frames.forEach(function (frame) {
-        stats[frame] = res.statistics[frame];
+        res.statistics[frame].timestamp = frame;
+        stats.push(res.statistics[frame]);
       });
 
       cb(null, stats);
