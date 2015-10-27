@@ -106,7 +106,7 @@ module.exports = Kuzzle = function (url, options, cb) {
   construct.call(this, url, cb);
 
   if (this.bluebird) {
-    return this.bluebird.promisifyAll(this);
+    return this.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
