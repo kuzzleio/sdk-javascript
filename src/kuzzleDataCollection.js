@@ -12,12 +12,6 @@ var
  */
 
 /**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
- */
-
-/**
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
@@ -332,10 +326,9 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
  * @param {object} [options] - subscriptions options
- * @param {readyCallback} [ready] - called once the subscription is finished
  * @returns {*} KuzzleRoom object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready) {
+KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
   var room;
 
   this.kuzzle.isValid();
@@ -343,7 +336,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready
 
   room = new KuzzleRoom(this, options);
 
-  return room.renew(filters, cb, ready);
+  return room.renew(filters, cb);
 };
 
 /**

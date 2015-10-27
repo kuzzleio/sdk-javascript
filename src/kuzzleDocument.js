@@ -7,12 +7,6 @@
  */
 
 /**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
- */
-
-/**
  * Kuzzle handles documents either as realtime messages or as stored documents.
  * KuzzleDocument is the object representation of one of these documents.
  *
@@ -190,9 +184,14 @@ KuzzleDocument.prototype.save = function (replace, cb) {
     }
 
     if (cb) {
-      cb(null, result);
+      cb(null, self);
     }
   };
+
+  if (!cb && replace && typeof replace === 'function') {
+    cb = replace;
+    replace = false;
+  }
 
   data.persist = true;
 
@@ -247,9 +246,8 @@ KuzzleDocument.prototype.setContent = function (data, replace) {
  * (i.e. if the document has not yet been created as a persisted document).
  *
  * @param {responseCallback} cb - callback that will be called each time a change has been detected on this document
- * @param {readyCallback} [ready] - called once the subscription is finished
  */
-KuzzleDocument.prototype.subscribe = function (cb, ready) {
+KuzzleDocument.prototype.subscribe = function (cb) {
   var filters;
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
@@ -260,7 +258,7 @@ KuzzleDocument.prototype.subscribe = function (cb, ready) {
 
   filters = { term: { _id: this.id } };
 
-  return this.dataCollection.subscribe(filters, cb, {}, ready);
+  return this.dataCollection.subscribe(filters, cb);
 };
 
 module.exports = KuzzleDocument;

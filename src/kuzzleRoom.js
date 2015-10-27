@@ -7,13 +7,6 @@
  */
 
 /**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
- */
-
-
-/**
  * This object is the result of a subscription request, allowing to manipulate the subscription itself.
  *
  * In Kuzzle, you don’t exactly subscribe to a room or a topic but, instead, you subscribe to documents.
@@ -35,6 +28,15 @@ function KuzzleRoom(kuzzleDataCollection, options) {
 
   // Define properties
   Object.defineProperties(this, {
+    // private properties
+    queue: {
+      value: [],
+      writable: true
+    },
+    subscribing: {
+      value: false,
+      writable: true
+    },
     // read-only properties
     collection: {
       value: kuzzleDataCollection.collection,
@@ -111,7 +113,18 @@ KuzzleRoom.prototype.count = function (cb) {
   this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
-  this.kuzzle.query(this.collection, 'subscribe', 'count', data, cb);
+  if (this.subscribing) {
+    this.queue.push({action: 'count', args: [cb]});
+    return this;
+  }
+
+  this.kuzzle.query(this.collection, 'subscribe', 'count', data, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res);
+  });
 
   return this;
 };
@@ -121,17 +134,23 @@ KuzzleRoom.prototype.count = function (cb) {
  *
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
- * @param {readyCallback} [ready] - called once the subscription is finished
  */
-KuzzleRoom.prototype.renew = function (filters, cb, ready) {
+KuzzleRoom.prototype.renew = function (filters, cb) {
   var
     subscribeQuery,
     self = this;
+
+  if (this.subscribing) {
+    this.queue.push({action: 'renew', args: [filters, cb]});
+    return this;
+  }
 
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
   this.filters = filters;
   this.unsubscribe();
   subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
+
+  this.subscribing = true;
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
     if (error) {
@@ -140,8 +159,9 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
 
     self.roomId = response.roomId;
     self.subscriptionId = response.roomName;
-    self.foo = response.roomName;
     self.subscriptionTimestamp = Date.now();
+    self.subscribing = false;
+    self.dequeue();
 
     self.kuzzle.socket.on(self.roomId, function (data) {
       var
@@ -185,14 +205,6 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
         cb(null, data.result);
       }
     });
-
-    if (ready) {
-      if (typeof ready === 'function') {
-        ready();
-      } else {
-        throw new Error('Expected the "ready" argument to be a callback function, got a ' + typeof ready + ' (value: ' + ready + ')');
-      }
-    }
   });
 
   return this;
@@ -206,6 +218,11 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
 KuzzleRoom.prototype.unsubscribe = function () {
   var data;
 
+  if (this.subscribing) {
+    this.queue.push({action: 'unsubscribed', args: []});
+    return this;
+  }
+
   if (this.roomId) {
     data = this.kuzzle.addHeaders({requestId: this.subscriptionId}, this.headers);
     this.kuzzle.query(this.collection, 'subscribe', 'off', data);
@@ -213,6 +230,21 @@ KuzzleRoom.prototype.unsubscribe = function () {
     this.roomId = null;
     this.subscriptionId = null;
     this.subscriptionTimestamp = null;
+  }
+
+  return this;
+};
+
+/**
+ * Dequeue actions performed while subscription was being renewed
+ */
+KuzzleRoom.prototype.dequeue = function () {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+
+    this[element.action].apply(this, element.args);
   }
 };
 
