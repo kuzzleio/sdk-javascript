@@ -55,9 +55,21 @@ function KuzzleDataMapping(kuzzleDataCollection) {
  * @param {responseCallback} [cb] - Handles the query response
  */
 KuzzleDataMapping.prototype.apply = function (cb) {
-  var data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
+  var
+    self = this,
+    data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
 
-  this.kuzzle.query(this.collection, 'admin', 'putMapping', data, cb);
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, function (err, res) {
+    if (err) {
+      return cb ? cb(err) : false;
+    }
+
+    self.mapping = res._source.properties;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
 
   return this;
 };
@@ -90,21 +102,6 @@ KuzzleDataMapping.prototype.refresh = function (cb) {
   return this;
 };
 
-/**
- * Removes a field mapping.
- *
- * Changes made by this function won’t be applied until you call the apply method
- *
- * @param {string} field - Name of the field from which the mapping is to be removed
- * @returns {KuzzleDataMapping}
- */
-KuzzleDataMapping.prototype.remove = function (field) {
-  if (this.mapping[field]) {
-    delete this.mapping[field];
-  }
-
-  return this;
-};
 
 /**
  * Adds or updates a field mapping.
