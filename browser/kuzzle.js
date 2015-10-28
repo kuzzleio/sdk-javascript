@@ -7353,7 +7353,7 @@ module.exports = Kuzzle = function (url, options, cb) {
   construct.call(this, url, cb);
 
   if (this.bluebird) {
-    return this.bluebird.promisifyAll(this);
+    return this.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
@@ -7445,10 +7445,20 @@ Kuzzle.prototype.getAllStatistics = function (cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
+    var result = [];
+
     if (err) {
       return cb(err);
     }
-    cb(null, res.statistics);
+
+    Object.keys(res.statistics).forEach(function (key) {
+      var frame = res.statistics[key];
+      frame.timestamp = key;
+
+      result.push(frame);
+    });
+
+    cb(null, result);
   });
 
   return this;
@@ -7472,11 +7482,15 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
 
   if (!timestamp) {
     this.query(null, 'admin', 'getStats', {}, function (err, res) {
+      var frame = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.statistics);
+      frame = res.statistics[Object.keys(res.statistics)[0]];
+      frame.timestamp = Object.keys(res.statistics)[0];
+      cb(null, frame);
     });
   } else {
     if (typeof timestamp !== 'number') {
@@ -7485,7 +7499,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
 
     this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
       var
-        stats = {},
+        stats = [],
         frames;
 
       if (err) {
@@ -7497,7 +7511,8 @@ Kuzzle.prototype.getStatistics = function (timestamp, cb) {
       });
 
       frames.forEach(function (frame) {
-        stats[frame] = res.statistics[frame];
+        res.statistics[frame].timestamp = frame;
+        stats.push(res.statistics[frame]);
       });
 
       cb(null, stats);
@@ -7684,12 +7699,6 @@ var
  */
 
 /**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
- */
-
-/**
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
@@ -7716,7 +7725,7 @@ function KuzzleDataCollection(kuzzle, collection) {
   });
 
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this);
+    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
@@ -7753,7 +7762,7 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
       documents.push(new KuzzleDocument(self, doc._id, doc._source));
     });
 
-    cb(null, documents);
+    cb(null, { total: result.hits.total, documents: documents });
   });
 
   return this;
@@ -8004,10 +8013,9 @@ KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
  * @param {object} [options] - subscriptions options
- * @param {readyCallback} [ready] - called once the subscription is finished
  * @returns {*} KuzzleRoom object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready) {
+KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
   var room;
 
   this.kuzzle.isValid();
@@ -8015,7 +8023,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options, ready
 
   room = new KuzzleRoom(this, options);
 
-  return room.renew(filters, cb, ready);
+  return room.renew(filters, cb);
 };
 
 /**
@@ -8105,7 +8113,7 @@ function KuzzleDataMapping(kuzzleDataCollection) {
   });
 
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this);
+    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
@@ -8117,9 +8125,21 @@ function KuzzleDataMapping(kuzzleDataCollection) {
  * @param {responseCallback} [cb] - Handles the query response
  */
 KuzzleDataMapping.prototype.apply = function (cb) {
-  var data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
+  var
+    self = this,
+    data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
 
-  this.kuzzle.query(this.collection, 'admin', 'putMapping', data, cb);
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, function (err, res) {
+    if (err) {
+      return cb ? cb(err) : false;
+    }
+
+    self.mapping = res._source.properties;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
 
   return this;
 };
@@ -8152,21 +8172,6 @@ KuzzleDataMapping.prototype.refresh = function (cb) {
   return this;
 };
 
-/**
- * Removes a field mapping.
- *
- * Changes made by this function won’t be applied until you call the apply method
- *
- * @param {string} field - Name of the field from which the mapping is to be removed
- * @returns {KuzzleDataMapping}
- */
-KuzzleDataMapping.prototype.remove = function (field) {
-  if (this.mapping[field]) {
-    delete this.mapping[field];
-  }
-
-  return this;
-};
 
 /**
  * Adds or updates a field mapping.
@@ -8191,12 +8196,6 @@ module.exports = KuzzleDataMapping;
  * @callback responseCallback
  * @param {Object} err - Error object, NULL if the query is successful
  * @param {Object} data - The content of the query response
- */
-
-/**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
  */
 
 /**
@@ -8276,7 +8275,7 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
 
   // promisifying
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this);
+    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
@@ -8377,9 +8376,14 @@ KuzzleDocument.prototype.save = function (replace, cb) {
     }
 
     if (cb) {
-      cb(null, result);
+      cb(null, self);
     }
   };
+
+  if (!cb && replace && typeof replace === 'function') {
+    cb = replace;
+    replace = false;
+  }
 
   data.persist = true;
 
@@ -8434,9 +8438,8 @@ KuzzleDocument.prototype.setContent = function (data, replace) {
  * (i.e. if the document has not yet been created as a persisted document).
  *
  * @param {responseCallback} cb - callback that will be called each time a change has been detected on this document
- * @param {readyCallback} [ready] - called once the subscription is finished
  */
-KuzzleDocument.prototype.subscribe = function (cb, ready) {
+KuzzleDocument.prototype.subscribe = function (cb) {
   var filters;
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
@@ -8447,7 +8450,7 @@ KuzzleDocument.prototype.subscribe = function (cb, ready) {
 
   filters = { term: { _id: this.id } };
 
-  return this.dataCollection.subscribe(filters, cb, {}, ready);
+  return this.dataCollection.subscribe(filters, cb);
 };
 
 module.exports = KuzzleDocument;
@@ -8460,13 +8463,6 @@ module.exports = KuzzleDocument;
  * @param {Object} err - Error object, NULL if the query is successful
  * @param {Object} data - The content of the query response
  */
-
-/**
- * Callback pattern: simple callback called when an async processus is finished
- *
- * @callback readyCallback
- */
-
 
 /**
  * This object is the result of a subscription request, allowing to manipulate the subscription itself.
@@ -8490,6 +8486,15 @@ function KuzzleRoom(kuzzleDataCollection, options) {
 
   // Define properties
   Object.defineProperties(this, {
+    // private properties
+    queue: {
+      value: [],
+      writable: true
+    },
+    subscribing: {
+      value: false,
+      writable: true
+    },
     // read-only properties
     collection: {
       value: kuzzleDataCollection.collection,
@@ -8549,7 +8554,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
   });
 
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this);
+    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
   }
 
   return this;
@@ -8566,7 +8571,18 @@ KuzzleRoom.prototype.count = function (cb) {
   this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
-  this.kuzzle.query(this.collection, 'subscribe', 'count', data, cb);
+  if (this.subscribing) {
+    this.queue.push({action: 'count', args: [cb]});
+    return this;
+  }
+
+  this.kuzzle.query(this.collection, 'subscribe', 'count', data, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res);
+  });
 
   return this;
 };
@@ -8576,17 +8592,23 @@ KuzzleRoom.prototype.count = function (cb) {
  *
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
- * @param {readyCallback} [ready] - called once the subscription is finished
  */
-KuzzleRoom.prototype.renew = function (filters, cb, ready) {
+KuzzleRoom.prototype.renew = function (filters, cb) {
   var
     subscribeQuery,
     self = this;
+
+  if (this.subscribing) {
+    this.queue.push({action: 'renew', args: [filters, cb]});
+    return this;
+  }
 
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
   this.filters = filters;
   this.unsubscribe();
   subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
+
+  this.subscribing = true;
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
     if (error) {
@@ -8595,8 +8617,9 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
 
     self.roomId = response.roomId;
     self.subscriptionId = response.roomName;
-    self.foo = response.roomName;
     self.subscriptionTimestamp = Date.now();
+    self.subscribing = false;
+    self.dequeue();
 
     self.kuzzle.socket.on(self.roomId, function (data) {
       var
@@ -8640,14 +8663,6 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
         cb(null, data.result);
       }
     });
-
-    if (ready) {
-      if (typeof ready === 'function') {
-        ready();
-      } else {
-        throw new Error('Expected the "ready" argument to be a callback function, got a ' + typeof ready + ' (value: ' + ready + ')');
-      }
-    }
   });
 
   return this;
@@ -8661,6 +8676,11 @@ KuzzleRoom.prototype.renew = function (filters, cb, ready) {
 KuzzleRoom.prototype.unsubscribe = function () {
   var data;
 
+  if (this.subscribing) {
+    this.queue.push({action: 'unsubscribed', args: []});
+    return this;
+  }
+
   if (this.roomId) {
     data = this.kuzzle.addHeaders({requestId: this.subscriptionId}, this.headers);
     this.kuzzle.query(this.collection, 'subscribe', 'off', data);
@@ -8668,6 +8688,21 @@ KuzzleRoom.prototype.unsubscribe = function () {
     this.roomId = null;
     this.subscriptionId = null;
     this.subscriptionTimestamp = null;
+  }
+
+  return this;
+};
+
+/**
+ * Dequeue actions performed while subscription was being renewed
+ */
+KuzzleRoom.prototype.dequeue = function () {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+
+    this[element.action].apply(this, element.args);
   }
 };
 
