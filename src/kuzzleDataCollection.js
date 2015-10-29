@@ -276,7 +276,7 @@ KuzzleDataCollection.prototype.publish = function (document) {
   }
 
   data.persist = false;
-  data = this.kuzzle.addHeaders(data, self.headers);
+  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'create', data);
 
   return this;

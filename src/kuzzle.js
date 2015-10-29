@@ -41,6 +41,10 @@ module.exports = Kuzzle = function (url, options, cb) {
         disconnected: []
       }
     },
+    requestHistory: {
+      value: {},
+      writable: true
+    },
     socket: {
       value: null,
       writable: true
@@ -357,19 +361,21 @@ Kuzzle.prototype.now = function (cb) {
 Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
   var
     attr,
+    now = Date.now(),
     object = {
-      requestId: uuid.v1(),
+      requestId: uuid.v4(),
       action: action
-    };
+    },
+    self = this;
+
+  this.isValid();
 
   if (collection) {
     object.collection = collection;
   }
 
-  this.isValid();
-
   if (cb) {
-    this.socket.once(object.requestId, function (response) {
+    self.socket.once(object.requestId, function (response) {
       cb(response.error, response.result);
     });
   }
@@ -380,10 +386,20 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
     }
   }
 
-  object = this.addHeaders(object, this.headers);
-  this.socket.emit(controller, object);
+  object = self.addHeaders(object, this.headers);
+  self.socket.emit(controller, object);
 
-  return this;
+  // Track requests made to allow KuzzleRoom.subscribeToSelf to work
+  self.requestHistory[object.requestId] = now;
+
+  // Clean history from requests made more than 30s ago
+  Object.keys(self.requestHistory).forEach(function (key) {
+    if (self.requestHistory[key] < now - 30000) {
+      delete self.requestHistory[key];
+    }
+  });
+
+  return self;
 };
 
 /**

@@ -202,7 +202,14 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
           });
         }
       } else {
-        cb(null, data.result);
+        if (self.kuzzle.requestHistory[data.result.requestId]) {
+          if (self.subscribeToSelf) {
+            cb(null, data.result);
+          }
+          delete self.kuzzle.requestHistory[data.result.requestId];
+        } else {
+          cb(null, data.result);
+        }
       }
     });
   });
