@@ -154,7 +154,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
     if (error) {
-      throw new Error('Error during Kuzzle subscription: ' + error);
+      throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
     self.roomId = response.roomId;
