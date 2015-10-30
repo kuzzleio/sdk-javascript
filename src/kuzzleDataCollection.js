@@ -369,7 +369,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, c
       }
 
       doc = new KuzzleDocument(self, res._id);
-      doc.refresh(cb);
+      cb(null, doc);
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'update', data);

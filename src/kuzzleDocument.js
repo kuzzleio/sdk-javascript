@@ -22,6 +22,16 @@
  */
 function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   Object.defineProperties(this, {
+    // private properties
+    queue: {
+      value: [],
+      writable: true
+    },
+    refreshing: {
+      value: false,
+      writable: true
+    },
+
     // read-only properties
     collection: {
       value: kuzzleDataCollection.collection,
@@ -79,6 +89,8 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: documentId,
       enumerable: true
     });
+
+    this.refresh();
   }
 
   // promisifying
@@ -124,11 +136,28 @@ KuzzleDocument.prototype.toString = function () {
  * @returns {*} this
  */
 KuzzleDocument.prototype.delete = function (cb) {
+  var self = this;
+
+  if (this.refreshing) {
+    this.queue.push({action: 'delete', args: [cb]});
+    return this;
+  }
+
   if (!this.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document that has not been saved into Kuzzle');
   }
 
-  this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), cb);
+  if (cb) {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), function (err) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, self);
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON());
+  }
 
   return this;
 };
@@ -142,17 +171,30 @@ KuzzleDocument.prototype.delete = function (cb) {
 KuzzleDocument.prototype.refresh = function (cb) {
   var self = this;
 
+  if (this.refreshing) {
+    this.queue.push({action: 'refresh', args: [cb]});
+    return this;
+  }
+
   if (!self.id) {
     throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
   }
 
+  self.refreshing = true;
+
   self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, function (error, result) {
+    self.refreshing = false;
+    dequeue.call(self);
+
     if (error) {
       return cb ? cb(error) : false;
     }
 
     self.content = result._source;
-    cb(null, self);
+
+    if (cb) {
+      cb(null, self);
+    }
   });
 
   return this;
@@ -171,7 +213,14 @@ KuzzleDocument.prototype.save = function (replace, cb) {
   var
     data = this.toJSON(),
     self = this;
-  var queryCB = function (error, result) {
+  var queryCB;
+
+  if (!cb && replace && typeof replace === 'function') {
+    cb = replace;
+    replace = false;
+  }
+
+  queryCB = function (error, result) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -188,9 +237,9 @@ KuzzleDocument.prototype.save = function (replace, cb) {
     }
   };
 
-  if (!cb && replace && typeof replace === 'function') {
-    cb = replace;
-    replace = false;
+  if (this.refreshing) {
+    this.queue.push({action: 'save', args: [replace, cb]});
+    return this;
   }
 
   data.persist = true;
@@ -212,6 +261,11 @@ KuzzleDocument.prototype.save = function (replace, cb) {
 KuzzleDocument.prototype.publish = function () {
   var data = this.toJSON();
 
+  if (this.refreshing) {
+    this.queue.push({action: 'publish', args: []});
+    return this;
+  }
+
   data.persist = false;
 
   this.kuzzle.query(this.collection, 'write', 'create', data);
@@ -228,6 +282,11 @@ KuzzleDocument.prototype.publish = function () {
  */
 KuzzleDocument.prototype.setContent = function (data, replace) {
   var self = this;
+
+  if (this.refreshing) {
+    this.queue.push({action: 'setContent', args: [data, replace]});
+    return this;
+  }
 
   if (replace) {
     this.content = data;
@@ -252,6 +311,11 @@ KuzzleDocument.prototype.subscribe = function (cb) {
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
 
+  if (this.refreshing) {
+    this.queue.push({action: 'subscribe', args: [cb]});
+    return this;
+  }
+
   if (!this.id) {
     throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
@@ -260,5 +324,14 @@ KuzzleDocument.prototype.subscribe = function (cb) {
 
   return this.dataCollection.subscribe(filters, cb);
 };
+
+function dequeue() {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+    this[element.action].apply(this, element.args);
+  }
+}
 
 module.exports = KuzzleDocument;
