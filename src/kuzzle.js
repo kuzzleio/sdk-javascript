@@ -450,5 +450,3 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
     }
   });
 };
-
-

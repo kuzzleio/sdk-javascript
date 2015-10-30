@@ -378,4 +378,17 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, c
   return self;
 };
 
+
+/**
+ * Instantiate a new KuzzleDocument object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - document id
+ * @param {object} content - document content
+ * @constructor
+ */
+KuzzleDataCollection.prototype.Document = function (id, content) {
+  return new KuzzleDocument(this, id, content);
+};
+
 module.exports = KuzzleDataCollection;
