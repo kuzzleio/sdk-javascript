@@ -391,4 +391,25 @@ KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   return new KuzzleDocument(this, id, content);
 };
 
+/**
+ * Instantiate a new KuzzleRoom object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {object} [options] - subscription configuration
+ * @constructor
+ */
+KuzzleDataCollection.prototype.roomFactory = function (options) {
+  return new KuzzleRoom(this, options);
+};
+
+/**
+ * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @constructor
+ */
+KuzzleDataCollection.prototype.dataMappingFactory = function () {
+  return new KuzzleDataMapping(this);
+};
+
 module.exports = KuzzleDataCollection;
