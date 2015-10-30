@@ -120,7 +120,7 @@ KuzzleDataCollection.prototype.count = function (filters, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.create = function (document, updateIfExist, cb) {
+KuzzleDataCollection.prototype.createDocument = function (document, updateIfExist, cb) {
   var
     self = this,
     data = {},
@@ -169,7 +169,7 @@ KuzzleDataCollection.prototype.create = function (document, updateIfExist, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.delete = function (arg, cb) {
+KuzzleDataCollection.prototype.deleteDocument = function (arg, cb) {
   var
     action,
     data = {};
@@ -210,7 +210,7 @@ KuzzleDataCollection.prototype.delete = function (arg, cb) {
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetch = function (documentId, cb) {
+KuzzleDataCollection.prototype.fetchDocument = function (documentId, cb) {
   var
     data = {_id: documentId},
     self = this;
@@ -235,7 +235,7 @@ KuzzleDataCollection.prototype.fetch = function (documentId, cb) {
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetchAll = function (cb) {
+KuzzleDataCollection.prototype.fetchAllDocuments = function (cb) {
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
   this.advancedSearch({}, cb);
@@ -290,7 +290,7 @@ KuzzleDataCollection.prototype.publish = function (document) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, cb) {
   var
     self = this,
     data = {};
@@ -347,7 +347,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.updateDocument = function (documentId, content, cb) {
   var
     data = {},
     self = this;
