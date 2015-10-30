@@ -387,7 +387,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, c
  * @param {object} content - document content
  * @constructor
  */
-KuzzleDataCollection.prototype.Document = function (id, content) {
+KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   return new KuzzleDocument(this, id, content);
 };
 
