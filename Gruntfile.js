@@ -3,43 +3,36 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('gruntify-eslint');
-  grunt.loadNpmTasks('grunt-jsbeautifier');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
 
   grunt.initConfig({
-    jsbeautifier: {
-      files: ['./index.js','./config.js','./examples/**/*.js',
-      '!**/node_modules/**','!**/bluebird.js ','!**/require.js'
-      ],
-      options: {
-        js: {
-          indentChar: ' ',
-          indentLevel: 0,
-          indentSize: 2,
-          indentWithTabs: false
-        }
-      }
-    },
     jshint: {
-      all: ['Gruntfile.js', 'tests/**/*.js', 'features/**/*.js']
+      all: ['Gruntfile.js', 'src/**/*.js']
     },
     eslint: {
-      src: ['lib/**/*.js', 'examples/**/*.js', '!examples/amd/require.js', '!examples/lib/*']
+      src: ['src/**/*.js']
+    },
+    browserify: {
+      kuzzle: {
+        src: ['src/kuzzle.js'],
+        dest: 'browser/kuzzle.js'
+      }
     },
     uglify: {
       kuzzle: {
         options: {
-          'sourceMap': true, 
-          'sourceMapName': 'kuzzle.min.map',
-          'banner': '// This is the Kuzzle SDK version 0.2.0 - Licenced under the Apache 2.0 Licence'
+          'sourceMap': true,
+          'sourceMapName': 'browser/kuzzle.min.map',
+          'banner': '// This is the Kuzzle SDK version 1.0 - Licenced under the Apache 2.0 Licence'
         },
         files: {
-          './kuzzle.min.js': ['./lib/kuzzle.js']
+          'browser/kuzzle.min.js': ['browser/kuzzle.js']
         }
       }
     }
   });
 
-  grunt.registerTask('default', ['jsbeautifier', 'jshint', 'eslint', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'eslint', 'browserify', 'uglify']);
 };

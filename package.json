@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/kuzzleio/sdk-javascript.git"
   },
-  "issues":"https://github.com/kuzzleio/sdk-javascript/issues",
+  "issues": "https://github.com/kuzzleio/sdk-javascript/issues",
   "keywords": [
     "kuzzle",
     "baas",
@@ -15,24 +15,27 @@
     "advanced-search",
     "bulk"
   ],
+  "browser": "src/kuzzle.js",
   "main": "index.js",
   "scripts": {
     "prepublish": "grunt"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "2.9.34",
+    "bluebird": "2.10.2",
+    "node-uuid": "^1.4.3",
     "socket.io-client": "1.3.6"
   },
   "devDependencies": {
+    "browserify": "^11.2.0",
+    "express": "4.10.5",
     "grunt": "0.4.5",
+    "grunt-browserify": "^4.0.1",
     "grunt-contrib-jshint": "^0.11.3",
     "gruntify-eslint": "^1.0.1",
     "grunt-contrib-uglify": "0.9.1",
-    "grunt-jsbeautifier": "0.2.10",
-    "selenium-webdriver": "2.46.0",
-    "express": "4.10.5",
     "mocha": "2.1.0",
+    "selenium-webdriver": "2.46.0",
     "webdriverio": "3.1.0"
   }
 }
