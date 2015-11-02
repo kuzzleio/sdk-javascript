@@ -201,15 +201,13 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
             });
           });
         }
-      } else {
-        if (self.kuzzle.requestHistory[data.result.requestId]) {
-          if (self.subscribeToSelf) {
-            cb(null, data.result);
-          }
-          delete self.kuzzle.requestHistory[data.result.requestId];
-        } else {
+      } else if (self.kuzzle.requestHistory[data.result.requestId]) {
+        if (self.subscribeToSelf) {
           cb(null, data.result);
         }
+        delete self.kuzzle.requestHistory[data.result.requestId];
+      } else {
+        cb(null, data.result);
       }
     });
   });

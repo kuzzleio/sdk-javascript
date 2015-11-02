@@ -7288,6 +7288,10 @@ module.exports = Kuzzle = function (url, options, cb) {
         disconnected: []
       }
     },
+    requestHistory: {
+      value: {},
+      writable: true
+    },
     socket: {
       value: null,
       writable: true
@@ -7604,19 +7608,21 @@ Kuzzle.prototype.now = function (cb) {
 Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
   var
     attr,
+    now = Date.now(),
     object = {
-      requestId: uuid.v1(),
+      requestId: uuid.v4(),
       action: action
-    };
+    },
+    self = this;
+
+  this.isValid();
 
   if (collection) {
     object.collection = collection;
   }
 
-  this.isValid();
-
   if (cb) {
-    this.socket.once(object.requestId, function (response) {
+    self.socket.once(object.requestId, function (response) {
       cb(response.error, response.result);
     });
   }
@@ -7627,10 +7633,20 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
     }
   }
 
-  object = this.addHeaders(object, this.headers);
-  this.socket.emit(controller, object);
+  object = self.addHeaders(object, this.headers);
+  self.socket.emit(controller, object);
 
-  return this;
+  // Track requests made to allow KuzzleRoom.subscribeToSelf to work
+  self.requestHistory[object.requestId] = now;
+
+  // Clean history from requests made more than 30s ago
+  Object.keys(self.requestHistory).forEach(function (key) {
+    if (self.requestHistory[key] < now - 30000) {
+      delete self.requestHistory[key];
+    }
+  });
+
+  return self;
 };
 
 /**
@@ -7681,8 +7697,6 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
     }
   });
 };
-
-
 
 },{"./kuzzleDataCollection":53,"node-uuid":1,"socket.io-client":2}],53:[function(require,module,exports){
 var
@@ -7807,7 +7821,7 @@ KuzzleDataCollection.prototype.count = function (filters, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.create = function (document, updateIfExist, cb) {
+KuzzleDataCollection.prototype.createDocument = function (document, updateIfExist, cb) {
   var
     self = this,
     data = {},
@@ -7856,7 +7870,7 @@ KuzzleDataCollection.prototype.create = function (document, updateIfExist, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.delete = function (arg, cb) {
+KuzzleDataCollection.prototype.deleteDocument = function (arg, cb) {
   var
     action,
     data = {};
@@ -7897,7 +7911,7 @@ KuzzleDataCollection.prototype.delete = function (arg, cb) {
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetch = function (documentId, cb) {
+KuzzleDataCollection.prototype.fetchDocument = function (documentId, cb) {
   var
     data = {_id: documentId},
     self = this;
@@ -7922,7 +7936,7 @@ KuzzleDataCollection.prototype.fetch = function (documentId, cb) {
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetchAll = function (cb) {
+KuzzleDataCollection.prototype.fetchAllDocuments = function (cb) {
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
   this.advancedSearch({}, cb);
@@ -7963,7 +7977,7 @@ KuzzleDataCollection.prototype.publish = function (document) {
   }
 
   data.persist = false;
-  data = this.kuzzle.addHeaders(data, self.headers);
+  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'create', data);
 
   return this;
@@ -7977,7 +7991,7 @@ KuzzleDataCollection.prototype.publish = function (document) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.replace = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, cb) {
   var
     self = this,
     data = {};
@@ -8034,7 +8048,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.updateDocument = function (documentId, content, cb) {
   var
     data = {},
     self = this;
@@ -8056,13 +8070,47 @@ KuzzleDataCollection.prototype.update = function (documentId, content, cb) {
       }
 
       doc = new KuzzleDocument(self, res._id);
-      doc.refresh(cb);
+      cb(null, doc);
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'update', data);
   }
 
   return self;
+};
+
+
+/**
+ * Instantiate a new KuzzleDocument object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - document id
+ * @param {object} content - document content
+ * @constructor
+ */
+KuzzleDataCollection.prototype.documentFactory = function (id, content) {
+  return new KuzzleDocument(this, id, content);
+};
+
+/**
+ * Instantiate a new KuzzleRoom object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {object} [options] - subscription configuration
+ * @constructor
+ */
+KuzzleDataCollection.prototype.roomFactory = function (options) {
+  return new KuzzleRoom(this, options);
+};
+
+/**
+ * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @constructor
+ */
+KuzzleDataCollection.prototype.dataMappingFactory = function () {
+  return new KuzzleDataMapping(this);
 };
 
 module.exports = KuzzleDataCollection;
@@ -8214,6 +8262,16 @@ module.exports = KuzzleDataMapping;
  */
 function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   Object.defineProperties(this, {
+    // private properties
+    queue: {
+      value: [],
+      writable: true
+    },
+    refreshing: {
+      value: false,
+      writable: true
+    },
+
     // read-only properties
     collection: {
       value: kuzzleDataCollection.collection,
@@ -8271,6 +8329,8 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: documentId,
       enumerable: true
     });
+
+    this.refresh();
   }
 
   // promisifying
@@ -8316,11 +8376,28 @@ KuzzleDocument.prototype.toString = function () {
  * @returns {*} this
  */
 KuzzleDocument.prototype.delete = function (cb) {
+  var self = this;
+
+  if (this.refreshing) {
+    this.queue.push({action: 'delete', args: [cb]});
+    return this;
+  }
+
   if (!this.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document that has not been saved into Kuzzle');
   }
 
-  this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), cb);
+  if (cb) {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), function (err) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, self);
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON());
+  }
 
   return this;
 };
@@ -8334,17 +8411,30 @@ KuzzleDocument.prototype.delete = function (cb) {
 KuzzleDocument.prototype.refresh = function (cb) {
   var self = this;
 
+  if (this.refreshing) {
+    this.queue.push({action: 'refresh', args: [cb]});
+    return this;
+  }
+
   if (!self.id) {
     throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
   }
 
+  self.refreshing = true;
+
   self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, function (error, result) {
+    self.refreshing = false;
+    dequeue.call(self);
+
     if (error) {
       return cb ? cb(error) : false;
     }
 
     self.content = result._source;
-    cb(null, self);
+
+    if (cb) {
+      cb(null, self);
+    }
   });
 
   return this;
@@ -8363,7 +8453,14 @@ KuzzleDocument.prototype.save = function (replace, cb) {
   var
     data = this.toJSON(),
     self = this;
-  var queryCB = function (error, result) {
+  var queryCB;
+
+  if (!cb && replace && typeof replace === 'function') {
+    cb = replace;
+    replace = false;
+  }
+
+  queryCB = function (error, result) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -8380,9 +8477,9 @@ KuzzleDocument.prototype.save = function (replace, cb) {
     }
   };
 
-  if (!cb && replace && typeof replace === 'function') {
-    cb = replace;
-    replace = false;
+  if (this.refreshing) {
+    this.queue.push({action: 'save', args: [replace, cb]});
+    return this;
   }
 
   data.persist = true;
@@ -8404,6 +8501,11 @@ KuzzleDocument.prototype.save = function (replace, cb) {
 KuzzleDocument.prototype.publish = function () {
   var data = this.toJSON();
 
+  if (this.refreshing) {
+    this.queue.push({action: 'publish', args: []});
+    return this;
+  }
+
   data.persist = false;
 
   this.kuzzle.query(this.collection, 'write', 'create', data);
@@ -8420,6 +8522,11 @@ KuzzleDocument.prototype.publish = function () {
  */
 KuzzleDocument.prototype.setContent = function (data, replace) {
   var self = this;
+
+  if (this.refreshing) {
+    this.queue.push({action: 'setContent', args: [data, replace]});
+    return this;
+  }
 
   if (replace) {
     this.content = data;
@@ -8444,6 +8551,11 @@ KuzzleDocument.prototype.subscribe = function (cb) {
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
 
+  if (this.refreshing) {
+    this.queue.push({action: 'subscribe', args: [cb]});
+    return this;
+  }
+
   if (!this.id) {
     throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
@@ -8452,6 +8564,15 @@ KuzzleDocument.prototype.subscribe = function (cb) {
 
   return this.dataCollection.subscribe(filters, cb);
 };
+
+function dequeue() {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+    this[element.action].apply(this, element.args);
+  }
+}
 
 module.exports = KuzzleDocument;
 
@@ -8612,7 +8733,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
     if (error) {
-      throw new Error('Error during Kuzzle subscription: ' + error);
+      throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
     self.roomId = response.roomId;
@@ -8659,6 +8780,11 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
             });
           });
         }
+      } else if (self.kuzzle.requestHistory[data.result.requestId]) {
+        if (self.subscribeToSelf) {
+          cb(null, data.result);
+        }
+        delete self.kuzzle.requestHistory[data.result.requestId];
       } else {
         cb(null, data.result);
       }
