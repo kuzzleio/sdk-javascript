@@ -320,7 +320,7 @@ KuzzleDocument.prototype.subscribe = function (cb) {
     throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
 
-  filters = { term: { _id: this.id } };
+  filters = { ids: { values: [this.id] } };
 
   return this.dataCollection.subscribe(filters, cb);
 };
