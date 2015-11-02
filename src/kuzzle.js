@@ -390,7 +390,7 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
       cb(response.error, response.result);
     });
   }
-  
+
   self.socket.emit(controller, object);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
@@ -453,4 +453,31 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
       self.eventListeners[event].splice(index, 1);
     }
   });
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+Kuzzle.prototype.setHeaders = function(content, replace) {
+  var self = this;
+
+  if (typeof content !== 'object') {
+    throw new Error('Expected a content object, received a ' + typeof content);
+  }
+
+  if (replace) {
+    self.headers = content;
+  } else {
+    Object.keys(content).forEach(function (key) {
+      self.headers[key] = content[key];
+    });
+  }
+
+  return self;
 };

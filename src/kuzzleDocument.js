@@ -90,7 +90,9 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       enumerable: true
     });
 
-    this.refresh();
+    if (!content) {
+      this.refresh();
+    }
   }
 
   // promisifying
@@ -325,6 +327,24 @@ KuzzleDocument.prototype.subscribe = function (cb) {
   return this.dataCollection.subscribe(filters, cb);
 };
 
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDocument.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+
+/**
+ * internal function used to dequeue calls which were put on hold while refreshing the content of this document
+ */
 function dequeue() {
   var element;
 
@@ -333,5 +353,6 @@ function dequeue() {
     this[element.action].apply(this, element.args);
   }
 }
+
 
 module.exports = KuzzleDocument;

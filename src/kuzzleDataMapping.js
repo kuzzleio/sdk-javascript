@@ -117,4 +117,18 @@ KuzzleDataMapping.prototype.set = function (field, mapping) {
   return this;
 };
 
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDataMapping.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
 module.exports = KuzzleDataMapping;
