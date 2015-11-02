@@ -363,22 +363,11 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
     attr,
     now = Date.now(),
     object = {
-      requestId: uuid.v4(),
       action: action
     },
     self = this;
 
   this.isValid();
-
-  if (collection) {
-    object.collection = collection;
-  }
-
-  if (cb) {
-    self.socket.once(object.requestId, function (response) {
-      cb(response.error, response.result);
-    });
-  }
 
   for (attr in query) {
     if (query.hasOwnProperty(attr)) {
@@ -387,6 +376,21 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
   }
 
   object = self.addHeaders(object, this.headers);
+
+  if (collection) {
+    object.collection = collection;
+  }
+
+  if (!object.requestId) {
+    object.requestId = uuid.v4();
+  }
+
+  if (cb) {
+    self.socket.once(object.requestId, function (response) {
+      cb(response.error, response.result);
+    });
+  }
+  
   self.socket.emit(controller, object);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
