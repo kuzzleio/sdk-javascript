@@ -7610,22 +7610,11 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
     attr,
     now = Date.now(),
     object = {
-      requestId: uuid.v4(),
       action: action
     },
     self = this;
 
   this.isValid();
-
-  if (collection) {
-    object.collection = collection;
-  }
-
-  if (cb) {
-    self.socket.once(object.requestId, function (response) {
-      cb(response.error, response.result);
-    });
-  }
 
   for (attr in query) {
     if (query.hasOwnProperty(attr)) {
@@ -7634,6 +7623,21 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
   }
 
   object = self.addHeaders(object, this.headers);
+
+  if (collection) {
+    object.collection = collection;
+  }
+
+  if (!object.requestId) {
+    object.requestId = uuid.v4();
+  }
+
+  if (cb) {
+    self.socket.once(object.requestId, function (response) {
+      cb(response.error, response.result);
+    });
+  }
+
   self.socket.emit(controller, object);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
@@ -7696,6 +7700,33 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
       self.eventListeners[event].splice(index, 1);
     }
   });
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+Kuzzle.prototype.setHeaders = function(content, replace) {
+  var self = this;
+
+  if (typeof content !== 'object') {
+    throw new Error('Expected a content object, received a ' + typeof content);
+  }
+
+  if (replace) {
+    self.headers = content;
+  } else {
+    Object.keys(content).forEach(function (key) {
+      self.headers[key] = content[key];
+    });
+  }
+
+  return self;
 };
 
 },{"./kuzzleDataCollection":53,"node-uuid":1,"socket.io-client":2}],53:[function(require,module,exports){
@@ -8113,6 +8144,20 @@ KuzzleDataCollection.prototype.dataMappingFactory = function () {
   return new KuzzleDataMapping(this);
 };
 
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDataCollection.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
 module.exports = KuzzleDataCollection;
 
 },{"./kuzzleDataMapping":54,"./kuzzleDocument":55,"./kuzzleRoom":56}],54:[function(require,module,exports){
@@ -8235,6 +8280,20 @@ KuzzleDataMapping.prototype.set = function (field, mapping) {
   return this;
 };
 
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDataMapping.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
 module.exports = KuzzleDataMapping;
 
 },{}],55:[function(require,module,exports){
@@ -8330,7 +8389,9 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       enumerable: true
     });
 
-    this.refresh();
+    if (!content) {
+      this.refresh();
+    }
   }
 
   // promisifying
@@ -8560,11 +8621,29 @@ KuzzleDocument.prototype.subscribe = function (cb) {
     throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
 
-  filters = { term: { _id: this.id } };
+  filters = { ids: { values: [this.id] } };
 
   return this.dataCollection.subscribe(filters, cb);
 };
 
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDocument.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+
+/**
+ * internal function used to dequeue calls which were put on hold while refreshing the content of this document
+ */
 function dequeue() {
   var element;
 
@@ -8573,6 +8652,7 @@ function dequeue() {
     this[element.action].apply(this, element.args);
   }
 }
+
 
 module.exports = KuzzleDocument;
 
@@ -8816,6 +8896,20 @@ KuzzleRoom.prototype.unsubscribe = function () {
     this.subscriptionTimestamp = null;
   }
 
+  return this;
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleRoom.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
 
