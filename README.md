@@ -85,7 +85,7 @@ kuzzle
 
 #### Vanilla
 
-Download the file [kuzzle.min.js](./browser/kuzzle.min.js) available in the ``browser`` directory of this project.
+Download the file [kuzzle.min.js](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/browser/kuzzle.min.js) available in the [browser](https://github.com/kuzzleio/sdk-javascript/tree/browser) branch of this project.
 
 ```html
 <script type="text/javascript" src="path/to/kuzzle.min.js"></script>
