@@ -42,24 +42,7 @@ kuzzle
       // handle error...
     }
     /*
-    If everything is ok, response should contain :
-    { _index: 'mainindex',
-       _type: 'people',
-       _id: 'AU7V79B426DqjnR4i97D',
-       _version: 1,
-       created: true,
-       requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
-       controller: 'write',
-       action: 'create',
-       collection: 'people',
-       _source: {
-          name: 'Rick Astley',
-          birthDate: '1966/02/06',
-          mainActivity: 'Singer',
-          website: 'http://www.rickastley.co.uk',
-          comment: 'Never gonna give you up, never gonna let you down'
-        }
-    }
+    'response' is a KuzzleDocument object
     */
 });
 
@@ -89,24 +72,7 @@ kuzzle
   .createDocumentPromise(myDoc)
   .then(response => {
     /*
-    response should contain :
-    { _index: 'mainindex',
-       _type: 'people',
-       _id: 'AU7V79B426DqjnR4i97D',
-       _version: 1,
-       created: true,
-       requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
-       controller: 'write',
-       action: 'create',
-       collection: 'people',
-       _source: {
-          name: 'Rick Astley',
-          birthDate: '1966/02/06',
-          mainActivity: 'Singer',
-          website: 'http://www.rickastley.co.uk',
-          comment: 'Never gonna give you up, never gonna let you down'
-        }
-    }
+    'response' is a KuzzleDocument object
     */
   })
   .catch(error => {
@@ -146,24 +112,7 @@ kuzzle
       // handle error...
     }
     /*
-    If everything is ok, response should contain :
-    { _index: 'mainindex',
-       _type: 'people',
-       _id: 'AU7V79B426DqjnR4i97D',
-       _version: 1,
-       created: true,
-       requestId: '3084e648-0977-4d81-822d-c04538f3dfd1',
-       controller: 'write',
-       action: 'create',
-       collection: 'people',
-       _source: {
-          name: 'Rick Astley',
-          birthDate: '1966/02/06',
-          mainActivity: 'Singer',
-          website: 'http://www.rickastley.co.uk',
-          comment: 'Never gonna give you up, never gonna let you down'
-        }
-    }
+    'response' is a KuzzleDocument object
     */
 });
 ```
