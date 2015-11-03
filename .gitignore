@@ -13,3 +13,7 @@ examples/node_modules/
 .DS_STORE
 *#
 *~
+
+# Compiled files
+browser/
+

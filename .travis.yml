@@ -8,6 +8,10 @@ node_js:
 script:
   - grunt
 
+before_install: npm install -g grunt-cli
+
+install: npm install
+
 after_success:
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then git config --global user.email "support@kuzzle.io";
   fi
