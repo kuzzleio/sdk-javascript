@@ -7,6 +7,11 @@ For UI and linked objects developers, Kuzzle is an open-source solution that han
 
 You can access the Kuzzle repository here: https://github.com/kuzzleio/kuzzle
 
+
+## SDK Documentation
+
+The complete SDK documentation is available here: http://kuzzleio.github.io/sdk-documentation
+
 ## Installation
 
 ### NodeJS
@@ -32,7 +37,7 @@ var myDoc = {
 
 kuzzle
   .dataCollectionFactory('people')
-  .create(myDoc, {persist: true}, function(error, response) {
+  .createDocument(myDoc, function(error, response) {
     if (error) {
       // handle error...
     }
@@ -62,7 +67,7 @@ kuzzle
 
 #### Hate callbacks & love promises ?
 
-There are promise-based methods for all Kuzzle method allowing a callback. Just suffix those methods with ```Async```.
+There are promise-based methods for all Kuzzle method allowing a callback. Just suffix those methods with ```Promise```.
 
 Here is the above example, using promises:
 
@@ -81,8 +86,8 @@ var myDoc = {
 
 kuzzle
   .dataCollectionFactory('people')
-  .createAsync(myDoc, {persist: true})
-  .then(function (response) {
+  .createDocumentPromise(myDoc)
+  .then(response => {
     /*
     response should contain :
     { _index: 'mainindex',
@@ -104,7 +109,7 @@ kuzzle
     }
     */
   })
-  .catch(function (error) {
+  .catch(error => {
     // handle error here
   });
 });
@@ -136,7 +141,7 @@ var myDoc = {
 
 kuzzle
   .dataCollectionFactory('people')
-  .create(myDoc, {persist: true}, function(error, response) {
+  .createDocument(myDoc, function(error, response) {
     if (error) {
       // handle error...
     }
@@ -162,10 +167,6 @@ kuzzle
     */
 });
 ```
-
-## SDK Documentation
-
-Complete SDK documentation available here: http://kuzzleio.github.io/sdk-documentation
 
 # License
 
