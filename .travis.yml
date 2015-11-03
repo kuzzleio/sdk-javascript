@@ -14,7 +14,7 @@ after_success:
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then  git clone --quiet --branch=browser https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
   travis-build > /dev/null; fi
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then  cp -rp browser/* travis-build/ && cd
-  browser ; fi
+  travis-build ; fi
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then  git commit -am "Travis CI auto-merge
   from travis build ${TRAVIS_BUILD_NUMBER}"; fi
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then  git push -fq origin browser > /dev/null;

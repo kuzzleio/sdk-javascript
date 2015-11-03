@@ -17,9 +17,6 @@
   ],
   "browser": "src/kuzzle.js",
   "main": "index.js",
-  "scripts": {
-    "prepublish": "grunt"
-  },
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "2.10.2",
