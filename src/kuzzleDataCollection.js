@@ -286,22 +286,18 @@ KuzzleDataCollection.prototype.publish = function (document) {
  * Replace an existing document with a new one.
  *
  * @param {string} documentId - Unique document identifier of the document to replace
- * @param {object} content - Either a KuzzleDocument or a JSON object representing the new document version
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
+ * @param {object} content - JSON object representing the new document version
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
 KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, cb) {
   var
     self = this,
-    data = {};
+    data = {
+      _id: documentId,
+      body: content
+    };
 
-  if (content instanceof KuzzleDocument) {
-    data = content.toJSON();
-  } else {
-    data.body = content;
-  }
-
-  data._id = documentId;
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
@@ -343,22 +339,18 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
  * Update parts of a document
  *
  * @param {string} documentId - Unique document identifier of the document to update
- * @param {object} content - Either a KuzzleDocument or a JSON object representing the new document version
+ * @param {object} content - JSON object containing changes to perform on the document
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
 KuzzleDataCollection.prototype.updateDocument = function (documentId, content, cb) {
   var
-    data = {},
+    data = {
+      _id: documentId,
+      body: content
+    },
     self = this;
 
-  if (content instanceof KuzzleDocument) {
-    data = content.toJSON();
-  } else {
-    data.body = content;
-  }
-
-  data._id = documentId;
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {

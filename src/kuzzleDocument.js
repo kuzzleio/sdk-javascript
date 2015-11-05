@@ -204,25 +204,19 @@ KuzzleDocument.prototype.refresh = function (cb) {
 
 /**
  * Saves this document into Kuzzle.
- * If this is a new document, this function will create it in Kuzzle. Otherwise, you can specify whether you want
- * to merge this document with the one stored in Kuzzle, or if you want to replace it.
  *
- * @param {boolean} replace - true: replace the document, false: merge it
+ * If this is a new document, this function will create it in Kuzzle and the id property will be made available.
+ * Otherwise, this method will replace the latest version of this document in Kuzzle by the current content
+ * of this object.
+ *
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.save = function (replace, cb) {
+KuzzleDocument.prototype.save = function (cb) {
   var
     data = this.toJSON(),
     self = this;
-  var queryCB;
-
-  if (!cb && replace && typeof replace === 'function') {
-    cb = replace;
-    replace = false;
-  }
-
-  queryCB = function (error, result) {
+  var queryCB = function (error, result) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -239,18 +233,14 @@ KuzzleDocument.prototype.save = function (replace, cb) {
     }
   };
 
-  if (this.refreshing) {
-    this.queue.push({action: 'save', args: [replace, cb]});
-    return this;
+  if (self.refreshing) {
+    self.queue.push({action: 'save', args: [replace, cb]});
+    return self;
   }
 
   data.persist = true;
 
-  if (!self.id || replace) {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, queryCB);
-  } else {
-    self.kuzzle.query(this.collection, 'write', 'update', data, queryCB);
-  }
+  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, queryCB);
 
   return self;
 };
