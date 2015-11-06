@@ -352,13 +352,18 @@ Kuzzle.prototype.now = function (cb) {
  * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
  * Base method used to send read queries to Kuzzle
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
  * @param {string} collection - Name of the data collection you want to manipulate
  * @param {string} controller - The Kuzzle controller that will handle this query
  * @param {string} action - The controller action to perform
  * @param {object} query - The query data
+ * @param {object} [options] - Optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  */
-Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
+Kuzzle.prototype.query = function (collection, controller, action, query, options, cb) {
   var
     attr,
     now = Date.now(),
@@ -368,6 +373,15 @@ Kuzzle.prototype.query = function (collection, controller, action, query, cb) {
     self = this;
 
   this.isValid();
+
+  if (!cb && options && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (options) {
+    query.metadata = options.metadata || {};
+  }
 
   for (attr in query) {
     if (query.hasOwnProperty(attr)) {

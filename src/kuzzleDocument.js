@@ -134,11 +134,21 @@ KuzzleDocument.prototype.toString = function () {
 /**
  * Deletes this document in Kuzzle.
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.delete = function (cb) {
+KuzzleDocument.prototype.delete = function (options, cb) {
   var self = this;
+
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   if (this.refreshing) {
     this.queue.push({action: 'delete', args: [cb]});
@@ -150,7 +160,7 @@ KuzzleDocument.prototype.delete = function (cb) {
   }
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), function (err) {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options, function (err) {
       if (err) {
         return cb(err);
       }
@@ -158,7 +168,7 @@ KuzzleDocument.prototype.delete = function (cb) {
       cb(null, self);
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON());
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options);
   }
 
   return this;
@@ -209,10 +219,15 @@ KuzzleDocument.prototype.refresh = function (cb) {
  * Otherwise, this method will replace the latest version of this document in Kuzzle by the current content
  * of this object.
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.save = function (cb) {
+KuzzleDocument.prototype.save = function (options, cb) {
   var
     data = this.toJSON(),
     self = this;
@@ -240,7 +255,7 @@ KuzzleDocument.prototype.save = function (cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, queryCB);
+  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, queryCB);
 
   return self;
 };
@@ -248,9 +263,14 @@ KuzzleDocument.prototype.save = function (cb) {
 /**
  * Sends the content of this document as a realtime message.
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
  * @returns {*} this
  */
-KuzzleDocument.prototype.publish = function () {
+KuzzleDocument.prototype.publish = function (options) {
   var data = this.toJSON();
 
   if (this.refreshing) {
@@ -260,7 +280,7 @@ KuzzleDocument.prototype.publish = function () {
 
   data.persist = false;
 
-  this.kuzzle.query(this.collection, 'write', 'create', data);
+  this.kuzzle.query(this.collection, 'write', 'create', data, options);
 
   return this;
 };

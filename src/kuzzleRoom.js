@@ -67,23 +67,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       enumerable: true,
       writable: true
     },
-    metadata: {
-      value: {},
-      enumerable: true,
-      writable: true
-    },
     roomId: {
-      value: null,
-      enumerable: true,
-      writable: true
-    },
-    subscriptionId: {
-      value: null,
-      enumerable: true,
-      writable: true,
-      configurable: true
-    },
-    subscriptionTimestamp: {
       value: null,
       enumerable: true,
       writable: true
@@ -132,7 +116,7 @@ KuzzleRoom.prototype.count = function (cb) {
 /**
  * Renew the subscription using new filters
  *
- * @param {object} filters - Filters in Kuzzle DSL format
+ * @param {object} [filters] - Filters in Kuzzle DSL format
  * @param {responseCallback} cb - called for each new notification
  */
 KuzzleRoom.prototype.renew = function (filters, cb) {
@@ -140,13 +124,22 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     subscribeQuery,
     self = this;
 
+  if (!cb && filters && typeof filters === 'function') {
+    cb = filters;
+    filters = null;
+  }
+
   if (this.subscribing) {
     this.queue.push({action: 'renew', args: [filters, cb]});
     return this;
   }
 
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
-  this.filters = filters;
+
+  if (filters) {
+    this.filters = filters;
+  }
+
   this.unsubscribe();
   subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
 
@@ -158,8 +151,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     }
 
     self.roomId = response.roomId;
-    self.subscriptionId = response.roomName;
-    self.subscriptionTimestamp = Date.now();
     self.subscribing = false;
     self.dequeue();
 
@@ -229,12 +220,10 @@ KuzzleRoom.prototype.unsubscribe = function () {
   }
 
   if (this.roomId) {
-    data = this.kuzzle.addHeaders({requestId: this.subscriptionId}, this.headers);
+    data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
     this.kuzzle.query(this.collection, 'subscribe', 'off', data);
     this.kuzzle.socket.off(this.roomId);
     this.roomId = null;
-    this.subscriptionId = null;
-    this.subscriptionTimestamp = null;
   }
 
   return this;

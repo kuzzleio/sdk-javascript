@@ -113,24 +113,27 @@ KuzzleDataCollection.prototype.count = function (filters, cb) {
 /**
  * Create a new document in Kuzzle.
  *
- * By default, the updateIfExist argument is set to false
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *    - updateIfExist (boolean, default: false):
+ *        If the same document already exists: throw an error if sets to false.
+ *        Update the existing document otherwise
  *
  * @param {object} document - either an instance of a KuzzleDocument object, or a document
- * @param {boolean} [updateIfExist] - (true)throw an error if document already exists (false)updates the existing document
+ * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.createDocument = function (document, updateIfExist, cb) {
+KuzzleDataCollection.prototype.createDocument = function (document, options, cb) {
   var
     self = this,
     data = {},
-    action;
+    action = 'create';
 
-  if (!cb && updateIfExist) {
-    if (typeof updateIfExist === 'function') {
-      cb = updateIfExist;
-      updateIfExist = false;
-    }
+  if (!cb && options && typeof options === 'function') {
+    cb = options;
+    options = null;
   }
 
   if (document instanceof KuzzleDocument) {
@@ -139,12 +142,15 @@ KuzzleDataCollection.prototype.createDocument = function (document, updateIfExis
     data.body = document;
   }
 
+  if (options) {
+    action = options.updateIfExist ? 'createOrUpdate' : 'create';
+  }
+
   data.persist = true;
   data = self.kuzzle.addHeaders(data, self.headers);
-  action = updateIfExist ? 'createOrUpdate' : 'create';
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', action, data, function (err, res) {
+    self.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -152,7 +158,7 @@ KuzzleDataCollection.prototype.createDocument = function (document, updateIfExis
       cb(null, new KuzzleDocument(self, res._id, res._source));
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data);
+    this.kuzzle.query(this.collection, 'write', action, data, options);
   }
 
   return this;
@@ -165,11 +171,16 @@ KuzzleDataCollection.prototype.createDocument = function (document, updateIfExis
  * usually a couple of seconds.
  * That means that a document that was just been created won’t be returned by this function
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
+ * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.deleteDocument = function (arg, cb) {
+KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   var
     action,
     data = {};
@@ -182,10 +193,15 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, cb) {
     action = 'deleteByQuery';
   }
 
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   data = this.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', action, data, function (err, res) {
+    this.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -197,7 +213,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, cb) {
       }
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data);
+    this.kuzzle.query(this.collection, 'write', action, data, options);
   }
 
   return this;
@@ -263,10 +279,16 @@ KuzzleDataCollection.prototype.getMapping = function (cb) {
 
 /**
  * Publish a realtime message
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
  * @param {object} document - either a KuzzleDocument instance or a JSON object
+ * @param {object} [options] - optional arguments
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.publish = function (document) {
+KuzzleDataCollection.prototype.publish = function (document, options) {
   var data = {};
 
   if (document instanceof KuzzleDocument) {
@@ -277,7 +299,7 @@ KuzzleDataCollection.prototype.publish = function (document) {
 
   data.persist = false;
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'create', data);
+  this.kuzzle.query(this.collection, 'write', 'create', data, options);
 
   return this;
 };
@@ -285,12 +307,17 @@ KuzzleDataCollection.prototype.publish = function (document) {
 /**
  * Replace an existing document with a new one.
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
  * @param {string} documentId - Unique document identifier of the document to replace
  * @param {object} content - JSON object representing the new document version
+ * @param {object} [options] - additional arguments
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, options, cb) {
   var
     self = this,
     data = {
@@ -298,10 +325,15 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       body: content
     };
 
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, function (err, res) {
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -309,7 +341,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       cb(null, new KuzzleDocument(self, res._id, res._source));
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data);
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
   }
 
   return this;
@@ -338,12 +370,17 @@ KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
 /**
  * Update parts of a document
  *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
  * @param {string} documentId - Unique document identifier of the document to update
  * @param {object} content - JSON object containing changes to perform on the document
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.updateDocument = function (documentId, content, cb) {
+KuzzleDataCollection.prototype.updateDocument = function (documentId, content, options, cb) {
   var
     data = {
       _id: documentId,
@@ -354,7 +391,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, c
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'update', data, function (err, res) {
+    self.kuzzle.query(this.collection, 'write', 'update', data, options, function (err, res) {
       var doc;
       if (err) {
         return cb(err);
@@ -364,7 +401,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, c
       cb(null, doc);
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'update', data);
+    self.kuzzle.query(this.collection, 'write', 'update', data, options);
   }
 
   return self;
