@@ -401,6 +401,12 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     }
   }
 
+  if (query.metadata) {
+    Object.keys(query.metadata).forEach(function (meta) {
+      object.metadata[meta] = query.metadata[meta];
+    });
+  }
+
   for (attr in query) {
     if (attr !== 'metadata' && query.hasOwnProperty(attr)) {
       object[attr] = query[attr];
