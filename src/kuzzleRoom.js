@@ -57,13 +57,18 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       enumerable: true,
       writable: true
     },
-    listeningToConnections: {
-      value: (options && options.listeningToConnections) ? options.listeningToConnections : false,
+    listenToConnections: {
+      value: options ? options.listenToConnections : false,
       enumerable: true,
       writable: true
     },
-    listeningToDisconnections: {
-      value: (options && options.listeningToDisconnections) ? options.listeningToDisconnections : false,
+    listenToDisconnections: {
+      value: options ? options.listenToDisconnections : false,
+      enumerable: true,
+      writable: true
+    },
+    metadata: {
+      value: (options && options.metadata) ? options.metadata : {},
       enumerable: true,
       writable: true
     },
@@ -73,7 +78,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       writable: true
     },
     subscribeToSelf: {
-      value: (options && options.subscribeToSelf) ? options.subscribeToSelf : false,
+      value: options ? options.subscribeToSelf : false,
       enumerable: true,
       writable: true
     }
@@ -145,7 +150,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   this.subscribing = true;
 
-  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, function (error, response) {
+  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     if (error) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
@@ -166,10 +171,10 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       if (data.result.action === 'on' || data.result.action === 'off') {
         if (data.result.action === 'on') {
           globalEvent = 'subscribed';
-          listening = self.listeningToConnections;
+          listening = self.listenToConnections;
         } else {
           globalEvent = 'unsubscribed';
-          listening = self.listeningToDisconnections;
+          listening = self.listenToDisconnections;
         }
 
         if (listening || self.kuzzle.eventListeners[globalEvent].length > 0) {

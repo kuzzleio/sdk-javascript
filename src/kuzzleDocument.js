@@ -316,10 +316,16 @@ KuzzleDocument.prototype.setContent = function (data, replace) {
  * Listens to events concerning this document. Has no effect if the document does not have an ID
  * (i.e. if the document has not yet been created as a persisted document).
  *
+ * @param {object} [options] - subscription options
  * @param {responseCallback} cb - callback that will be called each time a change has been detected on this document
  */
-KuzzleDocument.prototype.subscribe = function (cb) {
+KuzzleDocument.prototype.subscribe = function (options, cb) {
   var filters;
+
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
 
@@ -334,7 +340,7 @@ KuzzleDocument.prototype.subscribe = function (cb) {
 
   filters = { ids: { values: [this.id] } };
 
-  return this.dataCollection.subscribe(filters, cb);
+  return this.dataCollection.subscribe(filters, cb, options);
 };
 
 /**

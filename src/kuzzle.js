@@ -67,7 +67,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: true
     },
     metadata: {
-      value: {},
+      value: (options && options.metadata) ? options.metadata : {},
       enumerable: true,
       writable: true
     }
@@ -368,7 +368,8 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     attr,
     now = Date.now(),
     object = {
-      action: action
+      action: action,
+      metadata: this.metadata
     },
     self = this;
 
@@ -380,11 +381,15 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
   }
 
   if (options) {
-    query.metadata = options.metadata || {};
+    if (options.metadata) {
+      Object.keys(options.metadata).forEach(function (meta) {
+        object.metadata[meta] = options.metadata[meta];
+      });
+    }
   }
 
   for (attr in query) {
-    if (query.hasOwnProperty(attr)) {
+    if (attr !== 'metadata' && query.hasOwnProperty(attr)) {
       object[attr] = query[attr];
     }
   }
