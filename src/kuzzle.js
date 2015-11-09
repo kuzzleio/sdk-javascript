@@ -49,6 +49,16 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: null,
       writable: true
     },
+    subscriptions: {
+      /*
+       Contains the centralized subscription list in the following format:
+          'roomId': [ kuzzleRoomID_1, kuzzleRoomID_2, kuzzleRoomID_... ]
+
+       This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
+       */
+      value: {},
+      writable: true
+    },
     // read-only properties
     collections: {
       value: {},

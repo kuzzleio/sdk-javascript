@@ -1,3 +1,5 @@
+var uuid = require('node-uuid');
+
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
@@ -29,6 +31,13 @@ function KuzzleRoom(kuzzleDataCollection, options) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
+    callback: {
+      value: null,
+      writable: true
+    },
+    id: {
+      value: uuid.v4()
+    },
     queue: {
       value: [],
       writable: true
@@ -141,71 +150,43 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
 
+  this.unsubscribe();
+  this.subscribing = true;
+
   if (filters) {
     this.filters = filters;
   }
 
-  this.unsubscribe();
-  subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
+  this.roomId = null;
+  this.callback = cb;
 
-  this.subscribing = true;
+  subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     if (error) {
-      throw new Error('Error during Kuzzle subscription: ' + error.message);
+      /*
+       If we've already subscribed to this room, Kuzzle returns the actual roomID.
+       We'll simply ignore the error and acts as if we successfully subscribed.
+        */
+      if (error.details.roomId) {
+        self.roomId = error.details.roomId;
+      } else {
+        throw new Error('Error during Kuzzle subscription: ' + error.message);
+      }
+    } else {
+      self.roomId = response.roomId;
     }
 
-    self.roomId = response.roomId;
+    if (self.kuzzle.subscriptions[self.roomId]) {
+      self.kuzzle.subscriptions[self.roomId].push(self.id);
+    } else {
+      self.kuzzle.subscriptions[self.roomId] = [self.id];
+    }
+
     self.subscribing = false;
     self.dequeue();
 
-    self.kuzzle.socket.on(self.roomId, function (data) {
-      var
-        globalEvent,
-        listening;
-
-      if (data.error) {
-        return cb(data.error);
-      }
-
-      if (data.result.action === 'on' || data.result.action === 'off') {
-        if (data.result.action === 'on') {
-          globalEvent = 'subscribed';
-          listening = self.listenToConnections;
-        } else {
-          globalEvent = 'unsubscribed';
-          listening = self.listenToDisconnections;
-        }
-
-        if (listening || self.kuzzle.eventListeners[globalEvent].length > 0) {
-          self.count(function (countError, countResult) {
-            if (countError) {
-              if (listening) {
-                cb(countError);
-              }
-              return false;
-            }
-
-            data.result.count = countResult;
-
-            if (listening) {
-              cb(null, data.result);
-            }
-
-            self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
-              listener(self.subscriptionId, data.result);
-            });
-          });
-        }
-      } else if (self.kuzzle.requestHistory[data.result.requestId]) {
-        if (self.subscribeToSelf) {
-          cb(null, data.result);
-        }
-        delete self.kuzzle.requestHistory[data.result.requestId];
-      } else {
-        cb(null, data.result);
-      }
-    });
+    self.kuzzle.socket.on(self.roomId, notificationCallback.bind(self));
   });
 
   return this;
@@ -217,17 +198,20 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
  * @return {*} this
  */
 KuzzleRoom.prototype.unsubscribe = function () {
-  var data;
-
   if (this.subscribing) {
-    this.queue.push({action: 'unsubscribed', args: []});
+    this.queue.push({action: 'unsubscribe', args: []});
     return this;
   }
 
   if (this.roomId) {
-    data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
-    this.kuzzle.query(this.collection, 'subscribe', 'off', data);
-    this.kuzzle.socket.off(this.roomId);
+    this.kuzzle.socket.off(this.roomId, notificationCallback);
+    if (this.kuzzle.subscriptions[this.roomId].length === 1) {
+      delete this.kuzzle.subscriptions[this.roomId];
+      this.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: this.roomId}});
+    } else {
+      this.kuzzle.subscriptions[this.roomId].splice(this.kuzzle.subscriptions[this.roomId].indexOf(this.id), 1);
+    }
+
     this.roomId = null;
   }
 
@@ -260,5 +244,50 @@ KuzzleRoom.prototype.dequeue = function () {
     this[element.action].apply(this, element.args);
   }
 };
+
+/**
+ * Callback called by socket.io when a message is sent to the subscribed room ID
+ * Calls the registered callback if the notification passes the subscription filters
+ *
+ * @param {object} data - data
+ * @returns {*}
+ */
+function notificationCallback (data) {
+  var
+    self = this,
+    globalEvent,
+    listening;
+
+  if (data.error) {
+    return self.callback(data.error);
+  }
+
+  if (data.result.action === 'on' || data.result.action === 'off') {
+    if (data.result.action === 'on') {
+      globalEvent = 'subscribed';
+      listening = self.listenToConnections;
+    } else {
+      globalEvent = 'unsubscribed';
+      listening = self.listenToDisconnections;
+    }
+
+    if (listening || self.kuzzle.eventListeners[globalEvent].length > 0) {
+      if (listening) {
+        self.callback(null, data.result);
+      }
+
+      self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
+        listener(self.subscriptionId, data.result);
+      });
+    }
+  } else if (self.kuzzle.requestHistory[data.result.requestId]) {
+    if (self.subscribeToSelf) {
+      self.callback(null, data.result);
+    }
+    delete self.kuzzle.requestHistory[data.result.requestId];
+  } else {
+    self.callback(null, data.result);
+  }
+}
 
 module.exports = KuzzleRoom;
