@@ -52,11 +52,14 @@ module.exports = Kuzzle = function (url, options, cb) {
     subscriptions: {
       /*
        Contains the centralized subscription list in the following format:
+          pending: <number of pending subscriptions>
           'roomId': [ kuzzleRoomID_1, kuzzleRoomID_2, kuzzleRoomID_... ]
 
        This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
        */
-      value: {},
+      value: {
+        pending: 0
+      },
       writable: true
     },
     // read-only properties

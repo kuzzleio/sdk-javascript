@@ -38,6 +38,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     id: {
       value: uuid.v4()
     },
+    notifier: {
+      value: null,
+      writable: true
+    },
     queue: {
       value: [],
       writable: true
@@ -152,6 +156,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   this.unsubscribe();
   this.subscribing = true;
+  this.kuzzle.subscriptions.pending++;
 
   if (filters) {
     this.filters = filters;
@@ -161,8 +166,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   this.callback = cb;
 
   subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
-
-  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+  self.kuzzle.que
+  ry(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     if (error) {
       /*
        If we've already subscribed to this room, Kuzzle returns the actual roomID.
@@ -183,10 +188,12 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       self.kuzzle.subscriptions[self.roomId] = [self.id];
     }
 
-    self.subscribing = false;
-    self.dequeue();
+    self.notifier = notificationCallback.bind(self);
+    self.kuzzle.socket.on(self.roomId, self.notifier);
 
-    self.kuzzle.socket.on(self.roomId, notificationCallback.bind(self));
+    self.subscribing = false;
+    self.kuzzle.subscriptions.pending--;
+    self.dequeue();
   });
 
   return this;
@@ -195,19 +202,40 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 /**
  * Unsubscribes from Kuzzle.
  *
+ * Stop listening immediately. If there is no listener left on that room, sends an unsubscribe request to Kuzzle, once
+ * pending subscriptions reaches 0, and only if there is still no listener on that room.
+ * We wait for pending subscriptions to finish to avoid unsubscribing while another subscription on that room is
+ *
  * @return {*} this
  */
 KuzzleRoom.prototype.unsubscribe = function () {
+  var
+    self = this,
+    interval;
+
   if (this.subscribing) {
     this.queue.push({action: 'unsubscribe', args: []});
     return this;
   }
 
   if (this.roomId) {
-    this.kuzzle.socket.off(this.roomId, notificationCallback);
+    this.kuzzle.socket.off(this.roomId, this.notifier);
+
     if (this.kuzzle.subscriptions[this.roomId].length === 1) {
       delete this.kuzzle.subscriptions[this.roomId];
-      this.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: this.roomId}});
+
+      if (this.kuzzle.subscriptions.pending === 0) {
+        this.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: this.roomId}});
+      } else {
+        interval = setInterval(function () {
+          if (self.kuzzle.subscriptions.pending === 0) {
+            if (!self.kuzzle.subscriptions[self.roomId]) {
+              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: self.roomId}});
+            }
+            clearInterval(interval);
+          }
+        }, 500);
+      }
     } else {
       this.kuzzle.subscriptions[this.roomId].splice(this.kuzzle.subscriptions[this.roomId].indexOf(this.id), 1);
     }
