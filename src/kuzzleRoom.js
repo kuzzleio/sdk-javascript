@@ -166,8 +166,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   this.callback = cb;
 
   subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
-  self.kuzzle.que
-  ry(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     if (error) {
       /*
        If we've already subscribed to this room, Kuzzle returns the actual roomID.
@@ -211,6 +210,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 KuzzleRoom.prototype.unsubscribe = function () {
   var
     self = this,
+    room = this.roomId,
     interval;
 
   if (this.subscribing) {
@@ -229,8 +229,8 @@ KuzzleRoom.prototype.unsubscribe = function () {
       } else {
         interval = setInterval(function () {
           if (self.kuzzle.subscriptions.pending === 0) {
-            if (!self.kuzzle.subscriptions[self.roomId]) {
-              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: self.roomId}});
+            if (!self.kuzzle.subscriptions[room]) {
+              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: room}});
             }
             clearInterval(interval);
           }
