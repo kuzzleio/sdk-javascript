@@ -347,7 +347,8 @@ Kuzzle.prototype.logout = function () {
 
 
 /**
- * Returns the current Kuzzle UTC timestamp
+ * Return the current Kuzzle's UTC Epoch time, in milliseconds
+ *
  * @param {responseCallback} cb - Handles the query response
  * @returns {object} this
  */
@@ -355,11 +356,17 @@ Kuzzle.prototype.now = function (cb) {
   this.isValid();
   this.callbackRequired('Kuzzle.now', cb);
 
-  // TODO
-  cb(null, {now: 0xBADDCAFE});
+  this.query(null, 'read', 'now', {}, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.now);
+  });
 
   return this;
 };
+
 
 /**
  * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
