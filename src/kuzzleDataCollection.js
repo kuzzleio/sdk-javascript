@@ -72,7 +72,7 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
     }
 
     result.hits.hits.forEach(function (doc) {
-      documents.push(this.documentFactory(doc._id, doc));
+      documents.push(self.documentFactory(doc._id, doc));
     });
 
     cb(null, { total: result.hits.total, documents: documents });
