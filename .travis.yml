@@ -6,9 +6,6 @@ script:
 - grunt
 before_install: npm install -g grunt-cli
 install: npm install
-deploy:
-  provider: npm
-  email:
 after_success:
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then git config --global user.email "support@kuzzle.io";
   fi
@@ -25,3 +22,10 @@ after_success:
 env:
   global:
     secure: EZ+XXJFDtehmag7wt8JbutqgzpkkJUCzkEWw6W+p7MIxWenLyuGv/RUu7KGqAloOud1cZbmZGSfRx/vsPvxRjo+ZC7aaPqb74qRvfctGdlJTtEffS2jFno1pEppJzCR4n7vocSfMVYtOD6oHP67lXwn/Qnh++WUkZaV137m5+7rqiYgJ+JTeSs5jBRZ6X7VNoNz8tZXejQ+FOymCFQTS2JM/rSZX9NEK+OwUEhEjRcxqWMm2avk6NAQNAL3WQuIBJQH8lxEJxOXkMc0rQZZ09AoLpqJKzsaicaZMInt5JstPo2e9vJfhi+PpRSNhErIff36aCHWRYYDPKl5x6IelZpBfZeTdrs4V2TbRi1y0ELbgMG1FHS4HAw3vTnh4/49g01lAJed4UguFRc6MzwTLAL8uPG/zFe8snm9+kaf4pL7yO89Hf3eltE03+N//tyVv+X/jdSca2dBZ9FMeLE5pJ2jlRiKitCLjXmLUEMMxEwNF7K/IvOrD9wue3JXK0UogOpcXfppk++pNTijsZluU1Yj7k3fGFeS8d6rIU0Yj40y6/VMaJeL4EXlARRsGLigUKVjQL6+/N5xudlsCng+EG+WVIy4wEEPH0QgjUkPTgWx1NrUlTwjskE0cdqDOBu39WkRFJHHECYFPTfTuDJ7xxuuibFTQmUFu2zjbYfYKhPE=
+deploy:
+  provider: npm
+  email: support@kuzzle.io
+  api_key:
+    secure: iF7FoEKqgQAtYFb/1812zdpZ8sn5gG7nVHIpdz49gNM6W6374wKW6ewS6b+K5fcQ8+L7oBDuNC33b5VUYuZu5ww27CTIRBm3AozwsXsL2R0WlxCJPCsPavSGlr+IGrcjfxXz0OG6woYI3k+weDGGdv8o5SXiqOjiWPhL1xWwBWwy3r9n+g9muvhRPqwPj9nYgfg3QchBJXHPw3NP6rH2h9AVjw9ekJAy2/dpdFxCPTCa0I+hvyBeGZB2r08yqAWD1KLZBqDz7M9+a3cZZqSFOFJefaKzVfoAhyj8GhrAUdOUB/GcPgwQvWq77gcOBpylZhcu6gUDqKhQCsM8M+pr4ZzKjeZAYrfZKc1rE2EXylHrlKrSqyyPYntnKqVR1ThDh/yFZe9MT2r8ZZLJoaj+OBpJ8YL2LrFLvAm2xSI6Nz+U8E8QL1kdCZttvEW/jqM7nxbUzdtJgM/hsoBB04EYpBgpBrgHb0pdg5qByhgB1jqVA31j1eaaeOosOJK/EXnPYDHRZmWQkW+Wn0DXwVYuBToklVxI1r2T0IBjywO72ZEGCADwtgiLwTDIKmXcfra1z9GxAEz+7uKxE9mKIOIZkZwozxhg6BDdjWV4JUIgRQOE/tZosZ0AhZtdZ8KZwovZNG66INhEFKitjPtKGQpaGlaAoCZoS1DCJfCxprl0Jdg=
+  on:
+    repo: kuzzleio/sdk-javascript
