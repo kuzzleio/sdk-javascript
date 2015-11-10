@@ -55,20 +55,17 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
     },
     // writable properties
     content: {
-      enumerable: true,
-      set: function (data) {
-        if (!content) {
-          content = {};
-        }
-
-        return this.setContent(data, false);
-      },
-      get: function () {
-        return content;
-      }
+      value: {},
+      writable: true,
+      enumerable: true
     },
     headers: {
       value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
+    version: {
+      value: undefined,
       enumerable: true,
       writable: true
     }
@@ -117,6 +114,7 @@ KuzzleDocument.prototype.toJSON = function () {
   }
 
   data.body = this.content;
+  data._version = this.version;
   data = this.kuzzle.addHeaders(data, this.headers);
 
   return data;
@@ -195,18 +193,21 @@ KuzzleDocument.prototype.refresh = function (cb) {
   self.refreshing = true;
 
   self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, function (error, result) {
-    self.refreshing = false;
-    dequeue.call(self);
-
     if (error) {
+      self.refreshing = false;
+      self.queue = [];
       return cb ? cb(error) : false;
     }
 
+    self.version = result._version;
     self.content = result._source;
 
     if (cb) {
       cb(null, self);
     }
+
+    self.refreshing = false;
+    dequeue.call(self);
   });
 
   return this;
