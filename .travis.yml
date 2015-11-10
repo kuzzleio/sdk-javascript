@@ -6,7 +6,7 @@ script:
 - grunt
 before_install: npm install -g grunt-cli
 install: npm install
-after_success:
+after_deploy:
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then git config --global user.email "support@kuzzle.io";
   fi
 - if [ "${TRAVIS_BRANCH}" = "master" ]; then git config --global user.name "Travis
