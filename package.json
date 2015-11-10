@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "1.0-alpha.1",
+  "version": "1.0.0-alpha.1",
   "description": "A connector for the Kuzzle API",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
