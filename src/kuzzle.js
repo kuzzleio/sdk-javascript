@@ -27,6 +27,10 @@ var
  * @constructor
  */
 module.exports = Kuzzle = function (url, options, cb) {
+  if (!(this instanceof Kuzzle)) {
+    return new Kuzzle(url, options, cb);
+  }
+
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
