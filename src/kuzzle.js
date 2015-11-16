@@ -38,11 +38,16 @@ module.exports = Kuzzle = function (url, options, cb) {
 
   Object.defineProperties(this, {
     // 'private' properties
+    collections: {
+      value: {},
+      writable: true
+    },
     eventListeners: {
       value: {
         subscribed: [],
         unsubscribed: [],
-        disconnected: []
+        disconnected: [],
+        reconnected: []
       }
     },
     requestHistory: {
@@ -51,6 +56,10 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     socket: {
       value: null,
+      writable: true
+    },
+    state: {
+      value: 'initializing',
       writable: true
     },
     subscriptions: {
@@ -67,28 +76,53 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: true
     },
     // read-only properties
-    collections: {
-      value: {},
+    autoReconnect: {
+      value: (options && options.autoReconnect) ? options.autoReconnect : true,
+      enumerable: true
+    },
+    reconnectionDelay: {
+      value: (options && options.reconnectionDelay) ? options.reconnectionDelay : 1000,
+      enumerable: true
+    },
+    // writable properties
+    autoQueue: {
+      value: false,
       enumerable: true,
       writable: true
     },
-    // writable properties
-    autoReconnect: {
-      value: (options && options.autoReconnect) ? options.autoReconnect : true,
+    autoReplay: {
+      value: false,
+      enumerable: true,
+      writable: true
+    },
+    autoResubscribe: {
+      value: true,
       enumerable: true,
       writable: true
     },
     headers: {
-      value: (options && options.headers) ? options. headers : {},
+      value: {},
       enumerable: true,
       writable: true
     },
     metadata: {
-      value: (options && options.metadata) ? options.metadata : {},
+      value: {},
       enumerable: true,
       writable: true
     }
   });
+
+  if (options) {
+    Object.keys(options).forEach(function (opt) {
+      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
+        this[opt] = options[opt];
+      }
+    });
+
+    if (options.offlineMode === 'auto' && this.autoReconnect) {
+      this.autoQueue = this.autoReplay = this.autoResubscribe = true;
+    }
+  }
 
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
   Object.defineProperty(this, 'isValid', {
@@ -147,17 +181,19 @@ function construct(url, cb) {
     throw new Error('URL to Kuzzle can\'t be empty');
   }
 
-  this.socket = io(url);
+  this.socket = io(url, {reconnection: this.autoReconnect, reconnectionDelay: this.reconnectionDelay});
 
   this.socket.once('connect', function () {
-    // TODO: initialize kuzzle-provided properties (applicationId, connectionId, connectionTimestamp)
+    self.state = 'connected';
+
     if (cb) {
       cb(null, self);
     }
   });
 
   this.socket.once('error', function (error) {
-    // TODO: Invalidate this object for now. Should handle the autoReconnect flag later
+    self.state = 'error';
+
     self.logout();
 
     if (cb) {
@@ -166,7 +202,21 @@ function construct(url, cb) {
   });
 
   this.socket.on('disconnect', function () {
+    self.state = 'offline';
+
+    if (!self.autoReconnect) {
+      self.logout();
+    }
+
     self.eventListeners.disconnected.forEach(function (listener) {
+      listener();
+    });
+  });
+
+  this.socket.on('reconnect', function () {
+    self.state = 'connected';
+
+    self.eventListeners.reconnected.forEach(function (listener) {
       listener();
     });
   });
@@ -242,6 +292,7 @@ Kuzzle.prototype.getAllStatistics = function (cb) {
  * Kuzzle monitors active connections, and ongoing/completed/failed requests.
  * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
  *
+ * @param {number} timestamp -  Epoch time. Starting time from which the frames are to be retrieved
  * @param {responseCallback} cb - Handles the query response
  * @returns {object} this
  */
