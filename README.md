@@ -8,12 +8,12 @@ Kuzzle
 
 For UI and linked objects developers, Kuzzle is an open-source solution that handles all the data management (CRUD, real-time storage, search, high-level features, etc).
 
-You can access the Kuzzle repository here: https://github.com/kuzzleio/kuzzle
+You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
 
 ## SDK Documentation
 
-The complete SDK documentation is available here: http://kuzzleio.github.io/sdk-documentation
+The complete SDK documentation is available [here](http://kuzzleio.github.io/sdk-documentation)
 
 ## Installation
 
