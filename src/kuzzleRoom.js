@@ -125,7 +125,7 @@ KuzzleRoom.prototype.count = function (cb) {
       return cb(err);
     }
 
-    cb(null, res);
+    cb(null, res.count);
   });
 
   return this;
