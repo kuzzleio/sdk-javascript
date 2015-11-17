@@ -393,6 +393,7 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     now = Date.now(),
     object = {
       action: action,
+      controller: controller,
       metadata: this.metadata
     },
     self = this;
@@ -440,7 +441,7 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     });
   }
 
-  self.socket.emit(controller, object);
+  self.socket.emit('kuzzle', object);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
   self.requestHistory[object.requestId] = now;
