@@ -109,6 +109,35 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: {},
       enumerable: true,
       writable: true
+    },
+    /*
+      Offline queue use the following format:
+            [
+              timestamp: {
+                query: 'query',
+                cb: callbackFunction
+              }
+            ]
+     */
+    offlineQueue: {
+      value: [],
+      enumerable: true,
+      writable: true
+    },
+    queueFilter: {
+      value: null,
+      enumerable: true,
+      writable: true
+    },
+    queueMaxSize: {
+      value: 500,
+      enumerable: true,
+      writable: true
+    },
+    queueTTL: {
+      value: 120000,
+      enumerable: true,
+      writable: true
     }
   });
 
