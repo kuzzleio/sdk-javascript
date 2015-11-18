@@ -312,10 +312,8 @@ function cleanQueue () {
     }
   }
 
-  if (self.queueMaxSize > 0) {
-    if (self.offlineQueue.length >= self.queueMaxSize) {
-      self.offlineQueue.splice(0, self.offlineQueue.length - self.queueMaxSize);
-    }
+  if (self.queueMaxSize > 0 && self.offlineQueue.length > self.queueMaxSize) {
+    self.offlineQueue.splice(0, self.offlineQueue.length - self.queueMaxSize);
   }
 }
 
@@ -455,7 +453,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
       timestamp = null;
     } else {
       cb = arguments[1];
-      if (arguments[0] === 'object') {
+      if (typeof arguments[0] === 'object') {
         options = arguments[0];
         timestamp = null;
       } else {
@@ -553,7 +551,7 @@ Kuzzle.prototype.listCollections = function (options, cb) {
 
   this.callbackRequired('Kuzzle.listCollections', cb);
 
-  this.query(null, 'read', 'listCollections', {}, function (err, res) {
+  this.query(null, 'read', 'listCollections', {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -785,8 +783,8 @@ Kuzzle.prototype.setHeaders = function(content, replace) {
  * Starts the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
  */
 Kuzzle.prototype.startQueuing = function () {
-  if (self.state === 'offline' && !self.autoQueue) {
-    self.queuing = true;
+  if (this.state === 'offline' && !this.autoQueue) {
+    this.queuing = true;
   }
 
   return this;
@@ -796,8 +794,8 @@ Kuzzle.prototype.startQueuing = function () {
  * Stops the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
  */
 Kuzzle.prototype.stopQueuing = function () {
-  if (self.state === 'offline' && !self.autoQueue) {
-    self.queuing = false;
+  if (this.state === 'offline' && !this.autoQueue) {
+    this.queuing = false;
   }
 
   return this;
