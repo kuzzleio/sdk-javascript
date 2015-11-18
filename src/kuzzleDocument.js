@@ -238,6 +238,12 @@ KuzzleDocument.prototype.save = function (options, cb) {
   var
     data = this.toJSON(),
     self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   var queryCB = function (error, result) {
     if (error) {
       return cb ? cb(error) : false;
