@@ -181,11 +181,11 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       self.roomId = response.roomId;
     }
 
-    if (self.kuzzle.subscriptions[self.roomId]) {
-      self.kuzzle.subscriptions[self.roomId].push(self.id);
-    } else {
-      self.kuzzle.subscriptions[self.roomId] = [self.id];
+    if (!self.kuzzle.subscriptions[self.roomId]) {
+      self.kuzzle.subscriptions[self.roomId] = {};
     }
+
+    self.kuzzle.subscriptions[self.roomId][self.id] = self;
 
     self.notifier = notificationCallback.bind(self);
     self.kuzzle.socket.on(self.roomId, self.notifier);
@@ -210,22 +210,22 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 KuzzleRoom.prototype.unsubscribe = function () {
   var
     self = this,
-    room = this.roomId,
+    room = self.roomId,
     interval;
 
-  if (this.subscribing) {
-    this.queue.push({action: 'unsubscribe', args: []});
-    return this;
+  if (self.subscribing) {
+    self.queue.push({action: 'unsubscribe', args: []});
+    return self;
   }
 
-  if (this.roomId) {
-    this.kuzzle.socket.off(this.roomId, this.notifier);
+  if (room) {
+    self.kuzzle.socket.off(room, this.notifier);
 
-    if (this.kuzzle.subscriptions[this.roomId].length === 1) {
-      delete this.kuzzle.subscriptions[this.roomId];
+    if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
+      delete self.kuzzle.subscriptions[room];
 
-      if (this.kuzzle.subscriptions.pending === 0) {
-        this.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: this.roomId}});
+      if (self.kuzzle.subscriptions.pending === 0) {
+        self.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: room}});
       } else {
         interval = setInterval(function () {
           if (self.kuzzle.subscriptions.pending === 0) {
@@ -237,13 +237,13 @@ KuzzleRoom.prototype.unsubscribe = function () {
         }, 500);
       }
     } else {
-      this.kuzzle.subscriptions[this.roomId].splice(this.kuzzle.subscriptions[this.roomId].indexOf(this.id), 1);
+      delete self.kuzzle.subscriptions[room][self.id];
     }
 
-    this.roomId = null;
+    self.roomId = null;
   }
 
-  return this;
+  return self;
 };
 
 /**

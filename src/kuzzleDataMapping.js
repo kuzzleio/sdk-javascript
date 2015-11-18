@@ -52,14 +52,20 @@ function KuzzleDataMapping(kuzzleDataCollection) {
 /**
  * Applies the new mapping to the data collection.
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleDataMapping.prototype.apply = function (cb) {
+KuzzleDataMapping.prototype.apply = function (options, cb) {
   var
     self = this,
     data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
 
-  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, function (err, res) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
     if (err) {
       return cb ? cb(err) : false;
     }
@@ -79,15 +85,21 @@ KuzzleDataMapping.prototype.apply = function (cb) {
  *
  * Calling this function will discard any uncommited changes. You can commit changes by calling the “apply” function
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDataMapping.prototype.refresh = function (cb) {
+KuzzleDataMapping.prototype.refresh = function (options, cb) {
   var
     self = this,
     data = this.kuzzle.addHeaders({}, this.headers);
 
-  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, function (err, res) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, options, function (err, res) {
     if (err) {
       return cb ? cb(err) : false;
     }

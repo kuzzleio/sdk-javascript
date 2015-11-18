@@ -52,19 +52,25 @@ function KuzzleDataCollection(kuzzle, collection) {
  * That means that a document that was just been created won’t be returned by this function.
  *
  * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
+KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
   var
     query,
     self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   self.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'search', query, function (error, result) {
+  self.kuzzle.query(this.collection, 'read', 'search', query, options, function (error, result) {
     var documents = [];
 
     if (error) {
@@ -89,17 +95,23 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, cb) {
  * That means that a document that was just been created won’t be returned by this function
  *
  * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.count = function (filters, cb) {
+KuzzleDataCollection.prototype.count = function (filters, options, cb) {
   var query;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.count', cb);
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'count', query, function (error, result) {
+  this.kuzzle.query(this.collection, 'read', 'count', query, options, function (error, result) {
     if (error) {
       return cb(error);
     }
@@ -131,7 +143,7 @@ KuzzleDataCollection.prototype.createDocument = function (document, options, cb)
     data = {},
     action = 'create';
 
-  if (!cb && options && typeof options === 'function') {
+  if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
@@ -193,7 +205,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
     action = 'deleteByQuery';
   }
 
-  if (options && !cb && typeof options === 'function') {
+  if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
@@ -223,18 +235,24 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
  * Retrieve a single stored document using its unique document ID.
  *
  * @param {string} documentId - Unique document identifier
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetchDocument = function (documentId, cb) {
+KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb) {
   var
     data = {_id: documentId},
     self = this;
 
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'get', data, function (err, res) {
+  self.kuzzle.query(this.collection, 'read', 'get', data, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -248,13 +266,19 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, cb) {
 /**
  * Retrieves all documents stored in this data collection
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.fetchAllDocuments = function (cb) {
+KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
-  this.advancedSearch({}, cb);
+  this.advancedSearch({}, options, cb);
 
   return this;
 };
@@ -263,16 +287,22 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (cb) {
 /**
  * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.getMapping = function (cb) {
+KuzzleDataCollection.prototype.getMapping = function (options, cb) {
   var kuzzleMapping;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.getMapping', cb);
 
   kuzzleMapping = new KuzzleDataMapping(this);
-  kuzzleMapping.refresh(cb);
+  kuzzleMapping.refresh(options, cb);
 
   return this;
 };
@@ -325,7 +355,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       body: content
     };
 
-  if (options && !cb && typeof options === 'function') {
+  if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
@@ -387,6 +417,11 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
       body: content
     },
     self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   data = self.kuzzle.addHeaders(data, this.headers);
 

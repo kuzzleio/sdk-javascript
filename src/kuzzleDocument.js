@@ -143,13 +143,13 @@ KuzzleDocument.prototype.toString = function () {
 KuzzleDocument.prototype.delete = function (options, cb) {
   var self = this;
 
-  if (options && !cb && typeof options === 'function') {
+  if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
 
   if (this.refreshing) {
-    this.queue.push({action: 'delete', args: [cb]});
+    this.queue.push({action: 'delete', args: [options, cb]});
     return this;
   }
 
@@ -175,14 +175,20 @@ KuzzleDocument.prototype.delete = function (options, cb) {
 /**
  * Replaces the current content with the last version of this document stored in Kuzzle.
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.refresh = function (cb) {
+KuzzleDocument.prototype.refresh = function (options, cb) {
   var self = this;
 
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   if (this.refreshing) {
-    this.queue.push({action: 'refresh', args: [cb]});
+    this.queue.push({action: 'refresh', args: [options, cb]});
     return this;
   }
 
@@ -192,7 +198,7 @@ KuzzleDocument.prototype.refresh = function (cb) {
 
   self.refreshing = true;
 
-  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, function (error, result) {
+  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, result) {
     if (error) {
       self.refreshing = false;
       self.queue = [];
@@ -250,7 +256,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
   };
 
   if (self.refreshing) {
-    self.queue.push({action: 'save', args: [replace, cb]});
+    self.queue.push({action: 'save', args: [options, cb]});
     return self;
   }
 
@@ -275,7 +281,7 @@ KuzzleDocument.prototype.publish = function (options) {
   var data = this.toJSON();
 
   if (this.refreshing) {
-    this.queue.push({action: 'publish', args: []});
+    this.queue.push({action: 'publish', args: [options]});
     return this;
   }
 
