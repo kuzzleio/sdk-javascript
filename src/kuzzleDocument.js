@@ -237,8 +237,15 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
 KuzzleDocument.prototype.save = function (options, cb) {
   var
     data = this.toJSON(),
-    self = this;
-  var queryCB = function (error, result) {
+    self = this,
+    queryCB;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  queryCB = function (error, result) {
     if (error) {
       return cb ? cb(error) : false;
     }
