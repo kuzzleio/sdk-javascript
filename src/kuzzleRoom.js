@@ -96,7 +96,14 @@ function KuzzleRoom(kuzzleDataCollection, options) {
   });
 
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['count'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
   }
 
   return this;
