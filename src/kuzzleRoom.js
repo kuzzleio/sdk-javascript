@@ -26,8 +26,6 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     throw new Error('KuzzleRoom: missing parameters');
   }
 
-  kuzzleDataCollection.kuzzle.isValid();
-
   // Define properties
   Object.defineProperties(this, {
     // private properties
