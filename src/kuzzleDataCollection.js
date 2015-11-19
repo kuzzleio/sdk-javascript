@@ -123,6 +123,29 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
 };
 
 /**
+ * Create a new empty data collection, with no associated mapping.
+ * Kuzzle automatically creates data collections when storing documents, but there are cases where we
+ * want to create and prepare data collections before storing documents in it.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.delete = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'write', 'createCollection', data, options, cb);
+
+  return this;
+};
+
+/**
  * Create a new document in Kuzzle.
  *
  * Takes an optional argument object with the following properties:
@@ -172,6 +195,27 @@ KuzzleDataCollection.prototype.createDocument = function (document, options, cb)
   } else {
     this.kuzzle.query(this.collection, 'write', action, data, options);
   }
+
+  return this;
+};
+
+/**
+ * Delete this data collection and all documents in it.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.delete = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'admin', 'deleteCollection', data, options, cb);
 
   return this;
 };
@@ -389,13 +433,35 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
 KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
   var room;
 
-  this.kuzzle.isValid();
   this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
 
   room = new KuzzleRoom(this, options);
 
   return room.renew(filters, cb);
 };
+
+/**
+ * Truncate the data collection, removing all stored documents but keeping all associated mappings.
+ * This method is a lot faster than removing all documents using a query.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.truncate = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'admin', 'truncateCollection', data, options, cb);
+
+  return this;
+};
+
 
 /**
  * Update parts of a document
