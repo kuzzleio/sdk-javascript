@@ -131,7 +131,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
  * @param {responseCallback} [cb] - returns Kuzzle's response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.delete = function (options, cb) {
+KuzzleDataCollection.prototype.create = function (options, cb) {
   var data = {};
 
   if (!cb && typeof options === 'function') {
