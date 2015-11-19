@@ -38,7 +38,14 @@ function KuzzleDataCollection(kuzzle, collection) {
   });
 
   if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this, {suffix: 'Promise'});
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var blacklist = ['publish', 'setHeaders', 'subscribe'];
+
+        return passes && blacklist.indexOf(name) === -1;
+      }
+    });
   }
 
   return this;

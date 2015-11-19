@@ -205,7 +205,14 @@ module.exports = Kuzzle = function (url, options, cb) {
   construct.call(this, url, cb);
 
   if (this.bluebird) {
-    return this.bluebird.promisifyAll(this, {suffix: 'Promise'});
+    return this.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
   }
 
   return this;
