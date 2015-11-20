@@ -27,6 +27,8 @@ var
  * @constructor
  */
 module.exports = Kuzzle = function (url, options, cb) {
+  var self = this;
+
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(url, options, cb);
   }
@@ -86,11 +88,11 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     // read-only properties
     autoReconnect: {
-      value: (options && options.autoReconnect) ? options.autoReconnect : true,
+      value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
       enumerable: true
     },
     reconnectionDelay: {
-      value: (options && options.reconnectionDelay) ? options.reconnectionDelay : 1000,
+      value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
     },
     // writable properties
@@ -158,8 +160,8 @@ module.exports = Kuzzle = function (url, options, cb) {
 
   if (options) {
     Object.keys(options).forEach(function (opt) {
-      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
-        this[opt] = options[opt];
+      if (self.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(self, opt).writable) {
+        self[opt] = options[opt];
       }
     });
 
@@ -169,6 +171,7 @@ module.exports = Kuzzle = function (url, options, cb) {
   }
 
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
+  // istanbul ignore next
   Object.defineProperty(this, 'isValid', {
     value: function () {
       if (this.socket === null) {
@@ -178,6 +181,7 @@ module.exports = Kuzzle = function (url, options, cb) {
   });
 
   // Helper function copying headers to the query data
+  // istanbul ignore next
   Object.defineProperty(this, 'addHeaders', {
     value: function (query, headers) {
       Object.keys(headers).forEach(function (header) {
@@ -194,6 +198,7 @@ module.exports = Kuzzle = function (url, options, cb) {
    * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
    * and is called by these methods
    */
+  // istanbul ignore next
   Object.defineProperty(this, 'callbackRequired', {
     value: function (errorMessagePrefix, callback) {
       if (!callback || typeof callback !== 'function') {
@@ -232,7 +237,11 @@ function construct(url, cb) {
     throw new Error('URL to Kuzzle can\'t be empty');
   }
 
-  self.socket = io(url, {reconnection: this.autoReconnect, reconnectionDelay: this.reconnectionDelay});
+  self.socket = io(url, {
+    reconnection: this.autoReconnect,
+    reconnectionDelay: this.reconnectionDelay,
+    'force new connection': true
+  });
 
   self.socket.once('connect', function () {
     self.state = 'connected';
@@ -242,7 +251,7 @@ function construct(url, cb) {
     }
   });
 
-  self.socket.once('error', function (error) {
+  self.socket.once('connect_error', function (error) {
     self.state = 'error';
     self.logout();
 
@@ -283,8 +292,8 @@ function construct(url, cb) {
 
     // replay queued requests
     if (self.autoReplay) {
-      cleanQueue.call(this);
-      dequeue.call(this);
+      cleanQueue.call(self);
+      dequeue.call(self);
     }
 
     // alert listeners
@@ -414,8 +423,6 @@ Kuzzle.prototype.addListener = function(event, listener) {
  * @returns {object} this
  */
 Kuzzle.prototype.getAllStatistics = function (options, cb) {
-  this.isValid();
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
@@ -470,7 +477,6 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
     }
   }
 
-  this.isValid();
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   if (!timestamp) {
@@ -549,8 +555,6 @@ Kuzzle.prototype.flushQueue = function () {
  * @returns {object} this
  */
 Kuzzle.prototype.listCollections = function (options, cb) {
-  this.isValid();
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
@@ -593,8 +597,6 @@ Kuzzle.prototype.logout = function () {
  * @returns {object} this
  */
 Kuzzle.prototype.now = function (options, cb) {
-  this.isValid();
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
@@ -707,8 +709,6 @@ Kuzzle.prototype.removeAllListeners = function (event) {
     knownEvents = Object.keys(this.eventListeners),
     self = this;
 
-  this.isValid();
-
   if (event) {
     if (knownEvents.indexOf(event) === -1) {
       throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
@@ -732,8 +732,6 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
   var
     knownEvents = Object.keys(this.eventListeners),
     self = this;
-
-  this.isValid();
 
   if (knownEvents.indexOf(event) === -1) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
