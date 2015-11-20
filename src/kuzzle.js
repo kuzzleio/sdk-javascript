@@ -403,7 +403,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
-  if (typeof listenerType !== 'function') {
+  if (listenerType !== 'function') {
     throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
   }
 
@@ -714,7 +714,7 @@ Kuzzle.prototype.removeAllListeners = function (event) {
       throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
     }
 
-    this.eventsListeners[event] = [];
+    this.eventListeners[event] = [];
   } else {
     knownEvents.forEach(function (eventName) {
       self.eventListeners[eventName] = [];
