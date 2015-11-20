@@ -111,4 +111,18 @@ describe('Kuzzle: offline queue management', () => {
       }, numRequests * kuzzle.replayInterval + 10)
     });
   });
+
+  describe('#flushing the queue', function () {
+    it ('should empty the queue when asked to', function () {
+      var kuzzle = new Kuzzle('foo');
+
+      kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
+      kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
+      kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
+      kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
+
+      kuzzle.flushQueue();
+      should(kuzzle.offlineQueue.length).be.exactly(0);
+    });
+  });
 });
