@@ -374,7 +374,7 @@ function dequeue () {
     self.offlineQueue.shift();
 
     setTimeout(function () {
-      dequeue();
+      dequeue.call(self);
     }, Math.max(0, self.replayInterval));
   } else {
     self.queuing = false;

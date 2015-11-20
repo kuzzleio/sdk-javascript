@@ -31,5 +31,12 @@ deploy:
     repo: kuzzleio/sdk-javascript
     branch: master
 notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/8e145155fbaaf37cffea
+    on_success: change
+    on_failure: always
+    on_start: never
+  email: false
   slack:
     secure: m0BEda/eXxYkil0zDZ1uNpK13kiNbb5/80I5OqDBz6X7/WH3uhWIV6q38lI929tQKz04eHAfVDaRSoPk1XwZBnb70MgcRmSG/m4/moR7BCnx7D9hHFqhNf0EfdzwEg44dCCVtD2vUvChtYV+jK74sNd4yqeq86YXi33qS7SYLS6kYnRloX0D7sQXDy14FWU2a5+hsrPX8yBoWuPjBergvK6W1dZAG+SfDywaqsrUDs+q64yEHiYV9VlvVZ/oKXZiDnVcB2hi0uulIZ8+iZaMJFEU30uCQiK6w3HG587yx3sVJmprr64ZYHKaFJD2ZAG1td6wJ1ccJsU/ruGkj4+0CeoZUYYBYXYQ4qhQl8F2QT0m+8dWqPwzYpxEoqyvGS9ioZG/YI18V2CE1pEyc72JzEv6c3AgDbtwrLH5s3ViNts7kulk3wwCzuAww+DapSV9ggezo+Bs7OGRpXwh/saeKWUCLqTkLQTjuq2dFVdo85HsC2RrLcSsZLMTOuV/A//FNBDJBlNnuneGP84zGkWGPEja0FFXvm2TS95gh1hd2PMe+QxjygOAvIMLmDmfdlWSLayUeWbqp20EdF7TUHV0dvBucga8s3UvFhIMnnGLS9vcNEIRtVornXznwdYSLbYD0mLXNtitneXTnSAxilThKtGDPOWQFkYkyoFV9FEwKO8=
