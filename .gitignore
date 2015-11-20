@@ -16,4 +16,4 @@ examples/node_modules/
 
 # Compiled files
 browser/
-
+coverage/
