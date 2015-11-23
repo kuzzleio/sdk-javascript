@@ -125,4 +125,106 @@ describe('Kuzzle: offline queue management', () => {
       should(kuzzle.offlineQueue.length).be.exactly(0);
     });
   });
+
+  describe('#replayQueue', function () {
+    it('should not replay the queue if the connection is offline', function () {
+      var replayed = false;
+
+      Kuzzle.__with__({
+        dequeue: function () { replayed = true; }
+      })(function () {
+        var kuzzle = new Kuzzle('foo');
+
+        kuzzle.state = 'offline';
+        kuzzle.replayQueue();
+        should(replayed).false();
+      });
+    });
+
+    it('should not replay the queue if autoReplay is on', function () {
+      var replayed = false;
+
+      Kuzzle.__with__({
+        dequeue: function () { replayed = true; }
+      })(function () {
+        var kuzzle = new Kuzzle('foo', {autoReplay: true});
+
+        kuzzle.state = 'connected';
+        kuzzle.replayQueue();
+        should(replayed).false();
+      });
+    });
+
+    it('should replay the queue if autoReplay is off and the instance is connected', function () {
+      var replayed = false;
+
+      Kuzzle.__with__({
+        dequeue: function () { replayed = true; }
+      })(function () {
+        var kuzzle = new Kuzzle('foo');
+
+        kuzzle.state = 'connected';
+        kuzzle.replayQueue();
+        should(replayed).true();
+      });
+    });
+  });
+
+  describe('#startQueuing', function () {
+    it('should not start queuing if the instance is connected', function () {
+      var kuzzle = new Kuzzle('foo');
+
+      kuzzle.state = 'connected';
+      kuzzle.startQueuing();
+
+      should(kuzzle.queuing).be.false();
+    });
+
+    it('should not start queuing if autoQueue is on', function () {
+      var kuzzle = new Kuzzle('foo', {autoQueue: true});
+
+      kuzzle.state = 'offline';
+      kuzzle.startQueuing();
+
+      should(kuzzle.queuing).be.false();
+    });
+
+    it('should start queing if autoQueue is off and the instance is disconnected', function () {
+      var kuzzle = new Kuzzle('foo');
+
+      kuzzle.state = 'offline';
+      kuzzle.startQueuing();
+
+      should(kuzzle.queuing).be.true();
+    });
+  });
+
+  describe('#stopQueuing', function () {
+    it('should not stop queuing if the instance is connected', function () {
+      var kuzzle = new Kuzzle('foo');
+
+      kuzzle.state = 'connected';
+      kuzzle.queuing = true;
+      kuzzle.stopQueuing();
+      should(kuzzle.queuing).be.true();
+    });
+
+    it('should not stop queuing if autoQueue is on', function () {
+      var kuzzle = new Kuzzle('foo', {autoQueue: true});
+
+      kuzzle.state = 'offline';
+      kuzzle.queuing = true;
+      kuzzle.stopQueuing();
+      should(kuzzle.queuing).be.true();
+    });
+
+    it('should stop queuing if autoQueue is off and the instance is offline', function () {
+      var kuzzle = new Kuzzle('foo');
+
+      kuzzle.state = 'offline';
+      kuzzle.queuing = true;
+      kuzzle.stopQueuing();
+      should(kuzzle.queuing).be.false();
+    });
+  });
 });
