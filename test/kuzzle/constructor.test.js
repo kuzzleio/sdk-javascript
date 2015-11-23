@@ -102,7 +102,7 @@ describe('Kuzzle constructor', () => {
   });
 
   it('should allow passing a callback and respond once initialized', function (done) {
-    this.timeout(200);
+    this.timeout(500);
 
     new Kuzzle('nowhere', () => {
       try {
