@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/kuzzle');
 
-describe('Kuzzle: offline queue management', () => {
+describe('Offline queue management', () => {
   var sent;
 
   // deactivate socket.io

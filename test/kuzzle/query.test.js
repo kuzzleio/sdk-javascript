@@ -147,6 +147,13 @@ describe('Query management', function () {
       should(requestObject.collection).be.undefined();
     });
 
+    it('should add global headers without overwriting any existing query headers', function () {
+      kuzzle.headers = { foo: 'bar', bar: 'foo' };
+      kuzzle.query(null, 'controller', 'action', { foo: 'foo', body: {some: 'query'}});
+      should(requestObject.foo).be.exactly('foo');
+      should(requestObject.bar).be.exactly('foo');
+    });
+
     it('should not generate a new request ID if one is already defined', function () {
       kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}, requestId: 'foobar'});
       should(requestObject.requestId).be.exactly('foobar');
