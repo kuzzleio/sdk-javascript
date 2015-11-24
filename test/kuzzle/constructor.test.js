@@ -29,18 +29,18 @@ describe('Kuzzle constructor', () => {
   it('should expose the documented properties', () => {
     var kuzzle = new Kuzzle('nowhere');
 
-    kuzzle.should.have.enumerable('autoQueue');
-    kuzzle.should.have.enumerable('autoReconnect');
-    kuzzle.should.have.enumerable('autoReplay');
-    kuzzle.should.have.enumerable('autoResubscribe');
-    kuzzle.should.have.enumerable('offlineQueue');
-    kuzzle.should.have.enumerable('queueFilter');
-    kuzzle.should.have.enumerable('queueMaxSize');
-    kuzzle.should.have.enumerable('queueTTL');
-    kuzzle.should.have.enumerable('headers');
-    kuzzle.should.have.enumerable('metadata');
-    kuzzle.should.have.enumerable('replayInterval');
-    kuzzle.should.have.enumerable('reconnectionDelay');
+    should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('queueFilter', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('queueTTL', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
   });
 
   it('should have properties with the documented default values', () => {
