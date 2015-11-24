@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/kuzzle');
 
-describe('Kuzzle: listeners management', () => {
+describe('Listeners management', () => {
   var
     kuzzle,
     listenerIds;

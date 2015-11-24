@@ -177,7 +177,7 @@ describe('Kuzzle constructor', () => {
     });
   });
 
-  describe('# on disconnection', () => {
+  describe('#on disconnection', () => {
     var
       iostub = function () {
         var emitter = new EventEmitter;

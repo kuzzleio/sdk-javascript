@@ -171,7 +171,6 @@ module.exports = Kuzzle = function (url, options, cb) {
   }
 
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
-  // istanbul ignore next
   Object.defineProperty(this, 'isValid', {
     value: function () {
       if (this.socket === null) {
@@ -181,7 +180,6 @@ module.exports = Kuzzle = function (url, options, cb) {
   });
 
   // Helper function copying headers to the query data
-  // istanbul ignore next
   Object.defineProperty(this, 'addHeaders', {
     value: function (query, headers) {
       Object.keys(headers).forEach(function (header) {
@@ -198,7 +196,6 @@ module.exports = Kuzzle = function (url, options, cb) {
    * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
    * and is called by these methods
    */
-  // istanbul ignore next
   Object.defineProperty(this, 'callbackRequired', {
     value: function (errorMessagePrefix, callback) {
       if (!callback || typeof callback !== 'function') {
@@ -253,7 +250,6 @@ function construct(url, cb) {
 
   self.socket.once('connect_error', function (error) {
     self.state = 'error';
-    self.logout();
 
     if (cb) {
       cb(error);
@@ -604,7 +600,7 @@ Kuzzle.prototype.now = function (options, cb) {
 
   this.callbackRequired('Kuzzle.now', cb);
 
-  this.query(null, 'read', 'now', {}, function (err, res) {
+  this.query(null, 'read', 'now', {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -769,7 +765,7 @@ Kuzzle.prototype.replayQueue = function () {
 Kuzzle.prototype.setHeaders = function(content, replace) {
   var self = this;
 
-  if (typeof content !== 'object') {
+  if (typeof content !== 'object' || Array.isArray(content)) {
     throw new Error('Expected a content object, received a ' + typeof content);
   }
 
