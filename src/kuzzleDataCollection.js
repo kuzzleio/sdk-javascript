@@ -386,6 +386,29 @@ KuzzleDataCollection.prototype.publish = function (document, options) {
 };
 
 /**
+ * Update a new mapping to the data collection.
+ * Note that you cannot delete an existing mapping, you can only add or update one.
+ *
+ * @param {object} mapping - mapping to apply
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.putMapping = function (mapping, options, cb) {
+  var dataMapping;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  dataMapping = new KuzzleDataMapping(this, mapping);
+  dataMapping.apply(options, cb);
+
+  return this;
+};
+
+/**
  * Replace an existing document with a new one.
  *
  * Takes an optional argument object with the following properties:
@@ -549,10 +572,11 @@ KuzzleDataCollection.prototype.roomFactory = function (options) {
  * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
+ * @param {object} [mapping] - mapping to instantiate the KuzzleDataMapping object with
  * @constructor
  */
-KuzzleDataCollection.prototype.dataMappingFactory = function () {
-  return new KuzzleDataMapping(this);
+KuzzleDataCollection.prototype.dataMappingFactory = function (mapping) {
+  return new KuzzleDataMapping(this, mapping);
 };
 
 /**

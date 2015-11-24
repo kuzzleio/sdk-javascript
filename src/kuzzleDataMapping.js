@@ -18,7 +18,7 @@
  * @param {object} kuzzleDataCollection - Instance of the inherited KuzzleDataCollection object
  * @constructor
  */
-function KuzzleDataMapping(kuzzleDataCollection) {
+function KuzzleDataMapping(kuzzleDataCollection, mapping) {
   Object.defineProperties(this, {
     //read-only properties
     collection: {
@@ -36,7 +36,7 @@ function KuzzleDataMapping(kuzzleDataCollection) {
       writable: true
     },
     mapping: {
-      value: {},
+      value: mapping || {},
       enumerable: true,
       writable: true
     }

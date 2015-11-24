@@ -15,10 +15,15 @@ describe('Kuzzle methods', function () {
       should(collection).be.null();
       should(controller).be.exactly(expectedQuery.controller);
       should(action).be.exactly(expectedQuery.action);
-      should(Object.keys(query).length).be.exactly(0);
 
       if (passedOptions) {
         should(options).match(passedOptions);
+      }
+
+      if (expectedQuery.body) {
+        should(query.body).match(expectedQuery.body);
+      } else {
+        should(Object.keys(query).length).be.exactly(0);
       }
 
       cb(error, result);
@@ -95,6 +100,85 @@ describe('Kuzzle methods', function () {
         should(res).be.undefined();
         done();
       });
+    });
+  });
+
+  describe('#getStatistics', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      passedOptions = null;
+      error = null;
+      result = {statistics: {}};
+      expectedQuery = {
+        controller: 'admin',
+        action: 'getLastStats'
+      };
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      should(function () { kuzzle.getStatistics(); }).throw(Error);
+      should(function () { kuzzle.getStatistics(123456); }).throw(Error);
+      should(function () { kuzzle.getStatistics({}); }).throw(Error);
+      should(function () { kuzzle.getStatistics(123456, {}); }).throw(Error);
+    });
+
+    it('should return the last statistics frame if no timestamp is provided', function () {
+      should(kuzzle.getStatistics(function () {})).be.exactly(kuzzle);
+      should(emitted).be.true();
+    });
+
+    it('should return statistics frames starting from the given timestamp', function () {
+      expectedQuery = {
+        controller: 'admin',
+        action: 'getStats',
+        body: { startTime: 123 }
+      };
+
+      result = {
+        statistics: {
+          123: {},
+          456: {},
+          789: {}
+        }
+      };
+
+      kuzzle.getStatistics(123, function () {});
+      should(emitted).be.true();
+    });
+
+    it('should execute the provided callback with an error argument if one occurs', function (done) {
+      error = 'foobar';
+      kuzzle.getStatistics(function (err, res) {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should handle arguments properly', function () {
+      /*
+      already tested by previous tests:
+       getStatistics(callback)
+       getStatistics(timestamp, callback)
+       */
+
+      // testing: getStatistics(options, callback)
+      passedOptions = { foo: 'bar' };
+      kuzzle.getStatistics(passedOptions, function () {});
+      should(emitted).be.true();
+
+      // testing: getStatistics(timestamp, options callback);
+      emitted = false;
+      expectedQuery = {
+        controller: 'admin',
+        action: 'getStats',
+        body: { startTime: 123 }
+      };
+      kuzzle.getStatistics(123, passedOptions, function () {});
+      should(emitted).be.true();
     });
   });
 

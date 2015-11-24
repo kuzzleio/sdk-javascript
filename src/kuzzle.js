@@ -456,6 +456,8 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
  * @returns {object} this
  */
 Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
+  var queryCB;
+
   if (!cb) {
     if (arguments.length === 1) {
       cb = arguments[0];
@@ -473,45 +475,27 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
     }
   }
 
+  queryCB = function (err, res) {
+    var stats = [];
+
+    if (err) {
+      return cb(err);
+    }
+
+    Object.keys(res.statistics).forEach(function (frame) {
+      res.statistics[frame].timestamp = frame;
+      stats.push(res.statistics[frame]);
+    });
+
+    cb(null, stats);
+  };
+
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   if (!timestamp) {
-    this.query(null, 'admin', 'getStats', {}, options, function (err, res) {
-      var frame;
-
-      if (err) {
-        return cb(err);
-      }
-
-      frame = res.statistics[Object.keys(res.statistics)[0]];
-      frame.timestamp = Object.keys(res.statistics)[0];
-      cb(null, frame);
-    });
+    this.query(null, 'admin', 'getLastStats', {}, options, queryCB);
   } else {
-    if (typeof timestamp !== 'number') {
-      throw new Error('Timestamp number expected, received a ' + typeof timestamp);
-    }
-
-    this.query(null, 'admin', 'getAllStats', {}, function (err, res) {
-      var
-        stats = [],
-        frames;
-
-      if (err) {
-        return cb(err);
-      }
-
-      frames = Object.keys(res.statistics).filter(function (element) {
-        return (new Date(element).getTime()) >= timestamp;
-      });
-
-      frames.forEach(function (frame) {
-        res.statistics[frame].timestamp = frame;
-        stats.push(res.statistics[frame]);
-      });
-
-      cb(null, stats);
-    });
+    this.query(null, 'admin', 'getStats', { body: { startTime: timestamp } }, options, queryCB);
   }
 
   return this;
