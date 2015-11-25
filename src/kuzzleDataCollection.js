@@ -386,7 +386,7 @@ KuzzleDataCollection.prototype.publish = function (document, options) {
 };
 
 /**
- * Update a new mapping to the data collection.
+ * Applies a new mapping to the data collection.
  * Note that you cannot delete an existing mapping, you can only add or update one.
  *
  * @param {object} mapping - mapping to apply
