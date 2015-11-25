@@ -161,7 +161,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
   this.unsubscribe();
   this.subscribing = true;
-  this.kuzzle.subscriptions.pending++;
+  self.kuzzle.subscriptions.pending[self.id] = self;
 
   if (filters) {
     this.filters = filters;
@@ -170,14 +170,15 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   this.roomId = null;
   this.callback = cb;
 
-  subscribeQuery = this.kuzzle.addHeaders({body: filters}, this.headers);
+  subscribeQuery = this.kuzzle.addHeaders({body: self.filters}, this.headers);
+
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     if (error) {
       /*
        If we've already subscribed to this room, Kuzzle returns the actual roomID.
        We'll simply ignore the error and acts as if we successfully subscribed.
         */
-      if (error.details.roomId) {
+      if (error.details && error.details.roomId) {
         self.roomId = error.details.roomId;
       } else {
         throw new Error('Error during Kuzzle subscription: ' + error.message);
@@ -196,7 +197,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.kuzzle.socket.on(self.roomId, self.notifier);
 
     self.subscribing = false;
-    self.kuzzle.subscriptions.pending--;
+    delete self.kuzzle.subscriptions.pending[self.id];
+
     self.dequeue();
   });
 
@@ -229,11 +231,11 @@ KuzzleRoom.prototype.unsubscribe = function () {
     if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
       delete self.kuzzle.subscriptions[room];
 
-      if (self.kuzzle.subscriptions.pending === 0) {
+      if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
         self.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: room}});
       } else {
         interval = setInterval(function () {
-          if (self.kuzzle.subscriptions.pending === 0) {
+          if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
             if (!self.kuzzle.subscriptions[room]) {
               self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: room}});
             }
