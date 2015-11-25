@@ -82,7 +82,7 @@ module.exports = Kuzzle = function (url, options, cb) {
        This structure also allows renewing subscriptions after a connection loss
        */
       value: {
-        pending: 0
+        pending: {}
       },
       writable: true
     },
@@ -243,12 +243,21 @@ function construct(url, cb) {
   self.socket.once('connect', function () {
     self.state = 'connected';
 
+    Object.keys(self.subscriptions).forEach(function (roomId) {
+      Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+        var subscription = self.subscriptions[roomId][subscriptionId];
+        subscription.renew(subscription.callback);
+      });
+    });
+
+    dequeue.call(self);
+
     if (cb) {
       cb(null, self);
     }
   });
 
-  self.socket.once('connect_error', function (error) {
+  self.socket.on('connect_error', function (error) {
     self.state = 'error';
 
     if (cb) {
@@ -664,15 +673,15 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
     emitRequest.call(this, object, cb);
-  } else if (self.queuing) {
+  } else if (self.queuing|| self.state === 'initializing') {
     cleanQueue.call(this, object, cb);
 
     if (self.queueFilter) {
-      if (self.queueFilter(query)) {
-        self.offlineQueue.push({ts: Date.now(), query: query, cb: cb});
+      if (self.queueFilter(object)) {
+        self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
       }
     } else {
-      self.offlineQueue.push({ts: Date.now(), query: query, cb: cb});
+      self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
     }
   }
 
