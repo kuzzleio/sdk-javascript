@@ -95,6 +95,17 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.autoResubscribe).be.true();
   });
 
+  it('should handle the connect option properly', () => {
+    var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+
+    should(kuzzle.state).be.exactly('ready');
+    should(kuzzle.socket).be.null();
+
+    kuzzle = new Kuzzle('nowhere', {connect: 'auto'});
+    should(kuzzle.state).be.exactly('initializing');
+    should(kuzzle.socket).not.be.null();
+  });
+
   it('should return a new instance even if not called with "new"', () => {
     var kuzzle = Kuzzle('nowhere');
 
@@ -122,6 +133,7 @@ describe('Kuzzle constructor', () => {
     kuzzle = new Kuzzle('nowhere');
 
     should.not.exist(kuzzle.addListenerPromise);
+    should.exist(kuzzle.connectPromise);
     should.not.exist(kuzzle.dataCollectionFactoryPromise);
     should.not.exist(kuzzle.flushQueuePromise);
     should.exist(kuzzle.getAllStatisticsPromise);

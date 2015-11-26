@@ -620,7 +620,7 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      collection.publish(result._source, options);
+      collection.publishMessage(result._source, options);
       should(emitted).be.true();
     });
 
@@ -631,7 +631,7 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      collection.publish(new KuzzleDocument(collection, result._source), options);
+      collection.publishMessage(new KuzzleDocument(collection, result._source), options);
       should(emitted).be.true();
     });
   });
