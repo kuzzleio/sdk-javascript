@@ -4,14 +4,6 @@ var
   KuzzleDataCollection = require('./kuzzleDataCollection');
 
 /**
- * This callback is called by the Kuzzle constructor once connection to a Kuzzle instance has been established.
- *
- * @callback Kuzzle~constructorCallback
- * @param {Object} err - Error object, NULL if connection is successful
- * @param {Object} data - Kuzzle instance
- */
-
-/**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
  * @callback responseCallback
@@ -36,6 +28,10 @@ module.exports = Kuzzle = function (url, options, cb) {
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!url || url === '') {
+    throw new Error('URL to Kuzzle can\'t be empty');
   }
 
   Object.defineProperties(this, {
@@ -93,6 +89,10 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     reconnectionDelay: {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
+      enumerable: true
+    },
+    url: {
+      value: url,
       enumerable: true
     },
     // writable properties
@@ -173,7 +173,7 @@ module.exports = Kuzzle = function (url, options, cb) {
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
   Object.defineProperty(this, 'isValid', {
     value: function () {
-      if (this.socket === null) {
+      if (this.state === 'loggedOff') {
         throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a logout call?');
       }
     }
@@ -204,13 +204,18 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  construct.call(this, url, cb);
+
+  if (!options || !options.connect || options.connect === 'auto') {
+    this.connect(cb);
+  } else {
+    this.state = 'ready';
+  }
 
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
+        var whitelist = ['connect', 'getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -223,20 +228,22 @@ module.exports = Kuzzle = function (url, options, cb) {
 
 /**
  * Connects to a Kuzzle instance using the provided URL.
- * @param url
- * @param {Kuzzle~constructorCallback} [cb]
+ * @param {responseCallback} [cb]
  * @returns {Object} this
  */
-function construct(url, cb) {
+Kuzzle.prototype.connect = function (cb) {
   var self = this;
 
-  if (!url || url === '') {
-    throw new Error('URL to Kuzzle can\'t be empty');
+  if (['initializing', 'ready', 'loggedOff'].indexOf(this.state) === -1) {
+    if (cb) {
+      cb(null, self);
+    }
+    return self;
   }
 
-  self.socket = io(url, {
-    reconnection: this.autoReconnect,
-    reconnectionDelay: this.reconnectionDelay,
+  self.socket = io(self.url, {
+    reconnection: self.autoReconnect,
+    reconnectionDelay: self.reconnectionDelay,
     'force new connection': true
   });
 
@@ -310,7 +317,7 @@ function construct(url, cb) {
   });
 
   return this;
-}
+};
 
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
@@ -568,6 +575,7 @@ Kuzzle.prototype.listCollections = function (options, cb) {
 Kuzzle.prototype.logout = function () {
   var collection;
 
+  this.state = 'loggedOff';
   this.socket.close();
   this.socket = null;
 

@@ -188,7 +188,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
-      kuzzle.socket = null;
+      kuzzle.logout();
       should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
     });
 

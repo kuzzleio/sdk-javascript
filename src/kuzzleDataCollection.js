@@ -41,7 +41,7 @@ function KuzzleDataCollection(kuzzle, collection) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['publish', 'setHeaders', 'subscribe'];
+        var blacklist = ['publishMessage', 'setHeaders', 'subscribe'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -162,16 +162,24 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
  *        If the same document already exists: throw an error if sets to false.
  *        Update the existing document otherwise
  *
+ * @param {string} [id] - (optional) document identifier
  * @param {object} document - either an instance of a KuzzleDocument object, or a document
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.createDocument = function (document, options, cb) {
+KuzzleDataCollection.prototype.createDocument = function (id, document, options, cb) {
   var
     self = this,
     data = {},
     action = 'create';
+
+  if (typeof id !== 'string') {
+    cb = options;
+    options = document;
+    document = id;
+    id = null;
+  }
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -186,6 +194,10 @@ KuzzleDataCollection.prototype.createDocument = function (document, options, cb)
 
   if (options) {
     action = options.updateIfExist ? 'createOrUpdate' : 'create';
+  }
+
+  if (id) {
+    data._id = id;
   }
 
   data.persist = true;
@@ -369,7 +381,7 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
  * @param {object} [options] - optional arguments
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.publish = function (document, options) {
+KuzzleDataCollection.prototype.publishMessage = function (document, options) {
   var data = {};
 
   if (document instanceof KuzzleDocument) {
