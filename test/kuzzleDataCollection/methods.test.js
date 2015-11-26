@@ -28,6 +28,10 @@ describe('KuzzleDataCollection methods', function () {
         should(Object.keys(query).length).be.exactly(0);
       }
 
+      if (expectedQuery._id) {
+        should(query._id).be.exactly(expectedQuery._id);
+      }
+
       if (cb) {
         if (error) {
           return cb(error);
@@ -263,11 +267,32 @@ describe('KuzzleDataCollection methods', function () {
     it('should handle the callback argument correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
+      collection.createDocument('id', {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.createDocument('id', {}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.createDocument('id', {}, {}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
       collection.createDocument({}, function () {});
       should(emitted).be.true();
 
       emitted = false;
       collection.createDocument({}, {}, function () {});
+      should(emitted).be.true();
+    });
+
+    it('should handle a document ID if one is provided', function () {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      expectedQuery._id = 'foo';
+
+      collection.createDocument('foo', {});
       should(emitted).be.true();
     });
 
@@ -598,7 +623,7 @@ describe('KuzzleDataCollection methods', function () {
     });
   });
 
-  describe('#publish', function () {
+  describe('#publishMessage', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
       kuzzle.query = queryStub;
