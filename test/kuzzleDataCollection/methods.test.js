@@ -677,7 +677,7 @@ describe('KuzzleDataCollection methods', function () {
       };
     });
 
-    it('should send instantiate a new KuzzleDataMapping object', function (done) {
+    it('should instantiate a new KuzzleDataMapping object', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = { queuable: false };
