@@ -5,7 +5,8 @@ var
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
-  KuzzleDataMapping = require('../../src/kuzzleDataMapping');
+  KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
+  KuzzleRoom = require('../../src/kuzzleRoom');
 
 describe('KuzzleDataCollection methods', function () {
   var
@@ -773,6 +774,172 @@ describe('KuzzleDataCollection methods', function () {
         should(res).be.undefined();
         done();
       });
+    });
+  });
+
+  describe('#subscribe', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { roomId: 'foobar' };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'on',
+        controller: 'subscribe',
+        body: {}
+      };
+    });
+
+    it('should send instantiate a new KuzzleRoom object', function () {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      should(collection.subscribe(expectedQuery.body, function () {}, {})).be.instanceof(KuzzleRoom);
+      should(emitted).be.true();
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      should(function () { collection.subscribe({}); }).throw(Error);
+      should(emitted).be.false();
+    });
+  });
+
+  describe('#truncate', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { acknowledged: true };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'truncateCollection',
+        controller: 'admin',
+        body: {}
+      };
+    });
+
+    it('should send the right truncate query to Kuzzle', function () {
+      var
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        options = { queuable: false };
+
+      expectedQuery.options = options;
+
+      should(collection.truncate(options, function () {})).be.exactly(collection);
+      should(emitted).be.true();
+    });
+
+    it('should handle arguments correctly', function () {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      collection.truncate();
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.truncate({});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.truncate({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.truncate(function () {});
+      should(emitted).be.true();
+    });
+  });
+
+  describe('#updateDocument', function () {
+    var revert;
+
+    beforeEach(function () {
+      revert = KuzzleDataCollection.__set__('KuzzleDocument', function (collection) { return new KuzzleDocument(collection, 'foo', {}); });
+
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { _id: 'foobar', _source: { foo: 'bar' } };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'update',
+        controller: 'write',
+        body: {}
+      };
+    });
+
+    afterEach(function () {
+      revert();
+    });
+
+    it('should send the right updateDocument query to Kuzzle', function (done) {
+      var
+        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection),
+        options = { queuable: false };
+      expectedQuery.options = options;
+
+      should(collection.updateDocument(result._id, result._source, options, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleDocument);
+        done();
+      })).be.exactly(collection);
+      should(emitted).be.true();
+    });
+
+    it('should handle arguments correctly', function () {
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection);
+
+      collection.updateDocument('foo');
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.updateDocument('foo', {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.updateDocument('foo', {}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.updateDocument('foo', {}, {}, function () {});
+      should(emitted).be.true();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection);
+      error = 'foobar';
+      this.timeout(50);
+
+      collection.updateDocument(result._id, result._source, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#factories', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('documentFactory should return a new KuzzleDocument object', function () {
+      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(KuzzleDocument);
+    });
+
+    it('documentFactory should handle a _source content', function () {
+      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { _source: {foo: 'bar'}})).be.instanceof(KuzzleDocument);
+    });
+
+    it('roomFactory should return a new KuzzleRoom object', function () {
+      should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(KuzzleRoom);
+    });
+
+    it('dataMappingFactory should return a KuzzleDataMapping object', function () {
+      should(kuzzle.dataCollectionFactory('foo').dataMappingFactory({})).be.instanceof(KuzzleDataMapping);
     });
   });
 });

@@ -562,10 +562,6 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
 
-  if (content._version) {
-    document.version = content._version;
-  }
-
   return document;
 };
 

@@ -6,377 +6,467 @@ var
   Kuzzle = rewire('../../src/kuzzle');
 
 describe('Kuzzle constructor', () => {
-  it('should expose the documented functions', () => {
-    var kuzzle = new Kuzzle('nowhere');
+  describe('#constructor', function () {
+    it('should expose the documented functions', () => {
+      var kuzzle = new Kuzzle('nowhere');
 
-    should.exist(kuzzle.addListener);
-    should.exist(kuzzle.dataCollectionFactory);
-    should.exist(kuzzle.flushQueue);
-    should.exist(kuzzle.getAllStatistics);
-    should.exist(kuzzle.getStatistics);
-    should.exist(kuzzle.listCollections);
-    should.exist(kuzzle.logout);
-    should.exist(kuzzle.now);
-    should.exist(kuzzle.query);
-    should.exist(kuzzle.removeAllListeners);
-    should.exist(kuzzle.removeListener);
-    should.exist(kuzzle.replayQueue);
-    should.exist(kuzzle.setHeaders);
-    should.exist(kuzzle.startQueuing);
-    should.exist(kuzzle.stopQueuing);
-  });
+      should.exist(kuzzle.addListener);
+      should.exist(kuzzle.dataCollectionFactory);
+      should.exist(kuzzle.flushQueue);
+      should.exist(kuzzle.getAllStatistics);
+      should.exist(kuzzle.getStatistics);
+      should.exist(kuzzle.listCollections);
+      should.exist(kuzzle.logout);
+      should.exist(kuzzle.now);
+      should.exist(kuzzle.query);
+      should.exist(kuzzle.removeAllListeners);
+      should.exist(kuzzle.removeListener);
+      should.exist(kuzzle.replayQueue);
+      should.exist(kuzzle.setHeaders);
+      should.exist(kuzzle.startQueuing);
+      should.exist(kuzzle.stopQueuing);
+    });
 
-  it('should expose the documented properties', () => {
-    var kuzzle = new Kuzzle('nowhere');
+    it('should expose the documented properties', () => {
+      var kuzzle = new Kuzzle('nowhere');
 
-    should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('queueFilter', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('queueTTL', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
-  });
+      should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('queueFilter', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('queueTTL', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
+    });
 
-  it('should have properties with the documented default values', () => {
-    var kuzzle = new Kuzzle('nowhere');
+    it('should have properties with the documented default values', () => {
+      var kuzzle = new Kuzzle('nowhere');
 
-    should(kuzzle.autoQueue).be.false();
-    should(kuzzle.autoReconnect).be.true();
-    should(kuzzle.autoReplay).be.false();
-    should(kuzzle.autoResubscribe).be.true();
-    should(kuzzle.queueTTL).be.exactly(120000);
-    should(kuzzle.queueMaxSize).be.exactly(500);
-    should(kuzzle.headers).be.an.Object().and.be.empty();
-    should(kuzzle.metadata).be.an.Object().and.be.empty();
-    should(kuzzle.replayInterval).be.exactly(10);
-    should(kuzzle.reconnectionDelay).be.exactly(1000);
-  });
+      should(kuzzle.autoQueue).be.false();
+      should(kuzzle.autoReconnect).be.true();
+      should(kuzzle.autoReplay).be.false();
+      should(kuzzle.autoResubscribe).be.true();
+      should(kuzzle.queueTTL).be.exactly(120000);
+      should(kuzzle.queueMaxSize).be.exactly(500);
+      should(kuzzle.headers).be.an.Object().and.be.empty();
+      should(kuzzle.metadata).be.an.Object().and.be.empty();
+      should(kuzzle.replayInterval).be.exactly(10);
+      should(kuzzle.reconnectionDelay).be.exactly(1000);
+    });
 
-  it('should initialize correctly properties using the "options" argument', () => {
-    var
-      options = {
-        autoQueue: true,
-        autoReconnect: false,
-        autoReplay: true,
-        autoResubscribe: false,
-        queueTTL: 123,
-        queueMaxSize: 42,
-        headers: {foo: 'bar'},
-        metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
-        replayInterval: 99999,
-        reconnectionDelay: 666
-      },
-      kuzzle = new Kuzzle('nowhere', options);
+    it('should initialize correctly properties using the "options" argument', () => {
+      var
+        options = {
+          autoQueue: true,
+          autoReconnect: false,
+          autoReplay: true,
+          autoResubscribe: false,
+          queueTTL: 123,
+          queueMaxSize: 42,
+          headers: {foo: 'bar'},
+          metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
+          replayInterval: 99999,
+          reconnectionDelay: 666
+        },
+        kuzzle = new Kuzzle('nowhere', options);
 
-    should(kuzzle.autoQueue).be.exactly(options.autoQueue);
-    should(kuzzle.autoReconnect).be.exactly(options.autoReconnect);
-    should(kuzzle.autoReplay).be.exactly(options.autoReplay);
-    should(kuzzle.autoResubscribe).be.exactly(options.autoResubscribe);
-    should(kuzzle.queueTTL).be.exactly(options.queueTTL);
-    should(kuzzle.queueMaxSize).be.exactly(options.queueMaxSize);
-    should(kuzzle.headers).be.an.Object().and.match(options.headers);
-    should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
-    should(kuzzle.replayInterval).be.exactly(options.replayInterval);
-    should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
-  });
+      should(kuzzle.autoQueue).be.exactly(options.autoQueue);
+      should(kuzzle.autoReconnect).be.exactly(options.autoReconnect);
+      should(kuzzle.autoReplay).be.exactly(options.autoReplay);
+      should(kuzzle.autoResubscribe).be.exactly(options.autoResubscribe);
+      should(kuzzle.queueTTL).be.exactly(options.queueTTL);
+      should(kuzzle.queueMaxSize).be.exactly(options.queueMaxSize);
+      should(kuzzle.headers).be.an.Object().and.match(options.headers);
+      should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
+      should(kuzzle.replayInterval).be.exactly(options.replayInterval);
+      should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
+    });
 
-  it('should handle the offlineMode option properly', () => {
-    var kuzzle = new Kuzzle('nowhere', {offlineMode: 'auto'});
+    it('should handle the offlineMode option properly', () => {
+      var kuzzle = new Kuzzle('nowhere', {offlineMode: 'auto'});
 
-    should(kuzzle.autoQueue).be.true();
-    should(kuzzle.autoReconnect).be.true();
-    should(kuzzle.autoReplay).be.true();
-    should(kuzzle.autoResubscribe).be.true();
-  });
+      should(kuzzle.autoQueue).be.true();
+      should(kuzzle.autoReconnect).be.true();
+      should(kuzzle.autoReplay).be.true();
+      should(kuzzle.autoResubscribe).be.true();
+    });
 
-  it('should handle the connect option properly', () => {
-    var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+    it('should handle the connect option properly', () => {
+      var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-    should(kuzzle.state).be.exactly('ready');
-    should(kuzzle.socket).be.null();
+      should(kuzzle.state).be.exactly('ready');
+      should(kuzzle.socket).be.null();
 
-    kuzzle = new Kuzzle('nowhere', {connect: 'auto'});
-    should(kuzzle.state).be.exactly('initializing');
-    should(kuzzle.socket).not.be.null();
-  });
+      kuzzle = new Kuzzle('nowhere', {connect: 'auto'});
+      should(kuzzle.state).be.exactly('connecting');
+      should(kuzzle.socket).not.be.null();
+    });
 
-  it('should return a new instance even if not called with "new"', () => {
-    var kuzzle = Kuzzle('nowhere');
+    it('should return a new instance even if not called with "new"', () => {
+      var kuzzle = Kuzzle('nowhere');
 
-    kuzzle.should.be.instanceof(Kuzzle);
-  });
+      kuzzle.should.be.instanceof(Kuzzle);
+    });
 
-  it('should allow passing a callback and respond once initialized', function (done) {
-    this.timeout(500);
+    it('should allow passing a callback and respond once initialized', function (done) {
+      this.timeout(500);
 
-    new Kuzzle('nowhere', () => {
+      new Kuzzle('nowhere', () => {
+        try {
+          kuzzle.isValid();
+          done('Error: the kuzzle object should have been invalidated');
+        }
+        catch(e) {
+          done();
+        }
+      });
+    });
+
+    it('should promisify the right functions', () => {
+      var kuzzle;
+
+      Kuzzle.prototype.bluebird = bluebird;
+      kuzzle = new Kuzzle('nowhere');
+
+      should.not.exist(kuzzle.addListenerPromise);
+      should.exist(kuzzle.connectPromise);
+      should.not.exist(kuzzle.dataCollectionFactoryPromise);
+      should.not.exist(kuzzle.flushQueuePromise);
+      should.exist(kuzzle.getAllStatisticsPromise);
+      should.exist(kuzzle.getStatisticsPromise);
+      should.exist(kuzzle.listCollectionsPromise);
+      should.not.exist(kuzzle.logoutPromise);
+      should.exist(kuzzle.nowPromise);
+      should.exist(kuzzle.queryPromise);
+      should.not.exist(kuzzle.removeAllListenersPromise);
+      should.not.exist(kuzzle.removeListenerPromise);
+      should.not.exist(kuzzle.replayQueuePromise);
+      should.not.exist(kuzzle.setHeadersPromise);
+      should.not.exist(kuzzle.startQueuingPromise);
+      should.not.exist(kuzzle.stopQueuingPromise);
+    });
+
+    it('should throw an error if no URL is provided', () => {
       try {
-        kuzzle.isValid();
-        done('Error: the kuzzle object should have been invalidated');
+        new Kuzzle();
+        should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
       }
-      catch(e) {
-        done();
+      catch (e) {
+
       }
     });
-  });
 
-  it('should promisify the right functions', () => {
-    var kuzzle;
+    describe('#connect', function () {
+      it('should return immediately if not initializing or logged off', function (done) {
+        this.timeout(50);
 
-    Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('nowhere');
+        Kuzzle.__with__({
+          io: function () {
+            // does nothing, making the test crash if trying to connect
+          }
+        })(function () {
+          var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-    should.not.exist(kuzzle.addListenerPromise);
-    should.exist(kuzzle.connectPromise);
-    should.not.exist(kuzzle.dataCollectionFactoryPromise);
-    should.not.exist(kuzzle.flushQueuePromise);
-    should.exist(kuzzle.getAllStatisticsPromise);
-    should.exist(kuzzle.getStatisticsPromise);
-    should.exist(kuzzle.listCollectionsPromise);
-    should.not.exist(kuzzle.logoutPromise);
-    should.exist(kuzzle.nowPromise);
-    should.exist(kuzzle.queryPromise);
-    should.not.exist(kuzzle.removeAllListenersPromise);
-    should.not.exist(kuzzle.removeListenerPromise);
-    should.not.exist(kuzzle.replayQueuePromise);
-    should.not.exist(kuzzle.setHeadersPromise);
-    should.not.exist(kuzzle.startQueuingPromise);
-    should.not.exist(kuzzle.stopQueuingPromise);
-  });
-
-  it('should throw an error if no URL is provided', () => {
-    try {
-      new Kuzzle();
-      should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
-    }
-    catch (e) {
-
-    }
-  });
-
-  describe('#on connection success', () => {
-    var
-      iostub = function () {
-        var emitter = new EventEmitter;
-        process.nextTick(() => emitter.emit('connect'));
-        return emitter;
-      };
-
-    it('should call the provided callback on a connection success', function (done) {
-      this.timeout(50);
-
-      Kuzzle.__with__({
-        io: iostub
-      })(function () {
-        new Kuzzle('nowhere', function (err, res) {
-          try {
+          kuzzle.state = 'connected';
+          kuzzle.connect((err, res) => {
             should(err).be.null();
-            should(res).be.instanceof(Kuzzle);
+            should(res).be.exactly(kuzzle);
             should(res.state).be.exactly('connected');
             done();
-          }
-          catch (e) {
-            done(e);
-          }
+          });
+
+          kuzzle.state = 'reconnecting';
+          should(kuzzle.connect()).be.exactly(kuzzle);
+          should(kuzzle.state).be.exactly('reconnecting');
         });
-      })
-    });
-  });
+      });
 
-  describe('#on disconnection', () => {
-    var
-      iostub = function () {
-        var emitter = new EventEmitter;
+      it('should try to connect when the instance is in a not-connected state', function () {
+        Kuzzle.__with__({
+          io: function () {
+            return new EventEmitter;
+          }
+        })(function () {
+          ['initializing', 'ready', 'loggedOff', 'error', 'offline'].forEach(state => {
+            var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-        /*
-        since we're stubbing the socket.io socket object,
-        we need a stubbed 'close' function to make kuzzle.logout() work
-         */
-        emitter.close = function () { return false; };
-        process.nextTick(() => emitter.emit('disconnect'));
-        return emitter;
-      };
+            kuzzle.state = state;
+            should(kuzzle.connect()).be.exactly(kuzzle);
+            should(kuzzle.state).be.exactly('connecting');
+          });
+        });
+      });
 
-    before(function () {
-      Kuzzle.__set__('io', iostub);
-    });
+      describe('=> on connection success', () => {
+        var
+          iostub = function () {
+            var emitter = new EventEmitter;
+            process.nextTick(() => emitter.emit('connect'));
+            return emitter;
+          };
+
+        it('should call the provided callback on a connection success', function (done) {
+          this.timeout(50);
+
+          Kuzzle.__with__({
+            io: iostub
+          })(function () {
+            new Kuzzle('nowhere', function (err, res) {
+              try {
+                should(err).be.null();
+                should(res).be.instanceof(Kuzzle);
+                should(res.state).be.exactly('connected');
+                done();
+              }
+              catch (e) {
+                done(e);
+              }
+            });
+          })
+        });
+
+        it('should renew subscriptions automatically on a connection success', function (done) {
+          var renewed = false;
+
+          this.timeout(50);
+
+          Kuzzle.__with__({io: iostub})(function () {
+            var kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
+
+            kuzzle.subscriptions['foo'] = {
+              bar: {
+                renew: function () { renewed = true; }
+              }
+            };
+
+            kuzzle.connect();
+            should(kuzzle.state).be.exactly('connecting');
+          });
+
+          setTimeout(() => {
+            should(renewed).be.true();
+            done();
+          }, 20);
+        });
+
+        it('should dequeue requests automatically on a connection success', function (done) {
+          var
+            dequeued = false,
+            revert = Kuzzle.__set__('dequeue', function () { dequeued = true; });
+
+          this.timeout(50);
 
 
-    it('should enter offline mode and call listeners', function (done) {
-      var
-        kuzzle = new Kuzzle('nowhere'),
-        listenerCalled = false;
+          Kuzzle.__with__({
+            io: iostub
+          })(function () {
+            var kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
 
-      this.timeout(200);
+            kuzzle.connect(() => {
+              should(kuzzle.state).be.exactly('connected');
+              should(dequeued).be.true();
+              revert();
+              done();
+            });
+          });
+        });
+      });
 
-      kuzzle.eventListeners.disconnected.push(function () { listenerCalled = true; });
+      describe('=> on disconnection', () => {
+        var
+          iostub = function () {
+            var emitter = new EventEmitter;
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('offline');
-          should(kuzzle.queuing).be.false();
-          should(listenerCalled).be.true();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
-    });
+            /*
+            since we're stubbing the socket.io socket object,
+            we need a stubbed 'close' function to make kuzzle.logout() work
+             */
+            emitter.close = function () { return false; };
+            process.nextTick(() => emitter.emit('disconnect'));
+            return emitter;
+          };
 
-    it('should enable queuing if autoQueue is set to true', function (done) {
-      var kuzzle = new Kuzzle('nowhere', {autoQueue: true});
-      this.timeout(200);
+        before(function () {
+          Kuzzle.__set__('io', iostub);
+        });
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('offline');
-          should(kuzzle.queuing).be.true();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
-    });
 
-    it('should invalidated the instance if autoReconnect is set to false', function (done) {
-      var kuzzle = new Kuzzle('nowhere', {autoReconnect: false});
+        it('should enter offline mode and call listeners', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere'),
+            listenerCalled = false;
 
-      this.timeout(200);
+          this.timeout(200);
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('offline');
-          should(kuzzle.queuing).be.false();
-          kuzzle.isValid();
-          done('the kuzzle instance should have been invalidated');
-        }
-        catch (e) {
-          done();
-        }
-      }, 10);
-    });
-  });
+          kuzzle.eventListeners.disconnected.push(function () { listenerCalled = true; });
 
-  describe('#on reconnection', () => {
-    var
-      iostub = function () {
-        var emitter = new EventEmitter;
-        process.nextTick(() => emitter.emit('reconnect'));
-        return emitter;
-      };
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('offline');
+              should(kuzzle.queuing).be.false();
+              should(listenerCalled).be.true();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
 
-    before(function () {
-      Kuzzle.__set__('io', iostub);
-    });
+        it('should enable queuing if autoQueue is set to true', function (done) {
+          var kuzzle = new Kuzzle('nowhere', {autoQueue: true});
+          this.timeout(200);
 
-    it('should exit offline mode when reconnecting', function (done) {
-      var
-        kuzzle = new Kuzzle('nowhere'),
-        listenersCalled = false;
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('offline');
+              should(kuzzle.queuing).be.true();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
 
-      this.timeout(200);
+        it('should invalidated the instance if autoReconnect is set to false', function (done) {
+          var kuzzle = new Kuzzle('nowhere', {autoReconnect: false});
 
-      kuzzle.eventListeners.reconnected.push(function () { listenersCalled = true; });
-      kuzzle.queuing = true;
+          this.timeout(200);
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(listenersCalled).be.true();
-          // should not switch queuing to 'false' automatically by default
-          should(kuzzle.queuing).be.true();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
-    });
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('offline');
+              should(kuzzle.queuing).be.false();
+              kuzzle.isValid();
+              done('the kuzzle instance should have been invalidated');
+            }
+            catch (e) {
+              done();
+            }
+          }, 10);
+        });
+      });
 
-    it('should renew subscriptions automatically when exiting offline mode', function (done) {
-      var
-        kuzzle = new Kuzzle('nowhere'),
-        renewCalled = false,
-        stubKuzzleRoom = {
-          callback: function () { renewCalled = true; },
-          renew: function (cb) { cb(); }
-        };
+      describe('=> on reconnection', () => {
+        var
+          iostub = function () {
+            var emitter = new EventEmitter;
+            process.nextTick(() => emitter.emit('reconnect'));
+            return emitter;
+          };
 
-      this.timeout(200);
+        before(function () {
+          Kuzzle.__set__('io', iostub);
+        });
 
-      kuzzle.subscriptions['foo'] = { bar: stubKuzzleRoom };
+        it('should exit offline mode when reconnecting', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere'),
+            listenersCalled = false;
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(renewCalled).be.true();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
-    });
+          this.timeout(200);
 
-    it('should not renew subscriptions if autoResubscribe is set to false', function (done) {
-      var
-        kuzzle = new Kuzzle('nowhere', {autoResubscribe: false}),
-        renewCalled = false,
-        stubKuzzleRoom = {
-          callback: function () { renewCalled = true; },
-          renew: function (cb) { cb(); }
-        };
+          kuzzle.eventListeners.reconnected.push(function () { listenersCalled = true; });
+          kuzzle.queuing = true;
 
-      this.timeout(200);
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('connected');
+              should(listenersCalled).be.true();
+              // should not switch queuing to 'false' automatically by default
+              should(kuzzle.queuing).be.true();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
 
-      kuzzle.subscriptions['foo'] = {
-        bar: stubKuzzleRoom
-      };
+        it('should renew subscriptions automatically when exiting offline mode', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere'),
+            renewCalled = false,
+            stubKuzzleRoom = {
+              callback: function () { renewCalled = true; },
+              renew: function (cb) { cb(); }
+            };
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(renewCalled).be.false();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
-    });
+          this.timeout(200);
 
-    it('should replay pending requests automatically if autoReplay is set to true', function (done) {
-      var
-        kuzzle = new Kuzzle('nowhere', {autoReplay: true});
+          kuzzle.subscriptions['foo'] = { bar: stubKuzzleRoom };
 
-      this.timeout(200);
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('connected');
+              should(renewCalled).be.true();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
 
-      kuzzle.queuing = true;
+        it('should not renew subscriptions if autoResubscribe is set to false', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere', {autoResubscribe: false}),
+            renewCalled = false,
+            stubKuzzleRoom = {
+              callback: function () { renewCalled = true; },
+              renew: function (cb) { cb(); }
+            };
 
-      setTimeout(() => {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(kuzzle.queuing).be.false();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+          this.timeout(200);
+
+          kuzzle.subscriptions['foo'] = {
+            bar: stubKuzzleRoom
+          };
+
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('connected');
+              should(renewCalled).be.false();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
+
+        it('should replay pending requests automatically if autoReplay is set to true', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere', {autoReplay: true});
+
+          this.timeout(200);
+
+          kuzzle.queuing = true;
+
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('connected');
+              should(kuzzle.queuing).be.false();
+              kuzzle.isValid();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
+      });
     });
   });
 });

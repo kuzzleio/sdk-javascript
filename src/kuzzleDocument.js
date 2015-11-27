@@ -78,6 +78,10 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   }
 
   if (content) {
+    if (content._version) {
+      this.version = content._version;
+      delete content._version;
+    }
     this.setContent(content, true);
   }
 

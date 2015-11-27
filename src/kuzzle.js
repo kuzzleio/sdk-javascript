@@ -241,6 +241,8 @@ Kuzzle.prototype.connect = function (cb) {
     return self;
   }
 
+  self.state = 'connecting';
+
   self.socket = io(self.url, {
     reconnection: self.autoReconnect,
     reconnectionDelay: self.reconnectionDelay,
