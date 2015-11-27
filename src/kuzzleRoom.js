@@ -22,10 +22,6 @@ var uuid = require('node-uuid');
  * @constructor
  */
 function KuzzleRoom(kuzzleDataCollection, options) {
-  if (!kuzzleDataCollection) {
-    throw new Error('KuzzleRoom: missing parameters');
-  }
-
   // Define properties
   Object.defineProperties(this, {
     // private properties

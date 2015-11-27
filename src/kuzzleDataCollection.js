@@ -468,12 +468,17 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
  * To subscribe to the entire data collection, simply provide an empty filter.
  *
  * @param {object} filters - Filters in Kuzzle DSL format
- * @param {responseCallback} cb - called for each new notification
  * @param {object} [options] - subscriptions options
+ * @param {responseCallback} cb - called for each new notification
  * @returns {*} KuzzleRoom object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, cb, options) {
+KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
   var room;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
 

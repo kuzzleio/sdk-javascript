@@ -1,7 +1,6 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
@@ -792,10 +791,17 @@ describe('KuzzleDataCollection methods', function () {
       };
     });
 
-    it('should send instantiate a new KuzzleRoom object', function () {
+    it('should instantiate a new KuzzleRoom object', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, function () {}, {})).be.instanceof(KuzzleRoom);
+      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleRoom);
+      should(emitted).be.true();
+    });
+
+    it('should handle arguments correctly', function () {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleRoom);
       should(emitted).be.true();
     });
 

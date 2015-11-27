@@ -8,7 +8,10 @@ var
 describe('Kuzzle constructor', () => {
   describe('#constructor', function () {
     it('should expose the documented functions', () => {
-      var kuzzle = new Kuzzle('nowhere');
+      var kuzzle;
+
+      Kuzzle.__set__('io', function () { return new EventEmitter; });
+      kuzzle = new Kuzzle('nowhere');
 
       should.exist(kuzzle.addListener);
       should.exist(kuzzle.dataCollectionFactory);
@@ -115,6 +118,12 @@ describe('Kuzzle constructor', () => {
 
     it('should allow passing a callback and respond once initialized', function (done) {
       this.timeout(500);
+
+      Kuzzle.__set__('io', function () {
+        var emitter = new EventEmitter;
+        process.nextTick(() => emitter.emit('connect'));
+        return emitter;
+      });
 
       new Kuzzle('nowhere', () => {
         try {
