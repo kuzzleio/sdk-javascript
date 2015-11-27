@@ -234,7 +234,7 @@ module.exports = Kuzzle = function (url, options, cb) {
 Kuzzle.prototype.connect = function (cb) {
   var self = this;
 
-  if (['initializing', 'ready', 'loggedOff', 'error'].indexOf(this.state) === -1) {
+  if (['initializing', 'ready', 'loggedOff', 'error', 'offline'].indexOf(this.state) === -1) {
     if (cb) {
       cb(null, self);
     }
