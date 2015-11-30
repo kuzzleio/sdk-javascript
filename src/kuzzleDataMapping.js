@@ -16,6 +16,7 @@
  *  The KuzzleDataMapping object allow to get the current mapping of a data collection and to modify it if needed.
  *
  * @param {object} kuzzleDataCollection - Instance of the inherited KuzzleDataCollection object
+ * @param {object} mapping - mappings
  * @constructor
  */
 function KuzzleDataMapping(kuzzleDataCollection, mapping) {

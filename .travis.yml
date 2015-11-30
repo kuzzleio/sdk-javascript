@@ -3,7 +3,7 @@ language: node_js
 node_js:
 - '4.2'
 script:
-- grunt && npm test
+- grunt && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 before_install: npm install -g grunt-cli
 install: npm install
 after_deploy:

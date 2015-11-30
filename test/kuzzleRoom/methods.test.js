@@ -1,0 +1,409 @@
+var
+  should = require('should'),
+  rewire = require('rewire'),
+  Kuzzle = rewire('../../src/kuzzle'),
+  KuzzleRoom = rewire('../../src/kuzzleRoom');
+
+describe('KuzzleRoom methods', function () {
+  var
+    expectedQuery,
+    error,
+    result,
+    queryStub = function (collection, controller, action, query, options, cb) {
+      if (!cb && typeof options === 'function') {
+        cb = options;
+        options = null;
+      }
+      emitted = true;
+      should(collection).be.exactly(expectedQuery.collection);
+      should(controller).be.exactly(expectedQuery.controller);
+      should(action).be.exactly(expectedQuery.action);
+
+      if (expectedQuery.options) {
+        should(options).match(expectedQuery.options);
+      }
+
+      if (expectedQuery.body) {
+        should(query.body).match(expectedQuery.body);
+      } else {
+        should(Object.keys(query).length).be.exactly(0);
+      }
+
+      if (expectedQuery._id) {
+        should(query._id).be.exactly(expectedQuery._id);
+      }
+
+      if (cb) {
+        if (error) {
+          return cb(error);
+        }
+
+        cb(error, result);
+      }
+    },
+    emitted,
+    kuzzle,
+    dataCollection;
+
+
+  describe('#count', function () {
+    var room;
+
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = { count: 42 };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'count',
+        controller: 'subscribe',
+        body: {}
+      };
+      room = new KuzzleRoom(dataCollection);
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      should(room.count(function () {})).be.exactly(room);
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      should(function () { room.count();}).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should delay the request until after subscribing', function () {
+      var cb = function () {};
+      room.subscribing = true;
+      should(room.count(cb)).be.exactly(room);
+      should(emitted).be.false();
+      should(room.queue).match([{action: 'count', args: [cb]}]);
+    });
+
+    it('should answer with the number of subscribers', function (done) {
+      this.timeout(50);
+
+      room.count(function (err, res) {
+        should(err).be.null();
+        should(res).be.a.Number().and.be.exactly(42);
+        done();
+      });
+    });
+
+    it('should resolve the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+      error = 'foobar';
+
+      room.count(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#renew', function () {
+    var
+      room,
+      revert,
+      dequeued;
+
+    beforeEach(function () {
+      dequeued = false;
+      revert = KuzzleRoom.__set__('dequeue', function () { dequeued = true; });
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = { roomId: 'foobar' };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'on',
+        controller: 'subscribe',
+        body: {}
+      };
+      room = new KuzzleRoom(dataCollection);
+    });
+
+    afterEach(function () {
+      revert();
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      should(room.renew({}, function () {})).be.exactly(room);
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      should(function () { room.renew();}).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should handle arguments properly', function () {
+      room.renew(function () {});
+      should(emitted).be.true();
+    });
+
+    it('should delay the request until after subscribing', function () {
+      var cb = function () {};
+      room.subscribing = true;
+      should(room.renew({}, cb)).be.exactly(room);
+      should(emitted).be.false();
+      should(room.queue).match([{action: 'renew', args: [{}, cb]}]);
+    });
+
+    it('should register itself in the global subscription list', function () {
+      room.renew({}, function () {});
+      should(kuzzle.subscriptions['foobar']).be.an.Object().and.not.be.empty();
+      should(kuzzle.subscriptions['foobar'][room.id]).be.exactly(room);
+    });
+
+    it('should start dequeuing if subscribed successfully', function (done) {
+      room.renew({}, function () {});
+
+      setTimeout(() => {
+        should(dequeued).be.true();
+        done();
+      }, 10);
+    });
+
+    it('should throw and empty the queue if the subscription fails', function () {
+      error = 'foobar';
+      room.queue.push({foo: 'bar'});
+      should(function () { room.renew({}, function () {}); }).throw(Error);
+      should(dequeued).be.false();
+      should(room.queue).be.empty();
+    });
+  });
+
+  describe('#setHeaders', function () {
+    var room;
+
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      room = new KuzzleRoom(dataCollection);
+    });
+
+    it('should set headers properly', function () {
+      should(room.setHeaders({foo: 'bar'})).be.exactly(room);
+      should(room.headers).match({foo: 'bar'});
+    });
+  });
+
+  describe('#unsubscribe', function () {
+    var
+      room,
+      socketOff;
+
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      kuzzle.socket = {
+        off: function () { socketOff = true; }
+      };
+
+      socketOff = true;
+      emitted = false;
+      result = { count: 42 };
+      error = null;
+      expectedQuery = {
+        collection: 'foo',
+        action: 'off',
+        controller: 'subscribe',
+        body: {}
+      };
+
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      room = new KuzzleRoom(dataCollection);
+      room.roomId = 'foobar';
+      kuzzle.subscriptions['foobar'] = {};
+      kuzzle.subscriptions['foobar'][room.id] = room;
+    });
+
+    it('should stop listening to the socket room once subscription has stopped', function () {
+      should(room.unsubscribe()).be.exactly(room);
+      should(socketOff).be.true();
+      should(emitted).be.true();
+      should(kuzzle.subscriptions['foobar']).be.undefined();
+    });
+
+    it('should not emit an unsubscribe request if another KuzzleRoom is listening to that room', function () {
+      kuzzle.subscriptions['foobar']['foo'] = {};
+      should(room.unsubscribe()).be.exactly(room);
+      should(socketOff).be.true();
+      should(emitted).be.false();
+      should(kuzzle.subscriptions['foobar']).not.be.empty();
+      should(Object.keys(kuzzle.subscriptions['foobar']).length).be.exactly(1);
+      should(kuzzle.subscriptions['foobar']['foo']).not.be.undefined();
+    });
+
+    it('should unsubscribe only after all pending subscriptions are finished', function (done) {
+      kuzzle.subscriptions.pending.foo = {};
+      should(room.unsubscribe()).be.exactly(room);
+      should(socketOff).be.true();
+      should(emitted).be.false();
+      should(kuzzle.subscriptions['foobar']).be.undefined();
+      kuzzle.subscriptions.pending = {};
+      setTimeout(() => {
+        should(emitted).be.true();
+        done();
+      }, 100);
+    });
+
+    it('should not unsubscribe if pending actions were subscriptions on that room', function (done) {
+      kuzzle.subscriptions.pending.foo = {};
+      should(room.unsubscribe()).be.exactly(room);
+      should(socketOff).be.true();
+      should(emitted).be.false();
+      should(kuzzle.subscriptions['foobar']).be.undefined();
+      kuzzle.subscriptions.pending = {};
+      kuzzle.subscriptions.foobar = {};
+      kuzzle.subscriptions.foobar.foo = {};
+      setTimeout(() => {
+        should(emitted).be.false();
+        done();
+      }, 100);
+    });
+
+    it('should delay the unsubscription until after the current subscription is done', function () {
+      room.subscribing = true;
+      should(room.unsubscribe()).be.exactly(room);
+      should(room.queue).match([{action: 'unsubscribe', args: []}]);
+    });
+  });
+
+  describe('#dequeue', function () {
+    var
+      dequeue = KuzzleRoom.__get__('dequeue'),
+      room,
+      dequeued;
+
+    beforeEach(function () {
+      var stub = function () { dequeued++; };
+
+      kuzzle = new Kuzzle('foo');
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      room = new KuzzleRoom(dataCollection);
+      room.count = stub;
+      room.renew = stub;
+      room.unsubscribe = stub;
+    });
+
+    it('should replay requests queued while refreshing', function () {
+      dequeued = 0;
+
+      dequeue.call(room);
+      should(dequeued).be.exactly(0);
+
+      room.queue.push({action: 'count', args: []});
+      room.queue.push({action: 'renew', args: []});
+      room.queue.push({action: 'unsubscribe', args: []});
+      dequeue.call(room);
+      should(dequeued).be.exactly(3);
+    });
+  });
+
+  describe('#notificationCallback', function () {
+    var
+      notifCB = KuzzleRoom.__get__('notificationCallback'),
+      room,
+      called,
+      error,
+      result;
+
+    beforeEach(function () {
+      called = false;
+      error = result = undefined;
+      kuzzle = new Kuzzle('foo');
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      room = new KuzzleRoom(dataCollection);
+      room.callback = function (err, res) { called = true; error = err; result = res; };
+    });
+
+    it('should call back with an error if query returns an error', function () {
+      notifCB.call(room, {error: 'foobar', res: {}});
+      should(result).be.undefined();
+      should(error).be.exactly('foobar');
+    });
+
+    it('should return the result when one is provided', function () {
+      notifCB.call(room, {error: null, result: {foo: 'bar'}});
+      should(result).match({foo: 'bar'});
+      should(error).be.null();
+    });
+
+    it('should handle the listenToConnections filter', function () {
+      var res = {action: 'on', foo: 'bar'};
+      room.listenToConnections = false;
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.false();
+
+      room.listenToConnections = true;
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.true();
+      should(error).be.null();
+      should(result).match(res);
+    });
+
+    it('should fire a "subscribed" global event when receiving a "on" message', function () {
+      var
+        listenerCalled = false,
+        res = {action: 'on', foo: 'bar'};
+
+      room.listenToConnections = false;
+      kuzzle.addListener('subscribed', function () { listenerCalled = true; });
+      notifCB.call(room, {error: null, result: res});
+      should(listenerCalled).be.true();
+    });
+
+
+    it('should handle the listenToDisconnections filter', function () {
+      var res = {action: 'off', foo: 'bar'};
+      room.listenToDisconnections = false;
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.false();
+
+      room.listenToDisconnections = true;
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.true();
+      should(error).be.null();
+      should(result).match(res);
+    });
+
+    it('should fire a "unsubscribed" global event when receiving a "on" message', function () {
+      var
+        listenerCalled = false,
+        res = {action: 'off', foo: 'bar'};
+
+      room.listenToDisconnections = false;
+      kuzzle.addListener('unsubscribed', function () { listenerCalled = true; });
+      notifCB.call(room, {error: null, result: res});
+      should(listenerCalled).be.true();
+    });
+
+    it('should delete the result from history if emitted by this instance', function () {
+      var res = { action: 'foo', requestId: 'bar'};
+
+      room.subscribeToSelf = true;
+      kuzzle.requestHistory['bar'] = {};
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.true();
+      should(kuzzle.requestHistory).be.empty();
+    });
+
+    it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
+      var res = { action: 'foo', requestId: 'bar'};
+
+      room.subscribeToSelf = false;
+      kuzzle.requestHistory['bar'] = {};
+      notifCB.call(room, {error: null, result: res});
+      should(called).be.false();
+      should(kuzzle.requestHistory).be.empty();
+    });
+  });
+});

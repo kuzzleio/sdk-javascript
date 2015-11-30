@@ -54,4 +54,15 @@ describe('KuzzleDataCollection constructor', function () {
     should.exist(dataCollection.updateDocumentPromise);
   });
 
+  it('should set headers using setHeaders', function () {
+    var
+      kuzzle = new Kuzzle('foo'),
+      collection = kuzzle.dataCollectionFactory('foo');
+
+    collection.setHeaders({foo: 'bar'}, true);
+    should(collection.headers).match({foo: 'bar'});
+
+    collection.setHeaders({bar: 'foobar'}, false);
+    should(collection.headers).match({foo: 'bar', bar: 'foobar'});
+  });
 });

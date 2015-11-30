@@ -37,10 +37,6 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: kuzzleDataCollection.collection,
       enumerable: true
     },
-    createdTimestamp: {
-      value: 'not yet implemented',
-      enumerable: true
-    },
     dataCollection: {
       value: kuzzleDataCollection,
       enumerable: true
@@ -49,11 +45,12 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: kuzzleDataCollection.kuzzle,
       enumerable: true
     },
-    modifiedTimestamp: {
-      value: 'not yet implemented',
-      enumerable: true
-    },
     // writable properties
+    id: {
+      value: undefined,
+      enumerable: true,
+      writable: true
+    },
     content: {
       value: {},
       writable: true,
@@ -78,6 +75,10 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   }
 
   if (content) {
+    if (content._version) {
+      this.version = content._version;
+      delete content._version;
+    }
     this.setContent(content, true);
   }
 
@@ -161,7 +162,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
   }
 
   if (!this.id) {
-    throw new Error('KuzzleDocument.delete: cannot delete a document that has not been saved into Kuzzle');
+    throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
   if (cb) {
@@ -244,30 +245,12 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
 KuzzleDocument.prototype.save = function (options, cb) {
   var
     data = this.toJSON(),
-    self = this,
-    queryCB;
+    self = this;
 
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;
   }
-
-  queryCB = function (error, result) {
-    if (error) {
-      return cb ? cb(error) : false;
-    }
-
-    if (!self.id) {
-      Object.defineProperty(self, 'id', {
-        value: result._id,
-        enumerable: true
-      });
-    }
-
-    if (cb) {
-      cb(null, self);
-    }
-  };
 
   if (self.refreshing) {
     self.queue.push({action: 'save', args: [options, cb]});
@@ -276,7 +259,18 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, queryCB);
+  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, result) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    self.id = result._id;
+    self.version = result._version;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
 
   return self;
 };
@@ -350,18 +344,13 @@ KuzzleDocument.prototype.subscribe = function (options, cb) {
 
   this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
 
-  if (this.refreshing) {
-    this.queue.push({action: 'subscribe', args: [cb]});
-    return this;
-  }
-
   if (!this.id) {
     throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
   }
 
   filters = { ids: { values: [this.id] } };
 
-  return this.dataCollection.subscribe(filters, cb, options);
+  return this.dataCollection.subscribe(filters, options, cb);
 };
 
 /**
@@ -382,7 +371,7 @@ KuzzleDocument.prototype.setHeaders = function (content, replace) {
 /**
  * internal function used to dequeue calls which were put on hold while refreshing the content of this document
  */
-function dequeue() {
+function dequeue () {
   var element;
 
   while (this.queue.length > 0) {

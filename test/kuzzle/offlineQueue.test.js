@@ -108,7 +108,7 @@ describe('Offline queue management', () => {
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(kuzzle.queuing).be.false();
         done();
-      }, numRequests * kuzzle.replayInterval + 10)
+      }, numRequests * kuzzle.replayInterval + 50)
     });
   });
 
