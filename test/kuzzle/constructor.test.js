@@ -211,6 +211,35 @@ describe('Kuzzle constructor', () => {
         });
       });
 
+      describe('=> on connection error', () => {
+        var
+          iostub = function () {
+            var emitter = new EventEmitter;
+            process.nextTick(() => emitter.emit('connect_error', 'error'));
+            return emitter;
+          };
+
+        it('should call the provided callback on a connection error', function (done) {
+          this.timeout(50);
+
+          Kuzzle.__with__({
+            io: iostub
+          })(function () {
+            var kuzzle = new Kuzzle('nowhere', function (err, res) {
+              try {
+                should(err).be.exactly('error');
+                should(res).be.undefined();
+                should(kuzzle.state).be.exactly('error');
+                done();
+              }
+              catch (e) {
+                done(e);
+              }
+            });
+          });
+        });
+      });
+
       describe('=> on connection success', () => {
         var
           iostub = function () {
@@ -236,7 +265,7 @@ describe('Kuzzle constructor', () => {
                 done(e);
               }
             });
-          })
+          });
         });
 
         it('should renew subscriptions automatically on a connection success', function (done) {

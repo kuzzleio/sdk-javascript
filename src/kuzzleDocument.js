@@ -371,7 +371,7 @@ KuzzleDocument.prototype.setHeaders = function (content, replace) {
 /**
  * internal function used to dequeue calls which were put on hold while refreshing the content of this document
  */
-function dequeue() {
+function dequeue () {
   var element;
 
   while (this.queue.length > 0) {

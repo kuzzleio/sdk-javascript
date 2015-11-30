@@ -169,19 +169,15 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   subscribeQuery = this.kuzzle.addHeaders({body: self.filters}, this.headers);
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+    delete self.kuzzle.subscriptions.pending[self.id];
+    self.subscribing = false;
+
     if (error) {
-      /*
-       If we've already subscribed to this room, Kuzzle returns the actual roomID.
-       We'll simply ignore the error and acts as if we successfully subscribed.
-        */
-      if (error.details && error.details.roomId) {
-        self.roomId = error.details.roomId;
-      } else {
-        throw new Error('Error during Kuzzle subscription: ' + error.message);
-      }
-    } else {
-      self.roomId = response.roomId;
+      self.queue = [];
+      throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
+
+    self.roomId = response.roomId;
 
     if (!self.kuzzle.subscriptions[self.roomId]) {
       self.kuzzle.subscriptions[self.roomId] = {};
@@ -192,10 +188,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.notifier = notificationCallback.bind(self);
     self.kuzzle.socket.on(self.roomId, self.notifier);
 
-    self.subscribing = false;
-    delete self.kuzzle.subscriptions.pending[self.id];
-
-    self.dequeue();
+    dequeue.call(self);
   });
 
   return this;
@@ -237,7 +230,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
             }
             clearInterval(interval);
           }
-        }, 500);
+        }, 100);
       }
     } else {
       delete self.kuzzle.subscriptions[room][self.id];
@@ -261,19 +254,6 @@ KuzzleRoom.prototype.unsubscribe = function () {
 KuzzleRoom.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
-};
-
-/**
- * Dequeue actions performed while subscription was being renewed
- */
-KuzzleRoom.prototype.dequeue = function () {
-  var element;
-
-  while (this.queue.length > 0) {
-    element = this.queue.shift();
-
-    this[element.action].apply(this, element.args);
-  }
 };
 
 /**
@@ -308,7 +288,7 @@ function notificationCallback (data) {
       }
 
       self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
-        listener(self.subscriptionId, data.result);
+        listener.fn(self.subscriptionId, data.result);
       });
     }
   } else if (self.kuzzle.requestHistory[data.result.requestId]) {
@@ -318,6 +298,20 @@ function notificationCallback (data) {
     delete self.kuzzle.requestHistory[data.result.requestId];
   } else {
     self.callback(null, data.result);
+  }
+}
+
+
+/**
+ * Dequeue actions performed while subscription was being renewed
+ */
+function dequeue () {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+
+    this[element.action].apply(this, element.args);
   }
 }
 
