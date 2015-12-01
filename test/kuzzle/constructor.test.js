@@ -341,7 +341,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
 
-          kuzzle.eventListeners.disconnected.push(function () { listenerCalled = true; });
+          kuzzle.addListener('disconnected', function () { listenerCalled = true; });
 
           setTimeout(() => {
             try {
@@ -412,7 +412,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
 
-          kuzzle.eventListeners.reconnected.push(function () { listenersCalled = true; });
+          kuzzle.addListener('reconnected', function () { listenersCalled = true; });
           kuzzle.queuing = true;
 
           setTimeout(() => {

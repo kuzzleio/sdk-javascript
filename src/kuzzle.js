@@ -286,12 +286,12 @@ Kuzzle.prototype.connect = function (cb) {
     }
 
     self.eventListeners.disconnected.forEach(function (listener) {
-      listener();
+      listener.fn();
     });
   });
 
   self.socket.on('reconnect', function () {
-    self.state = 'reconnecting';
+    self.state = 'connected';
 
     // renew subscriptions
     if (self.autoResubscribe) {
@@ -312,10 +312,8 @@ Kuzzle.prototype.connect = function (cb) {
 
     // alert listeners
     self.eventListeners.reconnected.forEach(function (listener) {
-      listener();
+      listener.fn();
     });
-
-    self.state = 'connected';
   });
 
   return this;
