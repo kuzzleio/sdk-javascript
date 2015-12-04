@@ -681,7 +681,7 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
     emitRequest.call(this, object, cb);
-  } else if (self.queuing|| self.state === 'initializing') {
+  } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
 
     if (self.queueFilter) {
