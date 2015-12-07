@@ -42,8 +42,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     eventListeners: {
       value: {
-        subscribed: [],
-        unsubscribed: [],
+        connected: [],
+        error: [],
         disconnected: [],
         reconnected: []
       }
@@ -261,6 +261,10 @@ Kuzzle.prototype.connect = function (cb) {
 
     dequeue.call(self);
 
+    self.eventListeners.connected.forEach(function (listener) {
+      listener.fn();
+    });
+
     if (cb) {
       cb(null, self);
     }
@@ -268,6 +272,10 @@ Kuzzle.prototype.connect = function (cb) {
 
   self.socket.on('connect_error', function (error) {
     self.state = 'error';
+
+    self.eventListeners.error.forEach(function (listener) {
+      listener.fn();
+    });
 
     if (cb) {
       cb(error);
@@ -443,20 +451,11 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query(null, 'admin', 'getAllStats', {}, options, function (err, res) {
-    var result = [];
-
     if (err) {
       return cb(err);
     }
 
-    Object.keys(res.statistics).forEach(function (key) {
-      var frame = res.statistics[key];
-      frame.timestamp = key;
-
-      result.push(frame);
-    });
-
-    cb(null, result);
+    cb(null, res.statistics);
   });
 
   return this;
@@ -492,18 +491,15 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
   }
 
   queryCB = function (err, res) {
-    var stats = [];
-
     if (err) {
       return cb(err);
     }
 
-    Object.keys(res.statistics).forEach(function (frame) {
-      res.statistics[frame].timestamp = frame;
-      stats.push(res.statistics[frame]);
-    });
-
-    cb(null, stats);
+    if (timestamp) {
+      cb(null, res.statistics);
+    } else {
+      cb(null, [res.statistics]);
+    }
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
