@@ -11,13 +11,24 @@ env:
   global:
     secure: EZ+XXJFDtehmag7wt8JbutqgzpkkJUCzkEWw6W+p7MIxWenLyuGv/RUu7KGqAloOud1cZbmZGSfRx/vsPvxRjo+ZC7aaPqb74qRvfctGdlJTtEffS2jFno1pEppJzCR4n7vocSfMVYtOD6oHP67lXwn/Qnh++WUkZaV137m5+7rqiYgJ+JTeSs5jBRZ6X7VNoNz8tZXejQ+FOymCFQTS2JM/rSZX9NEK+OwUEhEjRcxqWMm2avk6NAQNAL3WQuIBJQH8lxEJxOXkMc0rQZZ09AoLpqJKzsaicaZMInt5JstPo2e9vJfhi+PpRSNhErIff36aCHWRYYDPKl5x6IelZpBfZeTdrs4V2TbRi1y0ELbgMG1FHS4HAw3vTnh4/49g01lAJed4UguFRc6MzwTLAL8uPG/zFe8snm9+kaf4pL7yO89Hf3eltE03+N//tyVv+X/jdSca2dBZ9FMeLE5pJ2jlRiKitCLjXmLUEMMxEwNF7K/IvOrD9wue3JXK0UogOpcXfppk++pNTijsZluU1Yj7k3fGFeS8d6rIU0Yj40y6/VMaJeL4EXlARRsGLigUKVjQL6+/N5xudlsCng+EG+WVIy4wEEPH0QgjUkPTgWx1NrUlTwjskE0cdqDOBu39WkRFJHHECYFPTfTuDJ7xxuuibFTQmUFu2zjbYfYKhPE=
 deploy:
-  provider: npm
-  email: support@kuzzle.io
-  api_key:
-    secure: jQsANrQ9UXBZxrWLXJKL+G8eszVmADZ8Kx4/UhGE50mBXVOkbkXF0UjqElm4T5ADniK6IoPUAEZDQ1Jk8QsJyHo2FUkeu4kV0s7tj0SWdEAev+M8SChoPayDPQcMbncPRCNKZQy5MfAtAao/n+RxPOLZjqnWfQf+ucSNlKrmvhTNkN4L0YWJHoQgcdUE5zRHopPCJF7n0XENJFq61ke7SIBDotg4xmRIErhco09QUFkYe2OWfLljodbuY50jU+/3rHgK8pTUBCra5FithfiekeynyUpUXtcRUV4pg0UTnVzWow0S2z1LlrpHaywoe2QmfDOs+bZ7EqYZSpnFxRmrUqNUNQjtkxMG8DlAc7rMj/0P70c2FAUmulng0NW4YGP+TTP5J8pzu1Jf7i+Njwe7vm8dKvvQPUFC+p2hYMCbpIFe9kVDg7jDXAd1fyxz/yDwVyKYLwvX84S/00wdLq8zuHYmZTCtAnA3RNfpjbGdHCfAUxoro/4jAzAYN3g6ppUSOYnn0egqVoyo7vBXNR2i11zSL3XIZGKWNa+fCIkmF3/wE3LpFtmznzN66tTSL5D/6y0fkVxZ9SZRnaIsxyBIG9kRz1FH4YAlFlcLd8ul4+Tjc5gxpy7P8zIr+rKm1q+Tc+ieVzEDaPx3ikplXmwf0U9geFcFw80XCLpVVmZDvVo=
-  on:
-    repo: kuzzleio/sdk-javascript
-    branch: master
+  - provider: npm
+    email: support@kuzzle.io
+    api_key:
+      secure: jQsANrQ9UXBZxrWLXJKL+G8eszVmADZ8Kx4/UhGE50mBXVOkbkXF0UjqElm4T5ADniK6IoPUAEZDQ1Jk8QsJyHo2FUkeu4kV0s7tj0SWdEAev+M8SChoPayDPQcMbncPRCNKZQy5MfAtAao/n+RxPOLZjqnWfQf+ucSNlKrmvhTNkN4L0YWJHoQgcdUE5zRHopPCJF7n0XENJFq61ke7SIBDotg4xmRIErhco09QUFkYe2OWfLljodbuY50jU+/3rHgK8pTUBCra5FithfiekeynyUpUXtcRUV4pg0UTnVzWow0S2z1LlrpHaywoe2QmfDOs+bZ7EqYZSpnFxRmrUqNUNQjtkxMG8DlAc7rMj/0P70c2FAUmulng0NW4YGP+TTP5J8pzu1Jf7i+Njwe7vm8dKvvQPUFC+p2hYMCbpIFe9kVDg7jDXAd1fyxz/yDwVyKYLwvX84S/00wdLq8zuHYmZTCtAnA3RNfpjbGdHCfAUxoro/4jAzAYN3g6ppUSOYnn0egqVoyo7vBXNR2i11zSL3XIZGKWNa+fCIkmF3/wE3LpFtmznzN66tTSL5D/6y0fkVxZ9SZRnaIsxyBIG9kRz1FH4YAlFlcLd8ul4+Tjc5gxpy7P8zIr+rKm1q+Tc+ieVzEDaPx3ikplXmwf0U9geFcFw80XCLpVVmZDvVo=
+    on:
+      repo: kuzzleio/sdk-javascript
+      branch: master
+  - provider: releases
+    user: support@kuzzle.io
+    api-key: ${GH_TOKEN}
+    file:
+      - "dist/kuzzle.js"
+      - "dist/kuzzle.min.js"
+      - "dist/kuzzle.min.map"
+    skip_cleanup: true
+    on:
+      repo: kuzzleio/sdk-javascript
+      tags: true
 notifications:
   webhooks:
     urls:
@@ -32,4 +43,3 @@ notifications:
     on_failure: always
     on_start: never
 
-script: grunt
