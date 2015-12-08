@@ -1,8 +1,10 @@
 [![Build Status](https://travis-ci.org/kuzzleio/sdk-javascript.svg?branch=master)](https://travis-ci.org/kuzzleio/sdk-javascript) [![codecov.io](http://codecov.io/github/kuzzleio/sdk-javascript/coverage.svg?branch=master)](http://codecov.io/github/kuzzleio/sdk-javascript?branch=master) [![Dependency Status](https://david-dm.org/kuzzleio/sdk-javascript.svg)](https://david-dm.org/kuzzleio/sdk-javascript)
 
 
-Kuzzle
+Official Kuzzle Javascript SDK 
 ======
+
+:warning: This SDK version requires Kuzzle v0.5.6 or higher.
 
 ## About Kuzzle
 
@@ -86,7 +88,7 @@ kuzzle
 
 ### HTML
 
-#### Vanilla
+#### Using automatic builds
 
 Download the file [kuzzle.min.js](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/browser/kuzzle.min.js) available in the [browser](https://github.com/kuzzleio/sdk-javascript/tree/browser) branch of this project.
 
@@ -119,6 +121,10 @@ kuzzle
     */
 });
 ```
+
+#### Building manually
+
+Clone this github repository and run ``grunt``. A ``browser`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
 
 # License
 
