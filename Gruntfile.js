@@ -18,8 +18,9 @@ module.exports = function(grunt) {
     browserify: {
       kuzzle: {
         src: ['src/kuzzle.js'],
-        dest: 'browser/kuzzle.js',
+        dest: 'dist/kuzzle.js',
         options: {
+          exclude: ['socket.io-client'],
           browserifyOptions: {
             noParse: [require.resolve('node-uuid')]
           }
@@ -30,11 +31,11 @@ module.exports = function(grunt) {
       kuzzle: {
         options: {
           'sourceMap': true,
-          'sourceMapName': 'browser/kuzzle.min.map',
+          'sourceMapName': 'dist/kuzzle.min.map',
           'banner': '// <%= pkg.description %> v<%= pkg.version %> - License: <%= pkg.license %>'
         },
         files: {
-          'browser/kuzzle.min.js': ['browser/kuzzle.js']
+          'dist/kuzzle.min.js': ['dist/kuzzle.js']
         }
       }
     }

@@ -15,5 +15,5 @@ examples/node_modules/
 *~
 
 # Compiled files
-browser/
+dist/
 coverage/
