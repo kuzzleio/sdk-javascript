@@ -1,0 +1,2529 @@
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+//     uuid.js
+//
+//     Copyright (c) 2010-2012 Robert Kieffer
+//     MIT License - http://opensource.org/licenses/mit-license.php
+
+(function() {
+  var _global = this;
+
+  // Unique ID creation requires a high quality random # generator.  We feature
+  // detect to determine the best RNG source, normalizing to a function that
+  // returns 128-bits of randomness, since that's what's usually required
+  var _rng;
+
+  // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
+  //
+  // Moderately fast, high quality
+  if (typeof(_global.require) == 'function') {
+    try {
+      var _rb = _global.require('crypto').randomBytes;
+      _rng = _rb && function() {return _rb(16);};
+    } catch(e) {}
+  }
+
+  if (!_rng && _global.crypto && crypto.getRandomValues) {
+    // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+    //
+    // Moderately fast, high quality
+    var _rnds8 = new Uint8Array(16);
+    _rng = function whatwgRNG() {
+      crypto.getRandomValues(_rnds8);
+      return _rnds8;
+    };
+  }
+
+  if (!_rng) {
+    // Math.random()-based (RNG)
+    //
+    // If all else fails, use Math.random().  It's fast, but is of unspecified
+    // quality.
+    var  _rnds = new Array(16);
+    _rng = function() {
+      for (var i = 0, r; i < 16; i++) {
+        if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+        _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+      }
+
+      return _rnds;
+    };
+  }
+
+  // Buffer class to use
+  var BufferClass = typeof(_global.Buffer) == 'function' ? _global.Buffer : Array;
+
+  // Maps for number <-> hex string conversion
+  var _byteToHex = [];
+  var _hexToByte = {};
+  for (var i = 0; i < 256; i++) {
+    _byteToHex[i] = (i + 0x100).toString(16).substr(1);
+    _hexToByte[_byteToHex[i]] = i;
+  }
+
+  // **`parse()` - Parse a UUID into it's component bytes**
+  function parse(s, buf, offset) {
+    var i = (buf && offset) || 0, ii = 0;
+
+    buf = buf || [];
+    s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
+      if (ii < 16) { // Don't overflow!
+        buf[i + ii++] = _hexToByte[oct];
+      }
+    });
+
+    // Zero out remaining bytes if string was short
+    while (ii < 16) {
+      buf[i + ii++] = 0;
+    }
+
+    return buf;
+  }
+
+  // **`unparse()` - Convert UUID byte array (ala parse()) into a string**
+  function unparse(buf, offset) {
+    var i = offset || 0, bth = _byteToHex;
+    return  bth[buf[i++]] + bth[buf[i++]] +
+            bth[buf[i++]] + bth[buf[i++]] + '-' +
+            bth[buf[i++]] + bth[buf[i++]] + '-' +
+            bth[buf[i++]] + bth[buf[i++]] + '-' +
+            bth[buf[i++]] + bth[buf[i++]] + '-' +
+            bth[buf[i++]] + bth[buf[i++]] +
+            bth[buf[i++]] + bth[buf[i++]] +
+            bth[buf[i++]] + bth[buf[i++]];
+  }
+
+  // **`v1()` - Generate time-based UUID**
+  //
+  // Inspired by https://github.com/LiosK/UUID.js
+  // and http://docs.python.org/library/uuid.html
+
+  // random #'s we need to init node and clockseq
+  var _seedBytes = _rng();
+
+  // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+  var _nodeId = [
+    _seedBytes[0] | 0x01,
+    _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+  ];
+
+  // Per 4.2.2, randomize (14 bit) clockseq
+  var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+  // Previous uuid creation time
+  var _lastMSecs = 0, _lastNSecs = 0;
+
+  // See https://github.com/broofa/node-uuid for API details
+  function v1(options, buf, offset) {
+    var i = buf && offset || 0;
+    var b = buf || [];
+
+    options = options || {};
+
+    var clockseq = options.clockseq != null ? options.clockseq : _clockseq;
+
+    // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+    // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+    // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+    // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+    var msecs = options.msecs != null ? options.msecs : new Date().getTime();
+
+    // Per 4.2.1.2, use count of uuid's generated during the current clock
+    // cycle to simulate higher resolution clock
+    var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
+
+    // Time since last uuid creation (in msecs)
+    var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+    // Per 4.2.1.2, Bump clockseq on clock regression
+    if (dt < 0 && options.clockseq == null) {
+      clockseq = clockseq + 1 & 0x3fff;
+    }
+
+    // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+    // time interval
+    if ((dt < 0 || msecs > _lastMSecs) && options.nsecs == null) {
+      nsecs = 0;
+    }
+
+    // Per 4.2.1.2 Throw error if too many uuids are requested
+    if (nsecs >= 10000) {
+      throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+    }
+
+    _lastMSecs = msecs;
+    _lastNSecs = nsecs;
+    _clockseq = clockseq;
+
+    // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+    msecs += 12219292800000;
+
+    // `time_low`
+    var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+    b[i++] = tl >>> 24 & 0xff;
+    b[i++] = tl >>> 16 & 0xff;
+    b[i++] = tl >>> 8 & 0xff;
+    b[i++] = tl & 0xff;
+
+    // `time_mid`
+    var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+    b[i++] = tmh >>> 8 & 0xff;
+    b[i++] = tmh & 0xff;
+
+    // `time_high_and_version`
+    b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+    b[i++] = tmh >>> 16 & 0xff;
+
+    // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+    b[i++] = clockseq >>> 8 | 0x80;
+
+    // `clock_seq_low`
+    b[i++] = clockseq & 0xff;
+
+    // `node`
+    var node = options.node || _nodeId;
+    for (var n = 0; n < 6; n++) {
+      b[i + n] = node[n];
+    }
+
+    return buf ? buf : unparse(b);
+  }
+
+  // **`v4()` - Generate random UUID**
+
+  // See https://github.com/broofa/node-uuid for API details
+  function v4(options, buf, offset) {
+    // Deprecated - 'format' argument, as supported in v1.2
+    var i = buf && offset || 0;
+
+    if (typeof(options) == 'string') {
+      buf = options == 'binary' ? new BufferClass(16) : null;
+      options = null;
+    }
+    options = options || {};
+
+    var rnds = options.random || (options.rng || _rng)();
+
+    // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+    rnds[6] = (rnds[6] & 0x0f) | 0x40;
+    rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+    // Copy bytes to buffer, if provided
+    if (buf) {
+      for (var ii = 0; ii < 16; ii++) {
+        buf[i + ii] = rnds[ii];
+      }
+    }
+
+    return buf || unparse(rnds);
+  }
+
+  // Export public API
+  var uuid = v4;
+  uuid.v1 = v1;
+  uuid.v4 = v4;
+  uuid.parse = parse;
+  uuid.unparse = unparse;
+  uuid.BufferClass = BufferClass;
+
+  if (typeof(module) != 'undefined' && module.exports) {
+    // Publish as node.js module
+    module.exports = uuid;
+  } else  if (typeof define === 'function' && define.amd) {
+    // Publish as AMD module
+    define(function() {return uuid;});
+ 
+
+  } else {
+    // Publish as global (in browsers)
+    var _previousRoot = _global.uuid;
+
+    // **`noConflict()` - (browser only) to reset global 'uuid' var**
+    uuid.noConflict = function() {
+      _global.uuid = _previousRoot;
+      return uuid;
+    };
+
+    _global.uuid = uuid;
+  }
+}).call(this);
+
+},{}],2:[function(require,module,exports){
+var
+  uuid = require('node-uuid'),
+  io = require('socket.io-client'),
+  KuzzleDataCollection = require('./kuzzleDataCollection');
+
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+/**
+ * Kuzzle object constructor.
+ * @param url - URL to the Kuzzle instance
+ * @param [options] - Connection options
+ * @param {Kuzzle~constructorCallback} [cb] - Handles connection response
+ * @constructor
+ */
+module.exports = Kuzzle = function (url, options, cb) {
+  var self = this;
+
+  if (!(this instanceof Kuzzle)) {
+    return new Kuzzle(url, options, cb);
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!url || url === '') {
+    throw new Error('URL to Kuzzle can\'t be empty');
+  }
+
+  Object.defineProperties(this, {
+    // 'private' properties
+    collections: {
+      value: {},
+      writable: true
+    },
+    eventListeners: {
+      value: {
+        subscribed: [],
+        unsubscribed: [],
+        disconnected: [],
+        reconnected: []
+      }
+    },
+    queuing: {
+      value: false,
+      writable: true
+    },
+    requestHistory: {
+      value: {},
+      writable: true
+    },
+    socket: {
+      value: null,
+      writable: true
+    },
+    state: {
+      value: 'initializing',
+      writable: true
+    },
+    subscriptions: {
+      /*
+       Contains the centralized subscription list in the following format:
+          pending: <number of pending subscriptions>
+          'roomId': {
+            kuzzleRoomID_1: kuzzleRoomInstance_1,
+            kuzzleRoomID_2: kuzzleRoomInstance_2,
+            kuzzleRoomID_...: kuzzleRoomInstance_...
+          }
+
+       This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
+       This structure also allows renewing subscriptions after a connection loss
+       */
+      value: {
+        pending: {}
+      },
+      writable: true
+    },
+    // read-only properties
+    autoReconnect: {
+      value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
+      enumerable: true
+    },
+    reconnectionDelay: {
+      value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
+      enumerable: true
+    },
+    url: {
+      value: url,
+      enumerable: true
+    },
+    // writable properties
+    autoQueue: {
+      value: false,
+      enumerable: true,
+      writable: true
+    },
+    autoReplay: {
+      value: false,
+      enumerable: true,
+      writable: true
+    },
+    autoResubscribe: {
+      value: true,
+      enumerable: true,
+      writable: true
+    },
+    headers: {
+      value: {},
+      enumerable: true,
+      writable: true
+    },
+    metadata: {
+      value: {},
+      enumerable: true,
+      writable: true
+    },
+    /*
+      Offline queue use the following format:
+            [
+              {
+                ts: <query timestamp>,
+                query: 'query',
+                cb: callbackFunction
+              }
+            ]
+     */
+    offlineQueue: {
+      value: [],
+      enumerable: true,
+      writable: true
+    },
+    queueFilter: {
+      value: null,
+      enumerable: true,
+      writable: true
+    },
+    queueMaxSize: {
+      value: 500,
+      enumerable: true,
+      writable: true
+    },
+    queueTTL: {
+      value: 120000,
+      enumerable: true,
+      writable: true
+    },
+    replayInterval: {
+      value: 10,
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  if (options) {
+    Object.keys(options).forEach(function (opt) {
+      if (self.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(self, opt).writable) {
+        self[opt] = options[opt];
+      }
+    });
+
+    if (options.offlineMode === 'auto' && this.autoReconnect) {
+      this.autoQueue = this.autoReplay = this.autoResubscribe = true;
+    }
+  }
+
+  // Helper function ensuring that this Kuzzle object is still valid before performing a query
+  Object.defineProperty(this, 'isValid', {
+    value: function () {
+      if (this.state === 'loggedOff') {
+        throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a logout call?');
+      }
+    }
+  });
+
+  // Helper function copying headers to the query data
+  Object.defineProperty(this, 'addHeaders', {
+    value: function (query, headers) {
+      Object.keys(headers).forEach(function (header) {
+        if (!query[header]) {
+          query[header] = headers[header];
+        }
+      });
+
+      return query;
+    }
+  });
+
+  /*
+   * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
+   * and is called by these methods
+   */
+  Object.defineProperty(this, 'callbackRequired', {
+    value: function (errorMessagePrefix, callback) {
+      if (!callback || typeof callback !== 'function') {
+        throw new Error(errorMessagePrefix + ': a callback argument is required for read queries');
+      }
+    }
+  });
+
+
+  if (!options || !options.connect || options.connect === 'auto') {
+    this.connect(cb);
+  } else {
+    this.state = 'ready';
+  }
+
+  if (this.bluebird) {
+    return this.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['connect', 'getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+
+  return this;
+};
+
+
+/**
+ * Connects to a Kuzzle instance using the provided URL.
+ * @param {responseCallback} [cb]
+ * @returns {Object} this
+ */
+Kuzzle.prototype.connect = function (cb) {
+  var self = this;
+
+  if (['initializing', 'ready', 'loggedOff', 'error', 'offline'].indexOf(this.state) === -1) {
+    if (cb) {
+      cb(null, self);
+    }
+    return self;
+  }
+
+  self.state = 'connecting';
+
+  self.socket = io(self.url, {
+    reconnection: self.autoReconnect,
+    reconnectionDelay: self.reconnectionDelay,
+    'force new connection': true
+  });
+
+  self.socket.once('connect', function () {
+    self.state = 'connected';
+
+    Object.keys(self.subscriptions).forEach(function (roomId) {
+      Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+        var subscription = self.subscriptions[roomId][subscriptionId];
+        subscription.renew(subscription.callback);
+      });
+    });
+
+    dequeue.call(self);
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  self.socket.on('connect_error', function (error) {
+    self.state = 'error';
+
+    if (cb) {
+      cb(error);
+    }
+  });
+
+  self.socket.on('disconnect', function () {
+    self.state = 'offline';
+
+    if (!self.autoReconnect) {
+      self.logout();
+    }
+
+    if (self.autoQueue) {
+      self.queuing = true;
+    }
+
+    self.eventListeners.disconnected.forEach(function (listener) {
+      listener.fn();
+    });
+  });
+
+  self.socket.on('reconnect', function () {
+    self.state = 'connected';
+
+    // renew subscriptions
+    if (self.autoResubscribe) {
+      Object.keys(self.subscriptions).forEach(function (roomId) {
+        Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+          var subscription = self.subscriptions[roomId][subscriptionId];
+
+          subscription.renew(subscription.callback);
+        });
+      });
+    }
+
+    // replay queued requests
+    if (self.autoReplay) {
+      cleanQueue.call(self);
+      dequeue.call(self);
+    }
+
+    // alert listeners
+    self.eventListeners.reconnected.forEach(function (listener) {
+      listener.fn();
+    });
+  });
+
+  return this;
+};
+
+/**
+ * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
+ */
+function cleanQueue () {
+  var
+    self = this,
+    now = Date.now(),
+    lastDocumentIndex = -1;
+
+  if (self.queueTTL > 0) {
+    self.offlineQueue.forEach(function (query, index) {
+      if (query.ts < now - self.queueTTL) {
+        lastDocumentIndex = index;
+      }
+    });
+
+    if (lastDocumentIndex !== -1) {
+      self.offlineQueue.splice(0, lastDocumentIndex + 1);
+    }
+  }
+
+  if (self.queueMaxSize > 0 && self.offlineQueue.length > self.queueMaxSize) {
+    self.offlineQueue.splice(0, self.offlineQueue.length - self.queueMaxSize);
+  }
+}
+
+/**
+ * Emit a request to Kuzzle
+ *
+ * @param {object} request
+ * @param {responseCallback} [cb]
+ */
+function emitRequest (request, cb) {
+  var
+    now = Date.now(),
+    self = this;
+
+  if (cb) {
+    self.socket.once(request.requestId, function (response) {
+      cb(response.error, response.result);
+    });
+  }
+
+  self.socket.emit('kuzzle', request);
+
+  // Track requests made to allow KuzzleRoom.subscribeToSelf to work
+  self.requestHistory[request.requestId] = now;
+
+  // Clean history from requests made more than 10s ago
+  Object.keys(self.requestHistory).forEach(function (key) {
+    if (self.requestHistory[key] < now - 10000) {
+      delete self.requestHistory[key];
+    }
+  });
+}
+
+/**
+ * Play all queued requests, in order.
+ */
+function dequeue () {
+  var self = this;
+
+  if (self.offlineQueue.length > 0) {
+    emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
+    self.offlineQueue.shift();
+
+    setTimeout(function () {
+      dequeue.call(self);
+    }, Math.max(0, self.replayInterval));
+  } else {
+    self.queuing = false;
+  }
+}
+
+/**
+ * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
+ * insertion.
+ *
+ * The ID returned by this function is required to remove this listener at a later time.
+ *
+ * @param {string} event - name of the global event to subscribe to (see the 'eventListeners' object property)
+ * @param {function} listener - callback to invoke each time an event is fired
+ * @returns {string} Unique listener ID
+ */
+Kuzzle.prototype.addListener = function(event, listener) {
+  var
+    knownEvents = Object.keys(this.eventListeners),
+    listenerType = typeof listener,
+    listenerId;
+
+  this.isValid();
+
+  if (knownEvents.indexOf(event) === -1) {
+    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+  }
+
+  if (listenerType !== 'function') {
+    throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
+  }
+
+  listenerId = uuid.v1();
+  this.eventListeners[event].push({id: listenerId, fn: listener});
+
+  return listenerId;
+};
+
+
+/**
+ * Kuzzle monitors active connections, and ongoing/completed/failed requests.
+ * This method returns all available statistics from Kuzzle.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getAllStatistics = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.callbackRequired('Kuzzle.getAllStatistics', cb);
+
+  this.query(null, 'admin', 'getAllStats', {}, options, function (err, res) {
+    var result = [];
+
+    if (err) {
+      return cb(err);
+    }
+
+    Object.keys(res.statistics).forEach(function (key) {
+      var frame = res.statistics[key];
+      frame.timestamp = key;
+
+      result.push(frame);
+    });
+
+    cb(null, result);
+  });
+
+  return this;
+};
+
+/**
+ * Kuzzle monitors active connections, and ongoing/completed/failed requests.
+ * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
+ *
+ * @param {number} timestamp -  Epoch time. Starting time from which the frames are to be retrieved
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
+  var queryCB;
+
+  if (!cb) {
+    if (arguments.length === 1) {
+      cb = arguments[0];
+      options = null;
+      timestamp = null;
+    } else {
+      cb = arguments[1];
+      if (typeof arguments[0] === 'object') {
+        options = arguments[0];
+        timestamp = null;
+      } else {
+        timestamp = arguments[0];
+        options = null;
+      }
+    }
+  }
+
+  queryCB = function (err, res) {
+    var stats = [];
+
+    if (err) {
+      return cb(err);
+    }
+
+    Object.keys(res.statistics).forEach(function (frame) {
+      res.statistics[frame].timestamp = frame;
+      stats.push(res.statistics[frame]);
+    });
+
+    cb(null, stats);
+  };
+
+  this.callbackRequired('Kuzzle.getStatistics', cb);
+
+  if (!timestamp) {
+    this.query(null, 'admin', 'getLastStats', {}, options, queryCB);
+  } else {
+    this.query(null, 'admin', 'getStats', { body: { startTime: timestamp } }, options, queryCB);
+  }
+
+  return this;
+};
+
+/**
+ * Create a new instance of a KuzzleDataCollection object
+ * @param {string} collection - The name of the data collection you want to manipulate
+ * @param headers {object} [headers] - Common properties for all future write documents queries
+ * @returns {object} A KuzzleDataCollection instance
+ */
+Kuzzle.prototype.dataCollectionFactory = function(collection, headers) {
+  this.isValid();
+
+  if (!this.collections[collection]) {
+    this.collections[collection] = new KuzzleDataCollection(this, collection, headers);
+  }
+
+  return this.collections[collection];
+};
+
+/**
+ * Empties the offline queue without replaying it.
+ *
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.flushQueue = function () {
+  this.offlineQueue = [];
+  return this;
+};
+
+/**
+ * Returns the list of known persisted data collections.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.listCollections = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.callbackRequired('Kuzzle.listCollections', cb);
+
+  this.query(null, 'read', 'listCollections', {}, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    return cb(null, res.collections);
+  });
+
+  return this;
+};
+
+/**
+ * Disconnects from Kuzzle and invalidate this instance.
+ */
+Kuzzle.prototype.logout = function () {
+  var collection;
+
+  this.state = 'loggedOff';
+  this.socket.close();
+  this.socket = null;
+
+  for (collection in this.collections) {
+    if (this.collections.hasOwnProperty(collection)) {
+      delete this.collections[collection];
+    }
+  }
+};
+
+
+/**
+ * Return the current Kuzzle's UTC Epoch time, in milliseconds
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.now = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.callbackRequired('Kuzzle.now', cb);
+
+  this.query(null, 'read', 'now', {}, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.now);
+  });
+
+  return this;
+};
+
+
+/**
+ * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
+ * Base method used to send read queries to Kuzzle
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {string} collection - Name of the data collection you want to manipulate
+ * @param {string} controller - The Kuzzle controller that will handle this query
+ * @param {string} action - The controller action to perform
+ * @param {object} query - The query data
+ * @param {object} [options] - Optional arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+Kuzzle.prototype.query = function (collection, controller, action, query, options, cb) {
+  var
+    attr,
+    object = {
+      action: action,
+      controller: controller,
+      metadata: this.metadata
+    },
+    self = this;
+
+  this.isValid();
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (options) {
+    if (options.metadata) {
+      Object.keys(options.metadata).forEach(function (meta) {
+        object.metadata[meta] = options.metadata[meta];
+      });
+    }
+
+    if (options.queuable === false && self.state === 'offline') {
+      return self;
+    }
+  }
+
+  if (query.metadata) {
+    Object.keys(query.metadata).forEach(function (meta) {
+      object.metadata[meta] = query.metadata[meta];
+    });
+  }
+
+  for (attr in query) {
+    if (attr !== 'metadata' && query.hasOwnProperty(attr)) {
+      object[attr] = query[attr];
+    }
+  }
+
+  object = self.addHeaders(object, this.headers);
+
+  if (collection) {
+    object.collection = collection;
+  }
+
+  if (!object.requestId) {
+    object.requestId = uuid.v4();
+  }
+
+  if (self.state === 'connected' || (options && options.queuable === false)) {
+    emitRequest.call(this, object, cb);
+  } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
+    cleanQueue.call(this, object, cb);
+
+    if (self.queueFilter) {
+      if (self.queueFilter(object)) {
+        self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+      }
+    } else {
+      self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+    }
+  }
+
+  return self;
+};
+
+/**
+ * Removes all listeners, either from a specific event or from all events
+ *
+ * @param {string} event - One of the event described in the Event Handling section of this documentation
+ */
+Kuzzle.prototype.removeAllListeners = function (event) {
+  var
+    knownEvents = Object.keys(this.eventListeners),
+    self = this;
+
+  if (event) {
+    if (knownEvents.indexOf(event) === -1) {
+      throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+    }
+
+    this.eventListeners[event] = [];
+  } else {
+    knownEvents.forEach(function (eventName) {
+      self.eventListeners[eventName] = [];
+    });
+  }
+};
+
+/**
+ * Removes a listener from an event.
+ *
+ * @param {string} event - One of the event described in the Event Handling section of this documentation
+ * @param {string} listenerId - The ID returned by addListener
+ */
+Kuzzle.prototype.removeListener = function (event, listenerId) {
+  var
+    knownEvents = Object.keys(this.eventListeners),
+    self = this;
+
+  if (knownEvents.indexOf(event) === -1) {
+    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+  }
+
+  this.eventListeners[event].forEach(function (listener, index) {
+    if (listener.id === listenerId) {
+      self.eventListeners[event].splice(index, 1);
+    }
+  });
+};
+
+/**
+ * Replays the requests queued during offline mode.
+ * Works only if the SDK is not in a disconnected state, and if the autoReplay option is set to false.
+ */
+Kuzzle.prototype.replayQueue = function () {
+  if (this.state !== 'offline' && !this.autoReplay) {
+    cleanQueue.call(this);
+    dequeue.call(this);
+  }
+
+  return this;
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+Kuzzle.prototype.setHeaders = function(content, replace) {
+  var self = this;
+
+  if (typeof content !== 'object' || Array.isArray(content)) {
+    throw new Error('Expected a content object, received a ' + typeof content);
+  }
+
+  if (replace) {
+    self.headers = content;
+  } else {
+    Object.keys(content).forEach(function (key) {
+      self.headers[key] = content[key];
+    });
+  }
+
+  return self;
+};
+
+/**
+ * Starts the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
+ */
+Kuzzle.prototype.startQueuing = function () {
+  if (this.state === 'offline' && !this.autoQueue) {
+    this.queuing = true;
+  }
+
+  return this;
+};
+
+/**
+ * Stops the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
+ */
+Kuzzle.prototype.stopQueuing = function () {
+  if (this.state === 'offline' && !this.autoQueue) {
+    this.queuing = false;
+  }
+
+  return this;
+};
+
+},{"./kuzzleDataCollection":3,"node-uuid":1,"socket.io-client":undefined}],3:[function(require,module,exports){
+var
+  KuzzleDocument = require('./kuzzleDocument'),
+  KuzzleDataMapping = require('./kuzzleDataMapping'),
+  KuzzleRoom = require('./kuzzleRoom');
+
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+/**
+ * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
+ * or like a room for pub/sub messages.
+ * @param {object} kuzzle - Kuzzle instance to inherit from
+ * @param {string} collection - name of the data collection to handle
+ * @constructor
+ */
+function KuzzleDataCollection(kuzzle, collection) {
+  Object.defineProperties(this, {
+    // read-only properties
+    collection: {
+      value: collection,
+      enumerable: true
+    },
+    kuzzle: {
+      value: kuzzle,
+      enumerable: true
+    },
+    // writable properties
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzle.headers)),
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var blacklist = ['publishMessage', 'setHeaders', 'subscribe'];
+
+        return passes && blacklist.indexOf(name) === -1;
+      }
+    });
+  }
+
+  return this;
+}
+
+/**
+ * Executes an advanced search on the data collection.
+ *
+ * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a document that was just been created won’t be returned by this function.
+ *
+ * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
+  var
+    query,
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
+
+  query = self.kuzzle.addHeaders({body: filters}, this.headers);
+
+  self.kuzzle.query(this.collection, 'read', 'search', query, options, function (error, result) {
+    var documents = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.hits.hits.forEach(function (doc) {
+      documents.push(self.documentFactory(doc._id, doc));
+    });
+
+    cb(null, { total: result.hits.total, documents: documents });
+  });
+
+  return this;
+};
+
+/**
+ * Returns the number of documents matching the provided set of filters.
+ *
+ * There is a small delay between documents creation and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a document that was just been created won’t be returned by this function
+ *
+ * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.count = function (filters, options, cb) {
+  var query;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.count', cb);
+
+  query = this.kuzzle.addHeaders({body: filters}, this.headers);
+
+  this.kuzzle.query(this.collection, 'read', 'count', query, options, function (error, result) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, result.count);
+  });
+
+  return this;
+};
+
+/**
+ * Create a new empty data collection, with no associated mapping.
+ * Kuzzle automatically creates data collections when storing documents, but there are cases where we
+ * want to create and prepare data collections before storing documents in it.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.create = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'write', 'createCollection', data, options, cb);
+
+  return this;
+};
+
+/**
+ * Create a new document in Kuzzle.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *    - updateIfExist (boolean, default: false):
+ *        If the same document already exists: throw an error if sets to false.
+ *        Update the existing document otherwise
+ *
+ * @param {string} [id] - (optional) document identifier
+ * @param {object} document - either an instance of a KuzzleDocument object, or a document
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.createDocument = function (id, document, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'create';
+
+  if (typeof id !== 'string') {
+    cb = options;
+    options = document;
+    document = id;
+    id = null;
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (document instanceof KuzzleDocument) {
+    data = document.toJSON();
+  } else {
+    data.body = document;
+  }
+
+  if (options) {
+    action = options.updateIfExist ? 'createOrUpdate' : 'create';
+  }
+
+  if (id) {
+    data._id = id;
+  }
+
+  data.persist = true;
+  data = self.kuzzle.addHeaders(data, self.headers);
+
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, self.documentFactory(res._id, res));
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', action, data, options);
+  }
+
+  return this;
+};
+
+/**
+ * Delete this data collection and all documents in it.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.delete = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'admin', 'deleteCollection', data, options, cb);
+
+  return this;
+};
+
+/**
+ * Delete persistent documents.
+ *
+ * There is a small delay between documents creation and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a document that was just been created won’t be returned by this function
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
+  var
+    action,
+    data = {};
+
+  if (typeof arg === 'string') {
+    data._id = arg;
+    action = 'delete';
+  } else {
+    data.body = arg;
+    action = 'deleteByQuery';
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+
+  if (cb) {
+    this.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      if (action === 'delete') {
+        cb(null, [data._id]);
+      } else {
+        cb(null, res.ids);
+      }
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', action, data, options);
+  }
+
+  return this;
+};
+
+/**
+ * Retrieve a single stored document using its unique document ID.
+ *
+ * @param {string} documentId - Unique document identifier
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb) {
+  var
+    data = {_id: documentId},
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.collection, 'read', 'get', data, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, self.documentFactory(res._id, res));
+  });
+
+  return this;
+};
+
+/**
+ * Retrieves all documents stored in this data collection
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
+
+  this.advancedSearch({}, options, cb);
+
+  return this;
+};
+
+
+/**
+ * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
+ * @return {object} this
+ */
+KuzzleDataCollection.prototype.getMapping = function (options, cb) {
+  var kuzzleMapping;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.getMapping', cb);
+
+  kuzzleMapping = new KuzzleDataMapping(this);
+  kuzzleMapping.refresh(options, cb);
+
+  return this;
+};
+
+/**
+ * Publish a realtime message
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} document - either a KuzzleDocument instance or a JSON object
+ * @param {object} [options] - optional arguments
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.publishMessage = function (document, options) {
+  var data = {};
+
+  if (document instanceof KuzzleDocument) {
+    data = document.toJSON();
+  } else {
+    data.body = document;
+  }
+
+  data.persist = false;
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'write', 'create', data, options);
+
+  return this;
+};
+
+/**
+ * Applies a new mapping to the data collection.
+ * Note that you cannot delete an existing mapping, you can only add or update one.
+ *
+ * @param {object} mapping - mapping to apply
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.putMapping = function (mapping, options, cb) {
+  var dataMapping;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  dataMapping = new KuzzleDataMapping(this, mapping);
+  dataMapping.apply(options, cb);
+
+  return this;
+};
+
+/**
+ * Replace an existing document with a new one.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {string} documentId - Unique document identifier of the document to replace
+ * @param {object} content - JSON object representing the new document version
+ * @param {object} [options] - additional arguments
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @return {object} this
+ */
+KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, options, cb) {
+  var
+    self = this,
+    data = {
+      _id: documentId,
+      body: content
+    };
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, self.documentFactory(res._id, res));
+    });
+  } else {
+    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
+  }
+
+  return this;
+};
+
+/**
+ * Subscribes to this data collection with a set of filters.
+ * To subscribe to the entire data collection, simply provide an empty filter.
+ *
+ * @param {object} filters - Filters in Kuzzle DSL format
+ * @param {object} [options] - subscriptions options
+ * @param {responseCallback} cb - called for each new notification
+ * @returns {*} KuzzleRoom object
+ */
+KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
+  var room;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
+
+  room = new KuzzleRoom(this, options);
+
+  return room.renew(filters, cb);
+};
+
+/**
+ * Truncate the data collection, removing all stored documents but keeping all associated mappings.
+ * This method is a lot faster than removing all documents using a query.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @returns {*} this
+ */
+KuzzleDataCollection.prototype.truncate = function (options, cb) {
+  var data = {};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.kuzzle.addHeaders(data, this.headers);
+  this.kuzzle.query(this.collection, 'admin', 'truncateCollection', data, options, cb);
+
+  return this;
+};
+
+
+/**
+ * Update parts of a document
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {string} documentId - Unique document identifier of the document to update
+ * @param {object} content - JSON object containing changes to perform on the document
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @return {object} this
+ */
+KuzzleDataCollection.prototype.updateDocument = function (documentId, content, options, cb) {
+  var
+    data = {
+      _id: documentId,
+      body: content
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  if (cb) {
+    self.kuzzle.query(this.collection, 'write', 'update', data, options, function (err, res) {
+      var doc;
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleDocument(self, res._id);
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.collection, 'write', 'update', data, options);
+  }
+
+  return self;
+};
+
+
+/**
+ * Instantiate a new KuzzleDocument object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - document id
+ * @param {object} content - document content
+ * @constructor
+ */
+KuzzleDataCollection.prototype.documentFactory = function (id, content) {
+  var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
+
+  return document;
+};
+
+/**
+ * Instantiate a new KuzzleRoom object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {object} [options] - subscription configuration
+ * @constructor
+ */
+KuzzleDataCollection.prototype.roomFactory = function (options) {
+  return new KuzzleRoom(this, options);
+};
+
+/**
+ * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {object} [mapping] - mapping to instantiate the KuzzleDataMapping object with
+ * @constructor
+ */
+KuzzleDataCollection.prototype.dataMappingFactory = function (mapping) {
+  return new KuzzleDataMapping(this, mapping);
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDataCollection.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+module.exports = KuzzleDataCollection;
+
+},{"./kuzzleDataMapping":4,"./kuzzleDocument":5,"./kuzzleRoom":6}],4:[function(require,module,exports){
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+
+/**
+ *  When creating a new data collection in the persistent data storage layer, Kuzzle uses a default mapping.
+ *  It means that, by default, you won’t be able to exploit the full capabilities of our persistent data storage layer
+ *  (currently handled by ElasticSearch), and your searches may suffer from below-average performances, depending on
+ *  the amount of data you stored in a collection and the complexity of your database.
+ *
+ *  The KuzzleDataMapping object allow to get the current mapping of a data collection and to modify it if needed.
+ *
+ * @param {object} kuzzleDataCollection - Instance of the inherited KuzzleDataCollection object
+ * @param {object} mapping - mappings
+ * @constructor
+ */
+function KuzzleDataMapping(kuzzleDataCollection, mapping) {
+  Object.defineProperties(this, {
+    //read-only properties
+    collection: {
+      value: kuzzleDataCollection.collection,
+      eunmerable: true
+    },
+    kuzzle: {
+      value: kuzzleDataCollection.kuzzle,
+      enumerable: true
+    },
+    // writable properties
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
+    mapping: {
+      value: mapping || {},
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var blacklist = ['set', 'setHeaders'];
+
+        return passes && blacklist.indexOf(name) === -1;
+      }
+    });
+  }
+
+  return this;
+}
+
+/**
+ * Applies the new mapping to the data collection.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleDataMapping.prototype.apply = function (options, cb) {
+  var
+    self = this,
+    data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
+    if (err) {
+      return cb ? cb(err) : false;
+    }
+
+    self.mapping = res._source.properties;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Replaces the current content with the mapping stored in Kuzzle
+ *
+ * Calling this function will discard any uncommited changes. You can commit changes by calling the “apply” function
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+KuzzleDataMapping.prototype.refresh = function (options, cb) {
+  var
+    self = this,
+    data = this.kuzzle.addHeaders({}, this.headers);
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, options, function (err, res) {
+    if (err) {
+      return cb ? cb(err) : false;
+    }
+
+    self.mapping = res.mainindex.mappings[self.collection].properties;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return this;
+};
+
+
+/**
+ * Adds or updates a field mapping.
+ *
+ * Changes made by this function won’t be applied until you call the apply method
+ *
+ * @param {string} field - Name of the field from which the mapping is to be added or updated
+ * @returns {KuzzleDataMapping}
+ */
+KuzzleDataMapping.prototype.set = function (field, mapping) {
+  this.mapping[field] = mapping;
+
+  return this;
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDataMapping.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+module.exports = KuzzleDataMapping;
+
+},{}],5:[function(require,module,exports){
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+/**
+ * Kuzzle handles documents either as realtime messages or as stored documents.
+ * KuzzleDocument is the object representation of one of these documents.
+ *
+ * Notes:
+ *   - this constructor may be called either with a documentId, a content, neither or both.
+ *   - providing a documentID to the constructor will automatically call refresh, unless a content is also provided
+ *
+ *
+ * @param {object} kuzzleDataCollection - an instanciated KuzzleDataCollection object
+ * @param {string} [documentId] - ID of an existing document
+ * @param {object} [content] - Initializes this document with the provided content
+ * @constructor
+ */
+function KuzzleDocument(kuzzleDataCollection, documentId, content) {
+  Object.defineProperties(this, {
+    // private properties
+    queue: {
+      value: [],
+      writable: true
+    },
+    refreshing: {
+      value: false,
+      writable: true
+    },
+
+    // read-only properties
+    collection: {
+      value: kuzzleDataCollection.collection,
+      enumerable: true
+    },
+    dataCollection: {
+      value: kuzzleDataCollection,
+      enumerable: true
+    },
+    kuzzle: {
+      value: kuzzleDataCollection.kuzzle,
+      enumerable: true
+    },
+    // writable properties
+    id: {
+      value: undefined,
+      enumerable: true,
+      writable: true
+    },
+    content: {
+      value: {},
+      writable: true,
+      enumerable: true
+    },
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
+    version: {
+      value: undefined,
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  // handling provided arguments
+  if (!content && documentId && typeof documentId === 'object') {
+    content = documentId;
+    documentId = null;
+  }
+
+  if (content) {
+    if (content._version) {
+      this.version = content._version;
+      delete content._version;
+    }
+    this.setContent(content, true);
+  }
+
+  if (documentId) {
+    Object.defineProperty(this, 'id', {
+      value: documentId,
+      enumerable: true
+    });
+
+    if (!content) {
+      this.refresh();
+    }
+  }
+
+  // promisifying
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['delete', 'refresh', 'save'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+
+  return this;
+}
+
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this document
+ */
+KuzzleDocument.prototype.toJSON = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+  data._version = this.version;
+  data = this.kuzzle.addHeaders(data, this.headers);
+
+  return data;
+};
+
+/**
+ * Overrides the toString() method in order to return a serialized version of the document
+ *
+ * @return {string} serialized version of this object
+ */
+KuzzleDocument.prototype.toString = function () {
+  return JSON.stringify(this.toJSON());
+};
+
+/**
+ * Deletes this document in Kuzzle.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+KuzzleDocument.prototype.delete = function (options, cb) {
+  var self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (this.refreshing) {
+    this.queue.push({action: 'delete', args: [options, cb]});
+    return this;
+  }
+
+  if (!this.id) {
+    throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
+  }
+
+  if (cb) {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options, function (err) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, self);
+    });
+  } else {
+    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options);
+  }
+
+  return this;
+};
+
+/**
+ * Replaces the current content with the last version of this document stored in Kuzzle.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+KuzzleDocument.prototype.refresh = function (options, cb) {
+  var self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (this.refreshing) {
+    this.queue.push({action: 'refresh', args: [options, cb]});
+    return this;
+  }
+
+  if (!self.id) {
+    throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
+  }
+
+  self.refreshing = true;
+
+  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, result) {
+    if (error) {
+      self.refreshing = false;
+      self.queue = [];
+      return cb ? cb(error) : false;
+    }
+
+    self.version = result._version;
+    self.content = result._source;
+
+    if (cb) {
+      cb(null, self);
+    }
+
+    self.refreshing = false;
+    dequeue.call(self);
+  });
+
+  return this;
+};
+
+/**
+ * Saves this document into Kuzzle.
+ *
+ * If this is a new document, this function will create it in Kuzzle and the id property will be made available.
+ * Otherwise, this method will replace the latest version of this document in Kuzzle by the current content
+ * of this object.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+KuzzleDocument.prototype.save = function (options, cb) {
+  var
+    data = this.toJSON(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (self.refreshing) {
+    self.queue.push({action: 'save', args: [options, cb]});
+    return self;
+  }
+
+  data.persist = true;
+
+  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, result) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    self.id = result._id;
+    self.version = result._version;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
+};
+
+/**
+ * Sends the content of this document as a realtime message.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - metadata (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
+ * @returns {*} this
+ */
+KuzzleDocument.prototype.publish = function (options) {
+  var data = this.toJSON();
+
+  if (this.refreshing) {
+    this.queue.push({action: 'publish', args: [options]});
+    return this;
+  }
+
+  data.persist = false;
+
+  this.kuzzle.query(this.collection, 'write', 'create', data, options);
+
+  return this;
+};
+
+/**
+ * Replaces the current content with new data.
+ * Changes made by this function won’t be applied until the save method is called.
+ *
+ * @param {object} data - New content
+ * @param {boolean} replace - if true: replace this document content with the provided data
+ */
+KuzzleDocument.prototype.setContent = function (data, replace) {
+  var self = this;
+
+  if (this.refreshing) {
+    this.queue.push({action: 'setContent', args: [data, replace]});
+    return this;
+  }
+
+  if (replace) {
+    this.content = data;
+  }
+  else {
+    Object.keys(data).forEach(function (key) {
+      self.content[key] = data[key];
+    });
+  }
+
+  return this;
+};
+
+/**
+ * Listens to events concerning this document. Has no effect if the document does not have an ID
+ * (i.e. if the document has not yet been created as a persisted document).
+ *
+ * @param {object} [options] - subscription options
+ * @param {responseCallback} cb - callback that will be called each time a change has been detected on this document
+ */
+KuzzleDocument.prototype.subscribe = function (options, cb) {
+  var filters;
+
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
+
+  if (!this.id) {
+    throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
+  }
+
+  filters = { ids: { values: [this.id] } };
+
+  return this.dataCollection.subscribe(filters, options, cb);
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleDocument.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+
+/**
+ * internal function used to dequeue calls which were put on hold while refreshing the content of this document
+ */
+function dequeue () {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+    this[element.action].apply(this, element.args);
+  }
+}
+
+
+module.exports = KuzzleDocument;
+
+},{}],6:[function(require,module,exports){
+var uuid = require('node-uuid');
+
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+/**
+ * This object is the result of a subscription request, allowing to manipulate the subscription itself.
+ *
+ * In Kuzzle, you don’t exactly subscribe to a room or a topic but, instead, you subscribe to documents.
+ *
+ * What it means is that, to subscribe, you provide to Kuzzle a set of matching filters.
+ * Once you have subscribed, if a pub/sub message is published matching your filters, or if a matching stored
+ * document change (because it is created, updated or deleted), then you’ll receive a notification about it.
+ *
+ * @param {object} kuzzleDataCollection - an instantiated and valid kuzzle object
+ * @param {object} [options] - subscription optional configuration
+ * @constructor
+ */
+function KuzzleRoom(kuzzleDataCollection, options) {
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    callback: {
+      value: null,
+      writable: true
+    },
+    id: {
+      value: uuid.v4()
+    },
+    notifier: {
+      value: null,
+      writable: true
+    },
+    queue: {
+      value: [],
+      writable: true
+    },
+    subscribing: {
+      value: false,
+      writable: true
+    },
+    // read-only properties
+    collection: {
+      value: kuzzleDataCollection.collection,
+      enumerable: true
+    },
+    kuzzle: {
+      value: kuzzleDataCollection.kuzzle,
+      enumerable: true
+    },
+    // writable properties
+    filters: {
+      value: null,
+      enumerable: true,
+      writable: true
+    },
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      enumerable: true,
+      writable: true
+    },
+    listenToConnections: {
+      value: options ? options.listenToConnections : false,
+      enumerable: true,
+      writable: true
+    },
+    listenToDisconnections: {
+      value: options ? options.listenToDisconnections : false,
+      enumerable: true,
+      writable: true
+    },
+    metadata: {
+      value: (options && options.metadata) ? options.metadata : {},
+      enumerable: true,
+      writable: true
+    },
+    roomId: {
+      value: null,
+      enumerable: true,
+      writable: true
+    },
+    subscribeToSelf: {
+      value: options ? options.subscribeToSelf : false,
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['count'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+
+  return this;
+}
+
+/**
+ * Returns the number of other subscriptions on that room.
+ *
+ * @param {responseCallback} cb - Handles the query response
+ */
+KuzzleRoom.prototype.count = function (cb) {
+  var data;
+
+  this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+  data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
+
+  if (this.subscribing) {
+    this.queue.push({action: 'count', args: [cb]});
+    return this;
+  }
+
+  this.kuzzle.query(this.collection, 'subscribe', 'count', data, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.count);
+  });
+
+  return this;
+};
+
+/**
+ * Renew the subscription using new filters
+ *
+ * @param {object} [filters] - Filters in Kuzzle DSL format
+ * @param {responseCallback} cb - called for each new notification
+ */
+KuzzleRoom.prototype.renew = function (filters, cb) {
+  var
+    subscribeQuery,
+    self = this;
+
+  if (!cb && filters && typeof filters === 'function') {
+    cb = filters;
+    filters = null;
+  }
+
+  if (this.subscribing) {
+    this.queue.push({action: 'renew', args: [filters, cb]});
+    return this;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+
+  this.unsubscribe();
+  this.subscribing = true;
+  self.kuzzle.subscriptions.pending[self.id] = self;
+
+  if (filters) {
+    this.filters = filters;
+  }
+
+  this.roomId = null;
+  this.callback = cb;
+
+  subscribeQuery = this.kuzzle.addHeaders({body: self.filters}, this.headers);
+
+  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+    delete self.kuzzle.subscriptions.pending[self.id];
+    self.subscribing = false;
+
+    if (error) {
+      self.queue = [];
+      throw new Error('Error during Kuzzle subscription: ' + error.message);
+    }
+
+    self.roomId = response.roomId;
+
+    if (!self.kuzzle.subscriptions[self.roomId]) {
+      self.kuzzle.subscriptions[self.roomId] = {};
+    }
+
+    self.kuzzle.subscriptions[self.roomId][self.id] = self;
+
+    self.notifier = notificationCallback.bind(self);
+    self.kuzzle.socket.on(self.roomId, self.notifier);
+
+    dequeue.call(self);
+  });
+
+  return this;
+};
+
+/**
+ * Unsubscribes from Kuzzle.
+ *
+ * Stop listening immediately. If there is no listener left on that room, sends an unsubscribe request to Kuzzle, once
+ * pending subscriptions reaches 0, and only if there is still no listener on that room.
+ * We wait for pending subscriptions to finish to avoid unsubscribing while another subscription on that room is
+ *
+ * @return {*} this
+ */
+KuzzleRoom.prototype.unsubscribe = function () {
+  var
+    self = this,
+    room = self.roomId,
+    interval;
+
+  if (self.subscribing) {
+    self.queue.push({action: 'unsubscribe', args: []});
+    return self;
+  }
+
+  if (room) {
+    self.kuzzle.socket.off(room, this.notifier);
+
+    if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
+      delete self.kuzzle.subscriptions[room];
+
+      if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
+        self.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: room}});
+      } else {
+        interval = setInterval(function () {
+          if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
+            if (!self.kuzzle.subscriptions[room]) {
+              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: room}});
+            }
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    } else {
+      delete self.kuzzle.subscriptions[room][self.id];
+    }
+
+    self.roomId = null;
+  }
+
+  return self;
+};
+
+/**
+ * Helper function allowing to set headers while chaining calls.
+ *
+ * If the replace argument is set to true, replace the current headers with the provided content.
+ * Otherwise, it appends the content to the current headers, only replacing already existing values
+ *
+ * @param content - new headers content
+ * @param [replace] - default: false = append the content. If true: replace the current headers with tj
+ */
+KuzzleRoom.prototype.setHeaders = function (content, replace) {
+  this.kuzzle.setHeaders.call(this, content, replace);
+  return this;
+};
+
+/**
+ * Callback called by socket.io when a message is sent to the subscribed room ID
+ * Calls the registered callback if the notification passes the subscription filters
+ *
+ * @param {object} data - data
+ * @returns {*}
+ */
+function notificationCallback (data) {
+  var
+    self = this,
+    globalEvent,
+    listening;
+
+  if (data.error) {
+    return self.callback(data.error);
+  }
+
+  if (data.result.action === 'on' || data.result.action === 'off') {
+    if (data.result.action === 'on') {
+      globalEvent = 'subscribed';
+      listening = self.listenToConnections;
+    } else {
+      globalEvent = 'unsubscribed';
+      listening = self.listenToDisconnections;
+    }
+
+    if (listening || self.kuzzle.eventListeners[globalEvent].length > 0) {
+      if (listening) {
+        self.callback(null, data.result);
+      }
+
+      self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
+        listener.fn(self.subscriptionId, data.result);
+      });
+    }
+  } else if (self.kuzzle.requestHistory[data.result.requestId]) {
+    if (self.subscribeToSelf) {
+      self.callback(null, data.result);
+    }
+    delete self.kuzzle.requestHistory[data.result.requestId];
+  } else {
+    self.callback(null, data.result);
+  }
+}
+
+
+/**
+ * Dequeue actions performed while subscription was being renewed
+ */
+function dequeue () {
+  var element;
+
+  while (this.queue.length > 0) {
+    element = this.queue.shift();
+
+    this[element.action].apply(this, element.args);
+  }
+}
+
+module.exports = KuzzleRoom;
+
+},{"node-uuid":1}]},{},[2]);

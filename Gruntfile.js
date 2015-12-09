@@ -8,6 +8,7 @@ module.exports = function(grunt) {
 
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     jshint: {
       all: ['Gruntfile.js', 'src/**/*.js']
     },
@@ -17,18 +18,24 @@ module.exports = function(grunt) {
     browserify: {
       kuzzle: {
         src: ['src/kuzzle.js'],
-        dest: 'browser/kuzzle.js'
+        dest: 'dist/kuzzle.js',
+        options: {
+          exclude: ['socket.io-client'],
+          browserifyOptions: {
+            noParse: [require.resolve('node-uuid')]
+          }
+        }
       }
     },
     uglify: {
       kuzzle: {
         options: {
           'sourceMap': true,
-          'sourceMapName': 'browser/kuzzle.min.map',
-          'banner': '// This is the Kuzzle SDK version 1.0 - Licenced under the Apache 2.0 Licence'
+          'sourceMapName': 'dist/kuzzle.min.map',
+          'banner': '// <%= pkg.description %> v<%= pkg.version %> - License: <%= pkg.license %>'
         },
         files: {
-          'browser/kuzzle.min.js': ['browser/kuzzle.js']
+          'dist/kuzzle.min.js': ['dist/kuzzle.js']
         }
       }
     }
