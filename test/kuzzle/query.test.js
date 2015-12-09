@@ -1,17 +1,22 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  proxyquire = require('proxyquire'),
   EventEmitter = require('events').EventEmitter,
-  Kuzzle = rewire('../../src/kuzzle');
+  kuzzleSource = '../../src/kuzzle';
+
 
 describe('Query management', function () {
   describe('#emitRequest', function () {
     var
-      emitRequest = Kuzzle.__get__('emitRequest'),
+      emitRequest = rewire(kuzzleSource).__get__('emitRequest'),
+      Kuzzle,
       kuzzle;
 
     before(function () {
-      Kuzzle.__set__('io', function () { return new EventEmitter; });
+      Kuzzle = proxyquire(kuzzleSource, {
+        'socket.io-client': function () { return new EventEmitter; }
+      });
     });
 
     beforeEach(function () {
@@ -81,6 +86,7 @@ describe('Query management', function () {
       kuzzle;
 
     before(function () {
+      Kuzzle = rewire(kuzzleSource);
       Kuzzle.__set__('emitRequest', function (object, cb) {
         emitted = true;
         requestObject = object;

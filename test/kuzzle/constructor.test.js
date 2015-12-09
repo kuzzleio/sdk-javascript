@@ -2,15 +2,41 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
+  proxyquire = require('proxyquire'),
   EventEmitter = require('events').EventEmitter,
-  Kuzzle = rewire('../../src/kuzzle');
+  kuzzleSource = '../../src/kuzzle';
 
 describe('Kuzzle constructor', () => {
+  var Kuzzle;
+
   describe('#constructor', function () {
+    before(function () {
+      Kuzzle = proxyquire(kuzzleSource, {
+        'socket.io-client' : function () {
+          var emitter = new EventEmitter;
+          process.nextTick(() => emitter.emit('connect'));
+          return emitter;
+        }
+      });
+    });
+
+    it('when in javascript mode, it should not load socket.io', function () {
+      var
+        KuzzleRewired = rewire(kuzzleSource),
+        fakeIO = false,
+        kuzzle;
+
+      KuzzleRewired.__with__({
+        'window': {io:function () { fakeIO = true; return new EventEmitter; }}
+      })(function () {
+        kuzzle = new KuzzleRewired('foo');
+        should(fakeIO).be.true();
+      });
+    });
+
     it('should expose the documented functions', () => {
       var kuzzle;
 
-      Kuzzle.__set__('io', function () { return new EventEmitter; });
       kuzzle = new Kuzzle('nowhere');
 
       should.exist(kuzzle.addListener);
@@ -119,12 +145,6 @@ describe('Kuzzle constructor', () => {
     it('should allow passing a callback and respond once initialized', function (done) {
       this.timeout(500);
 
-      Kuzzle.__set__('io', function () {
-        var emitter = new EventEmitter;
-        process.nextTick(() => emitter.emit('connect'));
-        return emitter;
-      });
-
       new Kuzzle('nowhere', () => {
         try {
           kuzzle.isValid();
@@ -171,44 +191,49 @@ describe('Kuzzle constructor', () => {
     });
 
     describe('#connect', function () {
+      var iostub = function () {
+        var emitter = new EventEmitter;
+        process.nextTick(() => emitter.emit('connect'));
+        return emitter;
+      };
+
+      beforeEach(function () {
+        Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
+      });
+
       it('should return immediately if not initializing or logged off', function (done) {
+        var kuzzle;
+
         this.timeout(50);
 
-        Kuzzle.__with__({
+        Kuzzle = proxyquire(kuzzleSource, {
           io: function () {
             // does nothing, making the test crash if trying to connect
           }
-        })(function () {
-          var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
-
-          kuzzle.state = 'connected';
-          kuzzle.connect((err, res) => {
-            should(err).be.null();
-            should(res).be.exactly(kuzzle);
-            should(res.state).be.exactly('connected');
-            done();
-          });
-
-          kuzzle.state = 'reconnecting';
-          should(kuzzle.connect()).be.exactly(kuzzle);
-          should(kuzzle.state).be.exactly('reconnecting');
         });
+
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+        kuzzle.state = 'connected';
+        kuzzle.connect((err, res) => {
+          should(err).be.null();
+          should(res).be.exactly(kuzzle);
+          should(res.state).be.exactly('connected');
+          done();
+        });
+
+        kuzzle.state = 'reconnecting';
+        should(kuzzle.connect()).be.exactly(kuzzle);
+        should(kuzzle.state).be.exactly('reconnecting');
       });
 
       it('should try to connect when the instance is in a not-connected state', function () {
-        Kuzzle.__with__({
-          io: function () {
-            return new EventEmitter;
-          }
-        })(function () {
-          ['initializing', 'ready', 'loggedOff', 'error', 'offline'].forEach(state => {
-            var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+        ['initializing', 'ready', 'loggedOff', 'error', 'offline'].forEach(state => {
+          var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-            kuzzle.state = state;
-            should(kuzzle.connect()).be.exactly(kuzzle);
-            should(kuzzle.state).be.exactly('connecting');
-            kuzzle.socket.removeAllListeners();
-          });
+          kuzzle.state = state;
+          should(kuzzle.connect()).be.exactly(kuzzle);
+          should(kuzzle.state).be.exactly('connecting');
+          kuzzle.socket.removeAllListeners();
         });
       });
 
@@ -229,82 +254,69 @@ describe('Kuzzle constructor', () => {
       });
 
       describe('=> on connection error', () => {
-        var
-          iostub = function () {
-            var emitter = new EventEmitter;
-            process.nextTick(() => emitter.emit('connect_error', 'error'));
-            return emitter;
-          };
+        beforeEach(function () {
+          Kuzzle = proxyquire(kuzzleSource, {
+            'socket.io-client': function () {
+              var emitter = new EventEmitter;
+              process.nextTick(() => emitter.emit('connect_error', 'error'));
+              return emitter;
+            }
+          });
+        });
 
         it('should call the provided callback on a connection error', function (done) {
+          var kuzzle;
+
           this.timeout(50);
 
-          Kuzzle.__with__({
-            io: iostub
-          })(function () {
-            var kuzzle = new Kuzzle('nowhere', function (err, res) {
-              try {
-                should(err).be.exactly('error');
-                should(res).be.undefined();
-                should(kuzzle.state).be.exactly('error');
-                kuzzle.socket.removeAllListeners();
-                done();
-              }
-              catch (e) {
-                done(e);
-              }
-            });
+          kuzzle = new Kuzzle('nowhere', function (err, res) {
+            try {
+              should(err).be.exactly('error');
+              should(res).be.undefined();
+              should(kuzzle.state).be.exactly('error');
+              kuzzle.socket.removeAllListeners();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
           });
         });
 
         it('should registered listeners upon receiving a error event', function (done) {
-          Kuzzle.__with__({
-            io: iostub
-          })(function () {
-            var kuzzle = new Kuzzle('nowhere');
+          var kuzzle = new Kuzzle('nowhere');
 
-            kuzzle.addListener('error', function () { listenerCalled = true; });
+          kuzzle.addListener('error', function () { listenerCalled = true; });
 
-            setTimeout(() => {
-              try {
-                should(listenerCalled).be.true();
-                kuzzle.socket.removeAllListeners();
-                done();
-              }
-              catch (e) {
-                done(e);
-              }
-            }, 10);
-          });
+          setTimeout(() => {
+            try {
+              should(listenerCalled).be.true();
+              kuzzle.socket.removeAllListeners();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
         });
       });
 
       describe('=> on connection success', () => {
-        var
-          iostub = function () {
-            var emitter = new EventEmitter;
-            process.nextTick(() => emitter.emit('connect'));
-            return emitter;
-          };
-
         it('should call the provided callback on a connection success', function (done) {
+          var kuzzle;
           this.timeout(50);
 
-          Kuzzle.__with__({
-            io: iostub
-          })(function () {
-            var kuzzle = new Kuzzle('nowhere', function (err, res) {
-              try {
-                should(err).be.null();
-                should(res).be.instanceof(Kuzzle);
-                should(res.state).be.exactly('connected');
-                kuzzle.socket.removeAllListeners();
-                done();
-              }
-              catch (e) {
-                done(e);
-              }
-            });
+          kuzzle = new Kuzzle('nowhere', function (err, res) {
+            try {
+              should(err).be.null();
+              should(res).be.instanceof(Kuzzle);
+              should(res.state).be.exactly('connected');
+              kuzzle.socket.removeAllListeners();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
           });
         });
 
@@ -315,18 +327,15 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(50);
 
-          Kuzzle.__with__({io: iostub})(function () {
-            kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
+          kuzzle.subscriptions['foo'] = {
+            bar: {
+              renew: function () { renewed = true; }
+            }
+          };
 
-            kuzzle.subscriptions['foo'] = {
-              bar: {
-                renew: function () { renewed = true; }
-              }
-            };
-
-            kuzzle.connect();
-            should(kuzzle.state).be.exactly('connecting');
-          });
+          kuzzle.connect();
+          should(kuzzle.state).be.exactly('connecting');
 
           setTimeout(() => {
             should(renewed).be.true();
@@ -338,45 +347,43 @@ describe('Kuzzle constructor', () => {
         it('should dequeue requests automatically on a connection success', function (done) {
           var
             dequeued = false,
-            revert = Kuzzle.__set__('dequeue', function () { dequeued = true; });
+            kuzzle,
+            KuzzleRewired = rewire(kuzzleSource),
+            revert = KuzzleRewired.__set__('dequeue', function () { dequeued = true; });
 
           this.timeout(50);
 
+          kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
+          kuzzle.io = iostub;
 
-          Kuzzle.__with__({
-            io: iostub
-          })(function () {
-            var kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
-
-            kuzzle.connect(() => {
-              should(kuzzle.state).be.exactly('connected');
-              should(dequeued).be.true();
-              kuzzle.socket.removeAllListeners();
-              revert();
-              done();
-            });
+          kuzzle.connect((err, res) => {
+            should(kuzzle.state).be.exactly('connected');
+            should(dequeued).be.true();
+            kuzzle.socket.removeAllListeners();
+            revert();
+            done();
           });
         });
       });
 
       describe('=> on disconnection', () => {
-        var
-          iostub = function () {
-            var emitter = new EventEmitter;
+        beforeEach(function () {
+          Kuzzle = proxyquire(kuzzleSource, {
+            'socket.io-client': function () {
+              var emitter = new EventEmitter;
 
-            /*
-            since we're stubbing the socket.io socket object,
-            we need a stubbed 'close' function to make kuzzle.logout() work
-             */
-            emitter.close = function () { return false; };
-            process.nextTick(() => emitter.emit('disconnect'));
-            return emitter;
-          };
-
-        before(function () {
-          Kuzzle.__set__('io', iostub);
+              /*
+               since we're stubbing the socket.io socket object,
+               we need a stubbed 'close' function to make kuzzle.logout() work
+               */
+              emitter.close = function () {
+                return false;
+              };
+              process.nextTick(() => emitter.emit('disconnect'));
+              return emitter;
+            }
+          });
         });
-
 
         it('should enter offline mode and call listeners', function (done) {
           var
@@ -448,8 +455,10 @@ describe('Kuzzle constructor', () => {
             return emitter;
           };
 
-        before(function () {
-          Kuzzle.__set__('io', iostub);
+        beforeEach(function () {
+          Kuzzle = proxyquire(kuzzleSource, {
+            'socket.io-client': iostub
+          });
         });
 
         it('should exit offline mode when reconnecting', function (done) {
