@@ -292,8 +292,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     eventListeners: {
       value: {
-        subscribed: [],
-        unsubscribed: [],
+        connected: [],
+        error: [],
         disconnected: [],
         reconnected: []
       }
@@ -511,6 +511,10 @@ Kuzzle.prototype.connect = function (cb) {
 
     dequeue.call(self);
 
+    self.eventListeners.connected.forEach(function (listener) {
+      listener.fn();
+    });
+
     if (cb) {
       cb(null, self);
     }
@@ -518,6 +522,10 @@ Kuzzle.prototype.connect = function (cb) {
 
   self.socket.on('connect_error', function (error) {
     self.state = 'error';
+
+    self.eventListeners.error.forEach(function (listener) {
+      listener.fn();
+    });
 
     if (cb) {
       cb(error);
@@ -693,20 +701,11 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query(null, 'admin', 'getAllStats', {}, options, function (err, res) {
-    var result = [];
-
     if (err) {
       return cb(err);
     }
 
-    Object.keys(res.statistics).forEach(function (key) {
-      var frame = res.statistics[key];
-      frame.timestamp = key;
-
-      result.push(frame);
-    });
-
-    cb(null, result);
+    cb(null, res.statistics);
   });
 
   return this;
@@ -742,18 +741,15 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
   }
 
   queryCB = function (err, res) {
-    var stats = [];
-
     if (err) {
       return cb(err);
     }
 
-    Object.keys(res.statistics).forEach(function (frame) {
-      res.statistics[frame].timestamp = frame;
-      stats.push(res.statistics[frame]);
-    });
-
-    cb(null, stats);
+    if (timestamp) {
+      cb(null, res.statistics);
+    } else {
+      cb(null, [res.statistics]);
+    }
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
@@ -2238,6 +2234,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       value: null,
       writable: true
     },
+    channel: {
+      value: null,
+      writable: true
+    },
     id: {
       value: uuid.v4()
     },
@@ -2249,9 +2249,18 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       value: [],
       writable: true
     },
+    scope: {
+      value: options && options.scope ? options.scope : 'all'
+    },
+    state: {
+      value: options && options.state ? options.state : 'done'
+    },
     subscribing: {
       value: false,
       writable: true
+    },
+    users: {
+      value: options && options.users ? options.users : 'none'
     },
     // read-only properties
     collection: {
@@ -2349,7 +2358,11 @@ KuzzleRoom.prototype.count = function (cb) {
  */
 KuzzleRoom.prototype.renew = function (filters, cb) {
   var
-    subscribeQuery,
+    subscribeQuery = {
+      scope: this.scope,
+      state: this.state,
+      users: this.users
+    },
     self = this;
 
   if (!cb && filters && typeof filters === 'function') {
@@ -2365,17 +2378,17 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
 
   this.unsubscribe();
+  this.roomId = null;
   this.subscribing = true;
-  self.kuzzle.subscriptions.pending[self.id] = self;
+  this.callback = cb;
+  this.kuzzle.subscriptions.pending[self.id] = self;
 
   if (filters) {
     this.filters = filters;
   }
 
-  this.roomId = null;
-  this.callback = cb;
-
-  subscribeQuery = this.kuzzle.addHeaders({body: self.filters}, this.headers);
+  subscribeQuery.body = this.filters;
+  subscribeQuery = this.kuzzle.addHeaders(subscribeQuery, this.headers);
 
   self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
@@ -2387,6 +2400,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     }
 
     self.roomId = response.roomId;
+    self.channel = response.channel;
 
     if (!self.kuzzle.subscriptions[self.roomId]) {
       self.kuzzle.subscriptions[self.roomId] = {};
@@ -2395,7 +2409,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.kuzzle.subscriptions[self.roomId][self.id] = self;
 
     self.notifier = notificationCallback.bind(self);
-    self.kuzzle.socket.on(self.roomId, self.notifier);
+    self.kuzzle.socket.on(self.channel, self.notifier);
 
     dequeue.call(self);
   });
@@ -2424,7 +2438,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
   }
 
   if (room) {
-    self.kuzzle.socket.off(room, this.notifier);
+    self.kuzzle.socket.off(self.channel, this.notifier);
 
     if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
       delete self.kuzzle.subscriptions[room];
@@ -2473,40 +2487,17 @@ KuzzleRoom.prototype.setHeaders = function (content, replace) {
  * @returns {*}
  */
 function notificationCallback (data) {
-  var
-    self = this,
-    globalEvent,
-    listening;
-
   if (data.error) {
-    return self.callback(data.error);
+    return this.callback(data.error);
   }
 
-  if (data.result.action === 'on' || data.result.action === 'off') {
-    if (data.result.action === 'on') {
-      globalEvent = 'subscribed';
-      listening = self.listenToConnections;
-    } else {
-      globalEvent = 'unsubscribed';
-      listening = self.listenToDisconnections;
+  if (this.kuzzle.requestHistory[data.result.requestId]) {
+    if (this.subscribeToSelf) {
+      this.callback(null, data.result);
     }
-
-    if (listening || self.kuzzle.eventListeners[globalEvent].length > 0) {
-      if (listening) {
-        self.callback(null, data.result);
-      }
-
-      self.kuzzle.eventListeners[globalEvent].forEach(function (listener) {
-        listener.fn(self.subscriptionId, data.result);
-      });
-    }
-  } else if (self.kuzzle.requestHistory[data.result.requestId]) {
-    if (self.subscribeToSelf) {
-      self.callback(null, data.result);
-    }
-    delete self.kuzzle.requestHistory[data.result.requestId];
+    delete this.kuzzle.requestHistory[data.result.requestId];
   } else {
-    self.callback(null, data.result);
+    this.callback(null, data.result);
   }
 }
 
