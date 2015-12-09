@@ -13,7 +13,7 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 * [SDK Documentation](#sdk-documentation)
 * [Installation](#installation)
   * [NodeJS](#nodejs)
-    * [Basic usage](#basic-usage-noe)
+    * [Basic usage](#basic-usage-node)
   * [Javascript](#javascript)
     * [Basic usage](#basic-usage-js)
 * [License](#license)
