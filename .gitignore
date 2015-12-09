@@ -6,9 +6,6 @@
 node_modules/
 examples/node_modules/
 
-# Docker
-
-
 # Other
 .DS_STORE
 *#
@@ -16,3 +13,6 @@ examples/node_modules/
 
 # Compiled files
 coverage/
+
+# Bower
+bower_components/

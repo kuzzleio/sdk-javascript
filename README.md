@@ -81,6 +81,8 @@ bower install kuzzle-sdk --save
 ```
 
 ```html
+<!-- Don't forget to include socketio before kuzzle -->
+<script type="text/javascript" src="bower_components/socket.io-client/socket.io.js"></script>
 <script type="text/javascript" src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
 ```
 
