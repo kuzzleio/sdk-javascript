@@ -60,7 +60,7 @@ bower install kuzzle-sdk --save
 ```
 
 ```html
-<script type="text/javascript" src="bower_component/dist/kuzzle.min.js"></script>
+<script type="text/javascript" src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
 ```
 
 You are now ready to use Kuzzle:
