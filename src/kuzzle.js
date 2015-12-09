@@ -1,7 +1,13 @@
 var
   uuid = require('node-uuid'),
-  io = window.io || require('socket.io-client'),
+  io,
   KuzzleDataCollection = require('./kuzzleDataCollection');
+
+if (window && window.io) {
+  io = window.io;
+} else {
+  io = require('socket.io-client');
+}
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
