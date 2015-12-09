@@ -250,7 +250,6 @@
 },{}],2:[function(require,module,exports){
 var
   uuid = require('node-uuid'),
-  io = require('socket.io-client'),
   KuzzleDataCollection = require('./kuzzleDataCollection');
 
 /**
@@ -297,6 +296,10 @@ module.exports = Kuzzle = function (url, options, cb) {
         disconnected: [],
         reconnected: []
       }
+    },
+    io: {
+      value: null,
+      writable: true
     },
     queuing: {
       value: false,
@@ -408,6 +411,12 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
+  if (typeof window !== 'undefined' && window.io) {
+    this.io = window.io;
+  } else {
+    this.io = require('socket.io-client');
+  }
+
   if (options) {
     Object.keys(options).forEach(function (opt) {
       if (self.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(self, opt).writable) {
@@ -493,7 +502,7 @@ Kuzzle.prototype.connect = function (cb) {
 
   self.state = 'connecting';
 
-  self.socket = io(self.url, {
+  self.socket = self.io(self.url, {
     reconnection: self.autoReconnect,
     reconnectionDelay: self.reconnectionDelay,
     'force new connection': true
