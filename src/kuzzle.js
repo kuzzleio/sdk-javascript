@@ -1,6 +1,6 @@
 var
   uuid = require('node-uuid'),
-  io = require('socket.io-client'),
+  io = window.io || require('socket.io-client'),
   KuzzleDataCollection = require('./kuzzleDataCollection');
 
 /**
