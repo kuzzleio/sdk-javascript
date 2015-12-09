@@ -40,38 +40,6 @@ var myDoc = {
 
 kuzzle
   .dataCollectionFactory('people')
-  .createDocument(myDoc, function(error, response) {
-    if (error) {
-      // handle error...
-    }
-    /*
-    'response' is a KuzzleDocument object
-    */
-});
-
-```
-
-#### Hate callbacks & love promises ?
-
-There are promise-based methods for all Kuzzle method allowing a callback. Just suffix those methods with ```Promise```.
-
-Here is the above example, using promises:
-
-```javascript
-var
-  Kuzzle = require('kuzzle-sdk'),
-  kuzzle = new Kuzzle('http://foobar:7512');
-
-var myDoc = {
-  name: 'Rick Astley',
-  birthDate: '1966/02/06',
-  mainActivity: 'Singer',
-  website: 'http://www.rickastley.co.uk',
-  comment: 'Never gonna give you up, never gonna let you down'
-};
-
-kuzzle
-  .dataCollectionFactory('people')
   .createDocumentPromise(myDoc)
   .then(response => {
     /*
@@ -84,14 +52,15 @@ kuzzle
 });
 ```
 
-### HTML
+### Javascript
 
-#### Vanilla
-
-Download the file [kuzzle.min.js](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/browser/kuzzle.min.js) available in the [browser](https://github.com/kuzzleio/sdk-javascript/tree/browser) branch of this project.
+You can install this SDK with [Bower](http://bower.io/).
+```
+bower install kuzzle-sdk --save
+```
 
 ```html
-<script type="text/javascript" src="path/to/kuzzle.min.js"></script>
+<script type="text/javascript" src="bower_component/dist/kuzzle.min.js"></script>
 ```
 
 You are now ready to use Kuzzle:

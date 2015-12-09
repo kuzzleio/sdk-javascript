@@ -1,5 +1,5 @@
 {
-  "name": "kuzzle",
+  "name": "kuzzle-sdk",
   "description": "Official Javascript SDK for Kuzzle",
   "main": "dist/kuzzle.js",
   "authors": [
