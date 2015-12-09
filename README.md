@@ -10,12 +10,21 @@ For UI and linked objects developers, Kuzzle is an open-source solution that han
 
 You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
+* [SDK Documentation](#sdk-documentation)
+* [Installation](#installation)
+  * [NodeJS](#nodejs)
+    * [Basic usage](#basic-usage)
+  * [Javascript](#javascript)
+    * [Basic usage](#basic-usage)
+* [License](#license)
 
 ## SDK Documentation
 
 The complete SDK documentation is available [here](http://kuzzleio.github.io/sdk-documentation)
 
 ## Installation
+
+This SDK can be used either in NodeJS or in a browser.
 
 ### NodeJS
 
@@ -75,7 +84,7 @@ bower install kuzzle-sdk --save
 <script type="text/javascript" src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
 ```
 
-You are now ready to use Kuzzle:
+#### Basic usage
 
 ```javascript
 var
