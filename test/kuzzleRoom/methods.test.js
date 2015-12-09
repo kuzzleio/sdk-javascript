@@ -337,55 +337,6 @@ describe('KuzzleRoom methods', function () {
       should(error).be.null();
     });
 
-    it('should handle the listenToConnections filter', function () {
-      var res = {action: 'on', foo: 'bar'};
-      room.listenToConnections = false;
-      notifCB.call(room, {error: null, result: res});
-      should(called).be.false();
-
-      room.listenToConnections = true;
-      notifCB.call(room, {error: null, result: res});
-      should(called).be.true();
-      should(error).be.null();
-      should(result).match(res);
-    });
-
-    it('should fire a "subscribed" global event when receiving a "on" message', function () {
-      var
-        listenerCalled = false,
-        res = {action: 'on', foo: 'bar'};
-
-      room.listenToConnections = false;
-      kuzzle.addListener('subscribed', function () { listenerCalled = true; });
-      notifCB.call(room, {error: null, result: res});
-      should(listenerCalled).be.true();
-    });
-
-
-    it('should handle the listenToDisconnections filter', function () {
-      var res = {action: 'off', foo: 'bar'};
-      room.listenToDisconnections = false;
-      notifCB.call(room, {error: null, result: res});
-      should(called).be.false();
-
-      room.listenToDisconnections = true;
-      notifCB.call(room, {error: null, result: res});
-      should(called).be.true();
-      should(error).be.null();
-      should(result).match(res);
-    });
-
-    it('should fire a "unsubscribed" global event when receiving a "on" message', function () {
-      var
-        listenerCalled = false,
-        res = {action: 'off', foo: 'bar'};
-
-      room.listenToDisconnections = false;
-      kuzzle.addListener('unsubscribed', function () { listenerCalled = true; });
-      notifCB.call(room, {error: null, result: res});
-      should(listenerCalled).be.true();
-    });
-
     it('should delete the result from history if emitted by this instance', function () {
       var res = { action: 'foo', requestId: 'bar'};
 
