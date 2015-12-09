@@ -65,32 +65,6 @@ describe('Kuzzle methods', function () {
       kuzzle.getAllStatistics(passedOptions, function () {});
     });
 
-    it('should reformat the statistics frame according to the documentation', function (done) {
-      this.timeout(50);
-
-      result = {
-        statistics: {
-          123: { some: 'stats' },
-          456: { someother: 'stats'}
-        }
-      };
-
-      kuzzle.getAllStatistics(function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Array();
-        should(res.length).be.exactly(2);
-        should(res[0]).be.an.Object();
-        should(Object.keys(res[0]).length).be.exactly(2);
-        should(res[0].timestamp).be.exactly('123');
-        should(res[0].some).be.exactly('stats');
-        should(res[1]).be.an.Object();
-        should(Object.keys(res[1]).length).be.exactly(2);
-        should(res[1].timestamp).be.exactly('456');
-        should(res[1].someother).be.exactly('stats');
-        done();
-      });
-    });
-
     it('should execute the callback with an error if an error occurs', function (done) {
       this.timeout(50);
       error = 'foobar';

@@ -207,8 +207,25 @@ describe('Kuzzle constructor', () => {
             kuzzle.state = state;
             should(kuzzle.connect()).be.exactly(kuzzle);
             should(kuzzle.state).be.exactly('connecting');
+            kuzzle.socket.removeAllListeners();
           });
         });
+      });
+
+      it('should registered listeners upon receiving a connect event', function (done) {
+        var
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
+          listenerCalled = false;
+
+        kuzzle.state = 'initializing';
+        kuzzle.addListener('connected', function () { listenerCalled = true; });
+        kuzzle.connect();
+
+        setTimeout(() => {
+          should(listenerCalled).be.true();
+          kuzzle.socket.removeAllListeners();
+          done();
+        }, 10);
       });
 
       describe('=> on connection error', () => {
@@ -230,12 +247,34 @@ describe('Kuzzle constructor', () => {
                 should(err).be.exactly('error');
                 should(res).be.undefined();
                 should(kuzzle.state).be.exactly('error');
+                kuzzle.socket.removeAllListeners();
                 done();
               }
               catch (e) {
                 done(e);
               }
             });
+          });
+        });
+
+        it('should registered listeners upon receiving a error event', function (done) {
+          Kuzzle.__with__({
+            io: iostub
+          })(function () {
+            var kuzzle = new Kuzzle('nowhere');
+
+            kuzzle.addListener('error', function () { listenerCalled = true; });
+
+            setTimeout(() => {
+              try {
+                should(listenerCalled).be.true();
+                kuzzle.socket.removeAllListeners();
+                done();
+              }
+              catch (e) {
+                done(e);
+              }
+            }, 10);
           });
         });
       });
@@ -254,11 +293,12 @@ describe('Kuzzle constructor', () => {
           Kuzzle.__with__({
             io: iostub
           })(function () {
-            new Kuzzle('nowhere', function (err, res) {
+            var kuzzle = new Kuzzle('nowhere', function (err, res) {
               try {
                 should(err).be.null();
                 should(res).be.instanceof(Kuzzle);
                 should(res.state).be.exactly('connected');
+                kuzzle.socket.removeAllListeners();
                 done();
               }
               catch (e) {
@@ -269,12 +309,14 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should renew subscriptions automatically on a connection success', function (done) {
-          var renewed = false;
+          var
+            kuzzle,
+            renewed = false;
 
           this.timeout(50);
 
           Kuzzle.__with__({io: iostub})(function () {
-            var kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
+            kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
 
             kuzzle.subscriptions['foo'] = {
               bar: {
@@ -288,6 +330,7 @@ describe('Kuzzle constructor', () => {
 
           setTimeout(() => {
             should(renewed).be.true();
+            kuzzle.socket.removeAllListeners();
             done();
           }, 20);
         });
@@ -308,6 +351,7 @@ describe('Kuzzle constructor', () => {
             kuzzle.connect(() => {
               should(kuzzle.state).be.exactly('connected');
               should(dequeued).be.true();
+              kuzzle.socket.removeAllListeners();
               revert();
               done();
             });
@@ -349,6 +393,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.queuing).be.false();
               should(listenerCalled).be.true();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -366,6 +411,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.true();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -384,6 +430,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.false();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done('the kuzzle instance should have been invalidated');
             }
             catch (e) {
@@ -422,6 +469,7 @@ describe('Kuzzle constructor', () => {
               // should not switch queuing to 'false' automatically by default
               should(kuzzle.queuing).be.true();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -448,6 +496,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.true();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -476,6 +525,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.false();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -497,6 +547,7 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(kuzzle.queuing).be.false();
               kuzzle.isValid();
+              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {

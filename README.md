@@ -1,8 +1,10 @@
 [![Build Status](https://travis-ci.org/kuzzleio/sdk-javascript.svg?branch=master)](https://travis-ci.org/kuzzleio/sdk-javascript) [![codecov.io](http://codecov.io/github/kuzzleio/sdk-javascript/coverage.svg?branch=master)](http://codecov.io/github/kuzzleio/sdk-javascript?branch=master) [![Dependency Status](https://david-dm.org/kuzzleio/sdk-javascript.svg)](https://david-dm.org/kuzzleio/sdk-javascript)
 
 
-Kuzzle
+Official Kuzzle Javascript SDK 
 ======
+
+:warning: This SDK version requires Kuzzle v0.6.0 or higher.
 
 ## About Kuzzle
 
@@ -16,6 +18,7 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
     * [Basic usage](#basic-usage-node)
   * [Javascript](#javascript)
     * [Basic usage](#basic-usage-js)
+* [Building manually](#building-manually)
 * [License](#license)
 
 ## SDK Documentation
@@ -112,6 +115,10 @@ kuzzle
 });
 ```
 
-# License
+## Building manually
+
+Clone this github repository and run ``grunt``. A ``dist`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
+
+## License
 
 [Apache 2](LICENSE.md)
