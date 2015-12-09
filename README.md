@@ -40,6 +40,18 @@ var myDoc = {
 
 kuzzle
   .dataCollectionFactory('people')
+  .createDocument(myDoc, function(error, response) {
+    if (error) {
+      // handle error...
+    }
+    /*
+    'response' is a KuzzleDocument object
+    */
+});
+
+// In NodeJS version, you can also use Promise by suffixing functions with "Promise"
+kuzzle
+  .dataCollectionFactory('people')
   .createDocumentPromise(myDoc)
   .then(response => {
     /*
