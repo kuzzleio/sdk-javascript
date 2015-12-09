@@ -13,9 +13,9 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 * [SDK Documentation](#sdk-documentation)
 * [Installation](#installation)
   * [NodeJS](#nodejs)
-    * [Basic usage](#basic-usage)
+    * [Basic usage](#basic-usage-noe)
   * [Javascript](#javascript)
-    * [Basic usage](#basic-usage)
+    * [Basic usage](#basic-usage-js)
 * [License](#license)
 
 ## SDK Documentation
@@ -32,7 +32,7 @@ This SDK can be used either in NodeJS or in a browser.
 npm install kuzzle-sdk --save
 ```
 
-#### Basic usage
+#### <a name="basic-usage-node"></a> Basic usage
 
 ```javascript
 var
@@ -84,7 +84,7 @@ bower install kuzzle-sdk --save
 <script type="text/javascript" src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
 ```
 
-#### Basic usage
+#### <a name="basic-usage-js"></a> Basic usage
 
 ```javascript
 var
