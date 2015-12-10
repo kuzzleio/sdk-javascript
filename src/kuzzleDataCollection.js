@@ -392,7 +392,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
 
   data.persist = false;
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'create', data, options);
+  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
 
   return this;
 };
