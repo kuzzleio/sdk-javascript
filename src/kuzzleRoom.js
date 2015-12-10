@@ -77,16 +77,6 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       enumerable: true,
       writable: true
     },
-    listenToConnections: {
-      value: options ? options.listenToConnections : false,
-      enumerable: true,
-      writable: true
-    },
-    listenToDisconnections: {
-      value: options ? options.listenToDisconnections : false,
-      enumerable: true,
-      writable: true
-    },
     metadata: {
       value: (options && options.metadata) ? options.metadata : {},
       enumerable: true,
@@ -98,7 +88,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       writable: true
     },
     subscribeToSelf: {
-      value: options ? options.subscribeToSelf : false,
+      value: options && typeof options.subscribeToSelf === 'boolean' ? options.subscribeToSelf : true,
       enumerable: true,
       writable: true
     }

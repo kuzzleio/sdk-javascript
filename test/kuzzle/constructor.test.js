@@ -204,7 +204,7 @@ describe('Kuzzle constructor', () => {
       it('should return immediately if not initializing or logged off', function (done) {
         var kuzzle;
 
-        this.timeout(50);
+        this.timeout(200);
 
         Kuzzle = proxyquire(kuzzleSource, {
           io: function () {
