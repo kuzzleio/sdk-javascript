@@ -632,7 +632,7 @@ describe('KuzzleDataCollection methods', function () {
       error = null;
       expectedQuery = {
         collection: 'foo',
-        action: 'create',
+        action: 'publish',
         controller: 'write',
         body: {}
       };
