@@ -351,7 +351,7 @@ describe('Kuzzle constructor', () => {
             KuzzleRewired = rewire(kuzzleSource),
             revert = KuzzleRewired.__set__('dequeue', function () { dequeued = true; });
 
-          this.timeout(50);
+          this.timeout(500);
 
           kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
           kuzzle.io = iostub;
