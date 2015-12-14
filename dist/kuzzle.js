@@ -2123,7 +2123,7 @@ KuzzleDocument.prototype.publish = function (options) {
 
   data.persist = false;
 
-  this.kuzzle.query(this.collection, 'write', 'create', data, options);
+  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
 
   return this;
 };
