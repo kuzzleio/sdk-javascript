@@ -340,6 +340,10 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
       enumerable: true
     },
+    index: {
+      value: (options && typeof options.index === 'string') ? options.index : 'mainindex',
+      enumerable: true
+    },
     reconnectionDelay: {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
@@ -889,6 +893,7 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     object = {
       action: action,
       controller: controller,
+      index: this.index,
       metadata: this.metadata
     },
     self = this;

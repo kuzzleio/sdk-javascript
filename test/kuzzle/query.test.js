@@ -40,7 +40,7 @@ describe('Query management', function () {
           catch (e) {
             done(e);
           }
-        });
+        })
       });
 
       emitRequest.call(kuzzle, {requestId: 'bar'});
@@ -104,6 +104,7 @@ describe('Query management', function () {
 
     it('should generate a valid request object', function () {
       kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}});
+      should(requestObject.index).be.exactly('mainindex');
       should(requestObject.controller).be.exactly('controller');
       should(requestObject.collection).be.exactly('collection');
       should(requestObject.action).be.exactly('action');
