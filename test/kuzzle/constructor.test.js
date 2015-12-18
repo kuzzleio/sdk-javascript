@@ -63,6 +63,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('index', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('queueFilter', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true, writable: true, configurable: false });
@@ -86,6 +87,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.be.empty();
       should(kuzzle.replayInterval).be.exactly(10);
       should(kuzzle.reconnectionDelay).be.exactly(1000);
+      should(kuzzle.index).be.exactly('mainindex');
     });
 
     it('should initialize correctly properties using the "options" argument', () => {
@@ -95,6 +97,7 @@ describe('Kuzzle constructor', () => {
           autoReconnect: false,
           autoReplay: true,
           autoResubscribe: false,
+          index: 'myIndex',
           queueTTL: 123,
           queueMaxSize: 42,
           headers: {foo: 'bar'},
@@ -108,6 +111,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.autoReconnect).be.exactly(options.autoReconnect);
       should(kuzzle.autoReplay).be.exactly(options.autoReplay);
       should(kuzzle.autoResubscribe).be.exactly(options.autoResubscribe);
+      should(kuzzle.index).be.exactly(options.index);
       should(kuzzle.queueTTL).be.exactly(options.queueTTL);
       should(kuzzle.queueMaxSize).be.exactly(options.queueMaxSize);
       should(kuzzle.headers).be.an.Object().and.match(options.headers);

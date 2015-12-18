@@ -4,7 +4,7 @@
 Official Kuzzle Javascript SDK 
 ======
 
-:warning: This SDK version requires Kuzzle v0.6.0 or higher.
+:warning: This SDK version requires Kuzzle v0.7.0 or higher.
 
 ## About Kuzzle
 
