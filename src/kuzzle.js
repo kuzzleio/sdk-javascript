@@ -14,7 +14,7 @@ var
  * Kuzzle object constructor.
  * @param url - URL to the Kuzzle instance
  * @param [options] - Connection options
- * @param {Kuzzle~constructorCallback} [cb] - Handles connection response
+ * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
 module.exports = Kuzzle = function (url, options, cb) {
@@ -38,6 +38,9 @@ module.exports = Kuzzle = function (url, options, cb) {
     collections: {
       value: {},
       writable: true
+    },
+    connectCB: {
+      value: cb
     },
     eventListeners: {
       value: {
@@ -219,7 +222,7 @@ module.exports = Kuzzle = function (url, options, cb) {
 
 
   if (!options || !options.connect || options.connect === 'auto') {
-    this.connect(cb);
+    this.connect();
   } else {
     this.state = 'ready';
   }
@@ -228,7 +231,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['connect', 'getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
+        var whitelist = ['getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -241,15 +244,14 @@ module.exports = Kuzzle = function (url, options, cb) {
 
 /**
  * Connects to a Kuzzle instance using the provided URL.
- * @param {responseCallback} [cb]
  * @returns {Object} this
  */
-Kuzzle.prototype.connect = function (cb) {
+Kuzzle.prototype.connect = function () {
   var self = this;
 
   if (['initializing', 'ready', 'loggedOff', 'error', 'offline'].indexOf(this.state) === -1) {
-    if (cb) {
-      cb(null, self);
+    if (self.connectCB) {
+      self.connectCB(null, self);
     }
     return self;
   }
@@ -278,8 +280,8 @@ Kuzzle.prototype.connect = function (cb) {
       listener.fn();
     });
 
-    if (cb) {
-      cb(null, self);
+    if (self.connectCB) {
+      self.connectCB(null, self);
     }
   });
 
@@ -290,8 +292,8 @@ Kuzzle.prototype.connect = function (cb) {
       listener.fn();
     });
 
-    if (cb) {
-      cb(error);
+    if (self.connectCB) {
+      self.connectCB(error);
     }
   });
 
@@ -560,6 +562,8 @@ Kuzzle.prototype.flushQueue = function () {
  * @returns {object} this
  */
 Kuzzle.prototype.listCollections = function (options, cb) {
+  var collectionType = 'all';
+
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
@@ -567,7 +571,11 @@ Kuzzle.prototype.listCollections = function (options, cb) {
 
   this.callbackRequired('Kuzzle.listCollections', cb);
 
-  this.query(null, 'read', 'listCollections', {}, options, function (err, res) {
+  if (options && options.type) {
+    collectionType = options.type;
+  }
+
+  this.query(null, 'read', 'listCollections', {body: {type: collectionType}}, options, function (err, res) {
     if (err) {
       return cb(err);
     }

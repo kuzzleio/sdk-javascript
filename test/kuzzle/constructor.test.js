@@ -167,7 +167,7 @@ describe('Kuzzle constructor', () => {
       kuzzle = new Kuzzle('nowhere');
 
       should.not.exist(kuzzle.addListenerPromise);
-      should.exist(kuzzle.connectPromise);
+      should.not.exist(kuzzle.connectPromise);
       should.not.exist(kuzzle.dataCollectionFactoryPromise);
       should.not.exist(kuzzle.flushQueuePromise);
       should.exist(kuzzle.getAllStatisticsPromise);
@@ -205,7 +205,7 @@ describe('Kuzzle constructor', () => {
         Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
       });
 
-      it('should return immediately if not initializing or logged off', function (done) {
+      it('should return immediately if already connected', function (done) {
         var kuzzle;
 
         this.timeout(200);
@@ -216,18 +216,37 @@ describe('Kuzzle constructor', () => {
           }
         });
 
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
-        kuzzle.state = 'connected';
-        kuzzle.connect((err, res) => {
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.state).be.exactly('connected');
           done();
         });
 
+        kuzzle.state = 'connected';
+        kuzzle.connect();
+      });
+
+      it('should return immediately if trying to reconnect', function (done) {
+        var kuzzle;
+
+        this.timeout(200);
+
+        Kuzzle = proxyquire(kuzzleSource, {
+          io: function () {
+            // does nothing, making the test crash if trying to connect
+          }
+        });
+
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
+          should(err).be.null();
+          should(res).be.exactly(kuzzle);
+          should(res.state).be.exactly('reconnecting');
+          done();
+        });
+
         kuzzle.state = 'reconnecting';
-        should(kuzzle.connect()).be.exactly(kuzzle);
-        should(kuzzle.state).be.exactly('reconnecting');
+        kuzzle.connect();
       });
 
       it('should try to connect when the instance is in a not-connected state', function () {
@@ -357,16 +376,17 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(500);
 
-          kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
-          kuzzle.io = iostub;
-
-          kuzzle.connect((err, res) => {
+          kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false}, () => {
             should(kuzzle.state).be.exactly('connected');
             should(dequeued).be.true();
             kuzzle.socket.removeAllListeners();
             revert();
             done();
           });
+
+          kuzzle.io = iostub;
+
+          kuzzle.connect();
         });
       });
 

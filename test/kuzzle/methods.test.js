@@ -189,7 +189,8 @@ describe('Kuzzle methods', function () {
       result = {collections: []};
       expectedQuery = {
         controller: 'read',
-        action: 'listCollections'
+        action: 'listCollections',
+        body: {type: 'all'}
       };
     });
 
@@ -224,6 +225,11 @@ describe('Kuzzle methods', function () {
         should(res).be.undefined();
         done();
       });
+    });
+
+    it('should handle options correctly', function (done) {
+      expectedQuery.body.type = 'foobar';
+      kuzzle.listCollections({type: 'foobar'}, () => done());
     });
   });
 
