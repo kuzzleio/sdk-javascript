@@ -20,7 +20,7 @@ describe('Query management', function () {
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
     });
 
     it('should emit the request when asked to', function (done) {
@@ -95,7 +95,7 @@ describe('Query management', function () {
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.state = 'connected';
       requestObject = {};
       callback = null;
@@ -104,7 +104,7 @@ describe('Query management', function () {
 
     it('should generate a valid request object', function () {
       kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}});
-      should(requestObject.index).be.exactly('mainindex');
+      should(requestObject.index).be.exactly('this is not an index');
       should(requestObject.controller).be.exactly('controller');
       should(requestObject.collection).be.exactly('collection');
       should(requestObject.action).be.exactly('action');

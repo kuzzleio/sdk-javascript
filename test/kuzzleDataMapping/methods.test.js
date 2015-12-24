@@ -44,7 +44,7 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#apply', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -112,7 +112,7 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#refresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'bar');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -136,7 +136,7 @@ describe('KuzzleDataMapping methods', function () {
         should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);
-        should(res.mapping).match(result.mainindex.mappings.foo.properties);
+        should(res.mapping).match(result[kuzzle.index].mappings.foo.properties);
         done();
       })).be.exactly(mapping);
     });
@@ -177,11 +177,39 @@ describe('KuzzleDataMapping methods', function () {
         done();
       });
     });
+
+    it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
+      var mapping = new KuzzleDataMapping(dataCollection);
+
+      result = { foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}};
+
+      mapping.refresh((err, res) => {
+        should(emitted).be.true();
+        should(err).be.an.Error();
+        should(err.message).startWith('No mapping found for index');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
+      var mapping = new KuzzleDataMapping(dataCollection);
+
+      result = { bar: { mappings: { foobar: { properties: { foo: {type: 'date'}}}}}};
+
+      mapping.refresh((err, res) => {
+        should(emitted).be.true();
+        should(err).be.an.Error();
+        should(err.message).startWith('No mapping found for collection');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#set', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -201,7 +229,7 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#setHeaders', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 

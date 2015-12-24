@@ -45,7 +45,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#toJSON', function () {
     before(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -74,7 +74,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#toString', function () {
     before(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -91,7 +91,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#delete', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -186,7 +186,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#refresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -310,7 +310,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#save', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -396,7 +396,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#publish', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -443,7 +443,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#setContent', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -477,7 +477,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -518,7 +518,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#setHeaders', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -541,7 +541,7 @@ describe('KuzzleDocument methods', function () {
     beforeEach(function () {
       var stub = function () { dequeued++; };
 
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
       document = new KuzzleDocument(dataCollection);
       document.delete = stub;

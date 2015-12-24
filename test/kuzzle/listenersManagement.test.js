@@ -11,7 +11,7 @@ describe('Listeners management', () => {
   beforeEach(function () {
     var stublistener = function () {};
 
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', 'this is not an index');
     listenerIds = [];
 
     listenerIds.push(kuzzle.addListener('connected', stublistener));

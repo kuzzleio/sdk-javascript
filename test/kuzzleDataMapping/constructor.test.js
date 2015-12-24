@@ -11,7 +11,7 @@ describe('KuzzleDataMapping constructor', function () {
     collection;
 
   before(function () {
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', 'this is not an index');
 
   });
 
@@ -33,8 +33,7 @@ describe('KuzzleDataMapping constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var kuzzle = new Kuzzle('foo'),
-      mapping = new KuzzleDataMapping(collection);
+    var mapping = new KuzzleDataMapping(collection);
 
     should(mapping).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(mapping).have.propertyWithDescriptor('mapping', { enumerable: true, writable: true, configurable: false });
@@ -56,7 +55,7 @@ describe('KuzzleDataMapping constructor', function () {
       mapping;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', 'this is not an index');
     mapping = new KuzzleDataMapping(kuzzle.dataCollectionFactory('foo'));
 
     should.exist(mapping.applyPromise);

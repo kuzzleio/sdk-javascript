@@ -26,7 +26,7 @@ describe('Kuzzle.getStatistics', function () {
     controller;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', 'this is not an index');
     emitted = false;
   });
 
