@@ -289,6 +289,17 @@ describe('KuzzleDataCollection methods', function () {
       collection.createDocument(null, {}, {}, function () {});
       should(emitted).be.true();
 
+      collection.createDocument(undefined, {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.createDocument(undefined, {}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.createDocument(undefined, {}, {}, function () {});
+      should(emitted).be.true();
+
       emitted = false;
       collection.createDocument({}, function () {});
       should(emitted).be.true();
