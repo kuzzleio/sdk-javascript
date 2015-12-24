@@ -174,7 +174,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
     data = {},
     action = 'create';
 
-  if (typeof id !== 'string') {
+  if (typeof id !== 'string' && id !== null) {
     cb = options;
     options = document;
     document = id;
