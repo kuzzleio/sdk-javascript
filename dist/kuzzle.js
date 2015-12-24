@@ -4,74 +4,53 @@
 //     Copyright (c) 2010-2012 Robert Kieffer
 //     MIT License - http://opensource.org/licenses/mit-license.php
 
-/*global window, require, define */
-(function(_window) {
-  'use strict';
+(function() {
+  var _global = this;
 
   // Unique ID creation requires a high quality random # generator.  We feature
   // detect to determine the best RNG source, normalizing to a function that
   // returns 128-bits of randomness, since that's what's usually required
-  var _rng, _mathRNG, _nodeRNG, _whatwgRNG, _previousRoot;
+  var _rng;
 
-  function setupBrowser() {
-    // Allow for MSIE11 msCrypto
-    var _crypto = _window.crypto || _window.msCrypto;
-
-    if (!_rng && _crypto && _crypto.getRandomValues) {
-      // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
-      //
-      // Moderately fast, high quality
-      try {
-        var _rnds8 = new Uint8Array(16);
-        _whatwgRNG = _rng = function whatwgRNG() {
-          _crypto.getRandomValues(_rnds8);
-          return _rnds8;
-        };
-        _rng();
-      } catch(e) {}
-    }
-
-    if (!_rng) {
-      // Math.random()-based (RNG)
-      //
-      // If all else fails, use Math.random().  It's fast, but is of unspecified
-      // quality.
-      var  _rnds = new Array(16);
-      _mathRNG = _rng = function() {
-        for (var i = 0, r; i < 16; i++) {
-          if ((i & 0x03) === 0) { r = Math.random() * 0x100000000; }
-          _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-        }
-
-        return _rnds;
-      };
-      if ('undefined' !== typeof console && console.warn) {
-        console.warn("[SECURITY] node-uuid: crypto not usable, falling back to insecure Math.random()");
-      }
-    }
+  // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
+  //
+  // Moderately fast, high quality
+  if (typeof(_global.require) == 'function') {
+    try {
+      var _rb = _global.require('crypto').randomBytes;
+      _rng = _rb && function() {return _rb(16);};
+    } catch(e) {}
   }
 
-  function setupNode() {
-    // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
+  if (!_rng && _global.crypto && crypto.getRandomValues) {
+    // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
     //
     // Moderately fast, high quality
-    if ('function' === typeof require) {
-      try {
-        var _rb = require('crypto').randomBytes;
-        _nodeRNG = _rng = _rb && function() {return _rb(16);};
-        _rng();
-      } catch(e) {}
-    }
+    var _rnds8 = new Uint8Array(16);
+    _rng = function whatwgRNG() {
+      crypto.getRandomValues(_rnds8);
+      return _rnds8;
+    };
   }
 
-  if (_window) {
-    setupBrowser();
-  } else {
-    setupNode();
+  if (!_rng) {
+    // Math.random()-based (RNG)
+    //
+    // If all else fails, use Math.random().  It's fast, but is of unspecified
+    // quality.
+    var  _rnds = new Array(16);
+    _rng = function() {
+      for (var i = 0, r; i < 16; i++) {
+        if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+        _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+      }
+
+      return _rnds;
+    };
   }
 
   // Buffer class to use
-  var BufferClass = ('function' === typeof Buffer) ? Buffer : Array;
+  var BufferClass = typeof(_global.Buffer) == 'function' ? _global.Buffer : Array;
 
   // Maps for number <-> hex string conversion
   var _byteToHex = [];
@@ -140,17 +119,17 @@
 
     options = options || {};
 
-    var clockseq = (options.clockseq != null) ? options.clockseq : _clockseq;
+    var clockseq = options.clockseq != null ? options.clockseq : _clockseq;
 
     // UUID timestamps are 100 nano-second units since the Gregorian epoch,
     // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
     // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
     // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-    var msecs = (options.msecs != null) ? options.msecs : new Date().getTime();
+    var msecs = options.msecs != null ? options.msecs : new Date().getTime();
 
     // Per 4.2.1.2, use count of uuid's generated during the current clock
     // cycle to simulate higher resolution clock
-    var nsecs = (options.nsecs != null) ? options.nsecs : _lastNSecs + 1;
+    var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
     var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
@@ -216,8 +195,8 @@
     // Deprecated - 'format' argument, as supported in v1.2
     var i = buf && offset || 0;
 
-    if (typeof(options) === 'string') {
-      buf = (options === 'binary') ? new BufferClass(16) : null;
+    if (typeof(options) == 'string') {
+      buf = options == 'binary' ? new BufferClass(16) : null;
       options = null;
     }
     options = options || {};
@@ -245,32 +224,28 @@
   uuid.parse = parse;
   uuid.unparse = unparse;
   uuid.BufferClass = BufferClass;
-  uuid._rng = _rng;
-  uuid._mathRNG = _mathRNG;
-  uuid._nodeRNG = _nodeRNG;
-  uuid._whatwgRNG = _whatwgRNG;
 
-  if (('undefined' !== typeof module) && module.exports) {
+  if (typeof(module) != 'undefined' && module.exports) {
     // Publish as node.js module
     module.exports = uuid;
-  } else if (typeof define === 'function' && define.amd) {
+  } else  if (typeof define === 'function' && define.amd) {
     // Publish as AMD module
     define(function() {return uuid;});
-
+ 
 
   } else {
     // Publish as global (in browsers)
-    _previousRoot = _window.uuid;
+    var _previousRoot = _global.uuid;
 
     // **`noConflict()` - (browser only) to reset global 'uuid' var**
     uuid.noConflict = function() {
-      _window.uuid = _previousRoot;
+      _global.uuid = _previousRoot;
       return uuid;
     };
 
-    _window.uuid = uuid;
+    _global.uuid = uuid;
   }
-})('undefined' !== typeof window ? window : null);
+}).call(this);
 
 },{}],2:[function(require,module,exports){
 var
@@ -288,15 +263,16 @@ var
 /**
  * Kuzzle object constructor.
  * @param url - URL to the Kuzzle instance
+ * @param index - Database index
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (url, options, cb) {
+module.exports = Kuzzle = function (url, index, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, options, cb);
+    return new Kuzzle(url, index, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -305,7 +281,11 @@ module.exports = Kuzzle = function (url, options, cb) {
   }
 
   if (!url || url === '') {
-    throw new Error('URL to Kuzzle can\'t be empty');
+    throw new Error('URL argument missing');
+  }
+
+  if (!index || index === '') {
+    throw new Error('Index argument missing');
   }
 
   Object.defineProperties(this, {
@@ -369,7 +349,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       enumerable: true
     },
     index: {
-      value: (options && typeof options.index === 'string') ? options.index : 'mainindex',
+      value: index,
       enumerable: true
     },
     reconnectionDelay: {
@@ -1822,7 +1802,15 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res.mainindex.mappings[self.collection].properties;
+    if (res[self.kuzzle.index]) {
+      if (res[self.kuzzle.index].mappings[self.collection]) {
+        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+      } else {
+        return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
+      }
+    } else {
+      return cb ? cb(new Error('No mapping found for index ' + self.kuzzle.index)) : false;
+    }
 
     if (cb) {
       cb(null, self);
@@ -1839,6 +1827,7 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
  * Changes made by this function won’t be applied until you call the apply method
  *
  * @param {string} field - Name of the field from which the mapping is to be added or updated
+ * @param {object} mapping - corresponding field mapping
  * @returns {KuzzleDataMapping}
  */
 KuzzleDataMapping.prototype.set = function (field, mapping) {
