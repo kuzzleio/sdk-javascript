@@ -116,7 +116,7 @@ describe('KuzzleDataMapping methods', function () {
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { mainindex: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}};
+      result = { bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}};
       error = null;
       expectedQuery = {
         collection: 'foo',
