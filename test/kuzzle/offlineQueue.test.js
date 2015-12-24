@@ -28,7 +28,7 @@ describe('Offline queue management', () => {
       var
         pastTime = 60000;
 
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart
       while (pastTime >= 0) {
@@ -85,7 +85,7 @@ describe('Offline queue management', () => {
         pastTime = 60000;
 
       sent = 0;
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.socket = { emit: function () { sent++; } };
       kuzzle.queuing = true;
 
@@ -114,7 +114,7 @@ describe('Offline queue management', () => {
 
   describe('#flushing the queue', function () {
     it ('should empty the queue when asked to', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
       kuzzle.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
@@ -133,7 +133,7 @@ describe('Offline queue management', () => {
       Kuzzle.__with__({
         dequeue: function () { replayed = true; }
       })(function () {
-        var kuzzle = new Kuzzle('foo');
+        var kuzzle = new Kuzzle('foo', 'this is not an index');
 
         kuzzle.state = 'offline';
         kuzzle.replayQueue();
@@ -147,7 +147,7 @@ describe('Offline queue management', () => {
       Kuzzle.__with__({
         dequeue: function () { replayed = true; }
       })(function () {
-        var kuzzle = new Kuzzle('foo', {autoReplay: true});
+        var kuzzle = new Kuzzle('foo', 'this is not an index', {autoReplay: true});
 
         kuzzle.state = 'connected';
         kuzzle.replayQueue();
@@ -161,7 +161,7 @@ describe('Offline queue management', () => {
       Kuzzle.__with__({
         dequeue: function () { replayed = true; }
       })(function () {
-        var kuzzle = new Kuzzle('foo');
+        var kuzzle = new Kuzzle('foo', 'this is not an index');
 
         kuzzle.state = 'connected';
         kuzzle.replayQueue();
@@ -172,7 +172,7 @@ describe('Offline queue management', () => {
 
   describe('#startQueuing', function () {
     it('should not start queuing if the instance is connected', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.state = 'connected';
       kuzzle.startQueuing();
@@ -181,7 +181,7 @@ describe('Offline queue management', () => {
     });
 
     it('should not start queuing if autoQueue is on', function () {
-      var kuzzle = new Kuzzle('foo', {autoQueue: true});
+      var kuzzle = new Kuzzle('foo', 'this is not an index', {autoQueue: true});
 
       kuzzle.state = 'offline';
       kuzzle.startQueuing();
@@ -190,7 +190,7 @@ describe('Offline queue management', () => {
     });
 
     it('should start queing if autoQueue is off and the instance is disconnected', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.state = 'offline';
       kuzzle.startQueuing();
@@ -201,7 +201,7 @@ describe('Offline queue management', () => {
 
   describe('#stopQueuing', function () {
     it('should not stop queuing if the instance is connected', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.state = 'connected';
       kuzzle.queuing = true;
@@ -210,7 +210,7 @@ describe('Offline queue management', () => {
     });
 
     it('should not stop queuing if autoQueue is on', function () {
-      var kuzzle = new Kuzzle('foo', {autoQueue: true});
+      var kuzzle = new Kuzzle('foo', 'this is not an index', {autoQueue: true});
 
       kuzzle.state = 'offline';
       kuzzle.queuing = true;
@@ -219,7 +219,7 @@ describe('Offline queue management', () => {
     });
 
     it('should stop queuing if autoQueue is off and the instance is offline', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.state = 'offline';
       kuzzle.queuing = true;

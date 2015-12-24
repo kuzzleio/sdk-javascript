@@ -8,7 +8,7 @@ var
 describe('KuzzleDataCollection constructor', function () {
   it('should initialize properties and return a valid KuzzleDataCollection object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', 'this is not an index'),
       collection = 'foobar',
       c;
 
@@ -34,7 +34,7 @@ describe('KuzzleDataCollection constructor', function () {
       dataCollection;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', 'this is not an index');
     dataCollection = new KuzzleDataCollection(kuzzle, 'foo');
 
     should.exist(dataCollection.advancedSearchPromise);
@@ -56,7 +56,7 @@ describe('KuzzleDataCollection constructor', function () {
 
   it('should set headers using setHeaders', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', 'this is not an index'),
       collection = kuzzle.dataCollectionFactory('foo');
 
     collection.setHeaders({foo: 'bar'}, true);

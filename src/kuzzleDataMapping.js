@@ -112,7 +112,15 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res.mainindex.mappings[self.collection].properties;
+    if (res[self.kuzzle.index]) {
+      if (res[self.kuzzle.index].mappings[self.collection]) {
+        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+      } else {
+        return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
+      }
+    } else {
+      return cb ? cb(new Error('No mapping found for index ' + self.kuzzle.index)) : false;
+    }
 
     if (cb) {
       cb(null, self);
@@ -129,6 +137,7 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
  * Changes made by this function won’t be applied until you call the apply method
  *
  * @param {string} field - Name of the field from which the mapping is to be added or updated
+ * @param {object} mapping - corresponding field mapping
  * @returns {KuzzleDataMapping}
  */
 KuzzleDataMapping.prototype.set = function (field, mapping) {

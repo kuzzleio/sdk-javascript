@@ -45,7 +45,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#advancedSearch', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { hits: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
@@ -119,7 +119,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#count', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { count: 42 };
@@ -184,7 +184,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#create', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { acknowledged: true };
@@ -237,7 +237,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#createDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar', _source: { foo: 'bar' } };
@@ -354,7 +354,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#delete', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { acknowledged: true };
@@ -407,7 +407,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#deleteDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar' };
@@ -481,7 +481,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#fetchDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar', _source: {foo: 'bar'} };
@@ -545,7 +545,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#fetchAllDocuments', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       emitted = false;
     });
 
@@ -585,10 +585,10 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#getMapping', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
-      result = { mainindex: { mappings: { foo: { properties: {}}}} };
+      result = { 'this is not an index': { mappings: { foo: { properties: {}}}} };
       error = null;
       expectedQuery = {
         collection: 'foo',
@@ -598,7 +598,7 @@ describe('KuzzleDataCollection methods', function () {
       };
     });
 
-    it('should send instantiate a new KuzzleDataMapping object', function (done) {
+    it('should instantiate a new KuzzleDataMapping object', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = { queuable: false };
@@ -647,7 +647,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#publishMessage', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar', _source: {foo: 'bar'} };
@@ -685,7 +685,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#putMapping', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _source: { properties: {}}};
@@ -739,7 +739,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#replaceDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar', _source: { foo: 'bar' } };
@@ -800,7 +800,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { roomId: 'foobar' };
@@ -836,7 +836,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#truncate', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { acknowledged: true };
@@ -886,7 +886,7 @@ describe('KuzzleDataCollection methods', function () {
     beforeEach(function () {
       revert = KuzzleDataCollection.__set__('KuzzleDocument', function (collection) { return new KuzzleDocument(collection, 'foo', {}); });
 
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       result = { _id: 'foobar', _source: { foo: 'bar' } };
@@ -951,7 +951,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#factories', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
     });
 
     it('documentFactory should return a new KuzzleDocument object', function () {

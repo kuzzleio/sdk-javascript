@@ -29,7 +29,7 @@ describe('Kuzzle constructor', () => {
       KuzzleRewired.__with__({
         'window': {io:function () { fakeIO = true; return new EventEmitter; }}
       })(function () {
-        kuzzle = new KuzzleRewired('foo');
+        kuzzle = new KuzzleRewired('foo', 'this is not an index');
         should(fakeIO).be.true();
       });
     });
@@ -37,7 +37,7 @@ describe('Kuzzle constructor', () => {
     it('should expose the documented functions', () => {
       var kuzzle;
 
-      kuzzle = new Kuzzle('nowhere');
+      kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
       should.exist(kuzzle.addListener);
       should.exist(kuzzle.dataCollectionFactory);
@@ -57,7 +57,7 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should expose the documented properties', () => {
-      var kuzzle = new Kuzzle('nowhere');
+      var kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
       should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
@@ -75,7 +75,7 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should have properties with the documented default values', () => {
-      var kuzzle = new Kuzzle('nowhere');
+      var kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
       should(kuzzle.autoQueue).be.false();
       should(kuzzle.autoReconnect).be.true();
@@ -87,7 +87,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.be.empty();
       should(kuzzle.replayInterval).be.exactly(10);
       should(kuzzle.reconnectionDelay).be.exactly(1000);
-      should(kuzzle.index).be.exactly('mainindex');
+      should(kuzzle.index).be.exactly('this is not an index');
     });
 
     it('should initialize correctly properties using the "options" argument', () => {
@@ -97,7 +97,6 @@ describe('Kuzzle constructor', () => {
           autoReconnect: false,
           autoReplay: true,
           autoResubscribe: false,
-          index: 'myIndex',
           queueTTL: 123,
           queueMaxSize: 42,
           headers: {foo: 'bar'},
@@ -105,13 +104,13 @@ describe('Kuzzle constructor', () => {
           replayInterval: 99999,
           reconnectionDelay: 666
         },
-        kuzzle = new Kuzzle('nowhere', options);
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', options);
 
       should(kuzzle.autoQueue).be.exactly(options.autoQueue);
       should(kuzzle.autoReconnect).be.exactly(options.autoReconnect);
       should(kuzzle.autoReplay).be.exactly(options.autoReplay);
       should(kuzzle.autoResubscribe).be.exactly(options.autoResubscribe);
-      should(kuzzle.index).be.exactly(options.index);
+      should(kuzzle.index).be.exactly('this is not an index');
       should(kuzzle.queueTTL).be.exactly(options.queueTTL);
       should(kuzzle.queueMaxSize).be.exactly(options.queueMaxSize);
       should(kuzzle.headers).be.an.Object().and.match(options.headers);
@@ -121,7 +120,7 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should handle the offlineMode option properly', () => {
-      var kuzzle = new Kuzzle('nowhere', {offlineMode: 'auto'});
+      var kuzzle = new Kuzzle('nowhere', 'this is not an index', {offlineMode: 'auto'});
 
       should(kuzzle.autoQueue).be.true();
       should(kuzzle.autoReconnect).be.true();
@@ -130,7 +129,7 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should handle the connect option properly', () => {
-      var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+      var kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'});
 
       should(kuzzle.state).be.exactly('ready');
       should(kuzzle.socket).be.null();
@@ -141,7 +140,7 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should return a new instance even if not called with "new"', () => {
-      var kuzzle = Kuzzle('nowhere');
+      var kuzzle = Kuzzle('nowhere', 'this is not an index');
 
       kuzzle.should.be.instanceof(Kuzzle);
     });
@@ -149,7 +148,7 @@ describe('Kuzzle constructor', () => {
     it('should allow passing a callback and respond once initialized', function (done) {
       this.timeout(500);
 
-      new Kuzzle('nowhere', () => {
+      new Kuzzle('nowhere', 'this is not an index', () => {
         try {
           kuzzle.isValid();
           done('Error: the kuzzle object should have been invalidated');
@@ -164,7 +163,7 @@ describe('Kuzzle constructor', () => {
       var kuzzle;
 
       Kuzzle.prototype.bluebird = bluebird;
-      kuzzle = new Kuzzle('nowhere');
+      kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
       should.not.exist(kuzzle.addListenerPromise);
       should.not.exist(kuzzle.connectPromise);
@@ -194,6 +193,16 @@ describe('Kuzzle constructor', () => {
       }
     });
 
+    it('should throw an error if no index is provied', () => {
+      try {
+        new Kuzzle('foo');
+        should.fail('success', 'failure', 'Constructor should fail with no Index provided', '');
+      }
+      catch (e) {
+
+      }
+    });
+
     describe('#connect', function () {
       var iostub = function () {
         var emitter = new EventEmitter;
@@ -216,7 +225,7 @@ describe('Kuzzle constructor', () => {
           }
         });
 
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'}, (err, res) => {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.state).be.exactly('connected');
@@ -238,7 +247,7 @@ describe('Kuzzle constructor', () => {
           }
         });
 
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'}, (err, res) => {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.state).be.exactly('reconnecting');
@@ -251,7 +260,7 @@ describe('Kuzzle constructor', () => {
 
       it('should try to connect when the instance is in a not-connected state', function () {
         ['initializing', 'ready', 'loggedOff', 'error', 'offline'].forEach(state => {
-          var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+          var kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'});
 
           kuzzle.state = state;
           should(kuzzle.connect()).be.exactly(kuzzle);
@@ -262,7 +271,7 @@ describe('Kuzzle constructor', () => {
 
       it('should registered listeners upon receiving a connect event', function (done) {
         var
-          kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
+          kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'}),
           listenerCalled = false;
 
         kuzzle.state = 'initializing';
@@ -292,7 +301,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(50);
 
-          kuzzle = new Kuzzle('nowhere', function (err, res) {
+          kuzzle = new Kuzzle('nowhere', 'this is not an index', function (err, res) {
             try {
               should(err).be.exactly('error');
               should(res).be.undefined();
@@ -307,7 +316,7 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should registered listeners upon receiving a error event', function (done) {
-          var kuzzle = new Kuzzle('nowhere');
+          var kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
           kuzzle.addListener('error', function () { listenerCalled = true; });
 
@@ -329,7 +338,7 @@ describe('Kuzzle constructor', () => {
           var kuzzle;
           this.timeout(50);
 
-          kuzzle = new Kuzzle('nowhere', function (err, res) {
+          kuzzle = new Kuzzle('nowhere', 'this is not an index', function (err, res) {
             try {
               should(err).be.null();
               should(res).be.instanceof(Kuzzle);
@@ -350,7 +359,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(50);
 
-          kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
+          kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual', autoResubscribe: false});
           kuzzle.subscriptions['foo'] = {
             bar: {
               renew: function () { renewed = true; }
@@ -376,7 +385,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(500);
 
-          kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false}, () => {
+          kuzzle = new KuzzleRewired('nowhere', 'this is not an index', {connect: 'manual', autoReplay: false, autoQueue: false}, () => {
             should(kuzzle.state).be.exactly('connected');
             should(dequeued).be.true();
             kuzzle.socket.removeAllListeners();
@@ -411,7 +420,7 @@ describe('Kuzzle constructor', () => {
 
         it('should enter offline mode and call listeners', function (done) {
           var
-            kuzzle = new Kuzzle('nowhere'),
+            kuzzle = new Kuzzle('nowhere', 'this is not an index'),
             listenerCalled = false;
 
           this.timeout(200);
@@ -434,7 +443,7 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should enable queuing if autoQueue is set to true', function (done) {
-          var kuzzle = new Kuzzle('nowhere', {autoQueue: true});
+          var kuzzle = new Kuzzle('nowhere', 'this is not an index', {autoQueue: true});
           this.timeout(200);
 
           setTimeout(() => {
@@ -452,7 +461,7 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should invalidated the instance if autoReconnect is set to false', function (done) {
-          var kuzzle = new Kuzzle('nowhere', {autoReconnect: false});
+          var kuzzle = new Kuzzle('nowhere', 'this is not an index', {autoReconnect: false});
 
           this.timeout(200);
 
@@ -487,7 +496,7 @@ describe('Kuzzle constructor', () => {
 
         it('should exit offline mode when reconnecting', function (done) {
           var
-            kuzzle = new Kuzzle('nowhere'),
+            kuzzle = new Kuzzle('nowhere', 'this is not an index'),
             listenersCalled = false;
 
           this.timeout(200);
@@ -513,7 +522,7 @@ describe('Kuzzle constructor', () => {
 
         it('should renew subscriptions automatically when exiting offline mode', function (done) {
           var
-            kuzzle = new Kuzzle('nowhere'),
+            kuzzle = new Kuzzle('nowhere', 'this is not an index'),
             renewCalled = false,
             stubKuzzleRoom = {
               callback: function () { renewCalled = true; },
@@ -540,7 +549,7 @@ describe('Kuzzle constructor', () => {
 
         it('should not renew subscriptions if autoResubscribe is set to false', function (done) {
           var
-            kuzzle = new Kuzzle('nowhere', {autoResubscribe: false}),
+            kuzzle = new Kuzzle('nowhere', 'this is not an index', {autoResubscribe: false}),
             renewCalled = false,
             stubKuzzleRoom = {
               callback: function () { renewCalled = true; },
@@ -569,7 +578,7 @@ describe('Kuzzle constructor', () => {
 
         it('should replay pending requests automatically if autoReplay is set to true', function (done) {
           var
-            kuzzle = new Kuzzle('nowhere', {autoReplay: true});
+            kuzzle = new Kuzzle('nowhere', 'this is not an index', {autoReplay: true});
 
           this.timeout(200);
 

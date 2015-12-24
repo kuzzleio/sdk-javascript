@@ -50,7 +50,7 @@ describe('KuzzleRoom methods', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -114,7 +114,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       dequeued = false;
       revert = KuzzleRoom.__set__('dequeue', function () { dequeued = true; });
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
@@ -184,7 +184,7 @@ describe('KuzzleRoom methods', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
     });
@@ -201,7 +201,7 @@ describe('KuzzleRoom methods', function () {
       socketOff;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       kuzzle.socket = {
         off: function () { socketOff = true; }
@@ -286,7 +286,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       var stub = function () { dequeued++; };
 
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.count = stub;
@@ -319,7 +319,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       called = false;
       error = result = undefined;
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.callback = function (err, res) { called = true; error = err; result = res; };

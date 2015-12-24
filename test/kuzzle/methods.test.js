@@ -33,7 +33,7 @@ describe('Kuzzle methods', function () {
 
   describe('#getAllStatistics', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
@@ -79,7 +79,7 @@ describe('Kuzzle methods', function () {
 
   describe('#getStatistics', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
@@ -158,7 +158,7 @@ describe('Kuzzle methods', function () {
 
   describe('#dataCollectionFactory', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
@@ -181,7 +181,7 @@ describe('Kuzzle methods', function () {
 
   describe('#listCollections', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
@@ -235,7 +235,7 @@ describe('Kuzzle methods', function () {
 
   describe('#logout', function () {
     it('should clean up and invalidate the instance if called', function () {
-      var kuzzle = new Kuzzle('foo');
+      var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
       kuzzle.logout();
@@ -248,7 +248,7 @@ describe('Kuzzle methods', function () {
 
   describe('#now', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
@@ -295,7 +295,7 @@ describe('Kuzzle methods', function () {
 
   describe('#setHeaders', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', 'this is not an index');
     });
 
     it('should throw an error if an invalid content object is provided', function () {

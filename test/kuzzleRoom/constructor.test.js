@@ -12,7 +12,7 @@ describe('KuzzleRoom constructor', function () {
 
   before(function () {
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('nowhere');
+    kuzzle = new Kuzzle('nowhere', 'this is not an index');
 
     kuzzle.headers = {foo: 'bar'};
     dataCollection = kuzzle.dataCollectionFactory('foo');

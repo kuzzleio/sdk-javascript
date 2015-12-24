@@ -13,15 +13,16 @@ var
 /**
  * Kuzzle object constructor.
  * @param url - URL to the Kuzzle instance
+ * @param index - Database index
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (url, options, cb) {
+module.exports = Kuzzle = function (url, index, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, options, cb);
+    return new Kuzzle(url, index, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -30,7 +31,11 @@ module.exports = Kuzzle = function (url, options, cb) {
   }
 
   if (!url || url === '') {
-    throw new Error('URL to Kuzzle can\'t be empty');
+    throw new Error('URL argument missing');
+  }
+
+  if (!index || index === '') {
+    throw new Error('Index argument missing');
   }
 
   Object.defineProperties(this, {
@@ -94,7 +99,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       enumerable: true
     },
     index: {
-      value: (options && typeof options.index === 'string') ? options.index : 'mainindex',
+      value: index,
       enumerable: true
     },
     reconnectionDelay: {
