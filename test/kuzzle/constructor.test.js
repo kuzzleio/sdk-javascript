@@ -616,7 +616,7 @@ describe('Kuzzle constructor', () => {
         Kuzzle = rewire(kuzzleSource);
 
         kuzzle = new Kuzzle('nowhere', 'this is not an index', {
-          connect: 'manual',
+          connect: 'manual'
         });
 
         kuzzle.queuing = true;
@@ -624,7 +624,6 @@ describe('Kuzzle constructor', () => {
         kuzzle.login('local', loginCredentials);
 
         should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 30);
         should(kuzzle.offlineQueue[0].query.action).be.exactly('login');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
         should(kuzzle.offlineQueue[0].query.username).be.exactly('foo');
