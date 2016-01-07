@@ -1,7 +1,7 @@
 var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection');
-/*eslint no-console: 0*/
+
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
