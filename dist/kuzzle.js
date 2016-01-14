@@ -643,7 +643,10 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
     }
   });
 
-  if (typeof expiresIn === 'number') {
+  if (
+    typeof expiresIn === 'number' ||
+    typeof expiresIn === 'string'
+  ) {
     request.expiresIn = expiresIn;
   }
   request.strategy = strategy;
@@ -664,7 +667,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
     }
   });
 
-  return this;
+  return self;
 };
 
 Kuzzle.prototype.logout = function (cb) {
@@ -682,7 +685,7 @@ Kuzzle.prototype.logout = function (cb) {
       self.jwtToken = undefined;
 
       if (typeof cb === 'function') {
-        cb(null, response);
+        cb(null, self);
       }
     }
     else if (typeof cb === 'function') {
@@ -690,7 +693,7 @@ Kuzzle.prototype.logout = function (cb) {
     }
   });
 
-  return this;
+  return self;
 };
 
 /**
