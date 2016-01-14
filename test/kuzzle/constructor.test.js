@@ -852,7 +852,6 @@ describe('Kuzzle constructor', () => {
       it('should be able to send a login request', function () {
         var
           kuzzle,
-          now = Date.now(),
           loginCredentials = {username: 'foo', password: 'bar'};
 
         this.timeout(200);
