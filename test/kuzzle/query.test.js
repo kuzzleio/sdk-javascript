@@ -50,7 +50,7 @@ describe('Query management', function () {
       var response = {result: 'foo', error: 'bar'},
         cb = function (err, res) {
           should(err).be.exactly(response.error);
-          should(res).be.exactly(response.result);
+          should(res).be.exactly(response);
           done();
         };
 

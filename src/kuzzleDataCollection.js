@@ -84,11 +84,11 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
       return cb(error);
     }
 
-    result.hits.hits.forEach(function (doc) {
+    result.result.hits.forEach(function (doc) {
       documents.push(self.documentFactory(doc._id, doc));
     });
 
-    cb(null, { total: result.hits.total, documents: documents });
+    cb(null, { total: result.result.total, documents: documents });
   });
 
   return this;
@@ -123,7 +123,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
       return cb(error);
     }
 
-    cb(null, result.count);
+    cb(null, result.result.count);
   });
 
   return this;
@@ -209,7 +209,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
     this.kuzzle.query(this.collection, 'write', action, data, options);
@@ -282,9 +282,9 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
       }
 
       if (action === 'delete') {
-        cb(null, [data._id]);
+        cb(null, [res.result._id]);
       } else {
-        cb(null, res.ids);
+        cb(null, res.result.ids);
       }
     });
   } else {
@@ -320,7 +320,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
       return cb(err);
     }
 
-    cb(null, self.documentFactory(res._id, res));
+    cb(null, self.documentFactory(res.result._id, res.result));
   });
 
   return this;
@@ -390,7 +390,6 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
     data.body = document;
   }
 
-  data.persist = false;
   data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'publish', data, options);
 
@@ -454,7 +453,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
@@ -545,8 +544,8 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
         return cb(err);
       }
 
-      doc = new KuzzleDocument(self, res._id);
-      cb(null, doc);
+      doc = new KuzzleDocument(self, res.result._id);
+      doc.refresh(cb);
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'update', data, options);
@@ -566,6 +565,10 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
  */
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
+
+  if (content._version && content._source) {
+    document.version = content._version;
+  }
 
   return document;
 };

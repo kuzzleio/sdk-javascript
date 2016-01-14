@@ -4,53 +4,74 @@
 //     Copyright (c) 2010-2012 Robert Kieffer
 //     MIT License - http://opensource.org/licenses/mit-license.php
 
-(function() {
-  var _global = this;
+/*global window, require, define */
+(function(_window) {
+  'use strict';
 
   // Unique ID creation requires a high quality random # generator.  We feature
   // detect to determine the best RNG source, normalizing to a function that
   // returns 128-bits of randomness, since that's what's usually required
-  var _rng;
+  var _rng, _mathRNG, _nodeRNG, _whatwgRNG, _previousRoot;
 
-  // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
-  //
-  // Moderately fast, high quality
-  if (typeof(_global.require) == 'function') {
-    try {
-      var _rb = _global.require('crypto').randomBytes;
-      _rng = _rb && function() {return _rb(16);};
-    } catch(e) {}
+  function setupBrowser() {
+    // Allow for MSIE11 msCrypto
+    var _crypto = _window.crypto || _window.msCrypto;
+
+    if (!_rng && _crypto && _crypto.getRandomValues) {
+      // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+      //
+      // Moderately fast, high quality
+      try {
+        var _rnds8 = new Uint8Array(16);
+        _whatwgRNG = _rng = function whatwgRNG() {
+          _crypto.getRandomValues(_rnds8);
+          return _rnds8;
+        };
+        _rng();
+      } catch(e) {}
+    }
+
+    if (!_rng) {
+      // Math.random()-based (RNG)
+      //
+      // If all else fails, use Math.random().  It's fast, but is of unspecified
+      // quality.
+      var  _rnds = new Array(16);
+      _mathRNG = _rng = function() {
+        for (var i = 0, r; i < 16; i++) {
+          if ((i & 0x03) === 0) { r = Math.random() * 0x100000000; }
+          _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+        }
+
+        return _rnds;
+      };
+      if ('undefined' !== typeof console && console.warn) {
+        console.warn("[SECURITY] node-uuid: crypto not usable, falling back to insecure Math.random()");
+      }
+    }
   }
 
-  if (!_rng && _global.crypto && crypto.getRandomValues) {
-    // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+  function setupNode() {
+    // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
     //
     // Moderately fast, high quality
-    var _rnds8 = new Uint8Array(16);
-    _rng = function whatwgRNG() {
-      crypto.getRandomValues(_rnds8);
-      return _rnds8;
-    };
+    if ('function' === typeof require) {
+      try {
+        var _rb = require('crypto').randomBytes;
+        _nodeRNG = _rng = _rb && function() {return _rb(16);};
+        _rng();
+      } catch(e) {}
+    }
   }
 
-  if (!_rng) {
-    // Math.random()-based (RNG)
-    //
-    // If all else fails, use Math.random().  It's fast, but is of unspecified
-    // quality.
-    var  _rnds = new Array(16);
-    _rng = function() {
-      for (var i = 0, r; i < 16; i++) {
-        if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-        _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-      }
-
-      return _rnds;
-    };
+  if (_window) {
+    setupBrowser();
+  } else {
+    setupNode();
   }
 
   // Buffer class to use
-  var BufferClass = typeof(_global.Buffer) == 'function' ? _global.Buffer : Array;
+  var BufferClass = ('function' === typeof Buffer) ? Buffer : Array;
 
   // Maps for number <-> hex string conversion
   var _byteToHex = [];
@@ -119,17 +140,17 @@
 
     options = options || {};
 
-    var clockseq = options.clockseq != null ? options.clockseq : _clockseq;
+    var clockseq = (options.clockseq != null) ? options.clockseq : _clockseq;
 
     // UUID timestamps are 100 nano-second units since the Gregorian epoch,
     // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
     // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
     // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-    var msecs = options.msecs != null ? options.msecs : new Date().getTime();
+    var msecs = (options.msecs != null) ? options.msecs : new Date().getTime();
 
     // Per 4.2.1.2, use count of uuid's generated during the current clock
     // cycle to simulate higher resolution clock
-    var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
+    var nsecs = (options.nsecs != null) ? options.nsecs : _lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
     var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
@@ -195,8 +216,8 @@
     // Deprecated - 'format' argument, as supported in v1.2
     var i = buf && offset || 0;
 
-    if (typeof(options) == 'string') {
-      buf = options == 'binary' ? new BufferClass(16) : null;
+    if (typeof(options) === 'string') {
+      buf = (options === 'binary') ? new BufferClass(16) : null;
       options = null;
     }
     options = options || {};
@@ -224,28 +245,32 @@
   uuid.parse = parse;
   uuid.unparse = unparse;
   uuid.BufferClass = BufferClass;
+  uuid._rng = _rng;
+  uuid._mathRNG = _mathRNG;
+  uuid._nodeRNG = _nodeRNG;
+  uuid._whatwgRNG = _whatwgRNG;
 
-  if (typeof(module) != 'undefined' && module.exports) {
+  if (('undefined' !== typeof module) && module.exports) {
     // Publish as node.js module
     module.exports = uuid;
-  } else  if (typeof define === 'function' && define.amd) {
+  } else if (typeof define === 'function' && define.amd) {
     // Publish as AMD module
     define(function() {return uuid;});
- 
+
 
   } else {
     // Publish as global (in browsers)
-    var _previousRoot = _global.uuid;
+    _previousRoot = _window.uuid;
 
     // **`noConflict()` - (browser only) to reset global 'uuid' var**
     uuid.noConflict = function() {
-      _global.uuid = _previousRoot;
+      _window.uuid = _previousRoot;
       return uuid;
     };
 
-    _global.uuid = uuid;
+    _window.uuid = uuid;
   }
-}).call(this);
+})('undefined' !== typeof window ? window : null);
 
 },{}],2:[function(require,module,exports){
 var
@@ -636,7 +661,7 @@ function emitRequest (request, cb) {
 
   if (cb) {
     self.socket.once(request.requestId, function (response) {
-      cb(response.error, response.result);
+      cb(response.error, response);
     });
   }
 
@@ -725,7 +750,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
       return cb(err);
     }
 
-    cb(null, res.statistics);
+    cb(null, res.result.hits);
   });
 
   return this;
@@ -766,9 +791,9 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
     }
 
     if (timestamp) {
-      cb(null, res.statistics);
+      cb(null, res.result.hits);
     } else {
-      cb(null, [res.statistics]);
+      cb(null, [res.result]);
     }
   };
 
@@ -835,7 +860,7 @@ Kuzzle.prototype.listCollections = function (options, cb) {
       return cb(err);
     }
 
-    return cb(null, res.collections);
+    return cb(null, res.result.collections);
   });
 
   return this;
@@ -878,7 +903,7 @@ Kuzzle.prototype.now = function (options, cb) {
       return cb(err);
     }
 
-    cb(null, res.now);
+    cb(null, res.result.now);
   });
 
   return this;
@@ -1163,11 +1188,11 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
       return cb(error);
     }
 
-    result.hits.hits.forEach(function (doc) {
+    result.result.hits.forEach(function (doc) {
       documents.push(self.documentFactory(doc._id, doc));
     });
 
-    cb(null, { total: result.hits.total, documents: documents });
+    cb(null, { total: result.result.total, documents: documents });
   });
 
   return this;
@@ -1202,7 +1227,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
       return cb(error);
     }
 
-    cb(null, result.count);
+    cb(null, result.result.count);
   });
 
   return this;
@@ -1288,7 +1313,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
     this.kuzzle.query(this.collection, 'write', action, data, options);
@@ -1361,9 +1386,9 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
       }
 
       if (action === 'delete') {
-        cb(null, [data._id]);
+        cb(null, [res.result._id]);
       } else {
-        cb(null, res.ids);
+        cb(null, res.result.ids);
       }
     });
   } else {
@@ -1399,7 +1424,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
       return cb(err);
     }
 
-    cb(null, self.documentFactory(res._id, res));
+    cb(null, self.documentFactory(res.result._id, res.result));
   });
 
   return this;
@@ -1469,7 +1494,6 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
     data.body = document;
   }
 
-  data.persist = false;
   data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.collection, 'write', 'publish', data, options);
 
@@ -1533,7 +1557,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
@@ -1624,8 +1648,8 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
         return cb(err);
       }
 
-      doc = new KuzzleDocument(self, res._id);
-      cb(null, doc);
+      doc = new KuzzleDocument(self, res.result._id);
+      doc.refresh(cb);
     });
   } else {
     self.kuzzle.query(this.collection, 'write', 'update', data, options);
@@ -1645,6 +1669,10 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
  */
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
+
+  if (content._version && content._source) {
+    document.version = content._version;
+  }
 
   return document;
 };
@@ -1763,16 +1791,12 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res._source.properties;
-
-    if (cb) {
-      cb(null, self);
-    }
+    self.refresh(options, cb);
   });
 
   return this;
@@ -1802,9 +1826,9 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    if (res[self.kuzzle.index]) {
-      if (res[self.kuzzle.index].mappings[self.collection]) {
-        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+    if (res.result[self.kuzzle.index]) {
+      if (res.result[self.kuzzle.index].mappings[self.collection]) {
+        self.mapping = res.result[self.kuzzle.index].mappings[self.collection].properties;
       } else {
         return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
       }
@@ -1942,10 +1966,6 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: documentId,
       enumerable: true
     });
-
-    if (!content) {
-      this.refresh();
-    }
   }
 
   // promisifying
@@ -2060,16 +2080,15 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
   }
 
   self.refreshing = true;
-
-  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, result) {
+  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, res) {
     if (error) {
       self.refreshing = false;
       self.queue = [];
       return cb ? cb(error) : false;
     }
 
-    self.version = result._version;
-    self.content = result._source;
+    self.version = res.result._version;
+    self.content = res.result._source;
 
     if (cb) {
       cb(null, self);
@@ -2114,13 +2133,13 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, result) {
+  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
 
-    self.id = result._id;
-    self.version = result._version;
+    self.id = res.result._id;
+    self.version = res.result._version;
 
     if (cb) {
       cb(null, self);
@@ -2147,8 +2166,6 @@ KuzzleDocument.prototype.publish = function (options) {
     this.queue.push({action: 'publish', args: [options]});
     return this;
   }
-
-  data.persist = false;
 
   this.kuzzle.query(this.collection, 'write', 'publish', data, options);
 
@@ -2370,7 +2387,7 @@ KuzzleRoom.prototype.count = function (cb) {
       return cb(err);
     }
 
-    cb(null, res.count);
+    cb(null, res.result.count);
   });
 
   return this;
@@ -2395,6 +2412,17 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     cb = filters;
     filters = null;
   }
+
+  /*
+   if not yet connected, register itself to the subscriptions list and wait for the
+   main Kuzzle object to renew once online
+    */
+  if (this.kuzzle.state !== 'connected') {
+    this.callback = cb;
+    this.kuzzle.subscriptions.pending[self.id] = self;
+    return this;
+  }
+
 
   if (this.subscribing) {
     this.queue.push({action: 'renew', args: [filters, cb]});
@@ -2425,8 +2453,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
-    self.roomId = response.roomId;
-    self.channel = response.channel;
+    self.roomId = response.result.roomId;
+    self.channel = response.result.channel;
 
     if (!self.kuzzle.subscriptions[self.roomId]) {
       self.kuzzle.subscriptions[self.roomId] = {};
@@ -2517,13 +2545,13 @@ function notificationCallback (data) {
     return this.callback(data.error);
   }
 
-  if (this.kuzzle.requestHistory[data.result.requestId]) {
+  if (this.kuzzle.requestHistory[data.requestId]) {
     if (this.subscribeToSelf) {
-      this.callback(null, data.result);
+      this.callback(null, data);
     }
-    delete this.kuzzle.requestHistory[data.result.requestId];
+    delete this.kuzzle.requestHistory[data.requestId];
   } else {
-    this.callback(null, data.result);
+    this.callback(null, data);
   }
 }
 

@@ -386,7 +386,7 @@ function emitRequest (request, cb) {
 
   if (cb) {
     self.socket.once(request.requestId, function (response) {
-      cb(response.error, response.result);
+      cb(response.error, response);
     });
   }
 
@@ -475,7 +475,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
       return cb(err);
     }
 
-    cb(null, res.statistics);
+    cb(null, res.result.hits);
   });
 
   return this;
@@ -516,9 +516,9 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
     }
 
     if (timestamp) {
-      cb(null, res.statistics);
+      cb(null, res.result.hits);
     } else {
-      cb(null, [res.statistics]);
+      cb(null, [res.result]);
     }
   };
 
@@ -585,7 +585,7 @@ Kuzzle.prototype.listCollections = function (options, cb) {
       return cb(err);
     }
 
-    return cb(null, res.collections);
+    return cb(null, res.result.collections);
   });
 
   return this;
@@ -628,7 +628,7 @@ Kuzzle.prototype.now = function (options, cb) {
       return cb(err);
     }
 
-    cb(null, res.now);
+    cb(null, res.result.now);
   });
 
   return this;

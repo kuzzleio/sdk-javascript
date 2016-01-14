@@ -73,16 +73,12 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
+  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res._source.properties;
-
-    if (cb) {
-      cb(null, self);
-    }
+    self.refresh(options, cb);
   });
 
   return this;
@@ -112,9 +108,9 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    if (res[self.kuzzle.index]) {
-      if (res[self.kuzzle.index].mappings[self.collection]) {
-        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+    if (res.result[self.kuzzle.index]) {
+      if (res.result[self.kuzzle.index].mappings[self.collection]) {
+        self.mapping = res.result[self.kuzzle.index].mappings[self.collection].properties;
       } else {
         return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
       }

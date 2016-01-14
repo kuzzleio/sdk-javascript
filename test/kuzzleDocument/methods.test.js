@@ -190,7 +190,7 @@ describe('KuzzleDocument methods', function () {
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { _version: 42, _source: {some: 'content'}};
+      result = { result: {_id: 'foo', _version: 42, _source: {some: 'content'}}};
       error = null;
       expectedQuery = {
         collection: 'foo',
@@ -286,6 +286,7 @@ describe('KuzzleDocument methods', function () {
         revert = KuzzleDocument.__set__('dequeue', function () { dequeued = true; }),
         document = new KuzzleDocument(dataCollection, 'foo');
 
+      document.refresh();
       should(emitted).be.true();
       should(document.refreshing).be.false();
       should(dequeued).be.true();
@@ -301,6 +302,7 @@ describe('KuzzleDocument methods', function () {
 
       error = 'foobar';
       document = new KuzzleDocument(dataCollection, 'foo');
+      document.refresh();
       should(emitted).be.true();
       should(document.refreshing).be.false();
       should(dequeued).be.false();
@@ -314,7 +316,7 @@ describe('KuzzleDocument methods', function () {
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { _id: 'foo', _version: 42};
+      result = {result: { _id: 'foo', _version: 42}};
       error = null;
       expectedQuery = {
         collection: 'foo',
@@ -479,15 +481,16 @@ describe('KuzzleDocument methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
+      kuzzle.state = 'connected';
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = {};
+      result = { result: {roomId: 'foo', channel: 'bar'}};
       error = null;
       expectedQuery = {
         collection: 'foo',
         action: 'on',
         controller: 'subscribe',
-        body: {ids: {values: ['foo']}}
+        body: {}
       };
     });
 

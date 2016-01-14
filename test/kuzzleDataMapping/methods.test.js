@@ -48,24 +48,31 @@ describe('KuzzleDataMapping methods', function () {
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { _source: { properties: { foo: {type: 'date'}}}};
+      result = { result: {_source: { properties: { foo: {type: 'date'}}}}};
       error = null;
       expectedQuery = {
         collection: 'foo',
         action: 'putMapping',
         controller: 'admin',
-        body: result._source
+        body: result.result._source
       };
     });
 
     it('should call the right putMapping query when invoked', function (done) {
-      var mapping = new KuzzleDataMapping(dataCollection, result._source.properties);
+      var
+        refreshed = false,
+        mapping = new KuzzleDataMapping(dataCollection, result.result._source.properties);
 
       this.timeout(50);
       expectedQuery.options = { queuable: false};
+      mapping.refresh = function (options, cb) {
+        refreshed = true;
+        cb(null, mapping);
+      };
 
       should(mapping.apply(expectedQuery.options, function (err, res) {
         should(emitted).be.true();
+        should(refreshed).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);
         done();
@@ -73,26 +80,43 @@ describe('KuzzleDataMapping methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var mapping = new KuzzleDataMapping(dataCollection, result._source.properties);
+      var
+        refreshed = false,
+        mapping = new KuzzleDataMapping(dataCollection, result.result._source.properties);
+
+      mapping.refresh = function (options, cb) {
+        refreshed = true;
+
+        if (cb) {
+          cb(null, mapping);
+        }
+      };
 
       mapping.apply();
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
+      refreshed = false;
       mapping.apply({});
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
+      refreshed = false;
       mapping.apply(function () {});
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
+      refreshed = false;
       mapping.apply({}, function () {});
       should(emitted).be.true();
+      should(refreshed).be.true();
     });
 
     it('should invoke the callback with an error if one occurs', function (done) {
-      var mapping = new KuzzleDataMapping(dataCollection, result._source.properties);
+      var mapping = new KuzzleDataMapping(dataCollection, result.result._source.properties);
 
       this.timeout(50);
       error = 'foobar';
@@ -116,7 +140,7 @@ describe('KuzzleDataMapping methods', function () {
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}};
+      result = { result: {bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
       error = null;
       expectedQuery = {
         collection: 'foo',
@@ -136,7 +160,7 @@ describe('KuzzleDataMapping methods', function () {
         should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);
-        should(res.mapping).match(result[kuzzle.index].mappings.foo.properties);
+        should(res.mapping).match(result.result[kuzzle.index].mappings.foo.properties);
         done();
       })).be.exactly(mapping);
     });
@@ -181,7 +205,7 @@ describe('KuzzleDataMapping methods', function () {
     it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
       var mapping = new KuzzleDataMapping(dataCollection);
 
-      result = { foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}};
+      result = { result: {foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
 
       mapping.refresh((err, res) => {
         should(emitted).be.true();
@@ -195,7 +219,7 @@ describe('KuzzleDataMapping methods', function () {
     it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
       var mapping = new KuzzleDataMapping(dataCollection);
 
-      result = { bar: { mappings: { foobar: { properties: { foo: {type: 'date'}}}}}};
+      result = { result: {bar: { mappings: { foobar: { properties: { foo: {type: 'date'}}}}}}};
 
       mapping.refresh((err, res) => {
         should(emitted).be.true();

@@ -38,7 +38,7 @@ describe('Kuzzle methods', function () {
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {statistics: {}};
+      result = {result: {hits: []}};
       expectedQuery = {
         controller: 'admin',
         action: 'getAllStats'
@@ -84,7 +84,7 @@ describe('Kuzzle methods', function () {
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {statistics: {}};
+      result = {result: {hits: []}};
       expectedQuery = {
         controller: 'admin',
         action: 'getLastStats'
@@ -111,10 +111,12 @@ describe('Kuzzle methods', function () {
       };
 
       result = {
-        statistics: {
-          123: {},
-          456: {},
-          789: {}
+        result: {
+          hits: [
+            {123: {}},
+            {456: {}},
+            {789: {}}
+          ]
         }
       };
 
@@ -186,7 +188,7 @@ describe('Kuzzle methods', function () {
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {collections: []};
+      result = {result: {collections: {stored: [], realtime: []}}};
       expectedQuery = {
         controller: 'read',
         action: 'listCollections',
@@ -207,11 +209,11 @@ describe('Kuzzle methods', function () {
 
     it('should call query with the right arguments', function (done) {
       this.timeout(50);
-      result = { collections: ['foo', 'bar', 'baz', 'qux'] };
+      result = { result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux'] } } };
 
       kuzzle.listCollections(function (err, res) {
         should(err).be.null();
-        should(res).be.an.Array().and.match(result.collections);
+        should(res).be.an.Object().and.match(result.result.collections);
         done();
       });
     });
@@ -253,7 +255,7 @@ describe('Kuzzle methods', function () {
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {now: Date.now()};
+      result = {result: {now: Date.now()}};
       expectedQuery = {
         controller: 'read',
         action: 'now'
@@ -276,7 +278,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.now(function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.now);
+        should(res).be.exactly(result.result.now);
         done();
       });
     });
