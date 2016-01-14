@@ -605,6 +605,65 @@ describe('Kuzzle constructor', () => {
       });
     });
     describe("#login", () => {
+      var
+        emmited = false,
+        loginStub = function(strategy, credentials, expiresIn) {
+          emmited = true
+        },
+        iostub = function () {
+          var emitter = new EventEmitter;
+          process.nextTick(() => emitter.emit('connect'));
+          return emitter;
+        };
+
+      beforeEach(function () {
+        Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
+      });
+
+
+      it('should login after a connection when loginCredentials & loginStrategy are set', function(done) {
+        Kuzzle = proxyquire(kuzzleSource, {
+          'socket.io-client': function () {
+            var emitter = new EventEmitter;
+
+            /*
+             since we're stubbing the socket.io socket object,
+             we need a stubbed 'close' function to make kuzzle.logout() work
+             */
+            emitter.close = function () {
+              return false;
+            };
+            process.nextTick(() => emitter.emit('connect'));
+            return emitter;
+          }
+        });
+
+        var kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual',
+          loginStrategy: 'local',
+          loginCredentials: {
+            username: 'foo',
+            password: 'bar'
+          }
+        });
+
+        this.timeout(200);
+
+        kuzzle.login = loginStub;
+
+        kuzzle.connect();
+
+        setTimeout(() => {
+          try {
+            should(emmited).be.exactly(true);
+            done();
+          }
+          catch (e) {
+            done(e);
+          }
+        }, 10);
+      });
+
       it('should be able to send a login request', function () {
         var
           kuzzle,
@@ -648,8 +707,6 @@ describe('Kuzzle constructor', () => {
         kuzzle.jwtToken = 'fake-token';
 
         kuzzle.query('collection', 'controller', 'action', {});
-
-        console.log(kuzzle.offlineQueue);
 
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 30);

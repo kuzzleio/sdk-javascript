@@ -303,15 +303,24 @@ Kuzzle.prototype.connect = function () {
     dequeue.call(self);
 
     if (self.loginStrategy) {
-      self.login(self.loginStrategy, self.loginCredentials, self.loginExpiresIn);
+      self.login(self.loginStrategy, self.loginCredentials, self.loginExpiresIn, function(error) {
+        self.eventListeners.connected.forEach(function (listener) {
+          listener.fn(error);
+        });
+
+        if (self.connectCB) {
+          self.connectCB(error, self);
+        }
+      });
     }
+    else {
+      self.eventListeners.connected.forEach(function (listener) {
+        listener.fn();
+      });
 
-    self.eventListeners.connected.forEach(function (listener) {
-      listener.fn();
-    });
-
-    if (self.connectCB) {
-      self.connectCB(null, self);
+      if (self.connectCB) {
+        self.connectCB(null, self);
+      }
     }
   });
 
@@ -373,7 +382,7 @@ Kuzzle.prototype.connect = function () {
 };
 
 
-Kuzzle.prototype.login = function (strategy, credentials, expiresIn) {
+Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   var
     self = this,
     request = {};
@@ -387,18 +396,28 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn) {
   if (typeof expiresIn === 'number') {
     request.expiresIn = expiresIn;
   }
+  request.strategy = strategy;
 
   this.query(null, 'auth', 'login', request, {}, function(error, response) {
     if (error === null) {
       self.jwtToken = response.jwt;
+
+      if (typeof cb === 'function') {
+        cb(null, self);
+      }
+    }
+    else if (typeof cb === 'function') {
+      cb(error);
     }
     else {
       throw new Error(error.message);
     }
   });
+
+  return this;
 };
 
-Kuzzle.prototype.logout = function () {
+Kuzzle.prototype.logout = function (cb) {
   var
     self = this,
     request = {
@@ -411,11 +430,17 @@ Kuzzle.prototype.logout = function () {
   this.query(null, 'auth', 'logout', request, {}, function(error) {
     if (error === null) {
       self.jwtToken = undefined;
+
+      if (typeof cb === 'function') {
+        cb(null, response);
+      }
     }
-    else {
-      throw new Error(error.message);
+    else if (typeof cb === 'function') {
+      cb(error);
     }
   });
+
+  return this;
 };
 
 /**
