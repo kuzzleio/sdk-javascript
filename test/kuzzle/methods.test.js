@@ -164,7 +164,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
-      kuzzle.logout();
+      kuzzle.disconnect();
       should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
     });
 
@@ -235,12 +235,12 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#logout', function () {
+  describe('#disconnect', function () {
     it('should clean up and invalidate the instance if called', function () {
       var kuzzle = new Kuzzle('foo', 'this is not an index');
 
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
-      kuzzle.logout();
+      kuzzle.disconnect();
 
       should(kuzzle.socket).be.null();
       should(kuzzle.collections).be.empty();

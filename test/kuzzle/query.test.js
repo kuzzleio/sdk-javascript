@@ -46,6 +46,36 @@ describe('Query management', function () {
       emitRequest.call(kuzzle, {requestId: 'bar'});
     });
 
+    it('should emit the request when asked to', function (done) {
+      var listenerJwtTokenExpired = false;
+
+      Kuzzle = proxyquire(kuzzleSource, {
+        'socket.io-client': function () {
+          var emitter = new EventEmitter;
+          process.nextTick(() => emitter.emit('bar', {
+            error: {
+              message: 'Token expired'
+            }
+          }));
+          return emitter;
+        }
+      });
+
+      kuzzle = new Kuzzle('foo', 'this is not an index');
+
+      kuzzle.addListener('jwtTokenExpired', function() {
+        listenerJwtTokenExpired = true;
+      });
+
+      this.timeout(150);
+
+      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error, result) {
+        should(listenerJwtTokenExpired).be.exactly(true);
+        should(error.message).be.exactly('Token expired');
+        done();
+      });
+    });
+
     it('should launch the callback once a response has been received', function (done) {
       var response = {result: 'foo', error: 'bar'},
         cb = function (err, res) {
