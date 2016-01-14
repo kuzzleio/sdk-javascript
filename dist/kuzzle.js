@@ -302,7 +302,8 @@ module.exports = Kuzzle = function (url, index, options, cb) {
         connected: [],
         error: [],
         disconnected: [],
-        reconnected: []
+        reconnected: [],
+        jwtTokenExpired: []
       }
     },
     io: {
@@ -420,6 +421,26 @@ module.exports = Kuzzle = function (url, index, options, cb) {
       value: 10,
       enumerable: true,
       writable: true
+    },
+    loginStrategy: {
+      value: (options && typeof options.loginStrategy === 'string') ? options.loginStrategy : undefined,
+      enumerable: true,
+      writable: false
+    },
+    loginCredentials: {
+      value: (options && typeof options.loginCredentials === 'object') ? options.loginCredentials : undefined,
+      enumerable: true,
+      writable: false
+    },
+    loginExpiresIn: {
+      value: (options && typeof options.loginExpiresIn === 'number') ? options.loginExpiresIn : undefined,
+      enumerable: true,
+      writable: false
+    },
+    jwtToken: {
+      value: undefined,
+      enumerable: true,
+      writable: true
     }
   });
 
@@ -444,8 +465,8 @@ module.exports = Kuzzle = function (url, index, options, cb) {
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
   Object.defineProperty(this, 'isValid', {
     value: function () {
-      if (this.state === 'loggedOff') {
-        throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a logout call?');
+      if (self.state === 'disconnected') {
+        throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a disconnect call?');
       }
     }
   });
@@ -504,7 +525,7 @@ module.exports = Kuzzle = function (url, index, options, cb) {
 Kuzzle.prototype.connect = function () {
   var self = this;
 
-  if (['initializing', 'ready', 'loggedOff', 'error', 'offline'].indexOf(this.state) === -1) {
+  if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
       self.connectCB(null, self);
     }
@@ -516,7 +537,7 @@ Kuzzle.prototype.connect = function () {
   self.socket = self.io(self.url, {
     reconnection: self.autoReconnect,
     reconnectionDelay: self.reconnectionDelay,
-    'force new connection': true
+    forceNew: true
   });
 
   self.socket.once('connect', function () {
@@ -531,12 +552,25 @@ Kuzzle.prototype.connect = function () {
 
     dequeue.call(self);
 
-    self.eventListeners.connected.forEach(function (listener) {
-      listener.fn();
-    });
+    if (self.loginStrategy) {
+      self.login(self.loginStrategy, self.loginCredentials, self.loginExpiresIn, function(error) {
+        self.eventListeners.connected.forEach(function (listener) {
+          listener.fn(error);
+        });
 
-    if (self.connectCB) {
-      self.connectCB(null, self);
+        if (self.connectCB) {
+          self.connectCB(error, self);
+        }
+      });
+    }
+    else {
+      self.eventListeners.connected.forEach(function (listener) {
+        listener.fn();
+      });
+
+      if (self.connectCB) {
+        self.connectCB(null, self);
+      }
     }
   });
 
@@ -556,7 +590,7 @@ Kuzzle.prototype.connect = function () {
     self.state = 'offline';
 
     if (!self.autoReconnect) {
-      self.logout();
+      self.disconnect();
     }
 
     if (self.autoQueue) {
@@ -597,6 +631,71 @@ Kuzzle.prototype.connect = function () {
   return this;
 };
 
+
+Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
+  var
+    self = this,
+    request = {};
+
+  Object.keys(credentials).forEach(function (key) {
+    if (credentials.hasOwnProperty(key)) {
+      request[key] = credentials[key];
+    }
+  });
+
+  if (
+    typeof expiresIn === 'number' ||
+    typeof expiresIn === 'string'
+  ) {
+    request.expiresIn = expiresIn;
+  }
+  request.strategy = strategy;
+
+  this.query(null, 'auth', 'login', request, {}, function(error, response) {
+    if (error === null) {
+      self.jwtToken = response.jwt;
+
+      if (typeof cb === 'function') {
+        cb(null, self);
+      }
+    }
+    else if (typeof cb === 'function') {
+      cb(error);
+    }
+    else {
+      throw new Error(error.message);
+    }
+  });
+
+  return self;
+};
+
+Kuzzle.prototype.logout = function (cb) {
+  var
+    self = this,
+    request = {
+      action: 'logout',
+      controller: 'auth',
+      requestId: uuid.v4(),
+      body: {}
+    };
+
+  this.query(null, 'auth', 'logout', request, {}, function(error) {
+    if (error === null) {
+      self.jwtToken = undefined;
+
+      if (typeof cb === 'function') {
+        cb(null, self);
+      }
+    }
+    else if (typeof cb === 'function') {
+      cb(error);
+    }
+  });
+
+  return self;
+};
+
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
@@ -634,9 +733,17 @@ function emitRequest (request, cb) {
     now = Date.now(),
     self = this;
 
-  if (cb) {
+  if (self.jwtToken !== undefined || cb) {
     self.socket.once(request.requestId, function (response) {
-      cb(response.error, response.result);
+      if (response.error && response.error.message === 'Token expired') {
+        self.eventListeners.jwtTokenExpired.forEach(function (listener) {
+          listener.fn(request, cb);
+        });
+      }
+
+      if (cb) {
+        cb(response.error, response.result);
+      }
     });
   }
 
@@ -699,7 +806,6 @@ Kuzzle.prototype.addListener = function(event, listener) {
 
   listenerId = uuid.v1();
   this.eventListeners[event].push({id: listenerId, fn: listener});
-
   return listenerId;
 };
 
@@ -844,10 +950,12 @@ Kuzzle.prototype.listCollections = function (options, cb) {
 /**
  * Disconnects from Kuzzle and invalidate this instance.
  */
-Kuzzle.prototype.logout = function () {
+Kuzzle.prototype.disconnect = function () {
   var collection;
 
-  this.state = 'loggedOff';
+  this.logout();
+
+  this.state = 'disconnected';
   this.socket.close();
   this.socket = null;
 
@@ -857,7 +965,6 @@ Kuzzle.prototype.logout = function () {
     }
   }
 };
-
 
 /**
  * Return the current Kuzzle's UTC Epoch time, in milliseconds
@@ -883,7 +990,6 @@ Kuzzle.prototype.now = function (options, cb) {
 
   return this;
 };
-
 
 /**
  * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
@@ -943,6 +1049,11 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
   }
 
   object = self.addHeaders(object, this.headers);
+
+  if (self.jwtToken !== undefined) {
+    object.headers = object.headers || {};
+    object.headers.authorization = 'Bearer ' + self.jwtToken;
+  }
 
   if (collection) {
     object.collection = collection;

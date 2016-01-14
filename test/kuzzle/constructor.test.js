@@ -45,7 +45,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.getAllStatistics);
       should.exist(kuzzle.getStatistics);
       should.exist(kuzzle.listCollections);
-      should.exist(kuzzle.logout);
+      should.exist(kuzzle.disconnect);
       should.exist(kuzzle.now);
       should.exist(kuzzle.query);
       should.exist(kuzzle.removeAllListeners);
@@ -72,6 +72,11 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
+
+      should(kuzzle).have.propertyWithDescriptor('loginStrategy', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('loginCredentials', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('loginExpiresIn', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
     });
 
     it('should have properties with the documented default values', () => {
@@ -259,7 +264,7 @@ describe('Kuzzle constructor', () => {
       });
 
       it('should try to connect when the instance is in a not-connected state', function () {
-        ['initializing', 'ready', 'loggedOff', 'error', 'offline'].forEach(state => {
+        ['initializing', 'ready', 'disconnected', 'error', 'offline'].forEach(state => {
           var kuzzle = new Kuzzle('nowhere', 'this is not an index', {connect: 'manual'});
 
           kuzzle.state = state;
@@ -597,6 +602,300 @@ describe('Kuzzle constructor', () => {
             }
           }, 10);
         });
+      });
+    });
+
+    describe("#login", () => {
+      var
+        loginCalled = false,
+        loginStub = function(strategy, credentials, expiresIn, cb) {
+          loginCalled = true
+
+          if (typeof cb === 'function') {
+            if (strategy === 'error') {
+              cb(new Error());
+            }
+            else {
+              cb(null);
+            }
+          }
+        },
+        iostub = function () {
+          var emitter = new EventEmitter;
+          process.nextTick(() => emitter.emit('connect'));
+          return emitter;
+        };
+
+      beforeEach(function () {
+        Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
+      });
+
+      it('should login after a connection when loginCredentials & loginStrategy are set', function(done) {
+        Kuzzle = proxyquire(kuzzleSource, {
+          'socket.io-client': function () {
+            var emitter = new EventEmitter;
+
+            /*
+             since we're stubbing the socket.io socket object,
+             we need a stubbed 'close' function to make kuzzle.logout() work
+             */
+            emitter.close = function () {
+              return false;
+            };
+            process.nextTick(() => emitter.emit('connect'));
+            return emitter;
+          }
+        });
+
+        var
+          kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+            connect: 'manual',
+            loginStrategy: 'local',
+            loginCredentials: {
+              username: 'foo',
+              password: 'bar'
+            }
+          });
+
+        this.timeout(200);
+
+        kuzzle.login = loginStub;
+
+        kuzzle.connect();
+
+        setTimeout(() => {
+          try {
+            should(loginCalled).be.exactly(true);
+            done();
+          }
+          catch (e) {
+            done(e);
+          }
+        }, 10);
+      });
+
+      it('should call the provided callback on a connection & login success', function (done) {
+        var kuzzle;
+        this.timeout(150);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual',
+          loginStrategy: 'local',
+          loginCredentials: {
+            username: 'foo',
+            password: 'bar'
+          }
+        }, function (err, res) {
+          try {
+            should(err).be.null();
+            should(res).be.instanceof(Kuzzle);
+            should(res.state).be.exactly('connected');
+            kuzzle.socket.removeAllListeners();
+            done();
+          }
+          catch (e) {
+            done(e);
+          }
+        });
+
+        kuzzle.login = loginStub;
+        kuzzle.connect();
+      });
+
+
+      it('should emit a connected event when connection & login success', function (done) {
+        var
+          kuzzle,
+          listenerConnected = false;
+
+        this.timeout(150);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual',
+          loginStrategy: 'local',
+          loginCredentials: {
+            username: 'foo',
+            password: 'bar'
+          }
+        }, function (err, res) {
+          try {
+            should(err).be.null();
+            should(res).be.instanceof(Kuzzle);
+            should(res.state).be.exactly('connected');
+            should(listenerConnected).be.exactly(true);
+            kuzzle.socket.removeAllListeners();
+            done();
+          }
+          catch (e) {
+            done(e);
+          }
+        });
+
+        kuzzle.login = loginStub;
+        kuzzle.addListener('connected', function() {
+          listenerConnected = true;
+        });
+        kuzzle.connect();
+      });
+
+      it('should have the token in login callback', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(collection, controller, action, query, options, cb) {
+          cb(null, { jwt: 'test-toto'});
+        };
+
+        kuzzle.login('local', loginCredentials, '1h', function(error, k) {
+          should(k.jwtToken).be.exactly('test-toto');
+          done();
+        });
+      });
+
+      it('should have a empty token in logout callback', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(collection, controller, action, query, options, cb) {
+          cb(null, {});
+        };
+
+        kuzzle.logout(function(error, k) {
+          should(k.jwtToken).be.exactly(undefined);
+          done();
+        });
+      });
+
+      it('should give an error if login query fail to the logout callback if is set', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(collection, controller, action, query, options, cb) {
+          cb(new Error());
+        };
+
+        kuzzle.logout(function(error, k) {
+          should(error).be.an.instanceOf(Error);
+          done();
+        });
+      });
+
+      it('should raise an error if login query fail and no callback is set', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(collection, controller, action, query, options, cb) {
+          cb(new Error());
+        };
+
+        try {
+          kuzzle.login('local', loginCredentials, '1h');
+        }
+        catch(err) {
+          should(err).be.an.instanceOf(Error);
+          done();
+        }
+      });
+
+      it('should give an error if login query fail to the login callback if is set', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(collection, controller, action, query, options, cb) {
+          cb(new Error());
+        };
+
+        try {
+          kuzzle.login('local', loginCredentials, '1h', function(error, k) {
+            should(error).be.an.instanceOf(Error);
+            done();
+          });
+        }
+        catch(err) {
+          done(err);
+        }
+      });
+
+      it('should be able to send a login request', function () {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.queuing = true;
+
+        kuzzle.login('local', loginCredentials, '1h');
+
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].query.action).be.exactly('login');
+        should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
+        should(kuzzle.offlineQueue[0].query.username).be.exactly('foo');
+        should(kuzzle.offlineQueue[0].query.password).be.exactly('bar');
+        should(kuzzle.offlineQueue[0].query.expiresIn).be.exactly('1h');
+      });
+
+      it('should forward token when logged in', function () {
+        var
+          kuzzle,
+          query = { body: { some: 'query'}},
+          now = Date.now();
+
+        this.timeout(200);
+
+        Kuzzle = rewire(kuzzleSource);
+
+        kuzzle = new Kuzzle('nowhere', 'this is not an index', {
+          connect: 'manual'
+        });
+
+        kuzzle.queuing = true;
+        kuzzle.jwtToken = 'fake-token';
+
+        kuzzle.query('collection', 'controller', 'action', {});
+
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 100);
+        should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
+        should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
+        should(kuzzle.offlineQueue[0].query.headers.authorization).be.exactly('Bearer fake-token');
       });
     });
   });
