@@ -24,6 +24,10 @@ describe('KuzzleDataCollection methods', function () {
       }
 
       if (expectedQuery.body) {
+        if (!query.body) {
+          query.body = {};
+        }
+
         should(query.body).match(expectedQuery.body);
       } else {
         should(Object.keys(query).length).be.exactly(0);
@@ -188,13 +192,12 @@ describe('KuzzleDataCollection methods', function () {
       kuzzle = new Kuzzle('foo', 'this is not an index');
       kuzzle.query = queryStub;
       emitted = false;
-      result = { acknowledged: true };
+      result = { result: {acknowledged: true }};
       error = null;
       expectedQuery = {
         collection: 'foo',
         action: 'createCollection',
-        controller: 'write',
-        body: {}
+        controller: 'write'
       };
     });
 
@@ -363,8 +366,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         collection: 'foo',
         action: 'deleteCollection',
-        controller: 'admin',
-        body: {}
+        controller: 'admin'
       };
     });
 

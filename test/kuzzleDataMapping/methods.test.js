@@ -21,6 +21,10 @@ describe('KuzzleDataMapping methods', function () {
       }
 
       if (expectedQuery.body) {
+        if (!query.body) {
+          query.body = {};
+        }
+
         should(query.body).match(expectedQuery.body);
       } else {
         should(Object.keys(query).length).be.exactly(0);
