@@ -893,7 +893,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.query('collection', 'controller', 'action', {});
 
         should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 30);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 100);
         should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.headers.authorization).be.exactly('Bearer fake-token');
