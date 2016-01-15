@@ -254,7 +254,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['getAllStatistics', 'getStatistics', 'listCollections', 'now', 'query'];
+        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'now', 'query'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -686,16 +686,39 @@ Kuzzle.prototype.flushQueue = function () {
 /**
  * Returns the list of known persisted data collections.
  *
+ * @param {string} [index] - Index containing collections to be listed
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  * @returns {object} this
  */
-Kuzzle.prototype.listCollections = function (options, cb) {
-  var collectionType = 'all';
+Kuzzle.prototype.listCollections = function () {
+  var
+    collectionType = 'all',
+    index,
+    options,
+    cb,
+    args = Array.prototype.slice.call(arguments);
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
+  args.forEach(function(arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.listCollections: index required');
+    }
+
+    index = this.defaultIndex;
   }
 
   this.callbackRequired('Kuzzle.listCollections', cb);
@@ -704,12 +727,38 @@ Kuzzle.prototype.listCollections = function (options, cb) {
     collectionType = options.type;
   }
 
-  this.query({controller: 'read', action: 'listCollections'}, {body: {type: collectionType}}, options, function (err, res) {
+  this.query({index: index, controller: 'read', action: 'listCollections'}, {body: {type: collectionType}}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
 
     return cb(null, res.result.collections);
+  });
+
+  return this;
+};
+
+/**
+ * Returns the list of existing indexes in Kuzzle
+ *
+ * @param {object} [options] - Optional arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.listIndexes = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.callbackRequired('Kuzzle.listIndexes', cb);
+
+  this.query({controller: 'read', action: 'listIndexes'}, {}, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    return cb(null, res.result.indexes);
   });
 
   return this;
@@ -732,6 +781,32 @@ Kuzzle.prototype.disconnect = function () {
       delete this.collections[collection];
     }
   }
+};
+
+/**
+ * Returns the server informations
+ *
+ * @param {object} [options] - Optional arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getServerInfo = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.callbackRequired('Kuzzle.getServerInfo', cb);
+
+  this.query({controller: 'read', action: 'serverInfo'}, {}, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.result.serverInfo);
+  });
+
+  return this;
 };
 
 /**
@@ -906,7 +981,6 @@ Kuzzle.prototype.replayQueue = function () {
 
   return this;
 };
-
 
 /**
  * Sets the default Kuzzle index
