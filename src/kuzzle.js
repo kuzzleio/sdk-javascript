@@ -915,7 +915,7 @@ Kuzzle.prototype.replayQueue = function () {
  * @returns this
  */
 Kuzzle.prototype.setDefaultIndex = function (index) {
-    if (typeof index !== 'string') {
+  if (typeof index !== 'string') {
     throw new Error('Invalid default index: [' + index + '] (an index name is expected)');
   }
 

@@ -54,7 +54,7 @@ function KuzzleDataCollection(kuzzle, index, collection) {
         action: action,
         collection: this.collection,
         index: this.index
-      }
+      };
     }
   });
 
