@@ -51,7 +51,7 @@ var myDoc = {
 };
 
 kuzzle
-  .dataCollectionFactory('people')
+  .dataCollectionFactory('music', 'people')
   .createDocument(myDoc, function(error, response) {
     if (error) {
       // handle error...
@@ -63,7 +63,7 @@ kuzzle
 
 // In NodeJS version, you can also use Promise by suffixing functions with "Promise"
 kuzzle
-  .dataCollectionFactory('people')
+  .dataCollectionFactory('music', 'people')
   .createDocumentPromise(myDoc)
   .then(response => {
     /*
@@ -104,7 +104,7 @@ var myDoc = {
 };
 
 kuzzle
-  .dataCollectionFactory('people')
+  .dataCollectionFactory('music', 'people')
   .createDocument(myDoc, function(error, response) {
     if (error) {
       // handle error...
