@@ -15,14 +15,24 @@ var
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
+ * @param {string} index - Index containing the data collection
  * @param {string} collection - name of the data collection to handle
  * @constructor
  */
-function KuzzleDataCollection(kuzzle, collection) {
+function KuzzleDataCollection(kuzzle, index, collection) {
+  if (!index || !collection) {
+    throw new Error('The KuzzleDataCollection object constructor needs an index and a collection arguments');
+  }
+
+
   Object.defineProperties(this, {
     // read-only properties
     collection: {
       value: collection,
+      enumerable: true
+    },
+    index: {
+      value: index,
       enumerable: true
     },
     kuzzle: {
@@ -34,6 +44,17 @@ function KuzzleDataCollection(kuzzle, collection) {
       value: JSON.parse(JSON.stringify(kuzzle.headers)),
       enumerable: true,
       writable: true
+    }
+  });
+
+  Object.defineProperty(this, 'buildQueryArgs', {
+    value: function (controller, action) {
+      return {
+        controller: controller,
+        action: action,
+        collection: this.collection,
+        index: this.index
+      }
     }
   });
 
@@ -77,7 +98,7 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'search', query, options, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
     var documents = [];
 
     if (error) {
@@ -107,7 +128,8 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.count = function (filters, options, cb) {
-  var query;
+  var
+    query;
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -118,7 +140,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'count', query, options, function (error, result) {
+  this.kuzzle.query(this.buildQueryArgs('read', 'count'), query, options, function (error, result) {
     if (error) {
       return cb(error);
     }
@@ -147,7 +169,7 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'createCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('write', 'createCollection'), data, options, cb);
 
   return this;
 };
@@ -204,7 +226,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   data = self.kuzzle.addHeaders(data, self.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -212,7 +234,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
       cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data, options);
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
 
   return this;
@@ -234,7 +256,7 @@ KuzzleDataCollection.prototype.delete = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'admin', 'deleteCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('admin', 'deleteCollection'), data, options, cb);
 
   return this;
 };
@@ -276,7 +298,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   data = this.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -288,7 +310,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
       }
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data, options);
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
 
   return this;
@@ -315,7 +337,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
   self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'get', data, options, function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('read', 'get'), data, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -391,7 +413,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
+  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
 };
@@ -448,7 +470,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
@@ -456,7 +478,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options);
   }
 
   return this;
@@ -503,7 +525,7 @@ KuzzleDataCollection.prototype.truncate = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'admin', 'truncateCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('admin', 'truncateCollection'), data, options, cb);
 
   return this;
 };
@@ -538,7 +560,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'update', data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, function (err, res) {
       var doc;
       if (err) {
         return cb(err);
@@ -548,7 +570,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
       doc.refresh(cb);
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'update', data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options);
   }
 
   return self;

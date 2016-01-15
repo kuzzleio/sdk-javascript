@@ -13,11 +13,12 @@ describe('KuzzleDataCollection methods', function () {
     expectedQuery,
     error,
     result,
-    queryStub = function (collection, controller, action, query, options, cb) {
+    queryStub = function (args, query, options, cb) {
       emitted = true;
-      should(collection).be.exactly(expectedQuery.collection);
-      should(controller).be.exactly(expectedQuery.controller);
-      should(action).be.exactly(expectedQuery.action);
+      should(args.index).be.exactly(expectedQuery.index);
+      should(args.collection).be.exactly(expectedQuery.collection);
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
 
       if (expectedQuery.options) {
         should(options).match(expectedQuery.options);
@@ -50,12 +51,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#advancedSearch', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'search',
         controller: 'read',
@@ -124,12 +126,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#count', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'count',
         controller: 'read',
@@ -189,12 +192,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#create', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {acknowledged: true }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'createCollection',
         controller: 'write'
@@ -241,12 +245,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#createDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_id: 'foobar', _source: { foo: 'bar' }, _version: 1} };
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'create',
         controller: 'write',
@@ -358,12 +363,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#delete', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { acknowledged: true };
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'deleteCollection',
         controller: 'admin'
@@ -410,12 +416,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#deleteDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_id: 'foobar' } };
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'delete',
         controller: 'write',
@@ -484,12 +491,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#fetchDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_id: 'foobar', _source: {foo: 'bar'} }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'get',
         controller: 'read',
@@ -548,7 +556,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#fetchAllDocuments', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       emitted = false;
     });
 
@@ -588,12 +596,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#getMapping', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: {'this is not an index': { mappings: { foo: { properties: {}}}} }};
+      result = { result: {'bar': { mappings: { foo: { properties: {}}}} }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'getMapping',
         controller: 'admin',
@@ -650,12 +659,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#publishMessage', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_source: {foo: 'bar'} }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'publish',
         controller: 'write',
@@ -693,6 +703,7 @@ describe('KuzzleDataCollection methods', function () {
 
     beforeEach(function () {
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'putMapping',
         controller: 'admin',
@@ -710,8 +721,8 @@ describe('KuzzleDataCollection methods', function () {
         }
       });
 
-      kuzzle = new Kuzzle('foo', 'this is not an index');
-      collection = new KuzzleDataCollectionProxyquired(kuzzle, expectedQuery.collection);
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      collection = new KuzzleDataCollectionProxyquired(kuzzle, expectedQuery.index, expectedQuery.collection);
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_source: { properties: {}}}};
@@ -732,8 +743,6 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle the callback argument correctly', function () {
-      //var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
       collection.putMapping(result.result, function () {});
       should(emitted).be.true();
 
@@ -743,7 +752,6 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      //var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
       error = 'foobar';
       this.timeout(50);
 
@@ -757,12 +765,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#replaceDocument', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {_id: 'foobar', _source: { foo: 'bar' } }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'createOrUpdate',
         controller: 'write',
@@ -818,13 +827,14 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {roomId: 'foobar' }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'on',
         controller: 'subscribe',
@@ -855,12 +865,13 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#truncate', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
       result = { result: {acknowledged: true }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'truncateCollection',
         controller: 'admin',
@@ -916,12 +927,14 @@ describe('KuzzleDataCollection methods', function () {
         return doc;
       });
 
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
+
       emitted = false;
       result = { result: {_id: 'foobar', _source: { foo: 'bar' } }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'update',
         controller: 'write',
@@ -935,7 +948,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
-        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection),
+        collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection),
         options = { queuable: false };
       expectedQuery.options = options;
 
@@ -949,7 +962,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
 
       collection.updateDocument('foo');
       should(emitted).be.true();
@@ -968,7 +981,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
       error = 'foobar';
       this.timeout(50);
 
@@ -982,7 +995,7 @@ describe('KuzzleDataCollection methods', function () {
 
   describe('#factories', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     });
 
     it('documentFactory should return a new KuzzleDocument object', function () {

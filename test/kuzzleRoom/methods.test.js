@@ -9,15 +9,18 @@ describe('KuzzleRoom methods', function () {
     expectedQuery,
     error,
     result,
-    queryStub = function (collection, controller, action, query, options, cb) {
+    queryStub = function (args, query, options, cb) {
       if (!cb && typeof options === 'function') {
         cb = options;
         options = null;
       }
+
       emitted = true;
-      should(collection).be.exactly(expectedQuery.collection);
-      should(controller).be.exactly(expectedQuery.controller);
-      should(action).be.exactly(expectedQuery.action);
+      should(args.index).be.exactly(expectedQuery.index);
+      should(args.collection).be.exactly(expectedQuery.collection);
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
+
 
       if (expectedQuery.options) {
         should(options).match(expectedQuery.options);
@@ -54,13 +57,14 @@ describe('KuzzleRoom methods', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'count',
         controller: 'subscribe',
@@ -118,7 +122,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       dequeued = false;
       revert = KuzzleRoom.__set__('dequeue', function () { dequeued = true; });
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
@@ -126,6 +130,7 @@ describe('KuzzleRoom methods', function () {
       result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'on',
         controller: 'subscribe',
@@ -200,7 +205,7 @@ describe('KuzzleRoom methods', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
     });
@@ -217,7 +222,7 @@ describe('KuzzleRoom methods', function () {
       socketOff;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.socket = {
         off: function () { socketOff = true; }
@@ -228,6 +233,7 @@ describe('KuzzleRoom methods', function () {
       result = { result: {}};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'off',
         controller: 'subscribe',
@@ -302,7 +308,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       var stub = function () { dequeued++; };
 
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.count = stub;
@@ -335,7 +341,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       called = false;
       error = result = undefined;
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.callback = function (err, res) { called = true; error = err; result = res; };

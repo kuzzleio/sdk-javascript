@@ -16,7 +16,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', 'this is not an index');
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     kuzzle.query = function () {
       var cb = arguments[arguments.length - 1];
 

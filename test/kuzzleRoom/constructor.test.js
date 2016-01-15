@@ -12,7 +12,7 @@ describe('KuzzleRoom constructor', function () {
 
   before(function () {
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('nowhere', 'this is not an index');
+    kuzzle = new Kuzzle('nowhere', {defaultIndex: 'bar'});
 
     kuzzle.headers = {foo: 'bar'};
     dataCollection = kuzzle.dataCollectionFactory('foo');
@@ -26,7 +26,7 @@ describe('KuzzleRoom constructor', function () {
     should(room.scope).be.exactly('all');
     should(room.state).be.exactly('done');
     should(room.users).be.exactly('none');
-    should(room.collection).be.exactly('foo');
+    should(room.collection).be.exactly(dataCollection);
     should(room.filters).be.null();
     should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();

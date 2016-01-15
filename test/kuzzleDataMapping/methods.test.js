@@ -10,11 +10,12 @@ describe('KuzzleDataMapping methods', function () {
     expectedQuery,
     error,
     result,
-    queryStub = function (collection, controller, action, query, options, cb) {
+    queryStub = function (args, query, options, cb) {
       emitted = true;
-      should(collection).be.exactly(expectedQuery.collection);
-      should(controller).be.exactly(expectedQuery.controller);
-      should(action).be.exactly(expectedQuery.action);
+      should(args.index).be.exactly(expectedQuery.index);
+      should(args.collection).be.exactly(expectedQuery.collection);
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
 
       if (expectedQuery.options) {
         should(options).match(expectedQuery.options);
@@ -48,13 +49,14 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#apply', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
       result = { result: {_source: { properties: { foo: {type: 'date'}}}}};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'putMapping',
         controller: 'admin',
@@ -140,13 +142,14 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#refresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'bar');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
       result = { result: {bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'getMapping',
         controller: 'admin',
@@ -164,7 +167,7 @@ describe('KuzzleDataMapping methods', function () {
         should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);
-        should(res.mapping).match(result.result[kuzzle.index].mappings.foo.properties);
+        should(res.mapping).match(result.result[dataCollection.index].mappings.foo.properties);
         done();
       })).be.exactly(mapping);
     });
@@ -237,7 +240,7 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#set', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 
@@ -257,7 +260,7 @@ describe('KuzzleDataMapping methods', function () {
 
   describe('#setHeaders', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
     });
 

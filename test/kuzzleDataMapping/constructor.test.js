@@ -11,7 +11,7 @@ describe('KuzzleDataMapping constructor', function () {
     collection;
 
   before(function () {
-    kuzzle = new Kuzzle('foo', 'this is not an index');
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
 
   });
 
@@ -55,7 +55,7 @@ describe('KuzzleDataMapping constructor', function () {
       mapping;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo', 'this is not an index');
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     mapping = new KuzzleDataMapping(kuzzle.dataCollectionFactory('foo'));
 
     should.exist(mapping.applyPromise);

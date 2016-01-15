@@ -162,7 +162,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
   }
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options, function (err) {
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options, function (err) {
       if (err) {
         return cb(err);
       }
@@ -170,7 +170,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
       cb(null, self);
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options);
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options);
   }
 
   return this;
@@ -201,7 +201,7 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
   }
 
   self.refreshing = true;
-  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, res) {
+  self.kuzzle.query(self.dataCollection.buildQueryArgs('read', 'get'), {_id: self.id}, options, function (error, res) {
     if (error) {
       self.refreshing = false;
       self.queue = [];
@@ -254,7 +254,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, res) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrUpdate'), data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -288,7 +288,7 @@ KuzzleDocument.prototype.publish = function (options) {
     return this;
   }
 
-  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
 };

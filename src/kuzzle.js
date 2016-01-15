@@ -18,11 +18,11 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (url, index, options, cb) {
+module.exports = Kuzzle = function (url, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, index, options, cb);
+    return new Kuzzle(url, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -32,10 +32,6 @@ module.exports = Kuzzle = function (url, index, options, cb) {
 
   if (!url || url === '') {
     throw new Error('URL argument missing');
-  }
-
-  if (!index || index === '') {
-    throw new Error('Index argument missing');
   }
 
   Object.defineProperties(this, {
@@ -99,8 +95,9 @@ module.exports = Kuzzle = function (url, index, options, cb) {
       value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
       enumerable: true
     },
-    index: {
-      value: index,
+    defaultIndex: {
+      value: (options && typeof options.defaultIndex === 'string') ? options.defaultIndex : undefined,
+      writable: true,
       enumerable: true
     },
     reconnectionDelay: {
@@ -401,7 +398,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   }
   request.strategy = strategy;
 
-  this.query(null, 'auth', 'login', request, {}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, request, {}, function(error, response) {
     if (error === null) {
       self.jwtToken = response.jwt;
 
@@ -430,7 +427,7 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query(null, 'auth', 'logout', request, {}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {}, function(error) {
     if (error === null) {
       self.jwtToken = undefined;
 
@@ -576,7 +573,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
-  this.query(null, 'admin', 'getAllStats', {}, options, function (err, res) {
+  this.query({controller:'admin', action: 'getAllStats'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -631,28 +628,49 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   if (!timestamp) {
-    this.query(null, 'admin', 'getLastStats', {}, options, queryCB);
+    this.query({controller: 'admin', action: 'getLastStats'}, {}, options, queryCB);
   } else {
-    this.query(null, 'admin', 'getStats', { body: { startTime: timestamp } }, options, queryCB);
+    this.query({controller: 'admin', action: 'getStats'}, { body: { startTime: timestamp } }, options, queryCB);
   }
 
   return this;
 };
 
 /**
- * Create a new instance of a KuzzleDataCollection object
+ * Create a new instance of a KuzzleDataCollection object.
+ * If no index is specified, takes the default index.
+ *
+ * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param headers {object} [headers] - Common properties for all future write documents queries
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(collection, headers) {
+Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
   this.isValid();
 
-  if (!this.collections[collection]) {
-    this.collections[collection] = new KuzzleDataCollection(this, collection, headers);
+  if (arguments.length === 1) {
+    collection = arguments[0];
+    index = this.defaultIndex;
+  }
+  else if (arguments.length === 2 && typeof collection === 'object') {
+    headers = collection;
+    collection = index;
+    index = this.defaultIndex;
   }
 
-  return this.collections[collection];
+  if (!index) {
+    throw new Error('Unable to create a new data collection object: no index specified');
+  }
+
+  if (!this.collections[index]) {
+    this.collections[index] = {};
+  }
+
+  if (!this.collections[index][collection]) {
+    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection, headers);
+  }
+
+  return this.collections[index][collection];
 };
 
 /**
@@ -686,7 +704,7 @@ Kuzzle.prototype.listCollections = function (options, cb) {
     collectionType = options.type;
   }
 
-  this.query(null, 'read', 'listCollections', {body: {type: collectionType}}, options, function (err, res) {
+  this.query({controller: 'read', action: 'listCollections'}, {body: {type: collectionType}}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -730,7 +748,7 @@ Kuzzle.prototype.now = function (options, cb) {
 
   this.callbackRequired('Kuzzle.now', cb);
 
-  this.query(null, 'read', 'now', {}, options, function (err, res) {
+  this.query({controller: 'read', action: 'now'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -749,20 +767,17 @@ Kuzzle.prototype.now = function (options, cb) {
  *    - metadata (object, default: null):
  *        Additional information passed to notifications to other users
  *
- * @param {string} collection - Name of the data collection you want to manipulate
- * @param {string} controller - The Kuzzle controller that will handle this query
- * @param {string} action - The controller action to perform
+ * @param {object} queryArgs - Query configuration
  * @param {object} query - The query data
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  */
-Kuzzle.prototype.query = function (collection, controller, action, query, options, cb) {
+Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   var
     attr,
     object = {
-      action: action,
-      controller: controller,
-      index: this.index,
+      action: queryArgs.action,
+      controller: queryArgs.controller,
       metadata: this.metadata
     },
     self = this;
@@ -805,8 +820,12 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
 
-  if (collection) {
-    object.collection = collection;
+  if (queryArgs.collection) {
+    object.collection = queryArgs.collection;
+  }
+
+  if (queryArgs.index) {
+    object.index = queryArgs.index;
   }
 
   if (!object.requestId) {
@@ -888,6 +907,27 @@ Kuzzle.prototype.replayQueue = function () {
   return this;
 };
 
+
+/**
+ * Sets the default Kuzzle index
+ *
+ * @param index
+ * @returns this
+ */
+Kuzzle.prototype.setDefaultIndex = function (index) {
+    if (typeof index !== 'string') {
+    throw new Error('Invalid default index: [' + index + '] (an index name is expected)');
+  }
+
+  if (index.length === 0) {
+    throw new Error('Cannot set an empty index as the default index');
+  }
+
+  this.defaultIndex = index;
+
+  return this;
+};
+
 /**
  * Helper function allowing to set headers while chaining calls.
  *
@@ -897,7 +937,7 @@ Kuzzle.prototype.replayQueue = function () {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-Kuzzle.prototype.setHeaders = function(content, replace) {
+Kuzzle.prototype.setHeaders = function (content, replace) {
   var self = this;
 
   if (typeof content !== 'object' || Array.isArray(content)) {

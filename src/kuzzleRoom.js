@@ -59,7 +59,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     },
     // read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: kuzzleDataCollection,
       enumerable: true
     },
     kuzzle: {
@@ -124,7 +124,7 @@ KuzzleRoom.prototype.count = function (cb) {
     return this;
   }
 
-  this.kuzzle.query(this.collection, 'subscribe', 'count', data, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -186,7 +186,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   subscribeQuery.body = this.filters;
   subscribeQuery = this.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+  self.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'on'), subscribeQuery, {metadata: this.metadata}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 
@@ -240,12 +240,12 @@ KuzzleRoom.prototype.unsubscribe = function () {
       delete self.kuzzle.subscriptions[room];
 
       if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
-        self.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: room}});
+        self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
       } else {
         interval = setInterval(function () {
           if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
             if (!self.kuzzle.subscriptions[room]) {
-              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: room}});
+              self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
             }
             clearInterval(interval);
           }
