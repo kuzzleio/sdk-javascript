@@ -176,8 +176,10 @@ describe('Kuzzle constructor', () => {
       should.not.exist(kuzzle.dataCollectionFactoryPromise);
       should.not.exist(kuzzle.flushQueuePromise);
       should.exist(kuzzle.getAllStatisticsPromise);
+      should.exist(kuzzle.getServerInfoPromise);
       should.exist(kuzzle.getStatisticsPromise);
       should.exist(kuzzle.listCollectionsPromise);
+      should.exist(kuzzle.listIndexesPromise);
       should.not.exist(kuzzle.logoutPromise);
       should.exist(kuzzle.nowPromise);
       should.exist(kuzzle.queryPromise);

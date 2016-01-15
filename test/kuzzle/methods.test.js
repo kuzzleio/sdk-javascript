@@ -13,7 +13,7 @@ describe('Kuzzle methods', function () {
     queryStub = function (args, query, options, cb) {
       emitted = true;
       should(args.collection).be.undefined();
-      should(args.index).be.undefined();
+      should(args.index).be.eql(expectedQuery.index);
       should(args.controller).be.exactly(expectedQuery.controller);
       should(args.action).be.exactly(expectedQuery.action);
 
@@ -207,6 +207,70 @@ describe('Kuzzle methods', function () {
     });
   });
 
+  describe('#getServerInfo', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      passedOptions = null;
+      error = null;
+      result = {result: {serverInfo: {
+        kuzzle:
+        { version: '0.9.2',
+          api: { version: '1.0', routes: {} },
+          nodeVersion: 'v4.2.1',
+          memoryUsed: 100020224,
+          uptime: '161089.628s',
+          plugins:
+          { 'kuzzle-plugin-logger': {},
+            'kuzzle-plugin-socketio': {},
+            'kuzzle-plugin-auth-passport-local': {} },
+          system: { memory: {}, cpus: {} } },
+        services: {
+          writeEngine: {
+            type: 'elasticsearch',
+            api: '1.7',
+            version: '1.5.2',
+            lucene: '4.10.4',
+            status: 'red',
+            nodes: {},
+            spaceUsed: '14.5kb'
+          }
+        }
+      }}};
+      expectedQuery = {
+        controller: 'read',
+        action: 'serverInfo'
+      };
+    });
+
+    it('should behave correctly when invoked', function () {
+      should(kuzzle.getServerInfo(function (err, res) {
+        should(err).be.null();
+        should(res).be.eql(result.result.serverInfo);
+      })).be.eql(kuzzle);
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      should(function () {kuzzle.getServerInfo()}).throw(Error);
+      should(emitted).be.false();
+
+      should(function () {kuzzle.getServerInfo({some: 'options'})}).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should execute the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+      error = 'foobar';
+
+      kuzzle.getServerInfo('foo', function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#listCollections', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
@@ -216,6 +280,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {collections: {stored: [], realtime: []}}};
       expectedQuery = {
+        index: 'foo',
         controller: 'read',
         action: 'listCollections',
         body: {type: 'all'}
@@ -223,13 +288,20 @@ describe('Kuzzle methods', function () {
     });
 
     it('should return the kuzzle instance when called', function () {
-      should(kuzzle.listCollections(function () {})).be.exactly(kuzzle);
+      should(kuzzle.listCollections('foo', function () {})).be.exactly(kuzzle);
     });
 
     it('should throw an error if no callback has been provided', function () {
-      should(function () { kuzzle.listCollections(); }).throw(Error);
+      should(function () { kuzzle.listCollections('foo'); }).throw(Error);
       should(emitted).be.false();
-      should(function () { kuzzle.listCollections({}); }).throw(Error);
+      should(function () { kuzzle.listCollections('foo', {}); }).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should throw an error if no index has been provided', function () {
+      should(function () {kuzzle.listCollections(function () {})}).throw(Error);
+      should(emitted).be.false();
+      should(function () {kuzzle.listCollections({}, function () {})}).throw(Error);
       should(emitted).be.false();
     });
 
@@ -237,7 +309,7 @@ describe('Kuzzle methods', function () {
       this.timeout(50);
       result = { result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux'] } } };
 
-      kuzzle.listCollections(function (err, res) {
+      kuzzle.listCollections('foo', function (err, res) {
         should(err).be.null();
         should(res).be.an.Object().and.match(result.result.collections);
         done();
@@ -248,7 +320,7 @@ describe('Kuzzle methods', function () {
       this.timeout(50);
       error = 'foobar';
 
-      kuzzle.listCollections(function (err, res) {
+      kuzzle.listCollections('foo', function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -257,8 +329,61 @@ describe('Kuzzle methods', function () {
 
     it('should handle options correctly', function (done) {
       expectedQuery.body.type = 'foobar';
-      kuzzle.listCollections({type: 'foobar'}, () => done());
+      kuzzle.listCollections('foo', {type: 'foobar'}, () => done());
     });
+
+    it('should use the default index if none is provided', function () {
+      kuzzle.setDefaultIndex('foo');
+      should(kuzzle.listCollections(function () {})).be.exactly(kuzzle);
+      should(emitted).be.true();
+
+      emitted = false;
+      should(kuzzle.listCollections({some: 'options'}, function () {})).be.exactly(kuzzle);
+      should(emitted).be.true();
+    });
+  });
+
+  describe('#listIndexes', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo');
+      kuzzle.query = queryStub;
+      emitted = false;
+      passedOptions = null;
+      error = null;
+      result = {result: {indexes: ['foo', 'bar']}};
+      expectedQuery = {
+        controller: 'read',
+        action: 'listIndexes'
+      };
+    });
+
+    it('should return the kuzzle instance when called', function () {
+      should(kuzzle.listIndexes(function (err, res) {
+        should(err).be.null();
+        should(res).be.eql(result.result.indexes);
+      })).be.eql(kuzzle);
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      should(function () { kuzzle.listIndexes(); }).throw(Error);
+      should(emitted).be.false();
+
+      should(function () {kuzzle.listIndexes({some: 'options'})}).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should execute the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+      error = 'foobar';
+
+      kuzzle.listIndexes(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+
   });
 
   describe('#disconnect', function () {
