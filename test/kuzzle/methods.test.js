@@ -10,11 +10,12 @@ describe('Kuzzle methods', function () {
     passedOptions,
     error,
     result,
-    queryStub = function (collection, controller, action, query, options, cb) {
+    queryStub = function (args, query, options, cb) {
       emitted = true;
-      should(collection).be.null();
-      should(controller).be.exactly(expectedQuery.controller);
-      should(action).be.exactly(expectedQuery.action);
+      should(args.collection).be.undefined();
+      should(args.index).be.undefined();
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
 
       if (passedOptions) {
         should(options).match(passedOptions);
@@ -33,12 +34,12 @@ describe('Kuzzle methods', function () {
 
   describe('#getAllStatistics', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {statistics: {}};
+      result = {result: {hits: []}};
       expectedQuery = {
         controller: 'admin',
         action: 'getAllStats'
@@ -79,12 +80,12 @@ describe('Kuzzle methods', function () {
 
   describe('#getStatistics', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {statistics: {}};
+      result = {result: {hits: []}};
       expectedQuery = {
         controller: 'admin',
         action: 'getLastStats'
@@ -111,10 +112,12 @@ describe('Kuzzle methods', function () {
       };
 
       result = {
-        statistics: {
-          123: {},
-          456: {},
-          789: {}
+        result: {
+          hits: [
+            {123: {}},
+            {456: {}},
+            {789: {}}
+          ]
         }
       };
 
@@ -158,7 +161,7 @@ describe('Kuzzle methods', function () {
 
   describe('#dataCollectionFactory', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
@@ -167,26 +170,51 @@ describe('Kuzzle methods', function () {
     });
 
     it('should create and store the data collection instance if needed', function () {
-      var collection = kuzzle.dataCollectionFactory('foo');
+      var collection = kuzzle.dataCollectionFactory('foo', 'bar');
 
-      should(kuzzle.collections['foo']).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
+      should(kuzzle.collections['foo']['bar']).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
       should(collection).be.instanceof(KuzzleDataCollection);
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
-      kuzzle.collections['foo'] = 'bar';
-      should(kuzzle.dataCollectionFactory('foo')).be.a.String().and.be.exactly('bar');
+      kuzzle.collections['foo'] = { bar: 'qux'};
+      should(kuzzle.dataCollectionFactory('foo', 'bar')).be.a.String().and.be.exactly('qux');
+    });
+    
+    it('should use the default index if no index is provided', function () {
+      var
+        collection,
+        defaultIndex = 'bar';
+
+      kuzzle.setDefaultIndex(defaultIndex);
+      collection = kuzzle.dataCollectionFactory('foo');
+      should(collection).be.instanceof(KuzzleDataCollection);
+      should(collection.index).be.eql(defaultIndex);
+
+      collection = kuzzle.dataCollectionFactory('foo', {some: 'headers'});
+      should(collection).be.instanceof(KuzzleDataCollection);
+      should(collection.index).be.eql(defaultIndex);
+    });
+
+    it('should throw an error if no index is provided and no default index has been set', function (done) {
+      try {
+        kuzzle.dataCollectionFactory('foo');
+        done(new Error('Should have thrown an error'));
+      }
+      catch (e) {
+        done();
+      }
     });
   });
 
   describe('#listCollections', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {collections: []};
+      result = {result: {collections: {stored: [], realtime: []}}};
       expectedQuery = {
         controller: 'read',
         action: 'listCollections',
@@ -207,11 +235,11 @@ describe('Kuzzle methods', function () {
 
     it('should call query with the right arguments', function (done) {
       this.timeout(50);
-      result = { collections: ['foo', 'bar', 'baz', 'qux'] };
+      result = { result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux'] } } };
 
       kuzzle.listCollections(function (err, res) {
         should(err).be.null();
-        should(res).be.an.Array().and.match(result.collections);
+        should(res).be.an.Object().and.match(result.result.collections);
         done();
       });
     });
@@ -235,7 +263,7 @@ describe('Kuzzle methods', function () {
 
   describe('#disconnect', function () {
     it('should clean up and invalidate the instance if called', function () {
-      var kuzzle = new Kuzzle('foo', 'this is not an index');
+      var kuzzle = new Kuzzle('foo');
 
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
       kuzzle.disconnect();
@@ -248,12 +276,12 @@ describe('Kuzzle methods', function () {
 
   describe('#now', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
       kuzzle.query = queryStub;
       emitted = false;
       passedOptions = null;
       error = null;
-      result = {now: Date.now()};
+      result = {result: {now: Date.now()}};
       expectedQuery = {
         controller: 'read',
         action: 'now'
@@ -276,7 +304,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.now(function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.now);
+        should(res).be.exactly(result.result.now);
         done();
       });
     });
@@ -293,9 +321,33 @@ describe('Kuzzle methods', function () {
     });
   });
 
+  describe('#setDefaultIndex', function () {
+    before(function () {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if the provided index is not a string', function () {
+      should((function () {kuzzle.setDefaultIndex()})).throw();
+      should((function () {kuzzle.setDefaultIndex({})})).throw();
+      should((function () {kuzzle.setDefaultIndex([])})).throw();
+      should((function () {kuzzle.setDefaultIndex(123)})).throw();
+      should((function () {kuzzle.setDefaultIndex(null)})).throw();
+      should((function () {kuzzle.setDefaultIndex(undefined)})).throw();
+    });
+
+    it('should throw an error if the provided index is an empty string', function () {
+      should((function () {kuzzle.setDefaultIndex('')})).throw();
+    });
+
+    it('should set the default index in all other cases', function () {
+      should(kuzzle.setDefaultIndex('foo')).be.eql(kuzzle);
+      should(kuzzle.defaultIndex).be.eql('foo');
+    });
+  });
+
   describe('#setHeaders', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
     });
 
     it('should throw an error if an invalid content object is provided', function () {

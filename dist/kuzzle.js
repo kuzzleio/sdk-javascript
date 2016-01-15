@@ -4,53 +4,74 @@
 //     Copyright (c) 2010-2012 Robert Kieffer
 //     MIT License - http://opensource.org/licenses/mit-license.php
 
-(function() {
-  var _global = this;
+/*global window, require, define */
+(function(_window) {
+  'use strict';
 
   // Unique ID creation requires a high quality random # generator.  We feature
   // detect to determine the best RNG source, normalizing to a function that
   // returns 128-bits of randomness, since that's what's usually required
-  var _rng;
+  var _rng, _mathRNG, _nodeRNG, _whatwgRNG, _previousRoot;
 
-  // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
-  //
-  // Moderately fast, high quality
-  if (typeof(_global.require) == 'function') {
-    try {
-      var _rb = _global.require('crypto').randomBytes;
-      _rng = _rb && function() {return _rb(16);};
-    } catch(e) {}
+  function setupBrowser() {
+    // Allow for MSIE11 msCrypto
+    var _crypto = _window.crypto || _window.msCrypto;
+
+    if (!_rng && _crypto && _crypto.getRandomValues) {
+      // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+      //
+      // Moderately fast, high quality
+      try {
+        var _rnds8 = new Uint8Array(16);
+        _whatwgRNG = _rng = function whatwgRNG() {
+          _crypto.getRandomValues(_rnds8);
+          return _rnds8;
+        };
+        _rng();
+      } catch(e) {}
+    }
+
+    if (!_rng) {
+      // Math.random()-based (RNG)
+      //
+      // If all else fails, use Math.random().  It's fast, but is of unspecified
+      // quality.
+      var  _rnds = new Array(16);
+      _mathRNG = _rng = function() {
+        for (var i = 0, r; i < 16; i++) {
+          if ((i & 0x03) === 0) { r = Math.random() * 0x100000000; }
+          _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+        }
+
+        return _rnds;
+      };
+      if ('undefined' !== typeof console && console.warn) {
+        console.warn("[SECURITY] node-uuid: crypto not usable, falling back to insecure Math.random()");
+      }
+    }
   }
 
-  if (!_rng && _global.crypto && crypto.getRandomValues) {
-    // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+  function setupNode() {
+    // Node.js crypto-based RNG - http://nodejs.org/docs/v0.6.2/api/crypto.html
     //
     // Moderately fast, high quality
-    var _rnds8 = new Uint8Array(16);
-    _rng = function whatwgRNG() {
-      crypto.getRandomValues(_rnds8);
-      return _rnds8;
-    };
+    if ('function' === typeof require) {
+      try {
+        var _rb = require('crypto').randomBytes;
+        _nodeRNG = _rng = _rb && function() {return _rb(16);};
+        _rng();
+      } catch(e) {}
+    }
   }
 
-  if (!_rng) {
-    // Math.random()-based (RNG)
-    //
-    // If all else fails, use Math.random().  It's fast, but is of unspecified
-    // quality.
-    var  _rnds = new Array(16);
-    _rng = function() {
-      for (var i = 0, r; i < 16; i++) {
-        if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-        _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-      }
-
-      return _rnds;
-    };
+  if (_window) {
+    setupBrowser();
+  } else {
+    setupNode();
   }
 
   // Buffer class to use
-  var BufferClass = typeof(_global.Buffer) == 'function' ? _global.Buffer : Array;
+  var BufferClass = ('function' === typeof Buffer) ? Buffer : Array;
 
   // Maps for number <-> hex string conversion
   var _byteToHex = [];
@@ -119,17 +140,17 @@
 
     options = options || {};
 
-    var clockseq = options.clockseq != null ? options.clockseq : _clockseq;
+    var clockseq = (options.clockseq != null) ? options.clockseq : _clockseq;
 
     // UUID timestamps are 100 nano-second units since the Gregorian epoch,
     // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
     // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
     // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-    var msecs = options.msecs != null ? options.msecs : new Date().getTime();
+    var msecs = (options.msecs != null) ? options.msecs : new Date().getTime();
 
     // Per 4.2.1.2, use count of uuid's generated during the current clock
     // cycle to simulate higher resolution clock
-    var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
+    var nsecs = (options.nsecs != null) ? options.nsecs : _lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
     var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
@@ -195,8 +216,8 @@
     // Deprecated - 'format' argument, as supported in v1.2
     var i = buf && offset || 0;
 
-    if (typeof(options) == 'string') {
-      buf = options == 'binary' ? new BufferClass(16) : null;
+    if (typeof(options) === 'string') {
+      buf = (options === 'binary') ? new BufferClass(16) : null;
       options = null;
     }
     options = options || {};
@@ -224,28 +245,32 @@
   uuid.parse = parse;
   uuid.unparse = unparse;
   uuid.BufferClass = BufferClass;
+  uuid._rng = _rng;
+  uuid._mathRNG = _mathRNG;
+  uuid._nodeRNG = _nodeRNG;
+  uuid._whatwgRNG = _whatwgRNG;
 
-  if (typeof(module) != 'undefined' && module.exports) {
+  if (('undefined' !== typeof module) && module.exports) {
     // Publish as node.js module
     module.exports = uuid;
-  } else  if (typeof define === 'function' && define.amd) {
+  } else if (typeof define === 'function' && define.amd) {
     // Publish as AMD module
     define(function() {return uuid;});
- 
+
 
   } else {
     // Publish as global (in browsers)
-    var _previousRoot = _global.uuid;
+    _previousRoot = _window.uuid;
 
     // **`noConflict()` - (browser only) to reset global 'uuid' var**
     uuid.noConflict = function() {
-      _global.uuid = _previousRoot;
+      _window.uuid = _previousRoot;
       return uuid;
     };
 
-    _global.uuid = uuid;
+    _window.uuid = uuid;
   }
-}).call(this);
+})('undefined' !== typeof window ? window : null);
 
 },{}],2:[function(require,module,exports){
 var
@@ -268,11 +293,11 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (url, index, options, cb) {
+module.exports = Kuzzle = function (url, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, index, options, cb);
+    return new Kuzzle(url, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -282,10 +307,6 @@ module.exports = Kuzzle = function (url, index, options, cb) {
 
   if (!url || url === '') {
     throw new Error('URL argument missing');
-  }
-
-  if (!index || index === '') {
-    throw new Error('Index argument missing');
   }
 
   Object.defineProperties(this, {
@@ -349,8 +370,9 @@ module.exports = Kuzzle = function (url, index, options, cb) {
       value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
       enumerable: true
     },
-    index: {
-      value: index,
+    defaultIndex: {
+      value: (options && typeof options.defaultIndex === 'string') ? options.defaultIndex : undefined,
+      writable: true,
       enumerable: true
     },
     reconnectionDelay: {
@@ -651,7 +673,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   }
   request.strategy = strategy;
 
-  this.query(null, 'auth', 'login', request, {}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, request, {}, function(error, response) {
     if (error === null) {
       self.jwtToken = response.jwt;
 
@@ -680,7 +702,7 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query(null, 'auth', 'logout', request, {}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {}, function(error) {
     if (error === null) {
       self.jwtToken = undefined;
 
@@ -742,7 +764,7 @@ function emitRequest (request, cb) {
       }
 
       if (cb) {
-        cb(response.error, response.result);
+        cb(response.error, response);
       }
     });
   }
@@ -826,12 +848,12 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
-  this.query(null, 'admin', 'getAllStats', {}, options, function (err, res) {
+  this.query({controller:'admin', action: 'getAllStats'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
 
-    cb(null, res.statistics);
+    cb(null, res.result.hits);
   });
 
   return this;
@@ -872,37 +894,58 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
     }
 
     if (timestamp) {
-      cb(null, res.statistics);
+      cb(null, res.result.hits);
     } else {
-      cb(null, [res.statistics]);
+      cb(null, [res.result]);
     }
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   if (!timestamp) {
-    this.query(null, 'admin', 'getLastStats', {}, options, queryCB);
+    this.query({controller: 'admin', action: 'getLastStats'}, {}, options, queryCB);
   } else {
-    this.query(null, 'admin', 'getStats', { body: { startTime: timestamp } }, options, queryCB);
+    this.query({controller: 'admin', action: 'getStats'}, { body: { startTime: timestamp } }, options, queryCB);
   }
 
   return this;
 };
 
 /**
- * Create a new instance of a KuzzleDataCollection object
+ * Create a new instance of a KuzzleDataCollection object.
+ * If no index is specified, takes the default index.
+ *
+ * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param headers {object} [headers] - Common properties for all future write documents queries
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(collection, headers) {
+Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
   this.isValid();
 
-  if (!this.collections[collection]) {
-    this.collections[collection] = new KuzzleDataCollection(this, collection, headers);
+  if (arguments.length === 1) {
+    collection = arguments[0];
+    index = this.defaultIndex;
+  }
+  else if (arguments.length === 2 && typeof collection === 'object') {
+    headers = collection;
+    collection = index;
+    index = this.defaultIndex;
   }
 
-  return this.collections[collection];
+  if (!index) {
+    throw new Error('Unable to create a new data collection object: no index specified');
+  }
+
+  if (!this.collections[index]) {
+    this.collections[index] = {};
+  }
+
+  if (!this.collections[index][collection]) {
+    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection, headers);
+  }
+
+  return this.collections[index][collection];
 };
 
 /**
@@ -936,12 +979,12 @@ Kuzzle.prototype.listCollections = function (options, cb) {
     collectionType = options.type;
   }
 
-  this.query(null, 'read', 'listCollections', {body: {type: collectionType}}, options, function (err, res) {
+  this.query({controller: 'read', action: 'listCollections'}, {body: {type: collectionType}}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
 
-    return cb(null, res.collections);
+    return cb(null, res.result.collections);
   });
 
   return this;
@@ -980,12 +1023,12 @@ Kuzzle.prototype.now = function (options, cb) {
 
   this.callbackRequired('Kuzzle.now', cb);
 
-  this.query(null, 'read', 'now', {}, options, function (err, res) {
+  this.query({controller: 'read', action: 'now'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
 
-    cb(null, res.now);
+    cb(null, res.result.now);
   });
 
   return this;
@@ -999,20 +1042,17 @@ Kuzzle.prototype.now = function (options, cb) {
  *    - metadata (object, default: null):
  *        Additional information passed to notifications to other users
  *
- * @param {string} collection - Name of the data collection you want to manipulate
- * @param {string} controller - The Kuzzle controller that will handle this query
- * @param {string} action - The controller action to perform
+ * @param {object} queryArgs - Query configuration
  * @param {object} query - The query data
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  */
-Kuzzle.prototype.query = function (collection, controller, action, query, options, cb) {
+Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   var
     attr,
     object = {
-      action: action,
-      controller: controller,
-      index: this.index,
+      action: queryArgs.action,
+      controller: queryArgs.controller,
       metadata: this.metadata
     },
     self = this;
@@ -1055,8 +1095,12 @@ Kuzzle.prototype.query = function (collection, controller, action, query, option
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
 
-  if (collection) {
-    object.collection = collection;
+  if (queryArgs.collection) {
+    object.collection = queryArgs.collection;
+  }
+
+  if (queryArgs.index) {
+    object.index = queryArgs.index;
   }
 
   if (!object.requestId) {
@@ -1138,6 +1182,27 @@ Kuzzle.prototype.replayQueue = function () {
   return this;
 };
 
+
+/**
+ * Sets the default Kuzzle index
+ *
+ * @param index
+ * @returns this
+ */
+Kuzzle.prototype.setDefaultIndex = function (index) {
+  if (typeof index !== 'string') {
+    throw new Error('Invalid default index: [' + index + '] (an index name is expected)');
+  }
+
+  if (index.length === 0) {
+    throw new Error('Cannot set an empty index as the default index');
+  }
+
+  this.defaultIndex = index;
+
+  return this;
+};
+
 /**
  * Helper function allowing to set headers while chaining calls.
  *
@@ -1147,7 +1212,7 @@ Kuzzle.prototype.replayQueue = function () {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-Kuzzle.prototype.setHeaders = function(content, replace) {
+Kuzzle.prototype.setHeaders = function (content, replace) {
   var self = this;
 
   if (typeof content !== 'object' || Array.isArray(content)) {
@@ -1205,14 +1270,24 @@ var
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
+ * @param {string} index - Index containing the data collection
  * @param {string} collection - name of the data collection to handle
  * @constructor
  */
-function KuzzleDataCollection(kuzzle, collection) {
+function KuzzleDataCollection(kuzzle, index, collection) {
+  if (!index || !collection) {
+    throw new Error('The KuzzleDataCollection object constructor needs an index and a collection arguments');
+  }
+
+
   Object.defineProperties(this, {
     // read-only properties
     collection: {
       value: collection,
+      enumerable: true
+    },
+    index: {
+      value: index,
       enumerable: true
     },
     kuzzle: {
@@ -1224,6 +1299,17 @@ function KuzzleDataCollection(kuzzle, collection) {
       value: JSON.parse(JSON.stringify(kuzzle.headers)),
       enumerable: true,
       writable: true
+    }
+  });
+
+  Object.defineProperty(this, 'buildQueryArgs', {
+    value: function (controller, action) {
+      return {
+        controller: controller,
+        action: action,
+        collection: this.collection,
+        index: this.index
+      };
     }
   });
 
@@ -1267,18 +1353,18 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'search', query, options, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
     var documents = [];
 
     if (error) {
       return cb(error);
     }
 
-    result.hits.hits.forEach(function (doc) {
+    result.result.hits.forEach(function (doc) {
       documents.push(self.documentFactory(doc._id, doc));
     });
 
-    cb(null, { total: result.hits.total, documents: documents });
+    cb(null, { total: result.result.total, documents: documents });
   });
 
   return this;
@@ -1297,7 +1383,8 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.count = function (filters, options, cb) {
-  var query;
+  var
+    query;
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -1308,12 +1395,12 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.collection, 'read', 'count', query, options, function (error, result) {
+  this.kuzzle.query(this.buildQueryArgs('read', 'count'), query, options, function (error, result) {
     if (error) {
       return cb(error);
     }
 
-    cb(null, result.count);
+    cb(null, result.result.count);
   });
 
   return this;
@@ -1337,7 +1424,7 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'createCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('write', 'createCollection'), data, options, cb);
 
   return this;
 };
@@ -1394,15 +1481,15 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   data = self.kuzzle.addHeaders(data, self.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data, options);
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
 
   return this;
@@ -1424,7 +1511,7 @@ KuzzleDataCollection.prototype.delete = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'admin', 'deleteCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('admin', 'deleteCollection'), data, options, cb);
 
   return this;
 };
@@ -1466,19 +1553,19 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   data = this.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', action, data, options, function (err, res) {
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
 
       if (action === 'delete') {
-        cb(null, [data._id]);
+        cb(null, [res.result._id]);
       } else {
-        cb(null, res.ids);
+        cb(null, res.result.ids);
       }
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', action, data, options);
+    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
 
   return this;
@@ -1505,12 +1592,12 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
   self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.collection, 'read', 'get', data, options, function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('read', 'get'), data, options, function (err, res) {
     if (err) {
       return cb(err);
     }
 
-    cb(null, self.documentFactory(res._id, res));
+    cb(null, self.documentFactory(res.result._id, res.result));
   });
 
   return this;
@@ -1580,9 +1667,8 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
     data.body = document;
   }
 
-  data.persist = false;
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
+  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
 };
@@ -1639,15 +1725,15 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options, function (err, res) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res._id, res));
+      cb(null, self.documentFactory(res.result._id, res.result));
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options);
   }
 
   return this;
@@ -1694,7 +1780,7 @@ KuzzleDataCollection.prototype.truncate = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.collection, 'admin', 'truncateCollection', data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('admin', 'truncateCollection'), data, options, cb);
 
   return this;
 };
@@ -1729,17 +1815,17 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.collection, 'write', 'update', data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, function (err, res) {
       var doc;
       if (err) {
         return cb(err);
       }
 
-      doc = new KuzzleDocument(self, res._id);
-      cb(null, doc);
+      doc = new KuzzleDocument(self, res.result._id);
+      doc.refresh(cb);
     });
   } else {
-    self.kuzzle.query(this.collection, 'write', 'update', data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options);
   }
 
   return self;
@@ -1756,6 +1842,10 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
  */
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
   var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
+
+  if (content._version && content._source) {
+    document.version = content._version;
+  }
 
   return document;
 };
@@ -1824,7 +1914,7 @@ function KuzzleDataMapping(kuzzleDataCollection, mapping) {
   Object.defineProperties(this, {
     //read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: kuzzleDataCollection,
       eunmerable: true
     },
     kuzzle: {
@@ -1874,16 +1964,12 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
+  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'putMapping'), data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res._source.properties;
-
-    if (cb) {
-      cb(null, self);
-    }
+    self.refresh(options, cb);
   });
 
   return this;
@@ -1908,19 +1994,19 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
     options = null;
   }
 
-  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, options, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('admin', 'getMapping'), data, options, function (err, res) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    if (res[self.kuzzle.index]) {
-      if (res[self.kuzzle.index].mappings[self.collection]) {
-        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+    if (res.result[self.collection.index]) {
+      if (res.result[self.collection.index].mappings[self.collection.collection]) {
+        self.mapping = res.result[self.collection.index].mappings[self.collection.collection].properties;
       } else {
-        return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
+        return cb ? cb(new Error('No mapping found for collection ' + self.collection.collection)) : false;
       }
     } else {
-      return cb ? cb(new Error('No mapping found for index ' + self.kuzzle.index)) : false;
+      return cb ? cb(new Error('No mapping found for index ' + self.collection.index)) : false;
     }
 
     if (cb) {
@@ -2053,10 +2139,6 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: documentId,
       enumerable: true
     });
-
-    if (!content) {
-      this.refresh();
-    }
   }
 
   // promisifying
@@ -2132,7 +2214,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
   }
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options, function (err) {
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options, function (err) {
       if (err) {
         return cb(err);
       }
@@ -2140,7 +2222,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
       cb(null, self);
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options);
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options);
   }
 
   return this;
@@ -2171,16 +2253,15 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
   }
 
   self.refreshing = true;
-
-  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, result) {
+  self.kuzzle.query(self.dataCollection.buildQueryArgs('read', 'get'), {_id: self.id}, options, function (error, res) {
     if (error) {
       self.refreshing = false;
       self.queue = [];
       return cb ? cb(error) : false;
     }
 
-    self.version = result._version;
-    self.content = result._source;
+    self.version = res.result._version;
+    self.content = res.result._source;
 
     if (cb) {
       cb(null, self);
@@ -2225,13 +2306,13 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, result) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrUpdate'), data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
 
-    self.id = result._id;
-    self.version = result._version;
+    self.id = res.result._id;
+    self.version = res.result._version;
 
     if (cb) {
       cb(null, self);
@@ -2259,9 +2340,7 @@ KuzzleDocument.prototype.publish = function (options) {
     return this;
   }
 
-  data.persist = false;
-
-  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
 };
@@ -2411,7 +2490,7 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     },
     // read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: kuzzleDataCollection,
       enumerable: true
     },
     kuzzle: {
@@ -2476,12 +2555,12 @@ KuzzleRoom.prototype.count = function (cb) {
     return this;
   }
 
-  this.kuzzle.query(this.collection, 'subscribe', 'count', data, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
     if (err) {
       return cb(err);
     }
 
-    cb(null, res.count);
+    cb(null, res.result.count);
   });
 
   return this;
@@ -2507,6 +2586,17 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     filters = null;
   }
 
+  /*
+   if not yet connected, register itself to the subscriptions list and wait for the
+   main Kuzzle object to renew once online
+    */
+  if (this.kuzzle.state !== 'connected') {
+    this.callback = cb;
+    this.kuzzle.subscriptions.pending[self.id] = self;
+    return this;
+  }
+
+
   if (this.subscribing) {
     this.queue.push({action: 'renew', args: [filters, cb]});
     return this;
@@ -2527,7 +2617,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   subscribeQuery.body = this.filters;
   subscribeQuery = this.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(this.collection, 'subscribe', 'on', subscribeQuery, {metadata: this.metadata}, function (error, response) {
+  self.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'on'), subscribeQuery, {metadata: this.metadata}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 
@@ -2536,8 +2626,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
-    self.roomId = response.roomId;
-    self.channel = response.channel;
+    self.roomId = response.result.roomId;
+    self.channel = response.result.channel;
 
     if (!self.kuzzle.subscriptions[self.roomId]) {
       self.kuzzle.subscriptions[self.roomId] = {};
@@ -2581,12 +2671,12 @@ KuzzleRoom.prototype.unsubscribe = function () {
       delete self.kuzzle.subscriptions[room];
 
       if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
-        self.kuzzle.query(this.collection, 'subscribe', 'off', {body: {roomId: room}});
+        self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
       } else {
         interval = setInterval(function () {
           if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
             if (!self.kuzzle.subscriptions[room]) {
-              self.kuzzle.query(self.collection, 'subscribe', 'off', {body: {roomId: room}});
+              self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
             }
             clearInterval(interval);
           }
@@ -2628,13 +2718,13 @@ function notificationCallback (data) {
     return this.callback(data.error);
   }
 
-  if (this.kuzzle.requestHistory[data.result.requestId]) {
+  if (this.kuzzle.requestHistory[data.requestId]) {
     if (this.subscribeToSelf) {
-      this.callback(null, data.result);
+      this.callback(null, data);
     }
-    delete this.kuzzle.requestHistory[data.result.requestId];
+    delete this.kuzzle.requestHistory[data.requestId];
   } else {
-    this.callback(null, data.result);
+    this.callback(null, data);
   }
 }
 

@@ -9,21 +9,28 @@ describe('KuzzleRoom methods', function () {
     expectedQuery,
     error,
     result,
-    queryStub = function (collection, controller, action, query, options, cb) {
+    queryStub = function (args, query, options, cb) {
       if (!cb && typeof options === 'function') {
         cb = options;
         options = null;
       }
+
       emitted = true;
-      should(collection).be.exactly(expectedQuery.collection);
-      should(controller).be.exactly(expectedQuery.controller);
-      should(action).be.exactly(expectedQuery.action);
+      should(args.index).be.exactly(expectedQuery.index);
+      should(args.collection).be.exactly(expectedQuery.collection);
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
+
 
       if (expectedQuery.options) {
         should(options).match(expectedQuery.options);
       }
 
       if (expectedQuery.body) {
+        if (!query.body) {
+          query.body = {};
+        }
+
         should(query.body).match(expectedQuery.body);
       } else {
         should(Object.keys(query).length).be.exactly(0);
@@ -50,13 +57,14 @@ describe('KuzzleRoom methods', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { count: 42 };
+      result = { result: {count: 42 }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'count',
         controller: 'subscribe',
@@ -114,13 +122,15 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       dequeued = false;
       revert = KuzzleRoom.__set__('dequeue', function () { dequeued = true; });
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.state = 'connected';
       kuzzle.query = queryStub;
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { roomId: 'foobar' };
+      result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'on',
         controller: 'subscribe',
@@ -178,13 +188,24 @@ describe('KuzzleRoom methods', function () {
       should(dequeued).be.false();
       should(room.queue).be.empty();
     });
+
+    it('should register itself to Kuzzle and skip subscription if not connected', function (done) {
+      kuzzle.state = 'foo';
+      should(room.renew({}, function () {})).be.eql(room);
+      setTimeout(() => {
+        should(dequeued).be.false();
+        should(emitted).be.false();
+        should(kuzzle.subscriptions.pending[room.id]).be.eql(room);
+        done();
+      }, 10);
+    });
   });
 
   describe('#setHeaders', function () {
     var room;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
     });
@@ -201,7 +222,7 @@ describe('KuzzleRoom methods', function () {
       socketOff;
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.socket = {
         off: function () { socketOff = true; }
@@ -209,9 +230,10 @@ describe('KuzzleRoom methods', function () {
 
       socketOff = true;
       emitted = false;
-      result = { count: 42 };
+      result = { result: {}};
       error = null;
       expectedQuery = {
+        index: 'bar',
         collection: 'foo',
         action: 'off',
         controller: 'subscribe',
@@ -286,7 +308,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       var stub = function () { dequeued++; };
 
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.count = stub;
@@ -319,40 +341,37 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       called = false;
       error = result = undefined;
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.callback = function (err, res) { called = true; error = err; result = res; };
     });
 
     it('should call back with an error if query returns an error', function () {
-      notifCB.call(room, {error: 'foobar', res: {}});
+      notifCB.call(room, {error: 'foobar', result: {}});
       should(result).be.undefined();
       should(error).be.exactly('foobar');
     });
 
     it('should return the result when one is provided', function () {
-      notifCB.call(room, {error: null, result: {foo: 'bar'}});
-      should(result).match({foo: 'bar'});
+      var msg = {error: null, result: {foo: 'bar'}};
+      notifCB.call(room, msg);
+      should(result).match(msg);
       should(error).be.null();
     });
 
     it('should delete the result from history if emitted by this instance', function () {
-      var res = { action: 'foo', requestId: 'bar'};
-
       room.subscribeToSelf = true;
       kuzzle.requestHistory['bar'] = {};
-      notifCB.call(room, {error: null, result: res});
+      notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
       should(called).be.true();
       should(kuzzle.requestHistory).be.empty();
     });
 
     it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
-      var res = { action: 'foo', requestId: 'bar'};
-
       room.subscribeToSelf = false;
       kuzzle.requestHistory['bar'] = {};
-      notifCB.call(room, {error: null, result: res});
+      notifCB.call(room, {error: null, result: {}, requestId: 'bar', action: 'foo'});
       should(called).be.false();
       should(kuzzle.requestHistory).be.empty();
     });

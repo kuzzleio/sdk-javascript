@@ -20,7 +20,7 @@ describe('Query management', function () {
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
     });
 
     it('should emit the request when asked to', function (done) {
@@ -61,7 +61,7 @@ describe('Query management', function () {
         }
       });
 
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
 
       kuzzle.addListener('jwtTokenExpired', function() {
         listenerJwtTokenExpired = true;
@@ -80,7 +80,7 @@ describe('Query management', function () {
       var response = {result: 'foo', error: 'bar'},
         cb = function (err, res) {
           should(err).be.exactly(response.error);
-          should(res).be.exactly(response.result);
+          should(res).be.exactly(response);
           done();
         };
 
@@ -113,6 +113,12 @@ describe('Query management', function () {
       requestObject,
       emitted,
       callback,
+      queryArgs = {
+        controller: 'controller',
+        action: 'action',
+        collection: 'collection',
+        index: 'index'
+      },
       kuzzle;
 
     before(function () {
@@ -125,7 +131,7 @@ describe('Query management', function () {
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', 'this is not an index');
+      kuzzle = new Kuzzle('foo');
       kuzzle.state = 'connected';
       requestObject = {};
       callback = null;
@@ -133,8 +139,8 @@ describe('Query management', function () {
     });
 
     it('should generate a valid request object', function () {
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}});
-      should(requestObject.index).be.exactly('this is not an index');
+      kuzzle.query(queryArgs, { body: { some: 'query'}});
+      should(requestObject.index).be.exactly('index');
       should(requestObject.controller).be.exactly('controller');
       should(requestObject.collection).be.exactly('collection');
       should(requestObject.action).be.exactly('action');
@@ -145,7 +151,7 @@ describe('Query management', function () {
     it('should manage arguments properly if no options are provided', function () {
       var cb = function () {};
 
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}}, cb);
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, cb);
 
       should(callback).be.exactly(cb);
     });
@@ -157,13 +163,13 @@ describe('Query management', function () {
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}}, {metadata: metadata});
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {metadata: metadata});
       should(requestObject.metadata).match(metadata);
     });
 
     it('should exit early if the query is not queuable and the SDK is offline', function () {
       kuzzle.state = 'offline';
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}}, {queuable: false});
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
       should(emitted).be.false();
     });
 
@@ -174,36 +180,37 @@ describe('Query management', function () {
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}, metadata: {foo: 'foo'}}, {metadata: metadata});
+      kuzzle.query(queryArgs, { body: { some: 'query'}, metadata: {foo: 'foo'}}, {metadata: metadata});
       should(requestObject.metadata.foo).be.exactly('foo');
       should(requestObject.metadata.baz).match(metadata.baz);
     });
 
-    it('should not define a "collection" member if none was provided', function () {
-      kuzzle.query(null, 'controller', 'action', { body: { some: 'query'}});
+    it('should not define optional members if none was provided', function () {
+      kuzzle.query({controller: 'foo', action: 'bar'}, { body: { some: 'query'}});
       should(requestObject.collection).be.undefined();
+      should(requestObject.index).be.undefined();
     });
 
     it('should add global headers without overwriting any existing query headers', function () {
       kuzzle.headers = { foo: 'bar', bar: 'foo' };
-      kuzzle.query(null, 'controller', 'action', { foo: 'foo', body: {some: 'query'}});
+      kuzzle.query(queryArgs, { foo: 'foo', body: {some: 'query'}});
       should(requestObject.foo).be.exactly('foo');
       should(requestObject.bar).be.exactly('foo');
     });
 
     it('should not generate a new request ID if one is already defined', function () {
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}, requestId: 'foobar'});
+      kuzzle.query(queryArgs, { body: { some: 'query'}, requestId: 'foobar'});
       should(requestObject.requestId).be.exactly('foobar');
     });
 
     it('should emit the request directly without waiting the end of dequeuing if queuable is false', function () {
       kuzzle.state = 'reconnecting';
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}}, {queuable: false});
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
       should(emitted).be.true();
 
       emitted = false;
       kuzzle.queuing = true;
-      kuzzle.query('collection', 'controller', 'action', { body: { some: 'query'}}, {queuable: false});
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
       should(emitted).be.true();
     });
 
@@ -215,7 +222,7 @@ describe('Query management', function () {
 
       kuzzle.state = 'offline';
       kuzzle.queuing = true;
-      kuzzle.query('collection', 'controller', 'action', query, cb);
+      kuzzle.query(queryArgs, query, cb);
 
       should(emitted).be.false();
       should(kuzzle.offlineQueue.length).be.exactly(1);
@@ -233,7 +240,7 @@ describe('Query management', function () {
       kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return true; };
       kuzzle.queuing = true;
-      kuzzle.query('collection', 'controller', 'action', query, cb);
+      kuzzle.query(queryArgs, query, cb);
 
       should(emitted).be.false();
       should(kuzzle.offlineQueue.length).be.exactly(1);
@@ -250,7 +257,7 @@ describe('Query management', function () {
       kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return false; };
       kuzzle.queuing = true;
-      kuzzle.query('collection', 'controller', 'action', query, cb);
+      kuzzle.query(queryArgs, query, cb);
 
       should(emitted).be.false();
       should(kuzzle.offlineQueue.length).be.exactly(0);
@@ -263,7 +270,7 @@ describe('Query management', function () {
 
       kuzzle.state = 'offline';
       kuzzle.queuing = false;
-      kuzzle.query('collection', 'controller', 'action', query, cb);
+      kuzzle.query(queryArgs, query, cb);
 
       should(emitted).be.false();
       should(kuzzle.offlineQueue.length).be.exactly(0);

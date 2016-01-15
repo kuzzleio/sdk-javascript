@@ -87,10 +87,6 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
       value: documentId,
       enumerable: true
     });
-
-    if (!content) {
-      this.refresh();
-    }
   }
 
   // promisifying
@@ -166,7 +162,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
   }
 
   if (cb) {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options, function (err) {
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options, function (err) {
       if (err) {
         return cb(err);
       }
@@ -174,7 +170,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
       cb(null, self);
     });
   } else {
-    this.kuzzle.query(this.collection, 'write', 'delete', this.toJSON(), options);
+    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.toJSON(), options);
   }
 
   return this;
@@ -205,16 +201,15 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
   }
 
   self.refreshing = true;
-
-  self.kuzzle.query(self.collection, 'read', 'get', {_id: self.id}, options, function (error, result) {
+  self.kuzzle.query(self.dataCollection.buildQueryArgs('read', 'get'), {_id: self.id}, options, function (error, res) {
     if (error) {
       self.refreshing = false;
       self.queue = [];
       return cb ? cb(error) : false;
     }
 
-    self.version = result._version;
-    self.content = result._source;
+    self.version = res.result._version;
+    self.content = res.result._source;
 
     if (cb) {
       cb(null, self);
@@ -259,13 +254,13 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.collection, 'write', 'createOrUpdate', data, options, function (error, result) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrUpdate'), data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
 
-    self.id = result._id;
-    self.version = result._version;
+    self.id = res.result._id;
+    self.version = res.result._version;
 
     if (cb) {
       cb(null, self);
@@ -293,9 +288,7 @@ KuzzleDocument.prototype.publish = function (options) {
     return this;
   }
 
-  data.persist = false;
-
-  this.kuzzle.query(this.collection, 'write', 'publish', data, options);
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
 };

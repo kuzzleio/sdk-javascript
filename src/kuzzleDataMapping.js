@@ -23,7 +23,7 @@ function KuzzleDataMapping(kuzzleDataCollection, mapping) {
   Object.defineProperties(this, {
     //read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: kuzzleDataCollection,
       eunmerable: true
     },
     kuzzle: {
@@ -73,16 +73,12 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection, 'admin', 'putMapping', data, options, function (err, res) {
+  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'putMapping'), data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    self.mapping = res._source.properties;
-
-    if (cb) {
-      cb(null, self);
-    }
+    self.refresh(options, cb);
   });
 
   return this;
@@ -107,19 +103,19 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
     options = null;
   }
 
-  this.kuzzle.query(this.collection, 'admin', 'getMapping', data, options, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('admin', 'getMapping'), data, options, function (err, res) {
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    if (res[self.kuzzle.index]) {
-      if (res[self.kuzzle.index].mappings[self.collection]) {
-        self.mapping = res[self.kuzzle.index].mappings[self.collection].properties;
+    if (res.result[self.collection.index]) {
+      if (res.result[self.collection.index].mappings[self.collection.collection]) {
+        self.mapping = res.result[self.collection.index].mappings[self.collection.collection].properties;
       } else {
-        return cb ? cb(new Error('No mapping found for collection ' + self.collection)) : false;
+        return cb ? cb(new Error('No mapping found for collection ' + self.collection.collection)) : false;
       }
     } else {
-      return cb ? cb(new Error('No mapping found for index ' + self.kuzzle.index)) : false;
+      return cb ? cb(new Error('No mapping found for index ' + self.collection.index)) : false;
     }
 
     if (cb) {

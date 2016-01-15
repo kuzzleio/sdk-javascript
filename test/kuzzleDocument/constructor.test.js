@@ -16,7 +16,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', 'this is not an index');
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     kuzzle.query = function () {
       var cb = arguments[arguments.length - 1];
 
@@ -52,10 +52,10 @@ describe('KuzzleDocument constructor', function () {
     should(document.collection).be.exactly('foo');
 
     document = new KuzzleDocument(dataCollection, 'id');
-    should(refreshed).be.true();
+    should(refreshed).be.false();
     should(document.id).be.exactly('id');
-    should(document.content).match({some: 'content'});
-    should(document.version).be.exactly(42);
+    should(document.content).be.empty();
+    should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
   });
 
