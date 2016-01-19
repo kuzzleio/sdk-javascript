@@ -529,11 +529,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-<<<<<<< HEAD
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query'];
-=======
-        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'now', 'query'];
->>>>>>> origin/master
 
         return passes && whitelist.indexOf(name) !== -1;
       }
