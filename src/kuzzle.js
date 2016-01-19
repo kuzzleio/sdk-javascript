@@ -180,7 +180,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: false
     },
     loginExpiresIn: {
-      value: (options && typeof options.loginExpiresIn === 'number') ? options.loginExpiresIn : undefined,
+      value: (options && ['number', 'string'].indexOf(typeof options.loginExpiresIn) !== -1) ? options.loginExpiresIn : undefined,
       enumerable: true,
       writable: false
     },
@@ -254,7 +254,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'now', 'query'];
+        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -382,21 +382,22 @@ Kuzzle.prototype.connect = function () {
 Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   var
     self = this,
-    request = {};
+    request = {
+      strategy: strategy
+    };
+
+  if (!cb && typeof expiresIn === 'function') {
+    cb = expiresIn;
+    expiresIn = null;
+  }
 
   Object.keys(credentials).forEach(function (key) {
-    if (credentials.hasOwnProperty(key)) {
-      request[key] = credentials[key];
-    }
+    request[key] = credentials[key];
   });
 
-  if (
-    typeof expiresIn === 'number' ||
-    typeof expiresIn === 'string'
-  ) {
+  if (['number', 'string'].indexOf(typeof expiresIn) !== -1) {
     request.expiresIn = expiresIn;
   }
-  request.strategy = strategy;
 
   this.query({controller: 'auth', action: 'login'}, request, {}, function(error, response) {
     if (error === null) {
