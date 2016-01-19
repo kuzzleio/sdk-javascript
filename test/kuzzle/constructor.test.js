@@ -46,6 +46,8 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.getStatistics);
       should.exist(kuzzle.listCollections);
       should.exist(kuzzle.disconnect);
+      should.exist(kuzzle.login);
+      should.exist(kuzzle.logout);
       should.exist(kuzzle.now);
       should.exist(kuzzle.query);
       should.exist(kuzzle.removeAllListeners);
@@ -108,7 +110,10 @@ describe('Kuzzle constructor', () => {
           metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
           replayInterval: 99999,
           reconnectionDelay: 666,
-          defaultIndex: 'foobar'
+          defaultIndex: 'foobar',
+          loginStrategy: 'some strategy',
+          loginCredentials: { user: 'foo', password: 'bar'},
+          loginExpiresIn: 777
         },
         kuzzle = new Kuzzle('nowhere', options);
 
@@ -123,6 +128,9 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
       should(kuzzle.replayInterval).be.exactly(options.replayInterval);
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
+      should(kuzzle.loginStrategy).be.exactly(options.loginStrategy);
+      should(kuzzle.loginCredentials).be.exactly(options.loginCredentials);
+      should(kuzzle.loginExpiresIn).be.exactly(options.loginExpiresIn);
     });
 
     it('should handle the offlineMode option properly', () => {
@@ -180,7 +188,8 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.getStatisticsPromise);
       should.exist(kuzzle.listCollectionsPromise);
       should.exist(kuzzle.listIndexesPromise);
-      should.not.exist(kuzzle.logoutPromise);
+      should.exist(kuzzle.loginPromise);
+      should.exist(kuzzle.logoutPromise);
       should.exist(kuzzle.nowPromise);
       should.exist(kuzzle.queryPromise);
       should.not.exist(kuzzle.removeAllListenersPromise);
@@ -612,7 +621,7 @@ describe('Kuzzle constructor', () => {
       var
         loginCalled = false,
         loginStub = function(strategy, credentials, expiresIn, cb) {
-          loginCalled = true
+          loginCalled = true;
 
           if (typeof cb === 'function') {
             if (strategy === 'error') {
@@ -760,6 +769,44 @@ describe('Kuzzle constructor', () => {
           should(k.jwtToken).be.exactly('test-toto');
           done();
         });
+      });
+
+      it('should handle optional arguments correctly', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          should(query.expiresIn).be.undefined();
+          done();
+        };
+
+        kuzzle.login('local', loginCredentials, function () {});
+      });
+
+      it('should handle optional callback correctly', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          should(query.expiresIn).be.undefined();
+          done();
+        };
+
+        kuzzle.login('local', loginCredentials);
       });
 
       it('should have a empty token in logout callback', function (done) {
