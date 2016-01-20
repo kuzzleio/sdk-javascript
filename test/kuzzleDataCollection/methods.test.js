@@ -1002,10 +1002,6 @@ describe('KuzzleDataCollection methods', function () {
       should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(KuzzleDocument);
     });
 
-    it('documentFactory should handle a _source content', function () {
-      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { _source: {foo: 'bar'}})).be.instanceof(KuzzleDocument);
-    });
-
     it('roomFactory should return a new KuzzleRoom object', function () {
       should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(KuzzleRoom);
     });

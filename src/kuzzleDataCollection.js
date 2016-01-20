@@ -106,7 +106,11 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
     }
 
     result.result.hits.forEach(function (doc) {
-      documents.push(self.documentFactory(doc._id, doc));
+      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+
+      newDocument.version = doc._version;
+
+      documents.push(newDocument);
     });
 
     cb(null, { total: result.result.total, documents: documents });
@@ -227,14 +231,18 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
+      var doc;
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res.result._id, res.result));
+      doc = new KuzzleDocument(self, res.result._id, res.result._source);
+      doc.version = res.result._version;
+      cb(null, doc);
     });
   } else {
-    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
 
   return this;
@@ -338,11 +346,15 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
   data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('read', 'get'), data, options, function (err, res) {
+    var document;
+
     if (err) {
       return cb(err);
     }
 
-    cb(null, self.documentFactory(res.result._id, res.result));
+    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document.version = res.result._version;
+    cb(null, document);
   });
 
   return this;
@@ -471,11 +483,15 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options, function (err, res) {
+      var document;
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, self.documentFactory(res.result._id, res.result));
+      document = new KuzzleDocument(self, res.result._id, res.result._source);
+      document.version = res.result._version;
+      cb(null, document);
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options);
@@ -586,13 +602,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
  * @constructor
  */
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
-  var document = content._source ? new KuzzleDocument(this, id, content._source) : new KuzzleDocument(this, id, content);
-
-  if (content._version && content._source) {
-    document.version = content._version;
-  }
-
-  return document;
+  return new KuzzleDocument(this, id, content);
 };
 
 /**
