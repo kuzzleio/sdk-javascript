@@ -1932,11 +1932,6 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
  * @constructor
  */
 KuzzleDataCollection.prototype.documentFactory = function (id, content) {
-  if (!content && typeof id === 'object') {
-    content = id;
-    id = null;
-  }
-
   return new KuzzleDocument(this, id, content);
 };
 
