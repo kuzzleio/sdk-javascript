@@ -399,7 +399,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
     request.expiresIn = expiresIn;
   }
 
-  this.query({controller: 'auth', action: 'login'}, request, {}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, {body: request}, {}, function(error, response) {
     if (error === null) {
       self.jwtToken = response.jwt;
 

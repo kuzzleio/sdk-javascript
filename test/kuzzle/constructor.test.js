@@ -917,9 +917,9 @@ describe('Kuzzle constructor', () => {
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].query.action).be.exactly('login');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
-        should(kuzzle.offlineQueue[0].query.username).be.exactly('foo');
-        should(kuzzle.offlineQueue[0].query.password).be.exactly('bar');
-        should(kuzzle.offlineQueue[0].query.expiresIn).be.exactly('1h');
+        should(kuzzle.offlineQueue[0].query.body.username).be.exactly('foo');
+        should(kuzzle.offlineQueue[0].query.body.password).be.exactly('bar');
+        should(kuzzle.offlineQueue[0].query.body.expiresIn).be.exactly('1h');
       });
 
       it('should forward token when logged in', function () {
