@@ -696,7 +696,7 @@ describe('KuzzleDataCollection methods', function () {
     });
   });
 
-  describe('#createOrReplaceMapping', function () {
+  describe('#updateMapping', function () {
     var
       KuzzleDataCollectionProxyquired,
       collection;
@@ -705,7 +705,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createOrReplaceMapping',
+        action: 'updateMapping',
         controller: 'admin',
         body: {}
       };
@@ -735,7 +735,7 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.createOrReplaceMapping(result.result, options, function (err, res) {
+      should(collection.updateMapping(result.result, options, function (err, res) {
         should(err).be.null();
         done();
       })).be.exactly(collection);
@@ -743,11 +743,11 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle the callback argument correctly', function () {
-      collection.createOrReplaceMapping(result.result, function () {});
+      collection.updateMapping(result.result, function () {});
       should(emitted).be.true();
 
       emitted = false;
-      collection.createOrReplaceMapping(result.result, {}, function () {});
+      collection.updateMapping(result.result, {}, function () {});
       should(emitted).be.true();
     });
 
@@ -755,7 +755,7 @@ describe('KuzzleDataCollection methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      collection.createOrReplaceMapping({}, function (err, res) {
+      collection.updateMapping({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();

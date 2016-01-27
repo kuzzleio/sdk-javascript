@@ -439,7 +439,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.createOrReplaceMapping = function (mapping, options, cb) {
+KuzzleDataCollection.prototype.updateMapping = function (mapping, options, cb) {
   var dataMapping;
 
   if (!cb && typeof options === 'function') {
