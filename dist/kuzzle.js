@@ -2671,6 +2671,10 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     filters = null;
   }
 
+  if (filters) {
+    this.filters = filters;
+  }
+
   /*
    if not yet connected, register itself to the subscriptions list and wait for the
    main Kuzzle object to renew once online
@@ -2680,7 +2684,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     this.kuzzle.subscriptions.pending[self.id] = self;
     return this;
   }
-
 
   if (this.subscribing) {
     this.queue.push({action: 'renew', args: [filters, cb]});
@@ -2694,10 +2697,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   this.subscribing = true;
   this.callback = cb;
   this.kuzzle.subscriptions.pending[self.id] = self;
-
-  if (filters) {
-    this.filters = filters;
-  }
 
   subscribeQuery.body = this.filters;
   subscribeQuery = this.kuzzle.addHeaders(subscribeQuery, this.headers);
