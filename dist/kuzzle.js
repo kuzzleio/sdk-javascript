@@ -1549,7 +1549,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   }
 
   if (options) {
-    action = options.updateIfExist ? 'createOrUpdate' : 'create';
+    action = options.updateIfExist ? 'createOrReplace' : 'create';
   }
 
   if (id) {
@@ -1769,7 +1769,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.putMapping = function (mapping, options, cb) {
+KuzzleDataCollection.prototype.createOrReplaceMapping = function (mapping, options, cb) {
   var dataMapping;
 
   if (!cb && typeof options === 'function') {
@@ -1812,7 +1812,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, function (err, res) {
       var document;
 
       if (err) {
@@ -1824,7 +1824,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       cb(null, document);
     });
   } else {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options);
   }
 
   return this;
@@ -2049,7 +2049,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'putMapping'), data, options, function (err) {
+  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'createOrReplaceMapping'), data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
@@ -2391,7 +2391,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrUpdate'), data, options, function (error, res) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrReplace'), data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
