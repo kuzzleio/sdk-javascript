@@ -431,29 +431,6 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
 };
 
 /**
- * Applies a new mapping to the data collection.
- * Note that you cannot delete an existing mapping, you can only add or update one.
- *
- * @param {object} mapping - mapping to apply
- * @param {object} [options] - optional arguments
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
- * @returns {*} this
- */
-KuzzleDataCollection.prototype.putMapping = function (mapping, options, cb) {
-  var dataMapping;
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  dataMapping = new KuzzleDataMapping(this, mapping);
-  dataMapping.apply(options, cb);
-
-  return this;
-};
-
-/**
  * Replace an existing document with a new one.
  *
  * Takes an optional argument object with the following properties:
