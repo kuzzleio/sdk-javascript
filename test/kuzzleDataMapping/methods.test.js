@@ -58,13 +58,13 @@ describe('KuzzleDataMapping methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'putMapping',
+        action: 'createOrReplaceMapping',
         controller: 'admin',
         body: result.result._source
       };
     });
 
-    it('should call the right putMapping query when invoked', function (done) {
+    it('should call the right createOrReplaceMapping query when invoked', function (done) {
       var
         refreshed = false,
         mapping = new KuzzleDataMapping(dataCollection, result.result._source.properties);

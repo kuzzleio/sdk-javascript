@@ -354,7 +354,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should be able to handle the updateIfExist option', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      expectedQuery.action = 'createOrUpdate';
+      expectedQuery.action = 'createOrReplace';
 
       collection.createDocument(result.result._source, {updateIfExist: true});
       should(emitted).be.true();
@@ -696,7 +696,7 @@ describe('KuzzleDataCollection methods', function () {
     });
   });
 
-  describe('#putMapping', function () {
+  describe('#createOrReplaceMapping', function () {
     var
       KuzzleDataCollectionProxyquired,
       collection;
@@ -705,7 +705,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'putMapping',
+        action: 'createOrReplaceMapping',
         controller: 'admin',
         body: {}
       };
@@ -735,7 +735,7 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.putMapping(result.result, options, function (err, res) {
+      should(collection.createOrReplaceMapping(result.result, options, function (err, res) {
         should(err).be.null();
         done();
       })).be.exactly(collection);
@@ -743,11 +743,11 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle the callback argument correctly', function () {
-      collection.putMapping(result.result, function () {});
+      collection.createOrReplaceMapping(result.result, function () {});
       should(emitted).be.true();
 
       emitted = false;
-      collection.putMapping(result.result, {}, function () {});
+      collection.createOrReplaceMapping(result.result, {}, function () {});
       should(emitted).be.true();
     });
 
@@ -755,7 +755,7 @@ describe('KuzzleDataCollection methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      collection.putMapping({}, function (err, res) {
+      collection.createOrReplaceMapping({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -773,7 +773,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createOrUpdate',
+        action: 'createOrReplace',
         controller: 'write',
         body: {}
       };

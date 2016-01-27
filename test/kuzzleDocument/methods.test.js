@@ -328,7 +328,7 @@ describe('KuzzleDocument methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createOrUpdate',
+        action: 'createOrReplace',
         controller: 'write',
         body: {}
       };
