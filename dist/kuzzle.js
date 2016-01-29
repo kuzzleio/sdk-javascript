@@ -444,21 +444,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       enumerable: true,
       writable: true
     },
-    loginStrategy: {
-      value: (options && typeof options.loginStrategy === 'string') ? options.loginStrategy : undefined,
-      enumerable: true,
-      writable: false
-    },
-    loginCredentials: {
-      value: (options && typeof options.loginCredentials === 'object') ? options.loginCredentials : undefined,
-      enumerable: true,
-      writable: false
-    },
-    loginExpiresIn: {
-      value: (options && ['number', 'string'].indexOf(typeof options.loginExpiresIn) !== -1) ? options.loginExpiresIn : undefined,
-      enumerable: true,
-      writable: false
-    },
     jwtToken: {
       value: undefined,
       enumerable: true,
@@ -564,28 +549,12 @@ Kuzzle.prototype.connect = function () {
 
   self.socket.once('connect', function () {
     self.state = 'connected';
+    renewAllSubscriptions.call(self);
+    dequeue.call(self);
+    emitEvent.call(self, 'connected');
 
-    if (self.loginStrategy) {
-      self.login(self.loginStrategy, self.loginCredentials, self.loginExpiresIn, function(error) {
-        renewAllSubscriptions.call(self);
-        dequeue.call(self);
-
-        emitEvent.call(self, 'connected', error);
-
-        if (self.connectCB) {
-          self.connectCB(error, self);
-        }
-      });
-    }
-    else {
-      renewAllSubscriptions.call(self);
-      dequeue.call(self);
-
-      emitEvent.call(self, 'connected');
-
-      if (self.connectCB) {
-        self.connectCB(null, self);
-      }
+    if (self.connectCB) {
+      self.connectCB(null, self);
     }
   });
 
@@ -804,10 +773,6 @@ function emitEvent(event) {
   var
     self = this,
     args = Array.prototype.slice.call(arguments, 1);
-
-  if (!event || !self.eventListeners[event]) {
-    return false;
-  }
 
   self.eventListeners[event].forEach(function (listener) {
     listener.fn.apply(self, args);
@@ -2543,6 +2508,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     id: {
       value: uuid.v4()
     },
+    lastRenewal: {
+      value: null,
+      writable: true
+    },
     notifier: {
       value: null,
       writable: true
@@ -2550,6 +2519,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
     queue: {
       value: [],
       writable: true
+    },
+    // Delay before allowing a subscription renewal
+    renewalDelay: {
+      value: 500
     },
     scope: {
       value: options && options.scope ? options.scope : 'all'
@@ -2650,6 +2623,7 @@ KuzzleRoom.prototype.count = function (cb) {
  */
 KuzzleRoom.prototype.renew = function (filters, cb) {
   var
+    now = Date.now(),
     subscribeQuery = {
       scope: this.scope,
       state: this.state,
@@ -2662,37 +2636,46 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     filters = null;
   }
 
+  /*
+    Skip subscription renewal if another one was performed a moment before
+   */
+  if (self.lastRenewal && (now - self.lastRenewal) <= self.renewalDelay) {
+    return self;
+  }
+
+  self.lastRenewal = now;
+
   if (filters) {
-    this.filters = filters;
+    self.filters = filters;
   }
 
   /*
    if not yet connected, register itself to the subscriptions list and wait for the
    main Kuzzle object to renew once online
     */
-  if (this.kuzzle.state !== 'connected') {
-    this.callback = cb;
-    this.kuzzle.subscriptions.pending[self.id] = self;
-    return this;
+  if (self.kuzzle.state !== 'connected') {
+    self.callback = cb;
+    self.kuzzle.subscriptions.pending[self.id] = self;
+    return self;
   }
 
-  if (this.subscribing) {
-    this.queue.push({action: 'renew', args: [filters, cb]});
-    return this;
+  if (self.subscribing) {
+    self.queue.push({action: 'renew', args: [filters, cb]});
+    return self;
   }
 
-  this.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
 
-  this.unsubscribe();
-  this.roomId = null;
-  this.subscribing = true;
-  this.callback = cb;
-  this.kuzzle.subscriptions.pending[self.id] = self;
+  self.unsubscribe();
+  self.roomId = null;
+  self.subscribing = true;
+  self.callback = cb;
+  self.kuzzle.subscriptions.pending[self.id] = self;
 
-  subscribeQuery.body = this.filters;
-  subscribeQuery = this.kuzzle.addHeaders(subscribeQuery, this.headers);
+  subscribeQuery.body = self.filters;
+  subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'on'), subscribeQuery, {metadata: this.metadata}, function (error, response) {
+  self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'on'), subscribeQuery, {metadata: self.metadata}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 
@@ -2716,7 +2699,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     dequeue.call(self);
   });
 
-  return this;
+  return self;
 };
 
 /**
