@@ -1769,7 +1769,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
  * @param {responseCallback} [cb] - Returns an instantiated KuzzleDataMapping object
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.createOrReplaceMapping = function (mapping, options, cb) {
+KuzzleDataCollection.prototype.updateMapping = function (mapping, options, cb) {
   var dataMapping;
 
   if (!cb && typeof options === 'function') {
@@ -2049,7 +2049,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'createOrReplaceMapping'), data, options, function (err) {
+  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'updateMapping'), data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }
