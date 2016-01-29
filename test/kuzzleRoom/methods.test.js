@@ -199,6 +199,25 @@ describe('KuzzleRoom methods', function () {
         done();
       }, 10);
     });
+
+    it('should not renew subscription if another renewal was performed before the allowed delay', function (done) {
+      var
+        renewals = 0,
+        before = Date.now(),
+        after;
+
+      kuzzle.query = function () { renewals++; arguments[3](null, result); }
+      room.renew({}, function () {});
+      after = Date.now();
+      room.renew({}, function () {});
+      room.renew({}, function () {});
+
+      setTimeout(() => {
+        should(renewals).be.eql(1);
+        should(room.lastRenewal).be.within(before, after);
+        done();
+      }, 20);
+    });
   });
 
   describe('#setHeaders', function () {

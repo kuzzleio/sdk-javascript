@@ -74,10 +74,6 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
-
-      should(kuzzle).have.propertyWithDescriptor('loginStrategy', { enumerable: true, writable: false, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('loginCredentials', { enumerable: true, writable: false, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('loginExpiresIn', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
     });
 
@@ -110,10 +106,7 @@ describe('Kuzzle constructor', () => {
           metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
           replayInterval: 99999,
           reconnectionDelay: 666,
-          defaultIndex: 'foobar',
-          loginStrategy: 'some strategy',
-          loginCredentials: { user: 'foo', password: 'bar'},
-          loginExpiresIn: 777
+          defaultIndex: 'foobar'
         },
         kuzzle = new Kuzzle('nowhere', options);
 
@@ -128,9 +121,6 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
       should(kuzzle.replayInterval).be.exactly(options.replayInterval);
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
-      should(kuzzle.loginStrategy).be.exactly(options.loginStrategy);
-      should(kuzzle.loginCredentials).be.exactly(options.loginCredentials);
-      should(kuzzle.loginExpiresIn).be.exactly(options.loginExpiresIn);
     });
 
     it('should handle the offlineMode option properly', () => {
@@ -640,50 +630,6 @@ describe('Kuzzle constructor', () => {
 
       beforeEach(function () {
         Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
-      });
-
-      it('should login after a connection when loginCredentials & loginStrategy are set', function(done) {
-        Kuzzle = proxyquire(kuzzleSource, {
-          'socket.io-client': function () {
-            var emitter = new EventEmitter;
-
-            /*
-             since we're stubbing the socket.io socket object,
-             we need a stubbed 'close' function to make kuzzle.logout() work
-             */
-            emitter.close = function () {
-              return false;
-            };
-            process.nextTick(() => emitter.emit('connect'));
-            return emitter;
-          }
-        });
-
-        var
-          kuzzle = new Kuzzle('nowhere', {
-            connect: 'manual',
-            loginStrategy: 'local',
-            loginCredentials: {
-              username: 'foo',
-              password: 'bar'
-            }
-          });
-
-        this.timeout(200);
-
-        kuzzle.login = loginStub;
-
-        kuzzle.connect();
-
-        setTimeout(() => {
-          try {
-            should(loginCalled).be.exactly(true);
-            done();
-          }
-          catch (e) {
-            done(e);
-          }
-        }, 10);
       });
 
       it('should call the provided callback on a connection & login success', function (done) {
