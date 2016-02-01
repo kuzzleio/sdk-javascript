@@ -338,6 +338,14 @@ Kuzzle.prototype.setJwtToken = function(token) {
 };
 
 /**
+ * Get the jwtToken used by kuzzle
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.getJwtToken = function() {
+  return this.jwtToken;
+};
+
+/**
  * Send login request to kuzzle with credentials
  * If login success, store the jwtToken into kuzzle object
  *
