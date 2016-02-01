@@ -602,7 +602,26 @@ Kuzzle.prototype.connect = function () {
   return this;
 };
 
+/**
+ * Set the jwtToken used to query kuzzle
+ * @param token
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.setJwtToken = function(token) {
+  this.jwtToken = token;
+  return this;
+};
 
+/**
+ * Send login request to kuzzle with credentials
+ * If login success, store the jwtToken into kuzzle object
+ *
+ * @param strategy
+ * @param credentials
+ * @param expiresIn
+ * @param cb
+ * @returns {Kuzzle}
+ */
 Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   var
     self = this,
@@ -625,7 +644,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
 
   this.query({controller: 'auth', action: 'login'}, {body: request}, {}, function(error, response) {
     if (error === null) {
-      self.jwtToken = response.jwt;
+      self.setJwtToken(response.result.jwt);
       renewAllSubscriptions.call(self);
 
       if (typeof cb === 'function') {
@@ -643,6 +662,12 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   return self;
 };
 
+/**
+ * Send logout request to kuzzle with jwtToken.
+ *
+ * @param cb
+ * @returns {Kuzzle}
+ */
 Kuzzle.prototype.logout = function (cb) {
   var
     self = this,
@@ -655,7 +680,7 @@ Kuzzle.prototype.logout = function (cb) {
 
   this.query({controller: 'auth', action: 'logout'}, request, {}, function(error) {
     if (error === null) {
-      self.jwtToken = undefined;
+      self.setJwtToken(undefined);
 
       if (typeof cb === 'function') {
         cb(null, self);
