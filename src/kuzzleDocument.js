@@ -254,7 +254,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   data.persist = true;
 
-  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrUpdate'), data, options, function (error, res) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrReplace'), data, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }

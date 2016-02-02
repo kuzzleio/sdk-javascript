@@ -354,7 +354,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should be able to handle the updateIfExist option', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      expectedQuery.action = 'createOrUpdate';
+      expectedQuery.action = 'createOrReplace';
 
       collection.createDocument(result.result._source, {updateIfExist: true});
       should(emitted).be.true();
@@ -706,7 +706,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createOrUpdate',
+        action: 'createOrReplace',
         controller: 'write',
         body: {}
       };

@@ -73,7 +73,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'putMapping'), data, options, function (err) {
+  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'updateMapping'), data, options, function (err) {
     if (err) {
       return cb ? cb(err) : false;
     }

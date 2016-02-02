@@ -219,7 +219,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   }
 
   if (options) {
-    action = options.updateIfExist ? 'createOrUpdate' : 'create';
+    action = options.updateIfExist ? 'createOrReplace' : 'create';
   }
 
   if (id) {
@@ -459,7 +459,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
   data = self.kuzzle.addHeaders(data, this.headers);
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, function (err, res) {
       var document;
 
       if (err) {
@@ -471,7 +471,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       cb(null, document);
     });
   } else {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrUpdate'), data, options);
+    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options);
   }
 
   return this;
