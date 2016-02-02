@@ -708,7 +708,7 @@ describe('Kuzzle constructor', () => {
         });
 
         kuzzle.query = function(queryArgs, query, options, cb) {
-          cb(null, { jwt: 'test-toto'});
+          cb(null, { result: {jwt: 'test-toto'}});
         };
 
         kuzzle.login('local', loginCredentials, '1h', function(error, k) {
