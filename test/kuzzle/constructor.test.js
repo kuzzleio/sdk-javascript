@@ -182,6 +182,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.logoutPromise);
       should.exist(kuzzle.nowPromise);
       should.exist(kuzzle.queryPromise);
+      should.exist(kuzzle.checkTokenPromise);
       should.not.exist(kuzzle.removeAllListenersPromise);
       should.not.exist(kuzzle.removeListenerPromise);
       should.not.exist(kuzzle.replayQueuePromise);
@@ -893,53 +894,6 @@ describe('Kuzzle constructor', () => {
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.index).be.exactly('index');
         should(kuzzle.offlineQueue[0].query.headers.authorization).be.exactly('Bearer fake-token');
-      });
-
-      it('should send the checkToken request when the method is called', function () {
-        var
-          kuzzle,
-          token = 'fakeToken-eoijaodmowifnw8h';
-
-        this.timeout(200);
-
-        Kuzzle = rewire(kuzzleSource);
-
-        kuzzle = new Kuzzle('nowhere', {
-          connect: 'manual'
-        });
-
-        kuzzle.queuing = true;
-
-        kuzzle.checkToken(token, function (err, res) {});
-
-        should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].query.action).be.exactly('checkToken');
-        should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
-        should(kuzzle.offlineQueue[0].query.body.token).be.exactly(token);
-      });
-
-      it('should throw an error when checkToken is called with no callback', function (done) {
-        var
-          kuzzle,
-          token = 'fakeToken-eoijaodmowifnw8h';
-
-        this.timeout(200);
-
-        Kuzzle = rewire(kuzzleSource);
-
-        kuzzle = new Kuzzle('nowhere', {
-          connect: 'manual'
-        });
-
-        kuzzle.queuing = true;
-
-        try {
-          kuzzle.checkToken(token, null);
-        } catch (e) {
-          should(e).be.an.instanceOf(Error);
-        } finally {
-          done();
-        }
       });
     });
   });
