@@ -428,6 +428,32 @@ Kuzzle.prototype.logout = function (cb) {
 };
 
 /**
+ * Checks wether a given jwt token still represents a valid session in Kuzzle.
+ *
+ * @param  {string}   token     The jwt token to check
+ * @param  {function} callback  The callback to be called when the response is
+ *                              available. The signature is `function(error, response)`.
+ * @return {Kuzzle}             The Kuzzle instance to enable chaining.
+ */
+Kuzzle.prototype.checkToken = function (token, callback) {
+  var
+    self = this,
+    request = {
+      body: {
+        token: token
+      }
+    };
+
+  if (typeof callback !== 'function') {
+    throw new Error('The provided callback is not a function');
+  }
+
+  this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
+
+  return self;
+};
+
+/**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
 function cleanQueue () {
@@ -1062,4 +1088,3 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
-
