@@ -1,7 +1,7 @@
 var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
-  KuzzleSecurity = require('./KuzzleSecurity');
+  KuzzleSecurity = require('./security/KuzzleSecurity');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -19,6 +19,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
+
 module.exports = Kuzzle = function (url, options, cb) {
   var self = this;
 
@@ -1066,4 +1067,3 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
-
