@@ -11,11 +11,7 @@ var
  * @returns {KuzzleSecurity}
  * @constructor
  */
-function KuzzleSecurity(kuzzle, headers) {
-
-  if (!headers) {
-    headers = kuzzle.headers;
-  }
+function KuzzleSecurity(kuzzle) {
 
   Object.defineProperties(this, {
     kuzzle: {
@@ -23,11 +19,20 @@ function KuzzleSecurity(kuzzle, headers) {
       enumerable: true
     },
     // writable properties
-    //headers: {
-    //  value: JSON.parse(JSON.stringify(headers)),
-    //  enumerable: true,
-    //  writable: true
-    //}
+    headers: {
+      value: JSON.parse(JSON.stringify(kuzzle.headers)),
+      enumerable: true,
+      writable: true
+    }
+  });
+
+  Object.defineProperty(this, 'buildQueryArgs', {
+    value: function (action) {
+      return {
+        controller: 'security',
+        action: action
+      };
+    }
   });
 
   if (this.kuzzle.bluebird) {
@@ -63,7 +68,34 @@ KuzzleSecurity.prototype.fetchRole = function (name, cb) {
  * @returns {Object} this
  */
 KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
-  
+  var
+    query,
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
+
+  query = self.kuzzle.addHeaders({body: filters}, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('security', 'searchRoles'), query, options, function (error, result) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = result.result.hits.map(function (doc) {
+      return new Role(doc._id, doc._source);
+    });
+
+    cb(null, { total: result.result.total, documents: documents });
+  });
+
+  return this;
 };
 
 /**
