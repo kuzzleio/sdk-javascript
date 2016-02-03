@@ -252,7 +252,6 @@ module.exports = Kuzzle = function (url, options, cb) {
     });
   }
 
-  return this;
 };
 
 

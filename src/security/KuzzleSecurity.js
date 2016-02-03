@@ -23,18 +23,18 @@ function KuzzleSecurity(kuzzle, headers) {
       enumerable: true
     },
     // writable properties
-    headers: {
-      value: JSON.parse(JSON.stringify(headers)),
-      enumerable: true,
-      writable: true
-    }
+    //headers: {
+    //  value: JSON.parse(JSON.stringify(headers)),
+    //  enumerable: true,
+    //  writable: true
+    //}
   });
 
   if (this.kuzzle.bluebird) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['fetchRole', 'searchRoles', 'createRole', 'fetchProfile', 'searchProfiles', 'createProfile', 'fetchUser', 'searchUsers', 'createUser'];
+        var blacklist = [];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -63,7 +63,7 @@ KuzzleSecurity.prototype.fetchRole = function (name, cb) {
  * @returns {Object} this
  */
 KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
-
+  
 };
 
 /**
@@ -142,3 +142,6 @@ KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
 KuzzleSecurity.prototype.createUser = function (profile, cb) {
 
 };
+
+
+module.exports = KuzzleSecurity;
