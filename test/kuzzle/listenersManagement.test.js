@@ -28,10 +28,10 @@ describe('Listeners management', () => {
 
   describe('#addListener', function () {
     it('should properly add new listeners to events', function () {
-      should(kuzzle.eventListeners['connected'].length).be.exactly(4);
-      should(kuzzle.eventListeners['error'].length).be.exactly(3);
-      should(kuzzle.eventListeners['disconnected'].length).be.exactly(2);
-      should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+      should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(4);
+      should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+      should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(2);
+      should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
     });
 
     it('should throw an error if trying to adding a listener to an unknown event', function () {
@@ -55,19 +55,19 @@ describe('Listeners management', () => {
     it('should remove all registered listeners on a given event when asked to', function () {
       kuzzle.removeAllListeners('disconnected');
 
-      should(kuzzle.eventListeners['connected'].length).be.exactly(4);
-      should(kuzzle.eventListeners['error'].length).be.exactly(3);
-      should(kuzzle.eventListeners['disconnected'].length).be.exactly(0);
-      should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+      should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(4);
+      should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+      should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(0);
+      should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
     });
 
     it('should remove all registered listeners on all events when providing no event argument', function () {
       kuzzle.removeAllListeners();
 
-      should(kuzzle.eventListeners['connected'].length).be.exactly(0);
-      should(kuzzle.eventListeners['error'].length).be.exactly(0);
-      should(kuzzle.eventListeners['disconnected'].length).be.exactly(0);
-      should(kuzzle.eventListeners['reconnected'].length).be.exactly(0);
+      should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(0);
+      should(kuzzle.eventListeners['error'].listeners.length).be.exactly(0);
+      should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(0);
+      should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(0);
     });
 
     it('should throw an error when an unknown event is provided', function () {
@@ -76,26 +76,26 @@ describe('Listeners management', () => {
         should.fail('success', 'failure', 'Should have failed removing listeners with an unknown event', '');
       }
       catch (e) {
-        should(kuzzle.eventListeners['connected'].length).be.exactly(4);
-        should(kuzzle.eventListeners['error'].length).be.exactly(3);
-        should(kuzzle.eventListeners['disconnected'].length).be.exactly(2);
-        should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+        should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(4);
+        should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+        should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(2);
+        should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
       }
     });
   });
 
   describe('#removeListener', function () {
     it('should remove any one listener from the listener list', function () {
-      var listener = kuzzle.eventListeners['connected'].filter(l => { return l.id === listenerIds[2]});
+      var listener = kuzzle.eventListeners.connected.listeners.filter(l => { return l.id === listenerIds[2]});
 
       should(listener.length).be.exactly(1);
       kuzzle.removeListener('connected', listenerIds[2]);
-      listener = kuzzle.eventListeners['connected'].filter(l => { return l.id === listenerIds[2]});
+      listener = kuzzle.eventListeners.connected.listeners.filter(l => { return l.id === listenerIds[2]});
       should(listener.length).be.exactly(0);
-      should(kuzzle.eventListeners['connected'].length).be.exactly(3);
-      should(kuzzle.eventListeners['error'].length).be.exactly(3);
-      should(kuzzle.eventListeners['disconnected'].length).be.exactly(2);
-      should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+      should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(3);
+      should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+      should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(2);
+      should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
     });
 
     it('should throw an error when trying to remove a listener from an unknown event', function () {
@@ -104,19 +104,19 @@ describe('Listeners management', () => {
         should.fail('success', 'failure', 'Should have failed removing listeners with an unknown event', '');
       }
       catch (e) {
-        should(kuzzle.eventListeners['connected'].length).be.exactly(4);
-        should(kuzzle.eventListeners['error'].length).be.exactly(3);
-        should(kuzzle.eventListeners['disconnected'].length).be.exactly(2);
-        should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+        should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(4);
+        should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+        should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(2);
+        should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
       }
     });
 
     it('should do nothing if the provided listener id does not exist', function () {
       kuzzle.removeListener('connected', 'foo');
-      should(kuzzle.eventListeners['connected'].length).be.exactly(4);
-      should(kuzzle.eventListeners['error'].length).be.exactly(3);
-      should(kuzzle.eventListeners['disconnected'].length).be.exactly(2);
-      should(kuzzle.eventListeners['reconnected'].length).be.exactly(1);
+      should(kuzzle.eventListeners['connected'].listeners.length).be.exactly(4);
+      should(kuzzle.eventListeners['error'].listeners.length).be.exactly(3);
+      should(kuzzle.eventListeners['disconnected'].listeners.length).be.exactly(2);
+      should(kuzzle.eventListeners['reconnected'].listeners.length).be.exactly(1);
     });
   });
 });

@@ -43,6 +43,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.dataCollectionFactory);
       should.exist(kuzzle.flushQueue);
       should.exist(kuzzle.getAllStatistics);
+      should.exist(kuzzle.getJwtToken);
       should.exist(kuzzle.getStatistics);
       should.exist(kuzzle.listCollections);
       should.exist(kuzzle.disconnect);
@@ -56,6 +57,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.setHeaders);
       should.exist(kuzzle.startQueuing);
       should.exist(kuzzle.stopQueuing);
+      should.exist(kuzzle.setJwtToken);
     });
 
     it('should expose the documented properties', () => {
@@ -174,6 +176,7 @@ describe('Kuzzle constructor', () => {
       should.not.exist(kuzzle.dataCollectionFactoryPromise);
       should.not.exist(kuzzle.flushQueuePromise);
       should.exist(kuzzle.getAllStatisticsPromise);
+      should.not.exist(kuzzle.getJwtTokenPromise);
       should.exist(kuzzle.getServerInfoPromise);
       should.exist(kuzzle.getStatisticsPromise);
       should.exist(kuzzle.listCollectionsPromise);
@@ -185,6 +188,7 @@ describe('Kuzzle constructor', () => {
       should.not.exist(kuzzle.removeAllListenersPromise);
       should.not.exist(kuzzle.removeListenerPromise);
       should.not.exist(kuzzle.replayQueuePromise);
+      should.not.exist(kuzzle.setJwtTokenPromise);
       should.not.exist(kuzzle.setHeadersPromise);
       should.not.exist(kuzzle.startQueuingPromise);
       should.not.exist(kuzzle.stopQueuingPromise);
