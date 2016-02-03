@@ -22,6 +22,7 @@ function KuzzleUser() {
 
 /**
  * @param {Boolean} hydrate
+ *
  * @returns {Object} this
  */
 KuzzleUser.prototype.getProfiles = function (hydrate) {
@@ -31,6 +32,7 @@ KuzzleUser.prototype.getProfiles = function (hydrate) {
 /**
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
+ *
  * @returns {Object} this
  */
 KuzzleUser.prototype.save = function (options, cb) {
@@ -40,6 +42,7 @@ KuzzleUser.prototype.save = function (options, cb) {
 /**
  *
  * @param {Object} data - New user content
+ * 
  * @return {Object} KuzzleUser
  */
 KuzzleUser.prototype.setContent = function (data) {

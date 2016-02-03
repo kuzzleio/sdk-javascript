@@ -22,6 +22,7 @@ function KuzzleProfile() {
 
 /**
  * @param {Boolean} hydrate
+ *
  * @returns {Object} this
  */
 KuzzleProfile.prototype.getRoles = function (hydrate) {
@@ -31,6 +32,7 @@ KuzzleProfile.prototype.getRoles = function (hydrate) {
 /**
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
+ *
  * @returns {Object} this
  */
 KuzzleProfile.prototype.save = function (options, cb) {
@@ -40,6 +42,7 @@ KuzzleProfile.prototype.save = function (options, cb) {
 /**
  *
  * @param {Object} data - New profile content
+ *
  * @return {Object} this
  */
 KuzzleProfile.prototype.setContent = function (data) {

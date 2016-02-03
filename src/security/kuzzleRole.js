@@ -23,6 +23,7 @@ function KuzzleRole() {
 /**
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
+ *
  * @returns {Object} this
  */
 KuzzleRole.prototype.save = function (options, cb) {
@@ -32,6 +33,7 @@ KuzzleRole.prototype.save = function (options, cb) {
 /**
  *
  * @param {Object} data - New role content
+ *
  * @return {Object} this
  */
 KuzzleRole.prototype.setContent = function (data) {
