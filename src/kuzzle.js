@@ -1,6 +1,7 @@
 var
   uuid = require('node-uuid'),
-  KuzzleDataCollection = require('./kuzzleDataCollection');
+  KuzzleDataCollection = require('./kuzzleDataCollection'),
+  KuzzleSecurity = require('./KuzzleSecurity');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -39,6 +40,10 @@ module.exports = Kuzzle = function (url, options, cb) {
     collections: {
       value: {},
       writable: true
+    },
+    security: {
+      value: new KuzzleSecurity(this),
+      enumerable: true
     },
     connectCB: {
       value: cb
@@ -654,10 +659,9 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  *
  * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
- * @param headers {object} [headers] - Common properties for all future write documents queries
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
+Kuzzle.prototype.dataCollectionFactory = function(index, collection) {
   this.isValid();
 
   if (arguments.length === 1) {
@@ -679,7 +683,7 @@ Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection, headers);
+    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection);
   }
 
   return this.collections[index][collection];
