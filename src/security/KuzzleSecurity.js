@@ -1,13 +1,12 @@
 var
-  Role = require('./kuzzleRole'),
-  Profile = require('./kuzzleProfile'),
-  User = require('./kuzzleUser');
+  KuzzleRole = require('./KuzzleRole'),
+  KuzzleProfile = require('./kuzzleProfile'),
+  KuzzleUser = require('./kuzzleUser');
 
 /**
  * Kuzzle security constructor
  *
  * @param kuzzle
- * @param headers
  * @returns {KuzzleSecurity}
  * @constructor
  */
@@ -89,7 +88,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
     }
 
     documents = result.result.hits.map(function (doc) {
-      return new Role(doc._id, doc._source);
+      return new KuzzleRole(doc._id, doc._source);
     });
 
     cb(null, { total: result.result.total, documents: documents });
