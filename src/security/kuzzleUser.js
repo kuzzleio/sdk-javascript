@@ -42,8 +42,8 @@ KuzzleUser.prototype.save = function (options, cb) {
 /**
  *
  * @param {Object} data - New user content
- * 
- * @return {Object} KuzzleUser
+ *
+ * @return {Object} this
  */
 KuzzleUser.prototype.setContent = function (data) {
 
