@@ -1,5 +1,5 @@
 var
-  KuzzleRole = require('./KuzzleRole'),
+  KuzzleRole = require('./kuzzleRole'),
   KuzzleProfile = require('./kuzzleProfile'),
   KuzzleUser = require('./kuzzleUser');
 
@@ -12,17 +12,8 @@ var
  */
 function KuzzleSecurity(kuzzle) {
 
-  Object.defineProperties(this, {
-    kuzzle: {
-      value: kuzzle,
-      enumerable: true
-    },
-    // writable properties
-    headers: {
-      value: JSON.parse(JSON.stringify(kuzzle.headers)),
-      enumerable: true,
-      writable: true
-    }
+  Object.defineProperty(this, 'kuzzle', {
+    value: kuzzle
   });
 
   Object.defineProperty(this, 'buildQueryArgs', {
@@ -77,10 +68,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
-
-  query = self.kuzzle.addHeaders({body: filters}, this.headers);
-
-  self.kuzzle.query(this.buildQueryArgs('security', 'searchRoles'), query, options, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, options, function (error, result) {
     var documents;
 
     if (error) {
@@ -88,7 +76,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
     }
 
     documents = result.result.hits.map(function (doc) {
-      return new KuzzleRole(doc._id, doc._source);
+      return new KuzzleRole(this, doc._id, doc._source);
     });
 
     cb(null, { total: result.result.total, documents: documents });

@@ -1,4 +1,4 @@
-function KuzzleRole(roleId, content) {
+function KuzzleRole(kuzzle, roleId, content) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
@@ -14,6 +14,10 @@ function KuzzleRole(roleId, content) {
       writable: true,
       enumerable: true
     }
+  });
+
+  Object.defineProperty(this, 'kuzzle', {
+    value: kuzzle
   });
 
   // handling provided arguments

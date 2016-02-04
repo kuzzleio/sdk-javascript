@@ -42,10 +42,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: {},
       writable: true
     },
-    security: {
-      value: new KuzzleSecurity(this),
-      enumerable: true
-    },
     connectCB: {
       value: cb
     },
@@ -114,7 +110,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: url,
       enumerable: true
     },
-    // writable properties
     autoQueue: {
       value: false,
       enumerable: true,
@@ -222,7 +217,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  /*
+  /**
    * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
    * and is called by these methods
    */
@@ -232,6 +227,13 @@ module.exports = Kuzzle = function (url, options, cb) {
         throw new Error(errorMessagePrefix + ': a callback argument is required for read queries');
       }
     }
+  });
+
+  /**
+   * Create an attribute security that embed all methods for manage Role, Profile and User
+   */
+  Object.defineProperty(this, 'security', {
+    value: new KuzzleSecurity(this)
   });
 
 
