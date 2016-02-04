@@ -7,7 +7,6 @@ then
   git config --global user.name "Travis CI"
   git clone --quiet --branch=${TRAVIS_BRANCH} https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} travis-build
   cd travis-build
-  #npm install
   ln -s  ${TRAVIS_BUILD_DIR}/node_modules
   grunt
   git add dist/
