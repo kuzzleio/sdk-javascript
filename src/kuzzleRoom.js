@@ -306,6 +306,7 @@ function notificationCallback (data) {
   }
 
   if (data.action === 'jwtTokenExpired') {
+    this.kuzzle.jwtToken = undefined;
     return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 

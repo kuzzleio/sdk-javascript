@@ -516,12 +516,12 @@ module.exports = Kuzzle = function (url, options, cb) {
         now = Date.now(),
         args = Array.prototype.slice.call(arguments, 1);
 
-      if (this.eventListeners[event].lastEmitted && self.eventListeners[event].lastEmitted > now - self.eventTimeout) {
+      if (this.eventListeners[event].lastEmitted && this.eventListeners[event].lastEmitted >= now - this.eventTimeout) {
         return false;
       }
 
       this.eventListeners[event].listeners.forEach(function (listener) {
-        listener.fn.apply(self, args);
+        listener.fn.apply(this, args);
       });
 
       this.eventListeners[event].lastEmitted = now;
@@ -767,6 +767,7 @@ function emitRequest (request, cb) {
   if (self.jwtToken !== undefined || cb) {
     self.socket.once(request.requestId, function (response) {
       if (response.error && response.error.message === 'Token expired') {
+        self.jwtToken = undefined;
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
@@ -2821,6 +2822,7 @@ function notificationCallback (data) {
   }
 
   if (data.action === 'jwtTokenExpired') {
+    this.kuzzle.jwtToken = undefined;
     return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 

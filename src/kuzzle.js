@@ -492,6 +492,7 @@ function emitRequest (request, cb) {
   if (self.jwtToken !== undefined || cb) {
     self.socket.once(request.requestId, function (response) {
       if (response.error && response.error.message === 'Token expired') {
+        self.jwtToken = undefined;
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
