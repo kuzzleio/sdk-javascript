@@ -542,4 +542,24 @@ describe('Kuzzle methods', function () {
       }
     });
   });
+
+  describe('#whoAmI', function () {
+    it('should send the getCurrentUser after call', function () {
+      var kuzzle;
+
+      this.timeout(200);
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.queuing = true;
+
+      kuzzle.whoAmI(function (err, res) {});
+
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].query.action).be.exactly('getCurrentUser');
+      should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
+    });
+  });
 });
