@@ -541,7 +541,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
           'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-          'checkToken'];
+          'checkToken', 'whoAmI'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -763,7 +763,7 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
 
-  this.callbackRequired('Kuzzle.checkToken', callback);
+  this.callbackRequired('Kuzzle.whoAmI', callback);
 
   this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
 
