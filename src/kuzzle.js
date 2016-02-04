@@ -488,7 +488,7 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
 
-  this.callbackRequired('Kuzzle.checkToken', callback);
+  this.callbackRequired('Kuzzle.whoAmI', callback);
 
   this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
 
