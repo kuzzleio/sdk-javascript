@@ -180,7 +180,7 @@ describe('Kuzzle methods', function () {
       kuzzle.collections['foo'] = { bar: 'qux'};
       should(kuzzle.dataCollectionFactory('foo', 'bar')).be.a.String().and.be.exactly('qux');
     });
-    
+
     it('should use the default index if no index is provided', function () {
       var
         collection,
@@ -495,6 +495,51 @@ describe('Kuzzle methods', function () {
       kuzzle.setHeaders({}, true);
 
       should(kuzzle.headers).be.empty();
+    });
+  });
+
+  describe('#checkToken', function () {
+    it('should send the checkToken after call', function () {
+      var
+        kuzzle,
+        token = 'fakeToken-eoijaodmowifnw8h';
+
+      this.timeout(200);
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.queuing = true;
+
+      kuzzle.checkToken(token, function (err, res) {});
+
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].query.action).be.exactly('checkToken');
+      should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
+      should(kuzzle.offlineQueue[0].query.body.token).be.exactly(token);
+    });
+
+    it('should throw an error when it is called with no callback', function (done) {
+      var
+        kuzzle,
+        token = 'fakeToken-eoijaodmowifnw8h';
+
+      this.timeout(200);
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.queuing = true;
+
+      try {
+        kuzzle.checkToken(token, null);
+      } catch (e) {
+        should(e).be.an.instanceOf(Error);
+      } finally {
+        done();
+      }
     });
   });
 });
