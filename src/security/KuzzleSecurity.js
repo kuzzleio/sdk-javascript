@@ -106,10 +106,16 @@ KuzzleSecurity.prototype.createRole = function (role, cb) {
 KuzzleSecurity.prototype.fetchProfile = function (name, hydrate, cb) {
 
 };
+
 /**
+ * Executes a search on profiles according to a filter
  *
- * @param {object} filters
- * @param {Boolean} hydrate
+ * /!\ There is a small delay between profile creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a profile that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
+ * @param {Boolean} hydrate - if hydrate is true, profiles will have a list of Role object instead of just a list of role id
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
@@ -139,10 +145,16 @@ KuzzleSecurity.prototype.createProfile = function (profile, cb) {
 KuzzleSecurity.prototype.fetchUser = function (name, hydrate, cb) {
 
 };
+
 /**
+ * Executes a search on user according to a filter
  *
- * @param {object} filters
- * @param {Boolean} hydrate
+ * /!\ There is a small delay between user creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a user that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - same filters as documents filters
+ * @param {Boolean} hydrate - if hydrate is true, users will have a Profile object instead of just a profile id
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
