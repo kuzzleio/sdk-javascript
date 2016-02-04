@@ -21,11 +21,10 @@ function KuzzleProfile() {
 }
 
 /**
- * @param {Boolean} hydrate
  *
  * @returns {Object} this
  */
-KuzzleProfile.prototype.getRoles = function (hydrate) {
+KuzzleProfile.prototype.hydrate = function () {
 
 };
 

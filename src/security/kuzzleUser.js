@@ -21,11 +21,9 @@ function KuzzleUser() {
 }
 
 /**
- * @param {Boolean} hydrate
- *
  * @returns {Object} this
  */
-KuzzleUser.prototype.getProfiles = function (hydrate) {
+KuzzleUser.prototype.hydrate = function () {
 
 };
 
