@@ -454,6 +454,23 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 };
 
 /**
+ * Fetches the current user.
+ *
+ * @param  {function} callback  The callback to be called when the response is
+ *                              available. The signature is `function(error, response)`.
+ * @return {Kuzzle}             The Kuzzle instance to enable chaining.
+ */
+Kuzzle.prototype.whoAmI = function (callback) {
+  var self = this;
+
+  this.callbackRequired('Kuzzle.checkToken', callback);
+
+  this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
+
+  return self;
+};
+
+/**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
 function cleanQueue () {
