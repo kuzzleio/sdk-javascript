@@ -49,6 +49,7 @@ function KuzzleSecurity(kuzzle) {
 KuzzleSecurity.prototype.fetchRole = function (name, cb) {
 
 };
+
 /**
  * Executes a search on roles according to a filter
  *
@@ -57,23 +58,17 @@ KuzzleSecurity.prototype.fetchRole = function (name, cb) {
  * That means that a role that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `indexes` with a list of index id, a integer `from` and a integer `size`
- * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
+KuzzleSecurity.prototype.searchRoles = function (filters, cb) {
   var
     self = this;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
   self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, options, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, null, function (error, result) {
     var documents;
 
     if (error) {
