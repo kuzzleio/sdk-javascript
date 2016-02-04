@@ -79,6 +79,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, cb) {
       return new KuzzleRole(self, doc._id, doc._source);
     });
 
+    console.log(documents);
     cb(null, { total: result.result.total, documents: documents });
   });
 

@@ -1,44 +1,12 @@
+var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+
 function KuzzleUser(kuzzle, id, content) {
-  // Define properties
-  Object.defineProperties(this, {
-    // private properties
-    // read-only properties
-    // writable properties
-    id: {
-      value: undefined,
-      enumerable: true,
-      writable: true
-    },
-    content: {
-      value: {},
-      writable: true,
-      enumerable: true
-    }
-  });
 
-  Object.defineProperty(this, 'kuzzle', {
-    value: kuzzle
-  });
+  KuzzleSecurityDocument.call(this, kuzzle, id, content);
 
-  // handling provided arguments
-  if (!content && id && typeof id === 'object') {
-    content = id;
-    id = null;
-  }
-
-  if (content) {
-    this.setContent(content);
-  }
-
-  if (id) {
-    Object.defineProperty(this, 'id', {
-      value: id,
-      enumerable: true
-    });
-  }
-
-  if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this, {
+  // promisifying
+  if (kuzzle.bluebird) {
+    return kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['hydrate', 'save'];
@@ -48,8 +16,13 @@ function KuzzleUser(kuzzle, id, content) {
     });
   }
 
-  return this;
 }
+
+KuzzleUser.prototype = Object.create(KuzzleUser.prototype, {
+  constructor: {
+    value: KuzzleUser
+  }
+});
 
 /**
  *
@@ -65,16 +38,6 @@ KuzzleUser.prototype.hydrate = function () {
  * @returns {Object} this
  */
 KuzzleUser.prototype.save = function (options, cb) {
-
-};
-
-/**
- *
- * @param {Object} data - New user content
- *
- * @return {Object} this
- */
-KuzzleUser.prototype.setContent = function (data) {
 
 };
 

@@ -1,45 +1,14 @@
-function KuzzleRole(kuzzle, id, content) {
-  // Define properties
-  Object.defineProperties(this, {
-    // private properties
-    // read-only properties
-    // writable properties
-    id: {
-      value: undefined,
-      enumerable: true,
-      writable: true
-    },
-    content: {
-      value: {},
-      writable: true,
-      enumerable: true
-    }
-  });
+var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+var util = require('util');
 
-  Object.defineProperty(this, 'kuzzle', {
-    value: kuzzle
-  });
 
-  // handling provided arguments
-  if (!content && id && typeof id === 'object') {
-    content = id;
-    id = null;
-  }
+function KuzzleRole(kuzzleSecurity, id, content) {
 
-  if (content) {
-    this.setContent(content);
-  }
-
-  if (id) {
-    Object.defineProperty(this, 'id', {
-      value: id,
-      enumerable: true
-    });
-  }
+  KuzzleSecurityDocument.call(this, kuzzleSecurity.kuzzle, id, content);
 
   // promisifying
-  if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this, {
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['save'];
@@ -49,8 +18,13 @@ function KuzzleRole(kuzzle, id, content) {
     });
   }
 
-  return this;
 }
+
+KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+  constructor: {
+    value: KuzzleRole
+  }
+});
 
 /**
  * @param {object} [options] - Optional parameters
@@ -60,18 +34,6 @@ function KuzzleRole(kuzzle, id, content) {
  */
 KuzzleRole.prototype.save = function (options, cb) {
 
-};
-
-/**
- *
- * @param {Object} data - New role content
- *
- * @return {Object} this
- */
-KuzzleRole.prototype.setContent = function (data) {
-  this.content = data;
-
-  return this;
 };
 
 module.exports = KuzzleRole;
