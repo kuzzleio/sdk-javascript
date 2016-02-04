@@ -22,7 +22,6 @@ function KuzzleProfile() {
 
 /**
  *
- * @returns {Object} this
  */
 KuzzleProfile.prototype.hydrate = function () {
 

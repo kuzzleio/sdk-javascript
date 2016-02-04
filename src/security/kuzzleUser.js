@@ -21,7 +21,7 @@ function KuzzleUser() {
 }
 
 /**
- * @returns {Object} this
+ *
  */
 KuzzleUser.prototype.hydrate = function () {
 
