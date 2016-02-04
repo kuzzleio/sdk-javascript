@@ -1109,7 +1109,6 @@ Kuzzle.prototype.startQueuing = function () {
   if (this.state === 'offline' && !this.autoQueue) {
     this.queuing = true;
   }
-
   return this;
 };
 

@@ -97,6 +97,18 @@ KuzzleSecurity.prototype.createRole = function (role, cb) {
 };
 
 /**
+ * Instantiate a new KuzzleRole object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - role id
+ * @param {object} content - role content
+ * @constructor
+ */
+KuzzleSecurity.prototype.roleFactory = function(id, content) {
+  return new KuzzleRole(this.kuzzle, id, content);
+};
+
+/**
  * @param {string} name
  * @param {Boolean} hydrate
  * @param {responseCallback} [cb] - returns Kuzzle's response
@@ -136,6 +148,18 @@ KuzzleSecurity.prototype.createProfile = function (profile, cb) {
 };
 
 /**
+ * Instantiate a new KuzzleProfile object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - profile id
+ * @param {object} content - profile content
+ * @constructor
+ */
+KuzzleSecurity.prototype.profileFactory = function(id, content) {
+  return new KuzzleProfile(this.kuzzle, id, content);
+};
+
+/**
  * @param {string} name
  * @param {Boolean} hydrate
  * @param {responseCallback} [cb] - returns Kuzzle's response
@@ -172,6 +196,18 @@ KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
  */
 KuzzleSecurity.prototype.createUser = function (profile, cb) {
 
+};
+
+/**
+ * Instantiate a new KuzzleUser object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - user id
+ * @param {object} content - user content
+ * @constructor
+ */
+KuzzleSecurity.prototype.userFactory = function(id, content) {
+  return new KuzzleUser(this.kuzzle, id, content);
 };
 
 

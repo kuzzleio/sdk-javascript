@@ -1,4 +1,4 @@
-function KuzzleRole(kuzzle, roleId, content) {
+function KuzzleRole(kuzzle, id, content) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
@@ -21,18 +21,18 @@ function KuzzleRole(kuzzle, roleId, content) {
   });
 
   // handling provided arguments
-  if (!content && roleId && typeof roleId === 'object') {
-    content = roleId;
-    roleId = null;
+  if (!content && id && typeof id === 'object') {
+    content = id;
+    id = null;
   }
 
   if (content) {
     this.setContent(content);
   }
 
-  if (roleId) {
+  if (id) {
     Object.defineProperty(this, 'id', {
-      value: roleId,
+      value: id,
       enumerable: true
     });
   }
