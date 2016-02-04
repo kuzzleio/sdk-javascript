@@ -394,5 +394,18 @@ describe('KuzzleRoom methods', function () {
       should(called).be.false();
       should(kuzzle.requestHistory).be.empty();
     });
+
+    it('should fire a "jwtTokenExpired" event when receiving a jwtTokenExpired notification', function () {
+      var
+        eventEmitted = null,
+        context = {
+          kuzzle: {
+            emitEvent: event => eventEmitted = event
+          }
+        };
+
+      notifCB.call(context, {error: null, result: {}, action: 'jwtTokenExpired'});
+      should(eventEmitted).be.eql('jwtTokenExpired');
+    });
   });
 });

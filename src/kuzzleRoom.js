@@ -1,4 +1,5 @@
-var uuid = require('node-uuid');
+var
+  uuid = require('node-uuid');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -302,6 +303,11 @@ KuzzleRoom.prototype.setHeaders = function (content, replace) {
 function notificationCallback (data) {
   if (data.error) {
     return this.callback(data.error);
+  }
+
+  if (data.action === 'jwtTokenExpired') {
+    this.kuzzle.jwtToken = undefined;
+    return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 
   if (this.kuzzle.requestHistory[data.requestId]) {

@@ -1,15 +1,16 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
-  Kuzzle = rewire('../../src/kuzzle');
+  Kuzzle = require('../../src/kuzzle');
 
 
 describe('Event emitter', () => {
   var
+    kuzzle,
     emitEvent;
 
   before(function () {
-    emitEvent = Kuzzle.__get__('emitEvent');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    emitEvent = kuzzle.emitEvent;
   });
 
   it('should call all added listeners for a given event', function () {
@@ -20,11 +21,14 @@ describe('Event emitter', () => {
       },
       context = {
         eventListeners: {
-          foo: [
-            {fn: listener},
-            {fn: listener},
-            {fn: listener}
-          ]
+          foo: {
+            lastEmitted: null,
+            listeners: [
+              {fn: listener},
+              {fn: listener},
+              {fn: listener}
+            ]
+          }
         }
       };
 
@@ -39,10 +43,14 @@ describe('Event emitter', () => {
         argsCount = arguments.length;
       },
       context = {
+        eventTimeout: -100,
         eventListeners: {
-          foo: [
-            {fn: listener}
-          ]
+          foo: {
+            lastEmitted: null,
+            listeners: [
+              {fn: listener}
+            ]
+          }
         }
       };
 
@@ -59,5 +67,36 @@ describe('Event emitter', () => {
     argsCount = 0;
     emitEvent.call(context, 'foo', {foo: 'bar'}, 'bar', ['foo', 'bar']);
     should(argsCount).be.eql(3);
+  });
+
+  it('should not re-emit an event before event timeout', function (done) {
+    var
+      listenerCalled = 0,
+      listener = function () {
+        listenerCalled++;
+      },
+      context = {
+        eventTimeout: 20,
+        eventListeners: {
+          foo: {
+            lastEmitted: null,
+            listeners: [
+              {fn: listener}
+            ]
+          }
+        }
+      };
+
+    emitEvent.call(context, 'foo');
+    emitEvent.call(context, 'foo');
+    emitEvent.call(context, 'foo');
+    emitEvent.call(context, 'foo');
+    should(listenerCalled).be.eql(1);
+
+    setTimeout(() => {
+      emitEvent.call(context, 'foo');
+      should(listenerCalled).be.eql(2);
+      done();
+    }, 30);
   });
 });
