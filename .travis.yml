@@ -16,16 +16,7 @@ before_install: npm install -g grunt-cli
 install: npm install
 
 after_success:
-  - echo "Push generated dist folder"
-  - git config --global user.email "support@kuzzle.io"
-  - git config --global user.name "Travis CI"
-  - git clone --quiet --branch=${TRAVIS_BRANCH} https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} travis-build
-  - cd travis-build
-  - npm install
-  - grunt
-  - git add dist/
-  - git commit -am "Travis CI - [ci skip] - automatic dist folder"
-  - git push origin ${TRAVIS_BRANCH}
+  - chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 
 env:
   global:

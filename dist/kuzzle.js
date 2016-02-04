@@ -320,12 +320,15 @@ module.exports = Kuzzle = function (url, options, cb) {
     },
     eventListeners: {
       value: {
-        connected: [],
-        error: [],
-        disconnected: [],
-        reconnected: [],
-        jwtTokenExpired: []
+        connected: {lastEmitted: null, listeners: []},
+        error: {lastEmitted: null, listeners: []},
+        disconnected: {lastEmitted: null, listeners: []},
+        reconnected: {lastEmitted: null, listeners: []},
+        jwtTokenExpired: {lastEmitted: null, listeners: []}
       }
+    },
+    eventTimeout: {
+      value: 200
     },
     io: {
       value: null,
@@ -503,6 +506,28 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
+  /*
+   * Emit an event to all registered listeners
+   * An event cannot be emitted multiple times before a timeout has been reached.
+   */
+  Object.defineProperty(this, 'emitEvent', {
+    value: function emitEvent(event) {
+      var
+        now = Date.now(),
+        args = Array.prototype.slice.call(arguments, 1);
+
+      if (this.eventListeners[event].lastEmitted && this.eventListeners[event].lastEmitted >= now - this.eventTimeout) {
+        return false;
+      }
+
+      this.eventListeners[event].listeners.forEach(function (listener) {
+        listener.fn.apply(this, args);
+      });
+
+      this.eventListeners[event].lastEmitted = now;
+    }
+  });
+
 
   if (!options || !options.connect || options.connect === 'auto') {
     this.connect();
@@ -514,7 +539,9 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query'];
+        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
+          'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
+          'checkToken'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -551,7 +578,7 @@ Kuzzle.prototype.connect = function () {
     self.state = 'connected';
     renewAllSubscriptions.call(self);
     dequeue.call(self);
-    emitEvent.call(self, 'connected');
+    self.emitEvent('connected');
 
     if (self.connectCB) {
       self.connectCB(null, self);
@@ -560,7 +587,7 @@ Kuzzle.prototype.connect = function () {
 
   self.socket.on('connect_error', function (error) {
     self.state = 'error';
-    emitEvent.call(self, 'error');
+    self.emitEvent('error');
 
     if (self.connectCB) {
       self.connectCB(error);
@@ -578,7 +605,7 @@ Kuzzle.prototype.connect = function () {
       self.queuing = true;
     }
 
-    emitEvent.call(self, 'disconnected');
+    self.emitEvent('disconnected');
   });
 
   self.socket.on('reconnect', function () {
@@ -596,7 +623,7 @@ Kuzzle.prototype.connect = function () {
     }
 
     // alert listeners
-    emitEvent.call(self, 'reconnected');
+    self.emitEvent('reconnected');
   });
 
   return this;
@@ -719,9 +746,7 @@ Kuzzle.prototype.checkToken = function (token, callback) {
       }
     };
 
-  if (typeof callback !== 'function') {
-    throw new Error('The provided callback is not a function');
-  }
+  this.callbackRequired('Kuzzle.checkToken', callback);
 
   this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
 
@@ -768,7 +793,8 @@ function emitRequest (request, cb) {
   if (self.jwtToken !== undefined || cb) {
     self.socket.once(request.requestId, function (response) {
       if (response.error && response.error.message === 'Token expired') {
-        emitEvent.call(self, 'jwtTokenExpired', request, cb);
+        self.jwtToken = undefined;
+        self.emitEvent('jwtTokenExpired', request, cb);
       }
 
       if (cb) {
@@ -824,21 +850,6 @@ function renewAllSubscriptions() {
 }
 
 /**
- * Emits an event to all registered listeners
- *
- * @param {string} event - name of the target global event
-  */
-function emitEvent(event) {
-  var
-    self = this,
-    args = Array.prototype.slice.call(arguments, 1);
-
-  self.eventListeners[event].forEach(function (listener) {
-    listener.fn.apply(self, args);
-  });
-}
-
-/**
  * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
  * insertion.
  *
@@ -865,7 +876,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
   }
 
   listenerId = uuid.v1();
-  this.eventListeners[event].push({id: listenerId, fn: listener});
+  this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
   return listenerId;
 };
 
@@ -1252,10 +1263,10 @@ Kuzzle.prototype.removeAllListeners = function (event) {
       throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
     }
 
-    this.eventListeners[event] = [];
+    this.eventListeners[event].listeners = [];
   } else {
     knownEvents.forEach(function (eventName) {
-      self.eventListeners[eventName] = [];
+      self.eventListeners[eventName].listeners = [];
     });
   }
 };
@@ -1275,9 +1286,9 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
-  this.eventListeners[event].forEach(function (listener, index) {
+  this.eventListeners[event].listeners.forEach(function (listener, index) {
     if (listener.id === listenerId) {
-      self.eventListeners[event].splice(index, 1);
+      self.eventListeners[event].listeners.splice(index, 1);
     }
   });
 };
@@ -2528,7 +2539,8 @@ function dequeue () {
 module.exports = KuzzleDocument;
 
 },{}],6:[function(require,module,exports){
-var uuid = require('node-uuid');
+var
+  uuid = require('node-uuid');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -2832,6 +2844,11 @@ KuzzleRoom.prototype.setHeaders = function (content, replace) {
 function notificationCallback (data) {
   if (data.error) {
     return this.callback(data.error);
+  }
+
+  if (data.action === 'jwtTokenExpired') {
+    this.kuzzle.jwtToken = undefined;
+    return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 
   if (this.kuzzle.requestHistory[data.requestId]) {
