@@ -185,6 +185,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.logoutPromise);
       should.exist(kuzzle.nowPromise);
       should.exist(kuzzle.queryPromise);
+      should.exist(kuzzle.checkTokenPromise);
       should.not.exist(kuzzle.removeAllListenersPromise);
       should.not.exist(kuzzle.removeListenerPromise);
       should.not.exist(kuzzle.replayQueuePromise);
