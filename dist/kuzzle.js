@@ -541,7 +541,7 @@ module.exports = Kuzzle = function (url, options, cb) {
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
           'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-          'checkToken'];
+          'checkToken', 'whoAmI'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -749,6 +749,23 @@ Kuzzle.prototype.checkToken = function (token, callback) {
   this.callbackRequired('Kuzzle.checkToken', callback);
 
   this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
+
+  return self;
+};
+
+/**
+ * Fetches the current user.
+ *
+ * @param  {function} callback  The callback to be called when the response is
+ *                              available. The signature is `function(error, response)`.
+ * @return {Kuzzle}             The Kuzzle instance to enable chaining.
+ */
+Kuzzle.prototype.whoAmI = function (callback) {
+  var self = this;
+
+  this.callbackRequired('Kuzzle.whoAmI', callback);
+
+  this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
 
   return self;
 };
