@@ -233,7 +233,8 @@ module.exports = Kuzzle = function (url, options, cb) {
    * Create an attribute security that embed all methods for manage Role, Profile and User
    */
   Object.defineProperty(this, 'security', {
-    value: new KuzzleSecurity(this)
+    value: new KuzzleSecurity(this),
+    enumerable: true
   });
 
 

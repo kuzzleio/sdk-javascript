@@ -69,7 +69,9 @@ KuzzleRole.prototype.save = function (options, cb) {
  * @return {Object} this
  */
 KuzzleRole.prototype.setContent = function (data) {
+  this.content = data;
 
+  return this;
 };
 
 module.exports = KuzzleRole;
