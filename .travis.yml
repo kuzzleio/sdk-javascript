@@ -16,7 +16,7 @@ before_install: npm install -g grunt-cli
 install: npm install
 
 after_success:
-  - chmod 755 deploy.sh && sh -c "deploy.sh"
+  - chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 
 env:
   global:
