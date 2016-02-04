@@ -50,8 +50,13 @@ KuzzleSecurity.prototype.fetchRole = function (name, cb) {
 
 };
 /**
+ * Executes a search on roles according to a filter
  *
- * @param {object} filters
+ * /!\ There is a small delay between role creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a role that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - this object can contains an array `indexes` with a list of index id, a integer `from` and a integer `size`
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
@@ -59,7 +64,6 @@ KuzzleSecurity.prototype.fetchRole = function (name, cb) {
  */
 KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
   var
-    query,
     self = this;
 
   if (!cb && typeof options === 'function') {
@@ -68,6 +72,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
+
   self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, options, function (error, result) {
     var documents;
 
@@ -76,7 +81,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
     }
 
     documents = result.result.hits.map(function (doc) {
-      return new KuzzleRole(this, doc._id, doc._source);
+      return new KuzzleRole(self, doc._id, doc._source);
     });
 
     cb(null, { total: result.result.total, documents: documents });
