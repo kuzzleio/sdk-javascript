@@ -514,7 +514,9 @@ module.exports = Kuzzle = function (url, options, cb) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics', 'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query'];
+        var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
+          'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
+          'checkToken'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -698,6 +700,30 @@ Kuzzle.prototype.logout = function (cb) {
       cb(error);
     }
   });
+
+  return self;
+};
+
+/**
+ * Checks wether a given jwt token still represents a valid session in Kuzzle.
+ *
+ * @param  {string}   token     The jwt token to check
+ * @param  {function} callback  The callback to be called when the response is
+ *                              available. The signature is `function(error, response)`.
+ * @return {Kuzzle}             The Kuzzle instance to enable chaining.
+ */
+Kuzzle.prototype.checkToken = function (token, callback) {
+  var
+    self = this,
+    request = {
+      body: {
+        token: token
+      }
+    };
+
+  this.callbackRequired('Kuzzle.checkToken', callback);
+
+  this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
 
   return self;
 };
@@ -1337,7 +1363,6 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
-
 
 },{"./kuzzleDataCollection":3,"node-uuid":1,"socket.io-client":undefined}],3:[function(require,module,exports){
 var
