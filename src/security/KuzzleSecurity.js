@@ -55,12 +55,12 @@ KuzzleSecurity.prototype.getRole = function (id, cb) {
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getRole'), data, null, function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('getRole'), data, null, function (err, response) {
     if (err) {
       return cb(err);
     }
 
-    cb(null,  new KuzzleRole(self, res.result._id, res.result._source));
+    cb(null, new KuzzleRole(self, response.result._id, response.result._source));
   });
 
   return this;
@@ -210,7 +210,6 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 };
 
 
-
 /**
  * @param {string} id
  * @param {responseCallback} cb - returns Kuzzle's response
@@ -227,10 +226,6 @@ KuzzleSecurity.prototype.getProfile = function (id, cb) {
     if (error) {
       return cb(error);
     }
-
-    response.result._source.roles = response.result._source.roles.map(function(role) {
-      return new KuzzleRole(self, role._id, role._source);
-    });
 
     cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
   });
@@ -398,14 +393,29 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 };
 
 /**
+ * Retrieve a single User using its unique user ID.
+ *
  * @param {string} id
- * @param {Boolean} hydrate
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.getUser = function (id, hydrate, cb) {
+KuzzleSecurity.prototype.getUser = function (id, cb) {
+  var
+    data = {_id: id},
+    self = this;
 
+  self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getUser'), data, null, function (err, response) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+  });
+
+  return this;
 };
 
 /**

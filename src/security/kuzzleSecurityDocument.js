@@ -42,8 +42,6 @@ KuzzleSecurityDocument.prototype.setContent = function (data) {
   return this;
 };
 
-
-
 /**
  * Serialize this object into a JSON object
  *
@@ -61,5 +59,6 @@ KuzzleSecurityDocument.prototype.toJSON = function () {
 
   return data;
 };
+
 
 module.exports = KuzzleSecurityDocument;
