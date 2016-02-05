@@ -141,13 +141,46 @@ KuzzleSecurity.prototype.fetchProfile = function (name, hydrate, cb) {
  * That means that a profile that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
- * @param {Boolean} hydrate - if hydrate is true, profiles will have a list of Role object instead of just a list of role id
+ * @param {Boolean} [hydrate] - if hydrate is true, profiles will have a list of Role object instead of just a list of role id
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
 KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
+  var
+    self = this;
 
+
+  if (!cb && typeof hydrate === 'function') {
+    cb = hydrate;
+    hydrate = false;
+  }
+
+  filters.hydrate = hydrate;
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, null, function (error, result) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = result.result.hits.map(function (doc) {
+      if (hydrate) {
+        doc._source.roles = doc._source.roles.map(function(role) {
+          return new KuzzleRole(self, role._id, role._source);
+        });
+      }
+
+      return new KuzzleProfile(self, doc._id, doc._source);
+    });
+
+    cb(null, { total: result.result.total, documents: documents });
+  });
+
+  return this;
 };
 
 /**
