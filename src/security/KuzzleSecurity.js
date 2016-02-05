@@ -47,7 +47,21 @@ function KuzzleSecurity(kuzzle) {
  * @returns {Object} this
  */
 KuzzleSecurity.prototype.fetchRole = function (name, cb) {
+  var
+    data = {_id: name},
+    self = this;
 
+  self.kuzzle.callbackRequired('KuzzleSecurity.fetchRole', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getRole'), data, null, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null,  new KuzzleRole(self, res.result._id, res.result._source));
+  });
+
+  return this;
 };
 
 /**
@@ -79,7 +93,6 @@ KuzzleSecurity.prototype.searchRoles = function (filters, cb) {
       return new KuzzleRole(self, doc._id, doc._source);
     });
 
-    console.log(documents);
     cb(null, { total: result.result.total, documents: documents });
   });
 
