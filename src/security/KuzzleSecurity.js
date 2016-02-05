@@ -126,7 +126,7 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 
 /**
  * @param {string} id
- * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @param {responseCallback} cb - returns Kuzzle's response
  *
  * @returns {Object} this
  */
