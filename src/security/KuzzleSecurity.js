@@ -146,7 +146,7 @@ KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
   }
 
   if (options) {
-    action = options.updateIfExist ? 'createOrReplaceRole' : 'createRole';
+    action = options.replaceIfExist ? 'createOrReplaceRole' : 'createRole';
   }
 
   if (cb) {
@@ -158,7 +158,6 @@ KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
       }
 
       doc = new KuzzleRole(self, res.result._id, res.result._source);
-      doc.version = res.result._version;
       cb(null, doc);
     });
   } else {
