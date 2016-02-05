@@ -1,4 +1,9 @@
 function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
+
+  if (!id) {
+    throw new Error('A security document ' + typeof this + ' must have an id');
+  }
+
   // Define properties
   Object.defineProperties(this, {
     // private properties
@@ -23,10 +28,6 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 
   if (content) {
     this.setContent(content);
-  }
-
-  if (!id) {
-    throw new Error('A security document ' + typeof this + ' must have an id');
   }
 }
 
