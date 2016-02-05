@@ -1,15 +1,25 @@
 var
-  q = require('q'),
-  KuzzlRole = require('./kuzzleRole'),
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
+  KuzzleRole = require('./kuzzleRole');
 
-function KuzzleProfile(kuzzle, id, content) {
+function KuzzleProfile(kuzzleSecurity, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzle, id, content);
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+
+  // Hydrate profile with roles if roles are not only string but objects with `_id` and `_source`
+  if (content && content.roles) {
+    content.roles = content.roles.map(function (role) {
+      if (!role._id || !role._source) {
+        return role;
+      }
+
+      return new KuzzleRole(kuzzleSecurity, role._id, role._source);
+    })
+  }
 
   // promisifying
-  if (kuzzle.bluebird) {
-    return kuzzle.bluebird.promisifyAll(this, {
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['hydrate', 'save'];

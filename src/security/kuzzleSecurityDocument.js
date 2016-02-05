@@ -1,13 +1,18 @@
-function KuzzleSecurityDocument(kuzzle, id, content) {
+function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
+    kuzzle: {
+      value: kuzzleSecurity.kuzzle
+    },
+    kuzzleSecurity: {
+      value: kuzzleSecurity
+    },
     // read-only properties
     // writable properties
     id: {
-      value: undefined,
-      enumerable: true,
-      writable: true
+      value: id,
+      enumerable: true
     },
     content: {
       value: {},
@@ -16,25 +21,12 @@ function KuzzleSecurityDocument(kuzzle, id, content) {
     }
   });
 
-  Object.defineProperty(this, 'kuzzle', {
-    value: kuzzle
-  });
-
-  // handling provided arguments
-  if (!content && id && typeof id === 'object') {
-    content = id;
-    id = null;
-  }
-
   if (content) {
     this.setContent(content);
   }
 
-  if (id) {
-    Object.defineProperty(this, 'id', {
-      value: id,
-      enumerable: true
-    });
+  if (!id) {
+    throw new Error('A security document ' + typeof this + ' must have an id');
   }
 }
 
@@ -67,5 +59,6 @@ KuzzleSecurityDocument.prototype.toJSON = function () {
 
   return data;
 };
+
 
 module.exports = KuzzleSecurityDocument;
