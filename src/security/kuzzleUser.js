@@ -1,6 +1,6 @@
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleProfile = requrie('./kuzzleProfile');
+  KuzzleProfile = require('./kuzzleProfile');
 
 function KuzzleUser(kuzzleSecurity, id, content) {
 
