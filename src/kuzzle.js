@@ -1,7 +1,7 @@
 var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
-  KuzzleSecurity = require('./security/KuzzleSecurity');
+  KuzzleSecurity = require('./security/kuzzleSecurity');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.

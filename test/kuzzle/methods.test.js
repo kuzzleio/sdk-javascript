@@ -2,7 +2,8 @@ var
   should = require('should'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = require('../../src/kuzzleDataCollection');
+  KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
+  KuzzleSecurity = require('../../src/security/kuzzleSecurity');
 
 describe('Kuzzle methods', function () {
   var
@@ -560,6 +561,18 @@ describe('Kuzzle methods', function () {
       should(kuzzle.offlineQueue.length).be.exactly(1);
       should(kuzzle.offlineQueue[0].query.action).be.exactly('getCurrentUser');
       should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
+    });
+  });
+
+  describe('#security', function () {
+    it('should be an instance of KuzzleSecurity', function () {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      should(kuzzle.security).be.an.instanceOf(KuzzleSecurity);
     });
   });
 });

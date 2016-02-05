@@ -1,7 +1,7 @@
 function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 
   if (!id) {
-    throw new Error('A security document ' + typeof this + ' must have an id');
+    throw new Error('A security document must have an id');
   }
 
   // Define properties

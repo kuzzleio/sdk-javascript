@@ -50,8 +50,14 @@ function KuzzleSecurity(kuzzle) {
  */
 KuzzleSecurity.prototype.getRole = function (id, cb) {
   var
-    data = {_id: id},
+    data,
     self = this;
+
+  if (!id) {
+    throw new Error('Id parameter is mandatory for getRole function');
+  }
+
+  data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
 
@@ -206,11 +212,18 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
  */
 KuzzleSecurity.prototype.getProfile = function (id, cb) {
   var
+    data,
     self = this;
+
+  if (!id) {
+    throw new Error('Id parameter is mandatory for getProfile function');
+  }
+
+  data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getProfile'), {_id: id}, null, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, null, function (error, response) {
     if (error) {
       return cb(error);
     }
@@ -371,8 +384,14 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  */
 KuzzleSecurity.prototype.getUser = function (id, cb) {
   var
-    data = {_id: id},
+    data,
     self = this;
+
+  if (!id) {
+    throw new Error('Id parameter is mandatory for getUser function');
+  }
+
+  data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
 
