@@ -29,7 +29,7 @@ function KuzzleSecurity(kuzzle) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = [];
+        var blacklist = ['roleFactory', 'profileFactory', 'userFactory'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -41,17 +41,19 @@ function KuzzleSecurity(kuzzle) {
 
 
 /**
- * @param {string} name
+ * Retrieve a single Role using its unique role ID.
+ *
+ * @param {string} id
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.fetchRole = function (name, cb) {
+KuzzleSecurity.prototype.getRole = function (id, cb) {
   var
-    data = {_id: name},
+    data = {_id: id},
     self = this;
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.fetchRole', cb);
+  self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getRole'), data, null, function (err, res) {
     if (err) {
@@ -207,13 +209,13 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 };
 
 /**
- * @param {string} name
+ * @param {string} id
  * @param {Boolean} hydrate
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.fetchUser = function (name, hydrate, cb) {
+KuzzleSecurity.prototype.getUser = function (id, hydrate, cb) {
 
 };
 
