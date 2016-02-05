@@ -109,23 +109,28 @@ KuzzleSecurity.prototype.searchRoles = function (filters, cb) {
  *        If the same role already exists: throw an error if sets to false.
  *        Replace the existing role otherwise
  *
- * @param {string} [id] - (optional) document identifier
  * @param {object} role - either an instance of a KuzzleRole object, or a plain javascript object
+ * @param {string} [id] - document identifier
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.createRole = function (id, role, options, cb) {
+KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
   var
     self = this,
     data = {},
     action = 'createRole';
 
   if (id && typeof id !== 'string') {
-    cb = options;
-    options = role;
-    role = id;
-    id = null;
+    if (role instanceof KuzzleRole) {
+      cb = options;
+      options = role;
+      role = id;
+      id = null;
+    }
+    else {
+      throw new Error('KuzzleSecurity.createRole: cannot create a role without a role ID');
+    }
   }
 
   if (!cb && typeof options === 'function') {
@@ -136,15 +141,12 @@ KuzzleSecurity.prototype.createRole = function (id, role, options, cb) {
   if (role instanceof KuzzleRole) {
     data = role.toJSON();
   } else {
+    data._id = id;
     data.body = role;
   }
 
   if (options) {
     action = options.replaceIfExist ? 'createOrReplaceRole' : 'createRole';
-  }
-
-  if (id) {
-    data._id = id;
   }
 
   if (cb) {
@@ -179,7 +181,7 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 
 /**
  * @param {string} id
- * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @param {responseCallback} cb - returns Kuzzle's response
  *
  * @returns {Object} this
  */
@@ -254,14 +256,71 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
 };
 
 /**
+ * Create a new profile in Kuzzle.
+ *
+ * Takes an optional argument object with the following property:
+ *    - replaceIfExist (boolean, default: false):
+ *        If the same role already exists: throw an error if sets to false.
+ *        Replace the existing role otherwise
  *
  * @param {object} profile
- * @param {responseCallback} [cb] - returns Kuzzle's response
+ * @param {string} [id] - document identifier
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Handles the query response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.createProfile = function (profile, cb) {
+KuzzleSecurity.prototype.createProfile = function (profile, id, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'createProfile';
 
+  if (id && typeof id !== 'string') {
+    if (profile instanceof KuzzleProfile) {
+      cb = options;
+      options = profile;
+      profile = id;
+      id = null;
+    }
+    else {
+      throw new Error('KuzzleSecurity.createProfile: cannot create a profile without a role ID');
+    }
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (profile instanceof KuzzleProfile) {
+    data = profile.toJSON();
+  } else {
+    data._id = id;
+    data.body = profile;
+  }
+
+  if (options) {
+    action = options.updateIfExist ? 'createOrReplaceProfile' : 'createProfile';
+  }
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, null, function (err, res) {
+      var doc;
+
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleProfile(self, res.result._id, res.result._source);
+      doc.version = res.result._version;
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+
+  return this;
 };
 
 /**
