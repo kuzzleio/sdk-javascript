@@ -32,10 +32,28 @@ KuzzleUser.prototype = Object.create(KuzzleUser.prototype, {
 });
 
 /**
+ * This function allow to get the hydrated user of the corresponding current user.
+ * The hydrated user has profiles and roles.
  *
+ * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleUser.prototype.hydrate = function () {
+KuzzleUser.prototype.hydrate = function (cb) {
+  var
+    self = this;
 
+  self.kuzzle.callbackRequired('KuzzleUser.hydrate', cb);
+
+  if (!this.content.profile || typeof this.content.profile !== 'string') {
+    throw new Error('The User must contains a profile as string in order to be hydrated');
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, null, function (error, response) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+  });
 };
 
 /**
