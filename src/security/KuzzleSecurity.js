@@ -331,7 +331,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.deleteRole = function (id, cb) {
+KuzzleSecurity.prototype.deleteProfile = function (id, cb) {
   var data = {_id: id};
 
   if (cb) {
