@@ -206,7 +206,7 @@ KuzzleSecurity.prototype.deleteRole = function (id, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.roleFactory = function(id, content) {
-  return new KuzzleRole(this.kuzzle, id, content);
+  return new KuzzleRole(this, id, content);
 };
 
 
@@ -394,7 +394,7 @@ KuzzleSecurity.prototype.deleteRole = function (id, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.profileFactory = function(id, content) {
-  return new KuzzleProfile(this.kuzzle, id, content);
+  return new KuzzleProfile(this, id, content);
 };
 
 /**
@@ -475,7 +475,7 @@ KuzzleSecurity.prototype.deleteUser = function (id, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.userFactory = function(id, content) {
-  return new KuzzleUser(this.kuzzle, id, content);
+  return new KuzzleUser(this, id, content);
 };
 
 

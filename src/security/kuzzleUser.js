@@ -1,12 +1,12 @@
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
-function KuzzleUser(kuzzle, id, content) {
+function KuzzleUser(kuzzleSecurity, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzle, id, content);
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
   // promisifying
-  if (kuzzle.bluebird) {
-    return kuzzle.bluebird.promisifyAll(this, {
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['hydrate', 'save'];
