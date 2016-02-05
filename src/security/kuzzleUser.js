@@ -32,13 +32,33 @@ KuzzleUser.prototype.hydrate = function () {
 };
 
 /**
- * @param {object} [options] - Optional parameters
+ * Saves this user into Kuzzle.
+ *
+ * If this is a new user, this function will create it in Kuzzle.
+ * Otherwise, this method will replace the latest version of this user in Kuzzle by the current content
+ * of this object.
+ *
  * @param {responseCallback} [cb] - Handles the query response
  *
- * @returns {Object} this
+ * @returns {*} this
  */
-KuzzleUser.prototype.save = function (options, cb) {
+KuzzleUser.prototype.save = function (cb) {
+  var
+    data = this.toJSON(),
+    self = this;
 
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, null, function (error) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
 };
 
 /**
