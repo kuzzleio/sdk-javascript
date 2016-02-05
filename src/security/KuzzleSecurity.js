@@ -140,7 +140,7 @@ KuzzleSecurity.prototype.createRole = function (id, role, options, cb) {
   }
 
   if (options) {
-    action = options.updateIfExist ? 'createOrReplaceRole' : 'createRole';
+    action = options.replaceIfExist ? 'createOrReplaceRole' : 'createRole';
   }
 
   if (id) {
