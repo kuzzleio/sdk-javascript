@@ -41,4 +41,26 @@ KuzzleUser.prototype.save = function (options, cb) {
 
 };
 
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this User
+ */
+KuzzleUser.prototype.toJSON = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+
+  if (data.body.profile && data.body.profile._id) {
+    data.body.profile = data.body.profile._id;
+  }
+
+  return data;
+};
+
 module.exports = KuzzleUser;
