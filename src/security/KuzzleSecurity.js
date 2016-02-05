@@ -269,11 +269,11 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
  *
  * Takes an optional argument object with the following property:
  *    - replaceIfExist (boolean, default: false):
- *        If the same role already exists: throw an error if sets to false.
- *        Replace the existing role otherwise
+ *        If the same profile already exists: throw an error if sets to false.
+ *        Replace the existing profile otherwise
  *
  * @param {string} id - profile identifier
- * @param {object} content
+ * @param {object} content - attribute `roles` in `content` must only contains an array of role id
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  *
@@ -286,7 +286,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
     action = 'createProfile';
 
   if (id && typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.createProfile: cannot create a profile without a role ID');
+    throw new Error('KuzzleSecurity.createProfile: cannot create a profile without a profile ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -298,7 +298,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
   data.body = content;
 
   if (options) {
-    action = options.updateIfExist ? 'createOrReplaceProfile' : 'createProfile';
+    action = options.replaceIfExist ? 'createOrReplaceProfile' : 'createProfile';
   }
 
   if (cb) {
@@ -431,14 +431,58 @@ KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
 };
 
 /**
+ * Create a new user in Kuzzle.
  *
- * @param {object} profile
- * @param {responseCallback} [cb] - returns Kuzzle's response
+ * Takes an optional argument object with the following property:
+ *    - replaceIfExist (boolean, default: false):
+ *        If the same user already exists: throw an error if sets to false.
+ *        Replace the existing user otherwise
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - attribute `profile` in `content` must only contains the profile id
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.createUser = function (profile, cb) {
+KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'createUser';
 
+  if (id && typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.createUser: cannot create a user without a user ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (options) {
+    action = options.replaceIfExist ? 'createOrReplaceUser' : 'createUser';
+  }
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, null, function (err, res) {
+      var doc;
+
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleUser(self, res.result._id, res.result._source);
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+
+  return this;
 };
 
 /**
