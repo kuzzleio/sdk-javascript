@@ -267,12 +267,6 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      if (hydrate) {
-        doc._source.roles = doc._source.roles.map(function(role) {
-          return new KuzzleRole(self, role._id, role._source);
-        });
-      }
-
       return new KuzzleProfile(self, doc._id, doc._source);
     });
 
@@ -432,7 +426,33 @@ KuzzleSecurity.prototype.getUser = function (id, cb) {
  * @returns {Object} this
  */
 KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
+  var
+    self = this;
 
+  if (!cb && typeof hydrate === 'function') {
+    cb = hydrate;
+    hydrate = false;
+  }
+
+  filters.hydrate = hydrate;
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, null, function (error, response) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = response.result.hits.map(function (doc) {
+      return new KuzzleUser(self, doc._id, doc._source);
+    });
+
+    cb(null, { total: response.result.total, documents: documents });
+  });
+
+  return this;
 };
 
 /**
