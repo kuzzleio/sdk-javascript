@@ -110,14 +110,30 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 };
 
 /**
- * @param {string} name
- * @param {Boolean} hydrate
+ * @param {string} id
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  * @returns {Object} this
  */
-KuzzleSecurity.prototype.fetchProfile = function (name, hydrate, cb) {
+KuzzleSecurity.prototype.getProfile = function (id, cb) {
+  var
+    self = this;
 
+  self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), {_id: id}, null, function (error, response) {
+    if (error) {
+      return cb(error);
+    }
+
+    response.result._source.roles = response.result._source.roles.map(function(role) {
+      return new KuzzleRole(self, role._id, role._source);
+    });
+
+    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+  });
+
+  return this;
 };
 
 /**
@@ -137,7 +153,6 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
   var
     self = this;
 
-
   if (!cb && typeof hydrate === 'function') {
     cb = hydrate;
     hydrate = false;
@@ -147,14 +162,14 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, null, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, null, function (error, response) {
     var documents;
 
     if (error) {
       return cb(error);
     }
 
-    documents = result.result.hits.map(function (doc) {
+    documents = response.result.hits.map(function (doc) {
       if (hydrate) {
         doc._source.roles = doc._source.roles.map(function(role) {
           return new KuzzleRole(self, role._id, role._source);
@@ -164,7 +179,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
       return new KuzzleProfile(self, doc._id, doc._source);
     });
 
-    cb(null, { total: result.result.total, documents: documents });
+    cb(null, { total: response.result.total, documents: documents });
   });
 
   return this;
