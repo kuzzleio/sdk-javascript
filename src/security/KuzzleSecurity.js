@@ -156,7 +156,6 @@ KuzzleSecurity.prototype.createRole = function (id, role, options, cb) {
       }
 
       doc = new KuzzleRole(self, res.result._id, res.result._source);
-      doc.version = res.result._version;
       cb(null, doc);
     });
   } else {
