@@ -50,4 +50,23 @@ KuzzleSecurityDocument.prototype.setContent = function (data) {
   return this;
 };
 
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this securityDocument
+ */
+KuzzleSecurityDocument.prototype.toJSON = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+
+  return data;
+};
+
+
 module.exports = KuzzleSecurityDocument;
