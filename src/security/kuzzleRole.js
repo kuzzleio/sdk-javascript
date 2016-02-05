@@ -4,7 +4,7 @@ var util = require('util');
 
 function KuzzleRole(kuzzleSecurity, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzleSecurity.kuzzle, id, content);
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
   // promisifying
   if (kuzzleSecurity.kuzzle.bluebird) {
@@ -43,7 +43,7 @@ KuzzleRole.prototype.save = function (cb) {
     self = this;
 
 
-  self.kuzzle.query(this.dataCollection.buildQueryArgs('createOrReplace'), data, null, function (error) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplace'), data, null, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }

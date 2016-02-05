@@ -1,7 +1,13 @@
-function KuzzleSecurityDocument(kuzzle, id, content) {
+function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
+    kuzzle: {
+      value: kuzzleSecurity.kuzzle
+    },
+    kuzzleSecurity: {
+      value: kuzzleSecurity
+    },
     // read-only properties
     // writable properties
     id: {
@@ -13,10 +19,6 @@ function KuzzleSecurityDocument(kuzzle, id, content) {
       writable: true,
       enumerable: true
     }
-  });
-
-  Object.defineProperty(this, 'kuzzle', {
-    value: kuzzle
   });
 
   if (content) {
@@ -39,6 +41,8 @@ KuzzleSecurityDocument.prototype.setContent = function (data) {
 
   return this;
 };
+
+
 
 /**
  * Serialize this object into a JSON object

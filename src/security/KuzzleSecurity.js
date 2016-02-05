@@ -168,6 +168,36 @@ KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
 };
 
 /**
+ * Delete role.
+ *
+ * There is a small delay between role deletion and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a role that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Role id to delete
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleSecurity.prototype.deleteRole = function (id, cb) {
+  var data = {_id: id};
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, null, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data);
+  }
+
+  return this;
+};
+
+/**
  * Instantiate a new KuzzleRole object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
@@ -178,6 +208,8 @@ KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
 KuzzleSecurity.prototype.roleFactory = function(id, content) {
   return new KuzzleRole(this.kuzzle, id, content);
 };
+
+
 
 /**
  * @param {string} id
