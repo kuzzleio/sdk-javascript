@@ -5,9 +5,8 @@ function KuzzleSecurityDocument(kuzzle, id, content) {
     // read-only properties
     // writable properties
     id: {
-      value: undefined,
-      enumerable: true,
-      writable: true
+      value: id,
+      enumerable: true
     },
     content: {
       value: {},
@@ -20,21 +19,12 @@ function KuzzleSecurityDocument(kuzzle, id, content) {
     value: kuzzle
   });
 
-  // handling provided arguments
-  if (!content && id && typeof id === 'object') {
-    content = id;
-    id = null;
-  }
-
   if (content) {
     this.setContent(content);
   }
 
-  if (id) {
-    Object.defineProperty(this, 'id', {
-      value: id,
-      enumerable: true
-    });
+  if (!id) {
+    throw new Error('A security document ' + typeof this + ' must have an id');
   }
 }
 

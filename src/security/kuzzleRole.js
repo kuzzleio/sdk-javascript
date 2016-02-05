@@ -29,7 +29,7 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 /**
  * Saves this role into Kuzzle.
  *
- * If this is a new role, this function will create it in Kuzzle and the id property will be made available.
+ * If this is a new role, this function will create it in Kuzzle.
  * Otherwise, this method will replace the latest version of this role in Kuzzle by the current content
  * of this object.
  *
@@ -43,12 +43,10 @@ KuzzleRole.prototype.save = function (cb) {
     self = this;
 
 
-  self.kuzzle.query(this.dataCollection.buildQueryArgs('createOrReplace'), data, null, function (error, res) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('createOrReplace'), data, null, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }
-
-    self.id = res.result._id;
 
     if (cb) {
       cb(null, self);
