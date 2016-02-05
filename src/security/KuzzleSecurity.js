@@ -170,7 +170,7 @@ KuzzleSecurity.prototype.createRole = function (role, id, options, cb) {
 /**
  * Delete role.
  *
- * There is a small delay between role deletion and their existence in our advanced search layer,
+ * There is a small delay between role deletion and their deletion in our advanced search layer,
  * usually a couple of seconds.
  * That means that a role that was just been delete will be returned by this function
  *
@@ -356,6 +356,36 @@ KuzzleSecurity.prototype.createProfile = function (profile, id, options, cb) {
 };
 
 /**
+ * Delete profile.
+ *
+ * There is a small delay between profile deletion and their deletion in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a profile that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Profile id to delete
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleSecurity.prototype.deleteRole = function (id, cb) {
+  var data = {_id: id};
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, null, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data);
+  }
+
+  return this;
+};
+
+/**
  * Instantiate a new KuzzleProfile object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
@@ -404,6 +434,36 @@ KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
  */
 KuzzleSecurity.prototype.createUser = function (profile, cb) {
 
+};
+
+/**
+ * Delete user.
+ *
+ * There is a small delay between user deletion and their deletion in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a user that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Profile id to delete
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleSecurity.prototype.deleteUser = function (id, cb) {
+  var data = {_id: id};
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, null, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data);
+  }
+
+  return this;
 };
 
 /**

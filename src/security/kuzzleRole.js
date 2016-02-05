@@ -43,7 +43,7 @@ KuzzleRole.prototype.save = function (cb) {
     self = this;
 
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplace'), data, null, function (error) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, null, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }
