@@ -334,21 +334,37 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.socket.on('reconnect', function () {
+    var reconnect = function () {
+      // renew subscriptions
+      if (self.autoResubscribe) {
+        renewAllSubscriptions.call(self);
+      }
+
+      // replay queued requests
+      if (self.autoReplay) {
+        cleanQueue.call(self);
+        dequeue.call(self);
+      }
+
+      // alert listeners
+      self.emitEvent('reconnected');
+    };
+
     self.state = 'connected';
 
-    // renew subscriptions
-    if (self.autoResubscribe) {
-      renewAllSubscriptions.call(self);
-    }
+    if (self.jwtToken) {
+      self.checkToken(self.jwtToken, function (err, res) {
+        // shouldn't obtain an error but let's invalidate the token anyway
+        if (err || !res.valid) {
+          self.jwtToken = undefined;
+          self.emitEvent('jwtTokenExpired');
+        }
 
-    // replay queued requests
-    if (self.autoReplay) {
-      cleanQueue.call(self);
-      dequeue.call(self);
+        reconnect();
+      });
+    } else {
+      reconnect();
     }
-
-    // alert listeners
-    self.emitEvent('reconnected');
   });
 
   return this;
@@ -956,7 +972,11 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
 
   object = self.addHeaders(object, this.headers);
 
-  if (self.jwtToken !== undefined) {
+  /*
+   * Do not add the token for the checkToken route, to avoid getting a token error when
+   * a developer simply wish to verify his token
+   */
+  if (self.jwtToken !== undefined && object.controller !== 'auth' && object.action !== 'checkToken') {
     object.headers = object.headers || {};
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
