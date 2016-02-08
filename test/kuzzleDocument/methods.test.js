@@ -209,7 +209,7 @@ describe('KuzzleDocument methods', function () {
       should(emitted).be.true();
     });
 
-    it('should throw an error if no callback is required', function () {
+    it('should throw an error if no callback is provided', function () {
       var
         document = new KuzzleDocument(dataCollection);
 
