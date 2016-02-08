@@ -851,7 +851,7 @@ describe('Kuzzle constructor', () => {
         }
       });
 
-      it('should be able to send a login request', function () {
+      it('should be able to send a login request', function (done) {
         var
           kuzzle,
           loginCredentials = {username: 'foo', password: 'bar'};
@@ -862,16 +862,17 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.queuing = true;
+        kuzzle.query = function(queryArgs, query, options) {
+          should(queryArgs.action).be.exactly('login');
+          should(queryArgs.controller).be.exactly('auth');
+          should(query.body.username).be.exactly('foo');
+          should(query.body.password).be.exactly('bar');
+          should(query.body.expiresIn).be.exactly('1h');
+          should(options.queuable).be.false();
+          done();
+        };
 
         kuzzle.login('local', loginCredentials, '1h');
-
-        should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].query.action).be.exactly('login');
-        should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
-        should(kuzzle.offlineQueue[0].query.body.username).be.exactly('foo');
-        should(kuzzle.offlineQueue[0].query.body.password).be.exactly('bar');
-        should(kuzzle.offlineQueue[0].query.body.expiresIn).be.exactly('1h');
       });
 
       it('should forward token when logged in', function () {
