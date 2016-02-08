@@ -32,12 +32,10 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  * of this object.
  *
  * @param {responseCallback} [cb] - Handles the query response
- *
- * @returns {*} this
  */
 KuzzleRole.prototype.save = function (cb) {
   var
-    data = this.toJSON(),
+    data = this.serialize(),
     self = this;
 
 
@@ -50,8 +48,29 @@ KuzzleRole.prototype.save = function (cb) {
       cb(null, self);
     }
   });
-
-  return self;
 };
+
+/**
+ * Delete the current role into Kuzzle.
+ *
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleRole.prototype.delete = function (cb) {
+  var
+    self = this;
+
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('deleteRole'), {_id: this.id}, null, function (error, res) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, res.result._id);
+    }
+  });
+};
+
+
 
 module.exports = KuzzleRole;

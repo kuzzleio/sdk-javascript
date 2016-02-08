@@ -86,7 +86,7 @@ KuzzleUser.prototype.setProfile = function (profile) {
  */
 KuzzleUser.prototype.save = function (cb) {
   var
-    data = this.toJSON(),
+    data = this.serialize(),
     self = this;
 
 
@@ -108,7 +108,7 @@ KuzzleUser.prototype.save = function (cb) {
  *
  * @return {object} JSON object representing this User
  */
-KuzzleUser.prototype.toJSON = function () {
+KuzzleUser.prototype.serialize = function () {
   var
     data = {};
 

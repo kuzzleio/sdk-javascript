@@ -106,11 +106,11 @@ describe('KuzzleSecurity user methods', function () {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents).not.be.empty();
-        should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.users).be.an.Array();
+        should(res.users).not.be.empty();
+        should(res.users.length).be.exactly(result.result.hits.length);
 
-        res.documents.forEach(function (item) {
+        res.users.forEach(function (item) {
           should(item).be.instanceof(KuzzleUser);
 
           should(item.content.profile).be.String();
@@ -148,11 +148,11 @@ describe('KuzzleSecurity user methods', function () {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents).not.be.empty();
-        should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.users).be.an.Array();
+        should(res.users).not.be.empty();
+        should(res.users.length).be.exactly(result.result.hits.length);
 
-        res.documents.forEach(function (item) {
+        res.users.forEach(function (item) {
           should(item).be.instanceof(KuzzleUser);
 
           should(item.content.profile).be.instanceof(KuzzleProfile);

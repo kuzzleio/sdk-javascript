@@ -107,11 +107,11 @@ describe('KuzzleSecurity profiles methods', function () {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents).not.be.empty();
-        should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.profiles).be.an.Array();
+        should(res.profiles).not.be.empty();
+        should(res.profiles.length).be.exactly(result.result.hits.length);
 
-        res.documents.forEach(function (item) {
+        res.profiles.forEach(function (item) {
           should(item).be.instanceof(KuzzleProfile);
 
           item.content.roles.forEach(function (role) {
@@ -134,11 +134,11 @@ describe('KuzzleSecurity profiles methods', function () {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents).not.be.empty();
-        should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.profiles).be.an.Array();
+        should(res.profiles).not.be.empty();
+        should(res.profiles.length).be.exactly(result.result.hits.length);
 
-        res.documents.forEach(function (item) {
+        res.profiles.forEach(function (item) {
           should(item).be.instanceof(KuzzleProfile);
 
           item.content.roles.forEach(function (role) {

@@ -104,11 +104,11 @@ describe('KuzzleSecurity roles methods', function () {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents).not.be.empty();
-        should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.roles).be.an.Array();
+        should(res.roles).not.be.empty();
+        should(res.roles.length).be.exactly(result.result.hits.length);
 
-        res.documents.forEach(function (item) {
+        res.roles.forEach(function (item) {
           should(item).be.instanceof(KuzzleRole);
         });
 

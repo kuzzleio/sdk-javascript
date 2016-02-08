@@ -96,7 +96,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, cb) {
       return new KuzzleRole(self, doc._id, doc._source);
     });
 
-    cb(null, { total: result.result.total, documents: documents });
+    cb(null, { total: result.result.total, roles: documents });
   });
 };
 
@@ -252,7 +252,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, hydrate, cb) {
       return new KuzzleProfile(self, doc._id, doc._source);
     });
 
-    cb(null, { total: response.result.total, documents: documents });
+    cb(null, { total: response.result.total, profiles: documents });
   });
 };
 
@@ -409,7 +409,7 @@ KuzzleSecurity.prototype.searchUsers = function (filters, hydrate, cb) {
       return new KuzzleUser(self, doc._id, doc._source);
     });
 
-    cb(null, { total: response.result.total, documents: documents });
+    cb(null, { total: response.result.total, users: documents });
   });
 };
 

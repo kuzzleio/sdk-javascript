@@ -47,7 +47,7 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  */
 KuzzleProfile.prototype.save = function (options, cb) {
   var
-    data = this.toJSON(),
+    data = this.serialize(),
     self = this;
 
   self.kuzzle.callbackRequired('KuzzleProfile.save', cb);
@@ -134,7 +134,7 @@ KuzzleProfile.prototype.hydrate = function (cb) {
  *
  * @return {object} JSON object representing this securityDocument
  */
-KuzzleProfile.prototype.toJSON = function () {
+KuzzleProfile.prototype.serialize = function () {
   var
     data = {};
 

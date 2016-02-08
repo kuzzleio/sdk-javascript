@@ -44,11 +44,11 @@ KuzzleSecurityDocument.prototype.setContent = function (data) {
 };
 
 /**
- * Serialize this object into a JSON object
+ * Serialize this object into a pojo
  *
- * @return {object} JSON object representing this securityDocument
+ * @return {object} pojo representing this securityDocument
  */
-KuzzleSecurityDocument.prototype.toJSON = function () {
+KuzzleSecurityDocument.prototype.serialize = function () {
   var
     data = {};
 

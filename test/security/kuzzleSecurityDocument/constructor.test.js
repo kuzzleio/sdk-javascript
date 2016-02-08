@@ -1,9 +1,8 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleSecurityDocument = rewire('../../../src/security/kuzzleSecurityDocument');
+  Kuzzle = require('../../../src/kuzzle'),
+  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
 
 describe('KuzzleSecurityDocument constructor', function () {
   var
@@ -43,7 +42,7 @@ describe('KuzzleSecurityDocument constructor', function () {
     var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
 
     should.exist(securityDocument.setContent);
-    should.exist(securityDocument.toJSON);
+    should.exist(securityDocument.serialize);
   });
 
   it('should handle provided arguments correctly', function () {
