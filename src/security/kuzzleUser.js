@@ -25,7 +25,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
 
 }
 
-KuzzleUser.prototype = Object.create(KuzzleUser.prototype, {
+KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
   constructor: {
     value: KuzzleUser
   }
@@ -47,13 +47,30 @@ KuzzleUser.prototype.hydrate = function (cb) {
     throw new Error('The User must contains a profile as string in order to be hydrated');
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, null, function (error, response) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile, hydrate: true}, null, function (error, response) {
     if (error) {
       return cb(error);
     }
 
     cb(null, new KuzzleUser(self, response.result._id, response.result._source));
   });
+};
+
+/**
+ * Set profile in content
+ * @param {KuzzleProfile|string} profile - can be a KuzzleProfile or an id string
+ *
+ * @returns {KuzzleUser} this
+ */
+KuzzleUser.prototype.setProfile = function (profile) {
+
+  if (typeof profile !== 'string' && !(profile instanceof KuzzleProfile)) {
+    throw new Error('Parameter "profile" must be a KuzzleProfile or a string');
+  }
+
+  this.content.profile = profile;
+
+  return this;
 };
 
 /**

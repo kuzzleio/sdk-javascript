@@ -38,6 +38,8 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 });
 
 /**
+ * Persist to the persistent layer the current profile
+ *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  *
@@ -65,6 +67,45 @@ KuzzleProfile.prototype.save = function (options, cb) {
 
 
 /**
+ * Add a role in the roles list
+ * @param {KuzzleRole|string} role - can be an instance of KuzzleRole or an id in string
+ *
+ * @returns {KuzzleProfile} this
+ */
+KuzzleProfile.prototype.addRole = function (role) {
+
+  if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
+    throw new Error('Parameter "roles" must be a KuzzleRole or a id string');
+  }
+
+  if (!this.content.roles) {
+    this.content.roles = [];
+  }
+
+  this.content.roles.push(role);
+
+  return this;
+};
+
+/**
+ * Set roles list
+ * @param {Array} roles - can be an array of KuzzleRole or an array of string
+ *
+ * @returns {KuzzleProfile} this
+ */
+KuzzleProfile.prototype.setRoles = function (roles) {
+
+  if (!Array.isArray(roles)) {
+    throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  }
+
+  this.content.roles = roles;
+
+  return this;
+};
+
+
+/**
  * @param {responseCallback} [cb] - Handles the query response
  */
 KuzzleProfile.prototype.hydrate = function (cb) {
@@ -81,7 +122,7 @@ KuzzleProfile.prototype.hydrate = function (cb) {
     }
 
     self.content.roles = response.result.hits.map(function(role) {
-      return new KuzzlRole(self.kuzzleSecurity, role._id, role._source);
+      return new KuzzleRole(self.kuzzleSecurity, role._id, role._source);
     });
 
     cb(null, self);
@@ -93,7 +134,7 @@ KuzzleProfile.prototype.hydrate = function (cb) {
  *
  * @return {object} JSON object representing this securityDocument
  */
-KuzzleSecurityDocument.prototype.toJSON = function () {
+KuzzleProfile.prototype.toJSON = function () {
   var
     data = {};
 
