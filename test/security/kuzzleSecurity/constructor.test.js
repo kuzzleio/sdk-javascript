@@ -1,48 +1,42 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleSecurity = rewire('../../../src/security/kuzzleSecurity');
+  Kuzzle = require('../../../src/kuzzle'),
+  KuzzleSecurity = require('../../../src/security/kuzzleSecurity');
 
 describe('kuzzleSecurity constructor', function () {
   it('should initialize properties and return a valid kuzzleSecurity object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
-      security;
+      kuzzle = new Kuzzle('foo');
 
-    security = new KuzzleSecurity(kuzzle);
-
-    should(security).be.instanceof(KuzzleSecurity);
-    should(security).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
-    should(security).have.propertyWithDescriptor('buildQueryArgs', { enumerable: false, writable: false, configurable: false });
-    should(security.kuzzle).be.exactly(kuzzle);
+    should(kuzzle.security).be.instanceof(KuzzleSecurity);
+    should(kuzzle.security).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
+    should(kuzzle.security).have.propertyWithDescriptor('buildQueryArgs', { enumerable: false, writable: false, configurable: false });
+    should(kuzzle.security.kuzzle).be.exactly(kuzzle);
   });
 
   it('should promisify the right functions', () => {
     var
-      kuzzle,
-      security;
+      kuzzle;
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo');
-    security = new KuzzleSecurity(kuzzle, 'foo', 'bar');
 
-    should.exist(security.createRolePromise);
-    should.exist(security.getRolePromise);
-    should.exist(security.searchRolesPromise);
-    should.exist(security.deleteRolePromise);
-    should.exist(security.createProfilePromise);
-    should.exist(security.getProfilePromise);
-    should.exist(security.searchProfilesPromise);
-    should.exist(security.deleteProfilePromise);
-    should.exist(security.createUserPromise);
-    should.exist(security.getUserPromise);
-    should.exist(security.searchUsersPromise);
-    should.exist(security.deleteUserPromise);
+    should.exist(kuzzle.security.createRolePromise);
+    should.exist(kuzzle.security.getRolePromise);
+    should.exist(kuzzle.security.searchRolesPromise);
+    should.exist(kuzzle.security.deleteRolePromise);
+    should.exist(kuzzle.security.createProfilePromise);
+    should.exist(kuzzle.security.getProfilePromise);
+    should.exist(kuzzle.security.searchProfilesPromise);
+    should.exist(kuzzle.security.deleteProfilePromise);
+    should.exist(kuzzle.security.createUserPromise);
+    should.exist(kuzzle.security.getUserPromise);
+    should.exist(kuzzle.security.searchUsersPromise);
+    should.exist(kuzzle.security.deleteUserPromise);
 
-    should.not.exist(security.roleFactoryPromise);
-    should.not.exist(security.profileFactoryPromise);
-    should.not.exist(security.userFactoryPromise);
+    should.not.exist(kuzzle.security.roleFactoryPromise);
+    should.not.exist(kuzzle.security.profileFactoryPromise);
+    should.not.exist(kuzzle.security.userFactoryPromise);
   });
 });
