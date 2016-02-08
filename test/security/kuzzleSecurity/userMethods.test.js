@@ -83,26 +83,26 @@ describe('KuzzleSecurity user methods', function () {
     });
   });
 
-  describe('#searchUser', function () {
+  describe('#searchUsers', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {profile : 'myProfile'}} ]}};
       expectedQuery = {
-        action: 'searchUser',
+        action: 'searchUsers',
         controller: 'security'
       };
     });
 
-    it('should send the right search query to kuzzle and return user with profile', function (done) {
+    it('should send the right search query to kuzzle and return user with string', function (done) {
       var
         filters = {};
 
       this.timeout(50);
       expectedQuery.body = filters;
 
-      should(kuzzle.security.searchProfiles(filters, function (err, res) {
+      should(kuzzle.security.searchUsers(filters, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
@@ -113,9 +113,8 @@ describe('KuzzleSecurity user methods', function () {
         res.documents.forEach(function (item) {
           should(item).be.instanceof(KuzzleUser);
 
-          should(item.content.profile).be.instanceof(KuzzleProfile);
-          should(item.content.profile.roles).be.an.Array();
-          should(item.content.profile.roles[0]).be.a.String();
+          should(item.content.profile).be.String();
+          should(item.content.profile.roles).be.undefined();
         });
 
         done();
@@ -129,19 +128,23 @@ describe('KuzzleSecurity user methods', function () {
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
         profile: {
           _id: 'myProfile',
-          roles: [
-            {
-              _id: 'myRole',
-              indexes: {}
-            }
-          ]
+          _source: {
+            roles: [
+              {
+                _id: 'myRole',
+                _source: {
+                  indexes: {}
+                }
+              }
+            ]
+          }
         }
       }}]}};
 
       this.timeout(50);
       expectedQuery.body = filters;
 
-      should(kuzzle.security.searchProfiles(filters, function (err, res) {
+      should(kuzzle.security.searchUsers(filters, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
@@ -153,7 +156,10 @@ describe('KuzzleSecurity user methods', function () {
           should(item).be.instanceof(KuzzleUser);
 
           should(item.content.profile).be.instanceof(KuzzleProfile);
-          item.content.profile.roles.map(function (role) {
+          should(item.content.profile.content.roles).be.an.Array();
+          should(item.content.profile.content.roles).not.be.empty();
+
+          item.content.profile.content.roles.map(function (role) {
             should(role).instanceof(KuzzleRole);
           });
         });
@@ -166,7 +172,7 @@ describe('KuzzleSecurity user methods', function () {
       var
         filters = {};
 
-      should(function () { kuzzle.security.searchProfiles(filters); }).throw(Error);
+      should(function () { kuzzle.security.searchUsers(filters); }).throw(Error);
     });
   });
 
@@ -178,7 +184,7 @@ describe('KuzzleSecurity user methods', function () {
       error = null;
       result = { result: {_id: 'foobar', _source: {profile: ['myRole']}} };
       expectedQuery = {
-        action: 'createProfile',
+        action: 'createUser',
         controller: 'security'
       };
     });
@@ -199,7 +205,7 @@ describe('KuzzleSecurity user methods', function () {
       expectedQuery._id = result.result._id;
       expectedQuery.action = 'createOrReplaceUser';
 
-      should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
+      should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
         done();
