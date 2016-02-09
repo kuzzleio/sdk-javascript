@@ -2734,8 +2734,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     return self;
   }
 
-  self.lastRenewal = now;
-
   if (filters) {
     self.filters = filters;
   }
@@ -2775,6 +2773,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
+    self.lastRenewal = now;
     self.roomId = response.result.roomId;
     self.channel = response.result.channel;
 
