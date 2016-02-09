@@ -693,7 +693,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
     request.expiresIn = expiresIn;
   }
 
-  this.query({controller: 'auth', action: 'login'}, {body: request}, {}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, {body: request}, {queuable: false}, function(error, response) {
     if (error === null) {
       self.setJwtToken(response.result.jwt);
       renewAllSubscriptions.call(self);
@@ -729,7 +729,7 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query({controller: 'auth', action: 'logout'}, request, {}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
     if (error === null) {
       self.setJwtToken(undefined);
 
@@ -1269,7 +1269,11 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
-    emitRequest.call(this, object, cb);
+    if (self.state === 'connected') {
+      emitRequest.call(this, object, cb);
+    } else if (cb) {
+      cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + object));
+    }
   } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
 
@@ -2750,8 +2754,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     return self;
   }
 
-  self.lastRenewal = now;
-
   if (filters) {
     self.filters = filters;
   }
@@ -2791,6 +2793,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
+    self.lastRenewal = now;
     self.roomId = response.result.roomId;
     self.channel = response.result.channel;
 
