@@ -22,7 +22,7 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
       }
 
       return new KuzzleRole(kuzzleSecurity, role._id, role._source);
-    })
+    });
   }
 
   // promisifying
