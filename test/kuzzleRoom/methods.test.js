@@ -144,8 +144,12 @@ describe('KuzzleRoom methods', function () {
     });
 
     it('should send the right query to Kuzzle', function () {
+      var
+        before = Date.now();
+
       should(room.renew({}, function () {})).be.exactly(room);
       should(emitted).be.true();
+      should(room.lastRenewal).be.within(before, Date.now());
     });
 
     it('should throw an error if no callback is provided', function () {
@@ -186,6 +190,7 @@ describe('KuzzleRoom methods', function () {
       room.queue.push({foo: 'bar'});
       should(function () { room.renew({}, function () {}); }).throw(Error);
       should(dequeued).be.false();
+      should(room.lastRenewal).be.null();
       should(room.queue).be.empty();
     });
 
@@ -195,6 +200,7 @@ describe('KuzzleRoom methods', function () {
       setTimeout(() => {
         should(dequeued).be.false();
         should(emitted).be.false();
+        should(room.lastRenewal).be.null();
         should(kuzzle.subscriptions.pending[room.id]).be.eql(room);
         done();
       }, 10);
@@ -206,7 +212,7 @@ describe('KuzzleRoom methods', function () {
         before = Date.now(),
         after;
 
-      kuzzle.query = function () { renewals++; arguments[3](null, result); }
+      kuzzle.query = function () { renewals++; arguments[3](null, result); };
       room.renew({}, function () {});
       after = Date.now();
       room.renew({}, function () {});
