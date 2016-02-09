@@ -29,6 +29,17 @@ describe('KuzzleRole constructor', function () {
     return done(new Error('Constructor doesn\'t throw an Error'));
   });
 
+  it('should initialize properties and return a valid KuzzleProfile object', function () {
+    var
+      kuzzle = new Kuzzle('foo'),
+      kuzzleRole = new KuzzleRole(kuzzle.security, 'id', {some: 'content'});
+
+
+    should(kuzzleRole).be.instanceof(KuzzleRole);
+    should(kuzzleRole).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
+    should(kuzzleRole.deleteActionName).be.exactly('deleteRole');
+  });
+
   it('should expose functions', function () {
     var kuzzleRole = new KuzzleRole(kuzzle.security, 'test', {});
 

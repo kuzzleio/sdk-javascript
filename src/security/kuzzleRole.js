@@ -4,6 +4,14 @@ function KuzzleRole(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteRole'
+    }
+  });
+
   // promisifying
   if (kuzzleSecurity.kuzzle.bluebird) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
@@ -38,7 +46,6 @@ KuzzleRole.prototype.save = function (cb) {
     data = this.serialize(),
     self = this;
 
-
   self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, null, function (error) {
     if (error) {
       return cb ? cb(error) : false;
@@ -49,28 +56,5 @@ KuzzleRole.prototype.save = function (cb) {
     }
   });
 };
-
-/**
- * Delete the current role into Kuzzle.
- *
- * @param {responseCallback} [cb] - Handles the query response
- */
-KuzzleRole.prototype.delete = function (cb) {
-  var
-    self = this;
-
-
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('deleteRole'), {_id: this.id}, null, function (error, res) {
-    if (error) {
-      return cb ? cb(error) : false;
-    }
-
-    if (cb) {
-      cb(null, res.result._id);
-    }
-  });
-};
-
-
 
 module.exports = KuzzleRole;

@@ -6,6 +6,14 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteProfile'
+    }
+  });
+
   // Hydrate profile with roles if roles are not only string but objects with `_id` and `_source`
   if (content && content.roles) {
     content.roles = content.roles.map(function (role) {
@@ -40,17 +48,20 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 /**
  * Persist to the persistent layer the current profile
  *
- * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  *
  * @returns {Object} this
  */
-KuzzleProfile.prototype.save = function (options, cb) {
+KuzzleProfile.prototype.save = function (cb) {
   var
-    data = this.serialize(),
+    data,
     self = this;
 
-  self.kuzzle.callbackRequired('KuzzleProfile.save', cb);
+  if (!this.content.roles) {
+    throw new Error('Argument "roles" is mandatory in a profile. This argument contains an array of KuzzleRole or an array of id string');
+  }
+
+  data = this.serialize();
 
   self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, null, function (error) {
     if (error) {
@@ -99,6 +110,12 @@ KuzzleProfile.prototype.setRoles = function (roles) {
     throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
   }
 
+  roles.map(function (role) {
+    if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
+      throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+    }
+  });
+
   this.content.roles = roles;
 
   return this;
@@ -106,26 +123,34 @@ KuzzleProfile.prototype.setRoles = function (roles) {
 
 
 /**
+ * Hydrate the profile - get real KuzzleRole and not just ids
+ * Warning: do not try to hydrate a profile with newly added role which is not created in kuzzle
  * @param {responseCallback} [cb] - Handles the query response
  */
 KuzzleProfile.prototype.hydrate = function (cb) {
 
   var
     self = this,
-    data = {ids: self.content.roles};
+    data = {ids: []};
+
+  data.ids = this.content.roles.map(function (role) {
+    if (typeof role === 'string') {
+      return role;
+    }
+
+    if (role instanceof KuzzleRole) {
+      return role.id;
+    }
+  });
 
   self.kuzzle.callbackRequired('KuzzleProfile.hydrate', cb);
 
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), data, null, function (error, response) {
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, null, function (error, response) {
     if (error) {
       return cb(error);
     }
 
-    self.content.roles = response.result.hits.map(function(role) {
-      return new KuzzleRole(self.kuzzleSecurity, role._id, role._source);
-    });
-
-    cb(null, self);
+    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
   });
 };
 
@@ -143,9 +168,16 @@ KuzzleProfile.prototype.serialize = function () {
   }
 
   data.body = this.content;
+  if (!data.body.roles || !Array.isArray(data.body.roles)) {
+    return data;
+  }
 
   data.body.roles = data.body.roles.map(function(role) {
-    return role.id;
+    if (role instanceof KuzzleRole) {
+      return role.id;
+    }
+
+    return role;
   });
 
   return data;

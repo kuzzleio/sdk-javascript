@@ -11,6 +11,14 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source)
   }
 
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteUser'
+    }
+  });
+
   // promisifying
   if (kuzzleSecurity.kuzzle.bluebird) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
@@ -88,7 +96,6 @@ KuzzleUser.prototype.save = function (cb) {
   var
     data = this.serialize(),
     self = this;
-
 
   self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, null, function (error) {
     if (error) {

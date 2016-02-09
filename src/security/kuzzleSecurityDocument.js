@@ -61,5 +61,24 @@ KuzzleSecurityDocument.prototype.serialize = function () {
   return data;
 };
 
+/**
+ * Delete the current KuzzleSecurityDocument into Kuzzle.
+ *
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurityDocument.prototype.delete = function (cb) {
+  var
+    self = this;
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.deleteActionName), {_id: this.id}, null, function (error, res) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, res.result._id);
+    }
+  });
+};
 
 module.exports = KuzzleSecurityDocument;
