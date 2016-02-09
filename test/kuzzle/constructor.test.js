@@ -610,6 +610,33 @@ describe('Kuzzle constructor', () => {
             }
           }, 10);
         });
+
+        it('should empty the JWT Token if it has expired', function (done) {
+          var
+            kuzzle = new Kuzzle('nowhere', {}),
+            eventEmitted = false;
+
+          this.timeout(200);
+          kuzzle.jwtToken = 'foobar';
+          kuzzle.addListener('jwtTokenExpired', function () { eventEmitted = true });
+
+          kuzzle.checkToken = function (token, cb) {
+            should(token).be.eql(kuzzle.jwtToken);
+            cb(null, {valid: false});
+          };
+
+          setTimeout(() => {
+            try {
+              should(kuzzle.state).be.exactly('connected');
+              should(kuzzle.jwtToken).be.undefined();
+              should(eventEmitted).be.true();
+              done();
+            }
+            catch (e) {
+              done(e);
+            }
+          }, 10);
+        });
       });
     });
 
