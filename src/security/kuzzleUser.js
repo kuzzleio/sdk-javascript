@@ -30,7 +30,6 @@ function KuzzleUser(kuzzleSecurity, id, content) {
       }
     });
   }
-
 }
 
 KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
@@ -55,7 +54,7 @@ KuzzleUser.prototype.hydrate = function (cb) {
     throw new Error('The User must contains a profile as string in order to be hydrated');
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile, hydrate: true}, null, function (error, response) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, null, function (error, response) {
     if (error) {
       return cb(error);
     }
@@ -125,8 +124,8 @@ KuzzleUser.prototype.serialize = function () {
 
   data.body = this.content;
 
-  if (data.body.profile && data.body.profile._id) {
-    data.body.profile = data.body.profile._id;
+  if (data.body.profile && data.body.profile.id) {
+    data.body.profile = data.body.profile.id;
   }
 
   return data;

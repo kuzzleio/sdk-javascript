@@ -5,7 +5,7 @@ var
   KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument'),
   KuzzleProfile = require('../../../src/security/kuzzleProfile');
 
-describe('KuzzleRole constructor', function () {
+describe('KuzzleProfile constructor', function () {
   var
     kuzzle;
 

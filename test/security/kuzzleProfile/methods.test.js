@@ -208,7 +208,7 @@ describe('KuzzleRole methods', function () {
       done();
     });
 
-    it('should serialize with correct attributes when a role is hydrate', function (done) {
+    it('should serialize with correct attributes when a role is serialized', function (done) {
       var
         kuzzleRole = new KuzzleRole(kuzzle.security, 'role2', {indexes: {}}),
         serialized;
