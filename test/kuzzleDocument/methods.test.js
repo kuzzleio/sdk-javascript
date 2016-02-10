@@ -143,16 +143,6 @@ describe('KuzzleDocument methods', function () {
       should(emitted).be.true();
     });
 
-    it('should delay the document deletion until after the current refresh', function () {
-      var document = new KuzzleDocument(dataCollection);
-
-      document.id = 'foo';
-      document.refreshing = true;
-      should(document.delete()).be.exactly(document);
-      should(emitted).be.false();
-      should(document.queue).match([{action: 'delete', args: [undefined, undefined]}]);
-    });
-
     it('should throw an error if no ID has been set', function () {
       var document = new KuzzleDocument(dataCollection);
 
@@ -215,8 +205,16 @@ describe('KuzzleDocument methods', function () {
 
       expectedQuery.options = options;
       document.id = 'foo';
-      should(document.refresh(options)).be.exactly(document);
+      should(document.refresh(options, function () {})).be.undefined();
       should(emitted).be.true();
+    });
+
+    it('should throw an error if no callback is provided', function () {
+      var
+        document = new KuzzleDocument(dataCollection);
+
+      document.id = 'foo';
+      should(function () { document.refresh(); }).throw();
     });
 
     it('should handle arguments correctly', function () {
@@ -227,26 +225,8 @@ describe('KuzzleDocument methods', function () {
       should(emitted).be.true();
 
       emitted = false;
-      document.refresh();
-      should(emitted).be.true();
-
-      emitted = false;
       document.refresh({}, function () {});
       should(emitted).be.true();
-
-      emitted = false;
-      document.refresh({});
-      should(emitted).be.true();
-    });
-
-    it('should delay the document refresh until after the current refresh', function () {
-      var document = new KuzzleDocument(dataCollection);
-
-      document.id = 'foo';
-      document.refreshing = true;
-      should(document.refresh()).be.exactly(document);
-      should(emitted).be.false();
-      should(document.queue).match([{action: 'refresh', args: [undefined, undefined]}]);
     });
 
     it('should throw an error if no ID has been set', function () {
@@ -265,7 +245,8 @@ describe('KuzzleDocument methods', function () {
       document.refresh(function (err, res) {
         should(emitted).be.true();
         should(err).be.null();
-        should(res).be.exactly(document);
+        should(res).be.instanceof(KuzzleDocument).and.not.be.eql(document);
+        should(res.id).be.eql(document.id);
         should(res.version).be.exactly(42);
         should(res.content).match({some:'content'});
         done();
@@ -285,35 +266,6 @@ describe('KuzzleDocument methods', function () {
         should(res).be.undefined();
         done();
       });
-    });
-
-    it('should cancel the current refresh state and start dequeuing after a successful refresh', function () {
-      var
-        dequeued = false,
-        revert = KuzzleDocument.__set__('dequeue', function () { dequeued = true; }),
-        document = new KuzzleDocument(dataCollection, 'foo');
-
-      document.refresh();
-      should(emitted).be.true();
-      should(document.refreshing).be.false();
-      should(dequeued).be.true();
-      revert();
-    });
-
-
-    it('should cancel the current refresh state and empty the queue if the refresh fails', function () {
-      var
-        dequeued = false,
-        revert = KuzzleDocument.__set__('dequeue', function () { dequeued = true; }),
-        document;
-
-      error = 'foobar';
-      document = new KuzzleDocument(dataCollection, 'foo');
-      document.refresh();
-      should(emitted).be.true();
-      should(document.refreshing).be.false();
-      should(dequeued).be.false();
-      revert();
     });
   });
 
@@ -362,16 +314,6 @@ describe('KuzzleDocument methods', function () {
       emitted = false;
       document.save({});
       should(emitted).be.true();
-    });
-
-    it('should delay the document saving until after the current refresh', function () {
-      var document = new KuzzleDocument(dataCollection);
-
-      document.id = 'foo';
-      document.refreshing = true;
-      should(document.save()).be.exactly(document);
-      should(emitted).be.false();
-      should(document.queue).match([{action: 'save', args: [undefined, undefined]}]);
     });
 
     it('should resolve the callback with itself as a result', function (done) {
@@ -441,15 +383,6 @@ describe('KuzzleDocument methods', function () {
       document.publish({});
       should(emitted).be.true();
     });
-
-    it('should delay the document publication until after the current refresh', function () {
-      var document = new KuzzleDocument(dataCollection);
-
-      document.refreshing = true;
-      should(document.publish()).be.exactly(document);
-      should(emitted).be.false();
-      should(document.queue).match([{action: 'publish', args: [undefined]}]);
-    });
   });
 
   describe('#setContent', function () {
@@ -473,16 +406,6 @@ describe('KuzzleDocument methods', function () {
       document.content = { foo: 'foo', bar: 'bar' };
       should(document.setContent({foo: 'foobar'}, true)).be.exactly(document);
       should(document.content).match({foo: 'foobar'});
-    });
-
-    it('should delay the content setting until after the current refresh', function () {
-      var document = new KuzzleDocument(dataCollection);
-
-      document.content = { foo: 'foo', bar: 'bar' };
-
-      document.refreshing = true;
-      should(document.setContent({foo: 'foobar'}, true)).be.exactly(document);
-      should(document.content).match({ foo: 'foo', bar: 'bar' });
     });
   });
 
@@ -542,41 +465,6 @@ describe('KuzzleDocument methods', function () {
 
       should(document.setHeaders(header)).be.exactly(document);
       should(document.headers).match(header);
-    });
-  });
-
-  describe('#dequeue', function () {
-    var
-      dequeue = KuzzleDocument.__get__('dequeue'),
-      document,
-      dequeued;
-
-    beforeEach(function () {
-      var stub = function () { dequeued++; };
-
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
-      document = new KuzzleDocument(dataCollection);
-      document.delete = stub;
-      document.refresh = stub;
-      document.save = stub;
-      document.publish = stub;
-      document.setContent = stub;
-    });
-
-    it('should replay requests queued while refreshing', function () {
-      dequeued = 0;
-
-      dequeue.call(document);
-      should(dequeued).be.exactly(0);
-
-      document.queue.push({action: 'delete', args: []});
-      document.queue.push({action: 'refresh', args: []});
-      document.queue.push({action: 'save', args: []});
-      document.queue.push({action: 'publish', args: []});
-      document.queue.push({action: 'setContent', args: []});
-      dequeue.call(document);
-      should(dequeued).be.exactly(5);
     });
   });
 });
