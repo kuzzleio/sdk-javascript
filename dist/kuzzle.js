@@ -2225,16 +2225,6 @@ module.exports = KuzzleDataMapping;
  */
 function KuzzleDocument(kuzzleDataCollection, documentId, content) {
   Object.defineProperties(this, {
-    // private properties
-    queue: {
-      value: [],
-      writable: true
-    },
-    refreshing: {
-      value: false,
-      writable: true
-    },
-
     // read-only properties
     collection: {
       value: kuzzleDataCollection.collection,
@@ -2355,11 +2345,6 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     options = null;
   }
 
-  if (this.refreshing) {
-    this.queue.push({action: 'delete', args: [options, cb]});
-    return this;
-  }
-
   if (!this.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
@@ -2394,35 +2379,24 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
     options = null;
   }
 
-  if (this.refreshing) {
-    this.queue.push({action: 'refresh', args: [options, cb]});
-    return this;
-  }
-
   if (!self.id) {
     throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
   }
 
-  self.refreshing = true;
+  this.kuzzle.callbackRequired('KuzzleDocument.refresh', cb);
+
   self.kuzzle.query(self.dataCollection.buildQueryArgs('read', 'get'), {_id: self.id}, options, function (error, res) {
+    var newDocument;
+
     if (error) {
-      self.refreshing = false;
-      self.queue = [];
-      return cb ? cb(error) : false;
+      return cb(error);
     }
 
-    self.version = res.result._version;
-    self.content = res.result._source;
+    newDocument = new KuzzleDocument(self.dataCollection, self.id, res.result._source);
+    newDocument.version = res.result._version;
 
-    if (cb) {
-      cb(null, self);
-    }
-
-    self.refreshing = false;
-    dequeue.call(self);
+    cb(null, newDocument);
   });
-
-  return this;
 };
 
 /**
@@ -2449,13 +2423,6 @@ KuzzleDocument.prototype.save = function (options, cb) {
     cb = options;
     options = null;
   }
-
-  if (self.refreshing) {
-    self.queue.push({action: 'save', args: [options, cb]});
-    return self;
-  }
-
-  data.persist = true;
 
   self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrReplace'), data, options, function (error, res) {
     if (error) {
@@ -2486,11 +2453,6 @@ KuzzleDocument.prototype.save = function (options, cb) {
 KuzzleDocument.prototype.publish = function (options) {
   var data = this.toJSON();
 
-  if (this.refreshing) {
-    this.queue.push({action: 'publish', args: [options]});
-    return this;
-  }
-
   this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'publish'), data, options);
 
   return this;
@@ -2505,11 +2467,6 @@ KuzzleDocument.prototype.publish = function (options) {
  */
 KuzzleDocument.prototype.setContent = function (data, replace) {
   var self = this;
-
-  if (this.refreshing) {
-    this.queue.push({action: 'setContent', args: [data, replace]});
-    return this;
-  }
 
   if (replace) {
     this.content = data;
@@ -2562,19 +2519,6 @@ KuzzleDocument.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
-
-
-/**
- * internal function used to dequeue calls which were put on hold while refreshing the content of this document
- */
-function dequeue () {
-  var element;
-
-  while (this.queue.length > 0) {
-    element = this.queue.shift();
-    this[element.action].apply(this, element.args);
-  }
-}
 
 
 module.exports = KuzzleDocument;
