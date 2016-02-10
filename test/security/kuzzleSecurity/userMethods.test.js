@@ -47,7 +47,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {} }};
+      result = { result: {_id: 'foobar', _source: {profile: {_id: 'profile', _source: {roles: [{_id: 'role', _source: {indexes: {}}}]}}} }};
       expectedQuery = {
         action: 'getUser',
         controller: 'security',
@@ -59,6 +59,26 @@ describe('KuzzleSecurity user methods', function () {
       should(kuzzle.security.getUser(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
+
+
+        should(res.content.profile).instanceof(KuzzleProfile);
+        should(res.content.profile.content.roles).be.an.Array();
+        should(res.content.profile.content.roles).not.be.empty();
+
+        res.content.profile.content.roles.forEach(function (role) {
+          should(role).instanceof(KuzzleRole);
+        });
+
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle with id as profile when hydrate is false', function (done) {
+      should(kuzzle.security.getUser(result.result._id, false, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleUser);
+
+        should(res.content.profile).be.a.String();
         done();
       }));
     });

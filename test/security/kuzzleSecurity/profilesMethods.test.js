@@ -46,7 +46,7 @@ describe('KuzzleSecurity profiles methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {} }};
+      result = { result: {_id: 'foobar', _source: {roles: [{_id: 'role1', _source: {indexes: {}}}]} }};
       expectedQuery = {
         action: 'getProfile',
         controller: 'security',
@@ -58,6 +58,28 @@ describe('KuzzleSecurity profiles methods', function () {
       should(kuzzle.security.getProfile(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
+
+        should(res.content.roles).be.an.Array();
+        should(res.content.roles).not.be.empty();
+
+        res.content.roles.forEach(function (role) {
+          should(role).instanceof(KuzzleRole);
+        });
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
+      should(kuzzle.security.getProfile(result.result._id, false, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleProfile);
+
+        should(res.content.roles).be.an.Array();
+        should(res.content.roles).not.be.empty();
+
+        res.content.roles.forEach(function (role) {
+          should(role).be.a.String();
+        });
         done();
       }));
     });
