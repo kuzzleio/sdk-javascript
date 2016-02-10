@@ -983,7 +983,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwtToken !== undefined && object.controller !== 'auth' && object.action !== 'checkToken') {
+  if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
     object.headers = object.headers || {};
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
