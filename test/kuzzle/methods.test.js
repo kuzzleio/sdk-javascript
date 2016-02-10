@@ -575,4 +575,18 @@ describe('Kuzzle methods', function () {
       should(kuzzle.security).be.an.instanceOf(KuzzleSecurity);
     });
   });
+
+  describe('#getJwtToken', function () {
+    it('should return the current jwt token', function () {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.jwtToken = 'testToken';
+
+      should(kuzzle.getJwtToken()).be.exactly('testToken');
+    });
+  });
 });
