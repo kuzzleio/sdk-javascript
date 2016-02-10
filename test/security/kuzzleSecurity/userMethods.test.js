@@ -174,6 +174,37 @@ describe('KuzzleSecurity user methods', function () {
 
       should(function () { kuzzle.security.searchUsers(filters); }).throw(Error);
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var
+        filters = {};
+
+      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
+        profile: {
+          _id: 'myProfile',
+          _source: {
+            roles: [
+              {
+                _id: 'myRole',
+                _source: {
+                  indexes: {}
+                }
+              }
+            ]
+          }
+        }
+      }}]}};
+
+      expectedQuery.body = filters;
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.searchUsers(filters, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
 
@@ -200,12 +231,32 @@ describe('KuzzleSecurity user methods', function () {
       }));
     });
 
-    it('should construct a createOrReplaceUser action if option replaceIfExist is set', function (done) {
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.createUser(result.result._id, result.result._source);
+      done();
+    });
+
+    it('should construct a createOrReplaceUser action if option replaceIfExist is set to true', function (done) {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
       expectedQuery.action = 'createOrReplaceUser';
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleUser);
+        done();
+      }));
+    });
+
+    it('should construct a createUser action if option replaceIfExist is set to false', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      expectedQuery.action = 'createUser';
+
+      should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
         done();
@@ -248,6 +299,11 @@ describe('KuzzleSecurity user methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should send the right delete query to Kuzzle even without callback', function (done) {
+      kuzzle.security.deleteUser(result.result._id);
+      done();
     });
 
     it('should call the callback with an error if one occurs', function (done) {

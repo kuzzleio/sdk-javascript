@@ -156,6 +156,22 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(function () { kuzzle.security.searchProfiles(filters); }).throw(Error);
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var
+        filters = {};
+
+      expectedQuery.body = filters;
+
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.searchProfiles(filters, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
 
@@ -182,12 +198,32 @@ describe('KuzzleSecurity profiles methods', function () {
       }));
     });
 
-    it('should construct a createOrReplaceRole action if option replaceIfExist is set', function (done) {
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.createProfile(result.result._id, result.result._source);
+      done();
+    });
+
+    it('should construct a createOrReplaceProfile action if option replaceIfExist is set to true', function (done) {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
       expectedQuery.action = 'createOrReplaceProfile';
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleProfile);
+        done();
+      }));
+    });
+
+    it('should construct a createProfile action if option replaceIfExist is set to true', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      expectedQuery.action = 'createProfile';
+
+      should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
         done();
@@ -230,6 +266,11 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should send the right delete query to Kuzzle even without callback', function (done) {
+      kuzzle.security.deleteProfile(result.result._id);
+      done();
     });
 
     it('should call the callback with an error if one occurs', function (done) {

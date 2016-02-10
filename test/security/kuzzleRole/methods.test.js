@@ -67,6 +67,20 @@ describe('KuzzleRole methods', function () {
         done();
       }));
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzleRole.save(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#delete', function () {
@@ -92,6 +106,19 @@ describe('KuzzleRole methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      error = 'foobar';
+
+      kuzzleRole.delete(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
     });
   });
 });

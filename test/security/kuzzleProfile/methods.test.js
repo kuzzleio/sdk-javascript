@@ -78,6 +78,19 @@ describe('KuzzleRole methods', function () {
         done();
       }));
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzleProfile.save(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#addRole', function () {
@@ -107,6 +120,18 @@ describe('KuzzleRole methods', function () {
       kuzzleProfile.addRole(kuzzleRole);
       should(kuzzleProfile.content.roles).be.an.Array();
       should(kuzzleProfile.content.roles.length).be.exactly(2);
+      done();
+    });
+
+    it('should initialize roles with array if no role was set before', function (done) {
+      var
+        kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
+
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content'});
+
+      kuzzleProfile.addRole(kuzzleRole);
+      should(kuzzleProfile.content.roles).be.an.Array();
+      should(kuzzleProfile.content.roles.length).be.exactly(1);
       done();
     });
   });
@@ -192,6 +217,22 @@ describe('KuzzleRole methods', function () {
         done();
       }));
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
+      expectedQuery.body = {ids: ['role1', 'role3']};
+
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzleProfile.setRoles(['role1', kuzzleRole]);
+
+      kuzzleProfile.hydrate(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#serialize', function () {
@@ -260,6 +301,19 @@ describe('KuzzleRole methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      error = 'foobar';
+
+      kuzzleProfile.delete(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
     });
   });
 

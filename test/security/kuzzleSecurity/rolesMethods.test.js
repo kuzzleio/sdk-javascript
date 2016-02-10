@@ -122,6 +122,22 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(function () { kuzzle.security.searchRoles(filters); }).throw(Error);
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var
+        filters = { indexes: ['test'] };
+
+      expectedQuery.body = filters;
+
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.searchRoles(filters, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
 
@@ -148,12 +164,32 @@ describe('KuzzleSecurity roles methods', function () {
       }));
     });
 
-    it('should construct a createOrReplaceRole action if option replaceIfExist is set', function (done) {
+    it('should send the right createRole query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.createRole(result.result._id, result.result._source);
+      done();
+    });
+
+    it('should construct a createOrReplaceRole action if option replaceIfExist is set to true', function (done) {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
       expectedQuery.action = 'createOrReplaceRole';
 
       should(kuzzle.security.createRole(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleRole);
+        done();
+      }));
+    });
+
+    it('should construct a createRole action if option replaceIfExist is set to false', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      expectedQuery.action = 'createRole';
+
+      should(kuzzle.security.createRole(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleRole);
         done();
@@ -196,6 +232,11 @@ describe('KuzzleSecurity roles methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should send the right delete query to Kuzzle even without callback', function (done) {
+      kuzzle.security.deleteRole(result.result._id);
+      done();
     });
 
     it('should call the callback with an error if one occurs', function (done) {

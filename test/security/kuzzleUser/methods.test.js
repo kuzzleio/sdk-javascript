@@ -79,6 +79,18 @@ describe('KuzzleRole methods', function () {
         done();
       }));
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      error = 'foobar';
+
+      kuzzleUser.save(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#setProfile', function () {
@@ -154,6 +166,16 @@ describe('KuzzleRole methods', function () {
       should(function () { kuzzleUser.hydrate(function () {}); }).throw(Error);
       done();
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      error = 'foobar';
+
+      kuzzleUser.hydrate(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#serialize', function () {
@@ -222,6 +244,19 @@ describe('KuzzleRole methods', function () {
         should(res).be.exactly(result.result._id);
         done();
       }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      error = 'foobar';
+
+      kuzzleUser.delete(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
     });
   });
 
