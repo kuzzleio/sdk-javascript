@@ -3312,15 +3312,21 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 
 /**
  * @param {string} id
+ * @param {Boolean} hydrate - if is set to false, return a list id in role instead of KuzzleRole. Default true
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getProfile = function (id, cb) {
+KuzzleSecurity.prototype.getProfile = function (id, hydrate, cb) {
   var
     data,
     self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getProfile function');
+  }
+
+  if (!cb && typeof hydrate === 'function') {
+    cb = hydrate;
+    hydrate = true;
   }
 
   data = {_id: id};
@@ -3330,6 +3336,12 @@ KuzzleSecurity.prototype.getProfile = function (id, cb) {
   self.kuzzle.query(this.buildQueryArgs('getProfile'), data, null, function (error, response) {
     if (error) {
       return cb(error);
+    }
+
+    if (!hydrate) {
+      response.result._source.roles = response.result._source.roles.map(function (role) {
+        return role._id;
+      });
     }
 
     cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
@@ -3469,15 +3481,21 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  * Retrieve a single User using its unique user ID.
  *
  * @param {string} id
+ * @param {Boolean} hydrate - if is set to false, return a list id in role instead of KuzzleRole. Default true
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getUser = function (id, cb) {
+KuzzleSecurity.prototype.getUser = function (id, hydrate, cb) {
   var
     data,
     self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getUser function');
+  }
+
+  if (!cb && typeof hydrate === 'function') {
+    cb = hydrate;
+    hydrate = true;
   }
 
   data = {_id: id};
@@ -3487,6 +3505,10 @@ KuzzleSecurity.prototype.getUser = function (id, cb) {
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, null, function (err, response) {
     if (err) {
       return cb(err);
+    }
+
+    if (!hydrate) {
+      response.result._source.profile = response.result._source.profile._id;
     }
 
     cb(null, new KuzzleUser(self, response.result._id, response.result._source));
