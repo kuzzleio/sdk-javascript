@@ -29,6 +29,18 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   if (content) {
     this.setContent(content);
   }
+
+  // promisifying
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['delete'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
 }
 
 /**

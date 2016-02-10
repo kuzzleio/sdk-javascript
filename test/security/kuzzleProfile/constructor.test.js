@@ -1,8 +1,8 @@
 var
   should = require('should'),
   bluebird = require('bluebird'),
-  Kuzzle = require('../../../src/kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument'),
+  rewire = require('rewire'),
+  Kuzzle = rewire('../../../src/kuzzle'),
   KuzzleProfile = require('../../../src/security/kuzzleProfile');
 
 describe('KuzzleProfile constructor', function () {
@@ -32,23 +32,24 @@ describe('KuzzleProfile constructor', function () {
   it('should initialize properties and return a valid KuzzleProfile object', function () {
     var
       kuzzle = new Kuzzle('foo'),
-      kuzzlePorfile = new KuzzleProfile(kuzzle.security, 'id', {some: 'content'});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'id', {some: 'content'});
 
 
-    should(kuzzlePorfile).be.instanceof(KuzzleProfile);
-    should(kuzzlePorfile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
-    should(kuzzlePorfile.deleteActionName).be.exactly('deleteProfile');
+    should(kuzzleProfile).be.instanceof(KuzzleProfile);
+    should(kuzzleProfile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
+    should(kuzzleProfile.deleteActionName).be.exactly('deleteProfile');
   });
 
   it('should expose functions', function () {
-    var kuzzlePorfile = new KuzzleProfile(kuzzle.security, 'test', {});
+    var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
 
-    should.exist(kuzzlePorfile.save);
-    should.exist(kuzzlePorfile.addRole);
-    should.exist(kuzzlePorfile.savePromise);
-    should.exist(kuzzlePorfile.setRoles);
-    should.exist(kuzzlePorfile.hydratePromise);
-    should.exist(kuzzlePorfile.serialize);
+    should.exist(kuzzleProfile.save);
+    should.exist(kuzzleProfile.addRole);
+    should.exist(kuzzleProfile.savePromise);
+    should.exist(kuzzleProfile.setRoles);
+    should.exist(kuzzleProfile.hydratePromise);
+    should.exist(kuzzleProfile.deletePromise);
+    should.exist(kuzzleProfile.serialize);
   });
 
   it('should handle provided arguments correctly', function () {

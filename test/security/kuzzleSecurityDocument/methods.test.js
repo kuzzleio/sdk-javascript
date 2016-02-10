@@ -5,7 +5,7 @@ var
   Kuzzle = require('../../../src/kuzzle'),
   KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
 
-describe('KuzzleDocument methods', function () {
+describe('KuzzleSecurityDocument methods', function () {
   var
     securityDocument,
     kuzzle = new Kuzzle('http://localhost:7512');
@@ -27,7 +27,7 @@ describe('KuzzleDocument methods', function () {
 
   describe('#setContent', function () {
     before(function () {
-      securityDocument = new KuzzleSecurityDocument('myId', {some: 'content'});
+      securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'myId', {some: 'content'});
     });
 
     it('should replace the current security document', function () {

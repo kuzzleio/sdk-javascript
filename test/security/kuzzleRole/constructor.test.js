@@ -1,8 +1,8 @@
 var
   should = require('should'),
   bluebird = require('bluebird'),
-  Kuzzle = require('../../../src/kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument'),
+  rewire = require('rewire'),
+  Kuzzle = rewire('../../../src/kuzzle'),
   KuzzleRole = require('../../../src/security/kuzzleRole');
 
 describe('KuzzleRole constructor', function () {
@@ -46,6 +46,7 @@ describe('KuzzleRole constructor', function () {
     should.exist(kuzzleRole.setContent);
     should.exist(kuzzleRole.serialize);
     should.exist(kuzzleRole.savePromise);
+    should.exist(kuzzleRole.deletePromise);
   });
 
   it('should handle provided arguments correctly', function () {
