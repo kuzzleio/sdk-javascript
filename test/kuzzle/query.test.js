@@ -204,7 +204,7 @@ describe('Query management', function () {
     });
 
     it('should emit the request directly without waiting the end of dequeuing if queuable is false', function () {
-      kuzzle.state = 'reconnecting';
+      kuzzle.state = 'connected';
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
       should(emitted).be.true();
 
@@ -212,6 +212,23 @@ describe('Query management', function () {
       kuzzle.queuing = true;
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
       should(emitted).be.true();
+    });
+
+    it('should discard the request if not connected and if queuable is false', function () {
+      var
+        errorRaised = false,
+        callback = () => errorRaised = true;
+
+      kuzzle.state = 'reconnecting';
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false}, callback);
+      should(emitted).be.false();
+      should(errorRaised).be.true();
+
+      errorRaised = false;
+      kuzzle.queuing = true;
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false}, callback);
+      should(emitted).be.false();
+      should(errorRaised).be.true();
     });
 
     it('should queue the request during offline mode, if queuing has been activated', function () {

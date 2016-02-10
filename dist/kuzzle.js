@@ -617,21 +617,37 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.socket.on('reconnect', function () {
+    var reconnect = function () {
+      // renew subscriptions
+      if (self.autoResubscribe) {
+        renewAllSubscriptions.call(self);
+      }
+
+      // replay queued requests
+      if (self.autoReplay) {
+        cleanQueue.call(self);
+        dequeue.call(self);
+      }
+
+      // alert listeners
+      self.emitEvent('reconnected');
+    };
+
     self.state = 'connected';
 
-    // renew subscriptions
-    if (self.autoResubscribe) {
-      renewAllSubscriptions.call(self);
-    }
+    if (self.jwtToken) {
+      self.checkToken(self.jwtToken, function (err, res) {
+        // shouldn't obtain an error but let's invalidate the token anyway
+        if (err || !res.valid) {
+          self.jwtToken = undefined;
+          self.emitEvent('jwtTokenExpired');
+        }
 
-    // replay queued requests
-    if (self.autoReplay) {
-      cleanQueue.call(self);
-      dequeue.call(self);
+        reconnect();
+      });
+    } else {
+      reconnect();
     }
-
-    // alert listeners
-    self.emitEvent('reconnected');
   });
 
   return this;
@@ -685,7 +701,7 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
     request.expiresIn = expiresIn;
   }
 
-  this.query({controller: 'auth', action: 'login'}, {body: request}, {}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, {body: request}, {queuable: false}, function(error, response) {
     if (error === null) {
       self.setJwtToken(response.result.jwt);
       renewAllSubscriptions.call(self);
@@ -721,7 +737,7 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query({controller: 'auth', action: 'logout'}, request, {}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
     if (error === null) {
       self.setJwtToken(undefined);
 
@@ -1238,7 +1254,11 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
 
   object = self.addHeaders(object, this.headers);
 
-  if (self.jwtToken !== undefined) {
+  /*
+   * Do not add the token for the checkToken route, to avoid getting a token error when
+   * a developer simply wish to verify his token
+   */
+  if (self.jwtToken !== undefined && object.controller !== 'auth' && object.action !== 'checkToken') {
     object.headers = object.headers || {};
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
@@ -1256,7 +1276,11 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
-    emitRequest.call(this, object, cb);
+    if (self.state === 'connected') {
+      emitRequest.call(this, object, cb);
+    } else if (cb) {
+      cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + object));
+    }
   } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
 
@@ -2735,8 +2759,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     return self;
   }
 
-  self.lastRenewal = now;
-
   if (filters) {
     self.filters = filters;
   }
@@ -2776,6 +2798,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
       throw new Error('Error during Kuzzle subscription: ' + error.message);
     }
 
+    self.lastRenewal = now;
     self.roomId = response.result.roomId;
     self.channel = response.result.channel;
 
