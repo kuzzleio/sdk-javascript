@@ -2,7 +2,9 @@ var
   should = require('should'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = require('../../src/kuzzleDataCollection');
+  KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
+  KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
+  KuzzleUser = require('../../src/security/kuzzleUser');
 
 describe('Kuzzle methods', function () {
   var
@@ -16,7 +18,6 @@ describe('Kuzzle methods', function () {
       should(args.index).be.eql(expectedQuery.index);
       should(args.controller).be.exactly(expectedQuery.controller);
       should(args.action).be.exactly(expectedQuery.action);
-
       if (passedOptions) {
         should(options).match(passedOptions);
       }
@@ -560,6 +561,71 @@ describe('Kuzzle methods', function () {
       should(kuzzle.offlineQueue.length).be.exactly(1);
       should(kuzzle.offlineQueue[0].query.action).be.exactly('getCurrentUser');
       should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
+    });
+
+    it('should send correct query and return a KuzzleUser', function (done) {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+      kuzzle.query = queryStub;
+
+      error = false;
+      result = {result: {_id: 'user', _source: {firstName: 'Ada'}}};
+      expectedQuery = {
+        controller: 'auth',
+        action: 'getCurrentUser'
+      };
+
+      kuzzle.whoAmI(function (err, res) {
+        should(res).instanceof(KuzzleUser);
+        done();
+      });
+    });
+
+    it('should execute the callback with an error if an error occurs', function (done) {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+      kuzzle.query = queryStub;
+
+      this.timeout(50);
+      error = 'foobar';
+
+      kuzzle.whoAmI(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#security', function () {
+    it('should be an instance of KuzzleSecurity', function () {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      should(kuzzle.security).be.an.instanceOf(KuzzleSecurity);
+    });
+  });
+
+  describe('#getJwtToken', function () {
+    it('should return the current jwt token', function () {
+      var kuzzle;
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.jwtToken = 'testToken';
+
+      should(kuzzle.getJwtToken()).be.exactly('testToken');
     });
   });
 });

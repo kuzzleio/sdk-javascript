@@ -292,5 +292,28 @@ describe('Query management', function () {
       should(emitted).be.false();
       should(kuzzle.offlineQueue.length).be.exactly(0);
     });
+
+    it('should not set jwtToken if we execute auth/checkToken', function () {
+      var
+        kuzzle,
+        query = { body: { some: 'query'}},
+        now = Date.now();
+
+      this.timeout(200);
+
+      Kuzzle = rewire(kuzzleSource);
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.queuing = true;
+      kuzzle.jwtToken = 'fake-token';
+
+      kuzzle.query({collection: 'collection', controller: 'auth', action: 'checkToken', index: 'index'}, {});
+
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].query.headers).be.undefined();
+    });
   });
 });
