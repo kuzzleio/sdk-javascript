@@ -234,10 +234,8 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
     cb = options;
     options = null;
   }
-  else {
-    if (options.hydrate !== undefined) {
-      hydrate = options.hydrate;
-    }
+  else if (options.hydrate !== undefined) {
+    hydrate = options.hydrate;
   }
 
   data = {_id: id};
@@ -285,10 +283,8 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
     cb = options;
     options = null;
   }
-  else {
-    if (options.hydrate !== undefined) {
-      filters.hydrate = options.hydrate;
-    }
+  else if (options.hydrate !== undefined) {
+    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
@@ -429,10 +425,8 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
     cb = options;
     options = null;
   }
-  else {
-    if (options.hydrate !== undefined) {
-      hydrate = options.hydrate;
-    }
+  else if (options.hydrate !== undefined) {
+    hydrate = options.hydrate;
   }
 
   data = {_id: id};
@@ -478,10 +472,8 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
     cb = options;
     options = null;
   }
-  else {
-    if (options.hydrate !== undefined) {
-      filters.hydrate = options.hydrate;
-    }
+  else if (options.hydrate !== undefined) {
+    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
