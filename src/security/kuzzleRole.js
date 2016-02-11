@@ -39,14 +39,20 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  * Otherwise, this method will replace the latest version of this role in Kuzzle by the current content
  * of this object.
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleRole.prototype.save = function (cb) {
+KuzzleRole.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, null, function (error) {
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, options, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }

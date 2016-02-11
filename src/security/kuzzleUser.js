@@ -42,11 +42,17 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  * This function allow to get the hydrated user of the corresponding current user.
  * The hydrated user has profiles and roles.
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleUser.prototype.hydrate = function (cb) {
+KuzzleUser.prototype.hydrate = function (options, cb) {
   var
     self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   self.kuzzle.callbackRequired('KuzzleUser.hydrate', cb);
 
@@ -54,7 +60,7 @@ KuzzleUser.prototype.hydrate = function (cb) {
     throw new Error('The User must contains a profile as string in order to be hydrated');
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, null, function (error, response) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
     if (error) {
       return cb(error);
     }
@@ -88,15 +94,20 @@ KuzzleUser.prototype.setProfile = function (profile) {
  * of this object.
  *
  * @param {responseCallback} [cb] - Handles the query response
- *
+ * @param {object} [options] - Optional parameters
  * @returns {*} this
  */
-KuzzleUser.prototype.save = function (cb) {
+KuzzleUser.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, null, function (error) {
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }

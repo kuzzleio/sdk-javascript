@@ -70,7 +70,7 @@ describe('KuzzleSecurity profiles methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, false, function (err, res) {
+      should(kuzzle.security.getProfile(result.result._id, {hydrate: false}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
 
@@ -123,9 +123,38 @@ describe('KuzzleSecurity profiles methods', function () {
       result = { result: { total: 123, hits: [{_id: 'foobar', _source: {roles : ['myRole']}}]} };
 
       this.timeout(50);
-      expectedQuery.body = filters;
+      expectedQuery.body = {hydrate: true};
 
       should(kuzzle.security.searchProfiles(filters, function (err, res) {
+        should(err).be.null();
+        should(res).be.an.Object();
+        should(res.total).be.a.Number().and.be.exactly(result.result.total);
+        should(res.profiles).be.an.Array();
+        should(res.profiles).not.be.empty();
+        should(res.profiles.length).be.exactly(result.result.hits.length);
+
+        res.profiles.forEach(function (item) {
+          should(item).be.instanceof(KuzzleProfile);
+
+          item.content.roles.forEach(function (role) {
+            should(role).be.String()
+          })
+        });
+
+        done();
+      }));
+    });
+
+    it('should send the right search query non hydrated to kuzzle and return profile', function (done) {
+      var
+        filters = {};
+
+      result = { result: { total: 123, hits: [{_id: 'foobar', _source: {roles : ['myRole']}}]} };
+
+      this.timeout(50);
+      expectedQuery.body = {hydrate: false};
+
+      should(kuzzle.security.searchProfiles(filters, {hydrate: false}, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);

@@ -74,7 +74,7 @@ describe('KuzzleSecurity user methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as profile when hydrate is false', function (done) {
-      should(kuzzle.security.getUser(result.result._id, false, function (err, res) {
+      should(kuzzle.security.getUser(result.result._id, {hydrate: false}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
 
@@ -120,9 +120,35 @@ describe('KuzzleSecurity user methods', function () {
         filters = {};
 
       this.timeout(50);
-      expectedQuery.body = filters;
+      expectedQuery.body = {hydrate: true};
 
       should(kuzzle.security.searchUsers(filters, function (err, res) {
+        should(err).be.null();
+        should(res).be.an.Object();
+        should(res.total).be.a.Number().and.be.exactly(result.result.total);
+        should(res.users).be.an.Array();
+        should(res.users).not.be.empty();
+        should(res.users.length).be.exactly(result.result.hits.length);
+
+        res.users.forEach(function (item) {
+          should(item).be.instanceof(KuzzleUser);
+
+          should(item.content.profile).be.String();
+          should(item.content.profile.roles).be.undefined();
+        });
+
+        done();
+      }));
+    });
+
+    it('should send the right search query not hydrated to kuzzle and return user with string', function (done) {
+      var
+        filters = {};
+
+      this.timeout(50);
+      expectedQuery.body = {hydrate: false};
+
+      should(kuzzle.security.searchUsers(filters, {hydrate: false}, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);

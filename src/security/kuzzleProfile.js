@@ -48,11 +48,11 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 /**
  * Persist to the persistent layer the current profile
  *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- *
  * @returns {Object} this
  */
-KuzzleProfile.prototype.save = function (cb) {
+KuzzleProfile.prototype.save = function (options, cb) {
   var
     data,
     self = this;
@@ -61,9 +61,14 @@ KuzzleProfile.prototype.save = function (cb) {
     throw new Error('Argument "roles" is mandatory in a profile. This argument contains an array of KuzzleRole or an array of id string');
   }
 
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   data = this.serialize();
 
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, null, function (error) {
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, options, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -125,9 +130,11 @@ KuzzleProfile.prototype.setRoles = function (roles) {
 /**
  * Hydrate the profile - get real KuzzleRole and not just ids
  * Warning: do not try to hydrate a profile with newly added role which is not created in kuzzle
+ *
+ * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleProfile.prototype.hydrate = function (cb) {
+KuzzleProfile.prototype.hydrate = function (options, cb) {
 
   var
     self = this,
@@ -143,9 +150,14 @@ KuzzleProfile.prototype.hydrate = function (cb) {
     }
   });
 
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   self.kuzzle.callbackRequired('KuzzleProfile.hydrate', cb);
 
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, null, function (error, response) {
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, options, function (error, response) {
     if (error) {
       return cb(error);
     }
