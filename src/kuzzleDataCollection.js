@@ -213,7 +213,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   }
 
   if (document instanceof KuzzleDocument) {
-    data = document.toJSON();
+    data = document.serialize();
   } else {
     data.body = document;
   }
@@ -419,7 +419,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
   var data = {};
 
   if (document instanceof KuzzleDocument) {
-    data = document.toJSON();
+    data = document.serialize();
   } else {
     data.body = document;
   }

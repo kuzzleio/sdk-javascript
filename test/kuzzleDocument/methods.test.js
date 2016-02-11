@@ -57,20 +57,20 @@ describe('KuzzleDocument methods', function () {
     it('should serialize itself properly', function () {
       var
         document = new KuzzleDocument(dataCollection, {some: 'content'}),
-        serialized = document.toJSON();
+        serialized = document.serialize();
 
       should(serialized._id).be.undefined();
       should(serialized._version).be.undefined();
       should(serialized.body).be.an.Object().and.match({some: 'content'});
 
       document.id = 'foo';
-      serialized = document.toJSON();
+      serialized = document.serialize();
       should(serialized._id).be.exactly('foo');
       should(serialized._version).be.undefined();
       should(serialized.body).be.an.Object().and.match({some: 'content'});
 
       document.version = 42;
-      serialized = document.toJSON();
+      serialized = document.serialize();
       should(serialized._id).be.exactly('foo');
       should(serialized._version).be.exactly(42);
       should(serialized.body).be.an.Object().and.match({some: 'content'});
@@ -86,7 +86,7 @@ describe('KuzzleDocument methods', function () {
     it('should stringify itself properly', function () {
       var
         document = new KuzzleDocument(dataCollection, 'id', {some: 'content', _version: 42}),
-        serialized = document.toJSON(),
+        serialized = document.serialize(),
         stringified = document.toString();
 
       should(stringified).be.a.String();
