@@ -1,7 +1,8 @@
 var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
-  KuzzleSecurity = require('./security/kuzzleSecurity');
+  KuzzleSecurity = require('./security/kuzzleSecurity'),
+  KuzzleUser = require('./security/kuzzleUser');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -512,13 +513,18 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
 
-  this.callbackRequired('Kuzzle.whoAmI', callback);
+  self.callbackRequired('Kuzzle.whoAmI', callback);
 
-  this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
+  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, response) {
+    if (err) {
+      return callback(err);
+    }
+
+    callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
+  });
 
   return self;
 };
-
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
