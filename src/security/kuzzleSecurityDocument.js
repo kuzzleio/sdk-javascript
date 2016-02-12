@@ -27,7 +27,7 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   });
 
   if (content) {
-    this.setContent(content);
+    this.setContent(content, true);
   }
 
   // promisifying
@@ -44,13 +44,25 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 }
 
 /**
+ * Replaces the current content with new data.
+ * Changes made by this function won’t be applied until the save method is called.
  *
  * @param {Object} data - New securityDocument content
+ * @param {boolean} replace - if true: replace this document content with the provided data.
  *
  * @return {Object} this
  */
-KuzzleSecurityDocument.prototype.setContent = function (data) {
-  this.content = data;
+KuzzleSecurityDocument.prototype.setContent = function (data, replace) {
+  var self = this;
+
+  if (replace) {
+    this.content = data;
+  }
+  else {
+    Object.keys(data).forEach(function (key) {
+      self.content[key] = data[key];
+    });
+  }
 
   return this;
 };
