@@ -1,6 +1,8 @@
 var
   uuid = require('node-uuid'),
-  KuzzleDataCollection = require('./kuzzleDataCollection');
+  KuzzleDataCollection = require('./kuzzleDataCollection'),
+  KuzzleSecurity = require('./security/kuzzleSecurity'),
+  KuzzleUser = require('./security/kuzzleUser');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -18,6 +20,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
+
 module.exports = Kuzzle = function (url, options, cb) {
   var self = this;
 
@@ -111,7 +114,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: url,
       enumerable: true
     },
-    // writable properties
     autoQueue: {
       value: false,
       enumerable: true,
@@ -219,7 +221,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  /*
+  /**
    * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
    * and is called by these methods
    */
@@ -231,7 +233,15 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  /*
+  /**
+   * Create an attribute security that embed all methods to manage Role, Profile and User
+   */
+  Object.defineProperty(this, 'security', {
+    value: new KuzzleSecurity(this),
+    enumerable: true
+  });
+
+  /**
    * Emit an event to all registered listeners
    * An event cannot be emitted multiple times before a timeout has been reached.
    */
@@ -273,7 +283,6 @@ module.exports = Kuzzle = function (url, options, cb) {
     });
   }
 
-  return this;
 };
 
 
@@ -504,13 +513,18 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
 
-  this.callbackRequired('Kuzzle.whoAmI', callback);
+  self.callbackRequired('Kuzzle.whoAmI', callback);
 
-  this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
+  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, response) {
+    if (err) {
+      return callback(err);
+    }
+
+    callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
+  });
 
   return self;
 };
-
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
@@ -724,10 +738,9 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  *
  * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
- * @param headers {object} [headers] - Common properties for all future write documents queries
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
+Kuzzle.prototype.dataCollectionFactory = function(index, collection) {
   this.isValid();
 
   if (arguments.length === 1) {
@@ -749,7 +762,7 @@ Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection, headers);
+    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection);
   }
 
   return this.collections[index][collection];
@@ -976,7 +989,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwtToken !== undefined && object.controller !== 'auth' && object.action !== 'checkToken') {
+  if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
     object.headers = object.headers || {};
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
@@ -1126,7 +1139,6 @@ Kuzzle.prototype.startQueuing = function () {
   if (this.state === 'offline' && !this.autoQueue) {
     this.queuing = true;
   }
-
   return this;
 };
 

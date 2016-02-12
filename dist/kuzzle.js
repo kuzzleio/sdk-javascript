@@ -275,7 +275,9 @@
 },{}],2:[function(require,module,exports){
 var
   uuid = require('node-uuid'),
-  KuzzleDataCollection = require('./kuzzleDataCollection');
+  KuzzleDataCollection = require('./kuzzleDataCollection'),
+  KuzzleSecurity = require('./security/kuzzleSecurity'),
+  KuzzleUser = require('./security/kuzzleUser');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -293,6 +295,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
+
 module.exports = Kuzzle = function (url, options, cb) {
   var self = this;
 
@@ -386,7 +389,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: url,
       enumerable: true
     },
-    // writable properties
     autoQueue: {
       value: false,
       enumerable: true,
@@ -494,7 +496,7 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  /*
+  /**
    * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
    * and is called by these methods
    */
@@ -506,7 +508,15 @@ module.exports = Kuzzle = function (url, options, cb) {
     }
   });
 
-  /*
+  /**
+   * Create an attribute security that embed all methods to manage Role, Profile and User
+   */
+  Object.defineProperty(this, 'security', {
+    value: new KuzzleSecurity(this),
+    enumerable: true
+  });
+
+  /**
    * Emit an event to all registered listeners
    * An event cannot be emitted multiple times before a timeout has been reached.
    */
@@ -548,7 +558,6 @@ module.exports = Kuzzle = function (url, options, cb) {
     });
   }
 
-  return this;
 };
 
 
@@ -779,13 +788,18 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
 
-  this.callbackRequired('Kuzzle.whoAmI', callback);
+  self.callbackRequired('Kuzzle.whoAmI', callback);
 
-  this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, callback);
+  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, response) {
+    if (err) {
+      return callback(err);
+    }
+
+    callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
+  });
 
   return self;
 };
-
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
@@ -999,10 +1013,9 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  *
  * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
- * @param headers {object} [headers] - Common properties for all future write documents queries
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
+Kuzzle.prototype.dataCollectionFactory = function(index, collection) {
   this.isValid();
 
   if (arguments.length === 1) {
@@ -1024,7 +1037,7 @@ Kuzzle.prototype.dataCollectionFactory = function(index, collection, headers) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection, headers);
+    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection);
   }
 
   return this.collections[index][collection];
@@ -1251,7 +1264,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwtToken !== undefined && object.controller !== 'auth' && object.action !== 'checkToken') {
+  if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
     object.headers = object.headers || {};
     object.headers.authorization = 'Bearer ' + self.jwtToken;
   }
@@ -1401,7 +1414,6 @@ Kuzzle.prototype.startQueuing = function () {
   if (this.state === 'offline' && !this.autoQueue) {
     this.queuing = true;
   }
-
   return this;
 };
 
@@ -1416,7 +1428,7 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
-},{"./kuzzleDataCollection":3,"node-uuid":1,"socket.io-client":undefined}],3:[function(require,module,exports){
+},{"./kuzzleDataCollection":3,"./security/kuzzleSecurity":9,"./security/kuzzleUser":11,"node-uuid":1,"socket.io-client":undefined}],3:[function(require,module,exports){
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
@@ -1645,7 +1657,6 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
     data._id = id;
   }
 
-  data.persist = true;
   data = self.kuzzle.addHeaders(data, self.headers);
 
   if (cb) {
@@ -2861,4 +2872,1116 @@ function dequeue () {
 
 module.exports = KuzzleRoom;
 
-},{"node-uuid":1}]},{},[2]);
+},{"node-uuid":1}],7:[function(require,module,exports){
+var
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
+  KuzzleRole = require('./kuzzleRole');
+
+function KuzzleProfile(kuzzleSecurity, id, content) {
+
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteProfile'
+    }
+  });
+
+  // Hydrate profile with roles if roles are not only string but objects with `_id` and `_source`
+  if (content && content.roles) {
+    content.roles = content.roles.map(function (role) {
+      if (!role._id || !role._source) {
+        return role;
+      }
+
+      return new KuzzleRole(kuzzleSecurity, role._id, role._source);
+    });
+  }
+
+  // promisifying
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['hydrate', 'save'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+
+}
+
+KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+  constructor: {
+    value: KuzzleProfile
+  }
+});
+
+/**
+ * Persist to the persistent layer the current profile
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+KuzzleProfile.prototype.save = function (options, cb) {
+  var
+    data,
+    self = this;
+
+  if (!this.content.roles) {
+    throw new Error('Argument "roles" is mandatory in a profile. This argument contains an array of KuzzleRole or an array of id string');
+  }
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = this.serialize();
+
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, options, function (error) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
+};
+
+
+/**
+ * Add a role in the roles list
+ * @param {KuzzleRole|string} role - can be an instance of KuzzleRole or an id in string
+ *
+ * @returns {KuzzleProfile} this
+ */
+KuzzleProfile.prototype.addRole = function (role) {
+
+  if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
+    throw new Error('Parameter "roles" must be a KuzzleRole or a id string');
+  }
+
+  if (!this.content.roles) {
+    this.content.roles = [];
+  }
+
+  this.content.roles.push(role);
+
+  return this;
+};
+
+/**
+ * Set roles list
+ * @param {Array} roles - can be an array of KuzzleRole or an array of string
+ *
+ * @returns {KuzzleProfile} this
+ */
+KuzzleProfile.prototype.setRoles = function (roles) {
+
+  if (!Array.isArray(roles)) {
+    throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  }
+
+  roles.map(function (role) {
+    if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
+      throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+    }
+  });
+
+  this.content.roles = roles;
+
+  return this;
+};
+
+
+/**
+ * Hydrate the profile - get real KuzzleRole and not just ids
+ * Warning: do not try to hydrate a profile with newly added role which is not created in kuzzle
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleProfile.prototype.hydrate = function (options, cb) {
+
+  var
+    self = this,
+    data = {ids: []};
+
+  data.ids = this.content.roles.map(function (role) {
+    if (typeof role === 'string') {
+      return role;
+    }
+
+    if (role instanceof KuzzleRole) {
+      return role.id;
+    }
+  });
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleProfile.hydrate', cb);
+
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, options, function (error, response) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+  });
+};
+
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this securityDocument
+ */
+KuzzleProfile.prototype.serialize = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+  if (!data.body.roles || !Array.isArray(data.body.roles)) {
+    return data;
+  }
+
+  data.body.roles = data.body.roles.map(function(role) {
+    if (role instanceof KuzzleRole) {
+      return role.id;
+    }
+
+    return role;
+  });
+
+  return data;
+};
+
+
+module.exports = KuzzleProfile;
+
+},{"./kuzzleRole":8,"./kuzzleSecurityDocument":10}],8:[function(require,module,exports){
+var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+
+function KuzzleRole(kuzzleSecurity, id, content) {
+
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteRole'
+    }
+  });
+
+  // promisifying
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['save'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+
+}
+
+KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+  constructor: {
+    value: KuzzleRole
+  }
+});
+
+/**
+ * Saves this role into Kuzzle.
+ *
+ * If this is a new role, this function will create it in Kuzzle.
+ * Otherwise, this method will replace the latest version of this role in Kuzzle by the current content
+ * of this object.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleRole.prototype.save = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, options, function (error) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+};
+
+module.exports = KuzzleRole;
+},{"./kuzzleSecurityDocument":10}],9:[function(require,module,exports){
+var
+  KuzzleRole = require('./kuzzleRole'),
+  KuzzleProfile = require('./kuzzleProfile'),
+  KuzzleUser = require('./kuzzleUser');
+
+/**
+ * Kuzzle security constructor
+ *
+ * @param kuzzle
+ * @returns {KuzzleSecurity}
+ * @constructor
+ */
+function KuzzleSecurity(kuzzle) {
+
+  Object.defineProperty(this, 'kuzzle', {
+    value: kuzzle
+  });
+
+  Object.defineProperty(this, 'buildQueryArgs', {
+    value: function (action) {
+      return {
+        controller: 'security',
+        action: action
+      };
+    }
+  });
+
+  if (this.kuzzle.bluebird) {
+    return this.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var blacklist = ['roleFactory', 'profileFactory', 'userFactory'];
+
+        return passes && blacklist.indexOf(name) === -1;
+      }
+    });
+  }
+
+  return this;
+}
+
+
+/**
+ * Retrieve a single Role using its unique role ID.
+ *
+ * @param {string} id
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ */
+KuzzleSecurity.prototype.getRole = function (id, options, cb) {
+  var
+    data,
+    self = this;
+
+  if (!id) {
+    throw new Error('Id parameter is mandatory for getRole function');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = {_id: id};
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, new KuzzleRole(self, response.result._id, response.result._source));
+  });
+};
+
+/**
+ * Executes a search on roles according to a filter
+ *
+ * /!\ There is a small delay between role creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a role that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - this object can contains an array `indexes` with a list of index id, a integer `from` and a integer `size`
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ *
+ */
+KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
+  var
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, options, function (error, result) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = result.result.hits.map(function (doc) {
+      return new KuzzleRole(self, doc._id, doc._source);
+    });
+
+    cb(null, { total: result.result.total, roles: documents });
+  });
+};
+
+/**
+ * Create a new role in Kuzzle.
+ *
+ * Takes an optional argument object with the following property:
+ *    - replaceIfExist (boolean, default: false):
+ *        If the same role already exists: throw an error if sets to false.
+ *        Replace the existing role otherwise
+ *
+ * @param {string} id - role identifier
+ * @param {object} content - a plain javascript object representing the role
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'createRole';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.createRole: cannot create a role without a role ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (options) {
+    action = options.replaceIfExist ? 'createOrReplaceRole' : 'createRole';
+  }
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var doc;
+
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleRole(self, res.result._id, res.result._source);
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
+/**
+ * Delete role.
+ *
+ * There is a small delay between role deletion and their deletion in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a role that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Role id to delete
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
+  var data = {_id: id};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, options);
+  }
+};
+
+/**
+ * Instantiate a new KuzzleRole object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - role id
+ * @param {object} content - role content
+ * @constructor
+ */
+KuzzleSecurity.prototype.roleFactory = function(id, content) {
+  return new KuzzleRole(this, id, content);
+};
+
+
+/**
+ * Get a specific profile from kuzzle
+ *
+ * Takes an optional argument object with the following property:
+ *    - hydrate (boolean, default: true):
+ *         if is set to false, return a list id in role instead of KuzzleRole.
+ *
+ * @param {string} id
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} cb - returns Kuzzle's response
+ */
+KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
+  var
+    data,
+    self = this,
+    hydrate = true;
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('Id parameter is mandatory for getProfile function');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+  else if (options.hydrate !== undefined) {
+    hydrate = options.hydrate;
+  }
+
+  data = {_id: id};
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
+    if (error) {
+      return cb(error);
+    }
+
+    if (!hydrate) {
+      response.result._source.roles = response.result._source.roles.map(function (role) {
+        return role._id;
+      });
+    }
+
+    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+  });
+};
+
+/**
+ * Executes a search on profiles according to a filter
+ *
+ * Takes an optional argument object with the following property:
+ *    - hydrate (boolean, default: true):
+ *         if is set to false, return a list id in role instead of KuzzleRole.
+ *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
+ *
+ * /!\ There is a small delay between profile creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a profile that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ */
+KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
+  var
+    self = this;
+
+  filters.hydrate = true;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+  else if (options.hydrate !== undefined) {
+    filters.hydrate = options.hydrate;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, options, function (error, response) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = response.result.hits.map(function (doc) {
+      return new KuzzleProfile(self, doc._id, doc._source);
+    });
+
+    cb(null, { total: response.result.total, profiles: documents });
+  });
+};
+
+/**
+ * Create a new profile in Kuzzle.
+ *
+ * Takes an optional argument object with the following property:
+ *    - replaceIfExist (boolean, default: false):
+ *        If the same profile already exists: throw an error if sets to false.
+ *        Replace the existing profile otherwise
+ *
+ * @param {string} id - profile identifier
+ * @param {object} content - attribute `roles` in `content` must only contains an array of role id
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'createProfile';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.createProfile: cannot create a profile without a profile ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (options) {
+    action = options.replaceIfExist ? 'createOrReplaceProfile' : 'createProfile';
+  }
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var doc;
+
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleProfile(self, res.result._id, res.result._source);
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
+/**
+ * Delete profile.
+ *
+ * There is a small delay between profile deletion and their deletion in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a profile that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Profile id to delete
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
+  var data = {_id: id};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, options);
+  }
+};
+
+/**
+ * Instantiate a new KuzzleProfile object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - profile id
+ * @param {object} content - profile content
+ * @constructor
+ */
+KuzzleSecurity.prototype.profileFactory = function(id, content) {
+  return new KuzzleProfile(this, id, content);
+};
+
+/**
+ * Get a specific user from kuzzle using its unique ID
+ *
+ * Takes an optional argument object with the following property:
+ *    - hydrate (boolean, default: true):
+ *         if is set to false, return a list id in role instead of KuzzleRole.
+ *
+ * @param {string} id
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} cb - returns Kuzzle's response
+ */
+KuzzleSecurity.prototype.getUser = function (id, options, cb) {
+  var
+    data,
+    self = this,
+    hydrate = true;
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('Id parameter is mandatory for getUser function');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+  else if (options.hydrate !== undefined) {
+    hydrate = options.hydrate;
+  }
+
+  data = {_id: id};
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
+    if (err) {
+      return cb(err);
+    }
+
+    if (!hydrate) {
+      response.result._source.profile = response.result._source.profile._id;
+    }
+
+    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+  });
+};
+
+/**
+ * Executes a search on user according to a filter
+ *
+ * Takes an optional argument object with the following property:
+ *    - hydrate (boolean, default: true):
+ *         if is set to false, return a list id in role instead of KuzzleRole.
+ *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
+ *
+ * /!\ There is a small delay between user creation and their existence in our persistent search layer,
+ * usually a couple of seconds.
+ * That means that a user that was just been created won’t be returned by this function.
+ *
+ * @param {Object} filters - same filters as documents filters
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - returns Kuzzle's response
+ */
+KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
+  var
+    self = this;
+
+  filters.hydrate = true;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+  else if (options.hydrate !== undefined) {
+    filters.hydrate = options.hydrate;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
+    var documents;
+
+    if (error) {
+      return cb(error);
+    }
+
+    documents = response.result.hits.map(function (doc) {
+      return new KuzzleUser(self, doc._id, doc._source);
+    });
+
+    cb(null, { total: response.result.total, users: documents });
+  });
+};
+
+/**
+ * Create a new user in Kuzzle.
+ *
+ * Takes an optional argument object with the following property:
+ *    - replaceIfExist (boolean, default: false):
+ *        If the same user already exists: throw an error if sets to false.
+ *        Replace the existing user otherwise
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - attribute `profile` in `content` must only contains the profile id
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'createUser';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.createUser: cannot create a user without a user ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (options) {
+    action = options.replaceIfExist ? 'createOrReplaceUser' : 'createUser';
+  }
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, null, function (err, res) {
+      var doc;
+
+      if (err) {
+        return cb(err);
+      }
+
+      doc = new KuzzleUser(self, res.result._id, res.result._source);
+      cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
+/**
+ * Delete user.
+ *
+ * There is a small delay between user deletion and their deletion in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a user that was just been delete will be returned by this function
+ *
+ *
+ * @param {string} id - Profile id to delete
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
+  var data = {_id: id};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options);
+  }
+};
+
+/**
+ * Instantiate a new KuzzleUser object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {string} id - user id
+ * @param {object} content - user content
+ * @constructor
+ */
+KuzzleSecurity.prototype.userFactory = function(id, content) {
+  return new KuzzleUser(this, id, content);
+};
+
+
+module.exports = KuzzleSecurity;
+},{"./kuzzleProfile":7,"./kuzzleRole":8,"./kuzzleUser":11}],10:[function(require,module,exports){
+function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
+
+  if (!id) {
+    throw new Error('A security document must have an id');
+  }
+
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    kuzzle: {
+      value: kuzzleSecurity.kuzzle
+    },
+    kuzzleSecurity: {
+      value: kuzzleSecurity
+    },
+    // read-only properties
+    // writable properties
+    id: {
+      value: id,
+      enumerable: true
+    },
+    content: {
+      value: {},
+      writable: true,
+      enumerable: true
+    }
+  });
+
+  if (content) {
+    this.setContent(content);
+  }
+
+  // promisifying
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['delete'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+}
+
+/**
+ *
+ * @param {Object} data - New securityDocument content
+ *
+ * @return {Object} this
+ */
+KuzzleSecurityDocument.prototype.setContent = function (data) {
+  this.content = data;
+
+  return this;
+};
+
+/**
+ * Serialize this object into a pojo
+ *
+ * @return {object} pojo representing this securityDocument
+ */
+KuzzleSecurityDocument.prototype.serialize = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+
+  return data;
+};
+
+/**
+ * Delete the current KuzzleSecurityDocument into Kuzzle.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurityDocument.prototype.delete = function (options, cb) {
+  var
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.deleteActionName), {_id: this.id}, options, function (error, res) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, res.result._id);
+    }
+  });
+};
+
+module.exports = KuzzleSecurityDocument;
+},{}],11:[function(require,module,exports){
+var
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
+  KuzzleProfile = require('./kuzzleProfile');
+
+function KuzzleUser(kuzzleSecurity, id, content) {
+
+  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+
+  // Hydrate user with profile if profile is not only a string but an object with `_id` and `_source`
+  if (content.profile && content.profile._id && content.profile._source) {
+    content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
+  }
+
+  // Define properties
+  Object.defineProperties(this, {
+    // private properties
+    deleteActionName: {
+      value: 'deleteUser'
+    }
+  });
+
+  // promisifying
+  if (kuzzleSecurity.kuzzle.bluebird) {
+    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['hydrate', 'save'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
+}
+
+KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+  constructor: {
+    value: KuzzleUser
+  }
+});
+
+/**
+ * This function allow to get the hydrated user of the corresponding current user.
+ * The hydrated user has profiles and roles.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleUser.prototype.hydrate = function (options, cb) {
+  var
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleUser.hydrate', cb);
+
+  if (!this.content.profile || typeof this.content.profile !== 'string') {
+    throw new Error('The User must contains a profile as string in order to be hydrated');
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
+    if (error) {
+      return cb(error);
+    }
+
+    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+  });
+};
+
+/**
+ * Set profile in content
+ * @param {KuzzleProfile|string} profile - can be a KuzzleProfile or an id string
+ *
+ * @returns {KuzzleUser} this
+ */
+KuzzleUser.prototype.setProfile = function (profile) {
+
+  if (typeof profile !== 'string' && !(profile instanceof KuzzleProfile)) {
+    throw new Error('Parameter "profile" must be a KuzzleProfile or a string');
+  }
+
+  this.content.profile = profile;
+
+  return this;
+};
+
+/**
+ * Saves this user into Kuzzle.
+ *
+ * If this is a new user, this function will create it in Kuzzle.
+ * Otherwise, this method will replace the latest version of this user in Kuzzle by the current content
+ * of this object.
+ *
+ * @param {responseCallback} [cb] - Handles the query response
+ * @param {object} [options] - Optional parameters
+ * @returns {*} this
+ */
+KuzzleUser.prototype.save = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, function (error) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
+};
+
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this User
+ */
+KuzzleUser.prototype.serialize = function () {
+  var
+    data = {};
+
+  if (this.id) {
+    data._id = this.id;
+  }
+
+  data.body = this.content;
+
+  if (data.body.profile && data.body.profile.id) {
+    data.body.profile = data.body.profile.id;
+  }
+
+  return data;
+};
+
+module.exports = KuzzleUser;
+
+},{"./kuzzleProfile":7,"./kuzzleSecurityDocument":10}]},{},[2]);

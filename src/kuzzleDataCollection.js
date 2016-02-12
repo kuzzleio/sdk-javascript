@@ -226,7 +226,6 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
     data._id = id;
   }
 
-  data.persist = true;
   data = self.kuzzle.addHeaders(data, self.headers);
 
   if (cb) {
