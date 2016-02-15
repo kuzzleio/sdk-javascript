@@ -162,7 +162,7 @@ KuzzleProfile.prototype.hydrate = function (options, cb) {
       return cb(error);
     }
 
-    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+    cb(null, new KuzzleProfile(self, self.id, {roles: response.result.hits}));
   });
 };
 
