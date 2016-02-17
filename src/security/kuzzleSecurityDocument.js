@@ -35,7 +35,7 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['delete'];
+        var whitelist = ['delete', 'update'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -107,6 +107,43 @@ KuzzleSecurityDocument.prototype.delete = function (options, cb) {
 
     if (cb) {
       cb(null, res.result._id);
+    }
+  });
+};
+
+/**
+ * Update the current KuzzleSecurityDocument into Kuzzle.
+ *
+ * @param {object} content - Content to add to KuzzleSecurityDocument
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
+  var
+    data = {},
+    self = this;
+
+  if (typeof content !== 'object') {
+    throw new Error('Parameter "content" must be a object');
+  }
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = self.id;
+  data.body = content;
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error, res) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    self.setContent(content, false);
+
+    if (cb) {
+      cb(null, self);
     }
   });
 };

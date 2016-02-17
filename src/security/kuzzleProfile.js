@@ -11,6 +11,9 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteProfile'
+    },
+    updateActionName: {
+      value: 'updateProfile'
     }
   });
 
