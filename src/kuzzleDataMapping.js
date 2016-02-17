@@ -24,7 +24,7 @@ function KuzzleDataMapping(kuzzleDataCollection, mapping) {
     //read-only properties
     collection: {
       value: kuzzleDataCollection,
-      eunmerable: true
+      enumerable: true
     },
     kuzzle: {
       value: kuzzleDataCollection.kuzzle,
