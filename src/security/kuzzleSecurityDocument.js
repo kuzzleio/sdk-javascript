@@ -135,7 +135,7 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
   data._id = self.id;
   data.body = content;
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error, res) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error) {
     if (error) {
       return cb ? cb(error) : false;
     }
