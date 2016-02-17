@@ -1,6 +1,6 @@
 {
   "rules": {
-    "consistent-return": 2,
+    "consistent-return": 0,
     "curly": 2,
     "dot-notation": 2,
     "eqeqeq": 2,
@@ -44,7 +44,7 @@
     "no-with": 2,
     "quotes": [2, "single"],
     "semi": [2, "always"],
-    "space-after-keywords": 2,
+    "keyword-spacing": 2,
     "space-before-blocks": 2,
     "space-in-parens": [2, "never"],
     "vars-on-top": 2,

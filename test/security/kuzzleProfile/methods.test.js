@@ -183,8 +183,8 @@ describe('KuzzleRole methods', function () {
       kuzzle.query = queryStub;
       error = false;
 
-      result = { result: {_id: 'myProfile', _source: {roles : ['role1', 'role2']}} };
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, result.result._id, result.result._source);
+      result = { result: {hits: [{_id: 'role1', _source: {indexes: {}}}, {_id: 'role2', _source: {indexes: {}}}]}};
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'profile', {roles: result.result.hits});
       expectedQuery = {
         action: 'mGetRoles',
         controller: 'security'
@@ -196,11 +196,18 @@ describe('KuzzleRole methods', function () {
     });
 
     it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = {ids: result.result._source.roles};
+      expectedQuery.body = {ids: ['role1', 'role2']};
 
       should(kuzzleProfile.hydrate(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
+        should(res.content.roles).be.an.Array();
+        should(res.content.roles).not.be.empty();
+
+        res.content.roles.forEach(function (role) {
+          should(role).instanceof(KuzzleRole);
+        });
+
         done();
       }));
     });

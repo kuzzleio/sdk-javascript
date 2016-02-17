@@ -61,11 +61,16 @@ KuzzleUser.prototype.hydrate = function (options, cb) {
   }
 
   self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
+    var hydratedUser;
+
     if (error) {
       return cb(error);
     }
 
-    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+    hydratedUser = new KuzzleUser(self.kuzzleSecurity, self.id, self.content);
+    hydratedUser.setProfile(new KuzzleProfile(self.kuzzleSecurity, response.result._id, response.result._source));
+
+    cb(null, hydratedUser);
   });
 };
 
