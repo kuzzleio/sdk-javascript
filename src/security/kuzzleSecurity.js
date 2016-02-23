@@ -163,6 +163,46 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
   }
 };
 
+
+/**
+ * Update a role in Kuzzle.
+ *
+ * @param {string} id - role identifier
+ * @param {object} content - a plain javascript object representing the role's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateRole';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateRole: cannot update a role without a role ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
 /**
  * Delete role.
  *
@@ -355,6 +395,46 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
   }
 };
 
+
+/**
+ * Update a profile in Kuzzle.
+ *
+ * @param {string} id - profile identifier
+ * @param {object} content - a plain javascript object representing the profile's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateProfile';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateProfile: cannot update a profile without a profile ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
 /**
  * Delete profile.
  *
@@ -538,6 +618,46 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
 
       doc = new KuzzleUser(self, res.result._id, res.result._source);
       cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
+
+/**
+ * Update an user in Kuzzle.
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - a plain javascript object representing the user's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateUser';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateUser: cannot update an user without an user ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);

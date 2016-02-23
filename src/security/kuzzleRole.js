@@ -9,6 +9,9 @@ function KuzzleRole(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteRole'
+    },
+    updateActionName: {
+      value: 'updateRole'
     }
   });
 

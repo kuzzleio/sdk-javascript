@@ -16,6 +16,9 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteUser'
+    },
+    updateActionName: {
+      value: 'updateUser'
     }
   });
 
