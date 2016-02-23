@@ -498,7 +498,7 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 
   this.callbackRequired('Kuzzle.checkToken', callback);
 
-  this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
+  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, callback);
 
   return self;
 };

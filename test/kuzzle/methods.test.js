@@ -1,6 +1,7 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
   KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
@@ -511,14 +512,15 @@ describe('Kuzzle methods', function () {
         connect: 'manual'
       });
 
-      kuzzle.queuing = true;
+      kuzzle.query = function (args, query) {
+        should(args.action).be.eql('checkToken');
+        should(args.controller).be.eql('auth');
+        should(query.body.token).be.eql(token);
+      };
+
+      kuzzle.state = 'connected';
 
       kuzzle.checkToken(token, function (err, res) {});
-
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].query.action).be.exactly('checkToken');
-      should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
-      should(kuzzle.offlineQueue[0].query.body.token).be.exactly(token);
     });
 
     it('should throw an error when it is called with no callback', function (done) {
