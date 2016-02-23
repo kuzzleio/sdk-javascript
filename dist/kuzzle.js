@@ -2663,11 +2663,16 @@ KuzzleRoom.prototype.count = function (cb) {
   var data;
 
   this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
   if (this.subscribing) {
     this.queue.push({action: 'count', args: [cb]});
     return this;
+  }
+
+  if (!this.roomId) {
+    throw new Error('KuzzleRoom.count: cannot count subscriptions on an inactive room');
   }
 
   this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
@@ -2702,6 +2707,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     filters = null;
   }
 
+  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+
   /*
     Skip subscription renewal if another one was performed a moment before
    */
@@ -2727,8 +2734,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.queue.push({action: 'renew', args: [filters, cb]});
     return self;
   }
-
-  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
 
   self.unsubscribe();
   self.roomId = null;
