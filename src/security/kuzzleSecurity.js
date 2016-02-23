@@ -167,8 +167,8 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
 /**
  * Update a role in Kuzzle.
  *
- * @param {string} id - profile identifier
- * @param {object} content - a plain javascript object representing the profile's modification
+ * @param {string} id - role identifier
+ * @param {object} content - a plain javascript object representing the role's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
