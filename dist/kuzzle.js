@@ -773,7 +773,13 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 
   this.callbackRequired('Kuzzle.checkToken', callback);
 
-  this.query({controller: 'auth', action: 'checkToken'}, request, {}, callback);
+  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, function (err, response) {
+    if (err) {
+      return callback(err);
+    }
+
+    callback(null, response.result);
+  });
 
   return self;
 };
@@ -2891,6 +2897,9 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteProfile'
+    },
+    updateActionName: {
+      value: 'updateProfile'
     }
   });
 
@@ -3090,6 +3099,9 @@ function KuzzleRole(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteRole'
+    },
+    updateActionName: {
+      value: 'updateRole'
     }
   });
 
@@ -3311,6 +3323,46 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
   }
 };
 
+
+/**
+ * Update a role in Kuzzle.
+ *
+ * @param {string} id - role identifier
+ * @param {object} content - a plain javascript object representing the role's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateRole';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateRole: cannot update a role without a role ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
 /**
  * Delete role.
  *
@@ -3497,6 +3549,46 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
 
       doc = new KuzzleProfile(self, res.result._id, res.result._source);
       cb(null, doc);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
+
+/**
+ * Update a profile in Kuzzle.
+ *
+ * @param {string} id - profile identifier
+ * @param {object} content - a plain javascript object representing the profile's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateProfile';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateProfile: cannot update a profile without a profile ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -3692,6 +3784,46 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
   }
 };
 
+
+/**
+ * Update an user in Kuzzle.
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - a plain javascript object representing the user's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {},
+    action = 'updateUser';
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.updateUser: cannot update an user without an user ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = id;
+  data.body = content;
+
+  if (cb) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    self.kuzzle.query(this.buildQueryArgs(action), data);
+  }
+};
+
 /**
  * Delete user.
  *
@@ -3777,7 +3909,7 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['delete'];
+        var whitelist = ['delete', 'update'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -3853,6 +3985,43 @@ KuzzleSecurityDocument.prototype.delete = function (options, cb) {
   });
 };
 
+/**
+ * Update the current KuzzleSecurityDocument into Kuzzle.
+ *
+ * @param {object} content - Content to add to KuzzleSecurityDocument
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ */
+KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
+  var
+    data = {},
+    self = this;
+
+  if (typeof content !== 'object') {
+    throw new Error('Parameter "content" must be a object');
+  }
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data._id = self.id;
+  data.body = content;
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error) {
+    if (error) {
+      return cb ? cb(error) : false;
+    }
+
+    self.setContent(content, false);
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+};
+
 module.exports = KuzzleSecurityDocument;
 },{}],11:[function(require,module,exports){
 var
@@ -3873,6 +4042,9 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     // private properties
     deleteActionName: {
       value: 'deleteUser'
+    },
+    updateActionName: {
+      value: 'updateUser'
     }
   });
 
