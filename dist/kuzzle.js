@@ -2077,7 +2077,7 @@ function KuzzleDataMapping(kuzzleDataCollection, mapping) {
     //read-only properties
     collection: {
       value: kuzzleDataCollection,
-      eunmerable: true
+      enumerable: true
     },
     kuzzle: {
       value: kuzzleDataCollection.kuzzle,
@@ -2663,11 +2663,16 @@ KuzzleRoom.prototype.count = function (cb) {
   var data;
 
   this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
   if (this.subscribing) {
     this.queue.push({action: 'count', args: [cb]});
     return this;
+  }
+
+  if (!this.roomId) {
+    throw new Error('KuzzleRoom.count: cannot count subscriptions on an inactive room');
   }
 
   this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
@@ -2702,6 +2707,8 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     filters = null;
   }
 
+  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+
   /*
     Skip subscription renewal if another one was performed a moment before
    */
@@ -2727,8 +2734,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.queue.push({action: 'renew', args: [filters, cb]});
     return self;
   }
-
-  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
 
   self.unsubscribe();
   self.roomId = null;
@@ -3037,7 +3042,7 @@ KuzzleProfile.prototype.hydrate = function (options, cb) {
       return cb(error);
     }
 
-    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+    cb(null, new KuzzleProfile(self, self.id, {roles: response.result.hits}));
   });
 };
 
@@ -3764,7 +3769,7 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   });
 
   if (content) {
-    this.setContent(content);
+    this.setContent(content, true);
   }
 
   // promisifying
@@ -3781,13 +3786,25 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 }
 
 /**
+ * Replaces the current content with new data.
+ * Changes made by this function won’t be applied until the save method is called.
  *
  * @param {Object} data - New securityDocument content
+ * @param {boolean} replace - if true: replace this document content with the provided data.
  *
  * @return {Object} this
  */
-KuzzleSecurityDocument.prototype.setContent = function (data) {
-  this.content = data;
+KuzzleSecurityDocument.prototype.setContent = function (data, replace) {
+  var self = this;
+
+  if (replace) {
+    this.content = data;
+  }
+  else {
+    Object.keys(data).forEach(function (key) {
+      self.content[key] = data[key];
+    });
+  }
 
   return this;
 };
@@ -3901,11 +3918,16 @@ KuzzleUser.prototype.hydrate = function (options, cb) {
   }
 
   self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
+    var hydratedUser;
+
     if (error) {
       return cb(error);
     }
 
-    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+    hydratedUser = new KuzzleUser(self.kuzzleSecurity, self.id, self.content);
+    hydratedUser.setProfile(new KuzzleProfile(self.kuzzleSecurity, response.result._id, response.result._source));
+
+    cb(null, hydratedUser);
   });
 };
 
