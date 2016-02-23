@@ -71,6 +71,7 @@ describe('KuzzleRoom methods', function () {
         body: {}
       };
       room = new KuzzleRoom(dataCollection);
+      room.roomId = 'foobar';
     });
 
     it('should send the right query to Kuzzle', function () {
@@ -110,6 +111,11 @@ describe('KuzzleRoom methods', function () {
         should(res).be.undefined();
         done();
       });
+    });
+
+    it('should fail if the room has no room ID', function () {
+      room.roomId = undefined;
+      should(function () {room.count(function () {})}).throw();
     });
   });
 
