@@ -504,6 +504,7 @@ describe('Kuzzle methods', function () {
     it('should send the checkToken after call', function () {
       var
         kuzzle,
+        stubResults = { foo: 'bar' },
         token = 'fakeToken-eoijaodmowifnw8h';
 
       this.timeout(200);
@@ -512,15 +513,46 @@ describe('Kuzzle methods', function () {
         connect: 'manual'
       });
 
-      kuzzle.query = function (args, query) {
+      kuzzle.query = function (args, query, opts, cb) {
         should(args.action).be.eql('checkToken');
         should(args.controller).be.eql('auth');
         should(query.body.token).be.eql(token);
+        cb(null, {result: stubResults });
       };
 
       kuzzle.state = 'connected';
 
-      kuzzle.checkToken(token, function (err, res) {});
+      kuzzle.checkToken(token, function (err, res) {
+        should(err).be.null();
+        should(res).be.eql(stubResults);
+      });
+    });
+
+    it('should resolve to an error if Kuzzle respond with one', function () {
+      var
+        kuzzle,
+        stubError = { foo: 'bar' },
+        token = 'fakeToken-eoijaodmowifnw8h';
+
+      this.timeout(200);
+
+      kuzzle = new Kuzzle('nowhere', {
+        connect: 'manual'
+      });
+
+      kuzzle.query = function (args, query, opts, cb) {
+        should(args.action).be.eql('checkToken');
+        should(args.controller).be.eql('auth');
+        should(query.body.token).be.eql(token);
+        cb({error: stubError });
+      };
+
+      kuzzle.state = 'connected';
+
+      kuzzle.checkToken(token, function (err, res) {
+        should(err.error).be.eql(stubError);
+        should(res).be.undefined();
+      });
     });
 
     it('should throw an error when it is called with no callback', function (done) {
