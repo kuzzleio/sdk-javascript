@@ -213,6 +213,54 @@ describe('KuzzleSecurity roles methods', function () {
     });
   });
 
+  describe('#updateRole', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'roles'} };
+      expectedQuery = {
+        action: 'updateRole',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      should(kuzzle.security.updateRole(result.result._id, {'foo': 'bar'}, function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result.result._id);
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.updateRole(result.result._id, {'foo': 'bar'});
+      done();
+    });
+
+    it('should throw an error if no id provided', function () {
+      should(function () { kuzzle.security.updateRole(null); }).throw(Error);
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.updateRole(result.result._id, {'foo': 'bar'}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#deleteRole', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});

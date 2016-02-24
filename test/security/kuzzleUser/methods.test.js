@@ -93,6 +93,61 @@ describe('KuzzleRole methods', function () {
     });
   });
 
+  describe('#update', function () {
+    before(function () {
+      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzle.query = queryStub;
+      error = false;
+
+      result = { result: {_id: 'myUser', _index: '%kuzzle', _type: 'users'} };
+      kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
+      expectedQuery = {
+        action: 'updateUser',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to kuzzle', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      should(kuzzleUser.update({'foo': 'bar'}, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleUser);
+        done();
+      }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzleUser.update({'foo': 'bar'}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should raise an error if no content given', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      this.timeout(50);
+
+      try {
+        kuzzleUser.update();
+      }
+      catch(error) {
+        should(error).be.instanceOf(Error);
+        done();
+      }
+    });
+  });
+
   describe('#setProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
