@@ -195,5 +195,14 @@ KuzzleProfile.prototype.serialize = function () {
   return data;
 };
 
+/**
+ * Returns the list of roles associated to this profile.
+ * Each role element can be either a string or a KuzzleRole object
+ *
+ * @return {object} an array of roles
+ */
+KuzzleProfile.prototype.getRoles = function () {
+  return this.content.roles;
+};
 
 module.exports = KuzzleProfile;
