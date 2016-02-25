@@ -741,11 +741,53 @@ describe('Kuzzle constructor', () => {
         });
 
         kuzzle.query = function(queryArgs, query, options, cb) {
-          cb(null, { result: {jwt: 'test-toto'}});
+          cb(null, {result: {jwt: 'test-toto'}});
         };
 
-        kuzzle.login('local', loginCredentials, '1h', function(error, k) {
-          should(k.jwtToken).be.exactly('test-toto');
+        kuzzle.login('local', loginCredentials, '1h', function() {
+          should(kuzzle.jwtToken).be.exactly('test-toto');
+          done();
+        });
+      });
+
+      it('should send a failed loginAttempt event if logging in fails', function (done) {
+        var
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
+          eventEmitted = false;
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb({message: 'foobar'});
+        };
+
+        kuzzle.addListener('loginAttempt', status => {
+          should(status.success).be.false();
+          should(status.error).be.eql('foobar');
+          eventEmitted = true;
+        });
+
+        kuzzle.login('local', {});
+
+        process.nextTick(() => {
+          should(eventEmitted).be.true();
+          done();
+        });
+      });
+
+      it('should not forward an event if there is no JWT token in the response', function (done) {
+        var
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb(null, {result: {}});
+        };
+
+        kuzzle.addListener('loginAttempt', () => {
+          done('test failed');
+        });
+
+        kuzzle.login('local', {});
+
+        process.nextTick(() => {
           done();
         });
       });
@@ -826,30 +868,6 @@ describe('Kuzzle constructor', () => {
           should(error).be.an.instanceOf(Error);
           done();
         });
-      });
-
-      it('should raise an error if login query fail and no callback is set', function (done) {
-        var
-          kuzzle,
-          loginCredentials = {username: 'foo', password: 'bar'};
-
-        this.timeout(200);
-
-        kuzzle = new Kuzzle('nowhere', {
-          connect: 'manual'
-        });
-
-        kuzzle.query = function(queryArgs, query, options, cb) {
-          cb(new Error());
-        };
-
-        try {
-          kuzzle.login('local', loginCredentials, '1h');
-        }
-        catch(err) {
-          should(err).be.an.instanceOf(Error);
-          done();
-        }
       });
 
       it('should give an error if login query fail to the login callback if is set', function (done) {

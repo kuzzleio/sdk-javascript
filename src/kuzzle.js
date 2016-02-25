@@ -52,7 +52,8 @@ module.exports = Kuzzle = function (url, options, cb) {
         error: {lastEmitted: null, listeners: []},
         disconnected: {lastEmitted: null, listeners: []},
         reconnected: {lastEmitted: null, listeners: []},
-        jwtTokenExpired: {lastEmitted: null, listeners: []}
+        jwtTokenExpired: {lastEmitted: null, listeners: []},
+        loginAttempt: {lastEmitted: null, listeners: []}
       }
     },
     eventTimeout: {
@@ -385,7 +386,23 @@ Kuzzle.prototype.connect = function () {
  * @returns {Kuzzle}
  */
 Kuzzle.prototype.setJwtToken = function(token) {
-  this.jwtToken = token;
+  if (typeof token === 'string') {
+    this.jwtToken = token;
+  } else if (typeof token === 'object') {
+    if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
+      this.jwtToken = token.result.jwt;
+    } else {
+      return this.emitEvent('loginAttempt', {
+        success: false,
+        error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
+      });
+    }
+  } else {
+    return this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+  }
+
+  renewAllSubscriptions.call(this);
+  this.emitEvent('loginAttempt', {success: true});
   return this;
 };
 
@@ -428,19 +445,21 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
   }
 
   this.query({controller: 'auth', action: 'login'}, {body: request}, {queuable: false}, function(error, response) {
-    if (error === null) {
-      self.setJwtToken(response.result.jwt);
-      renewAllSubscriptions.call(self);
+    if (!error) {
+      if (response.result.jwt) {
+        self.setJwtToken(response.result.jwt);
+      }
 
-      if (typeof cb === 'function') {
-        cb(null, self);
+      if (cb && typeof cb === 'function') {
+        cb(null, response.result);
       }
     }
-    else if (typeof cb === 'function') {
-      cb(error);
-    }
     else {
-      throw new Error(error.message);
+      if (cb && typeof cb === 'function') {
+        cb(error);
+      }
+
+      self.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
 
@@ -480,7 +499,7 @@ Kuzzle.prototype.logout = function (cb) {
 };
 
 /**
- * Checks wether a given jwt token still represents a valid session in Kuzzle.
+ * Checks whether a given jwt token still represents a valid session in Kuzzle.
  *
  * @param  {string}   token     The jwt token to check
  * @param  {function} callback  The callback to be called when the response is
@@ -531,6 +550,7 @@ Kuzzle.prototype.whoAmI = function (callback) {
 
   return self;
 };
+
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
@@ -1016,7 +1036,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     if (self.state === 'connected') {
       emitRequest.call(this, object, cb);
     } else if (cb) {
-      cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + object));
+      cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
     }
   } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
