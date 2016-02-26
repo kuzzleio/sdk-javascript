@@ -484,7 +484,7 @@ Kuzzle.prototype.logout = function (cb) {
 
   this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
     if (error === null) {
-      self.setJwtToken(undefined);
+      self.jwtToken = undefined;
 
       if (typeof cb === 'function') {
         cb(null, self);
