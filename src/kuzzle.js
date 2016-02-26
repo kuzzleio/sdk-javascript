@@ -392,13 +392,16 @@ Kuzzle.prototype.setJwtToken = function(token) {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
       this.jwtToken = token.result.jwt;
     } else {
-      return this.emitEvent('loginAttempt', {
+      this.emitEvent('loginAttempt', {
         success: false,
         error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
       });
+
+      return this;
     }
   } else {
-    return this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    return this;
   }
 
   renewAllSubscriptions.call(this);
