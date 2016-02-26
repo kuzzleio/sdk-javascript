@@ -662,4 +662,64 @@ describe('Kuzzle methods', function () {
       should(kuzzle.getJwtToken()).be.exactly('testToken');
     });
   });
+
+  describe('#setJwtToken', function () {
+    var
+      eventEmitted,
+      loginStatus,
+      subscriptionsRenewed,
+      revert;
+
+    before(function () {
+      revert = Kuzzle.__set__('renewAllSubscriptions', function () { subscriptionsRenewed = true; });
+    });
+
+    beforeEach(function () {
+      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+      kuzzle.addListener('loginAttempt', status => {
+        eventEmitted = true;
+        loginStatus = status;
+      });
+      eventEmitted = false;
+      subscriptionsRenewed = false;
+    });
+
+    after(function () {
+      revert();
+    });
+
+    it('should set the token when provided with a string argument', function () {
+      kuzzle.setJwtToken('foobar');
+      should(kuzzle.getJwtToken()).be.eql('foobar');
+      should(subscriptionsRenewed).be.true();
+      should(eventEmitted).be.true();
+      should(loginStatus.success).be.true();
+    });
+
+    it('should set the token when provided with a kuzzle response argument', function () {
+      kuzzle.setJwtToken({result:{jwt: 'foobar'}});
+      should(kuzzle.getJwtToken()).be.eql('foobar');
+      should(subscriptionsRenewed).be.true();
+      should(eventEmitted).be.true();
+      should(loginStatus.success).be.true();
+    });
+
+    it('should send an "attempt failed" event if provided with an invalid argument type', function () {
+      kuzzle.setJwtToken();
+      should(kuzzle.getJwtToken()).be.undefined();
+      should(subscriptionsRenewed).be.false();
+      should(eventEmitted).be.true();
+      should(loginStatus.success).be.false();
+      should(loginStatus.error).not.be.undefined();
+    });
+
+    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
+      kuzzle.setJwtToken({foo: 'bar'});
+      should(kuzzle.getJwtToken()).be.undefined();
+      should(subscriptionsRenewed).be.false();
+      should(eventEmitted).be.true();
+      should(loginStatus.success).be.false();
+      should(loginStatus.error).not.be.undefined();
+    });
+  });
 });
