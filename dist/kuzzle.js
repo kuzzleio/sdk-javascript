@@ -667,13 +667,16 @@ Kuzzle.prototype.setJwtToken = function(token) {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
       this.jwtToken = token.result.jwt;
     } else {
-      return this.emitEvent('loginAttempt', {
+      this.emitEvent('loginAttempt', {
         success: false,
         error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
       });
+
+      return this;
     }
   } else {
-    return this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    return this;
   }
 
   renewAllSubscriptions.call(this);
@@ -759,7 +762,7 @@ Kuzzle.prototype.logout = function (cb) {
 
   this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
     if (error === null) {
-      self.setJwtToken(undefined);
+      self.jwtToken = undefined;
 
       if (typeof cb === 'function') {
         cb(null, self);
@@ -3104,6 +3107,15 @@ KuzzleProfile.prototype.serialize = function () {
   return data;
 };
 
+/**
+ * Returns the list of roles associated to this profile.
+ * Each role element can be either a string or a KuzzleRole object
+ *
+ * @return {object} an array of roles
+ */
+KuzzleProfile.prototype.getRoles = function () {
+  return this.content.roles;
+};
 
 module.exports = KuzzleProfile;
 
@@ -4054,7 +4066,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
 
   // Hydrate user with profile if profile is not only a string but an object with `_id` and `_source`
   if (content.profile && content.profile._id && content.profile._source) {
-    content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
+    this.content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
   }
 
   // Define properties
@@ -4194,6 +4206,15 @@ KuzzleUser.prototype.serialize = function () {
   }
 
   return data;
+};
+
+/**
+ * Return the associated profiles
+ *
+ * @return {object} either the associated profile ID or the KuzzleProfile instance
+ */
+KuzzleUser.prototype.getProfiles = function () {
+  return this.content.profile;
 };
 
 module.exports = KuzzleUser;
