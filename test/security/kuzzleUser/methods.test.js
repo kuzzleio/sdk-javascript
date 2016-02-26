@@ -315,4 +315,12 @@ describe('KuzzleRole methods', function () {
     });
   });
 
+  describe('#getProfiles', function () {
+    it('should return the associated profiles', function () {
+      var profile = 'profile';
+      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profile});
+      should(kuzzleUser.getProfiles()).be.eql(profile);
+    });
+  });
 });

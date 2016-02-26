@@ -8,7 +8,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
 
   // Hydrate user with profile if profile is not only a string but an object with `_id` and `_source`
   if (content.profile && content.profile._id && content.profile._source) {
-    content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
+    this.content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
   }
 
   // Define properties
@@ -148,6 +148,15 @@ KuzzleUser.prototype.serialize = function () {
   }
 
   return data;
+};
+
+/**
+ * Return the associated profiles
+ *
+ * @return {object} either the associated profile ID or the KuzzleProfile instance
+ */
+KuzzleUser.prototype.getProfiles = function () {
+  return this.content.profile;
 };
 
 module.exports = KuzzleUser;

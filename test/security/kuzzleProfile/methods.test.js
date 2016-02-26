@@ -379,4 +379,13 @@ describe('KuzzleRole methods', function () {
     });
   });
 
+  describe('#getRoles', function () {
+    it('should return the associated roles', function () {
+      var roles = ['role1', 'role2', 'role3'];
+
+      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles});
+      should(kuzzleProfile.getRoles()).be.eql(roles);
+    });
+  });
 });
