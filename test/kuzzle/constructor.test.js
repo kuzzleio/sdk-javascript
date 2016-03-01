@@ -750,7 +750,7 @@ describe('Kuzzle constructor', () => {
         });
       });
 
-      it('should get the url redirection from OAUTH', function (done) {
+      it('should handle login with only one argument and without callback', function (done) {
         var
           kuzzle;
 
@@ -761,11 +761,100 @@ describe('Kuzzle constructor', () => {
         });
 
         kuzzle.query = function(queryArgs, query, options, cb) {
-          cb(null, {result: {url: 'redirect'}});
+          done();
+        };
+        kuzzle.login('local');
+      });
+
+      it('should handle login with credentials and without callback', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          done();
         };
 
+        kuzzle.login('local', loginCredentials);
+      });
+
+      it('should handle login without credentials, with expiresIn and without callback', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          done();
+        };
+
+        kuzzle.login('local', '1h');
+      });
+
+      it('should handle login without credentials, without expiresIn and with callback', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb(null, {result: {jwt: 'test-toto'}});
+        };
+        console.log('## before');
         kuzzle.login('local', '1h', function() {
-          should(kuzzle.jwtToken).be.undefined();
+          done();
+        });
+      });
+
+      it('should handle login without credentials, without expiresIn and with callback', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb(null, {result: {jwt: 'test-toto'}});
+        };
+
+        kuzzle.login('local', function() {
+          done();
+        });
+      });
+
+      it('should handle login with credentials', function (done) {
+        var
+          kuzzle,
+          loginCredentials = {username: 'foo', password: 'bar'};
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb(null, {result: {jwt: 'test-toto'}});
+        };
+
+        kuzzle.login('local', loginCredentials, function() {
           done();
         });
       });
