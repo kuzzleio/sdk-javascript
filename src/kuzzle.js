@@ -434,6 +434,11 @@ Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
       strategy: strategy
     };
 
+  // don't need credentials in case of an OAUTH strategy
+  if (typeof credentials === 'number' || typeof credentials === 'string') {
+    cb = expiresIn;
+    expiresIn = credentials;
+  }
   if (!cb && typeof expiresIn === 'function') {
     cb = expiresIn;
     expiresIn = null;
