@@ -427,24 +427,40 @@ Kuzzle.prototype.getJwtToken = function() {
  * @param cb
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.login = function (strategy, credentials, expiresIn, cb) {
+Kuzzle.prototype.login = function (strategy) {
   var
     self = this,
     request = {
       strategy: strategy
-    };
+    },
+    credentials,
+    cb;
 
-  if (!cb && typeof expiresIn === 'function') {
-    cb = expiresIn;
-    expiresIn = null;
+  // Handle arguments (credentials, expiresIn, cb)
+  if (arguments[1]) {
+    if (typeof arguments[1] === 'object') {
+      credentials = arguments[1];
+    } else if (typeof arguments[1] === 'number' || typeof arguments[1] === 'string') {
+      request.expiresIn = arguments[1];
+    } else if (typeof arguments[1] === 'function') {
+      cb = arguments[1];
+    }
+  }
+  if (arguments[2]) {
+    if (typeof arguments[2] === 'number' || typeof arguments[2] === 'string') {
+      request.expiresIn = arguments[2];
+    } else if (typeof arguments[2] === 'function') {
+      cb = arguments[2];
+    }
+  }
+  if (arguments[3] && typeof arguments[3] === 'function') {
+    cb = arguments[3];
   }
 
-  Object.keys(credentials).forEach(function (key) {
-    request[key] = credentials[key];
-  });
-
-  if (['number', 'string'].indexOf(typeof expiresIn) !== -1) {
-    request.expiresIn = expiresIn;
+  if (typeof credentials === 'object') {
+    Object.keys(credentials).forEach(function (key) {
+      request[key] = credentials[key];
+    });
   }
 
   this.query({controller: 'auth', action: 'login'}, {body: request}, {queuable: false}, function(error, response) {
