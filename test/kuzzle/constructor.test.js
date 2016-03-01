@@ -750,6 +750,26 @@ describe('Kuzzle constructor', () => {
         });
       });
 
+      it('should get the url redirection from OAUTH', function (done) {
+        var
+          kuzzle;
+
+        this.timeout(200);
+
+        kuzzle = new Kuzzle('nowhere', {
+          connect: 'manual'
+        });
+
+        kuzzle.query = function(queryArgs, query, options, cb) {
+          cb(null, {result: {url: 'redirect'}});
+        };
+
+        kuzzle.login('local', '1h', function() {
+          should(kuzzle.jwtToken).be.undefined();
+          done();
+        });
+      });
+
       it('should send a failed loginAttempt event if logging in fails', function (done) {
         var
           kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
