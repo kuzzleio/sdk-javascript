@@ -688,38 +688,54 @@ describe('Kuzzle methods', function () {
       revert();
     });
 
-    it('should set the token when provided with a string argument', function () {
+    it('should set the token when provided with a string argument', function (done) {
       kuzzle.setJwtToken('foobar');
-      should(kuzzle.getJwtToken()).be.eql('foobar');
-      should(subscriptionsRenewed).be.true();
-      should(eventEmitted).be.true();
-      should(loginStatus.success).be.true();
+
+      process.nextTick(() => {
+        should(kuzzle.getJwtToken()).be.eql('foobar');
+        should(subscriptionsRenewed).be.true();
+        should(eventEmitted).be.true();
+        should(loginStatus.success).be.true();
+        done();
+      });
     });
 
-    it('should set the token when provided with a kuzzle response argument', function () {
+    it('should set the token when provided with a kuzzle response argument', function (done) {
       kuzzle.setJwtToken({result:{jwt: 'foobar'}});
-      should(kuzzle.getJwtToken()).be.eql('foobar');
-      should(subscriptionsRenewed).be.true();
-      should(eventEmitted).be.true();
-      should(loginStatus.success).be.true();
+
+      process.nextTick(() => {
+        should(kuzzle.getJwtToken()).be.eql('foobar');
+        should(subscriptionsRenewed).be.true();
+        should(eventEmitted).be.true();
+        should(loginStatus.success).be.true();
+        done();
+      });
     });
 
-    it('should send an "attempt failed" event if provided with an invalid argument type', function () {
+    it('should send an "attempt failed" event if provided with an invalid argument type', function (done) {
       kuzzle.setJwtToken();
-      should(kuzzle.getJwtToken()).be.undefined();
-      should(subscriptionsRenewed).be.false();
-      should(eventEmitted).be.true();
-      should(loginStatus.success).be.false();
-      should(loginStatus.error).not.be.undefined();
+
+      process.nextTick(() => {
+        should(kuzzle.getJwtToken()).be.undefined();
+        should(subscriptionsRenewed).be.false();
+        should(eventEmitted).be.true();
+        should(loginStatus.success).be.false();
+        should(loginStatus.error).not.be.undefined();
+        done();
+      });
     });
 
-    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
+    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function (done) {
       kuzzle.setJwtToken({foo: 'bar'});
-      should(kuzzle.getJwtToken()).be.undefined();
-      should(subscriptionsRenewed).be.false();
-      should(eventEmitted).be.true();
-      should(loginStatus.success).be.false();
-      should(loginStatus.error).not.be.undefined();
+
+      process.nextTick(() => {
+        should(kuzzle.getJwtToken()).be.undefined();
+        should(subscriptionsRenewed).be.false();
+        should(eventEmitted).be.true();
+        should(loginStatus.success).be.false();
+        should(loginStatus.error).not.be.undefined();
+        done();
+      });
     });
   });
 });

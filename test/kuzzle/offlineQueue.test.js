@@ -37,15 +37,22 @@ describe('Offline queue management', () => {
       }
     });
 
-    it('should remove outdated queued requests', function () {
+    it('should remove outdated queued requests', function (done) {
+      var eventFired = false;
+
       // setting the request TTL to 5s
       kuzzle.queueTTL = 5000;
+      kuzzle.addListener('offlineQueuePop', () => eventFired = true);
 
       cleanQueue.call(kuzzle);
 
       // should keep only the latest requests, dating from a few ms ago
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].ts).be.above(now - kuzzle.queueTTL);
+      process.nextTick(() => {
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].ts).be.above(now - kuzzle.queueTTL);
+        should(eventFired).be.true();
+        done();
+      });
     });
 
     it('should ignore requests timestamps if queueTTL is 0', function () {
@@ -56,13 +63,21 @@ describe('Offline queue management', () => {
       should(kuzzle.offlineQueue.length).be.exactly(numRequests);
     });
 
-    it('should remove older requests until the queueMaxSize condition is met', function () {
-      var lastRequest = kuzzle.offlineQueue[kuzzle.offlineQueue.length - 1];
+    it('should remove older requests until the queueMaxSize condition is met', function (done) {
+      var
+        lastRequest = kuzzle.offlineQueue[kuzzle.offlineQueue.length - 1],
+        eventFired = false;
 
       kuzzle.queueMaxSize = 1;
+      kuzzle.addListener('offlineQueuePop', () => eventFired = true);
       cleanQueue.call(kuzzle);
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0]).match(lastRequest);
+
+      process.nextTick(() => {
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0]).match(lastRequest);
+        should(eventFired).be.true();
+        done();
+      });
     });
 
     it('should not remove any request if queueMaxSize is 0', function () {
@@ -86,20 +101,23 @@ describe('Offline queue management', () => {
 
       sent = 0;
       kuzzle = new Kuzzle('foo');
-      kuzzle.socket = { emit: function () { sent++; } };
+      kuzzle.socket = { emit: () => { sent++; } };
       kuzzle.queuing = true;
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart
       while (pastTime >= 0) {
-        kuzzle.offlineQueue.push({ts: now - pastTime, query: {}});
+        kuzzle.offlineQueue.push({ts: now - pastTime, query: {requestId: pastTime, action: 'foo', controller: 'bar'}});
         pastTime -= 10000;
       }
     });
 
     it('should play all queued requests', function (done) {
-      var numRequests = kuzzle.offlineQueue.length;
+      var
+        numRequests = kuzzle.offlineQueue.length,
+        eventFired = 0;
 
       this.timeout(200);
+      kuzzle.addListener('offlineQueuePop', () => eventFired++);
       dequeue.call(kuzzle);
 
       setTimeout(() => {
@@ -107,8 +125,82 @@ describe('Offline queue management', () => {
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(kuzzle.queuing).be.false();
+        should(eventFired).be.eql(numRequests);
         done();
-      }, numRequests * kuzzle.replayInterval + 50)
+      }, numRequests * kuzzle.replayInterval + 50);
+    });
+
+    it('should also load the queue provided by the offlineQueueLoader property', function (done) {
+      var
+        numRequests = kuzzle.offlineQueue.length,
+        eventFired = 0;
+
+      this.timeout(200);
+      kuzzle.offlineQueueLoader = function () {
+        return [
+            {query: {requestId: 'foo', action: 'action', controller: 'controller'}},
+            {query: {requestId: 'foo2', action: 'action', controller: 'controller'}}
+          ];
+      };
+      kuzzle.addListener('offlineQueuePop', () => eventFired++);
+      dequeue.call(kuzzle);
+
+      setTimeout(() => {
+        should(sent).be.exactly(numRequests + 2);
+        should(kuzzle.offlineQueue).be.an.Array();
+        should(kuzzle.offlineQueue.length).be.exactly(0);
+        should(kuzzle.queuing).be.false();
+        should(eventFired).be.eql(numRequests + 2);
+        done();
+      }, (numRequests +2) * kuzzle.replayInterval + 50);
+    });
+
+    it('should filter duplicates from the offlineQueueLoader and the cached queue ', function (done) {
+      var
+        numRequests = kuzzle.offlineQueue.length,
+        eventFired = 0;
+
+      this.timeout(200);
+      kuzzle.offlineQueueLoader = function () {
+        return [
+          {query: {requestId: 'foo', action: 'action', controller: 'controller'}},
+          {query: {requestId: '50000', action: 'action', controller: 'controller'}}
+        ];
+      };
+      kuzzle.addListener('offlineQueuePop', () => eventFired++);
+      dequeue.call(kuzzle);
+
+      setTimeout(() => {
+        should(sent).be.exactly(numRequests + 1);
+        should(kuzzle.offlineQueue).be.an.Array();
+        should(kuzzle.offlineQueue.length).be.exactly(0);
+        should(kuzzle.queuing).be.false();
+        should(eventFired).be.eql(numRequests + 1);
+        done();
+      }, (numRequests + 1) * kuzzle.replayInterval + 50);
+    });
+
+    it('should throw on erroneous queries returned by the offlineQueueLoader property', function () {
+      kuzzle.offlineQueueLoader = function () {
+        return [
+          {}
+        ];
+      };
+
+      should(function () {dequeue.call(kuzzle);}).throw();
+    });
+
+    it('should throw if the offlineQueueLoader property is not a function', function () {
+      kuzzle.offlineQueueLoader = 'foobar';
+      should(function () {dequeue.call(kuzzle);}).throw();
+    });
+
+    it('should throw if the offlineQueueLoader function does not return an array', function () {
+      kuzzle.offlineQueueLoader = function () {
+        return false;
+      };
+
+      should(function () {dequeue.call(kuzzle);}).throw();
     });
   });
 

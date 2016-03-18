@@ -77,6 +77,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
     });
 
     it('should have properties with the documented default values', () => {
@@ -710,12 +711,14 @@ describe('Kuzzle constructor', () => {
           }
         }, function (err, res) {
           try {
-            should(err).be.null();
-            should(res).be.instanceof(Kuzzle);
-            should(res.state).be.exactly('connected');
-            should(listenerConnected).be.exactly(true);
-            kuzzle.socket.removeAllListeners();
-            done();
+            process.nextTick(() => {
+              should(err).be.null();
+              should(res).be.instanceof(Kuzzle);
+              should(res.state).be.exactly('connected');
+              should(listenerConnected).be.exactly(true);
+              kuzzle.socket.removeAllListeners();
+              done();
+            });
           }
           catch (e) {
             done(e);
