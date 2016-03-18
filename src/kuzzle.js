@@ -258,9 +258,9 @@ module.exports = Kuzzle = function (url, options, cb) {
       var
         now = Date.now(),
         args = Array.prototype.slice.call(arguments, 1),
-        eventProperties = self.eventListeners[event];
+        eventProperties = this.eventListeners[event];
 
-      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - self.eventTimeout) {
+      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
         return false;
       }
 
