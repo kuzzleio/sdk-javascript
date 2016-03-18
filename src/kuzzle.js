@@ -256,7 +256,6 @@ module.exports = Kuzzle = function (url, options, cb) {
   Object.defineProperty(this, 'emitEvent', {
     value: function emitEvent(event) {
       var
-        self = this,
         now = Date.now(),
         args = Array.prototype.slice.call(arguments, 1),
         eventProperties = self.eventListeners[event];
@@ -688,7 +687,7 @@ function dequeue () {
         .filter(function (request) {
           // throws if the query object does not contain required attributes
           if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
-            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.')
+            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
           }
 
           return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
