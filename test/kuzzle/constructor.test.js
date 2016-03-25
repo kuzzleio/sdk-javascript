@@ -317,7 +317,9 @@ describe('Kuzzle constructor', () => {
 
           kuzzle = new Kuzzle('nowhere', function (err, res) {
             try {
-              should(err).be.exactly('error');
+              should(err).be.instanceOf(Error);
+              should(err.message).be.exactly('Unable to connect to kuzzle server at "nowhere"');
+              should(err.internal).be.exactly('error');
               should(res).be.undefined();
               should(kuzzle.state).be.exactly('error');
               kuzzle.socket.removeAllListeners();

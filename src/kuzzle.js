@@ -334,11 +334,15 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.socket.on('connect_error', function (error) {
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+
     self.state = 'error';
     self.emitEvent('error');
 
+    connectionError.internal = error;
+
     if (self.connectCB) {
-      self.connectCB(error);
+      self.connectCB(connectionError);
     }
   });
 
