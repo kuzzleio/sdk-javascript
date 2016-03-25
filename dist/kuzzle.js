@@ -1,4 +1,97 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(require,module,exports){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -272,7 +365,8 @@
   }
 })('undefined' !== typeof window ? window : null);
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
+(function (process){
 var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
@@ -328,7 +422,9 @@ module.exports = Kuzzle = function (url, options, cb) {
         disconnected: {lastEmitted: null, listeners: []},
         reconnected: {lastEmitted: null, listeners: []},
         jwtTokenExpired: {lastEmitted: null, listeners: []},
-        loginAttempt: {lastEmitted: null, listeners: []}
+        loginAttempt: {lastEmitted: null, listeners: []},
+        offlineQueuePush: {listeners: []},
+        offlineQueuePop: {listeners: []}
       }
     },
     eventTimeout: {
@@ -454,6 +550,11 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    offlineQueueLoader: {
+      value: null,
+      enumerable: true,
+      writable: true
     }
   });
 
@@ -525,17 +626,23 @@ module.exports = Kuzzle = function (url, options, cb) {
     value: function emitEvent(event) {
       var
         now = Date.now(),
-        args = Array.prototype.slice.call(arguments, 1);
+        args = Array.prototype.slice.call(arguments, 1),
+        eventProperties = this.eventListeners[event];
 
-      if (this.eventListeners[event].lastEmitted && this.eventListeners[event].lastEmitted >= now - this.eventTimeout) {
+      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
         return false;
       }
 
-      this.eventListeners[event].listeners.forEach(function (listener) {
-        listener.fn.apply(this, args);
+      eventProperties.listeners.forEach(function (listener) {
+        process.nextTick(function () {
+          listener.fn.apply(undefined, args);
+        });
       });
 
-      this.eventListeners[event].lastEmitted = now;
+      // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
+      if (eventProperties.lastEmitted !== undefined) {
+        eventProperties.lastEmitted = now;
+      }
     }
   });
 
@@ -862,12 +969,20 @@ function cleanQueue () {
     });
 
     if (lastDocumentIndex !== -1) {
-      self.offlineQueue.splice(0, lastDocumentIndex + 1);
+      self.offlineQueue
+        .splice(0, lastDocumentIndex + 1)
+        .forEach(function (droppedRequest) {
+          self.emitEvent('offlineQueuePop', droppedRequest.query);
+        });
     }
   }
 
   if (self.queueMaxSize > 0 && self.offlineQueue.length > self.queueMaxSize) {
-    self.offlineQueue.splice(0, self.offlineQueue.length - self.queueMaxSize);
+    self.offlineQueue
+      .splice(0, self.offlineQueue.length - self.queueMaxSize)
+      .forEach(function (droppedRequest) {
+        self.emitEvent('offlineQueuePop', droppedRequest.query);
+      });
   }
 }
 
@@ -912,18 +1027,46 @@ function emitRequest (request, cb) {
  * Play all queued requests, in order.
  */
 function dequeue () {
-  var self = this;
+  var
+    self = this,
+    additionalQueue,
+    uniqueQueue = {},
+    dequeuingProcess = function () {
+      if (self.offlineQueue.length > 0) {
+        emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
+        self.emitEvent('offlineQueuePop', self.offlineQueue.shift());
 
-  if (self.offlineQueue.length > 0) {
-    emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
-    self.offlineQueue.shift();
+        setTimeout(function () {
+          dequeuingProcess();
+        }, Math.max(0, self.replayInterval));
+      } else {
+        self.queuing = false;
+      }
+    };
 
-    setTimeout(function () {
-      dequeue.call(self);
-    }, Math.max(0, self.replayInterval));
-  } else {
-    self.queuing = false;
+  if (self.offlineQueueLoader) {
+    if (typeof self.offlineQueueLoader !== 'function') {
+      throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof self.offlineQueueLoader);
+    }
+
+    additionalQueue = self.offlineQueueLoader();
+    if (Array.isArray(additionalQueue)) {
+      self.offlineQueue = additionalQueue
+        .concat(self.offlineQueue)
+        .filter(function (request) {
+          // throws if the query object does not contain required attributes
+          if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
+            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+          }
+
+          return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+        });
+    } else {
+      throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+    }
   }
+
+  dequeuingProcess();
 }
 
 /**
@@ -1332,15 +1475,12 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     } else if (cb) {
       cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
     }
-  } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
+  } else if (self.queuing || ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
 
-    if (self.queueFilter) {
-      if (self.queueFilter(object)) {
-        self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      }
-    } else {
+    if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+      self.emitEvent('offlineQueuePush', {query: object, cb: cb});
     }
   }
 
@@ -1473,7 +1613,8 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
-},{"./kuzzleDataCollection":3,"./security/kuzzleSecurity":9,"./security/kuzzleUser":11,"node-uuid":1,"socket.io-client":undefined}],3:[function(require,module,exports){
+}).call(this,require('_process'))
+},{"./kuzzleDataCollection":4,"./security/kuzzleSecurity":10,"./security/kuzzleUser":12,"_process":1,"node-uuid":2,"socket.io-client":undefined}],4:[function(require,module,exports){
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
@@ -2095,7 +2236,7 @@ KuzzleDataCollection.prototype.setHeaders = function (content, replace) {
 
 module.exports = KuzzleDataCollection;
 
-},{"./kuzzleDataMapping":4,"./kuzzleDocument":5,"./kuzzleRoom":6}],4:[function(require,module,exports){
+},{"./kuzzleDataMapping":5,"./kuzzleDocument":6,"./kuzzleRoom":7}],5:[function(require,module,exports){
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
@@ -2256,7 +2397,7 @@ KuzzleDataMapping.prototype.setHeaders = function (content, replace) {
 
 module.exports = KuzzleDataMapping;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
@@ -2579,7 +2720,7 @@ KuzzleDocument.prototype.setHeaders = function (content, replace) {
 
 module.exports = KuzzleDocument;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var
   uuid = require('node-uuid');
 
@@ -2922,7 +3063,7 @@ function dequeue () {
 
 module.exports = KuzzleRoom;
 
-},{"node-uuid":1}],7:[function(require,module,exports){
+},{"node-uuid":2}],8:[function(require,module,exports){
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
   KuzzleRole = require('./kuzzleRole');
@@ -3135,7 +3276,7 @@ KuzzleProfile.prototype.getRoles = function () {
 
 module.exports = KuzzleProfile;
 
-},{"./kuzzleRole":8,"./kuzzleSecurityDocument":10}],8:[function(require,module,exports){
+},{"./kuzzleRole":9,"./kuzzleSecurityDocument":11}],9:[function(require,module,exports){
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleRole(kuzzleSecurity, id, content) {
@@ -3205,7 +3346,7 @@ KuzzleRole.prototype.save = function (options, cb) {
 };
 
 module.exports = KuzzleRole;
-},{"./kuzzleSecurityDocument":10}],9:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":11}],10:[function(require,module,exports){
 var
   KuzzleRole = require('./kuzzleRole'),
   KuzzleProfile = require('./kuzzleProfile'),
@@ -3919,7 +4060,7 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
 
 
 module.exports = KuzzleSecurity;
-},{"./kuzzleProfile":7,"./kuzzleRole":8,"./kuzzleUser":11}],10:[function(require,module,exports){
+},{"./kuzzleProfile":8,"./kuzzleRole":9,"./kuzzleUser":12}],11:[function(require,module,exports){
 function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 
   if (!id) {
@@ -4071,7 +4212,7 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
 };
 
 module.exports = KuzzleSecurityDocument;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
   KuzzleProfile = require('./kuzzleProfile');
@@ -4235,4 +4376,4 @@ KuzzleUser.prototype.getProfiles = function () {
 
 module.exports = KuzzleUser;
 
-},{"./kuzzleProfile":7,"./kuzzleSecurityDocument":10}]},{},[2]);
+},{"./kuzzleProfile":8,"./kuzzleSecurityDocument":11}]},{},[3]);

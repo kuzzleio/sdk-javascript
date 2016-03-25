@@ -53,7 +53,9 @@ module.exports = Kuzzle = function (url, options, cb) {
         disconnected: {lastEmitted: null, listeners: []},
         reconnected: {lastEmitted: null, listeners: []},
         jwtTokenExpired: {lastEmitted: null, listeners: []},
-        loginAttempt: {lastEmitted: null, listeners: []}
+        loginAttempt: {lastEmitted: null, listeners: []},
+        offlineQueuePush: {listeners: []},
+        offlineQueuePop: {listeners: []}
       }
     },
     eventTimeout: {
@@ -179,6 +181,11 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    offlineQueueLoader: {
+      value: null,
+      enumerable: true,
+      writable: true
     }
   });
 
@@ -250,17 +257,23 @@ module.exports = Kuzzle = function (url, options, cb) {
     value: function emitEvent(event) {
       var
         now = Date.now(),
-        args = Array.prototype.slice.call(arguments, 1);
+        args = Array.prototype.slice.call(arguments, 1),
+        eventProperties = this.eventListeners[event];
 
-      if (this.eventListeners[event].lastEmitted && this.eventListeners[event].lastEmitted >= now - this.eventTimeout) {
+      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
         return false;
       }
 
-      this.eventListeners[event].listeners.forEach(function (listener) {
-        listener.fn.apply(this, args);
+      eventProperties.listeners.forEach(function (listener) {
+        process.nextTick(function () {
+          listener.fn.apply(undefined, args);
+        });
       });
 
-      this.eventListeners[event].lastEmitted = now;
+      // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
+      if (eventProperties.lastEmitted !== undefined) {
+        eventProperties.lastEmitted = now;
+      }
     }
   });
 
@@ -591,12 +604,20 @@ function cleanQueue () {
     });
 
     if (lastDocumentIndex !== -1) {
-      self.offlineQueue.splice(0, lastDocumentIndex + 1);
+      self.offlineQueue
+        .splice(0, lastDocumentIndex + 1)
+        .forEach(function (droppedRequest) {
+          self.emitEvent('offlineQueuePop', droppedRequest.query);
+        });
     }
   }
 
   if (self.queueMaxSize > 0 && self.offlineQueue.length > self.queueMaxSize) {
-    self.offlineQueue.splice(0, self.offlineQueue.length - self.queueMaxSize);
+    self.offlineQueue
+      .splice(0, self.offlineQueue.length - self.queueMaxSize)
+      .forEach(function (droppedRequest) {
+        self.emitEvent('offlineQueuePop', droppedRequest.query);
+      });
   }
 }
 
@@ -641,18 +662,46 @@ function emitRequest (request, cb) {
  * Play all queued requests, in order.
  */
 function dequeue () {
-  var self = this;
+  var
+    self = this,
+    additionalQueue,
+    uniqueQueue = {},
+    dequeuingProcess = function () {
+      if (self.offlineQueue.length > 0) {
+        emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
+        self.emitEvent('offlineQueuePop', self.offlineQueue.shift());
 
-  if (self.offlineQueue.length > 0) {
-    emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
-    self.offlineQueue.shift();
+        setTimeout(function () {
+          dequeuingProcess();
+        }, Math.max(0, self.replayInterval));
+      } else {
+        self.queuing = false;
+      }
+    };
 
-    setTimeout(function () {
-      dequeue.call(self);
-    }, Math.max(0, self.replayInterval));
-  } else {
-    self.queuing = false;
+  if (self.offlineQueueLoader) {
+    if (typeof self.offlineQueueLoader !== 'function') {
+      throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof self.offlineQueueLoader);
+    }
+
+    additionalQueue = self.offlineQueueLoader();
+    if (Array.isArray(additionalQueue)) {
+      self.offlineQueue = additionalQueue
+        .concat(self.offlineQueue)
+        .filter(function (request) {
+          // throws if the query object does not contain required attributes
+          if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
+            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+          }
+
+          return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+        });
+    } else {
+      throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+    }
   }
+
+  dequeuingProcess();
 }
 
 /**
@@ -1061,15 +1110,12 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     } else if (cb) {
       cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
     }
-  } else if (self.queuing|| ['initializing', 'connecting'].indexOf(self.state) !== -1) {
+  } else if (self.queuing || ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
 
-    if (self.queueFilter) {
-      if (self.queueFilter(object)) {
-        self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      }
-    } else {
+    if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+      self.emitEvent('offlineQueuePush', {query: object, cb: cb});
     }
   }
 
