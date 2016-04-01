@@ -703,11 +703,15 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.socket.on('connect_error', function (error) {
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+
     self.state = 'error';
     self.emitEvent('error');
 
+    connectionError.internal = error;
+
     if (self.connectCB) {
-      self.connectCB(error);
+      self.connectCB(connectionError);
     }
   });
 
@@ -4111,22 +4115,10 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
  * Changes made by this function won’t be applied until the save method is called.
  *
  * @param {Object} data - New securityDocument content
- * @param {boolean} replace - if true: replace this document content with the provided data.
- *
  * @return {Object} this
  */
-KuzzleSecurityDocument.prototype.setContent = function (data, replace) {
-  var self = this;
-
-  if (replace) {
-    this.content = data;
-  }
-  else {
-    Object.keys(data).forEach(function (key) {
-      self.content[key] = data[key];
-    });
-  }
-
+KuzzleSecurityDocument.prototype.setContent = function (data) {
+  this.content = data;
   return this;
 };
 
@@ -4198,12 +4190,12 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
   data._id = self.id;
   data.body = content;
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error) {
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error, response) {
     if (error) {
       return cb ? cb(error) : false;
     }
 
-    self.setContent(content, false);
+    self.setContent(response.result._source);
 
     if (cb) {
       cb(null, self);
