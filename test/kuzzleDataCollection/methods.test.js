@@ -361,59 +361,6 @@ describe('KuzzleDataCollection methods', function () {
     });
   });
 
-  describe('#delete', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { acknowledged: true };
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'deleteCollection',
-        controller: 'admin'
-      };
-    });
-
-    it('should send the right deleteCollection query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.delete(options, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object().and.be.exactly(result);
-        done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.delete(function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.delete({}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.delete(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
   describe('#deleteDocument', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
