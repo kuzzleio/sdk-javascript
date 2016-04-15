@@ -1,3 +1,33 @@
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+
+/**
+ * Kuzzle's memory storage is a separate data store from the database layer.
+ * It is internaly based on Redis. You can access most of Redis functions (all
+ * lowercased), excepting:
+ *   * all cluster based functions
+ *   * all script based functions
+ *   * all cursors functions
+ *
+ * For instance:
+ *     kuzzle.memoryStorage
+ *      .set('myKey', 'myValue')
+ *      .get('myKey', function (err, response) {
+ *        console.log(response.result);
+ *
+ *        // { _id: 'foo', body: { value: 'myValue' }}
+ *      });
+ *
+ *
+ * @param {object} kuzzle - Kuzzle instance to inherit from
+ * @constructor
+ */
 function KuzzleMemoryStorage(kuzzle) {
   Object.defineProperties(this, {
     // read-only properties
@@ -30,6 +60,9 @@ function KuzzleMemoryStorage(kuzzle) {
 }
 
 
+/**
+ * constructs the memoryStorage functions.
+ */
 (function() {
 
   var
