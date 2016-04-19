@@ -248,27 +248,6 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
 };
 
 /**
- * Delete this data collection and all documents in it.
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - returns Kuzzle's response
- * @returns {*} this
- */
-KuzzleDataCollection.prototype.delete = function (options, cb) {
-  var data = {};
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('admin', 'deleteCollection'), data, options, cb);
-
-  return this;
-};
-
-/**
  * Delete persistent documents.
  *
  * There is a small delay between documents creation and their existence in our advanced search layer,
