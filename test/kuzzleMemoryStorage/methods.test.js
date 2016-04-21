@@ -105,14 +105,6 @@ describe('KuzzleMemoryStorage methods', () => {
         });
       });
     });
-
-    it('blah', () => {
-      var t = new kuzzle.ErrorCallback((err, r) => {
-        console.log(err, r);
-      });
-      ms.get('foo', t);
-    });
-
   });
 
 
