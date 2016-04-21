@@ -2,6 +2,7 @@ var
   uuid = require('node-uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
+  KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
   KuzzleUser = require('./security/kuzzleUser');
 
 /**
@@ -275,6 +276,11 @@ module.exports = Kuzzle = function (url, options, cb) {
         eventProperties.lastEmitted = now;
       }
     }
+  });
+
+  Object.defineProperty(this, 'memoryStorage', {
+    value: new KuzzleMemoryStorage(this),
+    enumerable: true
   });
 
 
