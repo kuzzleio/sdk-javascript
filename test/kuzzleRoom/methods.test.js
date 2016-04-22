@@ -59,6 +59,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
+      kuzzle.state = 'connected';
       dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
       result = { result: {count: 42 }};
@@ -255,6 +256,7 @@ describe('KuzzleRoom methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
+      kuzzle.state = 'connected';
       kuzzle.socket = {
         off: function () { socketOff = true; }
       };
