@@ -129,7 +129,7 @@ KuzzleRoom.prototype.count = function (cb) {
 
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
-  if (this.subscribing) {
+  if (!isReady.call(this)) {
     this.queue.push({action: 'count', args: [cb]});
     return this;
   }
@@ -250,7 +250,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
     room = self.roomId,
     interval;
 
-  if (self.subscribing) {
+  if (!isReady.call(this)) {
     self.queue.push({action: 'unsubscribe', args: []});
     return self;
   }
@@ -336,6 +336,13 @@ function dequeue () {
 
     this[element.action].apply(this, element.args);
   }
+}
+
+function isReady() {
+  if (this.kuzzle.state !== 'connected' || this.subscribing) {
+    return false;
+  }
+  return true;
 }
 
 module.exports = KuzzleRoom;
