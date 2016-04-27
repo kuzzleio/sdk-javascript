@@ -77,6 +77,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
     });
 
     it('should have properties with the documented default values', () => {
@@ -316,7 +317,9 @@ describe('Kuzzle constructor', () => {
 
           kuzzle = new Kuzzle('nowhere', function (err, res) {
             try {
-              should(err).be.exactly('error');
+              should(err).be.instanceOf(Error);
+              should(err.message).be.exactly('Unable to connect to kuzzle server at "nowhere"');
+              should(err.internal).be.exactly('error');
               should(res).be.undefined();
               should(kuzzle.state).be.exactly('error');
               kuzzle.socket.removeAllListeners();
@@ -710,12 +713,14 @@ describe('Kuzzle constructor', () => {
           }
         }, function (err, res) {
           try {
-            should(err).be.null();
-            should(res).be.instanceof(Kuzzle);
-            should(res.state).be.exactly('connected');
-            should(listenerConnected).be.exactly(true);
-            kuzzle.socket.removeAllListeners();
-            done();
+            process.nextTick(() => {
+              should(err).be.null();
+              should(res).be.instanceof(Kuzzle);
+              should(res.state).be.exactly('connected');
+              should(listenerConnected).be.exactly(true);
+              kuzzle.socket.removeAllListeners();
+              done();
+            });
           }
           catch (e) {
             done(e);

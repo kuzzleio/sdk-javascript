@@ -46,7 +46,7 @@ describe('Query management', function () {
       emitRequest.call(kuzzle, {requestId: 'bar'});
     });
 
-    it('should emit the request when asked to', function (done) {
+    it('should fire a jwtTokenExpired event if the token has expired', function (done) {
       var listenerJwtTokenExpired = false;
 
       Kuzzle = proxyquire(kuzzleSource, {
@@ -69,10 +69,12 @@ describe('Query management', function () {
 
       this.timeout(150);
 
-      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error, result) {
-        should(listenerJwtTokenExpired).be.exactly(true);
-        should(error.message).be.exactly('Token expired');
-        done();
+      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
+        process.nextTick(() => {
+          should(listenerJwtTokenExpired).be.exactly(true);
+          should(error.message).be.exactly('Token expired');
+          done();
+        });
       });
     });
 
@@ -231,66 +233,98 @@ describe('Query management', function () {
       should(errorRaised).be.true();
     });
 
-    it('should queue the request during offline mode, if queuing has been activated', function () {
+    it('should queue the request during offline mode, if queuing has been activated', function (done) {
       var
         query = { body: { some: 'query'}},
         cb = function () {},
-        now = Date.now();
+        now = Date.now(),
+        eventFired = false;
 
       kuzzle.state = 'offline';
       kuzzle.queuing = true;
+      kuzzle.addListener('offlineQueuePush', object => {
+        eventFired = true;
+        should(object.query.body).be.eql(query.body);
+      });
+
       kuzzle.query(queryArgs, query, cb);
 
-      should(emitted).be.false();
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
-      should(kuzzle.offlineQueue[0].query).match(query);
-      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      process.nextTick(() => {
+        should(emitted).be.false();
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+        should(kuzzle.offlineQueue[0].query).match(query);
+        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+        should(eventFired).be.true();
+        done();
+      });
     });
 
-    it('should queue the request if a queue filter has been defined and if it allows queuing', function () {
+    it('should queue the request if a queue filter has been defined and if it allows queuing', function (done) {
       var
         query = { body: { some: 'query'}},
         cb = function () {},
-        now = Date.now();
+        now = Date.now(),
+        eventFired = false;
+
+      kuzzle.addListener('offlineQueuePush', object => {
+        eventFired = true;
+        should(object.query.body).be.eql(query.body);
+      });
 
       kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return true; };
       kuzzle.queuing = true;
       kuzzle.query(queryArgs, query, cb);
 
-      should(emitted).be.false();
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
-      should(kuzzle.offlineQueue[0].query).match(query);
-      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      process.nextTick(() => {
+        should(emitted).be.false();
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+        should(kuzzle.offlineQueue[0].query).match(query);
+        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+        should(eventFired).be.true();
+        done();
+      });
     });
 
-    it('should discard the request if a queue filter has been defined and if it does not allows queuing', function () {
+    it('should discard the request if a queue filter has been defined and if it does not allows queuing', function (done) {
       var
         query = { body: { some: 'query'}},
-        cb = function () {};
+        cb = function () {},
+        eventFired = false;
 
+      kuzzle.addListener('offlineQueuePush', () => eventFired = true);
       kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return false; };
       kuzzle.queuing = true;
       kuzzle.query(queryArgs, query, cb);
 
-      should(emitted).be.false();
-      should(kuzzle.offlineQueue.length).be.exactly(0);
+      process.nextTick(() => {
+        should(emitted).be.false();
+        should(kuzzle.offlineQueue.length).be.exactly(0);
+        should(eventFired).be.false();
+        done();
+      });
     });
 
-    it('should discard the request if in offline mode but queuing has not yet been activated', function () {
+    it('should discard the request if in offline mode but queuing has not yet been activated', function (done) {
       var
         query = { body: { some: 'query'}},
-        cb = function () {};
+        cb = function () {},
+        eventFired = false;
 
+      kuzzle.addListener('offlineQueuePush', () => eventFired = true);
       kuzzle.state = 'offline';
       kuzzle.queuing = false;
       kuzzle.query(queryArgs, query, cb);
 
-      should(emitted).be.false();
-      should(kuzzle.offlineQueue.length).be.exactly(0);
+      process.nextTick(() => {
+        should(emitted).be.false();
+        should(kuzzle.offlineQueue.length).be.exactly(0);
+        should(eventFired).be.false();
+        done();
+      });
     });
 
     it('should not set jwtToken if we execute auth/checkToken', function () {

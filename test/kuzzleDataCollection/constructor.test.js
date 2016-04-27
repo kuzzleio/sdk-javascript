@@ -44,7 +44,6 @@ describe('KuzzleDataCollection constructor', function () {
     should.exist(dataCollection.countPromise);
     should.exist(dataCollection.createPromise);
     should.exist(dataCollection.createDocumentPromise);
-    should.exist(dataCollection.deletePromise);
     should.exist(dataCollection.deleteDocumentPromise);
     should.exist(dataCollection.fetchDocumentPromise);
     should.exist(dataCollection.fetchAllDocumentsPromise);
