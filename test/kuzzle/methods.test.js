@@ -643,14 +643,14 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#selfUpdate', function () {
+  describe('#updateSelf', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
       result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users'} };
       expectedQuery = {
-        action: 'selfUpdate',
+        action: 'updateSelf',
         controller: 'auth'
       };
     });
@@ -658,7 +658,7 @@ describe('Kuzzle methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       expectedQuery.body = {'foo': 'bar'};
 
-      should(kuzzle.selfUpdate({'foo': 'bar'}, function (err, res) {
+      should(kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
         should(res).be.exactly(result.result._id);
         done();
@@ -668,7 +668,7 @@ describe('Kuzzle methods', function () {
     it('should send the right query to Kuzzle even without callback', function (done) {
       expectedQuery.body = {'foo': 'bar'};
 
-      kuzzle.selfUpdate({'foo': 'bar'});
+      kuzzle.updateSelf({'foo': 'bar'});
       done();
     });
 
@@ -677,7 +677,7 @@ describe('Kuzzle methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzle.selfUpdate({'foo': 'bar'}, function (err, res) {
+      kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();

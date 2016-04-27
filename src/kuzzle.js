@@ -600,11 +600,11 @@ Kuzzle.prototype.whoAmI = function (callback) {
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-Kuzzle.prototype.selfUpdate = function (content, options, cb) {
+Kuzzle.prototype.updateSelf = function (content, options, cb) {
   var
     self = this,
     data = {},
-    queryArgs = {controller: 'auth', action: 'selfUpdate'};
+    queryArgs = {controller: 'auth', action: 'updateSelf'};
 
   if (!cb && typeof options === 'function') {
     cb = options;
