@@ -660,7 +660,7 @@ describe('Kuzzle methods', function () {
 
       should(kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.exactly(result.result);
         done();
       }));
     });

@@ -619,7 +619,7 @@ Kuzzle.prototype.updateSelf = function (content, options, cb) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, res.result);
     });
   } else {
     self.query(queryArgs, data, options);

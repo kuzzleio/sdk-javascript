@@ -330,7 +330,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users'} };
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profile: 'foobar'} } };
       expectedQuery = {
         action: 'updateUser',
         controller: 'security'
@@ -343,7 +343,8 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.updateUser(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.an.instanceOf(KuzzleUser);
+        should(res).containDeep(new KuzzleUser(kuzzle.security, result.result._id, result.result._source));
         done();
       }));
     });
