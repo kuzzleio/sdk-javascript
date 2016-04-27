@@ -570,6 +570,40 @@ Kuzzle.prototype.whoAmI = function (callback) {
   return self;
 };
 
+
+/**
+ * Update current user in Kuzzle.
+ *
+ * @param {object} content - a plain javascript object representing the user's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+Kuzzle.prototype.selfUpdate = function (content, options, cb) {
+  var
+    self = this,
+    data = {},
+    queryArgs = {controller: 'auth', action: 'selfUpdate'};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data.body = content;
+
+  if (cb) {
+    self.query(queryArgs, data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._id);
+    });
+  } else {
+    self.query(queryArgs, data, options);
+  }
+};
+
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */

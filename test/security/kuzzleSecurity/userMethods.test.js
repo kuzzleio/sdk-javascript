@@ -253,7 +253,6 @@ describe('KuzzleSecurity user methods', function () {
     });
   });
 
-
   describe('#createUser', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
