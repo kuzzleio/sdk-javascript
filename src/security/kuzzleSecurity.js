@@ -657,10 +657,10 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleUser(self, res.result._id, res.result._source));
     });
   } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
+    self.kuzzle.query(this.buildQueryArgs(action), data, options);
   }
 };
 

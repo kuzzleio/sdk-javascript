@@ -29,7 +29,13 @@ describe('Kuzzle methods', function () {
         should(Object.keys(query).length).be.exactly(0);
       }
 
-      cb(error, result);
+      if (cb) {
+        if (error) {
+          return cb(error);
+        }
+
+        cb(error, result);
+      }
     },
     emitted,
     kuzzle;
@@ -630,6 +636,48 @@ describe('Kuzzle methods', function () {
       error = 'foobar';
 
       kuzzle.whoAmI(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#updateSelf', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users'} };
+      expectedQuery = {
+        action: 'updateSelf',
+        controller: 'auth'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+
+      should(kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result.result);
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+
+      kuzzle.updateSelf({'foo': 'bar'});
+      done();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
