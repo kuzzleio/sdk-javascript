@@ -1042,6 +1042,136 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 };
 
 /**
+ * Forces an index refresh
+ *
+ * @param {string} index - The index to refresh. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.refreshIndex = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function(arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.refreshIndex: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'refreshIndex'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * Returns de current autoRefresh status for the given index
+ *
+ * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optinal arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getAutoRefresh = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.getAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.callbackRequired('Kuzzle.getAutoRefresh', cb);
+  this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * (Un)Sets the autoRefresh flag on the given index
+ *
+ * @param {string} index - the index to modify. Defaults to Kuzzle.defaultIndex
+ * @param {boolean} autoRefresh - The autoRefresh value to set
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query result
+ * @returns {object} this
+ */
+Kuzzle.prototype.setAutoRefresh = function () {
+  var
+    index,
+    autoRefresh,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'boolean':
+        autoRefresh = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.setAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  if (autoRefresh === undefined) {
+    throw new Error('Kuzzle.setAutoRefresh: autoRefresh value is required');
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'setAutoRefresh'}, { body: { autoRefresh: autoRefresh }}, options, cb);
+
+  return this;
+};
+
+/**
  * Return the current Kuzzle's UTC Epoch time, in milliseconds
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
