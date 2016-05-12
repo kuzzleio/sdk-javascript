@@ -961,6 +961,40 @@ Kuzzle.prototype.whoAmI = function (callback) {
   return self;
 };
 
+
+/**
+ * Update current user in Kuzzle.
+ *
+ * @param {object} content - a plain javascript object representing the user's modification
+ * @param {object} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+Kuzzle.prototype.updateSelf = function (content, options, cb) {
+  var
+    self = this,
+    data = {},
+    queryArgs = {controller: 'auth', action: 'updateSelf'};
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data.body = content;
+
+  if (cb) {
+    self.query(queryArgs, data, options, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result);
+    });
+  } else {
+    self.query(queryArgs, data, options);
+  }
+};
+
 /**
  * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
  */
@@ -1372,6 +1406,136 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 
     cb(null, res.result.serverInfo);
   });
+
+  return this;
+};
+
+/**
+ * Forces an index refresh
+ *
+ * @param {string} index - The index to refresh. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.refreshIndex = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function(arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.refreshIndex: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'refreshIndex'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * Returns de current autoRefresh status for the given index
+ *
+ * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optinal arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getAutoRefresh = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.getAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.callbackRequired('Kuzzle.getAutoRefresh', cb);
+  this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * (Un)Sets the autoRefresh flag on the given index
+ *
+ * @param {string} index - the index to modify. Defaults to Kuzzle.defaultIndex
+ * @param {boolean} autoRefresh - The autoRefresh value to set
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query result
+ * @returns {object} this
+ */
+Kuzzle.prototype.setAutoRefresh = function () {
+  var
+    index,
+    autoRefresh,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'boolean':
+        autoRefresh = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.setAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  if (autoRefresh === undefined) {
+    throw new Error('Kuzzle.setAutoRefresh: autoRefresh value is required');
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'setAutoRefresh'}, { body: { autoRefresh: autoRefresh }}, options, cb);
 
   return this;
 };
@@ -1869,27 +2033,6 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
   } else {
     self.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
-
-  return this;
-};
-
-/**
- * Delete this data collection and all documents in it.
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - returns Kuzzle's response
- * @returns {*} this
- */
-KuzzleDataCollection.prototype.delete = function (options, cb) {
-  var data = {};
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('admin', 'deleteCollection'), data, options, cb);
 
   return this;
 };
@@ -2730,6 +2873,36 @@ KuzzleDocument.prototype.setHeaders = function (content, replace) {
 module.exports = KuzzleDocument;
 
 },{}],7:[function(require,module,exports){
+/**
+ * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+ *
+ * @callback responseCallback
+ * @param {Object} err - Error object, NULL if the query is successful
+ * @param {Object} data - The content of the query response
+ */
+
+
+/**
+ * Kuzzle's memory storage is a separate data store from the database layer.
+ * It is internaly based on Redis. You can access most of Redis functions (all
+ * lowercased), excepting:
+ *   * all cluster based functions
+ *   * all script based functions
+ *   * all cursors functions
+ *
+ * For instance:
+ *     kuzzle.memoryStorage
+ *      .set('myKey', 'myValue')
+ *      .get('myKey', function (err, response) {
+ *        console.log(response.result);
+ *
+ *        // { _id: 'foo', body: { value: 'myValue' }}
+ *      });
+ *
+ *
+ * @param {object} kuzzle - Kuzzle instance to inherit from
+ * @constructor
+ */
 function KuzzleMemoryStorage(kuzzle) {
   Object.defineProperties(this, {
     // read-only properties
@@ -2762,6 +2935,9 @@ function KuzzleMemoryStorage(kuzzle) {
 }
 
 
+/**
+ * constructs the memoryStorage functions.
+ */
 (function() {
 
   var
@@ -3064,7 +3240,7 @@ KuzzleRoom.prototype.count = function (cb) {
 
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
-  if (this.subscribing) {
+  if (!isReady.call(this)) {
     this.queue.push({action: 'count', args: [cb]});
     return this;
   }
@@ -3185,7 +3361,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
     room = self.roomId,
     interval;
 
-  if (self.subscribing) {
+  if (!isReady.call(this)) {
     self.queue.push({action: 'unsubscribe', args: []});
     return self;
   }
@@ -3271,6 +3447,13 @@ function dequeue () {
 
     this[element.action].apply(this, element.args);
   }
+}
+
+function isReady() {
+  if (this.kuzzle.state !== 'connected' || this.subscribing) {
+    return false;
+  }
+  return true;
 }
 
 module.exports = KuzzleRoom;
@@ -4218,10 +4401,10 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleUser(self, res.result._id, res.result._source));
     });
   } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
+    self.kuzzle.query(this.buildQueryArgs(action), data, options);
   }
 };
 
