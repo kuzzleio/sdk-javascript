@@ -884,14 +884,17 @@ Kuzzle.prototype.dataCollectionFactory = function(index, collection) {
     collection = arguments[0];
     index = this.defaultIndex;
   }
-  else if (arguments.length === 2 && typeof collection === 'object') {
-    headers = collection;
-    collection = index;
-    index = this.defaultIndex;
-  }
 
   if (!index) {
     throw new Error('Unable to create a new data collection object: no index specified');
+  }
+
+  if (typeof index !== 'string') {
+    throw new Error('Invalid "index" argument: string expected, got ' + typeof index);
+  }
+
+  if (typeof collection !== 'string') {
+    throw new Error('Invalid "collection" argument: string expected, got ' + typeof collection);
   }
 
   if (!this.collections[index]) {
