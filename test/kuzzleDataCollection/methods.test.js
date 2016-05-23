@@ -387,7 +387,7 @@ describe('KuzzleDataCollection methods', function () {
         should(err).be.null();
         should(res).be.an.Array().and.match([result.result._id]);
         done();
-      })).be.exactly(collection);
+      }));
       should(emitted).be.true();
     });
 

@@ -231,17 +231,16 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(kuzzle.security.updateRole(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.instanceOf(KuzzleRole);
         done();
       }));
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
+    it('should send the right query to Kuzzle even without callback', function () {
       expectedQuery.body = {'foo': 'bar'};
       expectedQuery._id = result.result._id;
 
       kuzzle.security.updateRole(result.result._id, {'foo': 'bar'});
-      done();
     });
 
     it('should throw an error if no id provided', function () {

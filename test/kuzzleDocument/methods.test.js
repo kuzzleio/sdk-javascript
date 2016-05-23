@@ -119,7 +119,7 @@ describe('KuzzleDocument methods', function () {
 
       expectedQuery.options = options;
       document.id = 'foo';
-      should(document.delete(options)).be.exactly(document);
+      should(document.delete(options));
       should(emitted).be.true();
     });
 
@@ -150,7 +150,7 @@ describe('KuzzleDocument methods', function () {
       should(emitted).be.false();
     });
 
-    it('should resolve the callback with itself as a result', function (done) {
+    it('should resolve the callback with its own id as a result', function (done) {
       var document = new KuzzleDocument(dataCollection);
 
       this.timeout(50);
@@ -159,7 +159,7 @@ describe('KuzzleDocument methods', function () {
       document.delete(function (err, res) {
         should(emitted).be.true();
         should(err).be.null();
-        should(res).be.exactly(document);
+        should(res).be.exactly(document.id);
         done();
       });
     });
