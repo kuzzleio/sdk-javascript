@@ -47,12 +47,12 @@ describe('Offline queue management', () => {
       cleanQueue.call(kuzzle);
 
       // should keep only the latest requests, dating from a few ms ago
-      process.nextTick(() => {
+      setTimeout(() => {
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).be.above(now - kuzzle.queueTTL);
         should(eventFired).be.true();
         done();
-      });
+      }, 50);
     });
 
     it('should ignore requests timestamps if queueTTL is 0', function () {
