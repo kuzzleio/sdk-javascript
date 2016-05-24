@@ -21,16 +21,17 @@ describe('Offline queue management', () => {
   describe('#cleanQueue', function () {
     var
       cleanQueue = Kuzzle.__get__('cleanQueue'),
+      now,
       kuzzle;
 
     beforeEach(function () {
-      var
-        now = Date.now(),
-        pastTime = 60000;
-
+      var pastTime = 60000;
+      
       kuzzle = new Kuzzle('foo');
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart
+      now = Date.now();
+
       while (pastTime >= 0) {
         kuzzle.offlineQueue.push({ts: now - pastTime, query: {}, cb: function () {}});
         pastTime -= 10000;
