@@ -873,20 +873,19 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  * Create a new instance of a KuzzleDataCollection object.
  * If no index is specified, takes the default index.
  *
- * @param {string} [index] - The name of the data index containing the data collection
  * @param {string} collection - The name of the data collection you want to manipulate
+ * @param {string} [index] - The name of the data index containing the data collection
  * @returns {object} A KuzzleDataCollection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(index, collection) {
+Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   this.isValid();
 
-  if (arguments.length === 1) {
-    collection = arguments[0];
-    index = this.defaultIndex;
-  }
-
   if (!index) {
-    throw new Error('Unable to create a new data collection object: no index specified');
+    if (!this.defaultIndex) {
+      throw new Error('Unable to create a new data collection object: no index specified');
+    }
+
+    index = this.defaultIndex;
   }
 
   if (typeof index !== 'string') {

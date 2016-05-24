@@ -344,14 +344,27 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  * @returns {Object} this
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
+  var filters = {};
+
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
 
+  // copying pagination options to the search filter
+  if (options) {
+    if (options.from) {
+      filters.from = options.from;
+    }
+
+    if (options.size) {
+      filters.size = options.size;
+    }
+  }
+
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
-  this.advancedSearch({}, options, cb);
+  this.advancedSearch(filters, options, cb);
 
   return this;
 };
