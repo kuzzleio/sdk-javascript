@@ -1,6 +1,7 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  sinon = require('sinon'),
   proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
@@ -538,6 +539,17 @@ describe('KuzzleDataCollection methods', function () {
       emitted = false;
       collection.fetchAllDocuments({}, function () {});
       should(emitted).be.true();
+    });
+
+    it('should handle the from and size options', () => {
+      var
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        stub = sinon.stub(collection, 'advancedSearch');
+
+      collection.fetchAllDocuments({from: 123, size: 456}, function () {});
+      should(stub.calledOnce).be.true();
+      should(stub.calledWithMatch({from: 123, size: 456})).be.true();
+      stub.restore();
     });
   });
 
