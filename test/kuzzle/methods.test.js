@@ -178,6 +178,23 @@ describe('Kuzzle methods', function () {
       kuzzle = new Kuzzle('foo');
     });
 
+    it('should throw an error if arguments are not strings', () => {
+      kuzzle.defaultIndex = 'foobar';
+      should(function () { kuzzle.dataCollectionFactory(undefined); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', undefined); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(null); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', null); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(123); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(123, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', 123); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', {foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', ['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(['bar'], 'foo'); }).throw(/string expected/);
+    });
+
     it('should throw an error if the kuzzle instance has been invalidated', function () {
       kuzzle.disconnect();
       should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
@@ -202,10 +219,6 @@ describe('Kuzzle methods', function () {
 
       kuzzle.setDefaultIndex(defaultIndex);
       collection = kuzzle.dataCollectionFactory('foo');
-      should(collection).be.instanceof(KuzzleDataCollection);
-      should(collection.index).be.eql(defaultIndex);
-
-      collection = kuzzle.dataCollectionFactory('foo', {some: 'headers'});
       should(collection).be.instanceof(KuzzleDataCollection);
       should(collection.index).be.eql(defaultIndex);
     });
