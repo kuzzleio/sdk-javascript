@@ -21,11 +21,11 @@ describe('Offline queue management', () => {
   describe('#cleanQueue', function () {
     var
       cleanQueue = Kuzzle.__get__('cleanQueue'),
-      now = Date.now(),
       kuzzle;
 
     beforeEach(function () {
       var
+        now = Date.now(),
         pastTime = 60000;
 
       kuzzle = new Kuzzle('foo');
