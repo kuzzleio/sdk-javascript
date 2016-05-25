@@ -709,5 +709,43 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
   return new KuzzleUser(this, id, content);
 };
 
+/**
+ * Tells whether an action is allowed, denied or conditional based on the rights
+ * policies provided as the first argument. An action is defined as a couple of
+ * action and controller (mandatory), plus an index and a collection(optional).
+ *
+ * @param {object} policies - The rights policies associated to a user
+ *                            (see getMyPolicies and getUserPolicies).
+ * @param {string} controller - The controller to check the action onto.
+ * @param {string} action - The action to perform.
+ * @param {string} index - (optional) The name of index to perform the action onto.
+ * @param {string} collection - (optional) The name of the collection to perform the action onto.
+ */
+KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action, index, collection) {
+  // We filter in all the policies that match the request (including wildcards).
+  var filteredPolicies = policies.filter(policy => {
+      return policy.controller === controller || policy.controller === '*';
+    })
+    .filter(policy => {
+      return policy.action === action || policy.action === '*';
+    })
+    .filter(policy => {
+      return policy.index === index || policy.index === '*';
+    })
+    .filter(policy => {
+      return policy.collection === collection || policy.collection === '*';
+    });
+
+  // Then, if at least one policy allows the action, we return 'allowed'
+  if (filteredPolicies.some(item => item.value === 'allowed') ) {
+    return 'allowed';
+  }
+  // If no policy allows the action, we check for conditionals.
+  if (filteredPolicies.some(item => item.value === 'conditional') ) {
+    return 'conditional';
+  }
+  // Otherwise we return 'denied'.
+  return 'denied';
+};
 
 module.exports = KuzzleSecurity;
