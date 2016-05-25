@@ -723,25 +723,25 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  */
 KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action, index, collection) {
   // We filter in all the policies that match the request (including wildcards).
-  var filteredPolicies = policies.filter(policy => {
-      return policy.controller === controller || policy.controller === '*';
-    })
-    .filter(policy => {
-      return policy.action === action || policy.action === '*';
-    })
-    .filter(policy => {
-      return policy.index === index || policy.index === '*';
-    })
-    .filter(policy => {
-      return policy.collection === collection || policy.collection === '*';
-    });
+  var filteredPolicies = policies.filter(function (policy) {
+    return policy.controller === controller || policy.controller === '*';
+  })
+  .filter(function (policy) {
+    return policy.action === action || policy.action === '*';
+  })
+  .filter(function (policy) {
+    return policy.index === index || policy.index === '*';
+  })
+  .filter(function (policy) {
+    return policy.collection === collection || policy.collection === '*';
+  });
 
   // Then, if at least one policy allows the action, we return 'allowed'
-  if (filteredPolicies.some(item => item.value === 'allowed') ) {
+  if (filteredPolicies.some(function (item) { return item.value === 'allowed'; })) {
     return 'allowed';
   }
   // If no policy allows the action, we check for conditionals.
-  if (filteredPolicies.some(item => item.value === 'conditional') ) {
+  if (filteredPolicies.some(function (item) { return item.value === 'conditional'; })) {
     return 'conditional';
   }
   // Otherwise we return 'denied'.
