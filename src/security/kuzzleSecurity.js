@@ -722,8 +722,20 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  * @param {string} collection - (optional) The name of the collection to perform the action onto.
  */
 KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action, index, collection) {
+  var filteredPolicies;
+
+  if (!policies || typeof policies !== 'object') {
+    throw new Error('policies parameter is mandatory for isActionAllowed function');
+  }
+  if (!controller || typeof controller !== 'string') {
+    throw new Error('controller parameter is mandatory for isActionAllowed function');
+  }
+  if (!action || typeof action !== 'string') {
+    throw new Error('action parameter is mandatory for isActionAllowed function');
+  }
+
   // We filter in all the policies that match the request (including wildcards).
-  var filteredPolicies = policies.filter(function (policy) {
+  filteredPolicies = policies.filter(function (policy) {
     return policy.controller === controller || policy.controller === '*';
   })
   .filter(function (policy) {

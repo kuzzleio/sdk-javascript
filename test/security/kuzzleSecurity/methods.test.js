@@ -108,5 +108,17 @@ describe('isActionAllowed', function () {
       should(kuzzle.security.isActionAllowed(examplePolicies, 'write', 'delete', 'index1', 'collection1'))
         .be.exactly('conditional');
     });
+
+    it('should throw if called with no arguments', function () {
+      should(function () { kuzzle.security.isActionAllowed() }).throw(Error);
+    });
+
+    it('should throw if called with no action, nor controller', function () {
+      should(function () { kuzzle.security.isActionAllowed(examplePolicies) }).throw(Error);
+    });
+
+    it('should throw if called with no action', function () {
+      should(function () { kuzzle.security.isActionAllowed(examplePolicies, 'write') }).throw(Error);
+    });
   });
 });
