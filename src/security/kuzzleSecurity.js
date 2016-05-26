@@ -720,6 +720,10 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  * @param {string} action - The action to perform.
  * @param {string} index - (optional) The name of index to perform the action onto.
  * @param {string} collection - (optional) The name of the collection to perform the action onto.
+ *
+ * @returns {string} ['allowed', 'denied', 'conditional'] where conditional cases
+ *                   correspond to rights containing closures.
+ *                   See also http://kuzzle.io/guide/#roles-definition
  */
 KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action, index, collection) {
   var filteredPolicies;
