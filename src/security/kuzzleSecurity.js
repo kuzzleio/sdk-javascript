@@ -29,7 +29,7 @@ function KuzzleSecurity(kuzzle) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['roleFactory', 'profileFactory', 'userFactory'];
+        var blacklist = ['roleFactory', 'profileFactory', 'userFactory', 'isActionAllowed'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
