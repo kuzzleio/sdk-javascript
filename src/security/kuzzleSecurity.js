@@ -764,4 +764,50 @@ KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action
   return 'denied';
 };
 
+
+/**
+ * Gets the rights array of a given user.
+ *
+ * @param  {string} userId The id of the user.
+ * @param  {function} cb   The callback containing the normalized array of rights.
+ */
+KuzzleSecurity.prototype.getUserRights = function (userId, cb) {
+  var data = {_id: userId};
+
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId parameter is mandatory for isActionAllowed function');
+  }
+
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, null, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._source);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, null);
+  }
+};
+
+/**
+ * Gets the rights array of the currently logged user.
+ *
+ * @param  {function} cb The callback containing the normalized array of rights.
+ */
+KuzzleSecurity.prototype.getMyRights = function (cb) {
+  if (cb) {
+    this.kuzzle.query(this.buildQueryArgs('getMyRights'), {}, null, function (err, res) {
+      if (err) {
+        return cb(err);
+      }
+
+      cb(null, res.result._source);
+    });
+  } else {
+    this.kuzzle.query(this.buildQueryArgs('getMyRights'), {}, null);
+  }
+};
+
 module.exports = KuzzleSecurity;

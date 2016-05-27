@@ -2,8 +2,44 @@ var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle');
 
-describe('isActionAllowed', function () {
-  var examplePolicies = [
+describe('KuzzleSecurity user rights methods', function () {
+  var
+    kuzzle,
+    expectedQuery,
+    result,
+    error,
+    queryStub = function (args, query, options, cb) {
+      should(args.controller).be.exactly(expectedQuery.controller);
+      should(args.action).be.exactly(expectedQuery.action);
+
+      if (expectedQuery.options) {
+        should(options).match(expectedQuery.options);
+      }
+
+      if (expectedQuery.body) {
+        if (!query.body) {
+          query.body = {};
+        }
+
+        should(query.body).match(expectedQuery.body);
+      } else {
+        should(query.body).be.undefined();
+      }
+
+      if (expectedQuery._id) {
+        should(query._id).be.exactly(expectedQuery._id);
+      }
+
+      if (cb) {
+        if (error) {
+          return cb(error);
+        }
+
+        cb(error, result);
+      }
+    };
+
+  var exampleRights = [
     {
       controller: 'read', action: 'get', index: '*', collection: '*',
       value: 'allowed'
@@ -54,58 +90,185 @@ describe('isActionAllowed', function () {
     }
   ];
 
+  describe('#getUserRights', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = { result: {_id: 'foobar', _source: exampleRights } };
+      expectedQuery = {
+        action: 'getUserRights',
+        controller: 'security',
+        _id: 'foobar'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function (done) {
+      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result.result._source);
+        done();
+      }));
+    });
+
+    it('should send the right delete query to Kuzzle even without callback', function (done) {
+      kuzzle.security.getUserRights(result.result._id);
+      done();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.getUserRights(result.result._id, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should call callback with an array', function (done) {
+      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+        should(err).be.exactly(null);
+        should(res).be.an.instanceOf(Array);
+        done();
+      }));
+    });
+
+    it('should call callback with an array containing rights (if not empty)', function (done) {
+      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+        should(err).be.exactly(null);
+        should(res).be.an.instanceOf(Array);
+
+        if (res.length > 0) {
+          should(res[0]).have.ownProperty('controller');
+          should(res[0]).have.ownProperty('action');
+          should(res[0]).have.ownProperty('index');
+          should(res[0]).have.ownProperty('collection');
+          should(res[0]).have.ownProperty('value');
+          should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
+        }
+
+        done();
+      }));
+    });
+  });
+
+  describe('#getMyRights', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = { result: {_id: 'foobar', _source: exampleRights } };
+      expectedQuery = {
+        action: 'getMyRights',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function (done) {
+      should(kuzzle.security.getMyRights(function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result.result._source);
+        done();
+      }));
+    });
+
+    it('should send the right delete query to Kuzzle even without callback', function (done) {
+      kuzzle.security.getMyRights();
+      done();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.getMyRights( function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should call callback with an array', function (done) {
+      should(kuzzle.security.getMyRights(function (err, res) {
+        should(err).be.exactly(null);
+        should(res).be.an.instanceOf(Array);
+        done();
+      }));
+    });
+
+    it('should call callback with an array containing rights (if not empty)', function (done) {
+      should(kuzzle.security.getMyRights(function (err, res) {
+        should(err).be.exactly(null);
+        should(res).be.an.instanceOf(Array);
+
+        if (res.length > 0) {
+          should(res[0]).have.ownProperty('controller');
+          should(res[0]).have.ownProperty('action');
+          should(res[0]).have.ownProperty('index');
+          should(res[0]).have.ownProperty('collection');
+          should(res[0]).have.ownProperty('value');
+          should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
+        }
+
+        done();
+      }));
+    });
+  });
+
   describe('#isActionAllowed', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     });
 
     it('should return "allowed" to ("read", "get")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'get'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'get'))
         .be.exactly('allowed');
     });
 
     it('should return "allowed" to ("read", "count", "myIndex")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'count', 'myIndex'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'count', 'myIndex'))
         .be.exactly('allowed');
     });
 
     it('should return "allowed" to ("read", "search", "myIndex", "myCollection")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'search', 'myIndex', 'myCollection'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'search', 'myIndex', 'myCollection'))
         .be.exactly('allowed');
     });
 
     it('should return "allowed" to ("read", "search", "index1", "collection1")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'search', 'index1', 'collection1'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'search', 'index1', 'collection1'))
         .be.exactly('allowed');
     });
 
     it('should return "denied" to ("read", "listIndexes", "index2")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'listIndexes', 'index2'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'listIndexes', 'index2'))
         .be.exactly('denied');
     });
 
     it('should return "allowed" to ("read", "search", "index1", "collection2")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'read', 'search', 'index1', 'collection2'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'search', 'index1', 'collection2'))
         .be.exactly('allowed');
     });
 
     it('should return "denied" to ("write", "replace")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'write', 'replace'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'write', 'replace'))
         .be.exactly('denied');
     });
 
     it('should return "conditional" to ("security", "updateUser")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'security', 'updateUser'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'security', 'updateUser'))
         .be.exactly('conditional');
     });
 
     it('should return "conditional" to ("write", "delete")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'write', 'delete'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'write', 'delete'))
         .be.exactly('conditional');
     });
 
     it('should return "conditional" to ("write", "delete", "index1", "collection1")', function() {
-      should(kuzzle.security.isActionAllowed(examplePolicies, 'write', 'delete', 'index1', 'collection1'))
+      should(kuzzle.security.isActionAllowed(exampleRights, 'write', 'delete', 'index1', 'collection1'))
         .be.exactly('conditional');
     });
 
@@ -114,11 +277,11 @@ describe('isActionAllowed', function () {
     });
 
     it('should throw if called with no action, nor controller', function () {
-      should(function () { kuzzle.security.isActionAllowed(examplePolicies) }).throw(Error);
+      should(function () { kuzzle.security.isActionAllowed(exampleRights) }).throw(Error);
     });
 
     it('should throw if called with no action', function () {
-      should(function () { kuzzle.security.isActionAllowed(examplePolicies, 'write') }).throw(Error);
+      should(function () { kuzzle.security.isActionAllowed(exampleRights, 'write') }).throw(Error);
     });
   });
 });
