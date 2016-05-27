@@ -784,7 +784,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, cb) {
         return cb(err);
       }
 
-      cb(null, res.result._source);
+      cb(null, res.result.hits);
     });
   } else {
     this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, null);
@@ -803,7 +803,7 @@ KuzzleSecurity.prototype.getMyRights = function (cb) {
         return cb(err);
       }
 
-      cb(null, res.result._source);
+      cb(null, res.result.hits);
     });
   } else {
     this.kuzzle.query(this.buildQueryArgs('getMyRights'), {}, null);

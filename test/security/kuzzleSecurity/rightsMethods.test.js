@@ -95,7 +95,7 @@ describe('KuzzleSecurity user rights methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: exampleRights } };
+      result = { result: { hits: exampleRights } };
       expectedQuery = {
         action: 'getUserRights',
         controller: 'security',
@@ -104,9 +104,9 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._source);
+        should(res).be.exactly(exampleRights);
         done();
       }));
     });
@@ -115,8 +115,8 @@ describe('KuzzleSecurity user rights methods', function () {
       should(function () { kuzzle.security.getUserRights() }).throw(Error);
     });
 
-    it('should send the right delete query to Kuzzle even without callback', function (done) {
-      kuzzle.security.getUserRights(result.result._id);
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      kuzzle.security.getUserRights(expectedQuery._id);
       done();
     });
 
@@ -124,7 +124,7 @@ describe('KuzzleSecurity user rights methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzle.security.getUserRights(result.result._id, function (err, res) {
+      kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -132,7 +132,7 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should call callback with an array', function (done) {
-      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
         done();
@@ -140,7 +140,7 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should call callback with an array containing rights (if not empty)', function (done) {
-      should(kuzzle.security.getUserRights(result.result._id, function (err, res) {
+      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
 
@@ -163,7 +163,7 @@ describe('KuzzleSecurity user rights methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: exampleRights } };
+      result = { result: { hits: exampleRights } };
       expectedQuery = {
         action: 'getMyRights',
         controller: 'security'
@@ -173,12 +173,12 @@ describe('KuzzleSecurity user rights methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       should(kuzzle.security.getMyRights(function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._source);
+        should(res).be.exactly(exampleRights);
         done();
       }));
     });
 
-    it('should send the right delete query to Kuzzle even without callback', function (done) {
+    it('should send the right query to Kuzzle even without callback', function (done) {
       kuzzle.security.getMyRights();
       done();
     });
