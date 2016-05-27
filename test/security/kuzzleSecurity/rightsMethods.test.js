@@ -111,6 +111,10 @@ describe('KuzzleSecurity user rights methods', function () {
       }));
     });
 
+    it('should throw if called with no arguments', function () {
+      should(function () { kuzzle.security.getUserRights() }).throw(Error);
+    });
+
     it('should send the right delete query to Kuzzle even without callback', function (done) {
       kuzzle.security.getUserRights(result.result._id);
       done();
