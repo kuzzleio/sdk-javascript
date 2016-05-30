@@ -191,12 +191,12 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   data.body = content;
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleRole(self, id, content));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -424,11 +424,23 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var updatedContent = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      Object.keys(res.result._source).forEach(function (property) {
+        if (property !== 'roles') {
+          updatedContent[property] = res.result._source[property];
+        }
+      });
+
+      updatedContent.roles = res.result._source.roles.map(function (role) {
+        return role._id;
+      });
+
+      cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);

@@ -21,16 +21,17 @@ describe('Offline queue management', () => {
   describe('#cleanQueue', function () {
     var
       cleanQueue = Kuzzle.__get__('cleanQueue'),
-      now = Date.now(),
+      now,
       kuzzle;
 
     beforeEach(function () {
-      var
-        pastTime = 60000;
-
+      var pastTime = 60000;
+      
       kuzzle = new Kuzzle('foo');
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart
+      now = Date.now();
+
       while (pastTime >= 0) {
         kuzzle.offlineQueue.push({ts: now - pastTime, query: {}, cb: function () {}});
         pastTime -= 10000;
@@ -47,12 +48,12 @@ describe('Offline queue management', () => {
       cleanQueue.call(kuzzle);
 
       // should keep only the latest requests, dating from a few ms ago
-      process.nextTick(() => {
+      setTimeout(() => {
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).be.above(now - kuzzle.queueTTL);
         should(eventFired).be.true();
         done();
-      });
+      }, 50);
     });
 
     it('should ignore requests timestamps if queueTTL is 0', function () {
