@@ -738,7 +738,7 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  *                   See also http://kuzzle.io/guide/#roles-definition
  */
 KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, index, collection) {
-  var filteredrights;
+  var filteredRights;
 
   if (!rights || typeof rights !== 'object') {
     throw new Error('rights parameter is mandatory for isActionAllowed function');
@@ -751,7 +751,7 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
   }
 
   // We filter in all the rights that match the request (including wildcards).
-  filteredrights = rights.filter(function (right) {
+  filteredRights = rights.filter(function (right) {
     return right.controller === controller || right.controller === '*';
   })
   .filter(function (right) {
@@ -765,11 +765,11 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
   });
 
   // Then, if at least one right allows the action, we return 'allowed'
-  if (filteredrights.some(function (item) { return item.value === 'allowed'; })) {
+  if (filteredRights.some(function (item) { return item.value === 'allowed'; })) {
     return 'allowed';
   }
   // If no right allows the action, we check for conditionals.
-  if (filteredrights.some(function (item) { return item.value === 'conditional'; })) {
+  if (filteredRights.some(function (item) { return item.value === 'conditional'; })) {
     return 'conditional';
   }
   // Otherwise we return 'denied'.
