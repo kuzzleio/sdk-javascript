@@ -298,8 +298,6 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   } else {
     this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
-
-  return this;
 };
 
 /**

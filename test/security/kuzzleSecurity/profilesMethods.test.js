@@ -303,7 +303,17 @@ describe('KuzzleSecurity profiles methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'profiles'} };
+      result = {
+        result: {
+          _id: 'foobar',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _source: {
+            roles: [{_id: 'foo'}],
+            foo: 'bar'
+          }
+        }
+      };
       expectedQuery = {
         action: 'updateProfile',
         controller: 'security'
@@ -316,17 +326,16 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.updateProfile(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.instanceOf(KuzzleProfile);
         done();
       }));
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
+    it('should send the right query to Kuzzle even without callback', () => {
       expectedQuery.body = {'foo': 'bar'};
       expectedQuery._id = result.result._id;
 
       kuzzle.security.updateProfile(result.result._id, {'foo': 'bar'});
-      done();
     });
 
     it('should throw an error if no id provided', function () {

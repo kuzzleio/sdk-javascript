@@ -2088,8 +2088,6 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   } else {
     this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
-
-  return this;
 };
 
 /**
@@ -2694,7 +2692,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     options = null;
   }
 
-  if (!this.id) {
+  if (!self.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
@@ -2704,13 +2702,11 @@ KuzzleDocument.prototype.delete = function (options, cb) {
         return cb(err);
       }
 
-      cb(null, self);
+      cb(null, self.id);
     });
   } else {
     this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options);
   }
-
-  return this;
 };
 
 /**
@@ -3935,12 +3931,12 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   data.body = content;
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleRole(self, id, content));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -4168,11 +4164,23 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var updatedContent = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      Object.keys(res.result._source).forEach(function (property) {
+        if (property !== 'roles') {
+          updatedContent[property] = res.result._source[property];
+        }
+      });
+
+      updatedContent.roles = res.result._source.roles.map(function (role) {
+        return role._id;
+      });
+
+      cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);

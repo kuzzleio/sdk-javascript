@@ -142,7 +142,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     options = null;
   }
 
-  if (!this.id) {
+  if (!self.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
@@ -152,13 +152,11 @@ KuzzleDocument.prototype.delete = function (options, cb) {
         return cb(err);
       }
 
-      cb(null, self);
+      cb(null, self.id);
     });
   } else {
     this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options);
   }
-
-  return this;
 };
 
 /**
