@@ -723,11 +723,11 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
 
 /**
  * Tells whether an action is allowed, denied or conditional based on the rights
- * policies provided as the first argument. An action is defined as a couple of
+ * rights provided as the first argument. An action is defined as a couple of
  * action and controller (mandatory), plus an index and a collection(optional).
  *
- * @param {object} policies - The rights policies associated to a user
- *                            (see getMyPolicies and getUserPolicies).
+ * @param {object} rights - The rights rights associated to a user
+ *                            (see getMyrights and getUserrights).
  * @param {string} controller - The controller to check the action onto.
  * @param {string} action - The action to perform.
  * @param {string} index - (optional) The name of index to perform the action onto.
@@ -737,11 +737,11 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  *                   correspond to rights containing closures.
  *                   See also http://kuzzle.io/guide/#roles-definition
  */
-KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action, index, collection) {
-  var filteredPolicies;
+KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, index, collection) {
+  var filteredRights;
 
-  if (!policies || typeof policies !== 'object') {
-    throw new Error('policies parameter is mandatory for isActionAllowed function');
+  if (!rights || typeof rights !== 'object') {
+    throw new Error('rights parameter is mandatory for isActionAllowed function');
   }
   if (!controller || typeof controller !== 'string') {
     throw new Error('controller parameter is mandatory for isActionAllowed function');
@@ -750,26 +750,26 @@ KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action
     throw new Error('action parameter is mandatory for isActionAllowed function');
   }
 
-  // We filter in all the policies that match the request (including wildcards).
-  filteredPolicies = policies.filter(function (policy) {
-    return policy.controller === controller || policy.controller === '*';
+  // We filter in all the rights that match the request (including wildcards).
+  filteredRights = rights.filter(function (right) {
+    return right.controller === controller || right.controller === '*';
   })
-  .filter(function (policy) {
-    return policy.action === action || policy.action === '*';
+  .filter(function (right) {
+    return right.action === action || right.action === '*';
   })
-  .filter(function (policy) {
-    return policy.index === index || policy.index === '*';
+  .filter(function (right) {
+    return right.index === index || right.index === '*';
   })
-  .filter(function (policy) {
-    return policy.collection === collection || policy.collection === '*';
+  .filter(function (right) {
+    return right.collection === collection || right.collection === '*';
   });
 
-  // Then, if at least one policy allows the action, we return 'allowed'
-  if (filteredPolicies.some(function (item) { return item.value === 'allowed'; })) {
+  // Then, if at least one right allows the action, we return 'allowed'
+  if (filteredRights.some(function (item) { return item.value === 'allowed'; })) {
     return 'allowed';
   }
-  // If no policy allows the action, we check for conditionals.
-  if (filteredPolicies.some(function (item) { return item.value === 'conditional'; })) {
+  // If no right allows the action, we check for conditionals.
+  if (filteredRights.some(function (item) { return item.value === 'conditional'; })) {
     return 'conditional';
   }
   // Otherwise we return 'denied'.
