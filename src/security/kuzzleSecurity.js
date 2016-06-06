@@ -784,7 +784,9 @@ KuzzleSecurity.prototype.isActionAllowed = function(policies, controller, action
  * @param  {function} cb   The callback containing the normalized array of rights.
  */
 KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
-  var data = {_id: userId};
+  var
+    data = {_id: userId},
+    self = this;
 
   if (!userId || typeof userId !== 'string') {
     throw new Error('userId parameter is mandatory for isActionAllowed function');
@@ -794,6 +796,8 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
     cb = options;
     options = null;
   }
+
+  self.kuzzle.callbackRequired('Kuzzle.getUserRights', cb);
 
   if (cb) {
     this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, function (err, res) {
@@ -805,30 +809,6 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
     });
   } else {
     this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options);
-  }
-};
-
-/**
- * Gets the rights array of the currently logged user.
- *
- * @param  {function} cb The callback containing the normalized array of rights.
- */
-KuzzleSecurity.prototype.getMyRights = function (options, cb) {
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-  
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('getMyRights'), {}, null, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
-
-      cb(null, res.result.hits);
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('getMyRights'), {}, null);
   }
 };
 

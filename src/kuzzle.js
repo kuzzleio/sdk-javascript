@@ -592,6 +592,29 @@ Kuzzle.prototype.whoAmI = function (callback) {
   return self;
 };
 
+/**
+ * Gets the rights array of the currently logged user.
+ *
+ * @param  {function} cb The callback containing the normalized array of rights.
+ */
+Kuzzle.prototype.getMyRights = function (options, cb) {
+  var self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.callbackRequired('Kuzzle.getMyRights', cb);
+
+  self.query({controller: 'auth', action:'getMyRights'}, {}, null, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.result.hits);
+  });
+};
 
 /**
  * Update current user in Kuzzle.

@@ -115,9 +115,8 @@ describe('KuzzleSecurity user rights methods', function () {
       should(function () { kuzzle.security.getUserRights() }).throw(Error);
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      kuzzle.security.getUserRights(expectedQuery._id);
-      done();
+    it('should throw if called with no callback', function () {
+      should(function () { kuzzle.security.getUserRights(expectedQuery._id) }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
@@ -166,28 +165,27 @@ describe('KuzzleSecurity user rights methods', function () {
       result = { result: { hits: exampleRights } };
       expectedQuery = {
         action: 'getMyRights',
-        controller: 'security'
+        controller: 'auth'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getMyRights(function (err, res) {
+      should(kuzzle.getMyRights(function (err, res) {
         should(err).be.null();
         should(res).be.exactly(exampleRights);
         done();
       }));
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      kuzzle.security.getMyRights();
-      done();
+    it('should throw if called with no callback', function () {
+      should(function () { kuzzle.getMyRights() }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzle.security.getMyRights( function (err, res) {
+      kuzzle.getMyRights( function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -195,7 +193,7 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should call callback with an array', function (done) {
-      should(kuzzle.security.getMyRights(function (err, res) {
+      should(kuzzle.getMyRights(function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
         done();
@@ -203,7 +201,7 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should call callback with an array containing rights (if not empty)', function (done) {
-      should(kuzzle.security.getMyRights(function (err, res) {
+      should(kuzzle.getMyRights(function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
 
