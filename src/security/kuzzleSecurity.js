@@ -799,17 +799,13 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
 
   self.kuzzle.callbackRequired('Kuzzle.getUserRights', cb);
 
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
 
-      cb(null, res.result.hits);
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options);
-  }
+    cb(null, res.result.hits);
+  });
 };
 
 module.exports = KuzzleSecurity;
