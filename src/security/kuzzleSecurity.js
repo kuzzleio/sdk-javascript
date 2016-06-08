@@ -29,7 +29,7 @@ function KuzzleSecurity(kuzzle) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['roleFactory', 'profileFactory', 'userFactory'];
+        var blacklist = ['roleFactory', 'profileFactory', 'userFactory', 'isActionAllowed'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -191,12 +191,12 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   data.body = content;
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleRole(self, id, content));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -424,11 +424,23 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var updatedContent = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      Object.keys(res.result._source).forEach(function (property) {
+        if (property !== 'roles') {
+          updatedContent[property] = res.result._source[property];
+        }
+      });
+
+      updatedContent.roles = res.result._source.roles.map(function (role) {
+        return role._id;
+      });
+
+      cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -709,5 +721,91 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
   return new KuzzleUser(this, id, content);
 };
 
+/**
+ * Tells whether an action is allowed, denied or conditional based on the rights
+ * rights provided as the first argument. An action is defined as a couple of
+ * action and controller (mandatory), plus an index and a collection(optional).
+ *
+ * @param {object} rights - The rights rights associated to a user
+ *                            (see getMyrights and getUserrights).
+ * @param {string} controller - The controller to check the action onto.
+ * @param {string} action - The action to perform.
+ * @param {string} index - (optional) The name of index to perform the action onto.
+ * @param {string} collection - (optional) The name of the collection to perform the action onto.
+ *
+ * @returns {string} ['allowed', 'denied', 'conditional'] where conditional cases
+ *                   correspond to rights containing closures.
+ *                   See also http://kuzzle.io/guide/#roles-definition
+ */
+KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, index, collection) {
+  var filteredRights;
+
+  if (!rights || typeof rights !== 'object') {
+    throw new Error('rights parameter is mandatory for isActionAllowed function');
+  }
+  if (!controller || typeof controller !== 'string') {
+    throw new Error('controller parameter is mandatory for isActionAllowed function');
+  }
+  if (!action || typeof action !== 'string') {
+    throw new Error('action parameter is mandatory for isActionAllowed function');
+  }
+
+  // We filter in all the rights that match the request (including wildcards).
+  filteredRights = rights.filter(function (right) {
+    return right.controller === controller || right.controller === '*';
+  })
+  .filter(function (right) {
+    return right.action === action || right.action === '*';
+  })
+  .filter(function (right) {
+    return right.index === index || right.index === '*';
+  })
+  .filter(function (right) {
+    return right.collection === collection || right.collection === '*';
+  });
+
+  // Then, if at least one right allows the action, we return 'allowed'
+  if (filteredRights.some(function (item) { return item.value === 'allowed'; })) {
+    return 'allowed';
+  }
+  // If no right allows the action, we check for conditionals.
+  if (filteredRights.some(function (item) { return item.value === 'conditional'; })) {
+    return 'conditional';
+  }
+  // Otherwise we return 'denied'.
+  return 'denied';
+};
+
+
+/**
+ * Gets the rights array of a given user.
+ *
+ * @param  {string} userId The id of the user.
+ * @param  {function} cb   The callback containing the normalized array of rights.
+ */
+KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
+  var
+    data = {_id: userId},
+    self = this;
+
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId parameter is mandatory for isActionAllowed function');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('Kuzzle.getUserRights', cb);
+
+  this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, function (err, res) {
+    if (err) {
+      return cb(err);
+    }
+
+    cb(null, res.result.hits);
+  });
+};
 
 module.exports = KuzzleSecurity;

@@ -2,6 +2,8 @@ var
   should = require('should'),
   rewire = require('rewire'),
   proxyquire = require('proxyquire'),
+  sinon = require('sinon'),
+  sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
   KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
@@ -39,6 +41,10 @@ describe('Kuzzle methods', function () {
     },
     emitted,
     kuzzle;
+
+  afterEach(() => {
+    sandbox.restore();
+  });
 
   describe('#getAllStatistics', function () {
     beforeEach(function () {
@@ -172,6 +178,23 @@ describe('Kuzzle methods', function () {
       kuzzle = new Kuzzle('foo');
     });
 
+    it('should throw an error if arguments are not strings', () => {
+      kuzzle.defaultIndex = 'foobar';
+      should(function () { kuzzle.dataCollectionFactory(undefined); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(undefined, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(null); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(null, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(123); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(123, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', 123); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', {foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory('foo', ['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.dataCollectionFactory(['bar'], 'foo'); }).throw(/string expected/);
+    });
+
     it('should throw an error if the kuzzle instance has been invalidated', function () {
       kuzzle.disconnect();
       should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
@@ -180,13 +203,13 @@ describe('Kuzzle methods', function () {
     it('should create and store the data collection instance if needed', function () {
       var collection = kuzzle.dataCollectionFactory('foo', 'bar');
 
-      should(kuzzle.collections['foo']['bar']).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
+      should(kuzzle.collections['bar']['foo']).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
       should(collection).be.instanceof(KuzzleDataCollection);
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
       kuzzle.collections['foo'] = { bar: 'qux'};
-      should(kuzzle.dataCollectionFactory('foo', 'bar')).be.a.String().and.be.exactly('qux');
+      should(kuzzle.dataCollectionFactory('bar', 'foo')).be.a.String().and.be.exactly('qux');
     });
 
     it('should use the default index if no index is provided', function () {
@@ -198,20 +221,10 @@ describe('Kuzzle methods', function () {
       collection = kuzzle.dataCollectionFactory('foo');
       should(collection).be.instanceof(KuzzleDataCollection);
       should(collection.index).be.eql(defaultIndex);
-
-      collection = kuzzle.dataCollectionFactory('foo', {some: 'headers'});
-      should(collection).be.instanceof(KuzzleDataCollection);
-      should(collection.index).be.eql(defaultIndex);
     });
 
-    it('should throw an error if no index is provided and no default index has been set', function (done) {
-      try {
-        kuzzle.dataCollectionFactory('foo');
-        done(new Error('Should have thrown an error'));
-      }
-      catch (e) {
-        done();
-      }
+    it('should throw an error if no index is provided and no default index has been set', () => {
+      should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(/no index specified/);
     });
   });
 
@@ -786,4 +799,166 @@ describe('Kuzzle methods', function () {
       });
     });
   });
+
+  describe('#refreshIndex', function () {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if no index is set', () => {
+      should(() => { kuzzle.refreshIndex() }).throw('Kuzzle.refreshIndex: index required');
+    });
+
+    it('should use the default index if no index is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.refreshIndex();
+
+      should(spy.calledOnce).be.true();
+      should(spy.firstCall.args[0].index).be.exactly(kuzzle.defaultIndex);
+    });
+
+    it('should parse the given parameters', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        options = {foo: 'bar'},
+        cb = () => {},
+        args;
+
+      kuzzle.refreshIndex(index, options, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].index).be.exactly(index);
+      should(args[0].controller).be.exactly('admin');
+      should(args[0].action).be.exactly('refreshIndex');
+      should(args[2]).be.exactly(options);
+      should(args[3]).be.exactly(cb);
+    });
+
+  });
+
+  describe('#getAutoRefresh', () => {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if no index is given', () => {
+      should(() => { kuzzle.getAutoRefresh(); }).throw('Kuzzle.getAutoRefresh: index required');
+    });
+
+    it('should use kuzzle default index if no index is provided', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+
+      kuzzle.getAutoRefresh(() => {});
+
+      should(spy.calledOnce).be.true();
+      should(spy.firstCall.args[0].index).be.exactly(kuzzle.defaultIndex);
+
+    });
+
+    it('should throw an error if no callback is given', () => {
+      should(() => { kuzzle.getAutoRefresh('index'); }).throw('Kuzzle.getAutoRefresh: a callback argument is required for read queries');
+    });
+
+    it('should parse the given arguments', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        options = { foo: 'bar'},
+        cb = () => {};
+
+      kuzzle.getAutoRefresh(index, options, cb);
+      should(spy.calledOnce).be.true();
+      should(spy.calledWithExactly(
+        { index: index, controller: 'admin', action: 'getAutoRefresh' },
+        {},
+        options,
+        cb )
+      ).be.true();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.getAutoRefresh(cb);
+      should(spy.calledTwice).be.true();
+      should(spy.secondCall.calledWithExactly(
+        { index: kuzzle.defaultIndex, controller: 'admin', action: 'getAutoRefresh' },
+        {},
+        undefined,
+        cb)
+      ).be.true();
+
+    });
+
+  });
+
+  describe('#setAutoRefresh', () => {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if no index is given', () => {
+      should(() => { kuzzle.setAutoRefresh(); }).throw('Kuzzle.setAutoRefresh: index required');
+    });
+
+    it('should use kuzzle default index if none is provided', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        cb = () => {};
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.setAutoRefresh(true, cb);
+      should(spy.calledOnce).be.true();
+      should(spy.calledWith(
+        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { body: { autoRefresh: true } },
+        undefined,
+        cb
+      )).be.true();
+
+    });
+
+    it('should throw an error is now autorefresh value is given', () => {
+      should(() => {
+        kuzzle.setAutoRefresh('index');
+      }).throw('Kuzzle.setAutoRefresh: autoRefresh value is required');
+    });
+
+    it('should parse the given arguments', () => {
+      var
+        index = 'index',
+        autoRefresh = true,
+        options = { foo: 'bar'},
+        cb = () => {},
+        spy = sandbox.stub(kuzzle, 'query').returns();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+
+      kuzzle.setAutoRefresh(autoRefresh, options, cb);
+      should(spy.calledOnce).be.true();
+      should(spy.firstCall.calledWithExactly(
+        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { body: { autoRefresh: autoRefresh }},
+        options,
+        cb
+      )).be.true();
+
+      kuzzle.setAutoRefresh(index, autoRefresh);
+      should(spy.calledTwice).be.true();
+      should(spy.secondCall.calledWithExactly(
+        { index: index, controller: 'admin', action: 'setAutoRefresh' },
+        { body: { autoRefresh: autoRefresh }},
+        undefined,
+        undefined
+      )).be.true();
+    });
+
+  });
+
 });

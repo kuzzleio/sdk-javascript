@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -41,6 +41,7 @@
     "mocha": "2.4.5",
     "proxyquire": "^1.7.3",
     "rewire": "^2.5.0",
-    "should": "8.2.2"
+    "should": "8.2.2",
+    "sinon": "^1.17.4"
   }
 }

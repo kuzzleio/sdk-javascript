@@ -1411,6 +1411,136 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 };
 
 /**
+ * Forces an index refresh
+ *
+ * @param {string} index - The index to refresh. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.refreshIndex = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function(arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.refreshIndex: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'refreshIndex'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * Returns de current autoRefresh status for the given index
+ *
+ * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
+ * @param {object} options - Optinal arguments
+ * @param {responseCallback} cb - Handles the query response
+ * @returns {object} this
+ */
+Kuzzle.prototype.getAutoRefresh = function () {
+  var
+    index,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.getAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  this.callbackRequired('Kuzzle.getAutoRefresh', cb);
+  this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
+
+  return this;
+};
+
+/**
+ * (Un)Sets the autoRefresh flag on the given index
+ *
+ * @param {string} index - the index to modify. Defaults to Kuzzle.defaultIndex
+ * @param {boolean} autoRefresh - The autoRefresh value to set
+ * @param {object} options - Optional arguments
+ * @param {responseCallback} cb - Handles the query result
+ * @returns {object} this
+ */
+Kuzzle.prototype.setAutoRefresh = function () {
+  var
+    index,
+    autoRefresh,
+    options,
+    cb;
+
+  Array.prototype.slice.call(arguments).forEach(function (arg) {
+    switch (typeof arg) {
+      case 'string':
+        index = arg;
+        break;
+      case 'boolean':
+        autoRefresh = arg;
+        break;
+      case 'object':
+        options = arg;
+        break;
+      case 'function':
+        cb = arg;
+        break;
+    }
+  });
+
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.setAutoRefresh: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  if (autoRefresh === undefined) {
+    throw new Error('Kuzzle.setAutoRefresh: autoRefresh value is required');
+  }
+
+  this.query({ index: index, controller: 'admin', action: 'setAutoRefresh'}, { body: { autoRefresh: autoRefresh }}, options, cb);
+
+  return this;
+};
+
+/**
  * Return the current Kuzzle's UTC Epoch time, in milliseconds
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
@@ -1958,8 +2088,6 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   } else {
     this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
   }
-
-  return this;
 };
 
 /**
@@ -2564,7 +2692,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     options = null;
   }
 
-  if (!this.id) {
+  if (!self.id) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
@@ -2574,13 +2702,11 @@ KuzzleDocument.prototype.delete = function (options, cb) {
         return cb(err);
       }
 
-      cb(null, self);
+      cb(null, self.id);
     });
   } else {
     this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options);
   }
-
-  return this;
 };
 
 /**
@@ -3805,12 +3931,12 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   data.body = content;
 
   if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err) {
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      cb(null, new KuzzleRole(self, id, content));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
@@ -4038,11 +4164,23 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
 
   if (cb) {
     self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
+      var updatedContent = {};
+
       if (err) {
         return cb(err);
       }
 
-      cb(null, res.result._id);
+      Object.keys(res.result._source).forEach(function (property) {
+        if (property !== 'roles') {
+          updatedContent[property] = res.result._source[property];
+        }
+      });
+
+      updatedContent.roles = res.result._source.roles.map(function (role) {
+        return role._id;
+      });
+
+      cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
     });
   } else {
     self.kuzzle.query(this.buildQueryArgs(action), data);
