@@ -78,7 +78,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.content.roles).not.be.empty();
 
         res.content.roles.forEach(function (role) {
-          should(role).be.a.String();
+          should(role._id).not.be.empty().and.be.a.String();
         });
         done();
       }));
