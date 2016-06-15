@@ -1,7 +1,6 @@
 module.exports = function(grunt) {
   var path = require('path');
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -9,9 +8,6 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js']
-    },
     eslint: {
       src: ['src/**/*.js']
     },
@@ -41,5 +37,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['jshint', 'eslint', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['eslint', 'browserify', 'uglify']);
 };
