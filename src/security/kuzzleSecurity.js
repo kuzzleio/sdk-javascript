@@ -289,7 +289,15 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
 
     if (!hydrate) {
       response.result._source.roles = response.result._source.roles.map(function (role) {
-        return role._id;
+        var formattedRole = {_id: role._id};
+        if (role._source.restrictedTo !== undefined) {
+          formattedRole.restrictedTo = role._source.restrictedTo;
+        }
+        if (role._source.allowInternalIndex !== undefined) {
+          formattedRole.allowInternalIndex = role._source.allowInternalIndex;
+        }
+
+        return formattedRole;
       });
     }
 
