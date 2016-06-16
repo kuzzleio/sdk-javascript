@@ -1,3 +1,9 @@
+*__note:__ the # at the end of lines are the pull request numbers on GitHub*
+
+# 1.9.1
+
+* Fix issue #91
+
 # 1.9.0
 
 ## Features
