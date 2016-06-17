@@ -46,7 +46,23 @@ describe('KuzzleSecurity profiles methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {roles: [{_id: 'role1', _source: {indexes: {}}}]} }};
+      result = {
+        result: {
+          _id: 'foobar',
+          _source: {
+            roles: [
+              {
+                _id: 'role1',
+                _source: {
+                  controllers: {'*': {actions: {'*': true}}},
+                  restrictedTo: [{index: 'foo', collections: ['bar']}],
+                  allowInternalIndex: false
+                }
+              }
+            ]
+          }
+        }
+      };
       expectedQuery = {
         action: 'getProfile',
         controller: 'security',
@@ -79,6 +95,12 @@ describe('KuzzleSecurity profiles methods', function () {
 
         res.content.roles.forEach(function (role) {
           should(role._id).not.be.empty().and.be.a.String();
+          should(role.controllers).be.empty();
+          should(role.allowInternalIndex).be.false();
+          should(role.restrictedTo).not.be.empty().and.be.an.Array();
+          should(role.restrictedTo[0].index).be.equal('foo');
+          should(role.restrictedTo[0].collections).not.be.empty().and.be.an.Array();
+          should(role.restrictedTo[0].collections[0]).be.equal('bar');
         });
         done();
       }));
