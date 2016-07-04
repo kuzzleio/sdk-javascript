@@ -236,6 +236,20 @@ describe('KuzzleDataMapping methods', function () {
         done();
       });
     });
+
+    it('should return an empty mapping if the stored mapping is empty', done => {
+      var mapping = new KuzzleDataMapping(dataCollection);
+
+      result = { result: {bar: { mappings: { foo: {}}}}};
+
+      mapping.refresh((err, res) => {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.exactly(mapping);
+        should(res.mapping).be.empty().and.not.be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#set', function () {
