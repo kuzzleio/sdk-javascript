@@ -1,5 +1,11 @@
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
+# 1.9.2
+
+* Reinforce unit tests on the `security.getProfile` method #94
+* Remove jshint as it overlapped with eslint #93
+* Fix #95: handle empty mappings #96
+
 # 1.9.1
 
 * Fix issue #91
