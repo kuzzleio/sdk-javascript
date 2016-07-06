@@ -111,6 +111,11 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
     if (res.result[self.collection.index]) {
       if (res.result[self.collection.index].mappings[self.collection.collection]) {
         self.mapping = res.result[self.collection.index].mappings[self.collection.collection].properties;
+
+        // Mappings can be empty. The mapping property should never be "undefined"
+        if (self.mapping === undefined) {
+          self.mapping = {};
+        }
       } else {
         return cb ? cb(new Error('No mapping found for collection ' + self.collection.collection)) : false;
       }
