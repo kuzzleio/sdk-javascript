@@ -120,6 +120,7 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
+(function (Buffer){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -393,6 +394,7 @@ process.umask = function() { return 0; };
   }
 })('undefined' !== typeof window ? window : null);
 
+}).call(this,require("buffer").Buffer)
 },{}],3:[function(require,module,exports){
 (function (process){
 var
@@ -2566,6 +2568,11 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
     if (res.result[self.collection.index]) {
       if (res.result[self.collection.index].mappings[self.collection.collection]) {
         self.mapping = res.result[self.collection.index].mappings[self.collection.collection].properties;
+
+        // Mappings can be empty. The mapping property should never be "undefined"
+        if (self.mapping === undefined) {
+          self.mapping = {};
+        }
       } else {
         return cb ? cb(new Error('No mapping found for collection ' + self.collection.collection)) : false;
       }
