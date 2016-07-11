@@ -2,40 +2,12 @@
 // shim for using process in browser
 
 var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-(function () {
-  try {
-    cachedSetTimeout = setTimeout;
-  } catch (e) {
-    cachedSetTimeout = function () {
-      throw new Error('setTimeout is not defined');
-    }
-  }
-  try {
-    cachedClearTimeout = clearTimeout;
-  } catch (e) {
-    cachedClearTimeout = function () {
-      throw new Error('clearTimeout is not defined');
-    }
-  }
-} ())
 var queue = [];
 var draining = false;
 var currentQueue;
 var queueIndex = -1;
 
 function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
     draining = false;
     if (currentQueue.length) {
         queue = currentQueue.concat(queue);
@@ -51,7 +23,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
+    var timeout = setTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -68,7 +40,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    cachedClearTimeout(timeout);
+    clearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -80,7 +52,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
+        setTimeout(drainQueue, 0);
     }
 };
 
@@ -120,7 +92,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-(function (Buffer){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -394,7 +365,6 @@ process.umask = function() { return 0; };
   }
 })('undefined' !== typeof window ? window : null);
 
-}).call(this,require("buffer").Buffer)
 },{}],3:[function(require,module,exports){
 (function (process){
 var
@@ -2247,9 +2217,10 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
  *
  * @param {object} document - either a KuzzleDocument instance or a JSON object
  * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Returns a raw Kuzzle response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.publishMessage = function (document, options) {
+KuzzleDataCollection.prototype.publishMessage = function (document, options, cb) {
   var data = {};
 
   if (document instanceof KuzzleDocument) {
@@ -2259,7 +2230,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options);
+  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options, cb);
 
   return this;
 };

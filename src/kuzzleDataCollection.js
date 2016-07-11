@@ -402,9 +402,10 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
  *
  * @param {object} document - either a KuzzleDocument instance or a JSON object
  * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Returns a raw Kuzzle response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.publishMessage = function (document, options) {
+KuzzleDataCollection.prototype.publishMessage = function (document, options, cb) {
   var data = {};
 
   if (document instanceof KuzzleDocument) {
@@ -414,7 +415,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options);
+  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options, cb);
 
   return this;
 };
