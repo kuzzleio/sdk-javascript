@@ -7,7 +7,7 @@ var
   KuzzleRole = require('../../../src/security/kuzzleRole'),
   KuzzleUser = require('../../../src/security/kuzzleUser');
 
-describe('KuzzleRole methods', function () {
+describe('KuzzleUser methods', function () {
   var
     kuzzle,
     kuzzleUser,
@@ -51,7 +51,7 @@ describe('KuzzleRole methods', function () {
       kuzzle.query = queryStub;
       error = false;
 
-      result = { result: {_id: 'myUser', _source: {some: 'content', profile: 'myProfile'}} };
+      result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
       kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceUser',
@@ -151,7 +151,7 @@ describe('KuzzleRole methods', function () {
   describe('#setProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profile: 'profile1'});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
     });
 
     it('should throw an error if the profile parameter is null', function (done) {
@@ -170,108 +170,24 @@ describe('KuzzleRole methods', function () {
       done();
     });
 
-    it('should add the id string in profile', function (done) {
-      kuzzleUser.setProfile('role2');
-      should(kuzzleUser.content.profile).be.exactly('role2');
+    it('should add the rights profiles IDs in profilesIds', function (done) {
+      kuzzleUser.setProfiles(['role2']);
+      should(kuzzleUser.content.profilesIds[0]).be.exactly('role2');
       done();
-    });
-
-    it('should add the KuzzleProfile in profile', function (done) {
-      var
-        kuzzleProfile = new KuzzleProfile(kuzzle.security, 'profile2', {roles: ['role1']});
-
-      kuzzleUser.setProfile(kuzzleProfile);
-      should(kuzzleUser.content.profile).match({id: 'profile2', content: {roles: ['role1']}});
-      should(kuzzleUser.content.profile).be.instanceOf(KuzzleProfile);
-      done();
-    });
-  });
-
-  describe('#hydrate', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('http://localhost:7512');
-
-      kuzzle.query = queryStub;
-      error = false;
-
-      result = { result: {_id: 'user', _source: {profile : 'profile1'}} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
-      expectedQuery = {
-        action: 'getProfile',
-        controller: 'security'
-      };
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzleUser.hydrate(); }).throw(Error);
-    });
-
-    it('should send the right query to kuzzle', function (done) {
-      should(kuzzleUser.hydrate(function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
-        done();
-      }));
-    });
-
-    it('should throw an error when the profile is already a KuzzleProfile', function (done) {
-      var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'profile', {roles: ['role1']});
-      kuzzleUser.setProfile(kuzzleProfile);
-
-      should(function () { kuzzleUser.hydrate(function () {}); }).throw(Error);
-      done();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      error = 'foobar';
-
-      kuzzleUser.hydrate(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
     });
   });
 
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profile: 'profile'});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds: ['profile']});
     });
 
     it('should serialize with correct attributes', function (done) {
       var serialized = kuzzleUser.serialize();
 
       should(serialized._id).be.exactly('user');
-      should(serialized.body).be.match({some: 'content', profile: 'profile'});
-      done();
-    });
-
-    it('should serialize with correct attributes when a user is serialized', function (done) {
-      var
-        kuzzleProfile = new KuzzleProfile(kuzzle.security, 'profile1', {some: 'content', roles: ['role1']}),
-        serialized;
-
-      kuzzleUser.setProfile(kuzzleProfile);
-
-      serialized = kuzzleUser.serialize();
-
-      should(serialized._id).be.exactly('user');
-      should(serialized.body).be.match({some: 'content', profile: 'profile1'});
-      done();
-    });
-
-    it('should serialize without roles if no profile attribute is defined', function (done) {
-      var
-        serialized;
-
-      kuzzleUser = new KuzzleProfile(kuzzle.security, 'user', {some: 'content'});
-
-      serialized = kuzzleUser.serialize();
-
-      should(serialized._id).be.exactly('user');
-      should.exist(serialized.body.some);
-      should.not.exist(serialized.body.profile);
+      should(serialized.body).be.match({some: 'content', profilesIds: ['profile']});
       done();
     });
   });
@@ -283,7 +199,7 @@ describe('KuzzleRole methods', function () {
       error = false;
 
       result = { result: {_id: 'user'} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profile: 'role1'});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds: ['profile']});
       expectedQuery = {
         action: 'deleteUser',
         controller: 'security'
@@ -317,10 +233,10 @@ describe('KuzzleRole methods', function () {
 
   describe('#getProfiles', function () {
     it('should return the associated profiles', function () {
-      var profile = 'profile';
+      var profilesIds = ['profile'];
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profile});
-      should(kuzzleUser.getProfiles()).be.eql(profile);
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds});
+      should(kuzzleUser.getProfiles()).be.eql(profilesIds);
     });
   });
 });

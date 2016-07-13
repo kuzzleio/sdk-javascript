@@ -22,7 +22,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['hydrate', 'save'];
+        var whitelist = ['save'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
