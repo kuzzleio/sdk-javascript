@@ -538,10 +538,6 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
       return cb(err);
     }
 
-    if (!hydrate) {
-      response.result._source.profile = response.result._source.profile._id;
-    }
-
     cb(null, new KuzzleUser(self, response.result._id, response.result._source));
   });
 };
@@ -797,7 +793,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
     self = this;
 
   if (!userId || typeof userId !== 'string') {
-    throw new Error('userId parameter is mandatory for isActionAllowed function');
+    throw new Error('userId parameter is mandatory for getUserRights function');
   }
 
   if (!cb && typeof options === 'function') {
