@@ -325,14 +325,9 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
   var
     self = this;
 
-  filters.hydrate = true;
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
@@ -439,13 +434,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
       }
 
       Object.keys(res.result._source).forEach(function (property) {
-        if (property !== 'roles') {
           updatedContent[property] = res.result._source[property];
-        }
-      });
-
-      updatedContent.roles = res.result._source.roles.map(function (role) {
-        return role._id;
       });
 
       cb(null, new KuzzleProfile(self, res.result._id, updatedContent));

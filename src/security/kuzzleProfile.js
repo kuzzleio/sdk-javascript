@@ -80,7 +80,7 @@ KuzzleProfile.prototype.save = function (options, cb) {
  *
  * @returns {KuzzleProfile} this
  */
-KuzzleProfile.prototype.addRole = function (policy) {
+KuzzleProfile.prototype.addPolicy = function (policy) {
 
   if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
     throw new Error('Parameter "policies" must be an object containing at least a "roleId" member which must be a string.');

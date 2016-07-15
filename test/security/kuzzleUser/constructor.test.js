@@ -44,9 +44,8 @@ describe('KuzzleUser constructor', function () {
   it('should expose functions', function () {
     var kuzzleUser = new KuzzleUser(kuzzle.security, 'test', {});
 
-    should.exist(kuzzleUser.setProfile);
+    should.exist(kuzzleUser.setProfiles);
     should.exist(kuzzleUser.savePromise);
-    should.exist(kuzzleUser.hydratePromise);
     should.exist(kuzzleUser.serialize);
     should.exist(kuzzleUser.deletePromise);
   });

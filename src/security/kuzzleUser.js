@@ -43,8 +43,7 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  * @returns {KuzzleUser} this
  */
 KuzzleUser.prototype.setProfiles = function (profilesIds) {
-
-  if (typeof profilesIds !== 'array' || typeof profilesIds[0] !== 'string') {
+  if (!Array.isArray(profilesIds) || typeof profilesIds[0] !== 'string') {
     throw new Error('Parameter "profilesIds" must be an array of strings');
   }
 

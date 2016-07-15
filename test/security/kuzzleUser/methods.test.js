@@ -151,7 +151,7 @@ describe('KuzzleUser methods', function () {
   describe('#setProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profilesIds: ['profile1']});
     });
 
     it('should throw an error if the profile parameter is null', function (done) {
@@ -171,8 +171,8 @@ describe('KuzzleUser methods', function () {
     });
 
     it('should add the rights profiles IDs in profilesIds', function (done) {
-      kuzzleUser.setProfiles(['role2']);
-      should(kuzzleUser.content.profilesIds[0]).be.exactly('role2');
+      kuzzleUser.setProfiles(['profile2']);
+      should(kuzzleUser.content.profilesIds[0]).be.exactly('profile2');
       done();
     });
   });

@@ -47,7 +47,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {profile: {_id: 'profile', _source: {roles: [{_id: 'role', _source: {indexes: {}}}]}}} }};
+      result = { result: {_id: 'foobar', _source: {profilesIds: ['profile']}}};
       expectedQuery = {
         action: 'getUser',
         controller: 'security',
@@ -60,25 +60,21 @@ describe('KuzzleSecurity user methods', function () {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
 
-
-        should(res.content.profile).instanceof(KuzzleProfile);
-        should(res.content.profile.content.roles).be.an.Array();
-        should(res.content.profile.content.roles).not.be.empty();
-
-        res.content.profile.content.roles.forEach(function (role) {
-          should(role).instanceof(KuzzleRole);
-        });
+        should(res.content.profilesIds).be.an.Array();
+        should(res.content.profilesIds[0]).be.a.String();
 
         done();
       }));
     });
 
-    it('should send the right query to Kuzzle with id as profile when hydrate is false', function (done) {
-      should(kuzzle.security.getUser(result.result._id, {hydrate: false}, function (err, res) {
+    it('should send the right query to Kuzzle with id as profile', function (done) {
+      should(kuzzle.security.getUser(result.result._id, {}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
 
-        should(res.content.profile).be.a.String();
+        should(res.content.profilesIds).be.an.Array();
+        should(res.content.profilesIds[0]).be.a.String();
+
         done();
       }));
     });
@@ -108,7 +104,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {profile : 'myProfile'}} ]}};
+      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {profilesIds : ['myProfile']}} ]}};
       expectedQuery = {
         action: 'searchUsers',
         controller: 'security'
@@ -120,7 +116,7 @@ describe('KuzzleSecurity user methods', function () {
         filters = {};
 
       this.timeout(50);
-      expectedQuery.body = {hydrate: true};
+      expectedQuery.body = {};
 
       should(kuzzle.security.searchUsers(filters, function (err, res) {
         should(err).be.null();
@@ -133,58 +129,20 @@ describe('KuzzleSecurity user methods', function () {
         res.users.forEach(function (item) {
           should(item).be.instanceof(KuzzleUser);
 
-          should(item.content.profile).be.String();
-          should(item.content.profile.roles).be.undefined();
+          should(item.content.profilesIds).be.an.Array();
+          should(item.content.profilesIds[0]).be.a.String();
         });
 
         done();
       }));
     });
 
-    it('should send the right search query not hydrated to kuzzle and return user with string', function (done) {
-      var
-        filters = {};
-
-      this.timeout(50);
-      expectedQuery.body = {hydrate: false};
-
-      should(kuzzle.security.searchUsers(filters, {hydrate: false}, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object();
-        should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.users).be.an.Array();
-        should(res.users).not.be.empty();
-        should(res.users.length).be.exactly(result.result.hits.length);
-
-        res.users.forEach(function (item) {
-          should(item).be.instanceof(KuzzleUser);
-
-          should(item.content.profile).be.String();
-          should(item.content.profile.roles).be.undefined();
-        });
-
-        done();
-      }));
-    });
-
-    it('should send the right search query to kuzzle and return user with profile and role if the user is hydrated', function (done) {
+    it('should send the right search query to kuzzle and return user', function (done) {
       var
         filters = {};
 
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
-        profile: {
-          _id: 'myProfile',
-          _source: {
-            roles: [
-              {
-                _id: 'myRole',
-                _source: {
-                  indexes: {}
-                }
-              }
-            ]
-          }
-        }
+        profilesIds: ['myProfile']
       }}]}};
 
       this.timeout(50);
@@ -201,13 +159,8 @@ describe('KuzzleSecurity user methods', function () {
         res.users.forEach(function (item) {
           should(item).be.instanceof(KuzzleUser);
 
-          should(item.content.profile).be.instanceof(KuzzleProfile);
-          should(item.content.profile.content.roles).be.an.Array();
-          should(item.content.profile.content.roles).not.be.empty();
-
-          item.content.profile.content.roles.map(function (role) {
-            should(role).instanceof(KuzzleRole);
-          });
+          should(item.content.profilesIds).be.an.Array();
+          should(item.content.profilesIds[0]).be.a.String();
         });
 
         done();
@@ -226,19 +179,7 @@ describe('KuzzleSecurity user methods', function () {
         filters = {};
 
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
-        profile: {
-          _id: 'myProfile',
-          _source: {
-            roles: [
-              {
-                _id: 'myRole',
-                _source: {
-                  indexes: {}
-                }
-              }
-            ]
-          }
-        }
+        profilesIds: ['myProfile']
       }}]}};
 
       expectedQuery.body = filters;
@@ -258,7 +199,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {profile: ['myRole']}} };
+      result = { result: {_id: 'foobar', _source: {profilesIds: ['myRole']}} };
       expectedQuery = {
         action: 'createUser',
         controller: 'security'
@@ -330,7 +271,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profile: 'foobar'} } };
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profilesIds: ['foobar']} } };
       expectedQuery = {
         action: 'updateUser',
         controller: 'security'
@@ -412,10 +353,10 @@ describe('KuzzleSecurity user methods', function () {
     });
   });
 
-  describe('#ProfileFactory', function () {
+  describe('#UserFactory', function () {
     it('should return an instance of Profile', function (done) {
-      var role = kuzzle.security.userFactory('test', {profile: ['myProfile']});
-      should(role).instanceof(KuzzleUser);
+      var user = kuzzle.security.userFactory('test', {profilesIds: ['myProfile']});
+      should(user).instanceof(KuzzleUser);
       done();
     });
 

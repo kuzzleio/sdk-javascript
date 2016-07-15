@@ -173,8 +173,8 @@ describe('KuzzleRole methods', function () {
       kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content'});
 
       kuzzleProfile.addPolicy({roleId: 'role'});
-      should(kuzzleProfile.content.roles).be.an.Array();
-      should(kuzzleProfile.content.roles.length).be.exactly(1);
+      should(kuzzleProfile.content.policies).be.an.Array();
+      should(kuzzleProfile.content.policies.length).be.exactly(1);
       done();
     });
   });
@@ -288,7 +288,7 @@ describe('KuzzleRole methods', function () {
       var policies = [{roleId:'role1'}, {roleId:'role2'}, {roleId:'role3'}];
 
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies: policies});
       should(kuzzleProfile.getPolicies()).be.eql(policies);
     });
   });

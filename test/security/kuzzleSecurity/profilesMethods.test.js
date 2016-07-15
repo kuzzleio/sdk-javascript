@@ -50,14 +50,11 @@ describe('KuzzleSecurity profiles methods', function () {
         result: {
           _id: 'foobar',
           _source: {
-            roles: [
+            policies: [
               {
-                _id: 'role1',
-                _source: {
-                  controllers: {'*': {actions: {'*': true}}},
-                  restrictedTo: [{index: 'foo', collections: ['bar']}],
-                  allowInternalIndex: false
-                }
+                roleId: 'role1',
+                restrictedTo: [{index: 'foo', collections: ['bar']}],
+                allowInternalIndex: false
               }
             ]
           }
@@ -75,32 +72,32 @@ describe('KuzzleSecurity profiles methods', function () {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
 
-        should(res.content.roles).be.an.Array();
-        should(res.content.roles).not.be.empty();
+        should(res.content.policies).be.an.Array();
+        should(res.content.policies).not.be.empty();
 
-        res.content.roles.forEach(function (role) {
-          should(role).instanceof(KuzzleRole);
+        res.content.policies.forEach(function (policy) {
+          should(policy).be.an.Object();
+          should(policy.roleId).be.a.String();
         });
         done();
       }));
     });
 
     it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, {hydrate: false}, function (err, res) {
+      should(kuzzle.security.getProfile(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleProfile);
 
-        should(res.content.roles).be.an.Array();
-        should(res.content.roles).not.be.empty();
+        should(res.content.policies).be.an.Array();
+        should(res.content.policies).not.be.empty();
 
-        res.content.roles.forEach(function (role) {
-          should(role._id).not.be.empty().and.be.a.String();
-          should(role.controllers).be.empty();
-          should(role.allowInternalIndex).be.false();
-          should(role.restrictedTo).not.be.empty().and.be.an.Array();
-          should(role.restrictedTo[0].index).be.equal('foo');
-          should(role.restrictedTo[0].collections).not.be.empty().and.be.an.Array();
-          should(role.restrictedTo[0].collections[0]).be.equal('bar');
+        res.content.policies.forEach(function (policy) {
+          should(policy.roleId).not.be.empty().and.be.a.String();
+          should(policy.controllers).be.empty();
+          should(policy.restrictedTo).not.be.empty().and.be.an.Array();
+          should(policy.restrictedTo[0].index).be.equal('foo');
+          should(policy.restrictedTo[0].collections).not.be.empty().and.be.an.Array();
+          should(policy.restrictedTo[0].collections[0]).be.equal('bar');
         });
         done();
       }));
@@ -131,7 +128,7 @@ describe('KuzzleSecurity profiles methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {roles : [{_id: 'myRole', _source: {indexes: {}}}]}} ]}};
+      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {policies: [ {roleId: 'myRole'} ]}} ]}};
       expectedQuery = {
         action: 'searchProfiles',
         controller: 'security'
@@ -142,10 +139,10 @@ describe('KuzzleSecurity profiles methods', function () {
       var
         filters = {};
 
-      result = { result: { total: 123, hits: [{_id: 'foobar', _source: {roles : ['myRole']}}]} };
+      result = { result: { total: 123, hits: [{_id: 'foobar', _source: {policies : [{roleId: 'myRole'}]}}]} };
 
       this.timeout(50);
-      expectedQuery.body = {hydrate: true};
+      expectedQuery.body = {};
 
       should(kuzzle.security.searchProfiles(filters, function (err, res) {
         should(err).be.null();
@@ -158,9 +155,10 @@ describe('KuzzleSecurity profiles methods', function () {
         res.profiles.forEach(function (item) {
           should(item).be.instanceof(KuzzleProfile);
 
-          item.content.roles.forEach(function (role) {
-            should(role).be.String()
-          })
+          item.content.policies.forEach(function (policy) {
+            should(policy).be.an.Object();
+            should(policy.roleId).be.String();
+          });
         });
 
         done();
@@ -171,10 +169,10 @@ describe('KuzzleSecurity profiles methods', function () {
       var
         filters = {};
 
-      result = { result: { total: 123, hits: [{_id: 'foobar', _source: {roles : ['myRole']}}]} };
+      result = { result: { total: 123, hits: [{_id: 'foobar', _source: {policies : [{roleId: 'myRole'}]}}]} };
 
       this.timeout(50);
-      expectedQuery.body = {hydrate: false};
+      expectedQuery.body = {};
 
       should(kuzzle.security.searchProfiles(filters, {hydrate: false}, function (err, res) {
         should(err).be.null();
@@ -187,9 +185,10 @@ describe('KuzzleSecurity profiles methods', function () {
         res.profiles.forEach(function (item) {
           should(item).be.instanceof(KuzzleProfile);
 
-          item.content.roles.forEach(function (role) {
-            should(role).be.String()
-          })
+          item.content.policies.forEach(function (policy) {
+            should(policy).be.an.Object();
+            should(policy.roleId).be.String();
+          });
         });
 
         done();
@@ -214,9 +213,10 @@ describe('KuzzleSecurity profiles methods', function () {
         res.profiles.forEach(function (item) {
           should(item).be.instanceof(KuzzleProfile);
 
-          item.content.roles.forEach(function (role) {
-            should(role).be.instanceof(KuzzleRole);
-          })
+          item.content.policies.forEach(function (policy) {
+            should(policy).be.an.Object();
+            should(policy.roleId).be.String();
+          });
         });
 
         done();
@@ -253,7 +253,7 @@ describe('KuzzleSecurity profiles methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {roles: ['myRole']}} };
+      result = { result: {_id: 'foobar', _source: {policies: [{roleId: 'myRole'}]}} };
       expectedQuery = {
         action: 'createProfile',
         controller: 'security'
@@ -331,7 +331,7 @@ describe('KuzzleSecurity profiles methods', function () {
           _index: '%kuzzle',
           _type: 'profiles',
           _source: {
-            roles: [{_id: 'foo'}],
+            policies: [{roleId: 'foo'}],
             foo: 'bar'
           }
         }
@@ -353,7 +353,7 @@ describe('KuzzleSecurity profiles methods', function () {
       }));
     });
 
-    it('should send the right query to Kuzzle even without callback', () => {
+    it('should send the right query to Kuzzle even without callback', function () {
       expectedQuery.body = {'foo': 'bar'};
       expectedQuery._id = result.result._id;
 
@@ -417,7 +417,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
   describe('#ProfileFactory', function () {
     it('should return an instance of Profile', function (done) {
-      var role = kuzzle.security.profileFactory('test', {roles: ['myRole']});
+      var role = kuzzle.security.profileFactory('test', {policies: [{roleId:'myRole'}]});
       should(role).instanceof(KuzzleProfile);
       done();
     });
