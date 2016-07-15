@@ -294,11 +294,6 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, cb) {
   var
     self = this;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, {}, function (error, response) {
