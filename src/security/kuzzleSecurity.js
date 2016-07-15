@@ -434,7 +434,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
       }
 
       Object.keys(res.result._source).forEach(function (property) {
-          updatedContent[property] = res.result._source[property];
+        updatedContent[property] = res.result._source[property];
       });
 
       cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
@@ -503,8 +503,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   var
     data,
-    self = this,
-    hydrate = true;
+    self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getUser function');

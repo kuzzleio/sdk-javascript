@@ -1,97 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -364,6 +271,127 @@ process.umask = function() { return 0; };
     _window.uuid = uuid;
   }
 })('undefined' !== typeof window ? window : null);
+
+},{}],2:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+(function () {
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
+    }
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
+    }
+  }
+} ())
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = cachedSetTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    cachedClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        cachedSetTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
 (function (process){
@@ -1812,7 +1840,7 @@ Kuzzle.prototype.stopQueuing = function () {
 };
 
 }).call(this,require('_process'))
-},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./security/kuzzleSecurity":11,"./security/kuzzleUser":13,"_process":1,"node-uuid":2,"socket.io-client":undefined}],4:[function(require,module,exports){
+},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./security/kuzzleSecurity":11,"./security/kuzzleUser":13,"_process":2,"node-uuid":1,"socket.io-client":undefined}],4:[function(require,module,exports){
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
@@ -3498,10 +3526,9 @@ function isReady() {
 
 module.exports = KuzzleRoom;
 
-},{"node-uuid":2}],9:[function(require,module,exports){
+},{"node-uuid":1}],9:[function(require,module,exports){
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleRole = require('./kuzzleRole');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleProfile(kuzzleSecurity, id, content) {
 
@@ -3517,17 +3544,6 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
       value: 'updateProfile'
     }
   });
-
-  // Hydrate profile with roles if roles are not only string but objects with `_id` and `_source`
-  if (content && content.roles) {
-    content.roles = content.roles.map(function (role) {
-      if (!role._id || !role._source) {
-        return role;
-      }
-
-      return new KuzzleRole(kuzzleSecurity, role._id, role._source);
-    });
-  }
 
   // promisifying
   if (kuzzleSecurity.kuzzle.bluebird) {
@@ -3561,8 +3577,8 @@ KuzzleProfile.prototype.save = function (options, cb) {
     data,
     self = this;
 
-  if (!this.content.roles) {
-    throw new Error('Argument "roles" is mandatory in a profile. This argument contains an array of KuzzleRole or an array of id string');
+  if (!this.content.policies) {
+    throw new Error('Argument "policies" is mandatory in a profile. This argument contains an array of objects.');
   }
 
   if (options && cb === undefined && typeof options === 'function') {
@@ -3587,87 +3603,47 @@ KuzzleProfile.prototype.save = function (options, cb) {
 
 
 /**
- * Add a role in the roles list
- * @param {KuzzleRole|string} role - can be an instance of KuzzleRole or an id in string
+ * Add a policy in the policies list
+ * @param {Object} role - must be an object containing at least a "roleId" member which must be a string.
  *
  * @returns {KuzzleProfile} this
  */
-KuzzleProfile.prototype.addRole = function (role) {
+KuzzleProfile.prototype.addPolicy = function (policy) {
 
-  if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
-    throw new Error('Parameter "roles" must be a KuzzleRole or a id string');
+  if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
+    throw new Error('Parameter "policies" must be an object containing at least a "roleId" member which must be a string.');
   }
 
-  if (!this.content.roles) {
-    this.content.roles = [];
+  if (!this.content.policies) {
+    this.content.policies = [];
   }
 
-  this.content.roles.push(role);
+  this.content.policies.push(policy);
 
   return this;
 };
 
 /**
- * Set roles list
- * @param {Array} roles - can be an array of KuzzleRole or an array of string
+ * Set policies list
+ * @param {Array} policies - must be an array of objects containing at least a "roleId" member which must be a string
  *
  * @returns {KuzzleProfile} this
  */
-KuzzleProfile.prototype.setRoles = function (roles) {
+KuzzleProfile.prototype.setPolicies = function (policies) {
 
-  if (!Array.isArray(roles)) {
-    throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  if (!Array.isArray(policies)) {
+    throw new Error('Parameter "policies" must be an array of objects containing at least a "roleId" member which must be a string');
   }
 
-  roles.map(function (role) {
-    if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
-      throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  policies.map(function (policy) {
+    if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
+      throw new Error('Parameter "policies" must be an array of objects containing at least a "roleId" member which must be a string');
     }
   });
 
-  this.content.roles = roles;
+  this.content.policies = policies;
 
   return this;
-};
-
-
-/**
- * Hydrate the profile - get real KuzzleRole and not just ids
- * Warning: do not try to hydrate a profile with newly added role which is not created in kuzzle
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
- */
-KuzzleProfile.prototype.hydrate = function (options, cb) {
-
-  var
-    self = this,
-    data = {ids: []};
-
-  data.ids = this.content.roles.map(function (role) {
-    if (typeof role === 'string') {
-      return role;
-    }
-
-    if (role instanceof KuzzleRole) {
-      return role.id;
-    }
-  });
-
-  if (options && cb === undefined && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleProfile.hydrate', cb);
-
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, options, function (error, response) {
-    if (error) {
-      return cb(error);
-    }
-
-    cb(null, new KuzzleProfile(self, self.id, {roles: response.result.hits}));
-  });
 };
 
 /**
@@ -3684,34 +3660,26 @@ KuzzleProfile.prototype.serialize = function () {
   }
 
   data.body = this.content;
-  if (!data.body.roles || !Array.isArray(data.body.roles)) {
+  if (!data.body.policies || !Array.isArray(data.body.policies)) {
     return data;
   }
-
-  data.body.roles = data.body.roles.map(function(role) {
-    if (role instanceof KuzzleRole) {
-      return role.id;
-    }
-
-    return role;
-  });
 
   return data;
 };
 
 /**
- * Returns the list of roles associated to this profile.
- * Each role element can be either a string or a KuzzleRole object
+ * Returns the list of policies associated to this profile.
+ * Each policy element is an array of objects containing at least a "roleId" member which must be a string
  *
- * @return {object} an array of roles
+ * @return {object} an array of policies
  */
-KuzzleProfile.prototype.getRoles = function () {
-  return this.content.roles;
+KuzzleProfile.prototype.getPolicies = function () {
+  return this.content.policies;
 };
 
 module.exports = KuzzleProfile;
 
-},{"./kuzzleRole":10,"./kuzzleSecurityDocument":12}],10:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":12}],10:[function(require,module,exports){
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleRole(kuzzleSecurity, id, content) {
@@ -4109,14 +4077,9 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
   var
     self = this;
 
-  filters.hydrate = true;
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
@@ -4223,13 +4186,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
       }
 
       Object.keys(res.result._source).forEach(function (property) {
-        if (property !== 'roles') {
-          updatedContent[property] = res.result._source[property];
-        }
-      });
-
-      updatedContent.roles = res.result._source.roles.map(function (role) {
-        return role._id;
+        updatedContent[property] = res.result._source[property];
       });
 
       cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
@@ -4298,8 +4255,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   var
     data,
-    self = this,
-    hydrate = true;
+    self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getUser function');
@@ -4320,10 +4276,6 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
     if (err) {
       return cb(err);
-    }
-
-    if (!hydrate) {
-      response.result._source.profile = response.result._source.profile._id;
     }
 
     cb(null, new KuzzleUser(self, response.result._id, response.result._source));
@@ -4581,7 +4533,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
     self = this;
 
   if (!userId || typeof userId !== 'string') {
-    throw new Error('userId parameter is mandatory for isActionAllowed function');
+    throw new Error('userId parameter is mandatory for getUserRights function');
   }
 
   if (!cb && typeof options === 'function') {
@@ -4744,17 +4696,11 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
 module.exports = KuzzleSecurityDocument;
 },{}],13:[function(require,module,exports){
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleProfile = require('./kuzzleProfile');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleUser(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
-
-  // Hydrate user with profile if profile is not only a string but an object with `_id` and `_source`
-  if (content.profile && content.profile._id && content.profile._source) {
-    this.content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
-  }
 
   // Define properties
   Object.defineProperties(this, {
@@ -4772,7 +4718,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['hydrate', 'save'];
+        var whitelist = ['save'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -4787,54 +4733,17 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 });
 
 /**
- * This function allow to get the hydrated user of the corresponding current user.
- * The hydrated user has profiles and roles.
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
- */
-KuzzleUser.prototype.hydrate = function (options, cb) {
-  var
-    self = this;
-
-  if (options && cb === undefined && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleUser.hydrate', cb);
-
-  if (!this.content.profile || typeof this.content.profile !== 'string') {
-    throw new Error('The User must contains a profile as string in order to be hydrated');
-  }
-
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
-    var hydratedUser;
-
-    if (error) {
-      return cb(error);
-    }
-
-    hydratedUser = new KuzzleUser(self.kuzzleSecurity, self.id, self.content);
-    hydratedUser.setProfile(new KuzzleProfile(self.kuzzleSecurity, response.result._id, response.result._source));
-
-    cb(null, hydratedUser);
-  });
-};
-
-/**
  * Set profile in content
- * @param {KuzzleProfile|string} profile - can be a KuzzleProfile or an id string
+ * @param {array} profile - an array of profiles ids string
  *
  * @returns {KuzzleUser} this
  */
-KuzzleUser.prototype.setProfile = function (profile) {
-
-  if (typeof profile !== 'string' && !(profile instanceof KuzzleProfile)) {
-    throw new Error('Parameter "profile" must be a KuzzleProfile or a string');
+KuzzleUser.prototype.setProfiles = function (profilesIds) {
+  if (!Array.isArray(profilesIds) || typeof profilesIds[0] !== 'string') {
+    throw new Error('Parameter "profilesIds" must be an array of strings');
   }
 
-  this.content.profile = profile;
+  this.content.profilesIds = profilesIds;
 
   return this;
 };
@@ -4888,22 +4797,18 @@ KuzzleUser.prototype.serialize = function () {
 
   data.body = this.content;
 
-  if (data.body.profile && data.body.profile.id) {
-    data.body.profile = data.body.profile.id;
-  }
-
   return data;
 };
 
 /**
- * Return the associated profiles
+ * Return the associated profiles IDs
  *
- * @return {object} either the associated profile ID or the KuzzleProfile instance
+ * @return {array} the associated profiles IDs
  */
 KuzzleUser.prototype.getProfiles = function () {
-  return this.content.profile;
+  return this.content.profilesIds;
 };
 
 module.exports = KuzzleUser;
 
-},{"./kuzzleProfile":9,"./kuzzleSecurityDocument":12}]},{},[3]);
+},{"./kuzzleSecurityDocument":12}]},{},[3]);

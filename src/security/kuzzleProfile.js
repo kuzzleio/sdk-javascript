@@ -1,6 +1,5 @@
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleRole = require('./kuzzleRole');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleProfile(kuzzleSecurity, id, content) {
 
