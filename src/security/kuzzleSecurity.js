@@ -252,53 +252,27 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 /**
  * Get a specific profile from kuzzle
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
  *
  * @param {string} id
- * @param {object} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
+KuzzleSecurity.prototype.getProfile = function (id, cb) {
   var
     data,
-    self = this,
-    hydrate = true;
+    self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getProfile function');
   }
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    hydrate = options.hydrate;
-  }
 
   data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, {}, function (error, response) {
     if (error) {
       return cb(error);
-    }
-
-    if (!hydrate) {
-      response.result._source.roles = response.result._source.roles.map(function (role) {
-        var formattedRole = {_id: role._id};
-        if (role._source.restrictedTo !== undefined) {
-          formattedRole.restrictedTo = role._source.restrictedTo;
-        }
-        if (role._source.allowInternalIndex !== undefined) {
-          formattedRole.allowInternalIndex = role._source.allowInternalIndex;
-        }
-
-        return formattedRole;
-      });
     }
 
     cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
@@ -308,20 +282,15 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
 /**
  * Executes a search on profiles according to a filter
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
  *
  * /!\ There is a small delay between profile creation and their existence in our persistent search layer,
  * usually a couple of seconds.
  * That means that a profile that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
- * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
+KuzzleSecurity.prototype.searchProfiles = function (filters, cb) {
   var
     self = this;
 
@@ -332,7 +301,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, options, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, {}, function (error, response) {
     var documents;
 
     if (error) {
@@ -492,15 +461,10 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 /**
  * Get a specific user from kuzzle using its unique ID
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *
  * @param {string} id
- * @param {object} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getUser = function (id, options, cb) {
+KuzzleSecurity.prototype.getUser = function (id, cb) {
   var
     data,
     self = this;
@@ -509,19 +473,11 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
     throw new Error('Id parameter is mandatory for getUser function');
   }
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    hydrate = options.hydrate;
-  }
-
   data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('getUser'), data, {}, function (err, response) {
     if (err) {
       return cb(err);
     }
@@ -533,36 +489,22 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
 /**
  * Executes a search on user according to a filter
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
- *
  * /!\ There is a small delay between user creation and their existence in our persistent search layer,
  * usually a couple of seconds.
  * That means that a user that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - same filters as documents filters
- * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
+KuzzleSecurity.prototype.searchUsers = function (filters, cb) {
   var
     self = this;
 
   filters.hydrate = true;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    filters.hydrate = options.hydrate;
-  }
-
   self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, {}, function (error, response) {
     var documents;
 
     if (error) {

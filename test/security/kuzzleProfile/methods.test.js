@@ -154,9 +154,17 @@ describe('KuzzleRole methods', function () {
       kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
     });
 
-    it('should throw an error if the policy is not an object', function (done) {
+    it('should throw an error if the policy parameter is not an object', function (done) {
       should((function () {
         kuzzleProfile.addPolicy(null);
+      })).throw(Error);
+
+      done();
+    });
+
+    it('should throw an error if the policy.roleId parameter is not a string', function (done) {
+      should((function () {
+        kuzzleProfile.addPolicy({roleId: null});
       })).throw(Error);
 
       done();

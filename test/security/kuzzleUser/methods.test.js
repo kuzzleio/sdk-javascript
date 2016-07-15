@@ -148,23 +148,31 @@ describe('KuzzleUser methods', function () {
     });
   });
 
-  describe('#setProfile', function () {
+  describe('#setProfiles', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profilesIds: ['profile1']});
     });
 
-    it('should throw an error if the profile parameter is null', function (done) {
+    it('should throw an error if the profilesIds parameter is null', function (done) {
       should((function () {
-        kuzzleUser.setProfile(null);
+        kuzzleUser.setProfiles(null);
       })).throw(Error);
 
       done();
     });
 
-    it('should throw an error if the profile parameter is not a string', function (done) {
+    it('should throw an error if the profilesIds parameter is not an array', function (done) {
       should((function () {
-        kuzzleUser.setProfile(1);
+        kuzzleUser.setProfiles(1);
+      })).throw(Error);
+
+      done();
+    });
+
+    it('should throw an error if the profilesIds parameter is not an array of strings', function (done) {
+      should((function () {
+        kuzzleUser.setProfiles([1]);
       })).throw(Error);
 
       done();

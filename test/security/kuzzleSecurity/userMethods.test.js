@@ -68,7 +68,7 @@ describe('KuzzleSecurity user methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as profile', function (done) {
-      should(kuzzle.security.getUser(result.result._id, {}, function (err, res) {
+      should(kuzzle.security.getUser(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleUser);
 

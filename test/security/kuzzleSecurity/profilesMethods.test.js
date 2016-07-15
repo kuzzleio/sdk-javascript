@@ -174,7 +174,7 @@ describe('KuzzleSecurity profiles methods', function () {
       this.timeout(50);
       expectedQuery.body = {};
 
-      should(kuzzle.security.searchProfiles(filters, {hydrate: false}, function (err, res) {
+      should(kuzzle.security.searchProfiles(filters, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
