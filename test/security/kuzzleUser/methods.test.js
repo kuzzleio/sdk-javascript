@@ -185,6 +185,45 @@ describe('KuzzleUser methods', function () {
     });
   });
 
+
+  describe('#addProfile', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profilesIds: ['profile1']});
+    });
+
+    it('should throw an error if the profileId parameter is null', function (done) {
+      should((function () {
+        kuzzleUser.addProfile(null);
+      })).throw(Error);
+
+      done();
+    });
+
+    it('should throw an error if the profileId parameter is not a string', function (done) {
+      should((function () {
+        kuzzleUser.addProfile(42);
+      })).throw(Error);
+
+      done();
+    });
+
+    it('should  add the profile if it does not already exists in list', function (done) {
+      kuzzleUser.addProfile('profile2');
+
+      should(kuzzleUser.content.profilesIds).be.eql(['profile1', 'profile2']);
+      done();
+    });
+
+    it('should not add the profile if it already exists in list', function (done) {
+      kuzzleUser.addProfile('profile1');
+
+      should(kuzzleUser.content.profilesIds).be.eql(['profile1']);
+      done();
+    });
+
+  });
+
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');

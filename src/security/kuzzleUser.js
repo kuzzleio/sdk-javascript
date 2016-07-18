@@ -36,7 +36,7 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 });
 
 /**
- * Set profile in content
+ * Set profiles in content
  * @param {array} profile - an array of profiles ids string
  *
  * @returns {KuzzleUser} this
@@ -47,6 +47,24 @@ KuzzleUser.prototype.setProfiles = function (profilesIds) {
   }
 
   this.content.profilesIds = profilesIds;
+
+  return this;
+};
+
+/**
+ * Add a profile
+ * @param {string} profile - a profile ids string
+ *
+ * @returns {KuzzleUser} this
+ */
+KuzzleUser.prototype.addProfile = function (profileId) {
+  if (typeof profileId !== 'string') {
+    throw new Error('Parameter "profileId" must be a string');
+  }
+
+  if (this.content.profilesIds.indexOf(profileId) === -1) {
+    this.content.profilesIds.push(profileId);
+  }
 
   return this;
 };
