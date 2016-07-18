@@ -62,6 +62,10 @@ KuzzleUser.prototype.addProfile = function (profileId) {
     throw new Error('Parameter "profileId" must be a string');
   }
 
+  if (!this.content.profilesIds) {
+    this.content.profilesIds = [];
+  }
+
   if (this.content.profilesIds.indexOf(profileId) === -1) {
     this.content.profilesIds.push(profileId);
   }

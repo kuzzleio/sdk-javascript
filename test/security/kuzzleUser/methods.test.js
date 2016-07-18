@@ -222,6 +222,14 @@ describe('KuzzleUser methods', function () {
       done();
     });
 
+    it('should add the profile even if no profilesIds are currently set', function (done) {
+      delete kuzzleUser.content.profilesIds;
+      kuzzleUser.addProfile('profile1');
+
+      should(kuzzleUser.content.profilesIds).be.eql(['profile1']);
+      done();
+    });
+
   });
 
   describe('#serialize', function () {
