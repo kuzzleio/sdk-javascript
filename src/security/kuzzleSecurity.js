@@ -254,6 +254,7 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
  *
  *
  * @param {string} id
+ * @param {object} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
@@ -293,6 +294,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
  * That means that a profile that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
+ * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
@@ -467,6 +469,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  * Get a specific user from kuzzle using its unique ID
  *
  * @param {string} id
+ * @param {object} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
@@ -504,6 +507,7 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
  * That means that a user that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - same filters as documents filters
+ * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
@@ -727,8 +731,9 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
 /**
  * Gets the rights array of a given user.
  *
- * @param  {string} userId The id of the user.
- * @param  {function} cb   The callback containing the normalized array of rights.
+ * @param {string} userId The id of the user.
+ * @param {object} [options] - (optional) arguments
+ * @param {function} cb   The callback containing the normalized array of rights.
  */
 KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
   var
