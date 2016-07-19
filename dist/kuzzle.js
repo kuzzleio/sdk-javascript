@@ -4211,7 +4211,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  * @param {string} id
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getUser = function (id, cb) {
+KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   var
     data,
     self = this;
@@ -4220,11 +4220,16 @@ KuzzleSecurity.prototype.getUser = function (id, cb) {
     throw new Error('Id parameter is mandatory for getUser function');
   }
 
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   data = {_id: id};
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getUser'), data, {}, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
     if (err) {
       return cb(err);
     }
@@ -4243,15 +4248,13 @@ KuzzleSecurity.prototype.getUser = function (id, cb) {
  * @param {Object} filters - same filters as documents filters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchUsers = function (filters, cb) {
+KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
   var
     self = this;
 
-  filters.hydrate = true;
-
   self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, {}, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
     var documents;
 
     if (error) {
