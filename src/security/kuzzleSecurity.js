@@ -256,10 +256,15 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
  * @param {string} id
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getProfile = function (id, cb) {
+KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
   var
     data,
     self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getProfile function');
@@ -270,7 +275,7 @@ KuzzleSecurity.prototype.getProfile = function (id, cb) {
 
   self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, {}, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
     if (error) {
       return cb(error);
     }
@@ -290,13 +295,18 @@ KuzzleSecurity.prototype.getProfile = function (id, cb) {
  * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchProfiles = function (filters, cb) {
+KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
   var
     self = this;
 
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, {}, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, options, function (error, response) {
     var documents;
 
     if (error) {
@@ -504,7 +514,7 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
     cb = options;
     options = null;
   }
-  
+
   self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
