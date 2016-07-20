@@ -1,6 +1,5 @@
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleRole = require('./kuzzleRole');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleProfile(kuzzleSecurity, id, content) {
 
@@ -16,17 +15,6 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
       value: 'updateProfile'
     }
   });
-
-  // Hydrate profile with roles if roles are not only string but objects with `_id` and `_source`
-  if (content && content.roles) {
-    content.roles = content.roles.map(function (role) {
-      if (!role._id || !role._source) {
-        return role;
-      }
-
-      return new KuzzleRole(kuzzleSecurity, role._id, role._source);
-    });
-  }
 
   // promisifying
   if (kuzzleSecurity.kuzzle.bluebird) {
@@ -60,8 +48,8 @@ KuzzleProfile.prototype.save = function (options, cb) {
     data,
     self = this;
 
-  if (!this.content.roles) {
-    throw new Error('Argument "roles" is mandatory in a profile. This argument contains an array of KuzzleRole or an array of id string');
+  if (!this.content.policies) {
+    throw new Error('Argument "policies" is mandatory in a profile. This argument contains an array of objects.');
   }
 
   if (options && cb === undefined && typeof options === 'function') {
@@ -86,87 +74,47 @@ KuzzleProfile.prototype.save = function (options, cb) {
 
 
 /**
- * Add a role in the roles list
- * @param {KuzzleRole|string} role - can be an instance of KuzzleRole or an id in string
+ * Add a policy in the policies list
+ * @param {Object} policy - must be an object containing at least a "roleId" member which must be a string.
  *
  * @returns {KuzzleProfile} this
  */
-KuzzleProfile.prototype.addRole = function (role) {
+KuzzleProfile.prototype.addPolicy = function (policy) {
 
-  if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
-    throw new Error('Parameter "roles" must be a KuzzleRole or a id string');
+  if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
+    throw new Error('Parameter "policies" must be an object containing at least a "roleId" member which must be a string.');
   }
 
-  if (!this.content.roles) {
-    this.content.roles = [];
+  if (!this.content.policies) {
+    this.content.policies = [];
   }
 
-  this.content.roles.push(role);
+  this.content.policies.push(policy);
 
   return this;
 };
 
 /**
- * Set roles list
- * @param {Array} roles - can be an array of KuzzleRole or an array of string
+ * Set policies list
+ * @param {Array} policies - must be an array of objects containing at least a "roleId" member which must be a string
  *
  * @returns {KuzzleProfile} this
  */
-KuzzleProfile.prototype.setRoles = function (roles) {
+KuzzleProfile.prototype.setPolicies = function (policies) {
 
-  if (!Array.isArray(roles)) {
-    throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  if (!Array.isArray(policies)) {
+    throw new Error('Parameter "policies" must be an array of objects containing at least a "roleId" member which must be a string');
   }
 
-  roles.map(function (role) {
-    if (typeof role !== 'string' && !(role instanceof KuzzleRole)) {
-      throw new Error('Parameter "roles" must be an array of KuzzleRole or an array of string');
+  policies.map(function (policy) {
+    if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
+      throw new Error('Parameter "policies" must be an array of objects containing at least a "roleId" member which must be a string');
     }
   });
 
-  this.content.roles = roles;
+  this.content.policies = policies;
 
   return this;
-};
-
-
-/**
- * Hydrate the profile - get real KuzzleRole and not just ids
- * Warning: do not try to hydrate a profile with newly added role which is not created in kuzzle
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
- */
-KuzzleProfile.prototype.hydrate = function (options, cb) {
-
-  var
-    self = this,
-    data = {ids: []};
-
-  data.ids = this.content.roles.map(function (role) {
-    if (typeof role === 'string') {
-      return role;
-    }
-
-    if (role instanceof KuzzleRole) {
-      return role.id;
-    }
-  });
-
-  if (options && cb === undefined && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleProfile.hydrate', cb);
-
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('mGetRoles'), {body: data}, options, function (error, response) {
-    if (error) {
-      return cb(error);
-    }
-
-    cb(null, new KuzzleProfile(self, self.id, {roles: response.result.hits}));
-  });
 };
 
 /**
@@ -183,29 +131,18 @@ KuzzleProfile.prototype.serialize = function () {
   }
 
   data.body = this.content;
-  if (!data.body.roles || !Array.isArray(data.body.roles)) {
-    return data;
-  }
-
-  data.body.roles = data.body.roles.map(function(role) {
-    if (role instanceof KuzzleRole) {
-      return role.id;
-    }
-
-    return role;
-  });
 
   return data;
 };
 
 /**
- * Returns the list of roles associated to this profile.
- * Each role element can be either a string or a KuzzleRole object
+ * Returns the list of policies associated to this profile.
+ * Each policy element is an array of objects containing at least a "roleId" member which must be a string
  *
- * @return {object} an array of roles
+ * @return {object} an array of policies
  */
-KuzzleProfile.prototype.getRoles = function () {
-  return this.content.roles;
+KuzzleProfile.prototype.getPolicies = function () {
+  return this.content.policies;
 };
 
 module.exports = KuzzleProfile;

@@ -1,15 +1,9 @@
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument'),
-  KuzzleProfile = require('./kuzzleProfile');
+  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleUser(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
-
-  // Hydrate user with profile if profile is not only a string but an object with `_id` and `_source`
-  if (content.profile && content.profile._id && content.profile._source) {
-    this.content.profile = new KuzzleProfile(kuzzleSecurity, content.profile._id, content.profile._source);
-  }
 
   // Define properties
   Object.defineProperties(this, {
@@ -27,7 +21,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['hydrate', 'save'];
+        var whitelist = ['save'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -42,54 +36,39 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 });
 
 /**
- * This function allow to get the hydrated user of the corresponding current user.
- * The hydrated user has profiles and roles.
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
- */
-KuzzleUser.prototype.hydrate = function (options, cb) {
-  var
-    self = this;
-
-  if (options && cb === undefined && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleUser.hydrate', cb);
-
-  if (!this.content.profile || typeof this.content.profile !== 'string') {
-    throw new Error('The User must contains a profile as string in order to be hydrated');
-  }
-
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('getProfile'), {_id: this.content.profile}, options, function (error, response) {
-    var hydratedUser;
-
-    if (error) {
-      return cb(error);
-    }
-
-    hydratedUser = new KuzzleUser(self.kuzzleSecurity, self.id, self.content);
-    hydratedUser.setProfile(new KuzzleProfile(self.kuzzleSecurity, response.result._id, response.result._source));
-
-    cb(null, hydratedUser);
-  });
-};
-
-/**
- * Set profile in content
- * @param {KuzzleProfile|string} profile - can be a KuzzleProfile or an id string
+ * Set profiles in content
+ * @param {array} profile - an array of profiles ids string
  *
  * @returns {KuzzleUser} this
  */
-KuzzleUser.prototype.setProfile = function (profile) {
-
-  if (typeof profile !== 'string' && !(profile instanceof KuzzleProfile)) {
-    throw new Error('Parameter "profile" must be a KuzzleProfile or a string');
+KuzzleUser.prototype.setProfiles = function (profilesIds) {
+  if (!Array.isArray(profilesIds) || typeof profilesIds[0] !== 'string') {
+    throw new Error('Parameter "profilesIds" must be an array of strings');
   }
 
-  this.content.profile = profile;
+  this.content.profilesIds = profilesIds;
+
+  return this;
+};
+
+/**
+ * Add a profile
+ * @param {string} profile - a profile ids string
+ *
+ * @returns {KuzzleUser} this
+ */
+KuzzleUser.prototype.addProfile = function (profileId) {
+  if (typeof profileId !== 'string') {
+    throw new Error('Parameter "profileId" must be a string');
+  }
+
+  if (!this.content.profilesIds) {
+    this.content.profilesIds = [];
+  }
+
+  if (this.content.profilesIds.indexOf(profileId) === -1) {
+    this.content.profilesIds.push(profileId);
+  }
 
   return this;
 };
@@ -143,20 +122,16 @@ KuzzleUser.prototype.serialize = function () {
 
   data.body = this.content;
 
-  if (data.body.profile && data.body.profile.id) {
-    data.body.profile = data.body.profile.id;
-  }
-
   return data;
 };
 
 /**
- * Return the associated profiles
+ * Return the associated profiles IDs
  *
- * @return {object} either the associated profile ID or the KuzzleProfile instance
+ * @return {array} the associated profiles IDs
  */
 KuzzleUser.prototype.getProfiles = function () {
-  return this.content.profile;
+  return this.content.profilesIds;
 };
 
 module.exports = KuzzleUser;

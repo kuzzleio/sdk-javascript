@@ -252,9 +252,6 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 /**
  * Get a specific profile from kuzzle
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
  *
  * @param {string} id
  * @param {object} [options] - (optional) arguments
@@ -263,20 +260,17 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
 KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
   var
     data,
-    self = this,
-    hydrate = true;
-
-  if (!id || typeof id !== 'string') {
-    throw new Error('Id parameter is mandatory for getProfile function');
-  }
+    self = this;
 
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
-  else if (options.hydrate !== undefined) {
-    hydrate = options.hydrate;
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('Id parameter is mandatory for getProfile function');
   }
+
 
   data = {_id: id};
 
@@ -287,20 +281,6 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
       return cb(error);
     }
 
-    if (!hydrate) {
-      response.result._source.roles = response.result._source.roles.map(function (role) {
-        var formattedRole = {_id: role._id};
-        if (role._source.restrictedTo !== undefined) {
-          formattedRole.restrictedTo = role._source.restrictedTo;
-        }
-        if (role._source.allowInternalIndex !== undefined) {
-          formattedRole.allowInternalIndex = role._source.allowInternalIndex;
-        }
-
-        return formattedRole;
-      });
-    }
-
     cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
   });
 };
@@ -308,10 +288,6 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
 /**
  * Executes a search on profiles according to a filter
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
  *
  * /!\ There is a small delay between profile creation and their existence in our persistent search layer,
  * usually a couple of seconds.
@@ -325,14 +301,9 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
   var
     self = this;
 
-  filters.hydrate = true;
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
@@ -439,13 +410,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
       }
 
       Object.keys(res.result._source).forEach(function (property) {
-        if (property !== 'roles') {
-          updatedContent[property] = res.result._source[property];
-        }
-      });
-
-      updatedContent.roles = res.result._source.roles.map(function (role) {
-        return role._id;
+        updatedContent[property] = res.result._source[property];
       });
 
       cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
@@ -503,10 +468,6 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 /**
  * Get a specific user from kuzzle using its unique ID
  *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *
  * @param {string} id
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
@@ -514,8 +475,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   var
     data,
-    self = this,
-    hydrate = true;
+    self = this;
 
   if (!id || typeof id !== 'string') {
     throw new Error('Id parameter is mandatory for getUser function');
@@ -524,9 +484,6 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    hydrate = options.hydrate;
   }
 
   data = {_id: id};
@@ -538,21 +495,12 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
       return cb(err);
     }
 
-    if (!hydrate) {
-      response.result._source.profile = response.result._source.profile._id;
-    }
-
     cb(null, new KuzzleUser(self, response.result._id, response.result._source));
   });
 };
 
 /**
  * Executes a search on user according to a filter
- *
- * Takes an optional argument object with the following property:
- *    - hydrate (boolean, default: true):
- *         if is set to false, return a list id in role instead of KuzzleRole.
- *         Because hydrate need to fetch all related KuzzleRole object, leave hydrate to true will have a performance cost
  *
  * /!\ There is a small delay between user creation and their existence in our persistent search layer,
  * usually a couple of seconds.
@@ -566,14 +514,9 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
   var
     self = this;
 
-  filters.hydrate = true;
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
-  }
-  else if (options.hydrate !== undefined) {
-    filters.hydrate = options.hydrate;
   }
 
   self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
@@ -788,8 +731,9 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
 /**
  * Gets the rights array of a given user.
  *
- * @param  {string} userId The id of the user.
- * @param  {function} cb   The callback containing the normalized array of rights.
+ * @param {string} userId The id of the user.
+ * @param {object} [options] - (optional) arguments
+ * @param {function} cb   The callback containing the normalized array of rights.
  */
 KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
   var
@@ -797,7 +741,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
     self = this;
 
   if (!userId || typeof userId !== 'string') {
-    throw new Error('userId parameter is mandatory for isActionAllowed function');
+    throw new Error('userId parameter is mandatory for getUserRights function');
   }
 
   if (!cb && typeof options === 'function') {
