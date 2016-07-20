@@ -75,7 +75,7 @@ KuzzleProfile.prototype.save = function (options, cb) {
 
 /**
  * Add a policy in the policies list
- * @param {Object} role - must be an object containing at least a "roleId" member which must be a string.
+ * @param {Object} policy - must be an object containing at least a "roleId" member which must be a string.
  *
  * @returns {KuzzleProfile} this
  */
@@ -131,9 +131,6 @@ KuzzleProfile.prototype.serialize = function () {
   }
 
   data.body = this.content;
-  if (!data.body.policies || !Array.isArray(data.body.policies)) {
-    return data;
-  }
 
   return data;
 };
