@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -25,8 +25,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "3.4.1",
+    "bufferutil": "^1.2.1",
     "node-uuid": "1.4.7",
-    "socket.io-client": "1.4.8"
+    "utf-8-validate": "^1.2.1",
+    "ws": "^1.1.1"
   },
   "devDependencies": {
     "browserify": "13.0.1",

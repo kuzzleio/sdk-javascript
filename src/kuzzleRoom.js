@@ -227,7 +227,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.kuzzle.subscriptions[self.roomId][self.id] = self;
 
     self.notifier = notificationCallback.bind(self);
-    self.kuzzle.socket.on(self.channel, self.notifier);
+    self.kuzzle.network.on(self.channel, self.notifier);
 
     dequeue.call(self);
   });
@@ -256,7 +256,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
   }
 
   if (room) {
-    self.kuzzle.socket.off(self.channel, this.notifier);
+    self.kuzzle.network.off(self.channel, this.notifier);
 
     if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
       delete self.kuzzle.subscriptions[room];
@@ -298,7 +298,7 @@ KuzzleRoom.prototype.setHeaders = function (content, replace) {
 };
 
 /**
- * Callback called by socket.io when a message is sent to the subscribed room ID
+ * Callback called by the network handler when a message is sent to the subscribed room ID
  * Calls the registered callback if the notification passes the subscription filters
  *
  * @param {object} data - data
