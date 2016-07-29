@@ -1,16 +1,17 @@
-function SocketIO() {
+function SocketIO(address, port) {
+  this.address = address;
+  this.port = port;
   this.socket = null;
 
   /**
    * Creates a new socket from the provided arguments
    *
    * @constructor
-   * @param {string} url
    * @param {boolean} autoReconnect
    * @param {int} reconnectionDelay
    */
-  this.connect = function (url, autoReconnect, reconnectionDelay) {
-    this.socket = window.io(url, {
+  this.connect = function (autoReconnect, reconnectionDelay) {
+    this.socket = window.io('http://' + this.address + ':' + this.port, {
       reconnection: autoReconnect,
       reconnectionDelay: reconnectionDelay,
       forceNew: true

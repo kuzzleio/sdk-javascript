@@ -18,18 +18,16 @@ var
  * Kuzzle object constructor.
  *
  * @constructor
- * @param url - URL to the Kuzzle instance
+ * @param address - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-function Kuzzle (url, options, cb) {
+module.exports = Kuzzle = function (address, options, cb) {
   var self = this;
 
-  this.network = networkWrapper();
-
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, options, cb);
+    return new Kuzzle(address, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -37,8 +35,8 @@ function Kuzzle (url, options, cb) {
     options = null;
   }
 
-  if (!url || url === '') {
-    throw new Error('URL argument missing');
+  if (!address || address === '') {
+    throw new Error('address argument missing');
   }
 
   Object.defineProperties(this, {
@@ -64,10 +62,6 @@ function Kuzzle (url, options, cb) {
     },
     eventTimeout: {
       value: 200
-    },
-    io: {
-      value: null,
-      writable: true
     },
     queuing: {
       value: false,
@@ -113,8 +107,16 @@ function Kuzzle (url, options, cb) {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
     },
-    url: {
-      value: url,
+    address: {
+      value: address,
+      enumerable: true
+    },
+    wsPort: {
+      value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
+      enumerable: true
+    },
+    ioPort: {
+      value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
       enumerable: true
     },
     autoQueue: {
@@ -297,14 +299,18 @@ function Kuzzle (url, options, cb) {
   }
 
   cleanHistory(this.requestHistory);
-}
+};
 
 /**
- * Connects to a Kuzzle instance using the provided URL.
+ * Connects to a Kuzzle instance using the provided address.
  * @returns {Object} this
  */
 Kuzzle.prototype.connect = function () {
   var self = this;
+
+  if (!self.network) {
+    self.network = networkWrapper(self.address, self.wsPort, self.ioPort);
+  }
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
@@ -314,7 +320,7 @@ Kuzzle.prototype.connect = function () {
   }
 
   self.state = 'connecting';
-  self.network.connect(self.url, self.autoReconnect, self.reconnectionDelay);
+  self.network.connect(self.autoReconnect, self.reconnectionDelay);
 
   self.network.onConnect(function () {
     self.state = 'connected';
@@ -1440,4 +1446,4 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
-module.exports = Kuzzle;
+

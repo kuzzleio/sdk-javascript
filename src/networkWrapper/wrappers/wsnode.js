@@ -1,18 +1,19 @@
 var
   WebSocket = require('ws');
 
-function WSBrowsers() {
+function WSNode(address, port) {
   var self = this;
-
+  this.address = address;
+  this.port = port;
   this.client = null;
   this.retrying = false;
 
   /*
-   Listeners are stored using the following format:
-   roomId: {
-     fn: callback_function,
-     once: boolean
-   }
+     Listeners are stored using the following format:
+     roomId: {
+       fn: callback_function,
+       once: boolean
+     }
    */
   this.listeners = {
     error: [],
@@ -25,22 +26,12 @@ function WSBrowsers() {
    * Creates a new socket from the provided arguments
    *
    * @constructor
-   * @param {string} url
    * @param {boolean} autoReconnect
    * @param {int} reconnectionDelay
    * @returns {Object} Socket
    */
-  this.connect = function (url, autoReconnect, reconnectionDelay) {
-    var wsUrl = url;
-
-    if (wsUrl.startsWith('http')) {
-      wsUrl = wsUrl.replace(/^http/, 'ws');
-    }
-    else if (!wsUrl.startsWith('ws')) {
-      wsUrl = 'ws://' + wsUrl;
-    }
-
-    this.client = new WebSocket(wsUrl, {perMessageDeflate: false});
+  this.connect = function (autoReconnect, reconnectionDelay) {
+    this.client = new WebSocket('ws://' + this.address + ':' + this.port, {perMessageDeflate: false});
 
     this.client.on('open', function () {
       if (self.retrying) {
@@ -55,7 +46,7 @@ function WSBrowsers() {
       poke(self.listeners, 'disconnect');
     });
 
-    this.client.on('error', function (err) {
+    this.client.on('error', function () {
       if (autoReconnect) {
         self.retrying = true;
         setTimeout(function () {
@@ -187,7 +178,7 @@ function WSBrowsers() {
    * @param {Object} payload
    */
   this.send = function (payload) {
-    if (this.client) {
+    if (this.client && this.client.readyState === this.client.OPEN) {
       this.client.send(JSON.stringify(payload));
     }
   };
@@ -239,4 +230,4 @@ function poke (listeners, roomId, payload) {
   });
 }
 
-module.exports = WSBrowsers;
+module.exports = WSNode;
