@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         src: ['src/kuzzle.js'],
         dest: 'dist/kuzzle.js',
         options: {
-          exclude: ['socket.io-client', 'ws'],
+          exclude: ['socket.io-client', 'ws', './src/networkWrapper/wrappers/wsnode.js'],
           browserifyOptions: {
             noParse: [require.resolve('node-uuid')]
           }

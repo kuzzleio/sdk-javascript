@@ -1846,7 +1846,7 @@ Kuzzle.prototype.stopQueuing = function () {
 
 
 }).call(this,require('_process'))
-},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./networkWrapper":9,"./security/kuzzleSecurity":15,"./security/kuzzleUser":17,"_process":1,"node-uuid":2}],4:[function(require,module,exports){
+},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./networkWrapper":9,"./security/kuzzleSecurity":14,"./security/kuzzleUser":16,"_process":1,"node-uuid":2}],4:[function(require,module,exports){
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
@@ -3561,7 +3561,7 @@ function network(address, wsPort, ioPort) {
 
 module.exports = network;
 
-},{"./wrappers/socketio":10,"./wrappers/wsbrowsers":11,"./wrappers/wsnode":12}],10:[function(require,module,exports){
+},{"./wrappers/socketio":10,"./wrappers/wsbrowsers":11,"./wrappers/wsnode":undefined}],10:[function(require,module,exports){
 function SocketIO(address, port) {
   this.address = address;
   this.port = port;
@@ -3904,241 +3904,6 @@ module.exports = WSBrowsers;
 
 },{}],12:[function(require,module,exports){
 var
-  WebSocket = require('ws');
-
-function WSNode(address, port) {
-  var self = this;
-  this.address = address;
-  this.port = port;
-  this.client = null;
-  this.retrying = false;
-
-  /*
-     Listeners are stored using the following format:
-     roomId: {
-       fn: callback_function,
-       once: boolean
-     }
-   */
-  this.listeners = {
-    error: [],
-    connect: [],
-    disconnect: [],
-    reconnect: []
-  };
-
-  /**
-   * Creates a new socket from the provided arguments
-   *
-   * @constructor
-   * @param {boolean} autoReconnect
-   * @param {int} reconnectionDelay
-   * @returns {Object} Socket
-   */
-  this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WebSocket('ws://' + this.address + ':' + this.port, {perMessageDeflate: false});
-
-    this.client.on('open', function () {
-      if (self.retrying) {
-        poke(self.listeners, 'reconnect');
-      }
-      else {
-        poke(self.listeners, 'connect');
-      }
-    });
-
-    this.client.on('close', function () {
-      poke(self.listeners, 'disconnect');
-    });
-
-    this.client.on('error', function () {
-      if (autoReconnect) {
-        self.retrying = true;
-        setTimeout(function () {
-          self.connect(url, autoReconnect, reconnectionDelay);
-        }, reconnectionDelay);
-      }
-
-      poke(self.listeners, 'error');
-    });
-
-    this.client.on('message', function (payload) {
-      var data = JSON.parse(payload);
-
-      if (data.room && self.listeners[data.room]) {
-        poke(self.listeners, data.room, data);
-      }
-    });
-  };
-
-  /**
-   * Fires the provided callback whence a connection is established
-   *
-   * @param {function} callback
-   */
-  this.onConnect = function (callback) {
-    this.listeners.connect.push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Fires the provided callback whenever a connection error is received
-   * @param {function} callback
-   */
-  this.onConnectError = function (callback) {
-    this.listeners.error.push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Fires the provided callback whenever a disconnection occurred
-   * @param {function} callback
-   */
-  this.onDisconnect = function (callback) {
-    this.listeners.disconnect.push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Fires the provided callback whenever a connection has been reestablished
-   * @param {function} callback
-   */
-  this.onReconnect = function (callback) {
-    this.listeners.reconnect.push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Registers a callback on a room. Once 1 message is received, fires the
-   * callback and unregister it afterward.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.once = function (roomId, callback) {
-    if (!this.listeners[roomId]) {
-      this.listeners[roomId] = [];
-    }
-
-    this.listeners[roomId].push({
-      fn: callback,
-      keep: false
-    });
-  };
-
-  /**
-   * Registers a callback on a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.on = function (roomId, callback) {
-    if (!this.listeners[roomId]) {
-      this.listeners[roomId] = [];
-    }
-
-    this.listeners[roomId].push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Unregisters a callback from a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.off = function (roomId, callback) {
-    var index;
-
-    if (this.listeners[roomId]) {
-      index = this.listeners[roomId].findIndex(function (listener) {
-        return listener.fn === callback;
-      });
-
-      if (index !== -1) {
-        if (this.listeners[roomId].length === 1) {
-          delete this.listeners[roomId];
-        }
-        else {
-          this.listeners[roomId].splice(index, 1);
-        }
-      }
-    }
-  };
-
-
-  /**
-   * Sends a payload to the connected server
-   *
-   * @param {Object} payload
-   */
-  this.send = function (payload) {
-    if (this.client && this.client.readyState === this.client.OPEN) {
-      this.client.send(JSON.stringify(payload));
-    }
-  };
-
-  /**
-   * Closes the connection
-   */
-  this.close = function () {
-    this.listeners = {
-      error: [],
-      connect: [],
-      disconnect: [],
-      reconnect: []
-    };
-
-    this.retrying = false;
-    this.client.close();
-    this.client = null;
-  };
-}
-
-/**
- * Executes all registered listeners in the provided
- * "listeners" structure.
- *
- * Listeners are of the following format:
- * [
- *    { fn: callback, once: boolean },
- *    ...
- * ]
- *
- * @private
- * @param {Object} listeners
- * @param {string} roomId
- * @param {Object} [payload]
- */
-function poke (listeners, roomId, payload) {
-  listeners[roomId].forEach(function (listener, index) {
-    listener.fn(payload);
-
-    if (!listener.keep) {
-      if (listeners[roomId].length > 1) {
-        listeners[roomId].splice(index, 1);
-      }
-      else {
-        delete listeners[roomId];
-      }
-    }
-  });
-}
-
-module.exports = WSNode;
-
-},{"ws":undefined}],13:[function(require,module,exports){
-var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleProfile(kuzzleSecurity, id, content) {
@@ -4287,7 +4052,7 @@ KuzzleProfile.prototype.getPolicies = function () {
 
 module.exports = KuzzleProfile;
 
-},{"./kuzzleSecurityDocument":16}],14:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":15}],13:[function(require,module,exports){
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleRole(kuzzleSecurity, id, content) {
@@ -4357,7 +4122,7 @@ KuzzleRole.prototype.save = function (options, cb) {
 };
 
 module.exports = KuzzleRole;
-},{"./kuzzleSecurityDocument":16}],15:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":15}],14:[function(require,module,exports){
 var
   KuzzleRole = require('./kuzzleRole'),
   KuzzleProfile = require('./kuzzleProfile'),
@@ -5122,7 +4887,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
 
 module.exports = KuzzleSecurity;
 
-},{"./kuzzleProfile":13,"./kuzzleRole":14,"./kuzzleUser":17}],16:[function(require,module,exports){
+},{"./kuzzleProfile":12,"./kuzzleRole":13,"./kuzzleUser":16}],15:[function(require,module,exports){
 function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 
   if (!id) {
@@ -5262,7 +5027,7 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
 };
 
 module.exports = KuzzleSecurityDocument;
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
@@ -5401,4 +5166,4 @@ KuzzleUser.prototype.getProfiles = function () {
 
 module.exports = KuzzleUser;
 
-},{"./kuzzleSecurityDocument":16}]},{},[3]);
+},{"./kuzzleSecurityDocument":15}]},{},[3]);
