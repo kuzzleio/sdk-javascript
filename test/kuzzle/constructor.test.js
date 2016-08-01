@@ -1,36 +1,27 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  sinon = require('sinon'),
   bluebird = require('bluebird'),
   proxyquire = require('proxyquire'),
-  EventEmitter = require('events').EventEmitter,
+  NetworkWrapper = require('../../src/networkWrapper/wrappers/wsnode'),
   kuzzleSource = '../../src/kuzzle';
 
 describe('Kuzzle constructor', () => {
-  var Kuzzle;
+  var
+    Kuzzle,
+    networkStub;
+
+  beforeEach(function () {
+    networkStub = sinon.stub(new NetworkWrapper('address', 'port'));
+  });
 
   describe('#constructor', function () {
     before(function () {
       Kuzzle = proxyquire(kuzzleSource, {
-        'socket.io-client' : function () {
-          var emitter = new EventEmitter;
-          process.nextTick(() => emitter.emit('connect'));
-          return emitter;
+        './networkWrapper' : function () {
+          return networkStub;
         }
-      });
-    });
-
-    it('when in javascript mode, it should not load socket.io', function () {
-      var
-        KuzzleRewired = rewire(kuzzleSource),
-        fakeIO = false,
-        kuzzle;
-
-      KuzzleRewired.__with__({
-        'window': {io:function () { fakeIO = true; return new EventEmitter; }}
-      })(function () {
-        kuzzle = new KuzzleRewired('foo');
-        should(fakeIO).be.true();
       });
     });
 
@@ -78,6 +69,8 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('wsPort', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('ioPort', { enumerable: true, writable: false, configurable: false });
     });
 
     it('should have properties with the documented default values', () => {
@@ -94,6 +87,8 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.replayInterval).be.exactly(10);
       should(kuzzle.reconnectionDelay).be.exactly(1000);
       should(kuzzle.defaultIndex).be.undefined();
+      should(kuzzle.wsPort).be.exactly(7513);
+      should(kuzzle.ioPort).be.exactly(7512);
     });
 
     it('should initialize correctly properties using the "options" argument', () => {
@@ -109,7 +104,9 @@ describe('Kuzzle constructor', () => {
           metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
           replayInterval: 99999,
           reconnectionDelay: 666,
-          defaultIndex: 'foobar'
+          defaultIndex: 'foobar',
+          wsPort: 1234,
+          ioPort: 4567
         },
         kuzzle = new Kuzzle('nowhere', options);
 
@@ -124,6 +121,8 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
       should(kuzzle.replayInterval).be.exactly(options.replayInterval);
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
+      should(kuzzle.wsPort).be.exactly(options.wsPort);
+      should(kuzzle.ioPort).be.exactly(options.ioPort);
     });
 
     it('should handle the offlineMode option properly', () => {
@@ -139,11 +138,11 @@ describe('Kuzzle constructor', () => {
       var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
       should(kuzzle.state).be.exactly('ready');
-      should(kuzzle.socket).be.null();
+      should(networkStub.connect.called).be.false();
 
       kuzzle = new Kuzzle('nowhere', {connect: 'auto'});
       should(kuzzle.state).be.exactly('connecting');
-      should(kuzzle.socket).not.be.null();
+      should(networkStub.connect.called).be.true();
     });
 
     it('should return a new instance even if not called with "new"', () => {
@@ -154,6 +153,12 @@ describe('Kuzzle constructor', () => {
 
     it('should allow passing a callback and respond once initialized', function (done) {
       this.timeout(500);
+
+      networkStub.onConnect = function (cb) {
+        process.nextTick(function () {
+          cb();
+        });
+      };
 
       new Kuzzle('nowhere', () => {
         try {
@@ -218,26 +223,10 @@ describe('Kuzzle constructor', () => {
     });
 
     describe('#connect', function () {
-      var iostub = function () {
-        var emitter = new EventEmitter;
-        process.nextTick(() => emitter.emit('connect'));
-        return emitter;
-      };
-
-      beforeEach(function () {
-        Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
-      });
-
       it('should return immediately if already connected', function (done) {
         var kuzzle;
 
         this.timeout(200);
-
-        Kuzzle = proxyquire(kuzzleSource, {
-          io: function () {
-            // does nothing, making the test crash if trying to connect
-          }
-        });
 
         kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
           should(err).be.null();
@@ -254,12 +243,6 @@ describe('Kuzzle constructor', () => {
         var kuzzle;
 
         this.timeout(200);
-
-        Kuzzle = proxyquire(kuzzleSource, {
-          io: function () {
-            // does nothing, making the test crash if trying to connect
-          }
-        });
 
         kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
           should(err).be.null();
@@ -279,7 +262,6 @@ describe('Kuzzle constructor', () => {
           kuzzle.state = state;
           should(kuzzle.connect()).be.exactly(kuzzle);
           should(kuzzle.state).be.exactly('connecting');
-          kuzzle.socket.removeAllListeners();
         });
       });
 
@@ -290,24 +272,26 @@ describe('Kuzzle constructor', () => {
 
         kuzzle.state = 'initializing';
         kuzzle.addListener('connected', function () { listenerCalled = true; });
+
+        networkStub.onConnect = function (cb) {
+          process.nextTick(function () {
+            cb();
+          });
+        };
+
         kuzzle.connect();
 
         setTimeout(() => {
           should(listenerCalled).be.true();
-          kuzzle.socket.removeAllListeners();
           done();
         }, 10);
       });
 
       describe('=> on connection error', () => {
         beforeEach(function () {
-          Kuzzle = proxyquire(kuzzleSource, {
-            'socket.io-client': function () {
-              var emitter = new EventEmitter;
-              process.nextTick(() => emitter.emit('connect_error', 'error'));
-              return emitter;
-            }
-          });
+          networkStub.onConnectError = function (cb) {
+            process.nextTick(() => cb('error'));
+          };
         });
 
         it('should call the provided callback on a connection error', function (done) {
@@ -322,7 +306,6 @@ describe('Kuzzle constructor', () => {
               should(err.internal).be.exactly('error');
               should(res).be.undefined();
               should(kuzzle.state).be.exactly('error');
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -339,7 +322,6 @@ describe('Kuzzle constructor', () => {
           setTimeout(() => {
             try {
               should(listenerCalled).be.true();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -350,6 +332,10 @@ describe('Kuzzle constructor', () => {
       });
 
       describe('=> on connection success', () => {
+        beforeEach(() => {
+          networkStub.onConnect = cb => process.nextTick(() => cb());
+        });
+
         it('should call the provided callback on a connection success', function (done) {
           var kuzzle;
           this.timeout(50);
@@ -359,7 +345,6 @@ describe('Kuzzle constructor', () => {
               should(err).be.null();
               should(res).be.instanceof(Kuzzle);
               should(res.state).be.exactly('connected');
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -387,7 +372,6 @@ describe('Kuzzle constructor', () => {
 
           setTimeout(() => {
             should(renewed).be.true();
-            kuzzle.socket.removeAllListeners();
             done();
           }, 20);
         });
@@ -404,34 +388,18 @@ describe('Kuzzle constructor', () => {
           kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false}, () => {
             should(kuzzle.state).be.exactly('connected');
             should(dequeued).be.true();
-            kuzzle.socket.removeAllListeners();
             revert();
             done();
           });
 
-          kuzzle.io = iostub;
-
+          kuzzle.network = networkStub;
           kuzzle.connect();
         });
       });
 
       describe('=> on disconnection', () => {
         beforeEach(function () {
-          Kuzzle = proxyquire(kuzzleSource, {
-            'socket.io-client': function () {
-              var emitter = new EventEmitter;
-
-              /*
-               since we're stubbing the socket.io socket object,
-               we need a stubbed 'close' function to make kuzzle.logout() work
-               */
-              emitter.close = function () {
-                return false;
-              };
-              process.nextTick(() => emitter.emit('disconnect'));
-              return emitter;
-            }
-          });
+          networkStub.onDisconnect = cb => process.nextTick(() => cb());
         });
 
         it('should enter offline mode and call listeners', function (done) {
@@ -449,7 +417,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.queuing).be.false();
               should(listenerCalled).be.true();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -467,7 +434,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.true();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -486,7 +452,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.false();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done('the kuzzle instance should have been invalidated');
             }
             catch (e) {
@@ -497,17 +462,8 @@ describe('Kuzzle constructor', () => {
       });
 
       describe('=> on reconnection', () => {
-        var
-          iostub = function () {
-            var emitter = new EventEmitter;
-            process.nextTick(() => emitter.emit('reconnect'));
-            return emitter;
-          };
-
         beforeEach(function () {
-          Kuzzle = proxyquire(kuzzleSource, {
-            'socket.io-client': iostub
-          });
+          networkStub.onReconnect = cb => process.nextTick(() => cb());
         });
 
         it('should exit offline mode when reconnecting', function (done) {
@@ -527,7 +483,6 @@ describe('Kuzzle constructor', () => {
               // should not switch queuing to 'false' automatically by default
               should(kuzzle.queuing).be.true();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -554,7 +509,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.true();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -583,7 +537,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.false();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -605,7 +558,6 @@ describe('Kuzzle constructor', () => {
               should(kuzzle.state).be.exactly('connected');
               should(kuzzle.queuing).be.false();
               kuzzle.isValid();
-              kuzzle.socket.removeAllListeners();
               done();
             }
             catch (e) {
@@ -657,15 +609,10 @@ describe('Kuzzle constructor', () => {
               cb(null);
             }
           }
-        },
-        iostub = function () {
-          var emitter = new EventEmitter;
-          process.nextTick(() => emitter.emit('connect'));
-          return emitter;
         };
 
-      beforeEach(function () {
-        Kuzzle = proxyquire(kuzzleSource, {'socket.io-client' : iostub});
+      beforeEach(() => {
+        networkStub.onConnect = cb => process.nextTick(() => cb());
       });
 
       it('should call the provided callback on a connection & login success', function (done) {
@@ -684,7 +631,6 @@ describe('Kuzzle constructor', () => {
             should(err).be.null();
             should(res).be.instanceof(Kuzzle);
             should(res.state).be.exactly('connected');
-            kuzzle.socket.removeAllListeners();
             done();
           }
           catch (e) {
@@ -718,7 +664,6 @@ describe('Kuzzle constructor', () => {
               should(res).be.instanceof(Kuzzle);
               should(res.state).be.exactly('connected');
               should(listenerConnected).be.exactly(true);
-              kuzzle.socket.removeAllListeners();
               done();
             });
           }
@@ -819,7 +764,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.query = function(queryArgs, query, options, cb) {
           cb(null, {result: {jwt: 'test-toto'}});
         };
-        console.log('## before');
+
         kuzzle.login('local', '1h', function() {
           done();
         });

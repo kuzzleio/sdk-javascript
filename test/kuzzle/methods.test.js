@@ -1,7 +1,6 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  proxyquire = require('proxyquire'),
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/kuzzle'),
@@ -411,10 +410,11 @@ describe('Kuzzle methods', function () {
     it('should clean up and invalidate the instance if called', function () {
       var kuzzle = new Kuzzle('foo');
 
+      kuzzle.network.close = sinon.stub(kuzzle.network, 'close');
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
       kuzzle.disconnect();
 
-      should(kuzzle.socket).be.null();
+      should(kuzzle.network.close.called).be.true();
       should(kuzzle.collections).be.empty();
       should(function () { kuzzle.isValid(); }).throw(Error);
     });

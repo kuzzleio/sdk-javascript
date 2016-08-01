@@ -1,7 +1,8 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  proxyquire = require('proxyquire'),
+  sinon = require('sinon'),
+  Kuzzle = require('../../src/kuzzle'),
   EventEmitter = require('events').EventEmitter,
   kuzzleSource = '../../src/kuzzle';
 
@@ -10,58 +11,32 @@ describe('Query management', function () {
   describe('#emitRequest', function () {
     var
       emitRequest = rewire(kuzzleSource).__get__('emitRequest'),
-      Kuzzle,
       kuzzle;
-
-    before(function () {
-      Kuzzle = proxyquire(kuzzleSource, {
-        'socket.io-client': function () { return new EventEmitter; }
-      });
-    });
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
+      kuzzle.network = new EventEmitter;
+      kuzzle.network.send = sinon.stub();
     });
 
-    it('should emit the request when asked to', function (done) {
-      var start = Date.now();
+    it('should emit the request when asked to', function () {
+      var
+        start = Date.now(),
+        request = {requestId: 'bar'};
 
-      this.timeout(50);
-
-      kuzzle.socket.on('kuzzle', function () {
-        // the event is emitted before the historization, so we need to delay our check a bit
-        process.nextTick(() => {
-          var end = Date.now();
-
-          try {
-            should(kuzzle.requestHistory['bar']).be.within(start, end);
-            done();
-          }
-          catch (e) {
-            done(e);
-          }
-        })
-      });
-
-      emitRequest.call(kuzzle, {requestId: 'bar'});
+      emitRequest.call(kuzzle, request);
+      should(kuzzle.network.send.calledWith(request)).be.true();
+      should(kuzzle.requestHistory['bar']).be.within(start, Date.now());
     });
 
     it('should fire a jwtTokenExpired event if the token has expired', function (done) {
       var listenerJwtTokenExpired = false;
 
-      Kuzzle = proxyquire(kuzzleSource, {
-        'socket.io-client': function () {
-          var emitter = new EventEmitter;
-          process.nextTick(() => emitter.emit('bar', {
-            error: {
-              message: 'Token expired'
-            }
-          }));
-          return emitter;
+      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit('bar', {
+        error: {
+          message: 'Token expired'
         }
-      });
-
-      kuzzle = new Kuzzle('foo');
+      }));
 
       kuzzle.addListener('jwtTokenExpired', function() {
         listenerJwtTokenExpired = true;
@@ -79,7 +54,9 @@ describe('Query management', function () {
     });
 
     it('should launch the callback once a response has been received', function (done) {
-      var response = {result: 'foo', error: 'bar'},
+      var
+        response = {result: 'foo', error: 'bar'},
+        request = {requestId: 'someEvent'},
         cb = function (err, res) {
           should(err).be.exactly(response.error);
           should(res).be.exactly(response);
@@ -88,25 +65,8 @@ describe('Query management', function () {
 
       this.timeout(50);
 
-      kuzzle.socket.on('kuzzle', request => {
-        kuzzle.socket.emit(request.requestId, response);
-      });
-
-      emitRequest.call(kuzzle, {requestId: 'someEvent'}, cb);
-    });
-
-    it('should delete older history entries when necessary', function () {
-      var now = Date.now();
-
-      kuzzle.requestHistory['foo'] = now - 30000;
-      kuzzle.requestHistory['bar'] = now - 20000;
-      kuzzle.requestHistory['baz'] = now - 11000;
-      kuzzle.requestHistory['qux'] = now - 1000;
-
-      emitRequest.call(kuzzle, {requestId: 'xyz'});
-
-      should(Object.keys(kuzzle.requestHistory).length).be.exactly(2);
-      should(Object.keys(kuzzle.requestHistory)).match(['qux', 'xyz']);
+      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit(request.requestId, response));
+      emitRequest.call(kuzzle, request, cb);
     });
   });
 

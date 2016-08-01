@@ -50,7 +50,7 @@ function WSBrowsers(address, port) {
       if (autoReconnect) {
         self.retrying = true;
         setTimeout(function () {
-          self.connect(url, autoReconnect, reconnectionDelay);
+          self.connect(autoReconnect, reconnectionDelay);
         }, reconnectionDelay);
       }
 

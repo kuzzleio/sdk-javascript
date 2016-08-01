@@ -1,23 +1,10 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle');
 
 describe('Offline queue management', () => {
-  var sent;
-
-  // deactivate socket.io
-  before(function () {
-    Kuzzle.__set__('io', function () {
-      return {
-        emit: function () { sent++; },
-        close: function () {},
-        on: function () {},
-        once: function () {}
-      };
-    });
-  });
-
   describe('#cleanQueue', function () {
     var
       cleanQueue = Kuzzle.__get__('cleanQueue'),
@@ -100,9 +87,8 @@ describe('Offline queue management', () => {
       var
         pastTime = 60000;
 
-      sent = 0;
       kuzzle = new Kuzzle('foo');
-      kuzzle.socket = { emit: () => { sent++; } };
+      kuzzle.network.send = sinon.stub();
       kuzzle.queuing = true;
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart
@@ -122,7 +108,7 @@ describe('Offline queue management', () => {
       dequeue.call(kuzzle);
 
       setTimeout(() => {
-        should(sent).be.exactly(numRequests);
+        should(kuzzle.network.send.callCount).be.exactly(numRequests);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(kuzzle.queuing).be.false();
@@ -147,7 +133,7 @@ describe('Offline queue management', () => {
       dequeue.call(kuzzle);
 
       setTimeout(() => {
-        should(sent).be.exactly(numRequests + 2);
+        should(kuzzle.network.send.callCount).be.exactly(numRequests + 2);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(kuzzle.queuing).be.false();
@@ -172,7 +158,7 @@ describe('Offline queue management', () => {
       dequeue.call(kuzzle);
 
       setTimeout(() => {
-        should(sent).be.exactly(numRequests + 1);
+        should(kuzzle.network.send.callCount).be.exactly(numRequests + 1);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(kuzzle.queuing).be.false();

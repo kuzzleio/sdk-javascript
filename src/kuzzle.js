@@ -334,7 +334,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.address + '"');
 
     connectionError.internal = error;
     self.state = 'error';
@@ -812,7 +812,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
   }
 
-  listenerId = uuid.v1();
+  listenerId = uuid.v4();
   this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
   return listenerId;
 };
