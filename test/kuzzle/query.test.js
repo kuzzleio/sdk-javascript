@@ -1,4 +1,4 @@
-var
+ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
@@ -308,6 +308,42 @@ describe('Query management', function () {
 
       should(kuzzle.offlineQueue.length).be.exactly(1);
       should(kuzzle.offlineQueue[0].query.headers).be.undefined();
+    });
+  });
+
+  describe('#cleanHistory', function () {
+    it('should be started by kuzzle constructor', function () {
+      var
+        cleanStub = sinon.stub(),
+        K = rewire(kuzzleSource);
+
+      K.__set__('cleanHistory', cleanStub);
+      new K('foo', {connect: 'manual'});
+
+      should(cleanStub.calledOnce).be.true();
+    });
+
+    it('should clean oldest entries every 1s', function () {
+      var
+        i,
+        clock = sinon.useFakeTimers(),
+        kuzzle = new Kuzzle('foo', {connect: 'manual'});
+
+      for(i = 100000; i >= 0; i -= 10000) {
+        kuzzle.requestHistory[i] = -i;
+      }
+
+      clock.tick(1000);
+
+      // should only contains i == 0 entry
+      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+
+      kuzzle.requestHistory['foobar'] = -100000;
+
+      clock.tick(1000);
+      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+
+      clock.restore();
     });
   });
 });

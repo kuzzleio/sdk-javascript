@@ -285,6 +285,8 @@ module.exports = Kuzzle = function (address, options, cb) {
     this.state = 'ready';
   }
 
+  cleanHistory(this.requestHistory);
+
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
@@ -297,8 +299,6 @@ module.exports = Kuzzle = function (address, options, cb) {
       }
     });
   }
-
-  cleanHistory(this.requestHistory);
 };
 
 /**
