@@ -10,7 +10,7 @@ function network(address, wsPort, ioPort) {
   // Web browser / NodeJS websocket handling
   if (typeof window !== 'undefined') {
     // use native websockets if the browser supports it
-    if (typeof WebSocket !== 'undefined' || typeof MozWebSocket !== 'undefined') {
+    if (typeof WebSocket !== 'undefined') {
       return new (require('./wrappers/wsbrowsers'))(address, wsPort);
     }
     // otherwise fallback to socket.io, if available

@@ -216,18 +216,24 @@ function WSNode(address, port) {
  * @param {Object} [payload]
  */
 function poke (listeners, roomId, payload) {
-  listeners[roomId].forEach(function (listener, index) {
-    listener.fn(payload);
+  var
+    i,
+    length = listeners[roomId].length;
 
-    if (!listener.keep) {
+  for(i = 0; i < length; ++i) {
+    listeners[roomId][i].fn(payload);
+
+    if (!listeners[roomId][i].keep) {
       if (listeners[roomId].length > 1) {
-        listeners[roomId].splice(index, 1);
+        listeners[roomId].splice(i, 1);
+        --i;
+        --length;
       }
       else {
         delete listeners[roomId];
       }
     }
-  });
+  }
 }
 
 module.exports = WSNode;

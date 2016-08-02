@@ -24,7 +24,7 @@ function SocketIO(address, port) {
    * @param {function} callback
    */
   this.onConnect = function (callback) {
-    this.socket.once('connect', callback);
+    this.socket.on('connect', callback);
   };
 
   /**
