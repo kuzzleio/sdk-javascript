@@ -682,6 +682,8 @@ module.exports = Kuzzle = function (address, options, cb) {
     this.state = 'ready';
   }
 
+  cleanHistory(this.requestHistory);
+
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
@@ -694,8 +696,6 @@ module.exports = Kuzzle = function (address, options, cb) {
       }
     });
   }
-
-  cleanHistory(this.requestHistory);
 };
 
 /**
@@ -731,7 +731,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.address + '"');
 
     connectionError.internal = error;
     self.state = 'error';
@@ -1209,7 +1209,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
   }
 
-  listenerId = uuid.v1();
+  listenerId = uuid.v4();
   this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
   return listenerId;
 };
@@ -3545,7 +3545,7 @@ function network(address, wsPort, ioPort) {
   // Web browser / NodeJS websocket handling
   if (typeof window !== 'undefined') {
     // use native websockets if the browser supports it
-    if (typeof WebSocket !== 'undefined' || typeof MozWebSocket !== 'undefined') {
+    if (typeof WebSocket !== 'undefined') {
       return new (require('./wrappers/wsbrowsers'))(address, wsPort);
     }
     // otherwise fallback to socket.io, if available
@@ -3588,7 +3588,7 @@ function SocketIO(address, port) {
    * @param {function} callback
    */
   this.onConnect = function (callback) {
-    this.socket.once('connect', callback);
+    this.socket.on('connect', callback);
   };
 
   /**
@@ -3668,9 +3668,6 @@ function SocketIO(address, port) {
 module.exports = SocketIO;
 
 },{}],11:[function(require,module,exports){
-var
-  WS = typeof WebSocket !== 'undefined' ? WebSocket : MozWebSocket;
-
 function WSBrowsers(address, port) {
   var self = this;
   this.address = address;
@@ -3701,7 +3698,7 @@ function WSBrowsers(address, port) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WS('ws://' + this.address + ':' + this.port);
+    this.client = new WebSocket('ws://' + this.address + ':' + this.port);
 
     this.client.onopen = function () {
       if (self.retrying) {
@@ -3720,7 +3717,7 @@ function WSBrowsers(address, port) {
       if (autoReconnect) {
         self.retrying = true;
         setTimeout(function () {
-          self.connect(url, autoReconnect, reconnectionDelay);
+          self.connect(autoReconnect, reconnectionDelay);
         }, reconnectionDelay);
       }
 
@@ -3886,18 +3883,24 @@ function WSBrowsers(address, port) {
  * @param {Object} [payload]
  */
 function poke (listeners, roomId, payload) {
-  listeners[roomId].forEach(function (listener, index) {
-    listener.fn(payload);
+  var
+    i,
+    length = listeners[roomId].length;
 
-    if (!listener.keep) {
+  for (i = 0; i < length; ++i) {
+    listeners[roomId][i].fn(payload);
+
+    if (!listeners[roomId][i].keep) {
       if (listeners[roomId].length > 1) {
-        listeners[roomId].splice(index, 1);
+        listeners[roomId].splice(i, 1);
+        --i;
+        --length;
       }
       else {
         delete listeners[roomId];
       }
     }
-  });
+  }
 }
 
 module.exports = WSBrowsers;

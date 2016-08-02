@@ -220,7 +220,7 @@ function poke (listeners, roomId, payload) {
     i,
     length = listeners[roomId].length;
 
-  for(i = 0; i < length; ++i) {
+  for (i = 0; i < length; ++i) {
     listeners[roomId][i].fn(payload);
 
     if (!listeners[roomId][i].keep) {
