@@ -1267,6 +1267,10 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     }
   }
 
+  if (!query || typeof query !== 'object' || Array.isArray(query)) {
+    throw new Error('Invalid query parameter: ' + query);
+  }
+
   if (query.metadata) {
     Object.keys(query.metadata).forEach(function (meta) {
       object.metadata[meta] = query.metadata[meta];

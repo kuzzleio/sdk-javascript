@@ -118,6 +118,13 @@ describe('Query management', function () {
       should(callback).be.exactly(cb);
     });
 
+    it('should invoke the callback with an error if no query is provided', () => {
+      should(() => kuzzle.query(queryArgs, () => {})).throw(Error);
+      should(() => kuzzle.query(queryArgs, ['foo', 'bar'])).throw(Error);
+      should(() => kuzzle.query(queryArgs)).throw(Error);
+      should(() => kuzzle.query(queryArgs, 'foobar')).throw(Error);
+    });
+
     it('should handle options metadata properly', function () {
       var
         metadata = {
