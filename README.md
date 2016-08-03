@@ -31,8 +31,8 @@ The complete SDK documentation is available [here](http://kuzzleio.github.io/sdk
 
 ## Protocols used
 
-The SDK Javascript implements two network protocols: plain WebSocket, and [Socket.IO](http://socket.io/)  
-The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, plain WebSocket is around 20% faster
+The SDK Javascript implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
+The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
 
 For this reason, there is a slight difference with the [generic SDK documentation](http://kuzzleio.github.io/sdk-documentation): instead of 1 available `port` option, there are actually a `wsPort` and a `ioPort` options.  
 These options are defaulted to Kuzzle default protocol plugins.
@@ -41,11 +41,11 @@ What protocol is used when you connect to Kuzzle depends on multiple factors:
 
 #### NodeJS
 
-The protocol used is always plain WebSocket.
+The protocol used is always raw WebSocket.
 
 #### Web Browsers
 
-The SDK will first try to use plain WebSocket to connect to Kuzzle. If the web browser doesn't support this protocol, then the SDK falls back to Socket.IO
+The SDK will first try to use raw WebSocket to connect to Kuzzle. If the web browser does not support this protocol, then the SDK falls back to Socket.IO
 
 ## Installation
 
@@ -62,7 +62,7 @@ npm install kuzzle-sdk --save
 ```javascript
 var
   Kuzzle = require('kuzzle-sdk'),
-  kuzzle = new Kuzzle('http://foobar:7512');
+  kuzzle = new Kuzzle('serverName');
 
 var myDoc = {
   name: 'Rick Astley',
@@ -115,7 +115,7 @@ bower install kuzzle-sdk --save
 
 ```javascript
 var
-  kuzzle = new Kuzzle('http://foobar:7512');
+  kuzzle = new Kuzzle('serverName');
 
 var myDoc = {
   name: 'Rick Astley',
