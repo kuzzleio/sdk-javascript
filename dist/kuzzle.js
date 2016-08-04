@@ -1,4 +1,125 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+(function () {
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
+    }
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
+    }
+  }
+} ())
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = cachedSetTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    cachedClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        cachedSetTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(require,module,exports){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -272,127 +393,6 @@
   }
 })('undefined' !== typeof window ? window : null);
 
-},{}],2:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-(function () {
-  try {
-    cachedSetTimeout = setTimeout;
-  } catch (e) {
-    cachedSetTimeout = function () {
-      throw new Error('setTimeout is not defined');
-    }
-  }
-  try {
-    cachedClearTimeout = clearTimeout;
-  } catch (e) {
-    cachedClearTimeout = function () {
-      throw new Error('clearTimeout is not defined');
-    }
-  }
-} ())
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    cachedClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
 },{}],3:[function(require,module,exports){
 (function (process){
 var
@@ -400,30 +400,31 @@ var
   KuzzleDataCollection = require('./kuzzleDataCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
   KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
-  KuzzleUser = require('./security/kuzzleUser');
+  KuzzleUser = require('./security/kuzzleUser'),
+  networkWrapper = require('./networkWrapper');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
  * @callback responseCallback
  * @param {Object} err - Error object, NULL if the query is successful
- * @param {Object} data - The content of the query response
+ * @param {Object} [data] - The content of the query response
  */
 
 /**
  * Kuzzle object constructor.
- * @param url - URL to the Kuzzle instance
- * @param index - Database index
+ *
+ * @constructor
+ * @param address - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-
-module.exports = Kuzzle = function (url, options, cb) {
+module.exports = Kuzzle = function (address, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, options, cb);
+    return new Kuzzle(address, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -431,8 +432,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     options = null;
   }
 
-  if (!url || url === '') {
-    throw new Error('URL argument missing');
+  if (!address || address === '') {
+    throw new Error('address argument missing');
   }
 
   Object.defineProperties(this, {
@@ -459,20 +460,12 @@ module.exports = Kuzzle = function (url, options, cb) {
     eventTimeout: {
       value: 200
     },
-    io: {
-      value: null,
-      writable: true
-    },
     queuing: {
       value: false,
       writable: true
     },
     requestHistory: {
       value: {},
-      writable: true
-    },
-    socket: {
-      value: null,
       writable: true
     },
     state: {
@@ -511,8 +504,16 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
     },
-    url: {
-      value: url,
+    address: {
+      value: address,
+      enumerable: true
+    },
+    wsPort: {
+      value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
+      enumerable: true
+    },
+    ioPort: {
+      value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
       enumerable: true
     },
     autoQueue: {
@@ -586,12 +587,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: true
     }
   });
-
-  if (typeof window !== 'undefined' && window.io) {
-    this.io = window.io;
-  } else {
-    this.io = require('socket.io-client');
-  }
 
   if (options) {
     Object.keys(options).forEach(function (opt) {
@@ -687,6 +682,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     this.state = 'ready';
   }
 
+  cleanHistory(this.requestHistory);
+
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
@@ -699,16 +696,18 @@ module.exports = Kuzzle = function (url, options, cb) {
       }
     });
   }
-
 };
 
-
 /**
- * Connects to a Kuzzle instance using the provided URL.
+ * Connects to a Kuzzle instance using the provided address.
  * @returns {Object} this
  */
 Kuzzle.prototype.connect = function () {
   var self = this;
+
+  if (!self.network) {
+    self.network = networkWrapper(self.address, self.wsPort, self.ioPort);
+  }
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
@@ -718,14 +717,9 @@ Kuzzle.prototype.connect = function () {
   }
 
   self.state = 'connecting';
+  self.network.connect(self.autoReconnect, self.reconnectionDelay);
 
-  self.socket = self.io(self.url, {
-    reconnection: self.autoReconnect,
-    reconnectionDelay: self.reconnectionDelay,
-    forceNew: true
-  });
-
-  self.socket.once('connect', function () {
+  self.network.onConnect(function () {
     self.state = 'connected';
     renewAllSubscriptions.call(self);
     dequeue.call(self);
@@ -736,8 +730,8 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.socket.on('connect_error', function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+  self.network.onConnectError(function (error) {
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.address + '"');
 
     connectionError.internal = error;
     self.state = 'error';
@@ -748,7 +742,7 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.socket.on('disconnect', function () {
+  self.network.onDisconnect(function () {
     self.state = 'offline';
 
     if (!self.autoReconnect) {
@@ -762,7 +756,7 @@ Kuzzle.prototype.connect = function () {
     self.emitEvent('disconnected');
   });
 
-  self.socket.on('reconnect', function () {
+  self.network.onReconnect(function () {
     var reconnect = function () {
       // renew subscriptions
       if (self.autoResubscribe) {
@@ -1080,6 +1074,25 @@ function cleanQueue () {
   }
 }
 
+
+/**
+ * Clean history from requests made more than 10s ago
+ */
+function cleanHistory (requestHistory) {
+  var
+    now = Date.now();
+
+  Object.keys(requestHistory).forEach(function (key) {
+    if (requestHistory[key] < now - 10000) {
+      delete requestHistory[key];
+    }
+  });
+
+  setTimeout(function () {
+    cleanHistory(requestHistory);
+  }, 1000);
+}
+
 /**
  * Emit a request to Kuzzle
  *
@@ -1088,11 +1101,10 @@ function cleanQueue () {
  */
 function emitRequest (request, cb) {
   var
-    now = Date.now(),
     self = this;
 
   if (self.jwtToken !== undefined || cb) {
-    self.socket.once(request.requestId, function (response) {
+    self.network.once(request.requestId, function (response) {
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
         self.emitEvent('jwtTokenExpired', request, cb);
@@ -1104,17 +1116,10 @@ function emitRequest (request, cb) {
     });
   }
 
-  self.socket.emit('kuzzle', request);
+  this.network.send(request);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
-  self.requestHistory[request.requestId] = now;
-
-  // Clean history from requests made more than 10s ago
-  Object.keys(self.requestHistory).forEach(function (key) {
-    if (self.requestHistory[key] < now - 10000) {
-      delete self.requestHistory[key];
-    }
-  });
+  self.requestHistory[request.requestId] = Date.now();
 }
 
 /**
@@ -1204,7 +1209,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
   }
 
-  listenerId = uuid.v1();
+  listenerId = uuid.v4();
   this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
   return listenerId;
 };
@@ -1427,8 +1432,7 @@ Kuzzle.prototype.disconnect = function () {
   this.logout();
 
   this.state = 'disconnected';
-  this.socket.close();
-  this.socket = null;
+  this.network.close();
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
@@ -1839,8 +1843,10 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
+
+
 }).call(this,require('_process'))
-},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./security/kuzzleSecurity":11,"./security/kuzzleUser":13,"_process":2,"node-uuid":1,"socket.io-client":undefined}],4:[function(require,module,exports){
+},{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./networkWrapper":9,"./security/kuzzleSecurity":14,"./security/kuzzleUser":16,"_process":1,"node-uuid":2}],4:[function(require,module,exports){
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
@@ -3406,7 +3412,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.kuzzle.subscriptions[self.roomId][self.id] = self;
 
     self.notifier = notificationCallback.bind(self);
-    self.kuzzle.socket.on(self.channel, self.notifier);
+    self.kuzzle.network.on(self.channel, self.notifier);
 
     dequeue.call(self);
   });
@@ -3435,7 +3441,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
   }
 
   if (room) {
-    self.kuzzle.socket.off(self.channel, this.notifier);
+    self.kuzzle.network.off(self.channel, this.notifier);
 
     if (Object.keys(self.kuzzle.subscriptions[room]).length === 1) {
       delete self.kuzzle.subscriptions[room];
@@ -3477,7 +3483,7 @@ KuzzleRoom.prototype.setHeaders = function (content, replace) {
 };
 
 /**
- * Callback called by socket.io when a message is sent to the subscribed room ID
+ * Callback called by the network handler when a message is sent to the subscribed room ID
  * Calls the registered callback if the notification passes the subscription filters
  *
  * @param {object} data - data
@@ -3526,7 +3532,380 @@ function isReady() {
 
 module.exports = KuzzleRoom;
 
-},{"node-uuid":1}],9:[function(require,module,exports){
+},{"node-uuid":2}],9:[function(require,module,exports){
+/**
+ *
+ * @param address
+ * @param wsPort
+ * @param ioPort
+ * @returns {Object} tnstantiated WebSocket/Socket.IO object
+ */
+
+function network(address, wsPort, ioPort) {
+  // Web browser / NodeJS websocket handling
+  if (typeof window !== 'undefined') {
+    // use native websockets if the browser supports it
+    if (typeof WebSocket !== 'undefined') {
+      return new (require('./wrappers/wsbrowsers'))(address, wsPort);
+    }
+    // otherwise fallback to socket.io, if available
+    else if (window.io) {
+      return new (require('./wrappers/socketio'))(address, ioPort);
+    }
+
+    throw new Error('Aborting: no websocket support detected and no socket.io library loaded either.');
+  }
+
+  return new (require('./wrappers/wsnode'))(address, wsPort);
+}
+
+module.exports = network;
+
+},{"./wrappers/socketio":10,"./wrappers/wsbrowsers":11,"./wrappers/wsnode":undefined}],10:[function(require,module,exports){
+function SocketIO(address, port) {
+  this.address = address;
+  this.port = port;
+  this.socket = null;
+
+  /**
+   * Creates a new socket from the provided arguments
+   *
+   * @constructor
+   * @param {boolean} autoReconnect
+   * @param {int} reconnectionDelay
+   */
+  this.connect = function (autoReconnect, reconnectionDelay) {
+    this.socket = window.io('http://' + this.address + ':' + this.port, {
+      reconnection: autoReconnect,
+      reconnectionDelay: reconnectionDelay,
+      forceNew: true
+    });
+  };
+
+  /**
+   * Fires the provided callback whence a connection is established
+   *
+   * @param {function} callback
+   */
+  this.onConnect = function (callback) {
+    this.socket.on('connect', callback);
+  };
+
+  /**
+   * Fires the provided callback whenever a connection error is received
+   * @param {function} callback
+   */
+  this.onConnectError = function (callback) {
+    this.socket.on('connect_error', callback);
+  };
+
+  /**
+   * Fires the provided callback whenever a disconnection occurred
+   * @param {function} callback
+   */
+  this.onDisconnect = function (callback) {
+    this.socket.on('disconnect', callback);
+  };
+
+  /**
+   * Fires the provided callback whenever a connection has been reestablished
+   * @param {function} callback
+   */
+  this.onReconnect = function (callback) {
+    this.socket.on('reconnect', callback);
+  };
+
+  /**
+   * Registers a callback on a room. Once 1 message is received, fires the
+   * callback and unregister it afterward.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.once = function (roomId, callback) {
+    this.socket.once(roomId, callback);
+  };
+
+  /**
+   * Registers a callback on a room.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.on = function (roomId, callback) {
+    this.socket.on(roomId, callback);
+  };
+
+  /**
+   * Unregisters a callback from a room.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.off = function (roomId, callback) {
+    this.socket.off(roomId, callback);
+  };
+
+
+  /**
+   * Sends a payload to the connected server
+   *
+   * @param {Object} payload
+   */
+  this.send = function (payload) {
+    this.socket.emit('kuzzle', payload);
+  };
+
+  /**
+   * Closes the connection
+   */
+  this.close = function () {
+    this.socket.close();
+    this.socket = null;
+  };
+}
+
+module.exports = SocketIO;
+
+},{}],11:[function(require,module,exports){
+function WSBrowsers(address, port) {
+  var self = this;
+  this.address = address;
+  this.port = port;
+  this.client = null;
+  this.retrying = false;
+
+  /*
+     Listeners are stored using the following format:
+     roomId: {
+     fn: callback_function,
+     once: boolean
+     }
+   */
+  this.listeners = {
+    error: [],
+    connect: [],
+    disconnect: [],
+    reconnect: []
+  };
+
+  /**
+   * Creates a new socket from the provided arguments
+   *
+   * @constructor
+   * @param {boolean} autoReconnect
+   * @param {int} reconnectionDelay
+   * @returns {Object} Socket
+   */
+  this.connect = function (autoReconnect, reconnectionDelay) {
+    this.client = new WebSocket('ws://' + this.address + ':' + this.port);
+
+    this.client.onopen = function () {
+      if (self.retrying) {
+        poke(self.listeners, 'reconnect');
+      }
+      else {
+        poke(self.listeners, 'connect');
+      }
+    };
+
+    this.client.onclose = function () {
+      poke(self.listeners, 'disconnect');
+    };
+
+    this.client.onerror = function () {
+      if (autoReconnect) {
+        self.retrying = true;
+        setTimeout(function () {
+          self.connect(autoReconnect, reconnectionDelay);
+        }, reconnectionDelay);
+      }
+
+      poke(self.listeners, 'error');
+    };
+
+    this.client.onmessage = function (payload) {
+      var data = JSON.parse(payload.data);
+
+      if (data.room && self.listeners[data.room]) {
+        poke(self.listeners, data.room, data);
+      }
+    };
+  };
+
+  /**
+   * Fires the provided callback whence a connection is established
+   *
+   * @param {function} callback
+   */
+  this.onConnect = function (callback) {
+    this.listeners.connect.push({
+      fn: callback,
+      keep: true
+    });
+  };
+
+  /**
+   * Fires the provided callback whenever a connection error is received
+   * @param {function} callback
+   */
+  this.onConnectError = function (callback) {
+    this.listeners.error.push({
+      fn: callback,
+      keep: true
+    });
+  };
+
+  /**
+   * Fires the provided callback whenever a disconnection occurred
+   * @param {function} callback
+   */
+  this.onDisconnect = function (callback) {
+    this.listeners.disconnect.push({
+      fn: callback,
+      keep: true
+    });
+  };
+
+  /**
+   * Fires the provided callback whenever a connection has been reestablished
+   * @param {function} callback
+   */
+  this.onReconnect = function (callback) {
+    this.listeners.reconnect.push({
+      fn: callback,
+      keep: true
+    });
+  };
+
+  /**
+   * Registers a callback on a room. Once 1 message is received, fires the
+   * callback and unregister it afterward.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.once = function (roomId, callback) {
+    if (!this.listeners[roomId]) {
+      this.listeners[roomId] = [];
+    }
+
+    this.listeners[roomId].push({
+      fn: callback,
+      keep: false
+    });
+  };
+
+  /**
+   * Registers a callback on a room.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.on = function (roomId, callback) {
+    if (!this.listeners[roomId]) {
+      this.listeners[roomId] = [];
+    }
+
+    this.listeners[roomId].push({
+      fn: callback,
+      keep: true
+    });
+  };
+
+  /**
+   * Unregisters a callback from a room.
+   *
+   * @param {string} roomId
+   * @param {function} callback
+   */
+  this.off = function (roomId, callback) {
+    var index;
+
+    if (this.listeners[roomId]) {
+      index = this.listeners[roomId].findIndex(function (listener) {
+        return listener.fn === callback;
+      });
+
+      if (index !== -1) {
+        if (this.listeners[roomId].length === 1) {
+          delete this.listeners[roomId];
+        }
+        else {
+          this.listeners[roomId].splice(index, 1);
+        }
+      }
+    }
+  };
+
+
+  /**
+   * Sends a payload to the connected server
+   *
+   * @param {Object} payload
+   */
+  this.send = function (payload) {
+    if (this.client && this.client.readyState === this.client.OPEN) {
+      this.client.send(JSON.stringify(payload));
+    }
+  };
+
+  /**
+   * Closes the connection
+   */
+  this.close = function () {
+    this.listeners = {
+      error: [],
+      connect: [],
+      disconnect: [],
+      reconnect: []
+    };
+
+    this.retrying = false;
+    this.client.close();
+    this.client = null;
+  };
+}
+
+/**
+ * Executes all registered listeners in the provided
+ * "listeners" structure.
+ *
+ * Listeners are of the following format:
+ * [
+ *    { fn: callback, once: boolean },
+ *    ...
+ * ]
+ *
+ * @private
+ * @param {Object} listeners
+ * @param {string} roomId
+ * @param {Object} [payload]
+ */
+function poke (listeners, roomId, payload) {
+  var
+    i,
+    length = listeners[roomId].length;
+
+  for (i = 0; i < length; ++i) {
+    listeners[roomId][i].fn(payload);
+
+    if (!listeners[roomId][i].keep) {
+      if (listeners[roomId].length > 1) {
+        listeners[roomId].splice(i, 1);
+        --i;
+        --length;
+      }
+      else {
+        delete listeners[roomId];
+      }
+    }
+  }
+}
+
+module.exports = WSBrowsers;
+
+},{}],12:[function(require,module,exports){
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
@@ -3676,7 +4055,7 @@ KuzzleProfile.prototype.getPolicies = function () {
 
 module.exports = KuzzleProfile;
 
-},{"./kuzzleSecurityDocument":12}],10:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":15}],13:[function(require,module,exports){
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 function KuzzleRole(kuzzleSecurity, id, content) {
@@ -3746,7 +4125,7 @@ KuzzleRole.prototype.save = function (options, cb) {
 };
 
 module.exports = KuzzleRole;
-},{"./kuzzleSecurityDocument":12}],11:[function(require,module,exports){
+},{"./kuzzleSecurityDocument":15}],14:[function(require,module,exports){
 var
   KuzzleRole = require('./kuzzleRole'),
   KuzzleProfile = require('./kuzzleProfile'),
@@ -4511,7 +4890,7 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
 
 module.exports = KuzzleSecurity;
 
-},{"./kuzzleProfile":9,"./kuzzleRole":10,"./kuzzleUser":13}],12:[function(require,module,exports){
+},{"./kuzzleProfile":12,"./kuzzleRole":13,"./kuzzleUser":16}],15:[function(require,module,exports){
 function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
 
   if (!id) {
@@ -4651,7 +5030,7 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
 };
 
 module.exports = KuzzleSecurityDocument;
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
@@ -4790,4 +5169,4 @@ KuzzleUser.prototype.getProfiles = function () {
 
 module.exports = KuzzleUser;
 
-},{"./kuzzleSecurityDocument":12}]},{},[3]);
+},{"./kuzzleSecurityDocument":15}]},{},[3]);

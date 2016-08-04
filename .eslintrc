@@ -51,7 +51,8 @@
     "yoda": [2, "never"]
   },
   "env": {
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "extends": "eslint:recommended"
 }

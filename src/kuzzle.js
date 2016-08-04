@@ -3,30 +3,31 @@ var
   KuzzleDataCollection = require('./kuzzleDataCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
   KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
-  KuzzleUser = require('./security/kuzzleUser');
+  KuzzleUser = require('./security/kuzzleUser'),
+  networkWrapper = require('./networkWrapper');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
  *
  * @callback responseCallback
  * @param {Object} err - Error object, NULL if the query is successful
- * @param {Object} data - The content of the query response
+ * @param {Object} [data] - The content of the query response
  */
 
 /**
  * Kuzzle object constructor.
- * @param url - URL to the Kuzzle instance
- * @param index - Database index
+ *
+ * @constructor
+ * @param host - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-
-module.exports = Kuzzle = function (url, options, cb) {
+module.exports = Kuzzle = function (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(url, options, cb);
+    return new Kuzzle(host, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -34,8 +35,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     options = null;
   }
 
-  if (!url || url === '') {
-    throw new Error('URL argument missing');
+  if (!host || host === '') {
+    throw new Error('host argument missing');
   }
 
   Object.defineProperties(this, {
@@ -62,20 +63,12 @@ module.exports = Kuzzle = function (url, options, cb) {
     eventTimeout: {
       value: 200
     },
-    io: {
-      value: null,
-      writable: true
-    },
     queuing: {
       value: false,
       writable: true
     },
     requestHistory: {
       value: {},
-      writable: true
-    },
-    socket: {
-      value: null,
       writable: true
     },
     state: {
@@ -114,8 +107,16 @@ module.exports = Kuzzle = function (url, options, cb) {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
     },
-    url: {
-      value: url,
+    host: {
+      value: host,
+      enumerable: true
+    },
+    wsPort: {
+      value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
+      enumerable: true
+    },
+    ioPort: {
+      value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
       enumerable: true
     },
     autoQueue: {
@@ -189,12 +190,6 @@ module.exports = Kuzzle = function (url, options, cb) {
       writable: true
     }
   });
-
-  if (typeof window !== 'undefined' && window.io) {
-    this.io = window.io;
-  } else {
-    this.io = require('socket.io-client');
-  }
 
   if (options) {
     Object.keys(options).forEach(function (opt) {
@@ -290,6 +285,8 @@ module.exports = Kuzzle = function (url, options, cb) {
     this.state = 'ready';
   }
 
+  cleanHistory(this.requestHistory);
+
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
@@ -302,16 +299,18 @@ module.exports = Kuzzle = function (url, options, cb) {
       }
     });
   }
-
 };
 
-
 /**
- * Connects to a Kuzzle instance using the provided URL.
+ * Connects to a Kuzzle instance using the provided host name.
  * @returns {Object} this
  */
 Kuzzle.prototype.connect = function () {
   var self = this;
+
+  if (!self.network) {
+    self.network = networkWrapper(self.host, self.wsPort, self.ioPort);
+  }
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
@@ -321,14 +320,9 @@ Kuzzle.prototype.connect = function () {
   }
 
   self.state = 'connecting';
+  self.network.connect(self.autoReconnect, self.reconnectionDelay);
 
-  self.socket = self.io(self.url, {
-    reconnection: self.autoReconnect,
-    reconnectionDelay: self.reconnectionDelay,
-    forceNew: true
-  });
-
-  self.socket.once('connect', function () {
+  self.network.onConnect(function () {
     self.state = 'connected';
     renewAllSubscriptions.call(self);
     dequeue.call(self);
@@ -339,8 +333,8 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.socket.on('connect_error', function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.url + '"');
+  self.network.onConnectError(function (error) {
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.host + '"');
 
     connectionError.internal = error;
     self.state = 'error';
@@ -351,7 +345,7 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.socket.on('disconnect', function () {
+  self.network.onDisconnect(function () {
     self.state = 'offline';
 
     if (!self.autoReconnect) {
@@ -365,7 +359,7 @@ Kuzzle.prototype.connect = function () {
     self.emitEvent('disconnected');
   });
 
-  self.socket.on('reconnect', function () {
+  self.network.onReconnect(function () {
     var reconnect = function () {
       // renew subscriptions
       if (self.autoResubscribe) {
@@ -683,6 +677,25 @@ function cleanQueue () {
   }
 }
 
+
+/**
+ * Clean history from requests made more than 10s ago
+ */
+function cleanHistory (requestHistory) {
+  var
+    now = Date.now();
+
+  Object.keys(requestHistory).forEach(function (key) {
+    if (requestHistory[key] < now - 10000) {
+      delete requestHistory[key];
+    }
+  });
+
+  setTimeout(function () {
+    cleanHistory(requestHistory);
+  }, 1000);
+}
+
 /**
  * Emit a request to Kuzzle
  *
@@ -691,11 +704,10 @@ function cleanQueue () {
  */
 function emitRequest (request, cb) {
   var
-    now = Date.now(),
     self = this;
 
   if (self.jwtToken !== undefined || cb) {
-    self.socket.once(request.requestId, function (response) {
+    self.network.once(request.requestId, function (response) {
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
         self.emitEvent('jwtTokenExpired', request, cb);
@@ -707,17 +719,10 @@ function emitRequest (request, cb) {
     });
   }
 
-  self.socket.emit('kuzzle', request);
+  this.network.send(request);
 
   // Track requests made to allow KuzzleRoom.subscribeToSelf to work
-  self.requestHistory[request.requestId] = now;
-
-  // Clean history from requests made more than 10s ago
-  Object.keys(self.requestHistory).forEach(function (key) {
-    if (self.requestHistory[key] < now - 10000) {
-      delete self.requestHistory[key];
-    }
-  });
+  self.requestHistory[request.requestId] = Date.now();
 }
 
 /**
@@ -807,7 +812,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
   }
 
-  listenerId = uuid.v1();
+  listenerId = uuid.v4();
   this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
   return listenerId;
 };
@@ -1030,8 +1035,7 @@ Kuzzle.prototype.disconnect = function () {
   this.logout();
 
   this.state = 'disconnected';
-  this.socket.close();
-  this.socket = null;
+  this.network.close();
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
@@ -1263,6 +1267,10 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     }
   }
 
+  if (!query || typeof query !== 'object' || Array.isArray(query)) {
+    throw new Error('Invalid query parameter: ' + query);
+  }
+
   if (query.metadata) {
     Object.keys(query.metadata).forEach(function (meta) {
       object.metadata[meta] = query.metadata[meta];
@@ -1441,3 +1449,5 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
+
+

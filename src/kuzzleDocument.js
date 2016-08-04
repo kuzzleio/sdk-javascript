@@ -3,7 +3,7 @@
  *
  * @callback responseCallback
  * @param {Object} err - Error object, NULL if the query is successful
- * @param {Object} data - The content of the query response
+ * @param {Object} [data] - The content of the query response
  */
 
 /**
