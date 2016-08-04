@@ -1,6 +1,6 @@
-function WSBrowsers(address, port) {
+function WSBrowsers(host, port) {
   var self = this;
-  this.address = address;
+  this.host = host;
   this.port = port;
   this.client = null;
   this.retrying = false;
@@ -28,7 +28,7 @@ function WSBrowsers(address, port) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WebSocket('ws://' + this.address + ':' + this.port);
+    this.client = new WebSocket('ws://' + this.host + ':' + this.port);
 
     this.client.onopen = function () {
       if (self.retrying) {
@@ -158,7 +158,7 @@ function WSBrowsers(address, port) {
       });
 
       if (index !== -1) {
-        if (this.listeners[roomId].length === 1) {
+        if (this.listeners[roomId].length === 1 && ['error', 'connect', 'disconnect', 'reconnect'].indexOf(roomId) === -1) {
           delete this.listeners[roomId];
         }
         else {

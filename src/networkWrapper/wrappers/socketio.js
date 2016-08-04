@@ -1,5 +1,5 @@
-function SocketIO(address, port) {
-  this.address = address;
+function SocketIO(host, port) {
+  this.host = host;
   this.port = port;
   this.socket = null;
 
@@ -11,7 +11,7 @@ function SocketIO(address, port) {
    * @param {int} reconnectionDelay
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.socket = window.io('http://' + this.address + ':' + this.port, {
+    this.socket = window.io('http://' + this.host + ':' + this.port, {
       reconnection: autoReconnect,
       reconnectionDelay: reconnectionDelay,
       forceNew: true

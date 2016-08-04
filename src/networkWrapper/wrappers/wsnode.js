@@ -1,9 +1,9 @@
 var
   WebSocket = require('ws');
 
-function WSNode(address, port) {
+function WSNode(host, port) {
   var self = this;
-  this.address = address;
+  this.host = host;
   this.port = port;
   this.client = null;
   this.retrying = false;
@@ -31,7 +31,7 @@ function WSNode(address, port) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WebSocket('ws://' + this.address + ':' + this.port, {perMessageDeflate: false});
+    this.client = new WebSocket('ws://' + this.host + ':' + this.port, {perMessageDeflate: false});
 
     this.client.on('open', function () {
       if (self.retrying) {
@@ -161,7 +161,7 @@ function WSNode(address, port) {
       });
 
       if (index !== -1) {
-        if (this.listeners[roomId].length === 1) {
+        if (this.listeners[roomId].length === 1 && ['error', 'connect', 'disconnect', 'reconnect'].indexOf(roomId) === -1) {
           delete this.listeners[roomId];
         }
         else {

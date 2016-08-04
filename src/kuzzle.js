@@ -18,16 +18,16 @@ var
  * Kuzzle object constructor.
  *
  * @constructor
- * @param address - Server name or IP Address to the Kuzzle instance
+ * @param host - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (address, options, cb) {
+module.exports = Kuzzle = function (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
-    return new Kuzzle(address, options, cb);
+    return new Kuzzle(host, options, cb);
   }
 
   if (!cb && typeof options === 'function') {
@@ -35,8 +35,8 @@ module.exports = Kuzzle = function (address, options, cb) {
     options = null;
   }
 
-  if (!address || address === '') {
-    throw new Error('address argument missing');
+  if (!host || host === '') {
+    throw new Error('host argument missing');
   }
 
   Object.defineProperties(this, {
@@ -107,8 +107,8 @@ module.exports = Kuzzle = function (address, options, cb) {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
       enumerable: true
     },
-    address: {
-      value: address,
+    host: {
+      value: host,
       enumerable: true
     },
     wsPort: {
@@ -302,14 +302,14 @@ module.exports = Kuzzle = function (address, options, cb) {
 };
 
 /**
- * Connects to a Kuzzle instance using the provided address.
+ * Connects to a Kuzzle instance using the provided host name.
  * @returns {Object} this
  */
 Kuzzle.prototype.connect = function () {
   var self = this;
 
   if (!self.network) {
-    self.network = networkWrapper(self.address, self.wsPort, self.ioPort);
+    self.network = networkWrapper(self.host, self.wsPort, self.ioPort);
   }
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
@@ -334,7 +334,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.address + '"');
+    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.host + '"');
 
     connectionError.internal = error;
     self.state = 'error';
