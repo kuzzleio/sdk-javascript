@@ -50,7 +50,7 @@ describe('KuzzleRole methods', function () {
       kuzzle.query = queryStub;
       error = false;
 
-      result = { result: {_id: 'myProfile', _source: {roles : []}} };
+      result = { result: {_id: 'myProfile', _source: {policies : []}} };
       kuzzleProfile = new KuzzleProfile(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceProfile',
@@ -148,184 +148,96 @@ describe('KuzzleRole methods', function () {
     });
   });
 
-  describe('#addRole', function () {
+  describe('#addPolicy', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {roles: ['role1']});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
     });
 
-    it('should throw an error if the role is not an id or a KuzzleRole', function (done) {
+    it('should throw an error if the policy parameter is not an object', function (done) {
       should((function () {
-        kuzzleProfile.addRole(null);
+        kuzzleProfile.addPolicy(null);
       })).throw(Error);
 
       done();
     });
 
-    it('should add the id string in roles list', function (done) {
-      kuzzleProfile.addRole('role2');
-      should(kuzzleProfile.content.roles).be.an.Array().match(['role1', 'role2']);
+    it('should throw an error if the policy.roleId parameter is not a string', function (done) {
+      should((function () {
+        kuzzleProfile.addPolicy({roleId: null});
+      })).throw(Error);
+
       done();
     });
 
-    it('should add the KuzzleRole in roles list', function (done) {
-      var
-        kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
-
-      kuzzleProfile.addRole(kuzzleRole);
-      should(kuzzleProfile.content.roles).be.an.Array();
-      should(kuzzleProfile.content.roles.length).be.exactly(2);
+    it('should add the right policy in policies list', function (done) {
+      kuzzleProfile.addPolicy({roleId: 'role2'});
+      should(kuzzleProfile.content.policies).be.an.Array().match([{roleId: 'role1'}, {roleId: 'role2'}]);
+      should(kuzzleProfile.content.policies.length).be.exactly(2);
       done();
     });
 
-    it('should initialize roles with array if no role was set before', function (done) {
-      var
-        kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
-
+    it('should initialize policies with array if no policy was set before', function (done) {
       kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content'});
 
-      kuzzleProfile.addRole(kuzzleRole);
-      should(kuzzleProfile.content.roles).be.an.Array();
-      should(kuzzleProfile.content.roles.length).be.exactly(1);
+      kuzzleProfile.addPolicy({roleId: 'role'});
+      should(kuzzleProfile.content.policies).be.an.Array();
+      should(kuzzleProfile.content.policies.length).be.exactly(1);
       done();
     });
   });
 
-  describe('#setRoles', function () {
+  describe('#setPolicies', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {roles: ['role1']});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
     });
 
-    it('should throw an error if the roles parameter is null', function (done) {
+    it('should throw an error if the policies parameter is null', function (done) {
       should((function () {
-        kuzzleProfile.setRoles(null);
+        kuzzleProfile.setPolicies(null);
       })).throw(Error);
 
       done();
     });
 
-    it('should throw an error if the role parameter is not a array of string', function (done) {
+    it('should throw an error if the role parameter is not a array of objects', function (done) {
       should((function () {
-        kuzzleProfile.setRoles([1, 2, 3]);
+        kuzzleProfile.setPolicies([1, 2, 3]);
       })).throw(Error);
 
       done();
     });
 
-    it('should add the id string in roles list', function (done) {
-      kuzzleProfile.setRoles(['role2']);
-      should(kuzzleProfile.content.roles).be.an.Array().match(['role2']);
+    it('should add the policy in policies list', function (done) {
+      kuzzleProfile.setPolicies([{roleId:'role2'}]);
+      should(kuzzleProfile.content.policies).be.an.Array().match([{roleId:'role2'}]);
       done();
     });
 
     it('should add the KuzzleRole in roles list', function (done) {
-      var
-        kuzzleRole1 = new KuzzleRole(kuzzle.security, 'role2', {indexes: {}}),
-        kuzzleRole2 = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
-
-      kuzzleProfile.setRoles([kuzzleRole1, kuzzleRole2]);
-      should(kuzzleProfile.content.roles).be.an.Array();
-      should(kuzzleProfile.content.roles.length).be.exactly(2);
+      kuzzleProfile.setPolicies([{roleId:'role1'}, {roleId:'role2'}]);
+      should(kuzzleProfile.content.policies).be.an.Array();
+      should(kuzzleProfile.content.policies.length).be.exactly(2);
       done();
-    });
-  });
-
-  describe('#hydrate', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('http://localhost:7512');
-
-      kuzzle.query = queryStub;
-      error = false;
-
-      result = { result: {hits: [{_id: 'role1', _source: {indexes: {}}}, {_id: 'role2', _source: {indexes: {}}}]}};
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'profile', {roles: result.result.hits});
-      expectedQuery = {
-        action: 'mGetRoles',
-        controller: 'security'
-      };
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzleProfile.hydrate(); }).throw(Error);
-    });
-
-    it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = {ids: ['role1', 'role2']};
-
-      should(kuzzleProfile.hydrate(function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
-        should(res.content.roles).be.an.Array();
-        should(res.content.roles).not.be.empty();
-
-        res.content.roles.forEach(function (role) {
-          should(role).instanceof(KuzzleRole);
-        });
-
-        done();
-      }));
-    });
-
-    it('should send the right query to kuzzle when a KuzzleRole is added', function (done) {
-      var kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
-      expectedQuery.body = {ids: ['role1', 'role3']};
-
-      kuzzleProfile.setRoles(['role1', kuzzleRole]);
-
-      should(kuzzleProfile.hydrate(function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
-        done();
-      }));
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var kuzzleRole = new KuzzleRole(kuzzle.security, 'role3', {indexes: {}});
-      expectedQuery.body = {ids: ['role1', 'role3']};
-
-      error = 'foobar';
-      this.timeout(50);
-
-      kuzzleProfile.setRoles(['role1', kuzzleRole]);
-
-      kuzzleProfile.hydrate(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
     });
   });
 
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles: ['role1']});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies: [{roleId:'role1'}]});
     });
 
     it('should serialize with correct attributes', function (done) {
       var serialized = kuzzleProfile.serialize();
 
       should(serialized._id).be.exactly('myProfile');
-      should(serialized.body).be.match({some: 'content', roles: ['role1']});
+      should(serialized.body).be.match({some: 'content', policies: [{roleId:'role1'}]});
       done();
     });
 
-    it('should serialize with correct attributes when a role is serialized', function (done) {
-      var
-        kuzzleRole = new KuzzleRole(kuzzle.security, 'role2', {indexes: {}}),
-        serialized;
-
-      kuzzleProfile.setRoles([kuzzleRole]);
-
-      serialized = kuzzleProfile.serialize();
-
-      should(serialized._id).be.exactly('myProfile');
-      should(serialized.body).be.match({some: 'content', roles: ['role2']});
-      done();
-    });
-
-    it('should serialize without roles if no roles attribute is defined', function (done) {
+    it('should serialize without policies if no policies attribute is defined', function (done) {
       var
         serialized;
 
@@ -335,7 +247,7 @@ describe('KuzzleRole methods', function () {
 
       should(serialized._id).be.exactly('myProfile');
       should.exist(serialized.body.some);
-      should.not.exist(serialized.body.roles);
+      should.not.exist(serialized.body.policies);
       done();
     });
   });
@@ -347,7 +259,7 @@ describe('KuzzleRole methods', function () {
       error = false;
 
       result = { result: {_id: 'myProfile'} };
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles: ['role1']});
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles: [{roleId:'role1'}]});
       expectedQuery = {
         action: 'deleteProfile',
         controller: 'security'
@@ -379,13 +291,13 @@ describe('KuzzleRole methods', function () {
     });
   });
 
-  describe('#getRoles', function () {
-    it('should return the associated roles', function () {
-      var roles = ['role1', 'role2', 'role3'];
+  describe('#getPolicies', function () {
+    it('should return the associated policies', function () {
+      var policies = [{roleId:'role1'}, {roleId:'role2'}, {roleId:'role3'}];
 
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles});
-      should(kuzzleProfile.getRoles()).be.eql(roles);
+      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies: policies});
+      should(kuzzleProfile.getPolicies()).be.eql(policies);
     });
   });
 });

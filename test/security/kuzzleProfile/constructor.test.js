@@ -17,7 +17,7 @@ describe('KuzzleProfile constructor', function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
   });
 
-  it('should throw an error if no id is provided', done => {
+  it('should throw an error if no id is provided', function(done) {
     try {
       new KuzzleProfile(kuzzle.security, null, null);
     }
@@ -44,10 +44,9 @@ describe('KuzzleProfile constructor', function () {
     var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
 
     should.exist(kuzzleProfile.save);
-    should.exist(kuzzleProfile.addRole);
+    should.exist(kuzzleProfile.addPolicy);
     should.exist(kuzzleProfile.savePromise);
-    should.exist(kuzzleProfile.setRoles);
-    should.exist(kuzzleProfile.hydratePromise);
+    should.exist(kuzzleProfile.setPolicies);
     should.exist(kuzzleProfile.deletePromise);
     should.exist(kuzzleProfile.serialize);
   });

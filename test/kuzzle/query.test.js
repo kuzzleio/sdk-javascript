@@ -1,7 +1,8 @@
-var
+ var
   should = require('should'),
   rewire = require('rewire'),
-  proxyquire = require('proxyquire'),
+  sinon = require('sinon'),
+  Kuzzle = require('../../src/kuzzle'),
   EventEmitter = require('events').EventEmitter,
   kuzzleSource = '../../src/kuzzle';
 
@@ -10,58 +11,32 @@ describe('Query management', function () {
   describe('#emitRequest', function () {
     var
       emitRequest = rewire(kuzzleSource).__get__('emitRequest'),
-      Kuzzle,
       kuzzle;
-
-    before(function () {
-      Kuzzle = proxyquire(kuzzleSource, {
-        'socket.io-client': function () { return new EventEmitter; }
-      });
-    });
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
+      kuzzle.network = new EventEmitter;
+      kuzzle.network.send = sinon.stub();
     });
 
-    it('should emit the request when asked to', function (done) {
-      var start = Date.now();
+    it('should emit the request when asked to', function () {
+      var
+        start = Date.now(),
+        request = {requestId: 'bar'};
 
-      this.timeout(50);
-
-      kuzzle.socket.on('kuzzle', function () {
-        // the event is emitted before the historization, so we need to delay our check a bit
-        process.nextTick(() => {
-          var end = Date.now();
-
-          try {
-            should(kuzzle.requestHistory['bar']).be.within(start, end);
-            done();
-          }
-          catch (e) {
-            done(e);
-          }
-        })
-      });
-
-      emitRequest.call(kuzzle, {requestId: 'bar'});
+      emitRequest.call(kuzzle, request);
+      should(kuzzle.network.send.calledWith(request)).be.true();
+      should(kuzzle.requestHistory['bar']).be.within(start, Date.now());
     });
 
     it('should fire a jwtTokenExpired event if the token has expired', function (done) {
       var listenerJwtTokenExpired = false;
 
-      Kuzzle = proxyquire(kuzzleSource, {
-        'socket.io-client': function () {
-          var emitter = new EventEmitter;
-          process.nextTick(() => emitter.emit('bar', {
-            error: {
-              message: 'Token expired'
-            }
-          }));
-          return emitter;
+      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit('bar', {
+        error: {
+          message: 'Token expired'
         }
-      });
-
-      kuzzle = new Kuzzle('foo');
+      }));
 
       kuzzle.addListener('jwtTokenExpired', function() {
         listenerJwtTokenExpired = true;
@@ -79,7 +54,9 @@ describe('Query management', function () {
     });
 
     it('should launch the callback once a response has been received', function (done) {
-      var response = {result: 'foo', error: 'bar'},
+      var
+        response = {result: 'foo', error: 'bar'},
+        request = {requestId: 'someEvent'},
         cb = function (err, res) {
           should(err).be.exactly(response.error);
           should(res).be.exactly(response);
@@ -88,25 +65,8 @@ describe('Query management', function () {
 
       this.timeout(50);
 
-      kuzzle.socket.on('kuzzle', request => {
-        kuzzle.socket.emit(request.requestId, response);
-      });
-
-      emitRequest.call(kuzzle, {requestId: 'someEvent'}, cb);
-    });
-
-    it('should delete older history entries when necessary', function () {
-      var now = Date.now();
-
-      kuzzle.requestHistory['foo'] = now - 30000;
-      kuzzle.requestHistory['bar'] = now - 20000;
-      kuzzle.requestHistory['baz'] = now - 11000;
-      kuzzle.requestHistory['qux'] = now - 1000;
-
-      emitRequest.call(kuzzle, {requestId: 'xyz'});
-
-      should(Object.keys(kuzzle.requestHistory).length).be.exactly(2);
-      should(Object.keys(kuzzle.requestHistory)).match(['qux', 'xyz']);
+      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit(request.requestId, response));
+      emitRequest.call(kuzzle, request, cb);
     });
   });
 
@@ -156,6 +116,13 @@ describe('Query management', function () {
       kuzzle.query(queryArgs, { body: { some: 'query'}}, cb);
 
       should(callback).be.exactly(cb);
+    });
+
+    it('should invoke the callback with an error if no query is provided', () => {
+      should(() => kuzzle.query(queryArgs, () => {})).throw(Error);
+      should(() => kuzzle.query(queryArgs, ['foo', 'bar'])).throw(Error);
+      should(() => kuzzle.query(queryArgs)).throw(Error);
+      should(() => kuzzle.query(queryArgs, 'foobar')).throw(Error);
     });
 
     it('should handle options metadata properly', function () {
@@ -348,6 +315,42 @@ describe('Query management', function () {
 
       should(kuzzle.offlineQueue.length).be.exactly(1);
       should(kuzzle.offlineQueue[0].query.headers).be.undefined();
+    });
+  });
+
+  describe('#cleanHistory', function () {
+    it('should be started by kuzzle constructor', function () {
+      var
+        cleanStub = sinon.stub(),
+        K = rewire(kuzzleSource);
+
+      K.__set__('cleanHistory', cleanStub);
+      new K('foo', {connect: 'manual'});
+
+      should(cleanStub.calledOnce).be.true();
+    });
+
+    it('should clean oldest entries every 1s', function () {
+      var
+        i,
+        clock = sinon.useFakeTimers(),
+        kuzzle = new Kuzzle('foo', {connect: 'manual'});
+
+      for(i = 100000; i >= 0; i -= 10000) {
+        kuzzle.requestHistory[i] = -i;
+      }
+
+      clock.tick(1000);
+
+      // should only contains i == 0 entry
+      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+
+      kuzzle.requestHistory['foobar'] = -100000;
+
+      clock.tick(1000);
+      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+
+      clock.restore();
     });
   });
 });
