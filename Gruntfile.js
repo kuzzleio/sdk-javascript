@@ -1,10 +1,12 @@
-module.exports = function(grunt) {
-  var path = require('path');
+var
+  path = require('path'),
+  webpack = require('webpack');
 
+module.exports = function(grunt) {
   grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-
+  grunt.loadNpmTasks('grunt-webpack');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -14,28 +16,66 @@ module.exports = function(grunt) {
     browserify: {
       kuzzle: {
         src: ['src/kuzzle.js'],
-        dest: 'dist/kuzzle.js',
+        dest: 'dist/browsers/kuzzle.js',
         options: {
-          exclude: ['socket.io-client', 'ws', './src/networkWrapper/wrappers/wsnode.js'],
+          exclude: ['./src/networkWrapper/wrappers/wsnode.js'],
           browserifyOptions: {
             noParse: [require.resolve('node-uuid')]
           }
         }
       }
     },
+    webpack: {
+      kuzzle: {
+        entry: './src/kuzzle.js',
+        output: {
+          path: './dist/webpack',
+          filename: 'kuzzle.js'
+        },
+        watch: false,
+        debug: false,
+        devtool: 'source-map',
+        node: {
+          console: false,
+          global: false,
+          process: false,
+          Buffer: false,
+          __filename: false,
+          __dirname: false,
+          setImmediate: false
+        },
+        module: {
+          noParse: [/wsnode\.js/]
+        },
+        plugins: [
+          new webpack.optimize.OccurenceOrderPlugin(),
+          new webpack.DefinePlugin({
+            'process.env': {
+              'NODE_ENV': JSON.stringify('production')
+            }
+          }),
+          new webpack.optimize.UglifyJsPlugin({
+            compressor: {
+              warnings: false
+            }
+          })
+        ]
+      }
+    },
     uglify: {
       kuzzle: {
         options: {
           'sourceMap': true,
-          'sourceMapName': 'dist/kuzzle.min.map',
+          'sourceMapName': 'dist/browsers/kuzzle.min.map',
           'banner': '// <%= pkg.description %> v<%= pkg.version %> - License: <%= pkg.license %>'
         },
         files: {
-          'dist/kuzzle.min.js': ['dist/kuzzle.js']
+          'dist/browsers/kuzzle.min.js': ['dist/browsers/kuzzle.js']
         }
       }
     }
   });
 
-  grunt.registerTask('default', ['eslint', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['eslint', 'browserify', 'webpack', 'uglify']);
 };
+

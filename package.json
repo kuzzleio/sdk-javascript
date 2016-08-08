@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -36,6 +36,7 @@
     "grunt": "1.0.1",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-uglify": "2.0.0",
+    "grunt-webpack": "^1.0.14",
     "gruntify-eslint": "^3.0.0",
     "istanbul": "0.4.4",
     "istanbul-middleware": "0.2.2",
@@ -43,6 +44,7 @@
     "proxyquire": "^1.7.10",
     "rewire": "^2.5.2",
     "should": "10.0.0",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "webpack": "^1.13.1"
   }
 }
