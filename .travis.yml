@@ -10,10 +10,9 @@ addons:
     - gcc-4.9
     - g++-4.9
 script:
-  - grunt && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+  - npm run build && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 before_install:
   - export CC="gcc-4.9" CXX="g++-4.9"
-  - npm install -g grunt-cli
 install:
   - npm install
 after_success:
@@ -42,4 +41,3 @@ notifications:
     on_success: never
     on_failure: always
     on_start: never
-
