@@ -23,7 +23,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-function Kuzzle (host, options, cb) {
+module.exports = Kuzzle = function (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
@@ -1450,4 +1450,4 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
-module.exports = Kuzzle;
+
