@@ -17,6 +17,7 @@ module.exports = function(grunt) {
       kuzzle: {
         src: ['src/kuzzle.js'],
         dest: 'dist/browsers/kuzzle.js',
+        standalone: 'Kuzzle',
         options: {
           exclude: ['./src/networkWrapper/wrappers/wsnode.js'],
           browserifyOptions: {
