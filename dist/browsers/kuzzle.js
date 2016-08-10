@@ -420,7 +420,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-function Kuzzle (host, options, cb) {
+module.exports = Kuzzle = function (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
@@ -1847,7 +1847,7 @@ Kuzzle.prototype.stopQueuing = function () {
   return this;
 };
 
-module.exports = Kuzzle;
+
 
 }).call(this,require('_process'))
 },{"./kuzzleDataCollection":4,"./kuzzleMemoryStorage":7,"./networkWrapper":9,"./security/kuzzleSecurity":14,"./security/kuzzleUser":16,"_process":1,"node-uuid":2}],4:[function(require,module,exports){
