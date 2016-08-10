@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
   entry: './src/kuzzle.js',
@@ -21,11 +22,11 @@ module.exports = {
   },
   module: {
     noParse: [/wsnode\.js/, /crypto/, /buffer/, /node-uuid/],
-    preLoaders: [
+    loaders: [
       {
         test: /\.js$/,
         loader: 'eslint',
-        include: './src',
+        include: path.resolve(__dirname, './src/'),
         exclude: /node_modules/
       }
     ]
@@ -34,6 +35,7 @@ module.exports = {
     formatter: require('eslint-friendly-formatter')
   },
   plugins: [
+    new webpack.NoErrorsPlugin(),
     new webpack.IgnorePlugin(/wsnode/),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({

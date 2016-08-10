@@ -27,8 +27,6 @@
   "dependencies": {
     "bluebird": "3.4.1",
     "bufferutil": "^1.2.1",
-    "eslint-friendly-formatter": "^2.0.6",
-    "eslint-loader": "^1.5.0",
     "node-uuid": "1.4.7",
     "ora": "^0.3.0",
     "utf-8-validate": "^1.2.1",
@@ -36,6 +34,9 @@
     "ws": "^1.1.1"
   },
   "devDependencies": {
+    "eslint": "^2.10.2",
+    "eslint-friendly-formatter": "^2.0.6",
+    "eslint-loader": "^1.5.0",
     "browserify": "13.1.0",
     "codecov": "^1.0.1",
     "grunt": "1.0.1",
