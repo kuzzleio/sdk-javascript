@@ -17,11 +17,11 @@ module.exports = function(grunt) {
       kuzzle: {
         src: ['src/kuzzle.js'],
         dest: 'dist/browsers/kuzzle.js',
-        standalone: 'Kuzzle',
         options: {
           exclude: ['./src/networkWrapper/wrappers/wsnode.js'],
           browserifyOptions: {
-            noParse: [require.resolve('node-uuid')]
+            noParse: [require.resolve('node-uuid')],
+            standalone: 'Kuzzle'
           }
         }
       }
@@ -45,6 +45,9 @@ module.exports = function(grunt) {
           __filename: false,
           __dirname: false,
           setImmediate: false
+        },
+        module: {
+          noParse: [/node-uuid/]
         },
         plugins: [
           new webpack.IgnorePlugin(/wsnode/),
