@@ -30,7 +30,8 @@ module.exports = function(grunt) {
         entry: './src/kuzzle.js',
         output: {
           path: './dist/webpack',
-          filename: 'kuzzle.js'
+          filename: 'kuzzle.js',
+          libraryTarget: 'umd'
         },
         watch: false,
         debug: false,
@@ -48,9 +49,7 @@ module.exports = function(grunt) {
           new webpack.IgnorePlugin(/wsnode/),
           new webpack.optimize.OccurenceOrderPlugin(),
           new webpack.DefinePlugin({
-            'process.env': {
-              'NODE_ENV': JSON.stringify('production')
-            }
+            global: "window"
           }),
           new webpack.optimize.UglifyJsPlugin({
             compressor: {
