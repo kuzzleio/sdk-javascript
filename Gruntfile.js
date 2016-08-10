@@ -44,10 +44,8 @@ module.exports = function(grunt) {
           __dirname: false,
           setImmediate: false
         },
-        module: {
-          noParse: [/wsnode\.js/]
-        },
         plugins: [
+          new webpack.IgnorePlugin(/wsnode/),
           new webpack.optimize.OccurenceOrderPlugin(),
           new webpack.DefinePlugin({
             'process.env': {
