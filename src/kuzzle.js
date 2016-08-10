@@ -293,7 +293,9 @@ module.exports = Kuzzle = function (host, options, cb) {
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
           'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-          'checkToken', 'whoAmI'];
+          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights',
+          'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
+        ];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
