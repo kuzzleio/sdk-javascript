@@ -20,7 +20,7 @@ describe('WebSocket Browsers networking module', () => {
       return clientStub;
     };
 
-    wsbrowsers = new WSBrowsers('address', 'port');
+    wsbrowsers = new WSBrowsers('address', 'port', false);
   });
 
   afterEach(() => {
@@ -35,6 +35,13 @@ describe('WebSocket Browsers networking module', () => {
     should(clientStub.onclose).not.be.undefined();
     should(clientStub.onerror).not.be.undefined();
     should(clientStub.onmessage).not.be.undefined();
+  });
+
+  it('should initialize a WS secure connection', () => {
+    clientStub.on = sinon.stub();
+    wsbrowsers.ssl = true;
+    wsbrowsers.connect('autoReconnect', 'reconnectionDelay');
+    should(wsargs).match(['wss://address:port']);
   });
 
   it('should call listeners on a "open" event', () => {

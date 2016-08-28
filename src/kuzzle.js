@@ -119,6 +119,10 @@ module.exports = Kuzzle = function (host, options, cb) {
       value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
       enumerable: true
     },
+    sslConnection: {
+      value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
+      enumerable: true
+    },
     autoQueue: {
       value: false,
       enumerable: true,
@@ -311,7 +315,7 @@ Kuzzle.prototype.connect = function () {
   var self = this;
 
   if (!self.network) {
-    self.network = networkWrapper(self.host, self.wsPort, self.ioPort);
+    self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
   }
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
@@ -1451,5 +1455,3 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
-
-
