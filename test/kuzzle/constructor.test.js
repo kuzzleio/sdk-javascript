@@ -1003,7 +1003,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.query({collection: 'collection', controller: 'controller', action: 'action', index: 'index'}, {});
 
         should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 100);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 200);
         should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.index).be.exactly('index');
