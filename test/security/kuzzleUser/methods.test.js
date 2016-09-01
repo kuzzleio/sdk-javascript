@@ -151,10 +151,10 @@ describe('KuzzleUser methods', function () {
   describe('#setProfiles', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profilesIds: ['profile1']});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
     });
 
-    it('should throw an error if the profilesIds parameter is null', function (done) {
+    it('should throw an error if the profileIds parameter is null', function (done) {
       should((function () {
         kuzzleUser.setProfiles(null);
       })).throw(Error);
@@ -162,7 +162,7 @@ describe('KuzzleUser methods', function () {
       done();
     });
 
-    it('should throw an error if the profilesIds parameter is not an array', function (done) {
+    it('should throw an error if the profileIds parameter is not an array', function (done) {
       should((function () {
         kuzzleUser.setProfiles(1);
       })).throw(Error);
@@ -170,7 +170,7 @@ describe('KuzzleUser methods', function () {
       done();
     });
 
-    it('should throw an error if the profilesIds parameter is not an array of strings', function (done) {
+    it('should throw an error if the profileIds parameter is not an array of strings', function (done) {
       should((function () {
         kuzzleUser.setProfiles([1]);
       })).throw(Error);
@@ -178,9 +178,9 @@ describe('KuzzleUser methods', function () {
       done();
     });
 
-    it('should add the rights profiles IDs in profilesIds', function (done) {
+    it('should add the rights profiles IDs in profileIds', function (done) {
       kuzzleUser.setProfiles(['profile2']);
-      should(kuzzleUser.content.profilesIds[0]).be.exactly('profile2');
+      should(kuzzleUser.content.profileIds[0]).be.exactly('profile2');
       done();
     });
   });
@@ -189,7 +189,7 @@ describe('KuzzleUser methods', function () {
   describe('#addProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profilesIds: ['profile1']});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
     });
 
     it('should throw an error if the profileId parameter is null', function (done) {
@@ -211,22 +211,22 @@ describe('KuzzleUser methods', function () {
     it('should  add the profile if it does not already exists in list', function (done) {
       kuzzleUser.addProfile('profile2');
 
-      should(kuzzleUser.content.profilesIds).be.eql(['profile1', 'profile2']);
+      should(kuzzleUser.content.profileIds).be.eql(['profile1', 'profile2']);
       done();
     });
 
     it('should not add the profile if it already exists in list', function (done) {
       kuzzleUser.addProfile('profile1');
 
-      should(kuzzleUser.content.profilesIds).be.eql(['profile1']);
+      should(kuzzleUser.content.profileIds).be.eql(['profile1']);
       done();
     });
 
-    it('should add the profile even if no profilesIds are currently set', function (done) {
-      delete kuzzleUser.content.profilesIds;
+    it('should add the profile even if no profileIds are currently set', function (done) {
+      delete kuzzleUser.content.profileIds;
       kuzzleUser.addProfile('profile1');
 
-      should(kuzzleUser.content.profilesIds).be.eql(['profile1']);
+      should(kuzzleUser.content.profileIds).be.eql(['profile1']);
       done();
     });
 
@@ -235,14 +235,14 @@ describe('KuzzleUser methods', function () {
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds: ['profile']});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
     });
 
     it('should serialize with correct attributes', function (done) {
       var serialized = kuzzleUser.serialize();
 
       should(serialized._id).be.exactly('user');
-      should(serialized.body).be.match({some: 'content', profilesIds: ['profile']});
+      should(serialized.body).be.match({some: 'content', profileIds: ['profile']});
       done();
     });
   });
@@ -254,7 +254,7 @@ describe('KuzzleUser methods', function () {
       error = false;
 
       result = { result: {_id: 'user'} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds: ['profile']});
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
       expectedQuery = {
         action: 'deleteUser',
         controller: 'security'
@@ -288,10 +288,10 @@ describe('KuzzleUser methods', function () {
 
   describe('#getProfiles', function () {
     it('should return the associated profiles', function () {
-      var profilesIds = ['profile'];
+      var profileIds = ['profile'];
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profilesIds});
-      should(kuzzleUser.getProfiles()).be.eql(profilesIds);
+      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds});
+      should(kuzzleUser.getProfiles()).be.eql(profileIds);
     });
   });
 });
