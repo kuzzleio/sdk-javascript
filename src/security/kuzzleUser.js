@@ -41,12 +41,12 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @returns {KuzzleUser} this
  */
-KuzzleUser.prototype.setProfiles = function (profilesIds) {
-  if (!Array.isArray(profilesIds) || typeof profilesIds[0] !== 'string') {
-    throw new Error('Parameter "profilesIds" must be an array of strings');
+KuzzleUser.prototype.setProfiles = function (profileIds) {
+  if (!Array.isArray(profileIds) || typeof profileIds[0] !== 'string') {
+    throw new Error('Parameter "profileIds" must be an array of strings');
   }
 
-  this.content.profilesIds = profilesIds;
+  this.content.profileIds = profileIds;
 
   return this;
 };
@@ -62,12 +62,12 @@ KuzzleUser.prototype.addProfile = function (profileId) {
     throw new Error('Parameter "profileId" must be a string');
   }
 
-  if (!this.content.profilesIds) {
-    this.content.profilesIds = [];
+  if (!this.content.profileIds) {
+    this.content.profileIds = [];
   }
 
-  if (this.content.profilesIds.indexOf(profileId) === -1) {
-    this.content.profilesIds.push(profileId);
+  if (this.content.profileIds.indexOf(profileId) === -1) {
+    this.content.profileIds.push(profileId);
   }
 
   return this;
@@ -131,7 +131,7 @@ KuzzleUser.prototype.serialize = function () {
  * @return {array} the associated profiles IDs
  */
 KuzzleUser.prototype.getProfiles = function () {
-  return this.content.profilesIds;
+  return this.content.profileIds;
 };
 
 module.exports = KuzzleUser;
