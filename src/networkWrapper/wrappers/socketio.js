@@ -1,6 +1,7 @@
-function SocketIO(host, port) {
+function SocketIO(host, port, ssl) {
   this.host = host;
   this.port = port;
+  this.ssl = ssl;
   this.socket = null;
 
   /**
@@ -11,7 +12,7 @@ function SocketIO(host, port) {
    * @param {int} reconnectionDelay
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.socket = window.io('http://' + this.host + ':' + this.port, {
+    this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
       reconnection: autoReconnect,
       reconnectionDelay: reconnectionDelay,
       forceNew: true

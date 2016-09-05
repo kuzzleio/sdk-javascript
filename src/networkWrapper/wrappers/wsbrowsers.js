@@ -1,7 +1,8 @@
-function WSBrowsers(host, port) {
+function WSBrowsers(host, port, ssl) {
   var self = this;
   this.host = host;
   this.port = port;
+  this.ssl = ssl;
   this.client = null;
   this.retrying = false;
 
@@ -28,7 +29,7 @@ function WSBrowsers(host, port) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WebSocket('ws://' + this.host + ':' + this.port);
+    this.client = new WebSocket((this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port);
 
     this.client.onopen = function () {
       if (self.retrying) {

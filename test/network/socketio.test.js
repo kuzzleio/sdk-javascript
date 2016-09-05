@@ -17,7 +17,7 @@ describe('SocketIO networking module', () => {
       close: sinon.stub()
     };
 
-    socketIO = new SocketIO('address', 'port');
+    socketIO = new SocketIO('address', 'port', false);
     socketIO.socket = socketStub;
   });
 
@@ -26,6 +26,19 @@ describe('SocketIO networking module', () => {
     socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
     should(window.io.calledOnce).be.true();
     should(window.io.calledWithMatch('http://address:port', {
+      reconnection: 'autoReconnectValue',
+      reconnectionDelay: 'reconnectionDelayValue',
+      forceNew: true
+    })).be.true();
+
+    window = undefined;
+  });
+
+  it('should connect with the secure connection', () => {
+    window = {io: sinon.stub()};
+    socketIO.ssl = true;
+    socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
+    should(window.io.calledWithMatch('https://address:port', {
       reconnection: 'autoReconnectValue',
       reconnectionDelay: 'reconnectionDelayValue',
       forceNew: true

@@ -13,7 +13,7 @@ describe('Kuzzle constructor', () => {
     networkStub;
 
   beforeEach(function () {
-    networkStub = sinon.stub(new NetworkWrapper('address', 'port'));
+    networkStub = sinon.stub(new NetworkWrapper('address', 'port', false));
   });
 
   describe('#constructor', function () {
@@ -71,6 +71,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('wsPort', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('ioPort', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: false, configurable: false });
     });
 
     it('should have properties with the documented default values', () => {
@@ -89,6 +90,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.defaultIndex).be.undefined();
       should(kuzzle.wsPort).be.exactly(7513);
       should(kuzzle.ioPort).be.exactly(7512);
+      should(kuzzle.sslConnection).be.false();
     });
 
     it('should initialize correctly properties using the "options" argument', () => {
@@ -106,7 +108,8 @@ describe('Kuzzle constructor', () => {
           reconnectionDelay: 666,
           defaultIndex: 'foobar',
           wsPort: 1234,
-          ioPort: 4567
+          ioPort: 4567,
+          sslConnection: true
         },
         kuzzle = new Kuzzle('nowhere', options);
 
@@ -123,6 +126,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
       should(kuzzle.wsPort).be.exactly(options.wsPort);
       should(kuzzle.ioPort).be.exactly(options.ioPort);
+      should(kuzzle.sslConnection).be.exactly(options.sslConnection);
     });
 
     it('should handle the offlineMode option properly', () => {
@@ -999,7 +1003,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.query({collection: 'collection', controller: 'controller', action: 'action', index: 'index'}, {});
 
         should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 100);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 200);
         should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.index).be.exactly('index');

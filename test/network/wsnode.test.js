@@ -37,6 +37,13 @@ describe('WebSocket NodeJS networking module', () => {
     should(clientStub.on.calledWithMatch('message', sinon.match.func)).be.true();
   });
 
+  it('should initialize a WS secure connection', () => {
+    clientStub.on = sinon.stub();
+    wsnode.ssl = true;
+    wsnode.connect('autoReconnect', 'reconnectionDelay');
+    should(wsargs).match(['wss://address:port', {perMessageDeflate: false}]);
+  });
+
   it('should call listeners on a "open" event', () => {
     var cb = sinon.stub();
 
