@@ -456,7 +456,7 @@ Kuzzle.prototype.login = function (strategy) {
       strategy: strategy
     },
     credentials,
-    cb;
+    cb = null;
 
   // Handle arguments (credentials, expiresIn, cb)
   if (arguments[1]) {
@@ -491,20 +491,13 @@ Kuzzle.prototype.login = function (strategy) {
         self.setJwtToken(response.result.jwt);
       }
 
-      if (cb && typeof cb === 'function') {
-        cb(null, response.result);
-      }
+      cb && cb(null, response.result);
     }
     else {
-      if (cb && typeof cb === 'function') {
-        cb(error);
-      }
-
+      cb && cb(error);
       self.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
-
-  return self;
 };
 
 /**
@@ -523,15 +516,12 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, typeof cb !== 'function' ? null : function(error) {
     if (error === null) {
       self.jwtToken = undefined;
-
-      if (typeof cb === 'function') {
-        cb(null, self);
-      }
+      cb(null, self);
     }
-    else if (typeof cb === 'function') {
+    else {
       cb(error);
     }
   });
@@ -549,7 +539,6 @@ Kuzzle.prototype.logout = function (cb) {
  */
 Kuzzle.prototype.checkToken = function (token, callback) {
   var
-    self = this,
     request = {
       body: {
         token: token
@@ -565,8 +554,6 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 
     callback(null, response.result);
   });
-
-  return self;
 };
 
 /**
@@ -588,13 +575,12 @@ Kuzzle.prototype.whoAmI = function (callback) {
 
     callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
   });
-
-  return self;
 };
 
 /**
  * Gets the rights array of the currently logged user.
  *
+ * @param {object} [options] - Optional parameters
  * @param  {function} cb The callback containing the normalized array of rights.
  */
 Kuzzle.prototype.getMyRights = function (options, cb) {
@@ -636,17 +622,11 @@ Kuzzle.prototype.updateSelf = function (content, options, cb) {
 
   data.body = content;
 
-  if (cb) {
-    self.query(queryArgs, data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  self.query(queryArgs, data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
 
-      cb(null, res.result);
-    });
-  } else {
-    self.query(queryArgs, data, options);
-  }
+  return this;
 };
 
 /**
@@ -719,9 +699,7 @@ function emitRequest (request, cb) {
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
-      if (cb) {
-        cb(response.error, response);
-      }
+      cb && cb(response.error, response);
     });
   }
 
@@ -847,8 +825,6 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 
     cb(null, res.result.hits);
   });
-
-  return this;
 };
 
 /**
@@ -861,7 +837,9 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
  * @returns {object} this
  */
 Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
-  var queryCB;
+  var
+    queryCB,
+    body;
 
   if (!cb) {
     if (arguments.length === 1) {
@@ -885,22 +863,13 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
       return cb(err);
     }
 
-    if (timestamp) {
-      cb(null, res.result.hits);
-    } else {
-      cb(null, [res.result]);
-    }
+    cb(null, timestamp ? res.result.hits : [res.result]);
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
-  if (!timestamp) {
-    this.query({controller: 'admin', action: 'getLastStats'}, {}, options, queryCB);
-  } else {
-    this.query({controller: 'admin', action: 'getStats'}, { body: { startTime: timestamp } }, options, queryCB);
-  }
-
-  return this;
+  body = timestamp ? {body: {startTime: timestamp}} : {};
+  this.query({controller: 'admin', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
 };
 
 /**
@@ -922,12 +891,8 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
     index = this.defaultIndex;
   }
 
-  if (typeof index !== 'string') {
-    throw new Error('Invalid "index" argument: string expected, got ' + typeof index);
-  }
-
-  if (typeof collection !== 'string') {
-    throw new Error('Invalid "collection" argument: string expected, got ' + typeof collection);
+  if (typeof index !== 'string' || typeof collection !== 'string') {
+    throw new Error('Invalid index or collection argument: string expected');
   }
 
   if (!this.collections[index]) {
@@ -1000,10 +965,8 @@ Kuzzle.prototype.listCollections = function () {
       return cb(err);
     }
 
-    return cb(null, res.result.collections);
+    cb(null, res.result.collections);
   });
-
-  return this;
 };
 
 /**
@@ -1022,14 +985,8 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
   this.callbackRequired('Kuzzle.listIndexes', cb);
 
   this.query({controller: 'read', action: 'listIndexes'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    return cb(null, res.result.indexes);
+    cb(err, err ? undefined : res.result.indexes);
   });
-
-  return this;
 };
 
 /**
@@ -1072,8 +1029,6 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 
     cb(null, res.result.serverInfo);
   });
-
-  return this;
 };
 
 /**
@@ -1153,8 +1108,6 @@ Kuzzle.prototype.getAutoRefresh = function () {
 
   this.callbackRequired('Kuzzle.getAutoRefresh', cb);
   this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
-
-  return this;
 };
 
 /**
@@ -1221,14 +1174,8 @@ Kuzzle.prototype.now = function (options, cb) {
   this.callbackRequired('Kuzzle.now', cb);
 
   this.query({controller: 'read', action: 'now'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.now);
+    cb(err, res && res.result.now);
   });
-
-  return this;
 };
 
 /**
@@ -1351,6 +1298,8 @@ Kuzzle.prototype.removeAllListeners = function (event) {
       self.eventListeners[eventName].listeners = [];
     });
   }
+
+  return this;
 };
 
 /**
@@ -1373,6 +1322,8 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
       self.eventListeners[event].listeners.splice(index, 1);
     }
   });
+
+  return this;
 };
 
 /**

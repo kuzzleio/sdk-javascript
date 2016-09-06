@@ -146,17 +146,9 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
-  if (cb) {
-    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options, function (err) {
-      if (err) {
-        return cb(err);
-      }
-
-      cb(null, self.id);
-    });
-  } else {
-    this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options);
-  }
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options, cb && function (err) {
+    cb(err, err ? undefined : self.id);
+  });
 };
 
 /**
@@ -221,7 +213,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
 
   self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrReplace'), data, options, function (error, res) {
     if (error) {
-      return cb ? cb(error) : false;
+      return cb && cb(error);
     }
 
     self.id = res.result._id;

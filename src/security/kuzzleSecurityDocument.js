@@ -134,6 +134,8 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
       cb(null, self);
     }
   });
+
+  return this;
 };
 
 module.exports = KuzzleSecurityDocument;

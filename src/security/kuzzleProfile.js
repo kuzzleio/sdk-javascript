@@ -59,14 +59,8 @@ KuzzleProfile.prototype.save = function (options, cb) {
 
   data = this.serialize();
 
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, options, function (error) {
-    if (error) {
-      return cb ? cb(error) : false;
-    }
-
-    if (cb) {
-      cb(null, self);
-    }
+  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, options, cb && function (error) {
+    cb(error, error ? undefined : self);
   });
 
   return self;
