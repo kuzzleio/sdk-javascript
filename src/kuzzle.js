@@ -447,7 +447,6 @@ Kuzzle.prototype.getJwtToken = function() {
  * @param credentials
  * @param expiresIn
  * @param cb
- * @returns {Kuzzle}
  */
 Kuzzle.prototype.login = function (strategy) {
   var
@@ -535,7 +534,6 @@ Kuzzle.prototype.logout = function (cb) {
  * @param  {string}   token     The jwt token to check
  * @param  {function} callback  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
- * @return {Kuzzle}             The Kuzzle instance to enable chaining.
  */
 Kuzzle.prototype.checkToken = function (token, callback) {
   var
@@ -561,7 +559,6 @@ Kuzzle.prototype.checkToken = function (token, callback) {
  *
  * @param  {function} callback  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
- * @return {Kuzzle}             The Kuzzle instance to enable chaining.
  */
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
@@ -608,6 +605,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
  * @param {object} content - a plain javascript object representing the user's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.updateSelf = function (content, options, cb) {
   var
@@ -808,7 +806,6 @@ Kuzzle.prototype.addListener = function(event, listener) {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getAllStatistics = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -834,7 +831,6 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
  * @param {number} timestamp -  Epoch time. Starting time from which the frames are to be retrieved
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
   var
@@ -922,7 +918,6 @@ Kuzzle.prototype.flushQueue = function () {
  * @param {string} [index] - Index containing collections to be listed
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.listCollections = function () {
   var
@@ -974,7 +969,6 @@ Kuzzle.prototype.listCollections = function () {
  *
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.listIndexes = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1012,7 +1006,6 @@ Kuzzle.prototype.disconnect = function () {
  *
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getServerInfo = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1077,7 +1070,6 @@ Kuzzle.prototype.refreshIndex = function () {
  * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
  * @param {object} options - Optinal arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getAutoRefresh = function () {
   var
@@ -1163,7 +1155,6 @@ Kuzzle.prototype.setAutoRefresh = function () {
  * Return the current Kuzzle's UTC Epoch time, in milliseconds
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.now = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1281,6 +1272,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
  * Removes all listeners, either from a specific event or from all events
  *
  * @param {string} event - One of the event described in the Event Handling section of this documentation
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeAllListeners = function (event) {
   var
@@ -1307,6 +1299,7 @@ Kuzzle.prototype.removeAllListeners = function (event) {
  *
  * @param {string} event - One of the event described in the Event Handling section of this documentation
  * @param {string} listenerId - The ID returned by addListener
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeListener = function (event, listenerId) {
   var

@@ -82,7 +82,6 @@ function KuzzleDataCollection(kuzzle, index, collection) {
  * @param {object} filters - Filters in Elasticsearch Query DSL format
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
   var
@@ -127,7 +126,6 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
  * @param {object} filters - Filters in Elasticsearch Query DSL format
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.count = function (filters, options, cb) {
   var
@@ -249,7 +247,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {Object} this
+ * @returns {KuzzleDataCollection} this
  */
 KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   var
@@ -289,7 +287,6 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
  * @param {string} documentId - Unique document identifier
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb) {
   var
@@ -322,7 +319,6 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   var filters = {};
@@ -354,7 +350,6 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
- * @return {object} this
  */
 KuzzleDataCollection.prototype.getMapping = function (options, cb) {
   var kuzzleMapping;

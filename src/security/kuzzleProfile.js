@@ -41,7 +41,7 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {Object} this
+ * @returns {KuzzleProfile} this
  */
 KuzzleProfile.prototype.save = function (options, cb) {
   var

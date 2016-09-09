@@ -82,7 +82,7 @@ KuzzleUser.prototype.addProfile = function (profileId) {
  *
  * @param {responseCallback} [cb] - Handles the query response
  * @param {object} [options] - Optional parameters
- * @returns {*} this
+ * @returns {KuzzleUser} this
  */
 KuzzleUser.prototype.save = function (options, cb) {
   var

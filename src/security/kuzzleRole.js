@@ -44,6 +44,7 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleRole} this object
  */
 KuzzleRole.prototype.save = function (options, cb) {
   var

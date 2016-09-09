@@ -156,6 +156,7 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the role's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   var
@@ -190,6 +191,7 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
  * @param {string} id - Role id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
   var data = {_id: id};
@@ -337,6 +339,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the profile's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
   var
@@ -384,6 +387,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
   var data = {_id: id};
@@ -522,6 +526,7 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the user's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
   var
@@ -559,6 +564,7 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
   var data = {_id: id};
