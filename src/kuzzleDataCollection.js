@@ -272,8 +272,12 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   data = this.kuzzle.addHeaders(data, this.headers);
 
   this.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
-    var result = action === 'delete' ? [res.result._id] : res.result.ids;
-    cb(err, err ? undefined : result);
+    if (err) {
+      cb(err);
+    }
+    else {
+      cb(null, (action === 'delete' ? [res.result._id] : res.result.ids));
+    }
   });
 
   return this;
