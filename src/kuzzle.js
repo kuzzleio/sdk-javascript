@@ -593,7 +593,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
 
   self.callbackRequired('Kuzzle.getMyRights', cb);
 
-  self.query({controller: 'auth', action:'getMyRights'}, {}, null, function (err, res) {
+  self.query({controller: 'auth', action:'getMyRights'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
