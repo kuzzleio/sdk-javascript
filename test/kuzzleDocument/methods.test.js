@@ -4,7 +4,8 @@ var
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDocument = rewire('../../src/kuzzleDocument'),
-  KuzzleRoom = require('../../src/kuzzleRoom');
+  KuzzleRoom = require('../../src/kuzzleRoom'),
+  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('KuzzleDocument methods', function () {
   var
@@ -432,7 +433,7 @@ describe('KuzzleDocument methods', function () {
         document = new KuzzleDocument(dataCollection);
 
       document.id = 'foo';
-      should(document.subscribe({}, function () {})).be.instanceof(KuzzleRoom);
+      should(document.subscribe({}, function () {})).be.instanceof(KuzzleSubscribeResult);
       should(emitted).be.true();
     });
 

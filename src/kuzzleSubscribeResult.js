@@ -13,6 +13,7 @@ function KuzzleSubscribeResult() {
  */
 KuzzleSubscribeResult.prototype.onSuccess = function (cb) {
   this.onSuccessCB.push(cb);
+  return this;
 };
 
 /**
@@ -21,6 +22,7 @@ KuzzleSubscribeResult.prototype.onSuccess = function (cb) {
  */
 KuzzleSubscribeResult.prototype.onError = function (cb) {
   this.onErrorCB.push(cb);
+  return this;
 };
 
 /**

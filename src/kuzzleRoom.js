@@ -166,7 +166,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
     filters = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+  self.kuzzle.callbackRequired('KuzzleRoom.renew', notificationCB);
 
   /*
     Skip subscription renewal if another one was performed a moment before
