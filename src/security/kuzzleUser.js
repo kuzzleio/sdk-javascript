@@ -82,7 +82,7 @@ KuzzleUser.prototype.addProfile = function (profileId) {
  *
  * @param {responseCallback} [cb] - Handles the query response
  * @param {object} [options] - Optional parameters
- * @returns {*} this
+ * @returns {KuzzleUser} this
  */
 KuzzleUser.prototype.save = function (options, cb) {
   var
@@ -94,14 +94,8 @@ KuzzleUser.prototype.save = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, function (error) {
-    if (error) {
-      return cb ? cb(error) : false;
-    }
-
-    if (cb) {
-      cb(null, self);
-    }
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
+    cb(error, error ? undefined : self);
   });
 
   return self;
@@ -113,16 +107,7 @@ KuzzleUser.prototype.save = function (options, cb) {
  * @return {object} JSON object representing this User
  */
 KuzzleUser.prototype.serialize = function () {
-  var
-    data = {};
-
-  if (this.id) {
-    data._id = this.id;
-  }
-
-  data.body = this.content;
-
-  return data;
+  return {_id: this.id, body: this.content};
 };
 
 /**

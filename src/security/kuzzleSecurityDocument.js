@@ -48,7 +48,7 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
  * Changes made by this function won’t be applied until the save method is called.
  *
  * @param {Object} data - New securityDocument content
- * @return {Object} this
+ * @return {KuzzleSecurityDocument} this
  */
 KuzzleSecurityDocument.prototype.setContent = function (data) {
   this.content = data;
@@ -105,6 +105,7 @@ KuzzleSecurityDocument.prototype.delete = function (options, cb) {
  * @param {object} content - Content to add to KuzzleSecurityDocument
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurityDocument} this
  */
 KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
   var
@@ -134,6 +135,8 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
       cb(null, self);
     }
   });
+
+  return this;
 };
 
 module.exports = KuzzleSecurityDocument;

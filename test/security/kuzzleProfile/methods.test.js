@@ -6,13 +6,13 @@ var
   KuzzleProfile = require('../../../src/security/kuzzleProfile'),
   KuzzleRole = require('../../../src/security/kuzzleRole');
 
-describe('KuzzleRole methods', function () {
+describe('KuzzleProfile methods', function () {
   var
     kuzzle,
     kuzzleProfile,
     result,
     expectedQuery,
-    error = false,
+    error = null,
     queryStub = function (args, query, options, cb) {
       should(args.controller).be.exactly(expectedQuery.controller);
       should(args.action).be.exactly(expectedQuery.action);
@@ -48,7 +48,7 @@ describe('KuzzleRole methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myProfile', _source: {policies : []}} };
       kuzzleProfile = new KuzzleProfile(kuzzle.security, result.result._id, result.result._source);
@@ -97,7 +97,7 @@ describe('KuzzleRole methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myProfile', _index: '%kuzzle', _type: 'profiles'} };
       kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
@@ -256,7 +256,7 @@ describe('KuzzleRole methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myProfile'} };
       kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles: [{roleId:'role1'}]});

@@ -377,7 +377,7 @@ describe('KuzzleSecurity profiles methods', function () {
     });
   });
 
-  describe('#deleteRole', function () {
+  describe('#deleteProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
