@@ -13,7 +13,7 @@ describe('KuzzleUser methods', function () {
     kuzzleUser,
     result,
     expectedQuery,
-    error = false,
+    error = null,
     queryStub = function (args, query, options, cb) {
       should(args.controller).be.exactly(expectedQuery.controller);
       should(args.action).be.exactly(expectedQuery.action);
@@ -36,20 +36,14 @@ describe('KuzzleUser methods', function () {
         should(query._id).be.exactly(expectedQuery._id);
       }
 
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
-        cb(error, result);
-      }
+      cb && cb(error, result);
     };
 
   describe('#save', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
       kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
@@ -97,7 +91,7 @@ describe('KuzzleUser methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myUser', _index: '%kuzzle', _type: 'users'} };
       kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
@@ -251,7 +245,7 @@ describe('KuzzleUser methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'user'} };
       kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});

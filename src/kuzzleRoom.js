@@ -131,7 +131,7 @@ KuzzleRoom.prototype.count = function (cb) {
 
   if (!isReady.call(this)) {
     this.queue.push({action: 'count', args: [cb]});
-    return this;
+    return;
   }
 
   if (!this.roomId) {
@@ -139,14 +139,8 @@ KuzzleRoom.prototype.count = function (cb) {
   }
 
   this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.count);
+    cb(err, res && res.result.count);
   });
-
-  return this;
 };
 
 /**
@@ -176,7 +170,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     Skip subscription renewal if another one was performed a moment before
    */
   if (self.lastRenewal && (now - self.lastRenewal) <= self.renewalDelay) {
-    return self;
+    return;
   }
 
   if (filters) {
@@ -190,12 +184,12 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
   if (self.kuzzle.state !== 'connected') {
     self.callback = cb;
     self.kuzzle.subscriptions.pending[self.id] = self;
-    return self;
+    return;
   }
 
   if (self.subscribing) {
     self.queue.push({action: 'renew', args: [filters, cb]});
-    return self;
+    return;
   }
 
   self.unsubscribe();
@@ -231,8 +225,6 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
     dequeue.call(self);
   });
-
-  return self;
 };
 
 /**
@@ -339,10 +331,7 @@ function dequeue () {
 }
 
 function isReady() {
-  if (this.kuzzle.state !== 'connected' || this.subscribing) {
-    return false;
-  }
-  return true;
+  return this.kuzzle.state === 'connected' && !this.subscribing;
 }
 
 module.exports = KuzzleRoom;
