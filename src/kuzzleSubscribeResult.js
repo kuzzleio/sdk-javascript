@@ -3,45 +3,27 @@
  * @constructor
  */
 function KuzzleSubscribeResult() {
-  this.onSuccessCB = [];
-  this.onErrorCB = [];
+  this.cbs = [];
 }
 
 /**
- * Registers a callback to be called on a successful subscription
+ * Registers a callback to be called with a subscription result
  * @param {Function} cb
  */
-KuzzleSubscribeResult.prototype.onSuccess = function (cb) {
-  this.onSuccessCB.push(cb);
+KuzzleSubscribeResult.prototype.onDone = function (cb) {
+  this.cbs.push(cb);
   return this;
 };
 
 /**
- * Registers a callback to be called on a failed subscription
- * @param {Function} cb
- */
-KuzzleSubscribeResult.prototype.onError = function (cb) {
-  this.onErrorCB.push(cb);
-  return this;
-};
-
-/**
- * Calls all onSuccess callbacks
+ * Calls all registered callbacks
+ *
+ * @param {Object} error object
  * @param {KuzzleRoom} room
  */
-KuzzleSubscribeResult.prototype.success = function (room) {
-  this.onSuccessCB.forEach(function (cb) {
-    cb(room);
-  });
-};
-
-/**
- * Calls all onError callbacks
- * @param {Error} err
- */
-KuzzleSubscribeResult.prototype.error = function (err) {
-  this.onErrorCB.forEach(function (cb) {
-    cb(err);
+KuzzleSubscribeResult.prototype.done = function (error, room) {
+  this.cbs.forEach(function (cb) {
+    cb(error, room);
   });
 };
 

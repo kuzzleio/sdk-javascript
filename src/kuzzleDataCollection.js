@@ -460,9 +460,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
   subscribeResult = new KuzzleSubscribeResult();
   room = new KuzzleRoom(this, options);
 
-  room.renew(filters, cb, function (err, res) {
-    err && subscribeResult.error(err) || subscribeResult.success(res);
-  });
+  room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
 
   return subscribeResult;
 };

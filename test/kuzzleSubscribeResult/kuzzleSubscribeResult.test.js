@@ -10,78 +10,44 @@ describe('KuzzleSubscribeResult object', function () {
   });
 
   it('should expose the right prototypes', function() {
-    should(ksr.onSuccess).be.a.Function();
-    should(ksr.onError).be.a.Function();
-    should(ksr.success).be.a.Function();
-    should(ksr.error).be.a.Function();
+    should(ksr.onDone).be.a.Function();
+    should(ksr.done).be.a.Function();
   });
 
-  it('should register a callback and return itself on a onSuccess call', function () {
+  it('should register a callback and return itself on a onDone call', function () {
     var cb = function () {};
 
-    should(ksr.onSuccess(cb)).be.eql(ksr);
-    should(ksr.onSuccess(cb)).be.eql(ksr);
-    should(ksr.onSuccess(cb)).be.eql(ksr);
+    should(ksr.onDone(cb)).be.eql(ksr);
+    should(ksr.onDone(cb)).be.eql(ksr);
+    should(ksr.onDone(cb)).be.eql(ksr);
 
-    should(ksr.onSuccessCB).have.length(3);
-    ksr.onSuccessCB.forEach(function (foo) {
+    should(ksr.cbs).have.length(3);
+    ksr.cbs.forEach(function (foo) {
       should(foo).be.eql(cb);
     });
   });
 
-  it('should register a callback and return itself on a onError call', function () {
-    var cb = function () {};
-
-    should(ksr.onError(cb)).be.eql(ksr);
-    should(ksr.onError(cb)).be.eql(ksr);
-    should(ksr.onError(cb)).be.eql(ksr);
-
-    should(ksr.onErrorCB).have.length(3);
-    ksr.onErrorCB.forEach(function (foo) {
-      should(foo).be.eql(cb);
-    });
-  });
-
-  it('should call all error callbacks on a success call', function (done) {
+  it('should call all callbacks on a done call', function (done) {
     var
       count = 0,
-      cb = function (arg) {
+      cb = function (err, res) {
         count++;
-        should(arg).be.eql(foo);
+        should(err).be.eql(foo);
+        should(res).be.eql(bar);
         if (count === 3) {
           done();
         }
       },
-      foo = 'bar';
+      foo = 'bar',
+      bar = 'baz';
 
     this.timeout(50);
 
-    ksr.onSuccess(cb);
-    ksr.onSuccess(cb);
-    ksr.onSuccess(cb);
+    ksr.onDone(cb);
+    ksr.onDone(cb);
+    ksr.onDone(cb);
 
-    ksr.success(foo);
-  });
-
-  it('should call all success callbacks on an error call', function (done) {
-    var
-      count = 0,
-      cb = function (arg) {
-        count++;
-        should(arg).be.eql(foo);
-        if (count === 3) {
-          done();
-        }
-      },
-      foo = 'bar';
-
-    this.timeout(50);
-
-    ksr.onError(cb);
-    ksr.onError(cb);
-    ksr.onError(cb);
-
-    ksr.error(foo);
+    ksr.done(foo, bar);
   });
 });
 
