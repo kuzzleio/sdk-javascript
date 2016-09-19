@@ -55,10 +55,14 @@ describe('Query management', function () {
 
     it('should launch the callback once a response has been received', function (done) {
       var
-        response = {result: 'foo', error: 'bar'},
+        response = {result: 'foo', error: {foo: 'bar', message: 'foobar'}, status: 42},
         request = {requestId: 'someEvent'},
         cb = function (err, res) {
-          should(err).be.exactly(response.error);
+          should(err).be.instanceOf(Error);
+          should(err.message).be.exactly(response.error.message);
+          should(err.stack).be.a.String();
+          should(err.foo).be.exactly('bar');
+          should(err.status).be.exactly(42);
           should(res).be.exactly(response);
           done();
         };
