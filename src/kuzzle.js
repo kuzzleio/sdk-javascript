@@ -340,7 +340,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.host + '"');
+    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + '"');
 
     connectionError.internal = error;
     self.state = 'error';
