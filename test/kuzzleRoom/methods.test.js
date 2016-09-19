@@ -181,9 +181,9 @@ describe('KuzzleRoom methods', function () {
     it('should delay the request until after subscribing', function () {
       var cb = function () {};
       room.subscribing = true;
-      room.renew({}, cb);
+      room.renew({}, cb, cb);
       should(emitted).be.false();
-      should(room.queue).match([{action: 'renew', args: [{}, cb]}]);
+      should(room.queue).match([{action: 'renew', args: [{}, cb, cb]}]);
     });
 
     it('should register itself in the global subscription list', function () {

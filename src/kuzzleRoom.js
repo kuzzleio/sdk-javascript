@@ -190,7 +190,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
   }
 
   if (self.subscribing) {
-    self.queue.push({action: 'renew', args: [filters, notificationCB]});
+    self.queue.push({action: 'renew', args: [filters, notificationCB, cb]});
     return;
   }
 
