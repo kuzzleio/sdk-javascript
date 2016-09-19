@@ -692,12 +692,19 @@ function emitRequest (request, cb) {
 
   if (self.jwtToken !== undefined || cb) {
     self.network.once(request.requestId, function (response) {
+      var error;
+
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
-      cb && cb(response.error, response);
+      if (cb) {
+        error = new Error(response.error.message);
+        Object.assign(error, response.error);
+        error.status = response.status;
+        cb(error, response);
+      }
     });
   }
 
