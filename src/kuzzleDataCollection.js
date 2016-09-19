@@ -16,15 +16,14 @@ var
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
  * @param {object} kuzzle - Kuzzle instance to inherit from
- * @param {string} index - Index containing the data collection
  * @param {string} collection - name of the data collection to handle
+ * @param {string} index - Index containing the data collection
  * @constructor
  */
-function KuzzleDataCollection(kuzzle, index, collection) {
+function KuzzleDataCollection(kuzzle, collection, index) {
   if (!index || !collection) {
     throw new Error('The KuzzleDataCollection object constructor needs an index and a collection arguments');
   }
-
 
   Object.defineProperties(this, {
     // read-only properties

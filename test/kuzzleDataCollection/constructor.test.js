@@ -14,7 +14,7 @@ describe('KuzzleDataCollection constructor', function () {
       c;
 
     kuzzle.headers.some = 'headers';
-    c = new KuzzleDataCollection(kuzzle, index, collection);
+    c = new KuzzleDataCollection(kuzzle, collection, index);
 
     // the collection "headers" should be a hard copy of the kuzzle ones
     kuzzle.headers = { someother: 'headers' };
@@ -38,7 +38,7 @@ describe('KuzzleDataCollection constructor', function () {
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo');
-    dataCollection = new KuzzleDataCollection(kuzzle, 'foo', 'bar');
+    dataCollection = new KuzzleDataCollection(kuzzle, 'bar', 'foo');
 
     should.exist(dataCollection.advancedSearchPromise);
     should.exist(dataCollection.countPromise);
