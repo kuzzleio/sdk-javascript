@@ -840,7 +840,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
-        collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection),
+        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index),
         options = { queuable: false };
       expectedQuery.options = options;
 
@@ -854,7 +854,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
 
       collection.updateDocument('foo');
       should(emitted).be.true();
@@ -873,7 +873,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
       error = 'foobar';
       this.timeout(50);
 

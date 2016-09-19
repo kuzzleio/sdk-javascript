@@ -896,7 +896,7 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection);
+    this.collections[index][collection] = new KuzzleDataCollection(this, collection, index);
   }
 
   return this.collections[index][collection];
