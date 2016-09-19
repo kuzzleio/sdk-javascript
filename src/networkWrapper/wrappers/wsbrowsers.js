@@ -40,19 +40,17 @@ function WSBrowsers(host, port, ssl) {
       }
     };
 
-    this.client.onclose = function () {
-      poke(self.listeners, 'disconnect');
+    this.client.onclose = function (code, message) {
+      if (code === 1000) {
+        poke(self.listeners, 'disconnect');
+      }
+      else {
+        onClientError.call(self, autoReconnect, reconnectionDelay, message);
+      }
     };
 
-    this.client.onerror = function () {
-      if (autoReconnect) {
-        self.retrying = true;
-        setTimeout(function () {
-          self.connect(autoReconnect, reconnectionDelay);
-        }, reconnectionDelay);
-      }
-
-      poke(self.listeners, 'error');
+    this.client.onerror = function (error) {
+      onClientError.call(self, autoReconnect, reconnectionDelay, error);
     };
 
     this.client.onmessage = function (payload) {
@@ -233,5 +231,26 @@ function poke (listeners, roomId, payload) {
     }
   }
 }
+
+/**
+ * Called when the connection closes with an error state
+ *
+ * @param {boolean} autoReconnect
+ * @param {number} reconnectionDelay
+ * @param {string|Object} message
+ */
+function onClientError(autoReconnect, reconnectionDelay, message) {
+  var self = this;
+
+  if (autoReconnect) {
+    self.retrying = true;
+    setTimeout(function () {
+      self.connect(autoReconnect, reconnectionDelay);
+    }, reconnectionDelay);
+  }
+
+  poke(self.listeners, 'error', message);
+}
+
 
 module.exports = WSBrowsers;
