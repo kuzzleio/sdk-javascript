@@ -4,7 +4,7 @@
 Official Kuzzle Javascript SDK
 ======
 
-This SDK version is compatible with Kuzzle 1.0.0-RC5 and higher
+This SDK version is compatible with Kuzzle 1.0.0-RC6 and higher
 
 Please use SDK v1.x for earlier versions of Kuzzle.
 

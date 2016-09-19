@@ -76,7 +76,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      should(collection.advancedSearch(filters, options, function (err, res) {
+      collection.advancedSearch(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
@@ -87,7 +87,7 @@ describe('KuzzleDataCollection methods', function () {
           should(item).be.instanceof(KuzzleDocument);
         });
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -149,11 +149,11 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      should(collection.count(filters, options, function (err, res) {
+      collection.count(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.a.Number().and.be.exactly(result.result.count);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -460,11 +460,11 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.fetchDocument(result.result._id, options, function (err, res) {
+      collection.fetchDocument(result.result._id, options, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleDocument);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -516,7 +516,7 @@ describe('KuzzleDataCollection methods', function () {
       collection.advancedSearch = function () { emitted = true; };
       expectedQuery.options = options;
 
-      should(collection.fetchAllDocuments(options, function () {})).be.exactly(collection);
+      collection.fetchAllDocuments(options, function () {});
       should(emitted).be.true();
     });
 
@@ -576,11 +576,11 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.getMapping(options, function (err, res) {
+      collection.getMapping(options, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleDataMapping);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 

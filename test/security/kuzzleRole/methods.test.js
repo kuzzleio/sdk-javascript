@@ -11,7 +11,7 @@ describe('KuzzleRole methods', function () {
     kuzzleRole,
     result,
     expectedQuery,
-    error = false,
+    error = null,
     queryStub = function (args, query, options, cb) {
       should(args.controller).be.exactly(expectedQuery.controller);
       should(args.action).be.exactly(expectedQuery.action);
@@ -47,7 +47,7 @@ describe('KuzzleRole methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myRole', _source: {indexes : {}}} };
       kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, result.result._source);
@@ -87,7 +87,7 @@ describe('KuzzleRole methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myRole', _index: '%kuzzle', _type: 'roles'} };
       kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
@@ -142,7 +142,7 @@ describe('KuzzleRole methods', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       kuzzle.query = queryStub;
-      error = false;
+      error = null;
 
       result = { result: {_id: 'myRole'} };
       kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, result.result._source);

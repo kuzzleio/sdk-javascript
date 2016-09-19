@@ -75,7 +75,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
 
   self.kuzzle.query(this.collection.buildQueryArgs('admin', 'updateMapping'), data, options, function (err) {
     if (err) {
-      return cb ? cb(err) : false;
+      return cb && cb(err);
     }
 
     self.refresh(options, cb);
@@ -117,10 +117,10 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
           self.mapping = {};
         }
       } else {
-        return cb ? cb(new Error('No mapping found for collection ' + self.collection.collection)) : false;
+        return cb && cb(new Error('No mapping found for collection ' + self.collection.collection));
       }
     } else {
-      return cb ? cb(new Error('No mapping found for index ' + self.collection.index)) : false;
+      return cb && cb(new Error('No mapping found for index ' + self.collection.index));
     }
 
     if (cb) {
