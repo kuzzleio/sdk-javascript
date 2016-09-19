@@ -692,7 +692,7 @@ function emitRequest (request, cb) {
 
   if (self.jwtToken !== undefined || cb) {
     self.network.once(request.requestId, function (response) {
-      var error;
+      var error = null;
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
@@ -700,9 +700,12 @@ function emitRequest (request, cb) {
       }
 
       if (cb) {
-        error = new Error(response.error.message);
-        Object.assign(error, response.error);
-        error.status = response.status;
+        if (response.error) {
+          error = new Error(response.error.message);
+          Object.assign(error, response.error);
+          error.status = response.status;
+        }
+        
         cb(error, response);
       }
     });
