@@ -7,7 +7,8 @@ var
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
-  KuzzleRoom = require('../../src/kuzzleRoom');
+  KuzzleRoom = require('../../src/kuzzleRoom'),
+  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('KuzzleDataCollection methods', function () {
   var
@@ -737,14 +738,14 @@ describe('KuzzleDataCollection methods', function () {
     it('should instantiate a new KuzzleRoom object', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleRoom);
+      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
       should(emitted).be.true();
     });
 
     it('should handle arguments correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleRoom);
+      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleSubscribeResult);
       should(emitted).be.true();
     });
 

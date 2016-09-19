@@ -1,7 +1,8 @@
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
-  KuzzleRoom = require('./kuzzleRoom');
+  KuzzleRoom = require('./kuzzleRoom'),
+  KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -441,10 +442,12 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {object} [options] - subscriptions options
  * @param {responseCallback} cb - called for each new notification
- * @returns {*} KuzzleRoom object
+ * @returns {*} KuzzleSubscribeResult object
  */
 KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
-  var room;
+  var
+    room,
+    subscribeResult;
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -453,10 +456,12 @@ KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
 
+  subscribeResult = new KuzzleSubscribeResult();
   room = new KuzzleRoom(this, options);
-  room.renew(filters, cb);
 
-  return room;
+  room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
+
+  return subscribeResult;
 };
 
 /**

@@ -147,9 +147,10 @@ KuzzleRoom.prototype.count = function (cb) {
  * Renew the subscription using new filters
  *
  * @param {object} [filters] - Filters in Kuzzle DSL format
- * @param {responseCallback} cb - called for each new notification
+ * @param {responseCallback} notificationCB - called for each new notification
+ * @param {responseCallback} [cb] - handles the query response
  */
-KuzzleRoom.prototype.renew = function (filters, cb) {
+KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
   var
     now = Date.now(),
     subscribeQuery = {
@@ -159,12 +160,13 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     },
     self = this;
 
-  if (!cb && filters && typeof filters === 'function') {
-    cb = filters;
+  if (typeof filters === 'function') {
+    cb = notificationCB;
+    notificationCB = filters;
     filters = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleRoom.renew', cb);
+  self.kuzzle.callbackRequired('KuzzleRoom.renew', notificationCB);
 
   /*
     Skip subscription renewal if another one was performed a moment before
@@ -182,20 +184,20 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
    main Kuzzle object to renew once online
     */
   if (self.kuzzle.state !== 'connected') {
-    self.callback = cb;
+    self.callback = notificationCB;
     self.kuzzle.subscriptions.pending[self.id] = self;
     return;
   }
 
   if (self.subscribing) {
-    self.queue.push({action: 'renew', args: [filters, cb]});
+    self.queue.push({action: 'renew', args: [filters, notificationCB, cb]});
     return;
   }
 
   self.unsubscribe();
   self.roomId = null;
   self.subscribing = true;
-  self.callback = cb;
+  self.callback = notificationCB;
   self.kuzzle.subscriptions.pending[self.id] = self;
 
   subscribeQuery.body = self.filters;
@@ -207,7 +209,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
 
     if (error) {
       self.queue = [];
-      throw new Error('Error during Kuzzle subscription: ' + error.message);
+      return cb && cb(new Error('Error during Kuzzle subscription: ' + error.message));
     }
 
     self.lastRenewal = now;
@@ -224,6 +226,7 @@ KuzzleRoom.prototype.renew = function (filters, cb) {
     self.kuzzle.network.on(self.channel, self.notifier);
 
     dequeue.call(self);
+    cb && cb(null, self);
   });
 };
 

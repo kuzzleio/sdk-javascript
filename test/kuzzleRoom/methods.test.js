@@ -1,6 +1,7 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleRoom = rewire('../../src/kuzzleRoom');
 
@@ -164,17 +165,25 @@ describe('KuzzleRoom methods', function () {
       should(emitted).be.false();
     });
 
-    it('should handle arguments properly', function () {
+    it('should handle arguments properly', function (done) {
       room.renew(function () {});
       should(emitted).be.true();
+
+      room.lastRenewal = null;
+      room.unsubscribe = sinon.stub();
+
+      room.renew(function () {}, function (err, res) {
+        should(res).be.exactly(room);
+        done(err);
+      });
     });
 
     it('should delay the request until after subscribing', function () {
       var cb = function () {};
       room.subscribing = true;
-      room.renew({}, cb);
+      room.renew({}, cb, cb);
       should(emitted).be.false();
-      should(room.queue).match([{action: 'renew', args: [{}, cb]}]);
+      should(room.queue).match([{action: 'renew', args: [{}, cb, cb]}]);
     });
 
     it('should register itself in the global subscription list', function () {
@@ -192,13 +201,18 @@ describe('KuzzleRoom methods', function () {
       }, 10);
     });
 
-    it('should throw and empty the queue if the subscription fails', function () {
+    it('should rejects the callback and empty the queue if the subscription fails', function (done) {
       error = 'foobar';
       room.queue.push({foo: 'bar'});
-      should(function () { room.renew({}, function () {}); }).throw(Error);
-      should(dequeued).be.false();
-      should(room.lastRenewal).be.null();
-      should(room.queue).be.empty();
+      room.renew({}, function () {}, function (err, res) {
+        should(err).not.be.null();
+        should(res).be.undefined();
+        should(dequeued).be.false();
+        should(room.lastRenewal).be.null();
+        should(room.queue).be.empty();
+        done();
+      });
+
     });
 
     it('should register itself to Kuzzle and skip subscription if not connected', function (done) {
