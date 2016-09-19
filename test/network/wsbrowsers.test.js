@@ -124,10 +124,25 @@ describe('WebSocket Browsers networking module', () => {
     should(wsbrowsers.listeners.disconnect.length).be.eql(1);
 
     wsbrowsers.connect();
-    clientStub.onclose();
+    clientStub.onclose(1000);
 
     should(cb.calledOnce).be.true();
     should(wsbrowsers.listeners.disconnect.length).be.eql(1);
+  });
+
+  it('should call error listeners on a disconnect event with an abnormal websocket code', () => {
+    var cb = sinon.stub();
+
+    wsbrowsers.retrying = false;
+    wsbrowsers.onConnectError(cb);
+    should(wsbrowsers.listeners.error.length).be.eql(1);
+
+    wsbrowsers.connect();
+    clientStub.onclose(4666, 'foobar');
+
+    should(cb.calledOnce).be.true();
+    should(cb.calledWith('foobar'));
+    should(wsbrowsers.listeners.error.length).be.eql(1);
   });
 
   it('should be able to register ephemeral callbacks on an event', () => {

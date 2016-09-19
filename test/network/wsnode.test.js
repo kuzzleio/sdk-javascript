@@ -124,10 +124,25 @@ describe('WebSocket NodeJS networking module', () => {
     should(wsnode.listeners.disconnect.length).be.eql(1);
 
     wsnode.connect();
-    clientStub.emit('close');
+    clientStub.emit('close', 1000);
 
     should(cb.calledOnce).be.true();
     should(wsnode.listeners.disconnect.length).be.eql(1);
+  });
+
+  it('should call error listeners on a disconnect event with an abnormal websocket code', () => {
+    var cb = sinon.stub();
+
+    wsnode.retrying = false;
+    wsnode.onConnectError(cb);
+    should(wsnode.listeners.error.length).be.eql(1);
+
+    wsnode.connect();
+    clientStub.emit('close', 4666, 'foobar');
+
+    should(cb.calledOnce).be.true();
+    should(cb.calledWith('foobar'));
+    should(wsnode.listeners.error.length).be.eql(1);
   });
 
   it('should be able to register ephemeral callbacks on an event', () => {
