@@ -340,7 +340,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle server at "' + self.host + '"');
+    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + '"');
 
     connectionError.internal = error;
     self.state = 'error';
@@ -447,7 +447,6 @@ Kuzzle.prototype.getJwtToken = function() {
  * @param credentials
  * @param expiresIn
  * @param cb
- * @returns {Kuzzle}
  */
 Kuzzle.prototype.login = function (strategy) {
   var
@@ -456,7 +455,7 @@ Kuzzle.prototype.login = function (strategy) {
       strategy: strategy
     },
     credentials,
-    cb;
+    cb = null;
 
   // Handle arguments (credentials, expiresIn, cb)
   if (arguments[1]) {
@@ -491,20 +490,13 @@ Kuzzle.prototype.login = function (strategy) {
         self.setJwtToken(response.result.jwt);
       }
 
-      if (cb && typeof cb === 'function') {
-        cb(null, response.result);
-      }
+      cb && cb(null, response.result);
     }
     else {
-      if (cb && typeof cb === 'function') {
-        cb(error);
-      }
-
+      cb && cb(error);
       self.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
-
-  return self;
 };
 
 /**
@@ -523,15 +515,12 @@ Kuzzle.prototype.logout = function (cb) {
       body: {}
     };
 
-  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, function(error) {
+  this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, typeof cb !== 'function' ? null : function(error) {
     if (error === null) {
       self.jwtToken = undefined;
-
-      if (typeof cb === 'function') {
-        cb(null, self);
-      }
+      cb(null, self);
     }
-    else if (typeof cb === 'function') {
+    else {
       cb(error);
     }
   });
@@ -545,11 +534,9 @@ Kuzzle.prototype.logout = function (cb) {
  * @param  {string}   token     The jwt token to check
  * @param  {function} callback  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
- * @return {Kuzzle}             The Kuzzle instance to enable chaining.
  */
 Kuzzle.prototype.checkToken = function (token, callback) {
   var
-    self = this,
     request = {
       body: {
         token: token
@@ -565,8 +552,6 @@ Kuzzle.prototype.checkToken = function (token, callback) {
 
     callback(null, response.result);
   });
-
-  return self;
 };
 
 /**
@@ -574,7 +559,6 @@ Kuzzle.prototype.checkToken = function (token, callback) {
  *
  * @param  {function} callback  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
- * @return {Kuzzle}             The Kuzzle instance to enable chaining.
  */
 Kuzzle.prototype.whoAmI = function (callback) {
   var self = this;
@@ -588,13 +572,12 @@ Kuzzle.prototype.whoAmI = function (callback) {
 
     callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
   });
-
-  return self;
 };
 
 /**
  * Gets the rights array of the currently logged user.
  *
+ * @param {object} [options] - Optional parameters
  * @param  {function} cb The callback containing the normalized array of rights.
  */
 Kuzzle.prototype.getMyRights = function (options, cb) {
@@ -607,7 +590,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
 
   self.callbackRequired('Kuzzle.getMyRights', cb);
 
-  self.query({controller: 'auth', action:'getMyRights'}, {}, null, function (err, res) {
+  self.query({controller: 'auth', action:'getMyRights'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -622,6 +605,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
  * @param {object} content - a plain javascript object representing the user's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.updateSelf = function (content, options, cb) {
   var
@@ -636,17 +620,11 @@ Kuzzle.prototype.updateSelf = function (content, options, cb) {
 
   data.body = content;
 
-  if (cb) {
-    self.query(queryArgs, data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  self.query(queryArgs, data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
 
-      cb(null, res.result);
-    });
-  } else {
-    self.query(queryArgs, data, options);
-  }
+  return this;
 };
 
 /**
@@ -719,9 +697,7 @@ function emitRequest (request, cb) {
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
-      if (cb) {
-        cb(response.error, response);
-      }
+      cb && cb(response.error, response);
     });
   }
 
@@ -830,7 +806,6 @@ Kuzzle.prototype.addListener = function(event, listener) {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getAllStatistics = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -847,8 +822,6 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 
     cb(null, res.result.hits);
   });
-
-  return this;
 };
 
 /**
@@ -858,10 +831,11 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
  * @param {number} timestamp -  Epoch time. Starting time from which the frames are to be retrieved
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
-  var queryCB;
+  var
+    queryCB,
+    body;
 
   if (!cb) {
     if (arguments.length === 1) {
@@ -885,22 +859,13 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
       return cb(err);
     }
 
-    if (timestamp) {
-      cb(null, res.result.hits);
-    } else {
-      cb(null, [res.result]);
-    }
+    cb(null, timestamp ? res.result.hits : [res.result]);
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
-  if (!timestamp) {
-    this.query({controller: 'admin', action: 'getLastStats'}, {}, options, queryCB);
-  } else {
-    this.query({controller: 'admin', action: 'getStats'}, { body: { startTime: timestamp } }, options, queryCB);
-  }
-
-  return this;
+  body = timestamp ? {body: {startTime: timestamp}} : {};
+  this.query({controller: 'admin', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
 };
 
 /**
@@ -922,12 +887,8 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
     index = this.defaultIndex;
   }
 
-  if (typeof index !== 'string') {
-    throw new Error('Invalid "index" argument: string expected, got ' + typeof index);
-  }
-
-  if (typeof collection !== 'string') {
-    throw new Error('Invalid "collection" argument: string expected, got ' + typeof collection);
+  if (typeof index !== 'string' || typeof collection !== 'string') {
+    throw new Error('Invalid index or collection argument: string expected');
   }
 
   if (!this.collections[index]) {
@@ -935,7 +896,7 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, index, collection);
+    this.collections[index][collection] = new KuzzleDataCollection(this, collection, index);
   }
 
   return this.collections[index][collection];
@@ -957,7 +918,6 @@ Kuzzle.prototype.flushQueue = function () {
  * @param {string} [index] - Index containing collections to be listed
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.listCollections = function () {
   var
@@ -1000,10 +960,8 @@ Kuzzle.prototype.listCollections = function () {
       return cb(err);
     }
 
-    return cb(null, res.result.collections);
+    cb(null, res.result.collections);
   });
-
-  return this;
 };
 
 /**
@@ -1011,7 +969,6 @@ Kuzzle.prototype.listCollections = function () {
  *
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.listIndexes = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1022,14 +979,8 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
   this.callbackRequired('Kuzzle.listIndexes', cb);
 
   this.query({controller: 'read', action: 'listIndexes'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    return cb(null, res.result.indexes);
+    cb(err, err ? undefined : res.result.indexes);
   });
-
-  return this;
 };
 
 /**
@@ -1055,7 +1006,6 @@ Kuzzle.prototype.disconnect = function () {
  *
  * @param {object} [options] - Optional arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getServerInfo = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1072,8 +1022,6 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 
     cb(null, res.result.serverInfo);
   });
-
-  return this;
 };
 
 /**
@@ -1122,7 +1070,6 @@ Kuzzle.prototype.refreshIndex = function () {
  * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
  * @param {object} options - Optinal arguments
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.getAutoRefresh = function () {
   var
@@ -1153,8 +1100,6 @@ Kuzzle.prototype.getAutoRefresh = function () {
 
   this.callbackRequired('Kuzzle.getAutoRefresh', cb);
   this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
-
-  return this;
 };
 
 /**
@@ -1210,7 +1155,6 @@ Kuzzle.prototype.setAutoRefresh = function () {
  * Return the current Kuzzle's UTC Epoch time, in milliseconds
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {object} this
  */
 Kuzzle.prototype.now = function (options, cb) {
   if (!cb && typeof options === 'function') {
@@ -1221,14 +1165,8 @@ Kuzzle.prototype.now = function (options, cb) {
   this.callbackRequired('Kuzzle.now', cb);
 
   this.query({controller: 'read', action: 'now'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.now);
+    cb(err, res && res.result.now);
   });
-
-  return this;
 };
 
 /**
@@ -1334,6 +1272,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
  * Removes all listeners, either from a specific event or from all events
  *
  * @param {string} event - One of the event described in the Event Handling section of this documentation
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeAllListeners = function (event) {
   var
@@ -1351,6 +1290,8 @@ Kuzzle.prototype.removeAllListeners = function (event) {
       self.eventListeners[eventName].listeners = [];
     });
   }
+
+  return this;
 };
 
 /**
@@ -1358,6 +1299,7 @@ Kuzzle.prototype.removeAllListeners = function (event) {
  *
  * @param {string} event - One of the event described in the Event Handling section of this documentation
  * @param {string} listenerId - The ID returned by addListener
+ * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeListener = function (event, listenerId) {
   var
@@ -1373,6 +1315,8 @@ Kuzzle.prototype.removeListener = function (event, listenerId) {
       self.eventListeners[event].listeners.splice(index, 1);
     }
   });
+
+  return this;
 };
 
 /**

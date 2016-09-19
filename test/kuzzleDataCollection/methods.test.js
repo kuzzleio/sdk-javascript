@@ -7,7 +7,8 @@ var
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
-  KuzzleRoom = require('../../src/kuzzleRoom');
+  KuzzleRoom = require('../../src/kuzzleRoom'),
+  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('KuzzleDataCollection methods', function () {
   var
@@ -76,7 +77,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      should(collection.advancedSearch(filters, options, function (err, res) {
+      collection.advancedSearch(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
@@ -87,7 +88,7 @@ describe('KuzzleDataCollection methods', function () {
           should(item).be.instanceof(KuzzleDocument);
         });
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -149,11 +150,11 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      should(collection.count(filters, options, function (err, res) {
+      collection.count(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.a.Number().and.be.exactly(result.result.count);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -460,11 +461,11 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.fetchDocument(result.result._id, options, function (err, res) {
+      collection.fetchDocument(result.result._id, options, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleDocument);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -516,7 +517,7 @@ describe('KuzzleDataCollection methods', function () {
       collection.advancedSearch = function () { emitted = true; };
       expectedQuery.options = options;
 
-      should(collection.fetchAllDocuments(options, function () {})).be.exactly(collection);
+      collection.fetchAllDocuments(options, function () {});
       should(emitted).be.true();
     });
 
@@ -576,11 +577,11 @@ describe('KuzzleDataCollection methods', function () {
 
       expectedQuery.options = options;
 
-      should(collection.getMapping(options, function (err, res) {
+      collection.getMapping(options, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(KuzzleDataMapping);
         done();
-      })).be.exactly(collection);
+      });
       should(emitted).be.true();
     });
 
@@ -737,14 +738,14 @@ describe('KuzzleDataCollection methods', function () {
     it('should instantiate a new KuzzleRoom object', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleRoom);
+      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
       should(emitted).be.true();
     });
 
     it('should handle arguments correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleRoom);
+      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleSubscribeResult);
       should(emitted).be.true();
     });
 
@@ -840,7 +841,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
-        collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection),
+        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index),
         options = { queuable: false };
       expectedQuery.options = options;
 
@@ -854,7 +855,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
 
       collection.updateDocument('foo');
       should(emitted).be.true();
@@ -873,7 +874,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.index, expectedQuery.collection);
+      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
       error = 'foobar';
       this.timeout(50);
 

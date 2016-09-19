@@ -43,19 +43,17 @@ function WSNode(host, port, ssl) {
       }
     });
 
-    this.client.on('close', function () {
-      poke(self.listeners, 'disconnect');
+    this.client.on('close', function (code, message) {
+      if (code === 1000) {
+        poke(self.listeners, 'disconnect');
+      }
+      else {
+        onClientError.call(self, autoReconnect, reconnectionDelay, message);
+      }
     });
 
-    this.client.on('error', function () {
-      if (autoReconnect) {
-        self.retrying = true;
-        setTimeout(function () {
-          self.connect(autoReconnect, reconnectionDelay);
-        }, reconnectionDelay);
-      }
-
-      poke(self.listeners, 'error');
+    this.client.on('error', function (error) {
+      onClientError.call(self, autoReconnect, reconnectionDelay, error);
     });
 
     this.client.on('message', function (payload) {
@@ -235,6 +233,26 @@ function poke (listeners, roomId, payload) {
       }
     }
   }
+}
+
+/**
+ * Called when the connection closes with an error state
+ *
+ * @param {boolean} autoReconnect
+ * @param {number} reconnectionDelay
+ * @param {string|Object} message
+ */
+function onClientError(autoReconnect, reconnectionDelay, message) {
+  var self = this;
+
+  if (autoReconnect) {
+    self.retrying = true;
+    setTimeout(function () {
+      self.connect(autoReconnect, reconnectionDelay);
+    }, reconnectionDelay);
+  }
+
+  poke(self.listeners, 'error', message);
 }
 
 module.exports = WSNode;
