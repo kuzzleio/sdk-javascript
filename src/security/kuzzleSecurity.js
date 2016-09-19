@@ -66,11 +66,7 @@ KuzzleSecurity.prototype.getRole = function (id, options, cb) {
   self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, new KuzzleRole(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new KuzzleRole(self, response.result._id, response.result._source));
   });
 };
 
@@ -147,20 +143,9 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
     action = options.replaceIfExist ? 'createOrReplaceRole' : 'createRole';
   }
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
-      var doc;
-
-      if (err) {
-        return cb(err);
-      }
-
-      doc = new KuzzleRole(self, res.result._id, res.result._source);
-      cb(null, doc);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
-  }
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : new KuzzleRole(self, res.result._id, res.result._source));
+  });
 };
 
 
@@ -171,11 +156,12 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the role's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   var
     self = this,
-    data = {},
+    data = {_id: id, body: content},
     action = 'updateRole';
 
   if (!id || typeof id !== 'string') {
@@ -187,20 +173,11 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
     options = null;
   }
 
-  data._id = id;
-  data.body = content;
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err) {
+    cb(err, err ? undefined : new KuzzleRole(self, id, content));
+  });
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err) {
-      if (err) {
-        return cb(err);
-      }
-
-      cb(null, new KuzzleRole(self, id, content));
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
-  }
+  return this;
 };
 
 /**
@@ -214,6 +191,7 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
  * @param {string} id - Role id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
   var data = {_id: id};
@@ -223,17 +201,11 @@ KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
     options = null;
   }
 
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result._id);
+  });
 
-      cb(null, res.result._id);
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('deleteRole'), data, options);
-  }
+  return this;
 };
 
 /**
@@ -277,11 +249,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
   self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
-    if (error) {
-      return cb(error);
-    }
-
-    cb(null, new KuzzleProfile(self, response.result._id, response.result._source));
+    cb(error, error ? undefined : new KuzzleProfile(self, response.result._id, response.result._source));
   });
 };
 
@@ -358,20 +326,9 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
     action = options.replaceIfExist ? 'createOrReplaceProfile' : 'createProfile';
   }
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
-      var doc;
-
-      if (err) {
-        return cb(err);
-      }
-
-      doc = new KuzzleProfile(self, res.result._id, res.result._source);
-      cb(null, doc);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
-  }
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : new KuzzleProfile(self, res.result._id, res.result._source));
+  });
 };
 
 
@@ -382,6 +339,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the profile's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
   var
@@ -401,23 +359,21 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
   data._id = id;
   data.body = content;
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
-      var updatedContent = {};
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
+    var updatedContent = {};
 
-      if (err) {
-        return cb(err);
-      }
+    if (err) {
+      return cb(err);
+    }
 
-      Object.keys(res.result._source).forEach(function (property) {
-        updatedContent[property] = res.result._source[property];
-      });
-
-      cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
+    Object.keys(res.result._source).forEach(function (property) {
+      updatedContent[property] = res.result._source[property];
     });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
-  }
+
+    cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
+  });
+
+  return this;
 };
 
 /**
@@ -431,6 +387,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
   var data = {_id: id};
@@ -440,17 +397,11 @@ KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
     options = null;
   }
 
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result._id);
+  });
 
-      cb(null, res.result._id);
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('deleteProfile'), data, options);
-  }
+  return this;
 };
 
 /**
@@ -474,7 +425,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  */
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   var
-    data,
+    data = {_id: id},
     self = this;
 
   if (!id || typeof id !== 'string') {
@@ -486,16 +437,10 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
     options = null;
   }
 
-  data = {_id: id};
-
   self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, new KuzzleUser(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new KuzzleUser(self, response.result._id, response.result._source));
   });
 };
 
@@ -552,7 +497,7 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
 KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
   var
     self = this,
-    data = {},
+    data = {_id: id, body: content},
     action = 'createUser';
 
   if (!id || typeof id !== 'string') {
@@ -564,27 +509,13 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
     options = null;
   }
 
-  data._id = id;
-  data.body = content;
-
   if (options) {
     action = options.replaceIfExist ? 'createOrReplaceUser' : 'createUser';
   }
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, null, function (err, res) {
-      var doc;
-
-      if (err) {
-        return cb(err);
-      }
-
-      doc = new KuzzleUser(self, res.result._id, res.result._source);
-      cb(null, doc);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data);
-  }
+  self.kuzzle.query(this.buildQueryArgs(action), data, null, cb && function (err, res) {
+    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+  });
 };
 
 
@@ -595,6 +526,7 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the user's modification
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
   var
@@ -614,17 +546,11 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
   data._id = id;
   data.body = content;
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+  });
 
-      cb(null, new KuzzleUser(self, res.result._id, res.result._source));
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs(action), data, options);
-  }
+  return this;
 };
 
 /**
@@ -638,6 +564,7 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleSecurity} this object
  */
 KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
   var data = {_id: id};
@@ -647,17 +574,11 @@ KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
     options = null;
   }
 
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result._id);
+  });
 
-      cb(null, res.result._id);
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options);
-  }
+  return this;
 };
 
 /**
@@ -702,18 +623,19 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
   }
 
   // We filter in all the rights that match the request (including wildcards).
-  filteredRights = rights.filter(function (right) {
-    return right.controller === controller || right.controller === '*';
-  })
-  .filter(function (right) {
-    return right.action === action || right.action === '*';
-  })
-  .filter(function (right) {
-    return right.index === index || right.index === '*';
-  })
-  .filter(function (right) {
-    return right.collection === collection || right.collection === '*';
-  });
+  filteredRights = rights
+    .filter(function (right) {
+      return right.controller === controller || right.controller === '*';
+    })
+    .filter(function (right) {
+      return right.action === action || right.action === '*';
+    })
+    .filter(function (right) {
+      return right.index === index || right.index === '*';
+    })
+    .filter(function (right) {
+      return right.collection === collection || right.collection === '*';
+    });
 
   // Then, if at least one right allows the action, we return 'allowed'
   if (filteredRights.some(function (item) { return item.value === 'allowed'; })) {
@@ -751,12 +673,8 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
 
   self.kuzzle.callbackRequired('Kuzzle.getUserRights', cb);
 
-  this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.hits);
+  this.kuzzle.query(this.buildQueryArgs('getUserRights'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result.hits);
   });
 };
 

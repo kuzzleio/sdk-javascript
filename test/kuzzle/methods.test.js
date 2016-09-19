@@ -59,10 +59,6 @@ describe('Kuzzle methods', function () {
       };
     });
 
-    it('should return the kuzzle instance when called', function () {
-      should(kuzzle.getAllStatistics(function () {})).be.exactly(kuzzle);
-    });
-
     it('should throw an error if no callback is provided', function () {
       should(function () { kuzzle.getAllStatistics(); }).throw(Error);
       should(emitted).be.false();
@@ -113,7 +109,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should return the last statistics frame if no timestamp is provided', function () {
-      should(kuzzle.getStatistics(function () {})).be.exactly(kuzzle);
+      kuzzle.getStatistics(function () {});
       should(emitted).be.true();
     });
 
@@ -265,10 +261,10 @@ describe('Kuzzle methods', function () {
     });
 
     it('should behave correctly when invoked', function () {
-      should(kuzzle.getServerInfo(function (err, res) {
+      kuzzle.getServerInfo(function (err, res) {
         should(err).be.null();
         should(res).be.eql(result.result.serverInfo);
-      })).be.eql(kuzzle);
+      });
     });
 
     it('should throw an error if no callback is provided', function () {
@@ -305,10 +301,6 @@ describe('Kuzzle methods', function () {
         action: 'listCollections',
         body: {type: 'all'}
       };
-    });
-
-    it('should return the kuzzle instance when called', function () {
-      should(kuzzle.listCollections('foo', function () {})).be.exactly(kuzzle);
     });
 
     it('should throw an error if no callback has been provided', function () {
@@ -354,11 +346,11 @@ describe('Kuzzle methods', function () {
 
     it('should use the default index if none is provided', function () {
       kuzzle.setDefaultIndex('foo');
-      should(kuzzle.listCollections(function () {})).be.exactly(kuzzle);
+      kuzzle.listCollections(function () {});
       should(emitted).be.true();
 
       emitted = false;
-      should(kuzzle.listCollections({some: 'options'}, function () {})).be.exactly(kuzzle);
+      kuzzle.listCollections({some: 'options'}, function () {});
       should(emitted).be.true();
     });
   });
@@ -375,13 +367,6 @@ describe('Kuzzle methods', function () {
         controller: 'read',
         action: 'listIndexes'
       };
-    });
-
-    it('should return the kuzzle instance when called', function () {
-      should(kuzzle.listIndexes(function (err, res) {
-        should(err).be.null();
-        should(res).be.eql(result.result.indexes);
-      })).be.eql(kuzzle);
     });
 
     it('should throw an error if no callback is provided', function () {
@@ -432,10 +417,6 @@ describe('Kuzzle methods', function () {
         controller: 'read',
         action: 'now'
       };
-    });
-
-    it('should return the kuzzle instance when called', function () {
-      should(kuzzle.now(function () {})).be.exactly(kuzzle);
     });
 
     it('should throw an error if called without a callback', function () {

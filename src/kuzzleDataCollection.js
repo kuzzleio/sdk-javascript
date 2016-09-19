@@ -82,7 +82,6 @@ function KuzzleDataCollection(kuzzle, index, collection) {
  * @param {object} filters - Filters in Elasticsearch Query DSL format
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
   var
@@ -115,8 +114,6 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
 
     cb(null, { total: result.result.total, documents: documents });
   });
-
-  return this;
 };
 
 /**
@@ -129,7 +126,6 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
  * @param {object} filters - Filters in Elasticsearch Query DSL format
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.count = function (filters, options, cb) {
   var
@@ -145,14 +141,8 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
   this.kuzzle.query(this.buildQueryArgs('read', 'count'), query, options, function (error, result) {
-    if (error) {
-      return cb(error);
-    }
-
-    cb(null, result.result.count);
+    cb(error, result && result.result.count);
   });
-
-  return this;
 };
 
 /**
@@ -228,21 +218,17 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
 
   data = self.kuzzle.addHeaders(data, self.headers);
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
-      var doc;
+  self.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+    var doc;
 
-      if (err) {
-        return cb(err);
-      }
+    if (err) {
+      return cb(err);
+    }
 
-      doc = new KuzzleDocument(self, res.result._id, res.result._source);
-      doc.version = res.result._version;
-      cb(null, doc);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs('write', action), data, options);
-  }
+    doc = new KuzzleDocument(self, res.result._id, res.result._source);
+    doc.version = res.result._version;
+    cb(null, doc);
+  });
 
   return this;
 };
@@ -261,7 +247,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {Object} this
+ * @returns {KuzzleDataCollection} this
  */
 KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
   var
@@ -283,21 +269,16 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
 
   data = this.kuzzle.addHeaders(data, this.headers);
 
-  if (cb) {
-    this.kuzzle.query(this.buildQueryArgs('write', action), data, options, function (err, res) {
-      if (err) {
-        return cb(err);
-      }
+  this.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+    if (err) {
+      cb(err);
+    }
+    else {
+      cb(null, (action === 'delete' ? [res.result._id] : res.result.ids));
+    }
+  });
 
-      if (action === 'delete') {
-        cb(null, [res.result._id]);
-      } else {
-        cb(null, res.result.ids);
-      }
-    });
-  } else {
-    this.kuzzle.query(this.buildQueryArgs('write', action), data, options);
-  }
+  return this;
 };
 
 /**
@@ -306,7 +287,6 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
  * @param {string} documentId - Unique document identifier
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb) {
   var
@@ -332,8 +312,6 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
     document.version = res.result._version;
     cb(null, document);
   });
-
-  return this;
 };
 
 /**
@@ -341,7 +319,6 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
- * @returns {Object} this
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   var filters = {};
@@ -365,8 +342,6 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
   this.advancedSearch(filters, options, cb);
-
-  return this;
 };
 
 
@@ -375,7 +350,6 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
- * @return {object} this
  */
 KuzzleDataCollection.prototype.getMapping = function (options, cb) {
   var kuzzleMapping;
@@ -389,8 +363,6 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
 
   kuzzleMapping = new KuzzleDataMapping(this);
   kuzzleMapping.refresh(options, cb);
-
-  return this;
 };
 
 /**
@@ -448,21 +420,17 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, function (err, res) {
-      var document;
+  self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, cb && function (err, res) {
+    var document;
 
-      if (err) {
-        return cb(err);
-      }
+    if (err) {
+      return cb(err);
+    }
 
-      document = new KuzzleDocument(self, res.result._id, res.result._source);
-      document.version = res.result._version;
-      cb(null, document);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options);
-  }
+    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document.version = res.result._version;
+    cb(null, document);
+  });
 
   return this;
 };
@@ -487,8 +455,9 @@ KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
   this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
 
   room = new KuzzleRoom(this, options);
+  room.renew(filters, cb);
 
-  return room.renew(filters, cb);
+  return room;
 };
 
 /**
@@ -542,19 +511,13 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  if (cb) {
-    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, function (err, res) {
-      var doc;
-      if (err) {
-        return cb(err);
-      }
+  self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, cb && function (err, res) {
+    if (err) {
+      return cb(err);
+    }
 
-      doc = new KuzzleDocument(self, res.result._id);
-      doc.refresh(cb);
-    });
-  } else {
-    self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options);
-  }
+    (new KuzzleDocument(self, res.result._id)).refresh(cb);
+  });
 
   return self;
 };
