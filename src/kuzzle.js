@@ -109,6 +109,7 @@ module.exports = Kuzzle = function (host, options, cb) {
     },
     host: {
       value: host,
+      writable: true,
       enumerable: true
     },
     wsPort: {
@@ -1003,6 +1004,7 @@ Kuzzle.prototype.disconnect = function () {
 
   this.state = 'disconnected';
   this.network.close();
+  this.network = null;
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
