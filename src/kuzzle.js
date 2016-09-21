@@ -114,11 +114,13 @@ module.exports = Kuzzle = function (host, options, cb) {
     },
     wsPort: {
       value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
-      enumerable: true
+      enumerable: true,
+      writable: true
     },
     ioPort: {
       value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
-      enumerable: true
+      enumerable: true,
+      writable: true
     },
     sslConnection: {
       value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
