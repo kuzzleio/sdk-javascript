@@ -438,6 +438,18 @@ Kuzzle.prototype.setJwtToken = function(token) {
 };
 
 /**
+ * Unset the jwtToken used to query kuzzle
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.unsetJwtToken = function() {
+  this.jwtToken = undefined;
+
+  removeAllSubscriptions.call(this);
+
+  return this;
+};
+
+/**
  * Get the jwtToken used by kuzzle
  * @returns {Kuzzle}
  */
@@ -523,7 +535,7 @@ Kuzzle.prototype.logout = function (cb) {
 
   this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, typeof cb !== 'function' ? null : function(error) {
     if (error === null) {
-      self.jwtToken = undefined;
+      self.unsetJwtToken();
       cb(null, self);
     }
     else {
@@ -781,6 +793,20 @@ function renewAllSubscriptions() {
     Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
       var subscription = self.subscriptions[roomId][subscriptionId];
       subscription.renew(subscription.callback);
+    });
+  });
+}
+
+/**
+ * Remove all registered subscriptions. Triggered either by a logout query or by un-setting the token
+ */
+function removeAllSubscriptions() {
+  var self = this;
+
+  Object.keys(self.subscriptions).forEach(function (roomId) {
+    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+      var subscription = self.subscriptions[roomId][subscriptionId];
+      subscription.unsubscribe();
     });
   });
 }

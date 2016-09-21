@@ -705,6 +705,49 @@ describe('Kuzzle methods', function () {
     });
   });
 
+  describe('#unsetJwtToken', function () {
+    var
+      subscriptionsRemoved,
+      revert;
+
+    it('should unset the token and call removeAllSubscriptions', function (done) {
+      revert = Kuzzle.__set__('removeAllSubscriptions', function () { subscriptionsRemoved = true; });
+
+      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+      subscriptionsRemoved = false;
+
+      kuzzle.unsetJwtToken();
+
+      process.nextTick(() => {
+        should(kuzzle.getJwtToken()).be.eql(undefined);
+        should(subscriptionsRemoved).be.true();
+        revert();
+        done();
+      });
+    });
+
+    it('should unsubscribe all rooms when un-setting token', function (done) {
+      var
+        unsubscribeCalled,
+        stubKuzzleRoom;
+
+      stubKuzzleRoom = {
+        unsubscribe: function () { unsubscribeCalled = true; },
+      };
+
+      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+
+      kuzzle.subscriptions['foo'] = { bar: stubKuzzleRoom };
+
+      kuzzle.unsetJwtToken();
+
+      process.nextTick(() => {
+        should(unsubscribeCalled).be.true();
+        done();
+      });
+    });
+  });
+
   describe('#setJwtToken', function () {
     var
       eventEmitted,
