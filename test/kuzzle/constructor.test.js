@@ -49,6 +49,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.startQueuing);
       should.exist(kuzzle.stopQueuing);
       should.exist(kuzzle.setJwtToken);
+      should.exist(kuzzle.unsetJwtToken);
     });
 
     it('should expose the documented properties', () => {
@@ -201,6 +202,7 @@ describe('Kuzzle constructor', () => {
       should.not.exist(kuzzle.removeListenerPromise);
       should.not.exist(kuzzle.replayQueuePromise);
       should.not.exist(kuzzle.setJwtTokenPromise);
+      should.not.exist(kuzzle.unsetJwtTokenPromise);
       should.not.exist(kuzzle.setHeadersPromise);
       should.not.exist(kuzzle.startQueuingPromise);
       should.not.exist(kuzzle.stopQueuingPromise);
@@ -503,6 +505,7 @@ describe('Kuzzle constructor', () => {
               callback: function () { renewCalled = true; },
               renew: function (cb) { cb(); }
             };
+
 
           this.timeout(200);
 
@@ -895,6 +898,7 @@ describe('Kuzzle constructor', () => {
 
       it('should have a empty token in logout callback', function (done) {
         var
+          unsetJwtToken = false,
           kuzzle;
 
         this.timeout(200);
@@ -903,12 +907,16 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
+        kuzzle.unsetJwtToken = function() {
+          unsetJwtToken = true;
+        };
+
         kuzzle.query = function(queryArgs, query, options, cb) {
           cb(null, {});
         };
 
-        kuzzle.logout(function(error, k) {
-          should(k.jwtToken).be.exactly(undefined);
+        kuzzle.logout(function() {
+          should(unsetJwtToken).be.exactly(true);
           done();
         });
       });
