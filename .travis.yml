@@ -15,7 +15,7 @@ before_install:
 - export CC="gcc-4.9" CXX="g++-4.9"
 install:
 - npm install
-after_success:
+after_script:
 - chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 env:
   global:
