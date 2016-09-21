@@ -315,9 +315,11 @@ module.exports = Kuzzle = function (host, options, cb) {
 Kuzzle.prototype.connect = function () {
   var self = this;
 
-  if (!self.network) {
-    self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
+  if (self.network) {
+    self.disconnect();
   }
+
+  self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {

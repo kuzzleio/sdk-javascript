@@ -291,6 +291,20 @@ describe('Kuzzle constructor', () => {
         }, 10);
       });
 
+      it('should first disconnect if it was connected', function () {
+        var
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
+          disconnectStub = sinon.stub();
+
+        kuzzle.disconnect = disconnectStub;
+        kuzzle.connect();
+
+        should(kuzzle.disconnect.called).be.false();
+
+        kuzzle.connect();
+        should(kuzzle.disconnect.called).be.true();
+      });
+
       describe('=> on connection error', () => {
         beforeEach(function () {
           networkStub.onConnectError = function (cb) {
@@ -382,22 +396,25 @@ describe('Kuzzle constructor', () => {
 
         it('should dequeue requests automatically on a connection success', function (done) {
           var
-            dequeued = false,
-            kuzzle,
-            KuzzleRewired = rewire(kuzzleSource),
-            revert = KuzzleRewired.__set__('dequeue', function () { dequeued = true; });
+            dequeueStub = sinon.stub(),
+            kuzzle;
 
           this.timeout(500);
 
-          kuzzle = new KuzzleRewired('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false}, () => {
-            should(kuzzle.state).be.exactly('connected');
-            should(dequeued).be.true();
-            revert();
-            done();
-          });
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoReplay: false, autoQueue: false});
 
-          kuzzle.network = networkStub;
+          kuzzle.queuing = true;
+          kuzzle.offlineQueue.push({query: 'foo'});
+          kuzzle.addListener('offlineQueuePop', dequeueStub);
           kuzzle.connect();
+
+          setTimeout(function () {
+            should(dequeueStub.called).be.true();
+            should(kuzzle.state).be.exactly('connected');
+            should(kuzzle.queuing).be.false();
+            should(kuzzle.offlineQueue).be.empty();
+            done();
+          }, 20);
         });
       });
 
