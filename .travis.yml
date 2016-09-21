@@ -11,12 +11,11 @@ addons:
     - g++-4.9
 script:
 - npm run build && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+- chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 before_install:
 - export CC="gcc-4.9" CXX="g++-4.9"
 install:
 - npm install
-after_script:
-- chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 env:
   global:
     secure: EZ+XXJFDtehmag7wt8JbutqgzpkkJUCzkEWw6W+p7MIxWenLyuGv/RUu7KGqAloOud1cZbmZGSfRx/vsPvxRjo+ZC7aaPqb74qRvfctGdlJTtEffS2jFno1pEppJzCR4n7vocSfMVYtOD6oHP67lXwn/Qnh++WUkZaV137m5+7rqiYgJ+JTeSs5jBRZ6X7VNoNz8tZXejQ+FOymCFQTS2JM/rSZX9NEK+OwUEhEjRcxqWMm2avk6NAQNAL3WQuIBJQH8lxEJxOXkMc0rQZZ09AoLpqJKzsaicaZMInt5JstPo2e9vJfhi+PpRSNhErIff36aCHWRYYDPKl5x6IelZpBfZeTdrs4V2TbRi1y0ELbgMG1FHS4HAw3vTnh4/49g01lAJed4UguFRc6MzwTLAL8uPG/zFe8snm9+kaf4pL7yO89Hf3eltE03+N//tyVv+X/jdSca2dBZ9FMeLE5pJ2jlRiKitCLjXmLUEMMxEwNF7K/IvOrD9wue3JXK0UogOpcXfppk++pNTijsZluU1Yj7k3fGFeS8d6rIU0Yj40y6/VMaJeL4EXlARRsGLigUKVjQL6+/N5xudlsCng+EG+WVIy4wEEPH0QgjUkPTgWx1NrUlTwjskE0cdqDOBu39WkRFJHHECYFPTfTuDJ7xxuuibFTQmUFu2zjbYfYKhPE=
