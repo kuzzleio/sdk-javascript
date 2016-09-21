@@ -53,6 +53,30 @@ describe('Query management', function () {
       });
     });
 
+    it('should fire a queryError if an error occurred', function (done) {
+      var listenerQueryError = false;
+
+      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit('bar', {
+        error: {
+          message: 'foo-bar'
+        }
+      }));
+
+      kuzzle.addListener('queryError', function() {
+        listenerQueryError = true;
+      });
+
+      this.timeout(150);
+
+      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
+        process.nextTick(() => {
+          should(listenerQueryError).be.exactly(true);
+          should(error.message).be.exactly('foo-bar');
+          done();
+        });
+      });
+    });
+
     it('should launch the callback once a response has been received', function (done) {
       var
         response = {result: 'foo', error: {foo: 'bar', message: 'foobar'}, status: 42},
