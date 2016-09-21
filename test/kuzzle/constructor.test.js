@@ -69,8 +69,8 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('wsPort', { enumerable: true, writable: false, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('ioPort', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('wsPort', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('ioPort', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: false, configurable: false });
     });
 
