@@ -57,7 +57,8 @@ module.exports = Kuzzle = function (host, options, cb) {
         jwtTokenExpired: {lastEmitted: null, listeners: []},
         loginAttempt: {lastEmitted: null, listeners: []},
         offlineQueuePush: {listeners: []},
-        offlineQueuePop: {listeners: []}
+        offlineQueuePop: {listeners: []},
+        queryError: {listeners: []}
       }
     },
     eventTimeout: {
@@ -704,13 +705,14 @@ function emitRequest (request, cb) {
         self.emitEvent('jwtTokenExpired', request, cb);
       }
 
+      if (response.error) {
+        error = new Error(response.error.message);
+        Object.assign(error, response.error);
+        error.status = response.status;
+        self.emitEvent('queryError', error, request, cb);
+      }
+
       if (cb) {
-        if (response.error) {
-          error = new Error(response.error.message);
-          Object.assign(error, response.error);
-          error.status = response.status;
-        }
-        
         cb(error, response);
       }
     });
