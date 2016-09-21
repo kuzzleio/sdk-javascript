@@ -58,7 +58,7 @@ module.exports = Kuzzle = function (host, options, cb) {
         loginAttempt: {lastEmitted: null, listeners: []},
         offlineQueuePush: {listeners: []},
         offlineQueuePop: {listeners: []},
-        queryError: {lastEmitted: null, listeners: []}
+        queryError: {listeners: []}
       }
     },
     eventTimeout: {
