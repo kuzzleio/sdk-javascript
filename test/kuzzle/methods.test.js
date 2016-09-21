@@ -399,7 +399,7 @@ describe('Kuzzle methods', function () {
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
       kuzzle.disconnect();
 
-      should(kuzzle.network.close.called).be.true();
+      should(kuzzle.network).be.null();
       should(kuzzle.collections).be.empty();
       should(function () { kuzzle.isValid(); }).throw(Error);
     });

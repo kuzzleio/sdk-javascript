@@ -109,15 +109,18 @@ module.exports = Kuzzle = function (host, options, cb) {
     },
     host: {
       value: host,
+      writable: true,
       enumerable: true
     },
     wsPort: {
       value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
-      enumerable: true
+      enumerable: true,
+      writable: true
     },
     ioPort: {
       value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
-      enumerable: true
+      enumerable: true,
+      writable: true
     },
     sslConnection: {
       value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
@@ -314,9 +317,11 @@ module.exports = Kuzzle = function (host, options, cb) {
 Kuzzle.prototype.connect = function () {
   var self = this;
 
-  if (!self.network) {
-    self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
+  if (self.network) {
+    self.disconnect();
   }
+
+  self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
@@ -1029,6 +1034,7 @@ Kuzzle.prototype.disconnect = function () {
 
   this.state = 'disconnected';
   this.network.close();
+  this.network = null;
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
