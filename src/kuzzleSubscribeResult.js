@@ -19,7 +19,7 @@ KuzzleSubscribeResult.prototype.onDone = function (cb) {
   else {
     this.cbs.push(cb);
   }
-  
+
   return this;
 };
 
