@@ -4,6 +4,8 @@
  */
 function KuzzleSubscribeResult() {
   this.cbs = [];
+  this.error = null;
+  this.room = null;
 }
 
 /**
@@ -11,7 +13,13 @@ function KuzzleSubscribeResult() {
  * @param {Function} cb
  */
 KuzzleSubscribeResult.prototype.onDone = function (cb) {
-  this.cbs.push(cb);
+  if (this.error || this.room) {
+    cb(this.error, this.room);
+  }
+  else {
+    this.cbs.push(cb);
+  }
+
   return this;
 };
 
@@ -22,6 +30,9 @@ KuzzleSubscribeResult.prototype.onDone = function (cb) {
  * @param {KuzzleRoom} room
  */
 KuzzleSubscribeResult.prototype.done = function (error, room) {
+  this.error = error;
+  this.room = room;
+
   this.cbs.forEach(function (cb) {
     cb(error, room);
   });
