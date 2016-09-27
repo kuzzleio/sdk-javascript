@@ -1,6 +1,16 @@
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
-# Current
+# 2.1.3
+
+* https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.3
+
+# 2.1.2
+
+* https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.2
+
+# 2.1.0
+
+* Full changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.0
 
 ## Breaking Changes
 
@@ -8,7 +18,11 @@
 `KuzzleDataCollection(kuzzle, index, collection)`  
  to:  
 `KuzzleDataCollection(kuzzle, collection, index)`  
-This has been done to make it on par with the `Kuzzle.dataCollectionFactory` method
+This has been done to make it on par with the `Kuzzle.dataCollectionFactory` method #109
+* Subscription changes: #112
+  * `KuzzleDataCollection.subscribe` and `KuzzleDocument.subscribe` now both return an object containing an `onDone` method, allowing to chain callback registrations. These callbacks are called once the subscription is done, with the following arguments: `callback(error, kuzzleRoomObject)`. 
+  * `KuzzleRoom.renew` now accepts an optional callback as its last argument. This callback is invoked with the subscription result (the first callback argument is still only invoked whenever a notification is received)
+
 
 # 2.0.3
 
