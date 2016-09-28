@@ -1,5 +1,9 @@
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
+# 2.1.4
+
+* Fix `onDone` callbacks being lost when subscribing in a `disconnected` state #121 
+
 # 2.1.3
 
 * https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.3
