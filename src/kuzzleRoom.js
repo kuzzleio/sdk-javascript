@@ -45,6 +45,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
       value: null,
       writable: true
     },
+    onDoneCB: {
+      value: null,
+      writable: true
+    },
     queue: {
       value: [],
       writable: true
@@ -166,13 +170,17 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
     filters = null;
   }
 
+  if (!cb) {
+    cb = self.onDoneCB;
+  }
+
   self.kuzzle.callbackRequired('KuzzleRoom.renew', notificationCB);
 
   /*
     Skip subscription renewal if another one was performed a moment before
    */
   if (self.lastRenewal && (now - self.lastRenewal) <= self.renewalDelay) {
-    return;
+    return cb && cb(new Error('Subscription already renewed less than ' + self.renewalDelay + 'ms ago'));
   }
 
   if (filters) {
@@ -185,6 +193,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
     */
   if (self.kuzzle.state !== 'connected') {
     self.callback = notificationCB;
+    self.onDoneCB = cb;
     self.kuzzle.subscriptions.pending[self.id] = self;
     return;
   }
@@ -198,6 +207,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
   self.roomId = null;
   self.subscribing = true;
   self.callback = notificationCB;
+  self.onDoneCB = cb;
   self.kuzzle.subscriptions.pending[self.id] = self;
 
   subscribeQuery.body = self.filters;
