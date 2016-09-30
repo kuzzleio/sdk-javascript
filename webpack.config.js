@@ -36,7 +36,7 @@ module.exports = {
   },
   plugins: [
     new webpack.NoErrorsPlugin(),
-    new webpack.IgnorePlugin(/wsnode/),
+    new webpack.IgnorePlugin(/ws/),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({
       global: 'window'
