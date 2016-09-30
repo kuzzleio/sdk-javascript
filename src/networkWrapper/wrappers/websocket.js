@@ -32,14 +32,16 @@ function WSNode(host, port, ssl) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    var url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port;
+    var
+      url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
+      options = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
 
     if (url !== this.lasturl) {
       self.wasConnected = false;
       this.lasturl = url;
     }
 
-    this.client = new this.WebSocket(url, {perMessageDeflate: false});
+    this.client = new this.WebSocket(url, options);
 
     this.client.onopen = function () {
       if (self.wasConnected) {
