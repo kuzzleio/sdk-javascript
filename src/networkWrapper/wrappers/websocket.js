@@ -1,17 +1,20 @@
-function WSBrowsers(host, port, ssl) {
+function WSNode(host, port, ssl) {
   var self = this;
+  this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
   this.host = host;
   this.port = port;
   this.ssl = ssl;
   this.client = null;
+  this.wasConnected = false;
   this.retrying = false;
+  this.lasturl = null;
 
   /*
-     Listeners are stored using the following format:
-     roomId: {
-     fn: callback_function,
-     once: boolean
-     }
+   Listeners are stored using the following format:
+   roomId: {
+   fn: callback_function,
+   once: boolean
+   }
    */
   this.listeners = {
     error: [],
@@ -29,15 +32,23 @@ function WSBrowsers(host, port, ssl) {
    * @returns {Object} Socket
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
-    this.client = new WebSocket((this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port);
+    var url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port;
+
+    if (url !== this.lasturl) {
+      self.wasConnected = false;
+      this.lasturl = url;
+    }
+
+    this.client = new this.WebSocket(url, {perMessageDeflate: false});
 
     this.client.onopen = function () {
-      if (self.retrying) {
+      if (self.wasConnected) {
         poke(self.listeners, 'reconnect');
       }
       else {
         poke(self.listeners, 'connect');
       }
+      self.wasConnected = true;
     };
 
     this.client.onclose = function (code, message) {
@@ -54,7 +65,7 @@ function WSBrowsers(host, port, ssl) {
     };
 
     this.client.onmessage = function (payload) {
-      var data = JSON.parse(payload.data);
+      var data = JSON.parse(payload.data || payload);
 
       if (data.room && self.listeners[data.room]) {
         poke(self.listeners, data.room, data);
@@ -190,7 +201,7 @@ function WSBrowsers(host, port, ssl) {
       reconnect: []
     };
 
-    this.retrying = false;
+    this.wasConnected = false;
     this.client.close();
     this.client = null;
   };
@@ -242,9 +253,10 @@ function poke (listeners, roomId, payload) {
 function onClientError(autoReconnect, reconnectionDelay, message) {
   var self = this;
 
-  if (autoReconnect) {
+  if (autoReconnect && !self.retrying) {
     self.retrying = true;
     setTimeout(function () {
+      self.retrying = false;
       self.connect(autoReconnect, reconnectionDelay);
     }, reconnectionDelay);
   }
@@ -252,5 +264,4 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
   poke(self.listeners, 'error', message);
 }
 
-
-module.exports = WSBrowsers;
+module.exports = WSNode;
