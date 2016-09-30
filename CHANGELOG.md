@@ -1,5 +1,9 @@
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
+# 2.1.5
+
+* Hotfixed a bug when recovering from a websocket connection error created an exponential number of clients #122
+
 # 2.1.4
 
 * https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.4
