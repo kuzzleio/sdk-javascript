@@ -1,7 +1,6 @@
 var
   should = require('should'),
-  WSNode = require('../../src/networkWrapper/wrappers/wsnode'),
-  WSBrowsers = require('../../src/networkWrapper/wrappers/wsbrowsers'),
+  WS = require('../../src/networkWrapper/wrappers/websocket'),
   SocketIO = require('../../src/networkWrapper/wrappers/socketio'),
   Wrapper = require('../../src/networkWrapper');
 
@@ -11,14 +10,14 @@ describe('Network Wrapper', () => {
     WebSocket = undefined;
   });
 
-  it('should instantiate a WSNode object if not in a Web Browser', () => {
-    should(Wrapper()).be.instanceof(WSNode);
+  it('should instantiate a WebSocket object if not in a Web Browser', () => {
+    should(Wrapper()).be.instanceof(WS);
   });
 
-  it('should instantiate a WSBrowsers object if in a Web Browser with WS support', () => {
+  it('should instantiate a WebSocket object if in a Web Browser with WS support', () => {
     window = 'foo';
     WebSocket = 'bar';
-    should(Wrapper()).be.instanceof(WSBrowsers);
+    should(Wrapper()).be.instanceof(WS);
   });
 
   it('should instantiate a SocketIO object if in a Web Browser without WS support', () => {
