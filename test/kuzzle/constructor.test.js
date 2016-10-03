@@ -4,7 +4,7 @@ var
   sinon = require('sinon'),
   bluebird = require('bluebird'),
   proxyquire = require('proxyquire'),
-  NetworkWrapper = require('../../src/networkWrapper/wrappers/wsnode'),
+  NetworkWrapper = require('../../src/networkWrapper/wrappers/websocket'),
   kuzzleSource = '../../src/kuzzle';
 
 describe('Kuzzle constructor', () => {
