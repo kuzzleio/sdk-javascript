@@ -1032,8 +1032,6 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
 Kuzzle.prototype.disconnect = function () {
   var collection;
 
-  this.logout();
-
   this.state = 'disconnected';
   this.network.close();
   this.network = null;
