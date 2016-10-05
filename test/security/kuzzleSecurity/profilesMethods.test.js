@@ -93,7 +93,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
         res.content.policies.forEach(function (policy) {
           should(policy.roleId).not.be.empty().and.be.a.String();
-          should(policy.controllers).be.empty();
+          should(policy.controllers).be.undefined();
           should(policy.restrictedTo).not.be.empty().and.be.an.Array();
           should(policy.restrictedTo[0].index).be.equal('foo');
           should(policy.restrictedTo[0].collections).not.be.empty().and.be.an.Array();

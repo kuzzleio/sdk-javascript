@@ -1,8 +1,8 @@
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
-# 2.1.6
+# 2.2.0
 
-* https://github.com/kuzzleio/sdk-javascript/releases/tag/2.1.4
+* https://github.com/kuzzleio/sdk-javascript/releases/tag/2.2.0
 
 # 2.1.5
 
