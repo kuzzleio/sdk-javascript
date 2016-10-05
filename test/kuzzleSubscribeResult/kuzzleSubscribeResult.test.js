@@ -34,6 +34,8 @@ describe('KuzzleSubscribeResult object', function () {
         count++;
         should(err).be.eql(foo);
         should(res).be.eql(bar);
+        should(ksr.error).be.eql(err);
+        should(ksr.room).be.eql(res);
         if (count === 3) {
           done();
         }
@@ -48,6 +50,23 @@ describe('KuzzleSubscribeResult object', function () {
     ksr.onDone(cb);
 
     ksr.done(foo, bar);
+  });
+
+  it('should invoke the provided callback directly if Kuzzle response is already stored', function (done) {
+    var
+      cb = function (err, res) {
+        should(err).be.eql('foo');
+        should(res).be.eql('bar');
+        should(ksr.cbs).be.empty();
+        done();
+      };
+
+    this.timeout(50);
+
+    ksr.error = 'foo';
+    ksr.room = 'bar';
+
+    ksr.onDone(cb);
   });
 });
 
