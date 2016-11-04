@@ -79,41 +79,16 @@ function KuzzleDataCollection(kuzzle, collection, index) {
  * usually a couple of seconds.
  * That means that a document that was just been created won’t be returned by this function.
  *
+ * @deprecated
+ * @see KuzzleDataCollection.prototype.search
+ *
  * @param {object} filters - Filters in Elasticsearch Query DSL format
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
-  var
-    query,
-    self = this;
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
-
-  query = self.kuzzle.addHeaders({body: filters}, this.headers);
-
-  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
-    var documents = [];
-
-    if (error) {
-      return cb(error);
-    }
-
-    result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
-
-      newDocument.version = doc._version;
-
-      documents.push(newDocument);
-    });
-
-    cb(null, { total: result.result.total, documents: documents });
-  });
+  console.warn('Usage of KuzzleDataCollection.advancedSearch is deprecated. Use KuzzleDataCollection.search instead');
+  return KuzzleDataCollection.prototype.search(filters, options, cb);
 };
 
 /**
@@ -341,7 +316,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
-  this.advancedSearch(filters, options, cb);
+  this.search(filters, options, cb);
 };
 
 
@@ -433,6 +408,50 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
   });
 
   return this;
+};
+
+/**
+ * Executes an advanced search on the data collection.
+ *
+ * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a document that was just been created won’t be returned by this function.
+ *
+ * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+KuzzleDataCollection.prototype.search = function (filters, options, cb) {
+  var
+    query,
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('KuzzleDataCollection.search', cb);
+
+  query = self.kuzzle.addHeaders({body: filters}, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
+    var documents = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (doc) {
+      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+
+      newDocument.version = doc._version;
+
+      documents.push(newDocument);
+    });
+
+    cb(null, { total: result.result.total, documents: documents });
+  });
 };
 
 /**

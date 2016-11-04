@@ -51,7 +51,7 @@ describe('KuzzleDataCollection methods', function () {
     emitted,
     kuzzle;
 
-  describe('#advancedSearch', function () {
+  describe('#search', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
@@ -77,7 +77,7 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      collection.advancedSearch(filters, options, function (err, res) {
+      collection.search(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
@@ -94,22 +94,22 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should raise an error if no callback is provided', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.advancedSearch(); }).throw(Error);
+      should(function () { collection.search(); }).throw(Error);
       should(emitted).be.false();
-      should(function () { collection.advancedSearch({}); }).throw(Error);
+      should(function () { collection.search({}); }).throw(Error);
       should(emitted).be.false();
-      should(function () { collection.advancedSearch({}, {}); }).throw(Error);
+      should(function () { collection.search({}, {}); }).throw(Error);
       should(emitted).be.false();
     });
 
     it('should handle the callback argument correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      collection.advancedSearch({}, function () {});
+      collection.search({}, function () {});
       should(emitted).be.true();
 
       emitted = false;
-      collection.advancedSearch({}, {}, function () {});
+      collection.search({}, {}, function () {});
       should(emitted).be.true();
     });
 
@@ -118,7 +118,7 @@ describe('KuzzleDataCollection methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      collection.advancedSearch({}, function (err, res) {
+      collection.search({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -509,12 +509,12 @@ describe('KuzzleDataCollection methods', function () {
       emitted = false;
     });
 
-    it('should forward the query to the advancedSearch method', function () {
+    it('should forward the query to the search method', function () {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = { queuable: false };
 
-      collection.advancedSearch = function () { emitted = true; };
+      collection.search = function () { emitted = true; };
       expectedQuery.options = options;
 
       collection.fetchAllDocuments(options, function () {});
@@ -532,7 +532,7 @@ describe('KuzzleDataCollection methods', function () {
     it('should handle the callback argument correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      collection.advancedSearch = function () { emitted = true; };
+      collection.search = function () { emitted = true; };
 
       collection.fetchAllDocuments(function () {});
       should(emitted).be.true();
@@ -545,7 +545,7 @@ describe('KuzzleDataCollection methods', function () {
     it('should handle the from and size options', () => {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        stub = sinon.stub(collection, 'advancedSearch');
+        stub = sinon.stub(collection, 'search');
 
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
       should(stub.calledOnce).be.true();

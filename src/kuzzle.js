@@ -520,6 +520,32 @@ Kuzzle.prototype.login = function (strategy) {
 /**
  * Send logout request to kuzzle with jwtToken.
  *
+ * @param {string} index
+ * @param {object} [options]
+ * @param {function} cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.createIndex = function (index, options, cb) {
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.createIndex: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'admin', action: 'createIndex'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+
+  return this;
+};
+
+/**
+ * Send logout request to kuzzle with jwtToken.
+ *
  * @param cb
  * @returns {Kuzzle}
  */

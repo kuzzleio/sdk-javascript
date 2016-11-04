@@ -866,6 +866,47 @@ describe('Kuzzle methods', function () {
 
   });
 
+  describe('#createIndex', function () {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if no index is set', () => {
+      should(() => { kuzzle.createIndex() }).throw('Kuzzle.createIndex: index required');
+    });
+
+    it('should use the default index if no index is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.createIndex();
+
+      should(spy.calledOnce).be.true();
+      should(spy.firstCall.args[1].index).be.exactly(kuzzle.defaultIndex);
+    });
+
+    it('should parse the given parameters', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        options = {foo: 'bar'},
+        cb = () => {},
+        args;
+
+      kuzzle.createIndex(index, options, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].action).be.exactly('createIndex');
+      should(args[1].index).be.exactly(index);
+      should(args[2]).be.exactly(options);
+      should(args[3]).be.exactly(cb);
+    });
+
+  });
+
   describe('#getAutoRefresh', () => {
     beforeEach(() => {
       kuzzle = new Kuzzle('foo');
