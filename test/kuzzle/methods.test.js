@@ -339,9 +339,19 @@ describe('Kuzzle methods', function () {
       });
     });
 
-    it('should handle options correctly', function (done) {
+    it('should handle type option correctly', function (done) {
       expectedQuery.body.type = 'foobar';
       kuzzle.listCollections('foo', {type: 'foobar'}, () => done());
+    });
+
+    it('should handle from option correctly', function (done) {
+      expectedQuery.body.from = 'foobar';
+      kuzzle.listCollections('foo', {from: 'foobar'}, () => done());
+    });
+
+    it('should handle size option correctly', function (done) {
+      expectedQuery.body.size = 'foobar';
+      kuzzle.listCollections('foo', {size: 'foobar'}, () => done());
     });
 
     it('should use the default index if none is provided', function () {
