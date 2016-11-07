@@ -976,7 +976,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  *
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param {string} [index] - The name of the data index containing the data collection
- * @returns {object} A KuzzleDataCollection instance
+ * @returns {KuzzleDataCollection} A KuzzleDataCollection instance
  */
 Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   this.isValid();

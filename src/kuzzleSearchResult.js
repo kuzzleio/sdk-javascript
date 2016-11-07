@@ -30,7 +30,7 @@ function KuzzleSearchResult (dataCollection, total, documents, searchArgs, previ
     },
     // writable properties
     _previous: {
-      value: previous,
+      value: previous || null,
       enumerable: true,
       writable: true
     },
@@ -40,6 +40,22 @@ function KuzzleSearchResult (dataCollection, total, documents, searchArgs, previ
       writable: true
     }
   });
+
+  if (this._previous instanceof KuzzleSearchResult) {
+    this._previous._next = this;
+  }
+
+  // promisifying
+  if (this.dataCollection.kuzzle.bluebird) {
+    return this.dataCollection.kuzzle.bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        var whitelist = ['previous', 'next'];
+
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
+  }
 
   return this;
 }
@@ -76,7 +92,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
 
     if (error) {
       cb(error);
-      return void(0);
+      return void 0;
     }
 
     result.result.hits.forEach(function (doc) {
@@ -103,10 +119,10 @@ KuzzleSearchResult.prototype.next = function (cb) {
   function handleFromSizeNext (error, searchResults) {
     if (error) {
       cb(error);
-      return void(0);
+      return void 0;
     }
 
-    searchResults.previous = self;
+    searchResults._previous = self;
     self._next = searchResults;
 
     cb(null, self._next);
@@ -167,7 +183,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
     return this;
   }
 
-  throw new Error('Unable to retrieve next results from search: missing scrollId or from/size params')
+  cb(new Error('Unable to retrieve next results from search: missing scrollId or from/size params'));
 };
 
 

@@ -4,6 +4,7 @@ var
   sinon = require('sinon'),
   proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
+  KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
@@ -56,7 +57,7 @@ describe('KuzzleDataCollection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
       error = null;
       expectedQuery = {
         index: 'bar',
@@ -67,11 +68,11 @@ describe('KuzzleDataCollection methods', function () {
       };
     });
 
-    it('should send the right search query to kuzzle', function (done) {
+    it('should send the right search query to kuzzle and retrieve the scrollId if exists', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = {queuable: false},
-        filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
+        filters = { scroll: '30s', and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
 
       this.timeout(50);
       expectedQuery.options = options;
@@ -79,10 +80,11 @@ describe('KuzzleDataCollection methods', function () {
 
       collection.search(filters, options, function (err, res) {
         should(err).be.null();
-        should(res).be.an.Object();
+        should(res).be.an.instanceOf(KuzzleSearchResult);
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.searchArgs.filters.scrollId).be.exactly('banana');
 
         res.documents.forEach(function (item) {
           should(item).be.instanceof(KuzzleDocument);
@@ -530,15 +532,24 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      var
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        mockSearchResult = new KuzzleSearchResult(
+          collection,
+          1,
+          [new KuzzleDocument(collection, 'banana', {answer: 42})],
+          {options: {}, filters: {from: 0, size: 1000}}
+        );
 
-      collection.search = function () { emitted = true; };
+      collection.search = function (filters, options, cb) {
+        cb(null, mockSearchResult);
+      };
 
-      collection.fetchAllDocuments(function () {});
+      collection.fetchAllDocuments(function () {emitted = true;});
       should(emitted).be.true();
 
       emitted = false;
-      collection.fetchAllDocuments({}, function () {});
+      collection.fetchAllDocuments({}, function () {emitted = true;});
       should(emitted).be.true();
     });
 
@@ -550,6 +561,17 @@ describe('KuzzleDataCollection methods', function () {
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
       should(stub.calledOnce).be.true();
       should(stub.calledWithMatch({from: 123, size: 456})).be.true();
+      stub.restore();
+    });
+
+    it('should handle the scroll options', () => {
+      var
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        stub = sinon.stub(collection, 'search');
+
+      collection.fetchAllDocuments({scroll: '30s'}, function () {});
+      should(stub.calledOnce).be.true();
+      should(stub.calledWithMatch({from: 0, size: 1000, scroll: '30s'})).be.true();
       stub.restore();
     });
   });
