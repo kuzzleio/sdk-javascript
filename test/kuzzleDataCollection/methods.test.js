@@ -52,6 +52,35 @@ describe('KuzzleDataCollection methods', function () {
     emitted,
     kuzzle;
 
+  describe('#advancedSearch', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'search',
+        controller: 'read',
+        body: {}
+      };
+    });
+
+    it('should call search method', function (done) {
+      var
+        searchCalled = false,
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      collection.search = function(filters, cb) {
+        searchCalled = true;
+        cb();
+      };
+
+      collection.advancedSearch({}, function() {
+        should(searchCalled).be.true();
+        done();
+      });
+    });
+  });
+
   describe('#search', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
@@ -573,6 +602,21 @@ describe('KuzzleDataCollection methods', function () {
       should(stub.calledOnce).be.true();
       should(stub.calledWithMatch({from: 0, size: 1000, scroll: '30s'})).be.true();
       stub.restore();
+    });
+
+    it('should transfer error if any', done => {
+      var
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+
+      collection.search = function (filters, options, cb) {
+        cb(new Error('foobar'));
+      };
+
+      collection.fetchAllDocuments(function (error) {
+        should(error).be.an.instanceOf(Error);
+        should(error.message).be.exactly('foobar');
+        done();
+      });
     });
   });
 

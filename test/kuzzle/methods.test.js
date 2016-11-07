@@ -900,6 +900,25 @@ describe('Kuzzle methods', function () {
       should(args[3]).be.exactly(cb);
     });
 
+    it('should parse the given parameters even if no options is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        scrollId = 'scrollId',
+        cb = () => {},
+        args;
+
+      kuzzle.scroll(scrollId, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].controller).be.exactly('read');
+      should(args[0].action).be.exactly('scroll');
+      should(args[1].body.scrollId).be.exactly(scrollId);
+      should(args[2]).be.null();
+      should(args[3]).be.exactly(cb);
+    });
+
   });
 
   describe('#createIndex', function () {
@@ -938,6 +957,24 @@ describe('Kuzzle methods', function () {
       should(args[0].action).be.exactly('createIndex');
       should(args[1].index).be.exactly(index);
       should(args[2]).be.exactly(options);
+      should(args[3]).be.exactly(cb);
+    });
+
+    it('should parse the given parameters even if no options is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        cb = () => {},
+        args;
+
+      kuzzle.createIndex(index, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].action).be.exactly('createIndex');
+      should(args[1].index).be.exactly(index);
+      should(args[2]).be.null();
       should(args[3]).be.exactly(cb);
     });
 

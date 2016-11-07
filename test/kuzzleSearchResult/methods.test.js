@@ -71,6 +71,25 @@ describe('KuzzleSearchResult methods', function () {
       });
     });
 
+    it('should transfer error if not-able to do a scroll request', function (done) {
+      var
+        firstSearchResult;
+
+      dataCollection.kuzzle.scroll = function(scrollId, options, cb) {
+        cb(new Error('foobar scroll'));
+      };
+
+      searchArgs.filters.scrollId = 'banana';
+
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+
+      firstSearchResult.next(function(error) {
+        should(error).be.an.instanceOf(Error);
+        should(error.message).be.exactly('foobar scroll');
+        done();
+      });
+    });
+
     it('should be able to do a from / next search request', function (done) {
       var
         firstSearchResult;
@@ -86,6 +105,23 @@ describe('KuzzleSearchResult methods', function () {
         should(result.documents).be.an.Array();
         should(result.documents.length).be.exactly(1);
         should(result.searchArgs.filters.from).be.exactly(1);
+        done();
+      });
+    });
+
+    it('should transfer error if not-able to do a from / next search request', function (done) {
+      var
+        firstSearchResult;
+
+      dataCollection.search = function(filters, options, cb) {
+        cb(new Error('foobar search'));
+      };
+
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+
+      firstSearchResult.next(function(error) {
+        should(error).be.an.instanceOf(Error);
+        should(error.message).be.exactly('foobar search');
         done();
       });
     });

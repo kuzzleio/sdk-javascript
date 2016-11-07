@@ -89,7 +89,7 @@ function KuzzleDataCollection(kuzzle, collection, index) {
  */
 KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
   console.warn('Usage of KuzzleDataCollection.advancedSearch is deprecated. Use KuzzleDataCollection.search instead');
-  return KuzzleDataCollection.prototype.search(filters, options, cb);
+  return this.search(filters, options, cb);
 };
 
 /**
