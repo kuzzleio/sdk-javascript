@@ -30,7 +30,9 @@ describe('Offline queue management', () => {
 
       // setting the request TTL to 5s
       kuzzle.queueTTL = 5000;
-      kuzzle.addListener('offlineQueuePop', () => eventFired = true);
+      kuzzle.addListener('offlineQueuePop', () => {
+        eventFired = true;
+      });
 
       cleanQueue.call(kuzzle);
 
@@ -57,7 +59,9 @@ describe('Offline queue management', () => {
         eventFired = false;
 
       kuzzle.queueMaxSize = 1;
-      kuzzle.addListener('offlineQueuePop', () => eventFired = true);
+      kuzzle.addListener('offlineQueuePop', () => {
+        eventFired = true;
+      });
       cleanQueue.call(kuzzle);
 
       process.nextTick(() => {
@@ -125,9 +129,9 @@ describe('Offline queue management', () => {
       this.timeout(200);
       kuzzle.offlineQueueLoader = function () {
         return [
-            {query: {requestId: 'foo', action: 'action', controller: 'controller'}},
-            {query: {requestId: 'foo2', action: 'action', controller: 'controller'}}
-          ];
+          {query: {requestId: 'foo', action: 'action', controller: 'controller'}},
+          {query: {requestId: 'foo2', action: 'action', controller: 'controller'}}
+        ];
       };
       kuzzle.addListener('offlineQueuePop', () => eventFired++);
       dequeue.call(kuzzle);

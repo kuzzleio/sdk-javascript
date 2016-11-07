@@ -2,7 +2,6 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),

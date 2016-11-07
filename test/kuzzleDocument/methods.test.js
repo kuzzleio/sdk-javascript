@@ -1,10 +1,8 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDocument = rewire('../../src/kuzzleDocument'),
-  KuzzleRoom = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('KuzzleDocument methods', function () {
@@ -178,7 +176,7 @@ describe('KuzzleDocument methods', function () {
         should(res).be.undefined();
         done();
       });
-    })
+    });
   });
 
   describe('#refresh', function () {
@@ -344,7 +342,7 @@ describe('KuzzleDocument methods', function () {
         should(res).be.undefined();
         done();
       });
-    })
+    });
   });
 
   describe('#publish', function () {
@@ -461,7 +459,7 @@ describe('KuzzleDocument methods', function () {
 
     it('should properly set headers', function () {
       var
-        document = new KuzzleDocument(dataCollection);
+        document = new KuzzleDocument(dataCollection),
         header = {_id: 'foobar'};
 
       should(document.setHeaders(header)).be.exactly(document);
