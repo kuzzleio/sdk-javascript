@@ -1,4 +1,5 @@
 var
+  KuzzleSearchResult = require('./kuzzleSearchResult'),
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
   KuzzleRoom = require('./kuzzleRoom'),
@@ -296,7 +297,9 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  * @param {responseCallback} cb - Handles the query response
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
-  var filters = {};
+  var
+    documents = [],
+    filters = {};
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -304,19 +307,41 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   }
 
   // copying pagination options to the search filter
-  if (options) {
-    if (options.from) {
-      filters.from = options.from;
-    }
-
-    if (options.size) {
-      filters.size = options.size;
-    }
+  if (options && options.scroll) {
+    filters.scroll = options.scroll;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
+  if (options && options.from) {
+    filters.from = options.from;
+  }
+  else {
+    filters.from = 0;
+  }
 
-  this.search(filters, options, cb);
+  if (options && options.size) {
+    filters.size = options.size;
+  }
+  else {
+    filters.size = 1000;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
+
+  this.search(filters, options, function getNext (error, searchResult) {
+    if (error) {
+      return cb(error);
+    }
+
+    if (searchResult instanceof KuzzleSearchResult) {
+      searchResult.documents.forEach(document => {
+        documents.push(document);
+      });
+      searchResult.getNext(getNext);
+    }
+    else {
+      cb(null, documents);
+    }
+  });
 };
 
 
@@ -421,6 +446,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
+
 KuzzleDataCollection.prototype.search = function (filters, options, cb) {
   var
     query,
@@ -450,7 +476,12 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
       documents.push(newDocument);
     });
 
-    cb(null, { total: result.result.total, documents: documents });
+    if (result.result['_scroll_id']) {
+      filters.scrollId = result.result['_scroll_id'];
+    }
+    console.log('search query',result.result);
+
+    cb(null, new KuzzleSearchResult(self, result.result.total, documents, {options: options, filters: filters}));
   });
 };
 

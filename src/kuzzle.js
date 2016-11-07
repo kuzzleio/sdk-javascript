@@ -518,11 +518,11 @@ Kuzzle.prototype.login = function (strategy) {
 };
 
 /**
- * Send logout request to kuzzle with jwtToken.
+ * Create a kuzzle index
  *
  * @param {string} index
  * @param {object} [options]
- * @param {function} cb
+ * @param {responseCallback} cb
  * @returns {Kuzzle}
  */
 Kuzzle.prototype.createIndex = function (index, options, cb) {
@@ -539,6 +539,39 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
   }
 
   this.query({controller: 'admin', action: 'createIndex'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+
+  return this;
+};
+
+/**
+ * Scroll into a search result
+ *
+ * @param {string} scrollId
+ * @param {object} [options]
+ * @param {responseCallback} cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.scroll = function (scrollId, options, cb) {
+  var request = {body: {}};
+
+  if (!scrollId) {
+    throw new Error('Kuzzle.scroll: scrollId required');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  request.body.scrollId = scrollId;
+
+  if (options.scroll) {
+    request.body.scroll = options.scroll;
+  }
+
+  this.callbackRequired('Kuzzle.scroll', cb);
+
+  this.query({controller: 'read', action: 'scroll'}, request, options, cb);
 
   return this;
 };
