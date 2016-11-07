@@ -565,7 +565,7 @@ Kuzzle.prototype.scroll = function (scrollId, options, cb) {
 
   request.body.scrollId = scrollId;
 
-  if (options.scroll) {
+  if (options && options.scroll) {
     request.body.scroll = options.scroll;
   }
 
