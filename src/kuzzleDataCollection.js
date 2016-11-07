@@ -327,7 +327,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
 
-  this.search(filters, options, function getNext (error, searchResult) {
+  this.search(filters, options, function getNextDocuments (error, searchResult) {
     if (error) {
       return cb(error);
     }
@@ -336,7 +336,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
       searchResult.documents.forEach(document => {
         documents.push(document);
       });
-      searchResult.getNext(getNext);
+      searchResult.next(getNextDocuments);
     }
     else {
       cb(null, documents);
@@ -479,7 +479,6 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
     if (result.result['_scroll_id']) {
       filters.scrollId = result.result['_scroll_id'];
     }
-    console.log('search query',result.result);
 
     cb(null, new KuzzleSearchResult(self, result.result.total, documents, {options: options, filters: filters}));
   });

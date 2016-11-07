@@ -10,40 +10,73 @@ var KuzzleDocument = require('./kuzzleDocument.js');
  * @constructor
  */
 function KuzzleSearchResult (dataCollection, total, documents, searchArgs, previous) {
-  this.dataCollection = dataCollection;
-  this.total = total;
-  this.documents = documents;
-  this.searchArgs = searchArgs;
-  this.previous = previous;
+  Object.defineProperties(this, {
+    // read-only properties
+    dataCollection: {
+      value: dataCollection,
+      enumerable: true
+    },
+    total: {
+      value: total,
+      enumerable: true
+    },
+    documents: {
+      value: documents,
+      enumerable: true
+    },
+    searchArgs: {
+      value: searchArgs,
+      enumerable: true
+    },
+    // writable properties
+    _previous: {
+      value: previous,
+      enumerable: true,
+      writable: true
+    },
+    _next: {
+      value: null,
+      enumerable: true,
+      writable: true
+    }
+  });
 
   return this;
 }
 
+
 /**
- *
+ * @param cb
+ * @returns {*}
+ */
+KuzzleSearchResult.prototype.previous = function (cb) {
+  if (cb) {
+    cb(null, this._previous);
+
+    return this;
+  }
+
+  return this._previous;
+};
+
+/**
  * @param {function} cb
  */
-KuzzleSearchResult.prototype.getNext = function (cb) {
+KuzzleSearchResult.prototype.next = function (cb) {
   var self = this;
 
+  /**
+   * @param error
+   * @param result
+   */
   function handleScrollNext (error, result) {
     var
       documents = [],
-      fetchedDocuments = self.documents.length,
-      options = Object.assign({}, self.searchArgs.options),
-      previous = self;
+      options = Object.assign({}, self.searchArgs.options);
 
     if (error) {
-      return cb(error);
-    }
-
-    while (previous = previous.previous) {
-      fetchedDocuments += previous.documents.length;
-    }
-    console.log('fetchedDocuments', fetchedDocuments, self.total, fetchedDocuments >= self.total);
-
-    if (fetchedDocuments >= self.total) {
-      return cb(null, null);
+      cb(error);
+      return void(0);
     }
 
     result.result.hits.forEach(function (doc) {
@@ -58,41 +91,83 @@ KuzzleSearchResult.prototype.getNext = function (cb) {
       options.scrollId = result.result['_scroll_id'];
     }
 
-    return cb(null, new KuzzleSearchResult(self.dataCollection, self.total, documents, {options: options, filters: self.searchArgs.filters}, self));
+    self._next = new KuzzleSearchResult(self.dataCollection, self.total, documents, {options: options, filters: self.searchArgs.filters}, self);
+
+    cb(null, self._next);
   }
 
-  if (this.searchArgs.filters.scrollId) {
-    return this.dataCollection.kuzzle.scroll(
-      this.searchArgs.filters.scrollId,
-      this.searchArgs.options || {},
-      handleScrollNext
-    )
-  }
-  else if (this.searchArgs.filters.from !== undefined && this.searchArgs.filters.size !== undefined) {
-    var
-      filters = Object.assign({}, this.searchArgs.filters);
-
-    filters.from += filters.size;
-
-    if (filters.from >= self.total) {
-      return cb(null, null);
+  /**
+   * @param error
+   * @param searchResults
+   */
+  function handleFromSizeNext (error, searchResults) {
+    if (error) {
+      cb(error);
+      return void(0);
     }
 
-    return this.dataCollection.search(filters, this.searchArgs.options, function (error, searchResults) {
-      if (error) {
-        return cb(error);
+    searchResults.previous = self;
+    self._next = searchResults;
+
+    cb(null, self._next);
+  }
+
+  if (!this._next) {
+    // retrieve next results with scroll if original search use it
+    if (this.searchArgs.filters.scrollId) {
+      var
+        fetchedDocuments = this.documents.length,
+        previous = this;
+
+      // check if we need to scroll again to fetch all matching documents
+      while (previous = previous.previous()) {
+        fetchedDocuments += previous.documents.length;
       }
 
-      searchResults.previous = self;
-      return cb(null, searchResults);
-    })
+      if (fetchedDocuments >= this.total) {
+        cb(null, null);
+        return this;
+      }
+
+      this.dataCollection.kuzzle.scroll(
+        this.searchArgs.filters.scrollId,
+        this.searchArgs.options || {},
+        handleScrollNext
+      );
+
+      return this;
+    }
+    // retrieve next results with  from/size if original search use it
+    else if (this.searchArgs.filters.from !== undefined && this.searchArgs.filters.size !== undefined) {
+      var
+        filters = Object.assign({}, this.searchArgs.filters);
+
+      // check if we need to do next request to fetch all matching documents
+      filters.from += filters.size;
+
+      if (filters.from >= self.total) {
+        cb(null, null);
+
+        return this;
+      }
+
+      this.dataCollection.search(
+        filters,
+        this.searchArgs.options,
+        handleFromSizeNext
+      );
+
+      return this;
+    }
+  }
+
+  if (this._next instanceof KuzzleSearchResult) {
+    cb(null, this._next);
+
+    return this;
   }
 
   throw new Error('Unable to retrieve next results from search: missing scrollId or from/size params')
-};
-
-KuzzleSearchResult.prototype.getPrevious = function () {
-  return this.previous;
 };
 
 
