@@ -56,7 +56,7 @@ describe('KuzzleDataCollection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
+      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
       error = null;
       expectedQuery = {
         index: 'bar',
@@ -83,6 +83,7 @@ describe('KuzzleDataCollection methods', function () {
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
           should(item).be.instanceof(KuzzleDocument);

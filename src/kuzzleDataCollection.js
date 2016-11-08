@@ -98,7 +98,9 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
-    var documents = [];
+    var
+      response,
+      documents = [];
 
     if (error) {
       return cb(error);
@@ -112,7 +114,16 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
       documents.push(newDocument);
     });
 
-    cb(null, { total: result.result.total, documents: documents });
+    response = {
+      total: result.result.total,
+      documents: documents
+    };
+
+    if (result.result.aggregations) {
+      response.aggregations = result.result.aggregations;
+    }
+
+    cb(null, response);
   });
 };
 
