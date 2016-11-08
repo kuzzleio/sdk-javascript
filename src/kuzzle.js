@@ -968,7 +968,8 @@ Kuzzle.prototype.listCollections = function () {
     index,
     options,
     cb,
-    args = Array.prototype.slice.call(arguments);
+    args = Array.prototype.slice.call(arguments),
+    query;
 
   args.forEach(function(arg) {
     switch (typeof arg) {
@@ -998,7 +999,17 @@ Kuzzle.prototype.listCollections = function () {
     collectionType = options.type;
   }
 
-  this.query({index: index, controller: 'read', action: 'listCollections'}, {body: {type: collectionType}}, options, function (err, res) {
+  query = {body: {type: collectionType}};
+
+  if (options && options.from) {
+    query.body.from = options.from;
+  }
+
+  if (options && options.size) {
+    query.body.size = options.size;
+  }
+
+  this.query({index: index, controller: 'read', action: 'listCollections'}, query, options, function (err, res) {
     if (err) {
       return cb(err);
     }
