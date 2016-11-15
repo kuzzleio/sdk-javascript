@@ -1,8 +1,6 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
-  KuzzleRole = require('../../../src/security/kuzzleRole'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile'),
   KuzzleUser = require('../../../src/security/kuzzleUser');
 
 describe('KuzzleSecurity user methods', function () {
@@ -361,7 +359,7 @@ describe('KuzzleSecurity user methods', function () {
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () { kuzzle.security.userFactory(null) })).throw(Error);
+      should((function () {kuzzle.security.userFactory(null);})).throw(Error);
       done();
     });
   });

@@ -4,6 +4,10 @@ var
   SocketIO = require('../../src/networkWrapper/wrappers/socketio'),
   Wrapper = require('../../src/networkWrapper');
 
+/**
+ * @global window
+ */
+
 describe('Network Wrapper', () => {
   afterEach(() => {
     window = undefined;

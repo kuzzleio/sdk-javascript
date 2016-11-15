@@ -6,24 +6,7 @@ var
 describe('Kuzzle.getStatistics', function () {
   var
     kuzzle,
-    passedOptions,
-    error,
-    result,
-    queryStub = function (collection, controller, action, query, options, cb) {
-      emitted = true;
-      should(collection).be.null();
-      should(controller).be.exactly('admin');
-      should(action).be.exactly('getAllStats');
-      should(Object.keys(query).length).be.exactly(0);
-
-      if (passedOptions) {
-        should(options).match(passedOptions);
-      }
-
-      cb(error, result);
-    },
-    emitted,
-    controller;
+    emitted;
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', 'this is not an index');

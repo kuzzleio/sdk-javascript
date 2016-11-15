@@ -31,9 +31,10 @@ describe('KuzzleRole constructor', function () {
 
   it('should initialize properties and return a valid KuzzleProfile object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
-      kuzzleRole = new KuzzleRole(kuzzle.security, 'id', {some: 'content'});
+      kuzzleRole;
 
+    kuzzle = new Kuzzle('foo');
+    kuzzleRole = new KuzzleRole(kuzzle.security, 'id', {some: 'content'});
 
     should(kuzzleRole).be.instanceof(KuzzleRole);
     should(kuzzleRole).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });

@@ -117,7 +117,7 @@ describe('KuzzleRoom methods', function () {
 
     it('should fail if the room has no room ID', function () {
       room.roomId = undefined;
-      should(function () {room.count(function () {})}).throw();
+      should(function () {room.count(function () {});}).throw();
     });
   });
 
@@ -129,7 +129,7 @@ describe('KuzzleRoom methods', function () {
 
     beforeEach(function () {
       dequeued = false;
-      revert = KuzzleRoom.__set__('dequeue', function () { dequeued = true; });
+      revert = KuzzleRoom.__set__('dequeue', function () {dequeued = true;});
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
@@ -188,8 +188,8 @@ describe('KuzzleRoom methods', function () {
 
     it('should register itself in the global subscription list', function () {
       room.renew({}, function () {});
-      should(kuzzle.subscriptions['foobar']).be.an.Object().and.not.be.empty();
-      should(kuzzle.subscriptions['foobar'][room.id]).be.exactly(room);
+      should(kuzzle.subscriptions.foobar).be.an.Object().and.not.be.empty();
+      should(kuzzle.subscriptions.foobar[room.id]).be.exactly(room);
     });
 
     it('should start dequeuing if subscribed successfully', function (done) {
@@ -290,25 +290,25 @@ describe('KuzzleRoom methods', function () {
       dataCollection = kuzzle.dataCollectionFactory('foo');
       room = new KuzzleRoom(dataCollection);
       room.roomId = 'foobar';
-      kuzzle.subscriptions['foobar'] = {};
-      kuzzle.subscriptions['foobar'][room.id] = room;
+      kuzzle.subscriptions.foobar = {};
+      kuzzle.subscriptions.foobar[room.id] = room;
     });
 
     it('should stop listening to the socket room once subscription has stopped', function () {
       should(room.unsubscribe()).be.exactly(room);
       should(socketOff).be.true();
       should(emitted).be.true();
-      should(kuzzle.subscriptions['foobar']).be.undefined();
+      should(kuzzle.subscriptions.foobar).be.undefined();
     });
 
     it('should not emit an unsubscribe request if another KuzzleRoom is listening to that room', function () {
-      kuzzle.subscriptions['foobar']['foo'] = {};
+      kuzzle.subscriptions.foobar.foo = {};
       should(room.unsubscribe()).be.exactly(room);
       should(socketOff).be.true();
       should(emitted).be.false();
-      should(kuzzle.subscriptions['foobar']).not.be.empty();
-      should(Object.keys(kuzzle.subscriptions['foobar']).length).be.exactly(1);
-      should(kuzzle.subscriptions['foobar']['foo']).not.be.undefined();
+      should(kuzzle.subscriptions.foobar).not.be.empty();
+      should(Object.keys(kuzzle.subscriptions.foobar).length).be.exactly(1);
+      should(kuzzle.subscriptions.foobar.foo).not.be.undefined();
     });
 
     it('should unsubscribe only after all pending subscriptions are finished', function (done) {
@@ -316,7 +316,7 @@ describe('KuzzleRoom methods', function () {
       should(room.unsubscribe()).be.exactly(room);
       should(socketOff).be.true();
       should(emitted).be.false();
-      should(kuzzle.subscriptions['foobar']).be.undefined();
+      should(kuzzle.subscriptions.foobar).be.undefined();
       kuzzle.subscriptions.pending = {};
       setTimeout(() => {
         should(emitted).be.true();
@@ -329,7 +329,7 @@ describe('KuzzleRoom methods', function () {
       should(room.unsubscribe()).be.exactly(room);
       should(socketOff).be.true();
       should(emitted).be.false();
-      should(kuzzle.subscriptions['foobar']).be.undefined();
+      should(kuzzle.subscriptions.foobar).be.undefined();
       kuzzle.subscriptions.pending = {};
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar.foo = {};
@@ -381,9 +381,7 @@ describe('KuzzleRoom methods', function () {
     var
       notifCB = KuzzleRoom.__get__('notificationCallback'),
       room,
-      called,
-      error,
-      result;
+      called;
 
     beforeEach(function () {
       called = false;
@@ -409,7 +407,7 @@ describe('KuzzleRoom methods', function () {
 
     it('should delete the result from history if emitted by this instance', function () {
       room.subscribeToSelf = true;
-      kuzzle.requestHistory['bar'] = {};
+      kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
       should(called).be.true();
       should(kuzzle.requestHistory).be.empty();
@@ -417,7 +415,7 @@ describe('KuzzleRoom methods', function () {
 
     it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
       room.subscribeToSelf = false;
-      kuzzle.requestHistory['bar'] = {};
+      kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, requestId: 'bar', action: 'foo'});
       should(called).be.false();
       should(kuzzle.requestHistory).be.empty();
@@ -428,7 +426,9 @@ describe('KuzzleRoom methods', function () {
         eventEmitted = null,
         context = {
           kuzzle: {
-            emitEvent: event => eventEmitted = event
+            emitEvent: event => {
+              eventEmitted = event;
+            }
           }
         };
 
