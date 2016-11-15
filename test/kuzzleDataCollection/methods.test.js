@@ -112,7 +112,7 @@ describe('KuzzleDataCollection methods', function () {
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
-        should(res.searchArgs.filters.scrollId).be.exactly('banana');
+        should(res.searchArgs.options.scrollId).be.exactly('banana');
         should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
@@ -154,6 +154,92 @@ describe('KuzzleDataCollection methods', function () {
         should(res).be.undefined();
         done();
       });
+    });
+  });
+
+  describe('#scroll', function () {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'scroll',
+        controller: 'read',
+        body: {}
+      };
+    });
+
+    it('should throw an error if no scrollId is set', () => {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      should(() => { collection.scroll(); }).throw('KuzzleDataCollection.scroll: scrollId required');
+    });
+
+    it('should throw an error if no callback is given', () => {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      should(() => { collection.scroll('scrollId'); }).throw('KuzzleDataCollection.scroll: a callback argument is required for read queries');
+    });
+
+    it('should parse the given parameters', done => {
+      var
+        queryScrollStub,
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        scrollId = 'scrollId',
+        filters = {},
+        options = {scroll: '30s'},
+        cb = () => {
+          done();
+        };
+
+      queryScrollStub = function (args, query, opts, callback) {
+        should(args.controller).be.exactly('read');
+        should(args.action).be.exactly('scroll');
+        should(query.body.scroll).be.exactly(options.scroll);
+        should(query.body.scrollId).be.exactly(scrollId);
+        should(opts).be.exactly(options);
+
+        callback(null, {
+          result: {
+            total: 0,
+            hits: []
+          }
+        });
+      };
+
+      kuzzle.query = queryScrollStub;
+
+      collection.scroll(scrollId, options, filters, cb);
+    });
+
+    it('should parse the given parameters even if no options is given', done => {
+      var
+        queryScrollStub,
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        scrollId = 'scrollId',
+        cb = () => {
+          done();
+        };
+
+      queryScrollStub = function (args, query, opts, callback) {
+        should(args.controller).be.exactly('read');
+        should(args.action).be.exactly('scroll');
+        should(query.body.scrollId).be.exactly(scrollId);
+        should(opts).be.null();
+
+        callback(null, {
+          result: {
+            total: 0,
+            hits: []
+          }
+        });
+      };
+
+      kuzzle.query = queryScrollStub;
+
+      collection.scroll(scrollId, cb);
     });
   });
 

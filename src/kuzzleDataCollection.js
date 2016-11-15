@@ -309,10 +309,12 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   // copying pagination options to the search filter
   if (options && options.scroll) {
     filters.scroll = options.scroll;
+    delete options.scroll;
   }
 
   if (options && options.from) {
     filters.from = options.from;
+    delete options.from;
   }
   else {
     filters.from = 0;
@@ -320,6 +322,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
 
   if (options && options.size) {
     filters.size = options.size;
+    delete options.size;
   }
   else {
     filters.size = 1000;
@@ -454,7 +457,7 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
 
   if (!cb && typeof options === 'function') {
     cb = options;
-    options = null;
+    options = {};
   }
 
   self.kuzzle.callbackRequired('KuzzleDataCollection.search', cb);
@@ -462,6 +465,70 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
+    var documents = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (doc) {
+      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+
+      newDocument.version = doc._version;
+
+      documents.push(newDocument);
+    });
+
+    if (result.result['_scroll_id']) {
+      options.scrollId = result.result['_scroll_id'];
+    }
+
+    cb(null, new KuzzleSearchResult(
+      self,
+      result.result.total,
+      documents,
+      result.result.aggregations ? result.result.aggregations : [],
+      {options: options, filters: filters}
+    ));
+  });
+};
+
+/**
+ * Scroll into a search result
+ *
+ * @param {string} scrollId
+ * @param {object} [options]
+ * @param {object} [filters]
+ * @param {responseCallback} cb
+ */
+KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb) {
+  var
+    request = {body: {}},
+    self = this;
+
+  if (!scrollId) {
+    throw new Error('KuzzleDataCollection.scroll: scrollId required');
+  }
+
+  if (!cb) {
+    cb = filters;
+    filters = null;
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  request.body.scrollId = scrollId;
+
+  if (options && options.scroll) {
+    request.body.scroll = options.scroll;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.scroll', cb);
+
+  this.kuzzle.query({controller: 'read', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
 
     if (error) {
@@ -488,6 +555,8 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
       {options: options, filters: filters}
     ));
   });
+
+  return this;
 };
 
 /**

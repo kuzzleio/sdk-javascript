@@ -863,61 +863,6 @@ describe('Kuzzle methods', function () {
 
   });
 
-  describe('#scroll', function () {
-    beforeEach(() => {
-      kuzzle = new Kuzzle('foo');
-    });
-
-    it('should throw an error if no scrollId is set', () => {
-      should(() => { kuzzle.scroll(); }).throw('Kuzzle.scroll: scrollId required');
-    });
-
-    it('should throw an error if no callback is given', () => {
-      should(() => { kuzzle.scroll('scrollId'); }).throw('Kuzzle.scroll: a callback argument is required for read queries');
-    });
-
-    it('should parse the given parameters', () => {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        scrollId = 'scrollId',
-        options = {scroll: '30s'},
-        cb = () => {},
-        args;
-
-      kuzzle.scroll(scrollId, options, cb);
-
-      should(spy.calledOnce).be.true();
-      args = spy.firstCall.args;
-
-      should(args[0].controller).be.exactly('read');
-      should(args[0].action).be.exactly('scroll');
-      should(args[1].body.scroll).be.exactly(options.scroll);
-      should(args[1].body.scrollId).be.exactly(scrollId);
-      should(args[2]).be.exactly(options);
-      should(args[3]).be.exactly(cb);
-    });
-
-    it('should parse the given parameters even if no options is given', () => {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        scrollId = 'scrollId',
-        cb = () => {},
-        args;
-
-      kuzzle.scroll(scrollId, cb);
-
-      should(spy.calledOnce).be.true();
-      args = spy.firstCall.args;
-
-      should(args[0].controller).be.exactly('read');
-      should(args[0].action).be.exactly('scroll');
-      should(args[1].body.scrollId).be.exactly(scrollId);
-      should(args[2]).be.null();
-      should(args[3]).be.exactly(cb);
-    });
-
-  });
-
   describe('#createIndex', function () {
     beforeEach(() => {
       kuzzle = new Kuzzle('foo');

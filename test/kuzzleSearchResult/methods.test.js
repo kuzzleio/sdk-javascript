@@ -42,22 +42,20 @@ describe('KuzzleSearchResult methods', function () {
 
     it('should be able to do a scroll request', function (done) {
       var
+        mockScrollResult = new KuzzleSearchResult(
+          dataCollection,
+          1,
+          [new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'})],
+          {},
+          {options: {scrollId: 'papagayo'}, filters: {from: 0, size: 1}}
+        ),
         firstSearchResult;
 
-      dataCollection.kuzzle.scroll = function(scrollId, options, cb) {
-        cb(null, {
-          result: {
-            _scroll_id: 'papagayo',
-            hits:  [{
-              _id: 'papagayo',
-              _source: {foo: 'bar'},
-              _version: 1
-            }]
-          }
-        });
+      dataCollection.scroll = function(scrollId, options, filters, cb) {
+        cb(null, mockScrollResult);
       };
 
-      searchArgs.filters.scrollId = 'banana';
+      searchArgs.options.scrollId = 'banana';
 
       firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
@@ -74,11 +72,11 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      dataCollection.kuzzle.scroll = function(scrollId, options, cb) {
+      dataCollection.scroll = function(scrollId, options, filters, cb) {
         cb(new Error('foobar scroll'));
       };
 
-      searchArgs.filters.scrollId = 'banana';
+      searchArgs.options.scrollId = 'banana';
 
       firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
