@@ -2,7 +2,6 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
@@ -86,7 +85,7 @@ describe('KuzzleDataCollection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
       error = null;
       expectedQuery = {
         index: 'bar',
@@ -114,6 +113,7 @@ describe('KuzzleDataCollection methods', function () {
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
         should(res.searchArgs.filters.scrollId).be.exactly('banana');
+        should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
           should(item).be.instanceof(KuzzleDocument);
@@ -542,18 +542,17 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should forward the query to the search method', function () {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        collection = kuzzle.dataCollectionFactory('collection'),
         options = { queuable: false };
 
       collection.search = function () { emitted = true; };
-      expectedQuery.options = options;
 
       collection.fetchAllDocuments(options, function () {});
       should(emitted).be.true();
     });
 
     it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      var collection = kuzzle.dataCollectionFactory('collection');
       should(function () { collection.fetchAllDocuments(); }).throw(Error);
       should(emitted).be.false();
       should(function () { collection.fetchAllDocuments({}); }).throw(Error);
@@ -562,11 +561,12 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should handle the callback argument correctly', function () {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        collection = kuzzle.dataCollectionFactory('collection'),
         mockSearchResult = new KuzzleSearchResult(
           collection,
           1,
           [new KuzzleDocument(collection, 'banana', {answer: 42})],
+          {},
           {options: {}, filters: {from: 0, size: 1000}}
         );
 
@@ -584,7 +584,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should handle the from and size options', () => {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        collection = kuzzle.dataCollectionFactory('collection'),
         stub = sinon.stub(collection, 'search');
 
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
@@ -595,7 +595,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should handle the scroll options', () => {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        collection = kuzzle.dataCollectionFactory('collection'),
         stub = sinon.stub(collection, 'search');
 
       collection.fetchAllDocuments({scroll: '30s'}, function () {});
@@ -606,15 +606,15 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should transfer error if any', done => {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+        collection = kuzzle.dataCollectionFactory('collection');
 
       collection.search = function (filters, options, cb) {
         cb(new Error('foobar'));
       };
 
-      collection.fetchAllDocuments(function (error) {
-        should(error).be.an.instanceOf(Error);
-        should(error.message).be.exactly('foobar');
+      collection.fetchAllDocuments(function (er) {
+        should(er).be.an.instanceOf(Error);
+        should(er.message).be.exactly('foobar');
         done();
       });
     });

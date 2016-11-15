@@ -1,5 +1,4 @@
 var
-  sinon = require('sinon'),
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
@@ -30,8 +29,8 @@ describe('KuzzleSearchResult methods', function () {
   describe('#next', function () {
     it('should return the next SearchResult if it has already fetched', function (done) {
       var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], searchArgs, firstSearchResult);
+        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
+        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
 
       firstSearchResult.next(function(error, next) {
         should(error).be.exactly(null);
@@ -60,7 +59,7 @@ describe('KuzzleSearchResult methods', function () {
 
       searchArgs.filters.scrollId = 'banana';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error, result) {
         should(result).be.an.instanceOf(KuzzleSearchResult);
@@ -81,7 +80,7 @@ describe('KuzzleSearchResult methods', function () {
 
       searchArgs.filters.scrollId = 'banana';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -95,10 +94,10 @@ describe('KuzzleSearchResult methods', function () {
         firstSearchResult;
 
       dataCollection.search = function(filters, options, cb) {
-        cb(null, new KuzzleSearchResult(dataCollection, 2, [secondDocument], {options: options, filters: filters}));
+        cb(null, new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, {options: options, filters: filters}));
       };
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error, result) {
         should(result).be.an.instanceOf(KuzzleSearchResult);
@@ -117,7 +116,7 @@ describe('KuzzleSearchResult methods', function () {
         cb(new Error('foobar search'));
       };
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -128,7 +127,7 @@ describe('KuzzleSearchResult methods', function () {
 
     it('should be resolve null if all documents is fetched', function (done) {
       var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], searchArgs);
+        firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error, result) {
         should(result).be.null();
@@ -142,7 +141,7 @@ describe('KuzzleSearchResult methods', function () {
 
       searchArgs.filters.scrollId = 'banana';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error, result) {
         should(result).be.null();
@@ -156,7 +155,7 @@ describe('KuzzleSearchResult methods', function () {
 
       searchArgs.filters = {};
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], searchArgs);
+      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
 
       firstSearchResult.next(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -169,16 +168,16 @@ describe('KuzzleSearchResult methods', function () {
   describe('#previous', function () {
     it('should return the previous SearchResult if set', function () {
       var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], searchArgs, firstSearchResult);
+        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
+        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
 
-      should(secondSearchResult.previous()).be.exactly(firstSearchResult)
+      should(secondSearchResult.previous()).be.exactly(firstSearchResult);
     });
 
     it('should call the callback with the previous SearchResult if callback is given', function (done) {
       var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], searchArgs, firstSearchResult);
+        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
+        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
 
       secondSearchResult.previous(function(error, previous) {
         should(error).be.exactly(null);

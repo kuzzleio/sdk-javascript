@@ -1,7 +1,6 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataMapping = rewire('../../src/kuzzleDataMapping');
 

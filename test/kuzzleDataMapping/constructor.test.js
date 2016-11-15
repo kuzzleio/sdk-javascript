@@ -51,7 +51,6 @@ describe('KuzzleDataMapping constructor', function () {
 
   it('should promisify the right functions', function () {
     var
-      kuzzle,
       mapping;
 
     Kuzzle.prototype.bluebird = bluebird;

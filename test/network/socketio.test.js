@@ -3,6 +3,10 @@ var
   sinon = require('sinon'),
   SocketIO = require('../../src/networkWrapper/wrappers/socketio');
 
+/**
+ * @global window
+ */
+
 describe('SocketIO networking module', () => {
   var
     socketIO,

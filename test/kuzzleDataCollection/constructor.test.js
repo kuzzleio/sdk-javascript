@@ -71,7 +71,7 @@ describe('KuzzleDataCollection constructor', function () {
   it('should throw an error if no collection or no index is provided', function () {
     var kuzzle = new Kuzzle('foo');
 
-    should((function () { new KuzzleDataCollection(kuzzle)})).throw();
-    should((function () { new KuzzleDataCollection(kuzzle, 'foo')})).throw();
+    should((function () { new KuzzleDataCollection(kuzzle);})).throw();
+    should((function () { new KuzzleDataCollection(kuzzle, 'foo');})).throw();
   });
 });

@@ -480,7 +480,13 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
       filters.scrollId = result.result['_scroll_id'];
     }
 
-    cb(null, new KuzzleSearchResult(self, result.result.total, documents, {options: options, filters: filters}));
+    cb(null, new KuzzleSearchResult(
+      self,
+      result.result.total,
+      documents,
+      result.result.aggregations ? result.result.aggregations : [],
+      {options: options, filters: filters}
+    ));
   });
 };
 

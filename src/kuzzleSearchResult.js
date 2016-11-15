@@ -5,11 +5,12 @@ var KuzzleDocument = require('./kuzzleDocument.js');
  * @param {KuzzleDataCollection} dataCollection
  * @param {int} total
  * @param {KuzzleDocument[]} documents
- * @param {object} searchArgs
+ * @param {object} [aggregations]
+ * @param {object} [searchArgs]
  * @param {KuzzleSearchResult} [previous]
  * @constructor
  */
-function KuzzleSearchResult (dataCollection, total, documents, searchArgs, previous) {
+function KuzzleSearchResult (dataCollection, total, documents, aggregations, searchArgs, previous) {
   Object.defineProperties(this, {
     // read-only properties
     dataCollection: {
@@ -24,8 +25,12 @@ function KuzzleSearchResult (dataCollection, total, documents, searchArgs, previ
       value: documents,
       enumerable: true
     },
+    aggregations: {
+      value: aggregations || {},
+      enumerable: true
+    },
     searchArgs: {
-      value: searchArgs,
+      value: searchArgs || {},
       enumerable: true
     },
     // writable properties
@@ -107,7 +112,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       options.scrollId = result.result['_scroll_id'];
     }
 
-    self._next = new KuzzleSearchResult(self.dataCollection, self.total, documents, {options: options, filters: self.searchArgs.filters}, self);
+    self._next = new KuzzleSearchResult(self.dataCollection, self.total, documents, {}, {options: options, filters: self.searchArgs.filters}, self);
 
     cb(null, self._next);
   }
@@ -148,6 +153,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       this.dataCollection.kuzzle.scroll(
         this.searchArgs.filters.scrollId,
         this.searchArgs.options || {},
+        // this.searchArgs.filters || {},
         handleScrollNext
       );
 

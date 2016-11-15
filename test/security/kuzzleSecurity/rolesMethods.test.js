@@ -306,7 +306,7 @@ describe('KuzzleSecurity roles methods', function () {
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () { kuzzle.security.roleFactory(null) })).throw(Error);
+      should((function () {kuzzle.security.roleFactory(null);})).throw(Error);
       done();
     });
   });

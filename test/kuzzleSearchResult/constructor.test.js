@@ -11,6 +11,7 @@ describe('KuzzleDocument constructor', function () {
     kuzzle,
     searchArgs,
     document,
+    aggregations,
     dataCollection;
 
   before(function () {
@@ -22,10 +23,11 @@ describe('KuzzleDocument constructor', function () {
     searchArgs = {options: {}, filters: {from:0, size: 1}};
     dataCollection = kuzzle.dataCollectionFactory('foo');
     document = new KuzzleDocument(dataCollection, 'banana', {foo: 'bar'});
+    aggregations = {};
   });
 
   it('should handle provided arguments correctly', function () {
-    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], searchArgs);
+    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], aggregations, searchArgs);
 
     should(searchResult).be.instanceof(KuzzleSearchResult);
     should(searchResult.total).be.exactly(2);
@@ -37,7 +39,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], searchArgs);
+    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], aggregations, searchArgs);
 
     should(searchResult).have.propertyWithDescriptor('dataCollection', { enumerable: true, writable: false, configurable: false });
     should(searchResult).have.propertyWithDescriptor('total', { enumerable: true, writable: false, configurable: false });
@@ -48,7 +50,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], searchArgs);
+    var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], aggregations, searchArgs);
 
     should.exist(searchResult.nextPromise);
     should.exist(searchResult.previousPromise);
