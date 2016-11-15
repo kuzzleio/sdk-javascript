@@ -298,6 +298,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   var
+    warnEmitted = false,
     documents = [],
     filters = {};
 
@@ -333,6 +334,11 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   this.search(filters, options, function getNextDocuments (error, searchResult) {
     if (error) {
       return cb(error);
+    }
+
+    if (searchResult.total > 10000 && !warnEmitted) {
+      warnEmitted = true;
+      console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests')
     }
 
     if (searchResult instanceof KuzzleSearchResult) {
