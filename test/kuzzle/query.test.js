@@ -164,6 +164,14 @@ describe('Query management', function () {
       should(requestObject.metadata).match(metadata);
     });
 
+    it('should handle option refresh properly', function () {
+      var
+        refresh = 'foo';
+
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {refresh: refresh});
+      should(requestObject.refresh).match(refresh);
+    });
+
     it('should exit early if the query is not queuable and the SDK is offline', function () {
       kuzzle.state = 'offline';
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
