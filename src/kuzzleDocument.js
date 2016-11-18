@@ -315,7 +315,7 @@ KuzzleDocument.prototype.validate = function (options, cb) {
     }
 
     if (!res.result.valid) {
-      return cb && cb(res.errorMessages);
+      return cb && cb(res.result.errorMessages);
     }
 
     if (cb) {

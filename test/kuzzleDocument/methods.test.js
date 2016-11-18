@@ -337,6 +337,22 @@ describe('KuzzleDocument methods', function () {
         done();
       });
     });
+
+    it('should revolve the callback with an error if the document is not valid', function (done) {
+      var document = new KuzzleDocument(dataCollection);
+
+      this.timeout(50);
+      document.id = 'foo';
+      error = null;
+      result = {result: {valid: false, errorMessages: {foo: 'bar'}}};
+
+      document.validate(function (err, res) {
+        should(emitted).be.true();
+        should(err).match({foo: 'bar'});
+        should(res).be.undefined();
+        done();
+      });
+    });
   });
 
   describe('#save', function () {

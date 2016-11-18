@@ -184,7 +184,7 @@ KuzzleDataValidation.prototype.validate = function (options, cb) {
     }
 
     if (res.error) {
-      return cb && cb(new Error(res.error.details.message));
+      return cb && cb(new Error(res.error.message));
     }
 
     if (cb) {

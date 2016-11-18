@@ -295,7 +295,7 @@ describe('KuzzleDataValidation methods', function () {
     it('should return an empty specification if the stored specification is empty', done => {
       var specifications = new KuzzleDataValidation(dataCollection);
 
-      result = { result: null};
+      result = { result: null };
 
       specifications.delete((err, res) => {
         should(emitted).be.true();
@@ -371,6 +371,22 @@ describe('KuzzleDataValidation methods', function () {
       specifications.validate((err, res) => {
         should(emitted).be.true();
         should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should invoke the callback with an error if the specifications does not validate', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      error = null;
+      result = {error: { message: 'foobar'}};
+      emitted = false;
+
+      specifications.validate((err, res) => {
+        should(emitted).be.true();
+        should(err.message).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
