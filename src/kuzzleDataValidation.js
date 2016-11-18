@@ -183,12 +183,12 @@ KuzzleDataValidation.prototype.validate = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    if (res.error !== null) {
+    if (res.error) {
       return cb && cb(new Error(res.error.details.message));
     }
 
     if (cb) {
-      cb(null, self);
+      cb(null, true);
     }
   });
 

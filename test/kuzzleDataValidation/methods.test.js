@@ -307,6 +307,76 @@ describe('KuzzleDataValidation methods', function () {
     });
   });
 
+  describe('#validate', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = {};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'validateSpecifications',
+        controller: 'admin',
+        body: {}
+      };
+    });
+
+    it('should call the right validateSpecifications query when invoked', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      expectedQuery.options = { queuable: false};
+      error = null;
+
+      should(specifications.validate(expectedQuery.options, function (err, res) {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.true();
+        done();
+      })).be.exactly(specifications);
+    });
+
+    it('should handle arguments correctly', function () {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      specifications.validate(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.validate({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.validate(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.validate({});
+      should(emitted).be.true();
+    });
+
+    it('should invoke the callback with an error if one occurs', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      error = 'foobar';
+
+      specifications.validate();
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.validate((err, res) => {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#setHeaders', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
