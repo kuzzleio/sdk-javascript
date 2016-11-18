@@ -84,7 +84,7 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['delete', 'refresh', 'save'];
+        var whitelist = ['delete', 'refresh', 'save', 'validate'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -291,6 +291,39 @@ KuzzleDocument.prototype.subscribe = function (options, cb) {
   filters = { ids: { values: [this.id] } };
 
   return this.dataCollection.subscribe(filters, options, cb);
+};
+
+/**
+ * Validate the curent document against the current validation specifications in Kuzzle
+ *
+ * @param {object} [options] - options
+ * @param {responseCallback} cb - callback that will be called with the validation result
+ */
+KuzzleDocument.prototype.validate = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'validate'), data, options, function (error, res) {
+    if (error) {
+      return cb && cb(error);
+    }
+
+    if (!res.result.valid) {
+      return cb && cb(res.errorMessages);
+    }
+
+    if (cb) {
+      cb(null, true);
+    }
+  });
+
+  return self;
 };
 
 /**

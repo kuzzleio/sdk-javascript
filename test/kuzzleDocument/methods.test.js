@@ -268,6 +268,77 @@ describe('KuzzleDocument methods', function () {
     });
   });
 
+  describe('#validate', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = { result: {errorMessages: {}, valid: true}};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'validate',
+        controller: 'write',
+        body: {},
+        _id: 'foo'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      var
+        options = { queuable: false },
+        document = new KuzzleDocument(dataCollection);
+
+      expectedQuery.options = options;
+      document.id = 'foo';
+      should(document.validate(options, function () {})).be.exactly(document);
+      should(emitted).be.true();
+    });
+
+    it('should handle arguments correctly', function () {
+      var document = new KuzzleDocument(dataCollection);
+
+      document.id = 'foo';
+      document.validate(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      document.validate({}, function () {});
+      should(emitted).be.true();
+    });
+
+    it('should resolve the callback with true as a result', function (done) {
+      var document = new KuzzleDocument(dataCollection);
+
+      this.timeout(50);
+      document.id = 'foo';
+
+      document.validate(function (err, res) {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.true();
+        done();
+      });
+    });
+
+    it('should revolve the callback with an error if one occurs', function (done) {
+      var document = new KuzzleDocument(dataCollection);
+
+      this.timeout(50);
+      document.id = 'foo';
+      error = 'foobar';
+
+      document.validate(function (err, res) {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#save', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});

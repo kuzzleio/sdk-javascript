@@ -79,5 +79,6 @@ describe('KuzzleDocument constructor', function () {
     should.not.exist(document.setContentPromise);
     should.not.exist(document.setHeadersPromise);
     should.not.exist(document.subscribePromise);
+    should.exist(document.validatePromise);
   });
 });

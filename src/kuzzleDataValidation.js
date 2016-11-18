@@ -21,12 +21,8 @@
 function KuzzleDataValidation(kuzzleDataCollection, specifications) {
   Object.defineProperties(this, {
     //read-only properties
-    index: {
-      value: kuzzleDataCollection.index,
-      enumerable: true
-    },
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: kuzzleDataCollection,
       enumerable: true
     },
     kuzzle: {
@@ -72,8 +68,8 @@ KuzzleDataValidation.prototype.apply = function (options, cb) {
     _rawData = {},
     data;
 
-  _rawData[self.index] = {};
-  _rawData[self.index][self.collection] = self.specifications;
+  _rawData[self.collection.index] = {};
+  _rawData[self.collection.index][self.collection.collection] = self.specifications;
 
   data = this.kuzzle.addHeaders({body: _rawData}, this.headers);
 
@@ -117,14 +113,10 @@ KuzzleDataValidation.prototype.refresh = function (options, cb) {
       return cb ? cb(err) : false;
     }
 
-    if (res.result[self.index]) {
-      if (res.result[self.index][self.collection]) {
-        self.specifications = res.result[self.index][self.collection].validation;
-      } else {
-        return cb && cb(new Error('No specifications found for collection ' + self.collection.collection));
-      }
+    if (res.result !== null) {
+      self.specifications = res.result[self.collection.index][self.collection.collection].validation;
     } else {
-      return cb && cb(new Error('No specifications found for index ' + self.collection.index));
+      self.specifications = {};
     }
 
     if (cb) {

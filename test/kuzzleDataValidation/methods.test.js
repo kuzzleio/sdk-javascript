@@ -1,15 +1,10 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
-  KuzzleDocument = require('../../src/kuzzleDocument'),
-  KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
-  KuzzleRoom = require('../../src/kuzzleRoom'),
-  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
+  KuzzleDataValidation = rewire('../../src/kuzzleDataValidation');
 
-describe('KuzzleDataCollection methods', function () {
+describe('KuzzleDataValidation methods', function () {
   var
     expectedQuery,
     error,
@@ -48,837 +43,95 @@ describe('KuzzleDataCollection methods', function () {
       }
     },
     emitted,
-    kuzzle;
+    kuzzle,
+    dataCollection;
 
-  describe('#advancedSearch', function () {
+  describe('#apply', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
       emitted = false;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
+      result = { result: {_source: { bar: { foo: {type: 'date'}}}}};
       error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'search',
-        controller: 'read',
-        body: {}
-      };
-    });
-
-    it('should send the right search query to kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = {queuable: false},
-        filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
-
-      this.timeout(50);
-      expectedQuery.options = options;
-      expectedQuery.body = filters;
-
-      collection.advancedSearch(filters, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object();
-        should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.documents).be.an.Array();
-        should(res.documents.length).be.exactly(result.result.hits.length);
-        should(res.aggregations).be.deepEqual(result.result.aggregations);
-
-        res.documents.forEach(function (item) {
-          should(item).be.instanceof(KuzzleDocument);
-        });
-        done();
-      });
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.advancedSearch(); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.advancedSearch({}); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.advancedSearch({}, {}); }).throw(Error);
-      should(emitted).be.false();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.advancedSearch({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.advancedSearch({}, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.advancedSearch({}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#count', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {count: 42 }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'count',
-        controller: 'read',
-        body: {}
-      };
-    });
-
-    it('should send the right count query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false },
-        filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
-      expectedQuery.options = options;
-      expectedQuery.body = filters;
-
-      collection.count(filters, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.a.Number().and.be.exactly(result.result.count);
-        done();
-      });
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.count(); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.count({}); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.count({}, {}); }).throw(Error);
-      should(emitted).be.false();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.count({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.count({}, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.count({}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#create', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {acknowledged: true }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'createCollection',
-        controller: 'write'
-      };
-    });
-
-    it('should send the right createCollection query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.create(options, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object().and.be.exactly(result);
-        done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.create(function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.create({}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.create(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#createDocument', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {_id: 'foobar', _source: { foo: 'bar' }, _version: 1} };
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'create',
-        controller: 'write',
-        body: {}
-      };
-    });
-
-    it('should send the right createDocument query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.createDocument(result.result._source, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
-        done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.createDocument('id', {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument('id', {}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument('id', {}, {}, function () {});
-      should(emitted).be.true();
-
-      collection.createDocument(null, {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument(null, {}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument(null, {}, {}, function () {});
-      should(emitted).be.true();
-
-      collection.createDocument(undefined, {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument(undefined, {}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument(undefined, {}, {}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.createDocument({}, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should handle a document ID if one is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      expectedQuery._id = 'foo';
-
-      collection.createDocument('foo', {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.createDocument({}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-
-    it('should be able to handle a KuzzleDocument argument', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        document = new KuzzleDocument(collection, result.result._source);
-
-      should(collection.createDocument(document, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
-        done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should be able to handle the updateIfExist option', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      expectedQuery.action = 'createOrReplace';
-
-      collection.createDocument(result.result._source, {updateIfExist: true});
-      should(emitted).be.true();
-    });
-  });
-
-  describe('#deleteDocument', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {_id: 'foobar' } };
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'delete',
-        controller: 'write',
-        body: {}
-      };
-    });
-
-    it('should send the right delete query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.deleteDocument(result.result._id, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Array().and.match([result.result._id]);
-        done();
-      }));
-      should(emitted).be.true();
-    });
-
-    it('should handle arguments correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.deleteDocument(result.result._id);
-      should(emitted).be.true();
-
-      collection.deleteDocument(result.result._id, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.deleteDocument(result.result._id, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.deleteDocument(result.result._id, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-
-    it('should execute a deleteByQuery if a set of filters is provided', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
-
-      this.timeout(50);
-      expectedQuery.body = filters;
-      expectedQuery.action = 'deleteByQuery';
-      result = { result: {ids: ['foo', 'bar'] }};
-
-      collection.deleteDocument(filters, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Array().and.match(result.result.ids);
-        done();
-      });
-      should(emitted).be.true();
-    });
-  });
-
-  describe('#fetchDocument', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {_id: 'foobar', _source: {foo: 'bar'} }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'get',
-        controller: 'read',
-        body: {}
-      };
-    });
-
-    it('should send the right fetchDocument query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-
-      expectedQuery.options = options;
-
-      collection.fetchDocument(result.result._id, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
-        done();
-      });
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.fetchDocument(); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.fetchDocument({}); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.fetchDocument({}, {}); }).throw(Error);
-      should(emitted).be.false();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.fetchDocument({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.fetchDocument({}, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.fetchDocument({}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#fetchAllDocuments', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      emitted = false;
-    });
-
-    it('should forward the query to the advancedSearch method', function () {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-
-      collection.advancedSearch = function () { emitted = true; };
-      expectedQuery.options = options;
-
-      collection.fetchAllDocuments(options, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.fetchAllDocuments(); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.fetchAllDocuments({}); }).throw(Error);
-      should(emitted).be.false();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.advancedSearch = function () { emitted = true; };
-
-      collection.fetchAllDocuments(function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.fetchAllDocuments({}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should handle the from and size options', () => {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        stub = sinon.stub(collection, 'advancedSearch');
-
-      collection.fetchAllDocuments({from: 123, size: 456}, function () {});
-      should(stub.calledOnce).be.true();
-      should(stub.calledWithMatch({from: 123, size: 456})).be.true();
-      stub.restore();
-    });
-  });
-
-  describe('#getMapping', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {'bar': { mappings: { foo: { properties: {}}}} }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'getMapping',
+        action: 'updateSpecifications',
         controller: 'admin',
-        body: {}
+        body: result.result._source
       };
     });
 
-    it('should instantiate a new KuzzleDataMapping object', function (done) {
+    it('should call the right updateSpecifications query when invoked', function (done) {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
+        refreshed = false,
+        specifications = new KuzzleDataValidation(dataCollection, result.result._source.bar.foo);
 
-      expectedQuery.options = options;
-
-      collection.getMapping(options, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDataMapping);
-        done();
-      });
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.getMapping(); }).throw(Error);
-      should(emitted).be.false();
-      should(function () { collection.getMapping({}); }).throw(Error);
-      should(emitted).be.false();
-    });
-
-    it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.getMapping(function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.getMapping({}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
       this.timeout(50);
-
-      collection.getMapping({}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#publishMessage', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {_source: {foo: 'bar'} }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'publish',
-        controller: 'write',
-        body: {}
+      expectedQuery.options = { queuable: false};
+      specifications.refresh = function (options, cb) {
+        refreshed = true;
+        cb(null, specifications);
       };
-    });
 
-    it('should send the right publish query to Kuzzle', function () {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-
-      expectedQuery.options = options;
-
-      collection.publishMessage(result.result._source, options);
-      should(emitted).be.true();
-    });
-
-    it('should handle a KuzzleDocument object as an argument', function () {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-
-      expectedQuery.options = options;
-
-      collection.publishMessage(new KuzzleDocument(collection, result.result._source), options);
-      should(emitted).be.true();
-    });
-  });
-
-  describe('#replaceDocument', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {_id: 'foobar', _source: { foo: 'bar' } }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'createOrReplace',
-        controller: 'write',
-        body: {}
-      };
-    });
-
-    it('should send the right replaceDocument query to Kuzzle', function (done) {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.replaceDocument(result.result._id, result.result._source, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
-        done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should handle arguments correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.replaceDocument('foo');
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.replaceDocument('foo', {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.replaceDocument('foo', {}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.replaceDocument('foo', {}, {}, function () {});
-      should(emitted).be.true();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      error = 'foobar';
-      this.timeout(50);
-
-      collection.replaceDocument(result.result._id, result.result._source, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#subscribe', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.state = 'connected';
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {roomId: 'foobar' }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
-        body: {}
-      };
-    });
-
-    it('should instantiate a new KuzzleRoom object', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
-      should(emitted).be.true();
-    });
-
-    it('should handle arguments correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleSubscribeResult);
-      should(emitted).be.true();
-    });
-
-    it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.subscribe({}); }).throw(Error);
-      should(emitted).be.false();
-    });
-  });
-
-  describe('#truncate', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      emitted = false;
-      result = { result: {acknowledged: true }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'truncateCollection',
-        controller: 'admin',
-        body: {}
-      };
-    });
-
-    it('should send the right truncate query to Kuzzle', function () {
-      var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        options = { queuable: false };
-
-      expectedQuery.options = options;
-
-      should(collection.truncate(options, function () {})).be.exactly(collection);
-      should(emitted).be.true();
-    });
-
-    it('should handle arguments correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.truncate();
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.truncate({});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.truncate({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      collection.truncate(function () {});
-      should(emitted).be.true();
-    });
-  });
-
-  describe('#updateDocument', function () {
-    var
-      revert,
-      refreshed = false;
-
-    beforeEach(function () {
-      revert = KuzzleDataCollection.__set__('KuzzleDocument', function (collection) {
-        var doc = new KuzzleDocument(collection, 'foo', {});
-
-        doc.refresh = function (cb) {
-          refreshed = true;
-          cb(null, doc);
-        };
-
-        return doc;
-      });
-
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-
-      emitted = false;
-      result = { result: {_id: 'foobar', _source: { foo: 'bar' } }};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'update',
-        controller: 'write',
-        body: {}
-      };
-    });
-
-    afterEach(function () {
-      revert();
-    });
-
-    it('should send the right updateDocument query to Kuzzle', function (done) {
-      var
-        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index),
-        options = { queuable: false };
-      expectedQuery.options = options;
-
-      should(collection.updateDocument(result.result._id, result.result._source, options, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+      should(specifications.apply(expectedQuery.options, function (err, res) {
+        should(emitted).be.true();
         should(refreshed).be.true();
+        should(err).be.null();
+        should(res).be.exactly(specifications);
         done();
-      })).be.exactly(collection);
-      should(emitted).be.true();
+      })).be.exactly(specifications);
     });
 
     it('should handle arguments correctly', function () {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
+      var
+        refreshed = false,
+        specifications = new KuzzleDataValidation(dataCollection, result.result._source.bar.foo);
 
-      collection.updateDocument('foo');
+      specifications.refresh = function (options, cb) {
+        refreshed = true;
+
+        if (cb) {
+          cb(null, specifications);
+        }
+      };
+
+      specifications.apply();
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
-      collection.updateDocument('foo', {});
+      refreshed = false;
+      specifications.apply({});
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
-      collection.updateDocument('foo', {}, function () {});
+      refreshed = false;
+      specifications.apply(function () {});
       should(emitted).be.true();
+      should(refreshed).be.true();
 
       emitted = false;
-      collection.updateDocument('foo', {}, {}, function () {});
+      refreshed = false;
+      specifications.apply({}, function () {});
       should(emitted).be.true();
+      should(refreshed).be.true();
     });
 
-    it('should call the callback with an error if one occurs', function (done) {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
-      error = 'foobar';
-      this.timeout(50);
+    it('should invoke the callback with an error if one occurs', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection, result.result._source.bar.foo);
 
-      collection.updateDocument(result.result._id, result.result._source, function (err, res) {
+      this.timeout(50);
+      error = 'foobar';
+
+      specifications.apply();
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.apply((err, res) => {
+        should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -886,21 +139,191 @@ describe('KuzzleDataCollection methods', function () {
     });
   });
 
-  describe('#factories', function () {
+  describe('#refresh', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = { result: {bar: { foo: {type: 'date'}}}};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'getSpecifications',
+        controller: 'admin',
+        body: {}
+      };
     });
 
-    it('documentFactory should return a new KuzzleDocument object', function () {
-      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(KuzzleDocument);
+    it('should call the right getSpecifications query when invoked', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      expectedQuery.options = { queuable: false};
+
+      should(specifications.refresh(expectedQuery.options, function (err, res) {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.exactly(specifications);
+        should(res.specifications).match(result.result[dataCollection.index].foo.bar);
+        done();
+      })).be.exactly(specifications);
     });
 
-    it('roomFactory should return a new KuzzleRoom object', function () {
-      should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(KuzzleRoom);
+    it('should handle arguments correctly', function () {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      specifications.refresh(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.refresh({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.refresh(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.refresh({});
+      should(emitted).be.true();
     });
 
-    it('dataMappingFactory should return a KuzzleDataMapping object', function () {
-      should(kuzzle.dataCollectionFactory('foo').dataMappingFactory({})).be.instanceof(KuzzleDataMapping);
+    it('should invoke the callback with an error if one occurs', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      error = 'foobar';
+
+      specifications.refresh();
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.refresh((err, res) => {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should return an empty specification if the stored specification is empty', done => {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      result = { result: null};
+
+      specifications.refresh((err, res) => {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.exactly(specifications);
+        should(res.specifications).be.empty().and.not.be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#delete', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+      emitted = false;
+      result = {};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'deleteSpecifications',
+        controller: 'admin',
+        body: {}
+      };
+    });
+
+    it('should call the right deleteSpecifications query when invoked', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      expectedQuery.options = { queuable: false};
+
+      should(specifications.delete(expectedQuery.options, function (err, res) {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.exactly(specifications);
+        should(res.specifications).be.empty().and.not.be.undefined();
+        done();
+      })).be.exactly(specifications);
+    });
+
+    it('should handle arguments correctly', function () {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      specifications.delete(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.delete({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.delete(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.delete({});
+      should(emitted).be.true();
+    });
+
+    it('should invoke the callback with an error if one occurs', function (done) {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      this.timeout(50);
+      error = 'foobar';
+
+      specifications.delete();
+      should(emitted).be.true();
+
+      emitted = false;
+      specifications.delete((err, res) => {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+
+    it('should return an empty specification if the stored specification is empty', done => {
+      var specifications = new KuzzleDataValidation(dataCollection);
+
+      result = { result: null};
+
+      specifications.delete((err, res) => {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.exactly(specifications);
+        should(res.specifications).be.empty().and.not.be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#setHeaders', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      dataCollection = kuzzle.dataCollectionFactory('foo');
+    });
+
+    it('should allow setting headers', function () {
+      var
+        specifications = new KuzzleDataValidation(dataCollection),
+        header = {_id: 'foobar'};
+
+      should(specifications.setHeaders(header)).be.exactly(specifications);
+      should(specifications.headers).match(header);
+
+      expectedQuery._id = 'foobar';
+      specifications.apply();
+      should(emitted).be.true();
     });
   });
 });
