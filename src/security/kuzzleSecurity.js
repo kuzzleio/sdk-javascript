@@ -519,7 +519,7 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
 };
 
 /**
- * Saves this user as restricted into Kuzzle.
+ * Create a new restricted user in Kuzzle.
  *
  * This function will create a new user. It is not usable to update an existing user.
  * This function allows anonymous users to create a "restricted" user with predefined rights.
