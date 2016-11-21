@@ -214,21 +214,11 @@ describe('Kuzzle constructor', () => {
     it('should throw an error if no URL is provided', () => {
       try {
         new Kuzzle();
-        should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
       }
       catch (e) {
-        // done
+        return;
       }
-    });
-
-    it('should throw an error if no index is provied', () => {
-      try {
-        new Kuzzle('foo');
-        should.fail('success', 'failure', 'Constructor should fail with no Index provided', '');
-      }
-      catch (e) {
-        // done
-      }
+      should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
     });
 
     describe('#connect', function () {
