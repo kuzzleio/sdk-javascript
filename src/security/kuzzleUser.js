@@ -27,7 +27,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['save'];
+        var whitelist = ['save', 'saveRestricted'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
