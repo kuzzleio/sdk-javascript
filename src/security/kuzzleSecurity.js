@@ -44,7 +44,7 @@ function KuzzleSecurity(kuzzle) {
  * Retrieve a single Role using its unique role ID.
  *
  * @param {string} id
- * @param {object} [options] - Optional parameters
+ * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.getRole = function (id, options, cb) {
@@ -78,7 +78,7 @@ KuzzleSecurity.prototype.getRole = function (id, options, cb) {
  * That means that a role that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `indexes` with a list of index id, a integer `from` and a integer `size`
- * @param {object} [options] - Optional parameters
+ * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  */
@@ -118,7 +118,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
  *
  * @param {string} id - role identifier
  * @param {object} content - a plain javascript object representing the role
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
 KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
@@ -154,7 +154,7 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
  *
  * @param {string} id - role identifier
  * @param {object} content - a plain javascript object representing the role's modification
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -189,7 +189,7 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
  *
  *
  * @param {string} id - Role id to delete
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -226,7 +226,7 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
  *
  *
  * @param {string} id
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
@@ -262,7 +262,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
  * That means that a profile that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - this object can contains an array `roles` with a list of roles id, a integer `from` and a integer `size`
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
@@ -301,7 +301,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
  *
  * @param {string} id - profile identifier
  * @param {object} content - attribute `roles` in `content` must only contains an array of role id
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
 KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
@@ -337,7 +337,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
  *
  * @param {string} id - profile identifier
  * @param {object} content - a plain javascript object representing the profile's modification
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -385,7 +385,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
  *
  *
  * @param {string} id - Profile id to delete
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -420,7 +420,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  * Get a specific user from kuzzle using its unique ID
  *
  * @param {string} id
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.getUser = function (id, options, cb) {
@@ -452,7 +452,7 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
  * That means that a user that was just been created won’t be returned by this function.
  *
  * @param {Object} filters - same filters as documents filters
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
 KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
@@ -490,8 +490,8 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
  *        Replace the existing user otherwise
  *
  * @param {string} id - user identifier
- * @param {object} content - attribute `profile` in `content` must only contains the profile id
- * @param {object} [options] - (optional) arguments
+ * @param {object} content - attribute `profileIds` in `content` must only contain an array of profile ids
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
 KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
@@ -518,13 +518,47 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
   });
 };
 
+/**
+ * Saves this user as restricted into Kuzzle.
+ *
+ * This function will create a new user. It is not usable to update an existing user.
+ * This function allows anonymous users to create a "restricted" user with predefined rights.
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - attribute `profile` in `content` must only contains the profile id
+ * @param {object|responseCallback} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+KuzzleSecurity.prototype.createRestrictedUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {_id: id, body: content};
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('KuzzleSecurity.createRestrictedUser: cannot create a user without a user ID');
+  }
+
+  if (content.profileIds) {
+    throw new Error('KuzzleSecurity.createRestrictedUser: cannot provide profileIds');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.buildQueryArgs('createRestrictedUser'), data, null, cb && function (err, res) {
+    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+  });
+};
+
 
 /**
  * Update an user in Kuzzle.
  *
  * @param {string} id - user identifier
  * @param {object} content - a plain javascript object representing the user's modification
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -562,7 +596,7 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
  *
  *
  * @param {string} id - Profile id to delete
- * @param {object} [options] - (optional) arguments
+ * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {KuzzleSecurity} this object
  */
@@ -654,8 +688,8 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
  * Gets the rights array of a given user.
  *
  * @param {string} userId The id of the user.
- * @param {object} [options] - (optional) arguments
- * @param {function} cb   The callback containing the normalized array of rights.
+ * @param {object|responseCallback} [options] - (optional) arguments
+ * @param {function} cb The callback containing the normalized array of rights.
  */
 KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
   var
