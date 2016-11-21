@@ -5,7 +5,7 @@ then
   echo "Push generated dist folder"
   git config --global user.email "support@kuzzle.io"
   git config --global user.name "Travis CI"
-  git clone --quiet --branch=${TRAVIS_BRANCH} https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} travis-build
+  git clone --quiet --branch=${TRAVIS_BRANCH} https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} travis-build > /dev/null 2<&1
   cd travis-build
   ln -s  ${TRAVIS_BUILD_DIR}/node_modules
   npm run build
