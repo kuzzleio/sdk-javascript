@@ -1253,14 +1253,18 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   if (options) {
+    if (options.queuable === false && self.state === 'offline') {
+      return self;
+    }
+
+    if (options.refresh) {
+      object.refresh = options.refresh;
+    }
+
     if (options.metadata) {
       Object.keys(options.metadata).forEach(function (meta) {
         object.metadata[meta] = options.metadata[meta];
       });
-    }
-
-    if (options.queuable === false && self.state === 'offline') {
-      return self;
     }
   }
 

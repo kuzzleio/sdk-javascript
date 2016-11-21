@@ -18,7 +18,8 @@
     "bulk"
   ],
   "scripts": {
-    "test": "npm run --silent lint && istanbul cover _mocha  -- --recursive",
+    "test": "npm run --silent lint && npm run unit-testing",
+    "unit-testing": "istanbul cover _mocha  -- --recursive",
     "lint": "eslint --max-warnings=0 ./lib ./test",
     "build": "node build.js"
   },
