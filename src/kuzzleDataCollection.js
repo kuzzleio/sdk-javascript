@@ -470,6 +470,7 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
+
   self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
     var documents = [];
 

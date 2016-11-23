@@ -203,8 +203,14 @@ describe('KuzzleDataCollection methods', function () {
 
         callback(null, {
           result: {
-            total: 0,
-            hits: []
+            total: 1,
+            _scroll_id: 'banana',
+            hits: [
+              {
+                _id: 'foo',
+                _source: {bar: 'baz'}
+              }
+            ]
           }
         });
       };

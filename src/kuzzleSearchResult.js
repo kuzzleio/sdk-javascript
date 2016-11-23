@@ -15,7 +15,7 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
     // read-only properties
     dataCollection: {
       value: dataCollection,
-      enumerable: true
+      enumerable: false
     },
     total: {
       value: total,
@@ -34,20 +34,26 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
       enumerable: true
     },
     // writable properties
+    fetchedDocument: {
+      value: documents.length,
+      enumerable: true,
+      writable: true
+    },
     _previous: {
       value: previous || null,
-      enumerable: true,
+      enumerable: false,
       writable: true
     },
     _next: {
       value: null,
-      enumerable: true,
+      enumerable: false,
       writable: true
     }
   });
 
   if (this._previous instanceof KuzzleSearchResult) {
     this._previous._next = this;
+    this.fetchedDocument += this._previous.fetchedDocument;
   }
 
   // promisifying
@@ -86,40 +92,17 @@ KuzzleSearchResult.prototype.previous = function (cb) {
 KuzzleSearchResult.prototype.next = function (cb) {
   var self = this;
 
-  /**
-   * @param error
-   * @param searchResults
-   */
-  function handleSearchResults (error, searchResults) {
-    if (error) {
-      cb(error);
-      return;
-    }
-
-    searchResults._previous = self;
-    self._next = searchResults;
-
-    cb(null, self._next);
-  }
-
   if (!this._next) {
     // retrieve next results with scroll if original search use it
     if (this.searchArgs.options.scrollId) {
       var
-        options = Object.assign({}, this.searchArgs.options),
-        fetchedDocuments = this.documents.length,
-        previous = this;
+        options = Object.assign({}, this.searchArgs.options);
 
       if (this.searchArgs.filters.scroll) {
         options.scroll = this.searchArgs.filters.scroll;
       }
 
-      // check if we need to scroll again to fetch all matching documents
-      while (previous = previous.previous()) {
-        fetchedDocuments += previous.documents.length;
-      }
-
-      if (fetchedDocuments >= this.total) {
+      if (this.fetchedDocument >= this.total) {
         cb(null, null);
         return;
       }
@@ -128,7 +111,9 @@ KuzzleSearchResult.prototype.next = function (cb) {
         options.scrollId,
         options,
         this.searchArgs.filters || {},
-        handleSearchResults
+        function(error, newSearchResults) {
+          handleNextSearchResults(error, self, newSearchResults, cb)
+        }
       );
 
       return;
@@ -141,7 +126,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       // check if we need to do next request to fetch all matching documents
       filters.from += filters.size;
 
-      if (filters.from >= self.total) {
+      if (filters.from >= this.total) {
         cb(null, null);
 
         return;
@@ -150,7 +135,9 @@ KuzzleSearchResult.prototype.next = function (cb) {
       this.dataCollection.search(
         filters,
         this.searchArgs.options,
-        handleSearchResults
+        function(error, newSearchResults) {
+          handleNextSearchResults(error, self, newSearchResults, cb)
+        }
       );
 
       return;
@@ -166,5 +153,25 @@ KuzzleSearchResult.prototype.next = function (cb) {
   cb(new Error('Unable to retrieve next results from search: missing scrollId or from/size params'));
 };
 
+/**
+ * @param {Error} error
+ * @param {KuzzleSearchResult} currentSearchResults
+ * @param {KuzzleSearchResult} newSearchResults
+ * @param {Function} cb
+ */
+function handleNextSearchResults (error, currentSearchResults, newSearchResults, cb) {
+  if (error) {
+    cb(error);
+    return;
+  }
+
+  newSearchResults.fetchedDocument += currentSearchResults.fetchedDocument;
+
+  newSearchResults._previous = currentSearchResults;
+  currentSearchResults._next = newSearchResults;
+
+
+  cb(null, newSearchResults);
+}
 
 module.exports = KuzzleSearchResult;

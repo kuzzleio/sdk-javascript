@@ -34,6 +34,7 @@ describe('KuzzleDocument constructor', function () {
     should(searchResult.documents).be.an.Array();
     should(searchResult.documents[0]).be.deepEqual(document);
     should(searchResult.searchArgs).be.deepEqual(searchArgs);
+    should(searchResult.fetchedDocument).be.deepEqual(1);
     should(searchResult._previous).be.exactly(null);
     should(searchResult._next).be.exactly(null);
   });
@@ -41,12 +42,13 @@ describe('KuzzleDocument constructor', function () {
   it('should expose documented properties with the right permissions', function () {
     var searchResult = new KuzzleSearchResult(dataCollection, 2, [document], aggregations, searchArgs);
 
-    should(searchResult).have.propertyWithDescriptor('dataCollection', { enumerable: true, writable: false, configurable: false });
+    should(searchResult).have.propertyWithDescriptor('dataCollection', { enumerable: false, writable: false, configurable: false });
     should(searchResult).have.propertyWithDescriptor('total', { enumerable: true, writable: false, configurable: false });
     should(searchResult).have.propertyWithDescriptor('documents', { enumerable: true, writable: false, configurable: false });
     should(searchResult).have.propertyWithDescriptor('searchArgs', { enumerable: true, writable: false, configurable: false });
-    should(searchResult).have.propertyWithDescriptor('_previous', { enumerable: true, writable: true, configurable: false });
-    should(searchResult).have.propertyWithDescriptor('_next', { enumerable: true, writable: true, configurable: false });
+    should(searchResult).have.propertyWithDescriptor('fetchedDocument', { enumerable: true, writable: true, configurable: false });
+    should(searchResult).have.propertyWithDescriptor('_previous', { enumerable: false, writable: true, configurable: false });
+    should(searchResult).have.propertyWithDescriptor('_next', { enumerable: false, writable: true, configurable: false });
   });
 
   it('should promisify the right functions', function () {
