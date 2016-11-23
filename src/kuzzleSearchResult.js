@@ -15,7 +15,6 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
     // read-only properties
     dataCollection: {
       value: dataCollection,
-      enumerable: false
     },
     total: {
       value: total,
@@ -41,12 +40,10 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
     },
     _previous: {
       value: previous || null,
-      enumerable: false,
       writable: true
     },
     _next: {
       value: null,
-      enumerable: false,
       writable: true
     }
   });
