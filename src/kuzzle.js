@@ -1,5 +1,5 @@
 var
-  uuid = require('node-uuid'),
+  uuid = require('uuid'),
   KuzzleDataCollection = require('./kuzzleDataCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
   KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
