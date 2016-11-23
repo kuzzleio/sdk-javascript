@@ -410,7 +410,7 @@ describe('KuzzleRoom methods', function () {
               foo: 'bar'
             }
           }
-      };
+        };
 
       // 1 - document notification
       notifCB.call(room, msg);
