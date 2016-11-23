@@ -336,12 +336,12 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
       return cb(error);
     }
 
-    if (searchResult.total > 10000 && !warnEmitted) {
-      warnEmitted = true;
-      console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests')
-    }
-
     if (searchResult instanceof KuzzleSearchResult) {
+      if (searchResult.total > 10000 && !warnEmitted) {
+        warnEmitted = true;
+        console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests')
+      }
+
       searchResult.documents.forEach(document => {
         documents.push(document);
       });
