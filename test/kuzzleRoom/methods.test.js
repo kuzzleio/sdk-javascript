@@ -3,6 +3,7 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
+  KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleRoom = rewire('../../src/kuzzleRoom');
 
 describe('KuzzleRoom methods', function () {
@@ -399,10 +400,58 @@ describe('KuzzleRoom methods', function () {
     });
 
     it('should return the result when one is provided', function () {
-      var msg = {error: null, result: {foo: 'bar'}};
+      var
+        msg = {
+          error: null,
+          controller: 'write',
+          result: {
+            _id: 'id',
+            _source: {
+              foo: 'bar'
+            }
+          }
+      };
+
+      // 1 - document notification
       notifCB.call(room, msg);
-      should(result).match(msg);
+
       should(error).be.null();
+
+      should(result.document)
+        .be.an.instanceOf(KuzzleDocument);
+      should(result.document.content)
+        .match({foo: 'bar'});
+      should(result.document.id)
+        .be.exactly('id');
+
+      // 2 - user notification
+      msg = {
+        error: null,
+        controller: 'subscribe',
+        result: {
+          roomId: 'roomId',
+          count: 42
+        }
+      };
+      notifCB.call(room, msg);
+
+      should(error).be.null();
+      should(result)
+        .not.have.property('document');
+      should(result.count).be.exactly(42);
+
+      // 3 - other (auth token expired) notifications
+      msg = {
+        error: null,
+        controller: 'auth'
+      };
+      notifCB.call(room, msg);
+
+      should(error).be.null();
+      should(result)
+        .not.have.property('document')
+        .not.have.property('count');
+
     });
 
     it('should delete the result from history if emitted by this instance', function () {

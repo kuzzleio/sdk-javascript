@@ -1,3 +1,9 @@
+# next
+
+## Breaking changes
+
+* Align notification response formats #110
+
 *__note:__ the # at the end of lines are the pull request numbers on GitHub*
 
 # 2.2.0

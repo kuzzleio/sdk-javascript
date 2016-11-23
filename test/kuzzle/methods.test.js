@@ -729,7 +729,7 @@ describe('Kuzzle methods', function () {
         stubKuzzleRoom;
 
       stubKuzzleRoom = {
-        unsubscribe: function () { unsubscribeCalled = true; },
+        unsubscribe: function () { unsubscribeCalled = true; }
       };
 
       kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
