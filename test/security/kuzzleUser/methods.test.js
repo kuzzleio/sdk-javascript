@@ -84,6 +84,44 @@ describe('KuzzleUser methods', function () {
     });
   });
 
+  describe('#saveRestricted', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzle.query = queryStub;
+      error = null;
+
+      result = { result: {_id: 'myUser', _source: {some: 'content'}} };
+      kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
+      expectedQuery = {
+        action: 'createRestrictedUser',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to kuzzle', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      should(kuzzleUser.saveRestricted(function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleUser);
+        done();
+      }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+      error = 'foobar';
+
+      kuzzleUser.saveRestricted(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#update', function () {
     before(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
