@@ -164,15 +164,7 @@ describe('KuzzleSearchResult methods', function () {
   });
 
   describe('#previous', function () {
-    it('should return the previous SearchResult if set', function () {
-      var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
-
-      should(secondSearchResult.previous()).be.exactly(firstSearchResult);
-    });
-
-    it('should call the callback with the previous SearchResult if callback is given', function (done) {
+    it('should call the callback with the previous SearchResult', function (done) {
       var
         firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
         secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);

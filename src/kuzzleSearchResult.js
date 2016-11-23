@@ -77,13 +77,9 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
  * @returns {*}
  */
 KuzzleSearchResult.prototype.previous = function (cb) {
-  if (cb) {
-    cb(null, this._previous);
+  cb(null, this._previous);
 
-    return this;
-  }
-
-  return this._previous;
+  return this;
 };
 
 /**
