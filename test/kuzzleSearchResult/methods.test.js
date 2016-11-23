@@ -137,7 +137,7 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      searchArgs.filters.scrollId = 'banana';
+      searchArgs.options.scrollId = 'banana';
 
       firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
 
