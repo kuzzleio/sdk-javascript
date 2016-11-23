@@ -1,6 +1,7 @@
 var
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
+  KuzzleDataValidation = require('./kuzzleDataValidation'),
   KuzzleRoom = require('./kuzzleRoom'),
   KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
 
@@ -570,6 +571,17 @@ KuzzleDataCollection.prototype.roomFactory = function (options) {
  */
 KuzzleDataCollection.prototype.dataMappingFactory = function (mapping) {
   return new KuzzleDataMapping(this, mapping);
+};
+
+/**
+ * Instantiate a new KuzzleDataValidation object. Workaround to the module.exports limitation, preventing multiple
+ * constructors to be exposed without having to use a factory or a composed object.
+ *
+ * @param {object} [specifications] - specifications to instantiate the KuzzleDataValidation object with
+ * @constructor
+ */
+KuzzleDataCollection.prototype.dataValidationFactory = function (specifications) {
+  return new KuzzleDataValidation(this, specifications);
 };
 
 /**

@@ -6,6 +6,7 @@ var
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
+  KuzzleDataValidation = require('../../src/kuzzleDataValidation'),
   KuzzleRoom = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
@@ -901,6 +902,10 @@ describe('KuzzleDataCollection methods', function () {
 
     it('dataMappingFactory should return a KuzzleDataMapping object', function () {
       should(kuzzle.dataCollectionFactory('foo').dataMappingFactory({})).be.instanceof(KuzzleDataMapping);
+    });
+
+    it('dataValidationFactory should return a KuzzleDataMValidation object', function () {
+      should(kuzzle.dataCollectionFactory('foo').dataValidationFactory({})).be.instanceof(KuzzleDataValidation);
     });
   });
 });
