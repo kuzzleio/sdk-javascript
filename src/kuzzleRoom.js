@@ -1,5 +1,5 @@
 var
-  uuid = require('node-uuid'),
+  uuid = require('uuid'),
   KuzzleDocument = require('./kuzzleDocument');
 
 /**
