@@ -1,5 +1,5 @@
 var
-  uuid = require('node-uuid');
+  uuid = require('uuid');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
