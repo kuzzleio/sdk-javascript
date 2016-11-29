@@ -104,7 +104,7 @@ Clone this github repository and run ``npm run build``. A ``dist`` directory wil
 
 
 ```html
-<script type="text/javascript" src="dist/kuzzle.min.js"></script>
+<script type="text/javascript" src="dist/kuzzle.js"></script>
 ```
 
 If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
