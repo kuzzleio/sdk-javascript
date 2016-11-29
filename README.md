@@ -139,7 +139,7 @@ kuzzle
 
 ## Building manually
 
-Clone this github repository and run ``grunt``. A ``dist`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
+Clone this github repository and run ``npm run build``. A ``dist`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
 
 ## Migrating from SDK v1.x
 
