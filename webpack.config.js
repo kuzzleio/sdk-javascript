@@ -21,7 +21,7 @@ module.exports = {
     setImmediate: false
   },
   module: {
-    noParse: [/ws/, /crypto/, /buffer/, /node-uuid/],
+    noParse: [/ws/, /crypto/, /buffer/, /uuid/],
     loaders: [
       {
         test: /\.js$/,
