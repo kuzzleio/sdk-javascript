@@ -538,7 +538,7 @@ Kuzzle.prototype.logout = function (cb) {
   });
 
   self.unsetJwtToken();
-  
+
   return self;
 };
 
