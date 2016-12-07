@@ -212,13 +212,9 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should throw an error if no URL is provided', () => {
-      try {
+      should(() => {
         new Kuzzle();
-      }
-      catch (e) {
-        return;
-      }
-      should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
+      }).throw();
     });
 
     describe('#connect', function () {

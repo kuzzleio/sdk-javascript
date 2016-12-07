@@ -35,25 +35,15 @@ describe('Listeners management', () => {
     });
 
     it('should throw an error if trying to adding a listener to an unknown event', function () {
-      try {
+      should(() => {
         kuzzle.addListener('foo', function () {});
-      }
-      catch (e) {
-        return;
-      }
-
-      should.fail('success', 'failure', 'Should have failed to add a listener to unknown event "foo"', '');
+      }).throw();
     });
 
     it('should throw an error when providing a non-function listener argument', function () {
-      try {
+      should(() => {
         kuzzle.addListener('connected', 'bar');
-      }
-      catch (e) {
-        return;
-      }
-
-      should.fail('success', 'failure', 'Should have failed to add a string listener', '');
+      }).throw();
     });
   });
 
