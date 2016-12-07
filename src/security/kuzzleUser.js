@@ -1,6 +1,12 @@
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
+/**
+ * @param {KuzzleSecurity} kuzzleSecurity
+ * @param {string} id
+ * @param {Object} content
+ * @constructor
+ */
 function KuzzleUser(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
@@ -21,7 +27,7 @@ function KuzzleUser(kuzzleSecurity, id, content) {
     return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['save'];
+        var whitelist = ['save', 'saveRestricted'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -37,7 +43,7 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
 
 /**
  * Set profiles in content
- * @param {array} profile - an array of profiles ids string
+ * @param {array} profileIds - an array of profiles ids string
  *
  * @returns {KuzzleUser} this
  */
@@ -53,7 +59,7 @@ KuzzleUser.prototype.setProfiles = function (profileIds) {
 
 /**
  * Add a profile
- * @param {string} profile - a profile ids string
+ * @param {string} profileId - a profile ids string
  *
  * @returns {KuzzleUser} this
  */
@@ -80,8 +86,8 @@ KuzzleUser.prototype.addProfile = function (profileId) {
  * Otherwise, this method will replace the latest version of this user in Kuzzle by the current content
  * of this object.
  *
+ * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @param {object} [options] - Optional parameters
  * @returns {KuzzleUser} this
  */
 KuzzleUser.prototype.save = function (options, cb) {
@@ -95,6 +101,34 @@ KuzzleUser.prototype.save = function (options, cb) {
   }
 
   self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
+    cb(error, error ? undefined : self);
+  });
+
+  return self;
+};
+
+/**
+ * Saves this user as restricted into Kuzzle.
+ *
+ * This function will create a new user. It is not usable to update an existing user.
+ * The "profileIds" property must not be provided, or the request will be rejected by Kuzzle.
+ * This function allows anonymous users to create a "restricted" user with predefined rights.
+ *
+ * @param {object|responseCallback} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {KuzzleUser} this
+ */
+KuzzleUser.prototype.saveRestricted = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createRestrictedUser'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 

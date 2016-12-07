@@ -197,7 +197,7 @@ describe('KuzzleSecurity user methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
-      result = { result: {_id: 'foobar', _source: {profileIds: ['myRole']}} };
+      result = { result: {_id: 'foobar', _source: {profileIds: ['myProfile']}} };
       expectedQuery = {
         action: 'createUser',
         controller: 'security'
@@ -257,6 +257,58 @@ describe('KuzzleSecurity user methods', function () {
       this.timeout(50);
 
       kuzzle.security.createUser(result.result._id, result.result._source, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#createRestrictedUser', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = {result: {_id: 'foobar', _source: {some: 'body'}}};
+      expectedQuery = {
+        action: 'createRestrictedUser',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      should(kuzzle.security.createRestrictedUser(result.result._id, result.result._source, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(KuzzleUser);
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = result.result._source;
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.createRestrictedUser(result.result._id, result.result._source);
+      done();
+    });
+
+    it('should throw an error if no id provided', function () {
+      should(function () { kuzzle.security.createRestrictedUser(null); }).throw(Error);
+    });
+
+    it('should throw an error if profileIds is provided', function () {
+      should(function () { kuzzle.security.createRestrictedUser(result.result._id, {profileIds: ['someProfile']}); }).throw(Error);
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      expectedQuery.body = result.result._source;
+      error = 'foobar';
+      this.timeout(50);
+
+      kuzzle.security.createRestrictedUser(result.result._id, result.result._source, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
