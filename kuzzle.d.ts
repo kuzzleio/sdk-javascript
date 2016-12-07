@@ -6,13 +6,13 @@ export as namespace Kuzzle;
 export = Kuzzle;
 
 declare class Kuzzle {
-    security: Kuzzle.KuzzleSecurity;
+    security: Kuzzle.Security;
 
     /**
      * @param host - Server name or IP Address to the Kuzzle instance
      * @param options - Initialization options
      */
-    constructor(host: string, options?: Kuzzle.KuzzleConnectOptions);
+    constructor(host: string, options?: Kuzzle.ConnectOptions);
 
     /**
      * Connects to a Kuzzle instance using the provided host name.
@@ -28,13 +28,19 @@ declare class Kuzzle {
      * If not, the loginAttempt event is fired with the following response:
      * { success: false, error: 'error message' }
      *
-     * @param jwt
+     * @param jwt - The string representing the token
      */
     setJwtToken(jwt: string): Kuzzle;
 
-    unsetJwtToken()
+    /**
+     * Unset the internal JWT token used for authentication, and stops all existing subscriptions
+     */
+    unsetJwtToken(): Kuzzle;
 
-    getJwtToken()
+    /**
+     * Get the jwtToken used by kuzzle
+     */
+    getJwtToken(): string;
 
     /**
      * Log a user according to a strategy and credentials.
@@ -53,7 +59,7 @@ declare class Kuzzle {
      * @param expiresIn
      * @param callback
      */
-    login(strategy: string, credential: {username: string; password: string}, expiresIn: string, callback: (err: any, res: any) => any): Kuzzle;
+    login(strategy: string, credential: {username: string; password: string}, expiresIn: string, callback: Kuzzle.ResponseCallback): Kuzzle;
 
     /**
      * Logs the user out.
@@ -63,9 +69,9 @@ declare class Kuzzle {
      *
      * @param callback
      */
-    logout(callback: (err: any, res: any)=>any): Kuzzle;
+    logout(callback: Kuzzle.ResponseCallback): Kuzzle;
 
-    checkToken(jwt: string, callBack: (err, res) => any): void;
+    checkToken(jwt: string, callback: Kuzzle.ResponseCallback): void;
 
     /**
      * Return informations about the currently logged user.
@@ -74,13 +80,36 @@ declare class Kuzzle {
      */
     whoAmI(callback: (err: any, result: any)=>any): void;
 
-    getMyRights()
+    /**
+     * Gets the rights array of the currently logged user.
+     *
+     * @param options - Optional parameters
+     * @param callback - The callback containing the normalized array of rights.
+     */
+    getMyRights(options: Kuzzle.QueuableOptions, callback: Kuzzle.ResponseCallback): void;
+    getMyRights(callback: Kuzzle.ResponseCallback): void;
 
-    updateSelf()
+    /**
+     * Performs a partial update on the current user.
+     *
+     * @param content - A plain javascript object representing the user.
+     * @param options - Optionals arguments
+     * @param callback - The response callback
+     */
+    updateSelf(content: any, options?: Kuzzle.QueuableOptions, callback?: Kuzzle.ResponseCallback);
 
-    addListener()
+    /**
+     * TODO : Wait improvement of Kuzzle documentation about this to specify callback arguments.
+     *
+     * Adds a listener to a Kuzzle global event.
+     * When an event is fired, listeners are called in the order of their insertion.
+     */
+    addListener(event: string, listener: Kuzzle.EventHandlerCallback)
 
-    getAllStatistics()
+    getAllStatistics(timestamp: any, options: Kuzzle.QueuableOptions, callback: any)
+    getAllStatistics(timestamp: any, options: Kuzzle.QueuableOptions, callback: any)
+    getAllStatistics(timestamp: any, options: Kuzzle.QueuableOptions, callback: any)
+    getAllStatistics(timestamp: any, options: Kuzzle.QueuableOptions, callback: any)
 
     getStatistics()
 
@@ -89,9 +118,9 @@ declare class Kuzzle {
      * @param index
      * @param collection
      *
-     * @return KuzzleDataCollection
+     * @return DataCollection
      */
-    dataCollectionFactory(index?: string, collection?: string): Kuzzle.KuzzleDataCollection;
+    dataCollectionFactory(index?: string, collection?: string): Kuzzle.DataCollection;
 
     flushQueue()
 
@@ -129,24 +158,38 @@ declare class Kuzzle {
 }
 
 declare namespace Kuzzle {
-    export interface KuzzleDataCollection {
-        publishMessage(document: any, options?: KuzzleMessageOptions): any;
-        createDocument(document: any, callback?: (err: any, res: any) => any): any;
-        updateDocument(documentId: any, document: any, callback?: (err: any, res: any) => any): any;
-        deleteDocument(documentId: any, callback?: (err: any, res: any) => any): any;
-        subscribe(filters: any, options: any, callback: (err: any, result: any)=> any): any;
-        fetchDocument(documentID: string, callback?: (err: any, res: any) => any): any
-        advancedSearch(filters: Object, options: any, callback: (err: any, result: any)=> any): any;
+
+    /**
+     * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
+     *
+     * @param Error object, NULL if the query is successful
+     * @param {Object} [data] - The content of the query response
+     */
+    export type ResponseCallback = (err: any, data: any) => void;
+
+    /**
+     * See specific event to know arguments
+     */
+    export type EventHandlerCallback = (...args) => void;
+
+    export interface DataCollection {
+        publishMessage(document: any, options?: MessageOptions): any;
+        createDocument(document: any, callback?: ResponseCallback): any;
+        updateDocument(documentId: any, document: any, callback?: ResponseCallback): any;
+        deleteDocument(documentId: any, callback?: ResponseCallback): any;
+        subscribe(filters: any, options: any, callback: ResponseCallback): any;
+        fetchDocument(documentID: string, callback?: ResponseCallback): any
+        advancedSearch(filters: Object, options: any, callback: ResponseCallback): any;
     }
 
-    export interface KuzzleSecurity {
+    export interface Security {
         searchUsers(filter: any, options?: any, callback?: (err: any, res: any) => any): any
     }
 
 
-    type OfflineModes = "auto" | "manual"
+    export type OfflineModes = "auto" | "manual"
 
-    export interface KuzzleConnectOptions {
+    export interface ConnectOptions {
         autoQueue?: boolean
         autoReconnect?: boolean
         autoReplay?: boolean
@@ -165,7 +208,11 @@ declare namespace Kuzzle {
         wsPort?: number
     }
 
-    export interface KuzzleMessageOptions {
+    export interface QueuableOptions {
+        queuable: boolean
+    }
+
+    export interface MessageOptions {
         metadata?: any;
         queuable?: boolean
     }
