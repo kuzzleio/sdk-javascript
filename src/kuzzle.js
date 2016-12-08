@@ -1291,8 +1291,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
    * a developer simply wish to verify his token
    */
   if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
-    object.headers = object.headers || {};
-    object.headers.authorization = 'Bearer ' + self.jwtToken;
+    object.jwt = self.jwtToken;
   }
 
   if (queryArgs.collection) {

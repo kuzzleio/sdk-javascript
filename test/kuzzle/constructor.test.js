@@ -1017,7 +1017,7 @@ describe('Kuzzle constructor', () => {
         should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.index).be.exactly('index');
-        should(kuzzle.offlineQueue[0].query.headers.authorization).be.exactly('Bearer fake-token');
+        should(kuzzle.offlineQueue[0].query.jwt).be.exactly('fake-token');
       });
     });
   });
