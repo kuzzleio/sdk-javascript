@@ -100,15 +100,18 @@ kuzzle
 
 ### Javascript
 
-You can install this SDK with [Bower](http://bower.io/).
-```
-bower install kuzzle-sdk --save
-```
+Clone this github repository and run ``npm run build``. A ``dist`` directory will be created, containing a browser version of this SDK.
+
 
 ```html
-<!-- Don't forget to include socketio before kuzzle -->
-<script type="text/javascript" src="bower_components/socket.io-client/socket.io.js"></script>
-<script type="text/javascript" src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
+<script type="text/javascript" src="dist/kuzzle.js"></script>
+```
+
+If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
+
+```html
+<!-- Don't forget to include socketio before kuzzle SDK -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.6.0/socket.io.min.js"></script>
 ```
 
 #### <a name="basic-usage-js"></a> Basic usage
@@ -136,10 +139,6 @@ kuzzle
     */
 });
 ```
-
-## Building manually
-
-Clone this github repository and run ``npm run build``. A ``dist`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
 
 ## Migrating from SDK v1.x
 
