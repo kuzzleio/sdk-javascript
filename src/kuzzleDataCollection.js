@@ -97,7 +97,7 @@ KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) 
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
     var
       response,
       documents = [];
@@ -151,7 +151,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.buildQueryArgs('read', 'count'), query, options, function (error, result) {
+  this.kuzzle.query(this.buildQueryArgs('document', 'count'), query, options, function (error, result) {
     cb(error, result && result.result.count);
   });
 };
@@ -174,7 +174,7 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'createCollection'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, cb);
 
   return this;
 };
@@ -229,7 +229,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
 
   data = self.kuzzle.addHeaders(data, self.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     var doc;
 
     if (err) {
@@ -280,7 +280,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
 
   data = this.kuzzle.addHeaders(data, this.headers);
 
-  this.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+  this.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     if (err) {
       cb(err);
     }
@@ -312,7 +312,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
   self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('read', 'get'), data, options, function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'get'), data, options, function (err, res) {
     var document;
 
     if (err) {
@@ -398,7 +398,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options, cb)
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('realtime', 'publish'), data, options, cb);
 
   return this;
 };
@@ -431,7 +431,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'createOrReplace'), data, options, cb && function (err, res) {
     var document;
 
     if (err) {
@@ -492,7 +492,7 @@ KuzzleDataCollection.prototype.truncate = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('admin', 'truncateCollection'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('collection', 'truncate'), data, options, cb);
 
   return this;
 };
@@ -526,7 +526,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'update'), data, options, cb && function (err, res) {
     if (err) {
       return cb(err);
     }
