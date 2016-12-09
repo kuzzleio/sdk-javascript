@@ -534,14 +534,10 @@ Kuzzle.prototype.logout = function (cb) {
     };
 
   this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, typeof cb !== 'function' ? null : function(error) {
-    if (error === null) {
-      self.unsetJwtToken();
-      cb(null, self);
-    }
-    else {
-      cb(error);
-    }
+    cb(error, self);
   });
+
+  self.unsetJwtToken();
 
   return self;
 };
