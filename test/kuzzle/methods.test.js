@@ -54,7 +54,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {hits: []}};
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getAllStats'
       };
     });
@@ -96,7 +96,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {hits: []}};
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getLastStats'
       };
     });
@@ -115,7 +115,7 @@ describe('Kuzzle methods', function () {
 
     it('should return statistics frames starting from the given timestamp', function () {
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getStats',
         body: { startTime: 123 }
       };
@@ -159,7 +159,7 @@ describe('Kuzzle methods', function () {
       // testing: getStatistics(timestamp, options callback);
       emitted = false;
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getStats',
         body: { startTime: 123 }
       };
@@ -198,12 +198,12 @@ describe('Kuzzle methods', function () {
     it('should create and store the data collection instance if needed', function () {
       var collection = kuzzle.dataCollectionFactory('foo', 'bar');
 
-      should(kuzzle.collections['bar']['foo']).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
+      should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
       should(collection).be.instanceof(KuzzleDataCollection);
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
-      kuzzle.collections['foo'] = { bar: 'qux'};
+      kuzzle.collections.foo = { bar: 'qux'};
       should(kuzzle.dataCollectionFactory('bar', 'foo')).be.a.String().and.be.exactly('qux');
     });
 
@@ -255,8 +255,8 @@ describe('Kuzzle methods', function () {
         }
       }}};
       expectedQuery = {
-        controller: 'read',
-        action: 'serverInfo'
+        controller: 'server',
+        action: 'info'
       };
     });
 
@@ -268,10 +268,10 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () {kuzzle.getServerInfo()}).throw(Error);
+      should(function () {kuzzle.getServerInfo();}).throw(Error);
       should(emitted).be.false();
 
-      should(function () {kuzzle.getServerInfo({some: 'options'})}).throw(Error);
+      should(function () {kuzzle.getServerInfo({some: 'options'});}).throw(Error);
       should(emitted).be.false();
     });
 
@@ -297,8 +297,8 @@ describe('Kuzzle methods', function () {
       result = {result: {collections: {stored: [], realtime: []}}};
       expectedQuery = {
         index: 'foo',
-        controller: 'read',
-        action: 'listCollections',
+        controller: 'collection',
+        action: 'list',
         body: {type: 'all'}
       };
     });
@@ -311,9 +311,9 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index has been provided', function () {
-      should(function () {kuzzle.listCollections(function () {})}).throw(Error);
+      should(function () {kuzzle.listCollections(function () {});}).throw(Error);
       should(emitted).be.false();
-      should(function () {kuzzle.listCollections({}, function () {})}).throw(Error);
+      should(function () {kuzzle.listCollections({}, function () {});}).throw(Error);
       should(emitted).be.false();
     });
 
@@ -339,9 +339,19 @@ describe('Kuzzle methods', function () {
       });
     });
 
-    it('should handle options correctly', function (done) {
+    it('should handle type option correctly', function (done) {
       expectedQuery.body.type = 'foobar';
       kuzzle.listCollections('foo', {type: 'foobar'}, () => done());
+    });
+
+    it('should handle from option correctly', function (done) {
+      expectedQuery.body.from = 'foobar';
+      kuzzle.listCollections('foo', {from: 'foobar'}, () => done());
+    });
+
+    it('should handle size option correctly', function (done) {
+      expectedQuery.body.size = 'foobar';
+      kuzzle.listCollections('foo', {size: 'foobar'}, () => done());
     });
 
     it('should use the default index if none is provided', function () {
@@ -364,8 +374,8 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {indexes: ['foo', 'bar']}};
       expectedQuery = {
-        controller: 'read',
-        action: 'listIndexes'
+        controller: 'index',
+        action: 'list'
       };
     });
 
@@ -373,7 +383,7 @@ describe('Kuzzle methods', function () {
       should(function () { kuzzle.listIndexes(); }).throw(Error);
       should(emitted).be.false();
 
-      should(function () {kuzzle.listIndexes({some: 'options'})}).throw(Error);
+      should(function () {kuzzle.listIndexes({some: 'options'});}).throw(Error);
       should(emitted).be.false();
     });
 
@@ -393,7 +403,7 @@ describe('Kuzzle methods', function () {
 
   describe('#disconnect', function () {
     it('should clean up and invalidate the instance if called', function () {
-      var kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo');
 
       kuzzle.network.close = sinon.stub(kuzzle.network, 'close');
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
@@ -414,7 +424,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {now: Date.now()}};
       expectedQuery = {
-        controller: 'read',
+        controller: 'server',
         action: 'now'
       };
     });
@@ -454,16 +464,16 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if the provided index is not a string', function () {
-      should((function () {kuzzle.setDefaultIndex()})).throw();
-      should((function () {kuzzle.setDefaultIndex({})})).throw();
-      should((function () {kuzzle.setDefaultIndex([])})).throw();
-      should((function () {kuzzle.setDefaultIndex(123)})).throw();
-      should((function () {kuzzle.setDefaultIndex(null)})).throw();
-      should((function () {kuzzle.setDefaultIndex(undefined)})).throw();
+      should((function () {kuzzle.setDefaultIndex();})).throw();
+      should((function () {kuzzle.setDefaultIndex({});})).throw();
+      should((function () {kuzzle.setDefaultIndex([]);})).throw();
+      should((function () {kuzzle.setDefaultIndex(123);})).throw();
+      should((function () {kuzzle.setDefaultIndex(null);})).throw();
+      should((function () {kuzzle.setDefaultIndex(undefined);})).throw();
     });
 
     it('should throw an error if the provided index is an empty string', function () {
-      should((function () {kuzzle.setDefaultIndex('')})).throw();
+      should((function () {kuzzle.setDefaultIndex('');})).throw();
     });
 
     it('should set the default index in all other cases', function () {
@@ -503,7 +513,6 @@ describe('Kuzzle methods', function () {
   describe('#checkToken', function () {
     it('should send the checkToken after call', function () {
       var
-        kuzzle,
         stubResults = { foo: 'bar' },
         token = 'fakeToken-eoijaodmowifnw8h';
 
@@ -530,7 +539,6 @@ describe('Kuzzle methods', function () {
 
     it('should resolve to an error if Kuzzle respond with one', function () {
       var
-        kuzzle,
         stubError = { foo: 'bar' },
         token = 'fakeToken-eoijaodmowifnw8h';
 
@@ -557,7 +565,6 @@ describe('Kuzzle methods', function () {
 
     it('should throw an error when it is called with no callback', function (done) {
       var
-        kuzzle,
         token = 'fakeToken-eoijaodmowifnw8h';
 
       this.timeout(200);
@@ -580,8 +587,6 @@ describe('Kuzzle methods', function () {
 
   describe('#whoAmI', function () {
     it('should send the getCurrentUser after call', function () {
-      var kuzzle;
-
       this.timeout(200);
 
       kuzzle = new Kuzzle('nowhere', {
@@ -590,7 +595,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.queuing = true;
 
-      kuzzle.whoAmI(function (err, res) {});
+      kuzzle.whoAmI(function () {});
 
       should(kuzzle.offlineQueue.length).be.exactly(1);
       should(kuzzle.offlineQueue[0].query.action).be.exactly('getCurrentUser');
@@ -598,8 +603,6 @@ describe('Kuzzle methods', function () {
     });
 
     it('should send correct query and return a KuzzleUser', function (done) {
-      var kuzzle;
-
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -619,8 +622,6 @@ describe('Kuzzle methods', function () {
     });
 
     it('should execute the callback with an error if an error occurs', function (done) {
-      var kuzzle;
-
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -681,8 +682,6 @@ describe('Kuzzle methods', function () {
 
   describe('#security', function () {
     it('should be an instance of KuzzleSecurity', function () {
-      var kuzzle;
-
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -693,8 +692,6 @@ describe('Kuzzle methods', function () {
 
   describe('#getJwtToken', function () {
     it('should return the current jwt token', function () {
-      var kuzzle;
-
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -737,7 +734,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-      kuzzle.subscriptions['foo'] = { bar: stubKuzzleRoom };
+      kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
 
       kuzzle.unsetJwtToken();
 
@@ -830,7 +827,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index is set', () => {
-      should(() => { kuzzle.refreshIndex() }).throw('Kuzzle.refreshIndex: index required');
+      should(() => {kuzzle.refreshIndex();}).throw('Kuzzle.refreshIndex: index required');
     });
 
     it('should use the default index if no index is given', () => {
@@ -858,8 +855,8 @@ describe('Kuzzle methods', function () {
       args = spy.firstCall.args;
 
       should(args[0].index).be.exactly(index);
-      should(args[0].controller).be.exactly('admin');
-      should(args[0].action).be.exactly('refreshIndex');
+      should(args[0].controller).be.exactly('index');
+      should(args[0].action).be.exactly('refresh');
       should(args[2]).be.exactly(options);
       should(args[3]).be.exactly(cb);
     });
@@ -902,17 +899,17 @@ describe('Kuzzle methods', function () {
       kuzzle.getAutoRefresh(index, options, cb);
       should(spy.calledOnce).be.true();
       should(spy.calledWithExactly(
-        { index: index, controller: 'admin', action: 'getAutoRefresh' },
+        { index: index, controller: 'index', action: 'getAutoRefresh' },
         {},
         options,
-        cb )
+        cb)
       ).be.true();
 
       kuzzle.defaultIndex = 'defaultIndex';
       kuzzle.getAutoRefresh(cb);
       should(spy.calledTwice).be.true();
       should(spy.secondCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'getAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'getAutoRefresh' },
         {},
         undefined,
         cb)
@@ -940,7 +937,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(true, cb);
       should(spy.calledOnce).be.true();
       should(spy.calledWith(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: true } },
         undefined,
         cb
@@ -967,7 +964,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(autoRefresh, options, cb);
       should(spy.calledOnce).be.true();
       should(spy.firstCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: autoRefresh }},
         options,
         cb
@@ -976,7 +973,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(index, autoRefresh);
       should(spy.calledTwice).be.true();
       should(spy.secondCall.calledWithExactly(
-        { index: index, controller: 'admin', action: 'setAutoRefresh' },
+        { index: index, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: autoRefresh }},
         undefined,
         undefined

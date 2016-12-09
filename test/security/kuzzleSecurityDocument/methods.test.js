@@ -1,7 +1,5 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = require('../../../src/kuzzle'),
   KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
 

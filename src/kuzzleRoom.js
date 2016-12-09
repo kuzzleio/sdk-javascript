@@ -1,5 +1,5 @@
 var
-  uuid = require('node-uuid');
+  uuid = require('uuid');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -142,7 +142,7 @@ KuzzleRoom.prototype.count = function (cb) {
     throw new Error('KuzzleRoom.count: cannot count subscriptions on an inactive room');
   }
 
-  this.kuzzle.query(this.collection.buildQueryArgs('subscribe', 'count'), data, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('realtime', 'count'), data, function (err, res) {
     cb(err, res && res.result.count);
   });
 };
@@ -213,7 +213,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
   subscribeQuery.body = self.filters;
   subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'on'), subscribeQuery, {metadata: self.metadata}, function (error, response) {
+  self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {metadata: self.metadata}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 
@@ -267,12 +267,12 @@ KuzzleRoom.prototype.unsubscribe = function () {
       delete self.kuzzle.subscriptions[room];
 
       if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
-        self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
+        self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'unsubscribe'), {body: {roomId: room}});
       } else {
         interval = setInterval(function () {
           if (Object.keys(self.kuzzle.subscriptions.pending).length === 0) {
             if (!self.kuzzle.subscriptions[room]) {
-              self.kuzzle.query(self.collection.buildQueryArgs('subscribe', 'off'), {body: {roomId: room}});
+              self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'unsubscribe'), {body: {roomId: room}});
             }
             clearInterval(interval);
           }

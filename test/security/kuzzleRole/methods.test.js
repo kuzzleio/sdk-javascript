@@ -1,7 +1,5 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = require('../../../src/kuzzle'),
   KuzzleRole = require('../../../src/security/kuzzleRole');
 
@@ -131,8 +129,8 @@ describe('KuzzleRole methods', function () {
       try {
         kuzzleRole.update();
       }
-      catch(error) {
-        should(error).be.instanceOf(Error);
+      catch (e) {
+        should(e).be.instanceOf(Error);
         done();
       }
     });

@@ -51,7 +51,7 @@ describe('WebSocket networking module', () => {
 
     websocket.retrying = false;
     websocket.onConnect(cb);
-    websocket.listeners.reconnect.push(() => {throw(new Error('wrong event called'));});
+    websocket.listeners.reconnect.push(() => {throw (new Error('wrong event called'));});
     should(websocket.listeners.connect.length).be.eql(1);
 
     websocket.connect();
@@ -67,7 +67,7 @@ describe('WebSocket networking module', () => {
     websocket.wasConnected = true;
     websocket.lasturl = 'ws://address:port';
     websocket.onReconnect(cb);
-    websocket.listeners.connect.push({fn: () => {throw(new Error('wrong event called'));}});
+    websocket.listeners.connect.push({fn: () => {throw (new Error('wrong event called'));}});
     should(websocket.listeners.reconnect.length).be.eql(1);
 
     websocket.connect();

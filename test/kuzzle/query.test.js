@@ -1,4 +1,4 @@
- var
+var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
@@ -26,13 +26,13 @@ describe('Query management', function () {
 
       emitRequest.call(kuzzle, request);
       should(kuzzle.network.send.calledWith(request)).be.true();
-      should(kuzzle.requestHistory['bar']).be.within(start, Date.now());
+      should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
     it('should fire a jwtTokenExpired event if the token has expired', function (done) {
       var listenerJwtTokenExpired = false;
 
-      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit('bar', {
+      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit('bar', {
         error: {
           message: 'Token expired'
         }
@@ -56,7 +56,7 @@ describe('Query management', function () {
     it('should fire a queryError if an error occurred', function (done) {
       var listenerQueryError = false;
 
-      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit('bar', {
+      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit('bar', {
         error: {
           message: 'foo-bar'
         }
@@ -93,7 +93,7 @@ describe('Query management', function () {
 
       this.timeout(50);
 
-      kuzzle.network.send  = () => process.nextTick(() => kuzzle.network.emit(request.requestId, response));
+      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit(request.requestId, response));
       emitRequest.call(kuzzle, request, cb);
     });
   });
@@ -164,6 +164,14 @@ describe('Query management', function () {
       should(requestObject.metadata).match(metadata);
     });
 
+    it('should handle option refresh properly', function () {
+      var
+        refresh = 'foo';
+
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {refresh: refresh});
+      should(requestObject.refresh).match(refresh);
+    });
+
     it('should exit early if the query is not queuable and the SDK is offline', function () {
       kuzzle.state = 'offline';
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
@@ -213,8 +221,11 @@ describe('Query management', function () {
 
     it('should discard the request if not connected and if queuable is false', function () {
       var
-        errorRaised = false,
-        callback = () => errorRaised = true;
+        errorRaised = false;
+
+      callback = () => {
+        errorRaised = true;
+      };
 
       kuzzle.state = 'reconnecting';
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false}, callback);
@@ -289,7 +300,9 @@ describe('Query management', function () {
         cb = function () {},
         eventFired = false;
 
-      kuzzle.addListener('offlineQueuePush', () => eventFired = true);
+      kuzzle.addListener('offlineQueuePush', () => {
+        eventFired = true;
+      });
       kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return false; };
       kuzzle.queuing = true;
@@ -309,7 +322,9 @@ describe('Query management', function () {
         cb = function () {},
         eventFired = false;
 
-      kuzzle.addListener('offlineQueuePush', () => eventFired = true);
+      kuzzle.addListener('offlineQueuePush', () => {
+        eventFired = true;
+      });
       kuzzle.state = 'offline';
       kuzzle.queuing = false;
       kuzzle.query(queryArgs, query, cb);
@@ -323,11 +338,6 @@ describe('Query management', function () {
     });
 
     it('should not set jwtToken if we execute auth/checkToken', function () {
-      var
-        kuzzle,
-        query = { body: { some: 'query'}},
-        now = Date.now();
-
       this.timeout(200);
 
       Kuzzle = rewire(kuzzleSource);
@@ -364,7 +374,7 @@ describe('Query management', function () {
         clock = sinon.useFakeTimers(),
         kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
-      for(i = 100000; i >= 0; i -= 10000) {
+      for (i = 100000; i >= 0; i -= 10000) {
         kuzzle.requestHistory[i] = -i;
       }
 
@@ -373,7 +383,7 @@ describe('Query management', function () {
       // should only contains i == 0 entry
       should(Object.keys(kuzzle.requestHistory)).match(['0']);
 
-      kuzzle.requestHistory['foobar'] = -100000;
+      kuzzle.requestHistory.foobar = -100000;
 
       clock.tick(1000);
       should(Object.keys(kuzzle.requestHistory)).match(['0']);

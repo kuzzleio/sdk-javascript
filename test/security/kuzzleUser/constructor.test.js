@@ -3,7 +3,6 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile'),
   KuzzleUser = require('../../../src/security/kuzzleUser');
 
 describe('KuzzleUser constructor', function () {
@@ -32,9 +31,10 @@ describe('KuzzleUser constructor', function () {
 
   it('should initialize properties and return a valid KuzzleProfile object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'id', {some: 'content'});
+      kuzzleUser;
 
+    kuzzle = new Kuzzle('foo');
+    kuzzleUser = new KuzzleUser(kuzzle.security, 'id', {some: 'content'});
 
     should(kuzzleUser).be.instanceof(KuzzleUser);
     should(kuzzleUser).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });

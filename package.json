@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "2.2.1",
+  "version": "2.2.3",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -18,7 +18,9 @@
     "bulk"
   ],
   "scripts": {
-    "test": "istanbul cover _mocha  -- --recursive ",
+    "test": "npm run --silent lint && npm run unit-testing",
+    "unit-testing": "istanbul cover _mocha  -- --recursive",
+    "lint": "eslint --max-warnings=0 ./lib ./test",
     "build": "node build.js"
   },
   "browser": "src/kuzzle.js",
@@ -27,7 +29,7 @@
   "dependencies": {
     "bluebird": "3.4.6",
     "bufferutil": "^1.2.1",
-    "node-uuid": "1.4.7",
+    "uuid": "3.0.0",
     "utf-8-validate": "^1.2.1",
     "ws": "^1.1.1"
   },
@@ -50,7 +52,6 @@
     "proxyquire": "^1.7.10",
     "rewire": "^2.5.2",
     "should": "11.1.0",
-    "sinon": "^1.17.5",
-    "webpack": "^1.13.1"
+    "sinon": "^1.17.5"
   }
 }

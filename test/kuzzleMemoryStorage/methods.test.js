@@ -1,6 +1,5 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   Kuzzle = require('../stubs/kuzzle.stub'),
   KuzzleMemoryStorage = require('../../src/kuzzleMemoryStorage');
 
@@ -61,13 +60,6 @@ describe('KuzzleMemoryStorage methods', () => {
         });
       });
     });
-
-    it('should handle missing arguments', () => {
-      ms.set((err, r) => {
-        should()
-      });
-    });
-
   });
 
   describe('#functions with optional parameters', () => {
@@ -106,8 +98,4 @@ describe('KuzzleMemoryStorage methods', () => {
       });
     });
   });
-
-
-
-
 });
