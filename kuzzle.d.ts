@@ -429,13 +429,252 @@ declare namespace Kuzzle {
     export type EpochTime = string;
 
     export interface DataCollection {
-        publishMessage(document: any, options?: MessageOptions): any;
-        createDocument(document: any, callback?: ResponseCallback): any;
-        updateDocument(documentId: any, document: any, callback?: ResponseCallback): any;
-        deleteDocument(documentId: any, callback?: ResponseCallback): any;
+
+        /**
+         * Executes an advanced search on the data collection.
+         *
+         * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function.
+         *
+         * @param filters - Filters in Elasticsearch Query DSL format
+         * @param options - Optional parameters
+         * @param callback - Handles the query response
+         */
+        advancedSearch(filters: any, options: QueuableOptions, callback: ResponseCallback): void;
+
+        /**
+         * Executes an advanced search on the data collection.
+         *
+         * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function.
+         *
+         * @param filters - Filters in Elasticsearch Query DSL format
+         * @param callback - Handles the query response
+         */
+        advancedSearch(filters: any, callback: ResponseCallback): void;
+
+        /**
+         * Returns the number of documents matching the provided set of filters.
+         *
+         * There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function
+         *
+         * @param filters - Filters in Elasticsearch Query DSL format
+         * @param options - Optional parameters
+         * @param callback - Handles the query response
+         */
+        count(filters: any, options: QueuableOptions, callback: ResponseCallback): void;
+
+        /**
+         * Returns the number of documents matching the provided set of filters.
+         *
+         * There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function
+         *
+         * @param filters - Filters in Elasticsearch Query DSL format
+         * @param callback - Handles the query response
+         */
+        count(filters: any, callback: ResponseCallback): void;
+
+        /**
+         * Create a new empty data collection, with no associated mapping.
+         * Kuzzle automatically creates data collections when storing documents, but there are cases where we
+         * want to create and prepare data collections before storing documents in it.
+         *
+         * @param options - Optional parameters
+         * @param callback - Returns Kuzzle's response
+         */
+        create(options?: QueuableOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Create a new document in Kuzzle.
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *    - updateIfExist (boolean, default: false):
+         *        If the same document already exists: throw an error if sets to false.
+         *        Update the existing document otherwise
+         *
+         * @param document - either an instance of a KuzzleDocument object, or a document
+         * @param options - optional arguments
+         * @param callback - Handles the query response
+         */
+        createDocument(document: Document, options?: CreateDocumentOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Create a new document in Kuzzle.
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *    - updateIfExist (boolean, default: false):
+         *        If the same document already exists: throw an error if sets to false.
+         *        Update the existing document otherwise
+         *
+         * @param id - (optional) document identifier
+         * @param content - The document content
+         * @param options - optional arguments
+         * @param callback - Handles the query response
+         */
+        createDocument(id: string, content: any, options?: CreateDocumentOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Create a new document in Kuzzle.
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *    - updateIfExist (boolean, default: false):
+         *        If the same document already exists: throw an error if sets to false.
+         *        Update the existing document otherwise
+         *
+         * @param content - The document content
+         * @param options - optional arguments
+         * @param callback - Handles the query response
+         */
+        createDocument(content: any, options?: CreateDocumentOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Delete persistent documents.
+         *
+         * There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *
+         * @param documentId - A document ID (will delete only this particular document)
+         * @param options - optional arguments
+         * @param callback - Handles the query response
+         */
+        deleteDocument(documentId: string, options?: QueryOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Delete persistent documents.
+         *
+         * There is a small delay between documents creation and their existence in our advanced search layer,
+         * usually a couple of seconds.
+         * That means that a document that was just been created won’t be returned by this function
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *
+         * @param filters - Filters in ElasticSearch Query DSL format
+         * @param options - optional arguments
+         * @param callback - Handles the query response
+         */
+        deleteDocument(filters: any, options?: QueryOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Retrieve a single stored document using its unique document ID.
+         *
+         * @param documentId - Unique document identifier
+         * @param options - Optional parameters
+         * @param callback - Handles the query response
+         */
+        fetchDocument(documentId: string, options: QueuableOptions, callback?: ResponseCallback): void;
+
+        /**
+         * Retrieve a single stored document using its unique document ID.
+         *
+         * @param documentId - Unique document identifier
+         * @param callback - Handles the query response
+         */
+        fetchDocument(documentId: string, callback?: ResponseCallback): void;
+
+        /**
+         * Retrieves all documents stored in this data collection
+         *
+         * @param options - Optional parameters
+         * @param callback - Handles the query response
+         */
+        fetchAllDocuments(options: FetchAllOptions, callback: ResponseCallback)
+
+        /**
+         * Retrieves all documents stored in this data collection
+         *
+         * @param callback - Handles the query response
+         */
+        fetchAllDocuments(callback: ResponseCallback)
+
+        /**
+         * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
+         *
+         * @param options - Optional parameters
+         * @param callback - Returns an instantiated KuzzleDataMapping object
+         */
+        getMapping(options: QueuableOptions, callback: ResponseCallback)
+
+        /**
+         * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
+         *
+         * @param callback - Returns an instantiated KuzzleDataMapping object
+         */
+        getMapping(callback: ResponseCallback)
+
+        /**
+         * Publish a realtime message
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *
+         * @param document - either a KuzzleDocument instance or a JSON object
+         * @param options - optional arguments
+         * @param callback - Returns a raw Kuzzle response
+         */
+        publishMessage(document: Document|any, options?: MessageOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Replace an existing document with a new one.
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *
+         * @param documentId - Unique document identifier of the document to replace
+         * @param content - JSON object representing the new document version
+         * @param options - additional arguments
+         * @param callback - Returns an instantiated KuzzleDocument object
+         */
+        replaceDocument(documentId: string, content:any, options?: QueryOptions, callback?: ResponseCallback): DataCollection;
+
+        /**
+         * Subscribes to this data collection with a set of filters.
+         * To subscribe to the entire data collection, simply provide an empty filter.
+         *
+         * @param filters - Filters in Kuzzle DSL format
+         * @param options - subscriptions options
+         * @param callback - called for each new notification
+         */
         subscribe(filters: any, options: any, callback: ResponseCallback): any;
-        fetchDocument(documentID: string, callback?: ResponseCallback): any
-        advancedSearch(filters: Object, options: any, callback: ResponseCallback): any;
+
+        /**
+         * Update parts of a document
+         *
+         * Takes an optional argument object with the following properties:
+         *    - metadata (object, default: null):
+         *        Additional information passed to notifications to other users
+         *
+         * @param documentId - Unique document identifier of the document to update
+         * @param content - JSON object containing changes to perform on the document
+         * @param options - Optional parameters
+         * @param callback - Returns an instantiated KuzzleDocument object
+         */
+        updateDocument(documentId: string, content:any, options?: QueryOptions, callback?: ResponseCallback): DataCollection;
+    }
+
+
+    export interface Document {
+
     }
 
     export interface Security {
@@ -465,9 +704,30 @@ declare namespace Kuzzle {
         queuable: boolean
     }
 
+    export interface CreateDocumentOptions {
+        metadata?: any;
+        queuable?: boolean;
+        updateIfExist?: boolean;
+    }
+
     export interface QueryOptions {
         metadata?: any;
         queuable?: boolean;
+    }
+
+    export interface FetchAllOptions {
+        /**
+         * Upper bounds for paginated results
+         */
+        from: number;
+        /**
+         * Mark this request as (not) queuable
+         */
+        queuable: boolean;
+        /**
+         * Lower bounds for paginated results
+         */
+        size: number;
     }
 
     export interface ListCollectionsOptions {
