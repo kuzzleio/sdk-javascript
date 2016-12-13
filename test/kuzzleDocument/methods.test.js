@@ -105,7 +105,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'delete',
-        controller: 'write',
+        controller: 'document',
         body: {},
         _id: 'foo'
       };
@@ -191,7 +191,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'get',
-        controller: 'read',
+        controller: 'document',
         body: {},
         _id: 'foo'
       };
@@ -280,7 +280,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'createOrReplace',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -357,7 +357,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'publish',
-        controller: 'write',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -420,8 +420,8 @@ describe('KuzzleDocument methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
+        action: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
     });

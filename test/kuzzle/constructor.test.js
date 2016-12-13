@@ -899,7 +899,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.login('local', loginCredentials);
       });
 
-      it('should have a empty token in logout callback', function (done) {
+      it('should have a empty token in logout callback', function () {
         var
           unsetJwtToken = false,
           kuzzle;
@@ -918,10 +918,8 @@ describe('Kuzzle constructor', () => {
           cb(null, {});
         };
 
-        kuzzle.logout(function() {
-          should(unsetJwtToken).be.exactly(true);
-          done();
-        });
+        kuzzle.logout(() => {});
+        should(unsetJwtToken).be.exactly(true);
       });
 
       it('should give an error if login query fail to the logout callback if is set', function (done) {
