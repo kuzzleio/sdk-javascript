@@ -4,7 +4,6 @@
 Official Kuzzle Javascript SDK
 ======
 
-This SDK version is compatible with Kuzzle 1.0.0-RC8 and higher
 
 Please use SDK v1.x for earlier versions of Kuzzle.
 
@@ -139,10 +138,6 @@ kuzzle
     */
 });
 ```
-
-## Building manually
-
-Clone this github repository and run ``npm run build``. A ``dist`` directory will be created, containing a plain browserified version of this SDK, and a minified version.
 
 ## Migrating from SDK v1.x
 
