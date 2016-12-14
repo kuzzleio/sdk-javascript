@@ -1261,7 +1261,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.from = options.from;
     }
 
-    if (options.refresh) {
+    if (options.size) {
       object.size = options.size;
     }
 
