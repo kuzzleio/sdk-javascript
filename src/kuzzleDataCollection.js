@@ -339,17 +339,6 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     options = null;
   }
 
-  // copying pagination options to the search filter
-  if (options) {
-    if (options.from) {
-      filters.from = options.from;
-    }
-
-    if (options.size) {
-      filters.size = options.size;
-    }
-  }
-
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
 
   this.advancedSearch(filters, options, cb);
