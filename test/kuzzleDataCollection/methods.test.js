@@ -507,6 +507,13 @@ describe('KuzzleDataCollection methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       emitted = false;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'get',
+        controller: 'document',
+        body: {}
+      };
     });
 
     it('should forward the query to the advancedSearch method', function () {
@@ -549,7 +556,7 @@ describe('KuzzleDataCollection methods', function () {
 
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
       should(stub.calledOnce).be.true();
-      should(stub.calledWithMatch({from: 123, size: 456})).be.true();
+      should(stub.calledWithMatch({}, {from: 123, size: 456})).be.true();
       stub.restore();
     });
   });

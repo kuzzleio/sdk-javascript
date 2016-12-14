@@ -345,12 +345,12 @@ describe('Kuzzle methods', function () {
     });
 
     it('should handle from option correctly', function (done) {
-      expectedQuery.body.from = 'foobar';
+      expectedQuery.from = 'foobar';
       kuzzle.listCollections('foo', {from: 'foobar'}, () => done());
     });
 
     it('should handle size option correctly', function (done) {
-      expectedQuery.body.size = 'foobar';
+      expectedQuery.size = 'foobar';
       kuzzle.listCollections('foo', {size: 'foobar'}, () => done());
     });
 
