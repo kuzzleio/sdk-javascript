@@ -40,7 +40,6 @@ describe('KuzzleDataCollection constructor', function () {
     kuzzle = new Kuzzle('foo');
     dataCollection = new KuzzleDataCollection(kuzzle, 'bar', 'foo');
 
-    should.exist(dataCollection.advancedSearchPromise);
     should.exist(dataCollection.countPromise);
     should.exist(dataCollection.createPromise);
     should.exist(dataCollection.createDocumentPromise);

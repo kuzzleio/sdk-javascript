@@ -51,35 +51,6 @@ describe('KuzzleDataCollection methods', function () {
     emitted,
     kuzzle;
 
-  describe('#advancedSearch', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'search',
-        controller: 'read',
-        body: {}
-      };
-    });
-
-    it('should call search method', function (done) {
-      var
-        searchCalled = false,
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-
-      collection.search = function(filters, cb) {
-        searchCalled = true;
-        cb();
-      };
-
-      collection.advancedSearch({}, function() {
-        should(searchCalled).be.true();
-        done();
-      });
-    });
-  });
-
   describe('#search', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});

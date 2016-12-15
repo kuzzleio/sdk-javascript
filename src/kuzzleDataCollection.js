@@ -74,25 +74,6 @@ function KuzzleDataCollection(kuzzle, collection, index) {
 }
 
 /**
- * Executes an advanced search on the data collection.
- *
- * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
- * usually a couple of seconds.
- * That means that a document that was just been created won’t be returned by this function.
- *
- * @deprecated
- * @see KuzzleDataCollection.prototype.search
- *
- * @param {object} filters - Filters in Elasticsearch Query DSL format
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Handles the query response
- */
-KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
-  console.warn('Usage of KuzzleDataCollection.advancedSearch is deprecated. Use KuzzleDataCollection.search instead');
-  return this.search(filters, options, cb);
-};
-
-/**
  * Returns the number of documents matching the provided set of filters.
  *
  * There is a small delay between documents creation and their existence in our advanced search layer,
