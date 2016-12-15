@@ -23,7 +23,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (host, options, cb) {
+function Kuzzle (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
@@ -309,7 +309,7 @@ module.exports = Kuzzle = function (host, options, cb) {
       }
     });
   }
-};
+}
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -1283,6 +1283,14 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.refresh = options.refresh;
     }
 
+    if (options.from) {
+      object.from = options.from;
+    }
+
+    if (options.size) {
+      object.size = options.size;
+    }
+
     if (options.metadata) {
       Object.keys(options.metadata).forEach(function (meta) {
         object.metadata[meta] = options.metadata[meta];
@@ -1477,3 +1485,5 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
+
+module.exports = Kuzzle;

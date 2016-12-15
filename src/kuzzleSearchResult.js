@@ -1,5 +1,3 @@
-var KuzzleDocument = require('./kuzzleDocument.js');
-
 /**
  *
  * @param {KuzzleDataCollection} dataCollection
@@ -83,18 +81,14 @@ KuzzleSearchResult.prototype.previous = function (cb) {
  * @param {function} cb
  */
 KuzzleSearchResult.prototype.next = function (cb) {
-  var self = this;
+  var
+    filters,
+    options = Object.assign({}, this.searchArgs.options),
+    self = this;
 
   if (!this._next) {
     // retrieve next results with scroll if original search use it
-    if (this.searchArgs.options.scrollId) {
-      var
-        options = Object.assign({}, this.searchArgs.options);
-
-      if (this.searchArgs.filters.scroll) {
-        options.scroll = this.searchArgs.filters.scroll;
-      }
-
+    if (options.scrollId) {
       if (this.fetchedDocument >= this.total) {
         cb(null, null);
         return;
@@ -105,21 +99,20 @@ KuzzleSearchResult.prototype.next = function (cb) {
         options,
         this.searchArgs.filters || {},
         function(error, newSearchResults) {
-          handleNextSearchResults(error, self, newSearchResults, cb)
+          handleNextSearchResults(error, self, newSearchResults, cb);
         }
       );
 
       return;
     }
-    // retrieve next results with  from/size if original search use it
-    else if (this.searchArgs.filters.from !== undefined && this.searchArgs.filters.size !== undefined) {
-      var
-        filters = Object.assign({}, this.searchArgs.filters);
+    // retrieve next results with from/size if original search use it
+    else if (options.from !== undefined && options.size !== undefined) {
+      filters = Object.assign({}, this.searchArgs.filters);
 
       // check if we need to do next request to fetch all matching documents
-      filters.from += filters.size;
+      options.from += options.size;
 
-      if (filters.from >= this.total) {
+      if (options.from >= this.total) {
         cb(null, null);
 
         return;
@@ -127,9 +120,9 @@ KuzzleSearchResult.prototype.next = function (cb) {
 
       this.dataCollection.search(
         filters,
-        this.searchArgs.options,
+        options,
         function(error, newSearchResults) {
-          handleNextSearchResults(error, self, newSearchResults, cb)
+          handleNextSearchResults(error, self, newSearchResults, cb);
         }
       );
 

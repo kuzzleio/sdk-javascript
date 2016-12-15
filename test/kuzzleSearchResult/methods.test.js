@@ -20,7 +20,7 @@ describe('KuzzleSearchResult methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    searchArgs = {options: {}, filters: {from:0, size: 1}};
+    searchArgs = {options: {from:0, size: 1}, filters: {}};
     dataCollection = kuzzle.dataCollectionFactory('foo');
     firstDocument = new KuzzleDocument(dataCollection, 'banana', {foo: 'bar'});
     secondDocument = new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'});
@@ -47,7 +47,7 @@ describe('KuzzleSearchResult methods', function () {
           1,
           [new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'})],
           {},
-          {options: {scrollId: 'papagayo'}, filters: {from: 0, size: 1}}
+          {options: {scrollId: 'papagayo', from: 0, size: 1}}
         ),
         firstSearchResult;
 
@@ -101,7 +101,7 @@ describe('KuzzleSearchResult methods', function () {
         should(result).be.an.instanceOf(KuzzleSearchResult);
         should(result.documents).be.an.Array();
         should(result.documents.length).be.exactly(1);
-        should(result.searchArgs.filters.from).be.exactly(1);
+        should(result.searchArgs.options.from).be.exactly(1);
         done();
       });
     });
@@ -151,7 +151,7 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      searchArgs.filters = {};
+      searchArgs.options = {};
 
       firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
 

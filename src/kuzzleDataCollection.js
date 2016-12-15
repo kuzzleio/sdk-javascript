@@ -16,6 +16,11 @@ var
 /**
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
+ *
+ * @property {string} collection
+ * @property {string} index
+ * @property {Kuzzle} kuzzle
+ * @property {Array.<string>} collection
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @param {string} collection - name of the data collection to handle
  * @param {string} index - Index containing the data collection
@@ -289,25 +294,16 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
   }
 
   // copying pagination options to the search filter
-  if (options && options.scroll) {
-    filters.scroll = options.scroll;
-    delete options.scroll;
+  if (!options) {
+    options = {};
   }
 
-  if (options && options.from) {
-    filters.from = options.from;
-    delete options.from;
-  }
-  else {
-    filters.from = 0;
+  if (!options.from) {
+    options.from = 0;
   }
 
-  if (options && options.size) {
-    filters.size = options.size;
-    delete options.size;
-  }
-  else {
-    filters.size = 1000;
+  if (!options.size) {
+    options.size = 1000;
   }
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
@@ -320,7 +316,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     if (searchResult instanceof KuzzleSearchResult) {
       if (searchResult.total > 10000 && !warnEmitted) {
         warnEmitted = true;
-        console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests')
+        console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests'); // eslint-disable-line no-console
       }
 
       searchResult.documents.forEach(document => {
@@ -505,18 +501,18 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
 
   if (!cb && typeof options === 'function') {
     cb = options;
-    options = null;
+    options = {};
   }
 
-  request.body.scrollId = scrollId;
-
-  if (options && options.scroll) {
-    request.body.scroll = options.scroll;
+  if (!options) {
+    options = {};
   }
+
+  options.scrollId = scrollId;
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.scroll', cb);
 
-  this.kuzzle.query({controller: 'read', action: 'scroll'}, request, options, function (error, result) {
+  this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
 
     if (error) {
@@ -532,7 +528,7 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
     });
 
     if (result.result._scroll_id) {
-      filters.scrollId = result.result._scroll_id;
+      options.scrollId = result.result._scroll_id;
     }
 
     cb(null, new KuzzleSearchResult(
