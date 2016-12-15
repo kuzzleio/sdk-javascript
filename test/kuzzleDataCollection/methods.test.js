@@ -62,7 +62,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'search',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
@@ -231,7 +231,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'count',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
@@ -296,8 +296,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createCollection',
-        controller: 'write'
+        action: 'create',
+        controller: 'collection'
       };
     });
 
@@ -350,7 +350,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'create',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -468,7 +468,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'delete',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -543,7 +543,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'get',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
@@ -694,7 +694,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'getMapping',
-        controller: 'admin',
+        controller: 'collection',
         body: {}
       };
     });
@@ -757,7 +757,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'publish',
-        controller: 'write',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -796,7 +796,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'createOrReplace',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -858,8 +858,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
+        action: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -895,8 +895,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'truncateCollection',
-        controller: 'admin',
+        action: 'truncate',
+        controller: 'collection',
         body: {}
       };
     });
@@ -959,7 +959,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'update',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });

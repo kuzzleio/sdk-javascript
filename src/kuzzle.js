@@ -560,14 +560,10 @@ Kuzzle.prototype.logout = function (cb) {
     };
 
   this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, typeof cb !== 'function' ? null : function(error) {
-    if (error === null) {
-      self.unsetJwtToken();
-      cb(null, self);
-    }
-    else {
-      cb(error);
-    }
+    cb(error, self);
   });
+
+  self.unsetJwtToken();
 
   return self;
 };
@@ -884,7 +880,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
-  this.query({controller:'admin', action: 'getAllStats'}, {}, options, function (err, res) {
+  this.query({controller:'server', action: 'getAllStats'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -934,7 +930,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   body = timestamp ? {body: {startTime: timestamp}} : {};
-  this.query({controller: 'admin', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
+  this.query({controller: 'server', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
 };
 
 /**
@@ -1035,7 +1031,7 @@ Kuzzle.prototype.listCollections = function () {
     query.body.size = options.size;
   }
 
-  this.query({index: index, controller: 'read', action: 'listCollections'}, query, options, function (err, res) {
+  this.query({index: index, controller: 'collection', action: 'list'}, query, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -1058,7 +1054,7 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
 
   this.callbackRequired('Kuzzle.listIndexes', cb);
 
-  this.query({controller: 'read', action: 'listIndexes'}, {}, options, function (err, res) {
+  this.query({controller: 'index', action: 'list'}, {}, options, function (err, res) {
     cb(err, err ? undefined : res.result.indexes);
   });
 };
@@ -1094,7 +1090,7 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
 
   this.callbackRequired('Kuzzle.getServerInfo', cb);
 
-  this.query({controller: 'read', action: 'serverInfo'}, {}, options, function (err, res) {
+  this.query({controller: 'server', action: 'info'}, {}, options, function (err, res) {
     if (err) {
       return cb(err);
     }
@@ -1138,7 +1134,7 @@ Kuzzle.prototype.refreshIndex = function () {
     index = this.defaultIndex;
   }
 
-  this.query({ index: index, controller: 'admin', action: 'refreshIndex'}, {}, options, cb);
+  this.query({ index: index, controller: 'index', action: 'refresh'}, {}, options, cb);
 
   return this;
 };
@@ -1178,7 +1174,7 @@ Kuzzle.prototype.getAutoRefresh = function () {
   }
 
   this.callbackRequired('Kuzzle.getAutoRefresh', cb);
-  this.query({ index: index, controller: 'admin', action: 'getAutoRefresh'}, {}, options, cb);
+  this.query({ index: index, controller: 'index', action: 'getAutoRefresh'}, {}, options, cb);
 };
 
 /**
@@ -1225,7 +1221,7 @@ Kuzzle.prototype.setAutoRefresh = function () {
     throw new Error('Kuzzle.setAutoRefresh: autoRefresh value is required');
   }
 
-  this.query({ index: index, controller: 'admin', action: 'setAutoRefresh'}, { body: { autoRefresh: autoRefresh }}, options, cb);
+  this.query({ index: index, controller: 'index', action: 'setAutoRefresh'}, { body: { autoRefresh: autoRefresh }}, options, cb);
 
   return this;
 };
@@ -1243,7 +1239,7 @@ Kuzzle.prototype.now = function (options, cb) {
 
   this.callbackRequired('Kuzzle.now', cb);
 
-  this.query({controller: 'read', action: 'now'}, {}, options, function (err, res) {
+  this.query({controller: 'server', action: 'now'}, {}, options, function (err, res) {
     cb(err, res && res.result.now);
   });
 };

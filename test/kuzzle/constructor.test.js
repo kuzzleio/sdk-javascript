@@ -212,23 +212,9 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should throw an error if no URL is provided', () => {
-      try {
+      should(() => {
         new Kuzzle();
-        should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
-      }
-      catch (e) {
-        // done
-      }
-    });
-
-    it('should throw an error if no index is provied', () => {
-      try {
-        new Kuzzle('foo');
-        should.fail('success', 'failure', 'Constructor should fail with no Index provided', '');
-      }
-      catch (e) {
-        // done
-      }
+      }).throw();
     });
 
     describe('#connect', function () {
@@ -913,7 +899,7 @@ describe('Kuzzle constructor', () => {
         kuzzle.login('local', loginCredentials);
       });
 
-      it('should have a empty token in logout callback', function (done) {
+      it('should have a empty token in logout callback', function () {
         var
           unsetJwtToken = false,
           kuzzle;
@@ -932,10 +918,8 @@ describe('Kuzzle constructor', () => {
           cb(null, {});
         };
 
-        kuzzle.logout(function() {
-          should(unsetJwtToken).be.exactly(true);
-          done();
-        });
+        kuzzle.logout(() => {});
+        should(unsetJwtToken).be.exactly(true);
       });
 
       it('should give an error if login query fail to the logout callback if is set', function (done) {
