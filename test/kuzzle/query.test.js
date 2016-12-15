@@ -172,6 +172,22 @@ describe('Query management', function () {
       should(requestObject.refresh).match(refresh);
     });
 
+    it('should handle option size properly', function () {
+      var
+        size = 'foo';
+
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {size: size});
+      should(requestObject.size).match(size);
+    });
+
+    it('should handle option from properly', function () {
+      var
+        from = 'foo';
+
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {from: from});
+      should(requestObject.from).match(from);
+    });
+
     it('should exit early if the query is not queuable and the SDK is offline', function () {
       kuzzle.state = 'offline';
       kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
