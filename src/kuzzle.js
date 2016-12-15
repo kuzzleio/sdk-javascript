@@ -23,7 +23,7 @@ var
  * @param {responseCallback} [cb] - Handles connection response
  * @constructor
  */
-module.exports = Kuzzle = function (host, options, cb) {
+function Kuzzle (host, options, cb) {
   var self = this;
 
   if (!(this instanceof Kuzzle)) {
@@ -309,7 +309,7 @@ module.exports = Kuzzle = function (host, options, cb) {
       }
     });
   }
-};
+}
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -515,6 +515,32 @@ Kuzzle.prototype.login = function (strategy) {
       self.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
+};
+
+/**
+ * Create a kuzzle index
+ *
+ * @param {string} index
+ * @param {object} [options]
+ * @param {responseCallback} cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.createIndex = function (index, options, cb) {
+  if (!index) {
+    if (!this.defaultIndex) {
+      throw new Error('Kuzzle.createIndex: index required');
+    }
+    index = this.defaultIndex;
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'admin', action: 'createIndex'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+
+  return this;
 };
 
 /**
@@ -913,7 +939,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  *
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param {string} [index] - The name of the data index containing the data collection
- * @returns {object} A KuzzleDataCollection instance
+ * @returns {KuzzleDataCollection} A KuzzleDataCollection instance
  */
 Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   this.isValid();
@@ -1459,3 +1485,5 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
+
+module.exports = Kuzzle;
