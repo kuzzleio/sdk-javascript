@@ -290,7 +290,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
 
   if (!cb && typeof options === 'function') {
     cb = options;
-    options = null;
+    options = {};
   }
 
   // copying pagination options to the search filter
@@ -316,7 +316,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     if (searchResult instanceof KuzzleSearchResult) {
       if (searchResult.total > 10000 && !warnEmitted) {
         warnEmitted = true;
-        console.warn('Usage of KuzzleDataCollection.fetchAllDocuments will fetch more than 10 000 document. To avoid performance issues, please use KuzzleDataCollection.search and KuzzleDataCollection.scroll requests'); // eslint-disable-line no-console
+        console.warn('KuzzleDataCollection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using KuzzleDataCollection.search or KuzzleDataCollection.scroll instead'); // eslint-disable-line no-console
       }
 
       searchResult.documents.forEach(document => {
@@ -478,7 +478,10 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
 };
 
 /**
- * Scroll into a search result
+ * A "scroll" option can be passed to search queries, creating persistent
+ * paginated results.
+ * This method can be used to manually get the next page of a search result,
+ * instead of using KuzzleSearchResult.next()
  *
  * @param {string} scrollId
  * @param {object} [options]
