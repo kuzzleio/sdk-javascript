@@ -1283,6 +1283,14 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.refresh = options.refresh;
     }
 
+    if (options.from) {
+      object.from = options.from;
+    }
+
+    if (options.size) {
+      object.size = options.size;
+    }
+
     if (options.metadata) {
       Object.keys(options.metadata).forEach(function (meta) {
         object.metadata[meta] = options.metadata[meta];

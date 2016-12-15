@@ -166,7 +166,7 @@ describe('KuzzleDataCollection methods', function () {
         };
 
       queryScrollStub = function (args, query, opts, callback) {
-        should(args.controller).be.exactly('read');
+        should(args.controller).be.exactly('document');
         should(args.action).be.exactly('scroll');
         should(query.body.scroll).be.exactly(options.scroll);
         should(query.body.scrollId).be.exactly(scrollId);
@@ -201,7 +201,7 @@ describe('KuzzleDataCollection methods', function () {
         };
 
       queryScrollStub = function (args, query, opts, callback) {
-        should(args.controller).be.exactly('read');
+        should(args.controller).be.exactly('document');
         should(args.action).be.exactly('scroll');
         should(query.body.scrollId).be.exactly(scrollId);
         should(opts).be.null();
@@ -601,6 +601,13 @@ describe('KuzzleDataCollection methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       emitted = false;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'get',
+        controller: 'document',
+        body: {}
+      };
     });
 
     it('should forward the query to the search method', function () {
@@ -652,7 +659,7 @@ describe('KuzzleDataCollection methods', function () {
 
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
       should(stub.calledOnce).be.true();
-      should(stub.calledWithMatch({from: 123, size: 456})).be.true();
+      should(stub.calledWithMatch({}, {from: 123, size: 456})).be.true();
       stub.restore();
     });
 
@@ -663,7 +670,8 @@ describe('KuzzleDataCollection methods', function () {
 
       collection.fetchAllDocuments({scroll: '30s'}, function () {});
       should(stub.calledOnce).be.true();
-      should(stub.calledWithMatch({from: 0, size: 1000, scroll: '30s'})).be.true();
+      console.dir(stub.firstCall.args, {depth: null});
+      should(stub.calledWith({}, {scroll: '30s'}, sinon.match.func)).be.true();
       stub.restore();
     });
 

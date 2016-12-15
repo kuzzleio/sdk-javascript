@@ -288,28 +288,6 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     options = null;
   }
 
-  // copying pagination options to the search filter
-  if (options && options.scroll) {
-    filters.scroll = options.scroll;
-    delete options.scroll;
-  }
-
-  if (options && options.from) {
-    filters.from = options.from;
-    delete options.from;
-  }
-  else {
-    filters.from = 0;
-  }
-
-  if (options && options.size) {
-    filters.size = options.size;
-    delete options.size;
-  }
-  else {
-    filters.size = 1000;
-  }
-
   this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
 
   this.search(filters, options, function getNextDocuments (error, searchResult) {
@@ -516,7 +494,7 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
 
   this.kuzzle.callbackRequired('KuzzleDataCollection.scroll', cb);
 
-  this.kuzzle.query({controller: 'read', action: 'scroll'}, request, options, function (error, result) {
+  this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
 
     if (error) {
