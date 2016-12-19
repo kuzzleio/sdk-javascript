@@ -3,7 +3,7 @@ var
   Kuzzle = require('../../../src/kuzzle'),
   Profile = require('../../../src/security/kuzzleProfile');
 
-describe('KuzzleSecurity profiles methods', function () {
+describe('Security profiles methods', function () {
   var
     kuzzle,
     expectedQuery,

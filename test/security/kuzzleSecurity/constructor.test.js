@@ -3,14 +3,14 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleSecurity = require('../../../src/security/kuzzleSecurity');
+  Security = require('../../../src/security/kuzzleSecurity');
 
 describe('kuzzleSecurity constructor', function () {
   it('should initialize properties and return a valid kuzzleSecurity object', function () {
     var
       kuzzle = new Kuzzle('foo');
 
-    should(kuzzle.security).be.instanceof(KuzzleSecurity);
+    should(kuzzle.security).be.instanceof(Security);
     should(kuzzle.security).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
     should(kuzzle.security).have.propertyWithDescriptor('buildQueryArgs', { enumerable: false, writable: false, configurable: false });
     should(kuzzle.security.kuzzle).be.exactly(kuzzle);

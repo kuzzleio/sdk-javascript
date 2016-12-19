@@ -7,10 +7,10 @@ var
  * Kuzzle security constructor
  *
  * @param kuzzle
- * @returns {KuzzleSecurity}
+ * @returns {Security}
  * @constructor
  */
-function KuzzleSecurity(kuzzle) {
+function Security(kuzzle) {
 
   Object.defineProperty(this, 'kuzzle', {
     value: kuzzle
@@ -47,7 +47,7 @@ function KuzzleSecurity(kuzzle) {
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getRole = function (id, options, cb) {
+Security.prototype.getRole = function (id, options, cb) {
   var
     data,
     self = this;
@@ -63,7 +63,7 @@ KuzzleSecurity.prototype.getRole = function (id, options, cb) {
 
   data = {_id: id};
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
+  self.kuzzle.callbackRequired('Security.getRole', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
     cb(err, err ? undefined : new Role(self, response.result._id, response.result._source));
@@ -82,7 +82,7 @@ KuzzleSecurity.prototype.getRole = function (id, options, cb) {
  * @param {responseCallback} [cb] - returns Kuzzle's response
  *
  */
-KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
+Security.prototype.searchRoles = function (filters, options, cb) {
   var
     self = this;
 
@@ -91,7 +91,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
     options = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.searchRoles', cb);
+  self.kuzzle.callbackRequired('Security.searchRoles', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchRoles'), {body: filters}, options, function (error, result) {
     var documents;
@@ -121,14 +121,14 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
+Security.prototype.createRole = function (id, content, options, cb) {
   var
     self = this,
     data = {},
     action = 'createRole';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.createRole: cannot create a role without a role ID');
+    throw new Error('Security.createRole: cannot create a role without a role ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -156,16 +156,16 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the role's modification
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
+Security.prototype.updateRole = function (id, content, options, cb) {
   var
     self = this,
     data = {_id: id, body: content},
     action = 'updateRole';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.updateRole: cannot update a role without a role ID');
+    throw new Error('Security.updateRole: cannot update a role without a role ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -191,9 +191,9 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
  * @param {string} id - Role id to delete
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
+Security.prototype.deleteRole = function (id, options, cb) {
   var data = {_id: id};
 
   if (!cb && typeof options === 'function') {
@@ -216,7 +216,7 @@ KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
  * @param {object} content - role content
  * @constructor
  */
-KuzzleSecurity.prototype.roleFactory = function(id, content) {
+Security.prototype.roleFactory = function(id, content) {
   return new Role(this, id, content);
 };
 
@@ -229,7 +229,7 @@ KuzzleSecurity.prototype.roleFactory = function(id, content) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
+Security.prototype.getProfile = function (id, options, cb) {
   var
     data,
     self = this;
@@ -246,7 +246,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
 
   data = {_id: id};
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
+  self.kuzzle.callbackRequired('Security.getProfile', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
     cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source));
@@ -265,7 +265,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
+Security.prototype.searchProfiles = function (filters, options, cb) {
   var
     self = this;
 
@@ -274,7 +274,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
     options = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.searchProfiles', cb);
+  self.kuzzle.callbackRequired('Security.searchProfiles', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, options, function (error, response) {
     var documents;
@@ -304,14 +304,14 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
+Security.prototype.createProfile = function (id, content, options, cb) {
   var
     self = this,
     data = {},
     action = 'createProfile';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.createProfile: cannot create a profile without a profile ID');
+    throw new Error('Security.createProfile: cannot create a profile without a profile ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -339,16 +339,16 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
  * @param {object} content - a plain javascript object representing the profile's modification
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
+Security.prototype.updateProfile = function (id, content, options, cb) {
   var
     self = this,
     data = {},
     action = 'updateProfile';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.updateProfile: cannot update a profile without a profile ID');
+    throw new Error('Security.updateProfile: cannot update a profile without a profile ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -387,9 +387,9 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
+Security.prototype.deleteProfile = function (id, options, cb) {
   var data = {_id: id};
 
   if (!cb && typeof options === 'function') {
@@ -412,7 +412,7 @@ KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
  * @param {object} content - profile content
  * @constructor
  */
-KuzzleSecurity.prototype.profileFactory = function(id, content) {
+Security.prototype.profileFactory = function(id, content) {
   return new Profile(this, id, content);
 };
 
@@ -423,7 +423,7 @@ KuzzleSecurity.prototype.profileFactory = function(id, content) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.getUser = function (id, options, cb) {
+Security.prototype.getUser = function (id, options, cb) {
   var
     data = {_id: id},
     self = this;
@@ -437,7 +437,7 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
     options = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
+  self.kuzzle.callbackRequired('Security.getUser', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
     cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
@@ -455,7 +455,7 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
+Security.prototype.searchUsers = function (filters, options, cb) {
   var
     self = this;
 
@@ -464,7 +464,7 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
     options = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleSecurity.searchUsers', cb);
+  self.kuzzle.callbackRequired('Security.searchUsers', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
     var documents;
@@ -494,14 +494,14 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
+Security.prototype.createUser = function (id, content, options, cb) {
   var
     self = this,
     data = {_id: id, body: content},
     action = 'createUser';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.createUser: cannot create a user without a user ID');
+    throw new Error('Security.createUser: cannot create a user without a user ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -529,17 +529,17 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-KuzzleSecurity.prototype.createRestrictedUser = function (id, content, options, cb) {
+Security.prototype.createRestrictedUser = function (id, content, options, cb) {
   var
     self = this,
     data = {_id: id, body: content};
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.createRestrictedUser: cannot create a user without a user ID');
+    throw new Error('Security.createRestrictedUser: cannot create a user without a user ID');
   }
 
   if (content.profileIds) {
-    throw new Error('KuzzleSecurity.createRestrictedUser: cannot provide profileIds');
+    throw new Error('Security.createRestrictedUser: cannot provide profileIds');
   }
 
   if (!cb && typeof options === 'function') {
@@ -560,16 +560,16 @@ KuzzleSecurity.prototype.createRestrictedUser = function (id, content, options, 
  * @param {object} content - a plain javascript object representing the user's modification
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
+Security.prototype.updateUser = function (id, content, options, cb) {
   var
     self = this,
     data = {},
     action = 'updateUser';
 
   if (!id || typeof id !== 'string') {
-    throw new Error('KuzzleSecurity.updateUser: cannot update an user without an user ID');
+    throw new Error('Security.updateUser: cannot update an user without an user ID');
   }
 
   if (!cb && typeof options === 'function') {
@@ -598,9 +598,9 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
  * @param {string} id - Profile id to delete
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleSecurity} this object
+ * @returns {Security} this object
  */
-KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
+Security.prototype.deleteUser = function (id, options, cb) {
   var data = {_id: id};
 
   if (!cb && typeof options === 'function') {
@@ -623,7 +623,7 @@ KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
  * @param {object} content - user content
  * @constructor
  */
-KuzzleSecurity.prototype.userFactory = function(id, content) {
+Security.prototype.userFactory = function(id, content) {
   return new User(this, id, content);
 };
 
@@ -643,7 +643,7 @@ KuzzleSecurity.prototype.userFactory = function(id, content) {
  *                   correspond to rights containing closures.
  *                   See also http://kuzzle.io/guide/#roles-definition
  */
-KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, index, collection) {
+Security.prototype.isActionAllowed = function(rights, controller, action, index, collection) {
   var filteredRights;
 
   if (!rights || typeof rights !== 'object') {
@@ -691,7 +691,7 @@ KuzzleSecurity.prototype.isActionAllowed = function(rights, controller, action, 
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {function} cb The callback containing the normalized array of rights.
  */
-KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
+Security.prototype.getUserRights = function (userId, options, cb) {
   var
     data = {_id: userId},
     self = this;
@@ -712,4 +712,4 @@ KuzzleSecurity.prototype.getUserRights = function (userId, options, cb) {
   });
 };
 
-module.exports = KuzzleSecurity;
+module.exports = Security;

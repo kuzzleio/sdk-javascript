@@ -3,7 +3,7 @@ var
   Kuzzle = require('../../../src/kuzzle'),
   Role = require('../../../src/security/kuzzleRole');
 
-describe('KuzzleSecurity roles methods', function () {
+describe('Security roles methods', function () {
   var
     kuzzle,
     expectedQuery,

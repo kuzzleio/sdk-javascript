@@ -2,7 +2,7 @@ var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 /**
- * @param {KuzzleSecurity} kuzzleSecurity
+ * @param {Security} kuzzleSecurity
  * @param {string} id
  * @param {Object} content
  * @constructor

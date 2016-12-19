@@ -1,7 +1,7 @@
 var
   uuid = require('uuid'),
   Collection = require('./kuzzleCollection'),
-  KuzzleSecurity = require('./security/kuzzleSecurity'),
+  Security = require('./security/kuzzleSecurity'),
   MemoryStorage = require('./kuzzleMemoryStorage'),
   User = require('./security/kuzzleUser'),
   networkWrapper = require('./networkWrapper');
@@ -249,7 +249,7 @@ function Kuzzle (host, options, cb) {
    * Create an attribute security that embed all methods to manage Role, Profile and User
    */
   Object.defineProperty(this, 'security', {
-    value: new KuzzleSecurity(this),
+    value: new Security(this),
     enumerable: true
   });
 

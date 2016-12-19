@@ -5,7 +5,7 @@ var
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/kuzzle'),
   Collection = require('../../src/kuzzleCollection'),
-  KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
+  Security = require('../../src/security/kuzzleSecurity'),
   User = require('../../src/security/kuzzleUser');
 
 describe('Kuzzle methods', function () {
@@ -681,12 +681,12 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#security', function () {
-    it('should be an instance of KuzzleSecurity', function () {
+    it('should be an instance of Security', function () {
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
 
-      should(kuzzle.security).be.an.instanceOf(KuzzleSecurity);
+      should(kuzzle.security).be.an.instanceOf(Security);
     });
   });
 
