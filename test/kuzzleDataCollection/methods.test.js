@@ -1029,8 +1029,8 @@ describe('Collection methods', function () {
       should(kuzzle.collection('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(Document);
     });
 
-    it('roomFactory should return a new Room object', function () {
-      should(kuzzle.collection('foo').roomFactory()).be.instanceof(Room);
+    it('room should return a new Room object', function () {
+      should(kuzzle.collection('foo').room()).be.instanceof(Room);
     });
 
     it('dataMappingFactory should return a CollectionMapping object', function () {

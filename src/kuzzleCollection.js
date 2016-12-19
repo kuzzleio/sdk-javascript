@@ -657,7 +657,7 @@ Collection.prototype.documentFactory = function (id, content) {
  * @param {object} [options] - subscription configuration
  * @constructor
  */
-Collection.prototype.roomFactory = function (options) {
+Collection.prototype.room = function (options) {
   return new Room(this, options);
 };
 
