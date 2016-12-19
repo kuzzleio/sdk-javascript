@@ -416,13 +416,13 @@ describe('Security profiles methods', function () {
 
   describe('#ProfileFactory', function () {
     it('should return an instance of Profile', function (done) {
-      var role = kuzzle.security.profileFactory('test', {policies: [{roleId:'myRole'}]});
+      var role = kuzzle.security.profile('test', {policies: [{roleId:'myRole'}]});
       should(role).instanceof(Profile);
       done();
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () {kuzzle.security.profileFactory(null);})).throw(Error);
+      should((function () {kuzzle.security.profile(null);})).throw(Error);
       done();
     });
   });
