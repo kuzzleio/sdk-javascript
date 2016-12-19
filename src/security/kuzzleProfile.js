@@ -1,7 +1,7 @@
 var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
-function KuzzleProfile(kuzzleSecurity, id, content) {
+function Profile(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
@@ -30,9 +30,9 @@ function KuzzleProfile(kuzzleSecurity, id, content) {
 
 }
 
-KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+Profile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
   constructor: {
-    value: KuzzleProfile
+    value: Profile
   }
 });
 
@@ -41,9 +41,9 @@ KuzzleProfile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleProfile} this
+ * @returns {Profile} this
  */
-KuzzleProfile.prototype.save = function (options, cb) {
+Profile.prototype.save = function (options, cb) {
   var
     data,
     self = this;
@@ -71,9 +71,9 @@ KuzzleProfile.prototype.save = function (options, cb) {
  * Add a policy in the policies list
  * @param {Object} policy - must be an object containing at least a "roleId" member which must be a string.
  *
- * @returns {KuzzleProfile} this
+ * @returns {Profile} this
  */
-KuzzleProfile.prototype.addPolicy = function (policy) {
+Profile.prototype.addPolicy = function (policy) {
 
   if (typeof policy !== 'object' || typeof policy.roleId !== 'string') {
     throw new Error('Parameter "policies" must be an object containing at least a "roleId" member which must be a string.');
@@ -92,9 +92,9 @@ KuzzleProfile.prototype.addPolicy = function (policy) {
  * Set policies list
  * @param {Array} policies - must be an array of objects containing at least a "roleId" member which must be a string
  *
- * @returns {KuzzleProfile} this
+ * @returns {Profile} this
  */
-KuzzleProfile.prototype.setPolicies = function (policies) {
+Profile.prototype.setPolicies = function (policies) {
 
   if (!Array.isArray(policies)) {
     throw new Error('Parameter "policies" must be an array of objects containing at least a "roleId" member which must be a string');
@@ -116,7 +116,7 @@ KuzzleProfile.prototype.setPolicies = function (policies) {
  *
  * @return {object} JSON object representing this securityDocument
  */
-KuzzleProfile.prototype.serialize = function () {
+Profile.prototype.serialize = function () {
   var
     data = {};
 
@@ -135,8 +135,8 @@ KuzzleProfile.prototype.serialize = function () {
  *
  * @return {object} an array of policies
  */
-KuzzleProfile.prototype.getPolicies = function () {
+Profile.prototype.getPolicies = function () {
   return this.content.policies;
 };
 
-module.exports = KuzzleProfile;
+module.exports = Profile;

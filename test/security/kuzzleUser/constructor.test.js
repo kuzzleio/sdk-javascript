@@ -29,7 +29,7 @@ describe('KuzzleUser constructor', function () {
     return done(new Error('Constructor doesn\'t throw an Error'));
   });
 
-  it('should initialize properties and return a valid KuzzleProfile object', function () {
+  it('should initialize properties and return a valid Profile object', function () {
     var
       kuzzleUser;
 

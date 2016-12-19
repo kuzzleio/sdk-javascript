@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile');
+  Profile = require('../../../src/security/kuzzleProfile');
 
 describe('KuzzleSecurity profiles methods', function () {
   var
@@ -69,7 +69,7 @@ describe('KuzzleSecurity profiles methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       should(kuzzle.security.getProfile(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
 
         should(res.content.policies).be.an.Array();
         should(res.content.policies).not.be.empty();
@@ -85,7 +85,7 @@ describe('KuzzleSecurity profiles methods', function () {
     it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
       should(kuzzle.security.getProfile(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
 
         should(res.content.policies).be.an.Array();
         should(res.content.policies).not.be.empty();
@@ -152,7 +152,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -182,7 +182,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -210,7 +210,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -265,7 +265,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -285,7 +285,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -297,7 +297,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -347,7 +347,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.updateProfile(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceOf(KuzzleProfile);
+        should(res).be.instanceOf(Profile);
         done();
       }));
     });
@@ -417,7 +417,7 @@ describe('KuzzleSecurity profiles methods', function () {
   describe('#ProfileFactory', function () {
     it('should return an instance of Profile', function (done) {
       var role = kuzzle.security.profileFactory('test', {policies: [{roleId:'myRole'}]});
-      should(role).instanceof(KuzzleProfile);
+      should(role).instanceof(Profile);
       done();
     });
 

@@ -3,9 +3,9 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile');
+  Profile = require('../../../src/security/kuzzleProfile');
 
-describe('KuzzleProfile constructor', function () {
+describe('Profile constructor', function () {
   var
     kuzzle;
 
@@ -19,7 +19,7 @@ describe('KuzzleProfile constructor', function () {
 
   it('should throw an error if no id is provided', function(done) {
     try {
-      new KuzzleProfile(kuzzle.security, null, null);
+      new Profile(kuzzle.security, null, null);
     }
     catch (e) {
       should(e).be.Error();
@@ -29,20 +29,20 @@ describe('KuzzleProfile constructor', function () {
     return done(new Error('Constructor doesn\'t throw an Error'));
   });
 
-  it('should initialize properties and return a valid KuzzleProfile object', function () {
+  it('should initialize properties and return a valid Profile object', function () {
     var
       kuzzleProfile;
 
     kuzzle = new Kuzzle('foo');
-    kuzzleProfile = new KuzzleProfile(kuzzle.security, 'id', {some: 'content'});
+    kuzzleProfile = new Profile(kuzzle.security, 'id', {some: 'content'});
 
-    should(kuzzleProfile).be.instanceof(KuzzleProfile);
+    should(kuzzleProfile).be.instanceof(Profile);
     should(kuzzleProfile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
     should(kuzzleProfile.deleteActionName).be.exactly('deleteProfile');
   });
 
   it('should expose functions', function () {
-    var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
+    var kuzzleProfile = new Profile(kuzzle.security, 'test', {});
 
     should.exist(kuzzleProfile.save);
     should.exist(kuzzleProfile.addPolicy);
@@ -53,13 +53,13 @@ describe('KuzzleProfile constructor', function () {
   });
 
   it('should handle provided arguments correctly', function () {
-    var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
+    var kuzzleProfile = new Profile(kuzzle.security, 'test', {});
 
-    should(kuzzleProfile).be.instanceof(KuzzleProfile);
+    should(kuzzleProfile).be.instanceof(Profile);
     should(kuzzleProfile.id).be.exactly('test');
     should(kuzzleProfile.content).be.empty();
 
-    kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {some: 'content'});
+    kuzzleProfile = new Profile(kuzzle.security, 'test', {some: 'content'});
     should(kuzzleProfile.id).be.exactly('test');
     should(kuzzleProfile.content).match({some: 'content'});
   });

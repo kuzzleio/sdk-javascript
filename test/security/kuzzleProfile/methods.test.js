@@ -1,10 +1,10 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile'),
+  Profile = require('../../../src/security/kuzzleProfile'),
   Role = require('../../../src/security/kuzzleRole');
 
-describe('KuzzleProfile methods', function () {
+describe('Profile methods', function () {
   var
     kuzzle,
     kuzzleProfile,
@@ -49,7 +49,7 @@ describe('KuzzleProfile methods', function () {
       error = null;
 
       result = { result: {_id: 'myProfile', _source: {policies : []}} };
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, result.result._id, result.result._source);
+      kuzzleProfile = new Profile(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceProfile',
         controller: 'security'
@@ -57,7 +57,7 @@ describe('KuzzleProfile methods', function () {
     });
 
     it('should throw an error if the profile has not roles parameter', function (done) {
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, result.result._id, {some: 'content'});
+      kuzzleProfile = new Profile(kuzzle.security, result.result._id, {some: 'content'});
 
       should((function () {
         kuzzleProfile.save();
@@ -72,7 +72,7 @@ describe('KuzzleProfile methods', function () {
 
       should(kuzzleProfile.save(function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -111,7 +111,7 @@ describe('KuzzleProfile methods', function () {
 
       should(kuzzleProfile.update({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -149,7 +149,7 @@ describe('KuzzleProfile methods', function () {
   describe('#addPolicy', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
     });
 
     it('should throw an error if the policy parameter is not an object', function (done) {
@@ -176,7 +176,7 @@ describe('KuzzleProfile methods', function () {
     });
 
     it('should initialize policies with array if no policy was set before', function (done) {
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content'});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {some: 'content'});
 
       kuzzleProfile.addPolicy({roleId: 'role'});
       should(kuzzleProfile.content.policies).be.an.Array();
@@ -188,7 +188,7 @@ describe('KuzzleProfile methods', function () {
   describe('#setPolicies', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {policies: [{roleId:'role1'}]});
     });
 
     it('should throw an error if the policies parameter is null', function (done) {
@@ -224,7 +224,7 @@ describe('KuzzleProfile methods', function () {
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies: [{roleId:'role1'}]});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {some: 'content', policies: [{roleId:'role1'}]});
     });
 
     it('should serialize with correct attributes', function (done) {
@@ -239,7 +239,7 @@ describe('KuzzleProfile methods', function () {
       var
         serialized;
 
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content'});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {some: 'content'});
 
       serialized = kuzzleProfile.serialize();
 
@@ -257,7 +257,7 @@ describe('KuzzleProfile methods', function () {
       error = null;
 
       result = { result: {_id: 'myProfile'} };
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', roles: [{roleId:'role1'}]});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {some: 'content', roles: [{roleId:'role1'}]});
       expectedQuery = {
         action: 'deleteProfile',
         controller: 'security'
@@ -294,7 +294,7 @@ describe('KuzzleProfile methods', function () {
       var policies = [{roleId:'role1'}, {roleId:'role2'}, {roleId:'role3'}];
 
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleProfile = new KuzzleProfile(kuzzle.security, 'myProfile', {some: 'content', policies: policies});
+      kuzzleProfile = new Profile(kuzzle.security, 'myProfile', {some: 'content', policies: policies});
       should(kuzzleProfile.getPolicies()).be.eql(policies);
     });
   });

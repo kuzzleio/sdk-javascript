@@ -1,6 +1,6 @@
 var
   Role = require('./kuzzleRole'),
-  KuzzleProfile = require('./kuzzleProfile'),
+  Profile = require('./kuzzleProfile'),
   KuzzleUser = require('./kuzzleUser');
 
 /**
@@ -249,7 +249,7 @@ KuzzleSecurity.prototype.getProfile = function (id, options, cb) {
   self.kuzzle.callbackRequired('KuzzleSecurity.getProfile', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
-    cb(error, error ? undefined : new KuzzleProfile(self, response.result._id, response.result._source));
+    cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source));
   });
 };
 
@@ -284,7 +284,7 @@ KuzzleSecurity.prototype.searchProfiles = function (filters, options, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      return new KuzzleProfile(self, doc._id, doc._source);
+      return new Profile(self, doc._id, doc._source);
     });
 
     cb(null, { total: response.result.total, profiles: documents });
@@ -327,7 +327,7 @@ KuzzleSecurity.prototype.createProfile = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new KuzzleProfile(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new Profile(self, res.result._id, res.result._source));
   });
 };
 
@@ -370,7 +370,7 @@ KuzzleSecurity.prototype.updateProfile = function (id, content, options, cb) {
       updatedContent[property] = res.result._source[property];
     });
 
-    cb(null, new KuzzleProfile(self, res.result._id, updatedContent));
+    cb(null, new Profile(self, res.result._id, updatedContent));
   });
 
   return this;
@@ -405,7 +405,7 @@ KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
 };
 
 /**
- * Instantiate a new KuzzleProfile object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Profile object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {string} id - profile id
@@ -413,7 +413,7 @@ KuzzleSecurity.prototype.deleteProfile = function (id, options, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.profileFactory = function(id, content) {
-  return new KuzzleProfile(this, id, content);
+  return new Profile(this, id, content);
 };
 
 /**
