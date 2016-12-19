@@ -1025,8 +1025,8 @@ describe('Collection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     });
 
-    it('documentFactory should return a new Document object', function () {
-      should(kuzzle.collection('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(Document);
+    it('document should return a new Document object', function () {
+      should(kuzzle.collection('foo').document('foo', { foo: 'bar'})).be.instanceof(Document);
     });
 
     it('room should return a new Room object', function () {

@@ -646,7 +646,7 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
  * @param {object} content - document content
  * @constructor
  */
-Collection.prototype.documentFactory = function (id, content) {
+Collection.prototype.document = function (id, content) {
   return new Document(this, id, content);
 };
 
