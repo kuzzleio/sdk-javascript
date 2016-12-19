@@ -1,6 +1,6 @@
 var
   KuzzleSearchResult = require('./kuzzleSearchResult'),
-  KuzzleDocument = require('./kuzzleDocument'),
+  Document = require('./kuzzleDocument'),
   CollectionMapping = require('./kuzzleCollectionMapping'),
   Room = require('./kuzzleRoom'),
   KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
@@ -141,7 +141,7 @@ Collection.prototype.create = function (options, cb) {
  *        Update the existing document otherwise
  *
  * @param {string} [id] - (optional) document identifier
- * @param {object} document - either an instance of a KuzzleDocument object, or a document
+ * @param {object} document - either an instance of a Document object, or a document
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
@@ -164,7 +164,7 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
     options = null;
   }
 
-  if (document instanceof KuzzleDocument) {
+  if (document instanceof Document) {
     data = document.serialize();
   } else {
     data.body = document;
@@ -187,7 +187,7 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
       return cb(err);
     }
 
-    doc = new KuzzleDocument(self, res.result._id, res.result._source);
+    doc = new Document(self, res.result._id, res.result._source);
     doc.version = res.result._version;
     cb(null, doc);
   });
@@ -270,7 +270,7 @@ Collection.prototype.fetchDocument = function (documentId, options, cb) {
       return cb(err);
     }
 
-    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document = new Document(self, res.result._id, res.result._source);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -358,7 +358,7 @@ Collection.prototype.getMapping = function (options, cb) {
  *    - metadata (object, default: null):
  *        Additional information passed to notifications to other users
  *
- * @param {object} document - either a KuzzleDocument instance or a JSON object
+ * @param {object} document - either a Document instance or a JSON object
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Returns a raw Kuzzle response
  * @returns {*} this
@@ -366,7 +366,7 @@ Collection.prototype.getMapping = function (options, cb) {
 Collection.prototype.publishMessage = function (document, options, cb) {
   var data = {};
 
-  if (document instanceof KuzzleDocument) {
+  if (document instanceof Document) {
     data = document.serialize();
   } else {
     data.body = document;
@@ -388,7 +388,7 @@ Collection.prototype.publishMessage = function (document, options, cb) {
  * @param {string} documentId - Unique document identifier of the document to replace
  * @param {object} content - JSON object representing the new document version
  * @param {object} [options] - additional arguments
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
  * @return {object} this
  */
 Collection.prototype.replaceDocument = function (documentId, content, options, cb) {
@@ -413,7 +413,7 @@ Collection.prototype.replaceDocument = function (documentId, content, options, c
       return cb(err);
     }
 
-    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document = new Document(self, res.result._id, res.result._source);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -456,7 +456,7 @@ Collection.prototype.search = function (filters, options, cb) {
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+      var newDocument = new Document(self, doc._id, doc._source);
 
       newDocument.version = doc._version;
 
@@ -523,7 +523,7 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+      var newDocument = new Document(self, doc._id, doc._source);
 
       newDocument.version = doc._version;
 
@@ -608,7 +608,7 @@ Collection.prototype.truncate = function (options, cb) {
  * @param {string} documentId - Unique document identifier of the document to update
  * @param {object} content - JSON object containing changes to perform on the document
  * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
  * @return {object} this
  */
 Collection.prototype.updateDocument = function (documentId, content, options, cb) {
@@ -631,7 +631,7 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
       return cb(err);
     }
 
-    (new KuzzleDocument(self, res.result._id)).refresh(cb);
+    (new Document(self, res.result._id)).refresh(cb);
   });
 
   return self;
@@ -639,7 +639,7 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
 
 
 /**
- * Instantiate a new KuzzleDocument object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Document object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {string} id - document id
@@ -647,7 +647,7 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
  * @constructor
  */
 Collection.prototype.documentFactory = function (id, content) {
-  return new KuzzleDocument(this, id, content);
+  return new Document(this, id, content);
 };
 
 /**

@@ -5,7 +5,7 @@ var
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   Collection = rewire('../../src/kuzzleCollection'),
-  KuzzleDocument = require('../../src/kuzzleDocument'),
+  Document = require('../../src/kuzzleDocument'),
   CollectionMapping = require('../../src/kuzzleCollectionMapping'),
   Room = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
@@ -87,7 +87,7 @@ describe('Collection methods', function () {
         should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
-          should(item).be.instanceof(KuzzleDocument);
+          should(item).be.instanceof(Document);
         });
         done();
       });
@@ -361,7 +361,7 @@ describe('Collection methods', function () {
 
       should(collection.createDocument(result.result._source, options, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+        should(res).be.instanceof(Document);
         done();
       })).be.exactly(collection);
       should(emitted).be.true();
@@ -433,14 +433,14 @@ describe('Collection methods', function () {
       });
     });
 
-    it('should be able to handle a KuzzleDocument argument', function (done) {
+    it('should be able to handle a Document argument', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        document = new KuzzleDocument(collection, result.result._source);
+        document = new Document(collection, result.result._source);
 
       should(collection.createDocument(document, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+        should(res).be.instanceof(Document);
         done();
       })).be.exactly(collection);
       should(emitted).be.true();
@@ -555,7 +555,7 @@ describe('Collection methods', function () {
 
       collection.fetchDocument(result.result._id, options, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+        should(res).be.instanceof(Document);
         done();
       });
       should(emitted).be.true();
@@ -633,7 +633,7 @@ describe('Collection methods', function () {
         mockSearchResult = new KuzzleSearchResult(
           collection,
           1,
-          [new KuzzleDocument(collection, 'banana', {answer: 42})],
+          [new Document(collection, 'banana', {answer: 42})],
           {},
           {options: {}, filters: {from: 0, size: 1000}}
         );
@@ -778,14 +778,14 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should handle a KuzzleDocument object as an argument', function () {
+    it('should handle a Document object as an argument', function () {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = { queuable: false };
 
       expectedQuery.options = options;
 
-      collection.publishMessage(new KuzzleDocument(collection, result.result._source), options);
+      collection.publishMessage(new Document(collection, result.result._source), options);
       should(emitted).be.true();
     });
   });
@@ -814,7 +814,7 @@ describe('Collection methods', function () {
 
       should(collection.replaceDocument(result.result._id, result.result._source, options, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+        should(res).be.instanceof(Document);
         done();
       })).be.exactly(collection);
       should(emitted).be.true();
@@ -943,8 +943,8 @@ describe('Collection methods', function () {
       refreshed = false;
 
     beforeEach(function () {
-      revert = Collection.__set__('KuzzleDocument', function (collection) {
-        var doc = new KuzzleDocument(collection, 'foo', {});
+      revert = Collection.__set__('Document', function (collection) {
+        var doc = new Document(collection, 'foo', {});
 
         doc.refresh = function (cb) {
           refreshed = true;
@@ -981,7 +981,7 @@ describe('Collection methods', function () {
 
       should(collection.updateDocument(result.result._id, result.result._source, options, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDocument);
+        should(res).be.instanceof(Document);
         should(refreshed).be.true();
         done();
       })).be.exactly(collection);
@@ -1025,8 +1025,8 @@ describe('Collection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     });
 
-    it('documentFactory should return a new KuzzleDocument object', function () {
-      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(KuzzleDocument);
+    it('documentFactory should return a new Document object', function () {
+      should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(Document);
     });
 
     it('roomFactory should return a new Room object', function () {

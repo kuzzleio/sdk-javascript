@@ -3,10 +3,10 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDocument = require('../../src/kuzzleDocument'),
+  Document = require('../../src/kuzzleDocument'),
   KuzzleSearchResult = rewire('../../src/kuzzleSearchResult');
 
-describe('KuzzleDocument constructor', function () {
+describe('Document constructor', function () {
   var
     kuzzle,
     searchArgs,
@@ -22,7 +22,7 @@ describe('KuzzleDocument constructor', function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {}, filters: {from:0, size: 1}};
     dataCollection = kuzzle.dataCollectionFactory('foo');
-    document = new KuzzleDocument(dataCollection, 'banana', {foo: 'bar'});
+    document = new Document(dataCollection, 'banana', {foo: 'bar'});
     aggregations = {};
   });
 

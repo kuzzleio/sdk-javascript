@@ -2,7 +2,7 @@
  *
  * @param {Collection} dataCollection
  * @param {int} total
- * @param {KuzzleDocument[]} documents
+ * @param {Document[]} documents
  * @param {object} [aggregations]
  * @param {object} [searchArgs]
  * @param {KuzzleSearchResult} [previous]

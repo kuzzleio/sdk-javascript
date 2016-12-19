@@ -8,7 +8,7 @@
 
 /**
  * Kuzzle handles documents either as realtime messages or as stored documents.
- * KuzzleDocument is the object representation of one of these documents.
+ * Document is the object representation of one of these documents.
  *
  * Notes:
  *   - this constructor may be called either with a documentId, a content, neither or both.
@@ -20,7 +20,7 @@
  * @param {object} [content] - Initializes this document with the provided content
  * @constructor
  */
-function KuzzleDocument(kuzzleDataCollection, documentId, content) {
+function Document(kuzzleDataCollection, documentId, content) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -99,7 +99,7 @@ function KuzzleDocument(kuzzleDataCollection, documentId, content) {
  *
  * @return {object} JSON object representing this document
  */
-KuzzleDocument.prototype.serialize = function () {
+Document.prototype.serialize = function () {
   var
     data = {};
 
@@ -119,7 +119,7 @@ KuzzleDocument.prototype.serialize = function () {
  *
  * @return {string} serialized version of this object
  */
-KuzzleDocument.prototype.toString = function () {
+Document.prototype.toString = function () {
   return JSON.stringify(this.serialize());
 };
 
@@ -134,7 +134,7 @@ KuzzleDocument.prototype.toString = function () {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.delete = function (options, cb) {
+Document.prototype.delete = function (options, cb) {
   var self = this;
 
   if (!cb && typeof options === 'function') {
@@ -143,7 +143,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
   }
 
   if (!self.id) {
-    throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
+    throw new Error('Document.delete: cannot delete a document without a document ID');
   }
 
   this.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'delete'), this.serialize(), options, cb && function (err) {
@@ -158,7 +158,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.refresh = function (options, cb) {
+Document.prototype.refresh = function (options, cb) {
   var self = this;
 
   if (!cb && typeof options === 'function') {
@@ -167,10 +167,10 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
   }
 
   if (!self.id) {
-    throw new Error('KuzzleDocument.refresh: cannot retrieve a document if no ID has been provided');
+    throw new Error('Document.refresh: cannot retrieve a document if no ID has been provided');
   }
 
-  this.kuzzle.callbackRequired('KuzzleDocument.refresh', cb);
+  this.kuzzle.callbackRequired('Document.refresh', cb);
 
   self.kuzzle.query(self.dataCollection.buildQueryArgs('document', 'get'), {_id: self.id}, options, function (error, res) {
     var newDocument;
@@ -179,7 +179,7 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
       return cb(error);
     }
 
-    newDocument = new KuzzleDocument(self.dataCollection, self.id, res.result._source);
+    newDocument = new Document(self.dataCollection, self.id, res.result._source);
     newDocument.version = res.result._version;
 
     cb(null, newDocument);
@@ -201,7 +201,7 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDocument.prototype.save = function (options, cb) {
+Document.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -237,7 +237,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
  * @param {object} [options] - Optional parameters
  * @returns {*} this
  */
-KuzzleDocument.prototype.publish = function (options) {
+Document.prototype.publish = function (options) {
   var data = this.serialize();
 
   this.kuzzle.query(this.dataCollection.buildQueryArgs('realtime', 'publish'), data, options);
@@ -252,7 +252,7 @@ KuzzleDocument.prototype.publish = function (options) {
  * @param {object} data - New content
  * @param {boolean} replace - if true: replace this document content with the provided data
  */
-KuzzleDocument.prototype.setContent = function (data, replace) {
+Document.prototype.setContent = function (data, replace) {
   var self = this;
 
   if (replace) {
@@ -274,7 +274,7 @@ KuzzleDocument.prototype.setContent = function (data, replace) {
  * @param {object} [options] - subscription options
  * @param {responseCallback} cb - callback that will be called each time a change has been detected on this document
  */
-KuzzleDocument.prototype.subscribe = function (options, cb) {
+Document.prototype.subscribe = function (options, cb) {
   var filters;
 
   if (options && !cb && typeof options === 'function') {
@@ -282,10 +282,10 @@ KuzzleDocument.prototype.subscribe = function (options, cb) {
     options = null;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDocument.subscribe', cb);
+  this.kuzzle.callbackRequired('Document.subscribe', cb);
 
   if (!this.id) {
-    throw new Error('KuzzleDocument.subscribe: cannot subscribe to a document if no ID has been provided');
+    throw new Error('Document.subscribe: cannot subscribe to a document if no ID has been provided');
   }
 
   filters = { ids: { values: [this.id] } };
@@ -302,10 +302,10 @@ KuzzleDocument.prototype.subscribe = function (options, cb) {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-KuzzleDocument.prototype.setHeaders = function (content, replace) {
+Document.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
 
 
-module.exports = KuzzleDocument;
+module.exports = Document;

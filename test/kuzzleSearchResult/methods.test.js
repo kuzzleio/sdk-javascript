@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDocument = require('../../src/kuzzleDocument'),
+  Document = require('../../src/kuzzleDocument'),
   KuzzleSearchResult = rewire('../../src/kuzzleSearchResult');
 
 describe('KuzzleSearchResult methods', function () {
@@ -22,8 +22,8 @@ describe('KuzzleSearchResult methods', function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {from:0, size: 1}, filters: {}};
     dataCollection = kuzzle.dataCollectionFactory('foo');
-    firstDocument = new KuzzleDocument(dataCollection, 'banana', {foo: 'bar'});
-    secondDocument = new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'});
+    firstDocument = new Document(dataCollection, 'banana', {foo: 'bar'});
+    secondDocument = new Document(dataCollection, 'papagayo', {foo: 'bar'});
   });
 
   describe('#next', function () {
@@ -45,7 +45,7 @@ describe('KuzzleSearchResult methods', function () {
         mockScrollResult = new KuzzleSearchResult(
           dataCollection,
           1,
-          [new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'})],
+          [new Document(dataCollection, 'papagayo', {foo: 'bar'})],
           {},
           {options: {scrollId: 'papagayo', from: 0, size: 1}}
         ),
