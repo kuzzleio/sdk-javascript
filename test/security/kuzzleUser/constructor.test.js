@@ -3,9 +3,9 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleUser = require('../../../src/security/kuzzleUser');
+  User = require('../../../src/security/kuzzleUser');
 
-describe('KuzzleUser constructor', function () {
+describe('User constructor', function () {
   var
     kuzzle;
 
@@ -19,7 +19,7 @@ describe('KuzzleUser constructor', function () {
 
   it('should throw an error if no id is provided', function (done) {
     try {
-      new KuzzleUser(kuzzle.security, null, null);
+      new User(kuzzle.security, null, null);
     }
     catch (e) {
       should(e).be.Error();
@@ -34,15 +34,15 @@ describe('KuzzleUser constructor', function () {
       kuzzleUser;
 
     kuzzle = new Kuzzle('foo');
-    kuzzleUser = new KuzzleUser(kuzzle.security, 'id', {some: 'content'});
+    kuzzleUser = new User(kuzzle.security, 'id', {some: 'content'});
 
-    should(kuzzleUser).be.instanceof(KuzzleUser);
+    should(kuzzleUser).be.instanceof(User);
     should(kuzzleUser).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
     should(kuzzleUser.deleteActionName).be.exactly('deleteUser');
   });
 
   it('should expose functions', function () {
-    var kuzzleUser = new KuzzleUser(kuzzle.security, 'test', {});
+    var kuzzleUser = new User(kuzzle.security, 'test', {});
 
     should.exist(kuzzleUser.setProfiles);
     should.exist(kuzzleUser.savePromise);
@@ -51,13 +51,13 @@ describe('KuzzleUser constructor', function () {
   });
 
   it('should handle provided arguments correctly', function () {
-    var kuzzleUser = new KuzzleUser(kuzzle.security, 'test', {});
+    var kuzzleUser = new User(kuzzle.security, 'test', {});
 
-    should(kuzzleUser).be.instanceof(KuzzleUser);
+    should(kuzzleUser).be.instanceof(User);
     should(kuzzleUser.id).be.exactly('test');
     should(kuzzleUser.content).be.empty();
 
-    kuzzleUser = new KuzzleUser(kuzzle.security, 'test', {some: 'content'});
+    kuzzleUser = new User(kuzzle.security, 'test', {some: 'content'});
     should(kuzzleUser.id).be.exactly('test');
     should(kuzzleUser.content).match({some: 'content'});
   });

@@ -3,7 +3,7 @@ var
   Collection = require('./kuzzleCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
   KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
-  KuzzleUser = require('./security/kuzzleUser'),
+  User = require('./security/kuzzleUser'),
   networkWrapper = require('./networkWrapper');
 
 /**
@@ -610,7 +610,7 @@ Kuzzle.prototype.whoAmI = function (callback) {
       return callback(err);
     }
 
-    callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
+    callback(null, new User(self.security, response.result._id, response.result._source));
   });
 };
 

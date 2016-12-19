@@ -1,7 +1,7 @@
 var
   Role = require('./kuzzleRole'),
   Profile = require('./kuzzleProfile'),
-  KuzzleUser = require('./kuzzleUser');
+  User = require('./kuzzleUser');
 
 /**
  * Kuzzle security constructor
@@ -440,7 +440,7 @@ KuzzleSecurity.prototype.getUser = function (id, options, cb) {
   self.kuzzle.callbackRequired('KuzzleSecurity.getUser', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
-    cb(err, err ? undefined : new KuzzleUser(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
   });
 };
 
@@ -474,7 +474,7 @@ KuzzleSecurity.prototype.searchUsers = function (filters, options, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      return new KuzzleUser(self, doc._id, doc._source);
+      return new User(self, doc._id, doc._source);
     });
 
     cb(null, { total: response.result.total, users: documents });
@@ -514,7 +514,7 @@ KuzzleSecurity.prototype.createUser = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, null, cb && function (err, res) {
-    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 };
 
@@ -548,7 +548,7 @@ KuzzleSecurity.prototype.createRestrictedUser = function (id, content, options, 
   }
 
   self.kuzzle.query(this.buildQueryArgs('createRestrictedUser'), data, null, cb && function (err, res) {
-    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 };
 
@@ -581,7 +581,7 @@ KuzzleSecurity.prototype.updateUser = function (id, content, options, cb) {
   data.body = content;
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new KuzzleUser(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 
   return this;
@@ -616,7 +616,7 @@ KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
 };
 
 /**
- * Instantiate a new KuzzleUser object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new User object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {string} id - user id
@@ -624,7 +624,7 @@ KuzzleSecurity.prototype.deleteUser = function (id, options, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.userFactory = function(id, content) {
-  return new KuzzleUser(this, id, content);
+  return new User(this, id, content);
 };
 
 /**

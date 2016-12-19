@@ -6,7 +6,7 @@ var
   Kuzzle = rewire('../../src/kuzzle'),
   Collection = require('../../src/kuzzleCollection'),
   KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
-  KuzzleUser = require('../../src/security/kuzzleUser');
+  User = require('../../src/security/kuzzleUser');
 
 describe('Kuzzle methods', function () {
   var
@@ -602,7 +602,7 @@ describe('Kuzzle methods', function () {
       should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
     });
 
-    it('should send correct query and return a KuzzleUser', function (done) {
+    it('should send correct query and return a User', function (done) {
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -616,7 +616,7 @@ describe('Kuzzle methods', function () {
       };
 
       kuzzle.whoAmI(function (err, res) {
-        should(res).instanceof(KuzzleUser);
+        should(res).instanceof(User);
         done();
       });
     });

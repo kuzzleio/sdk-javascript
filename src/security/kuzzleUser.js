@@ -7,7 +7,7 @@ var
  * @param {Object} content
  * @constructor
  */
-function KuzzleUser(kuzzleSecurity, id, content) {
+function User(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
@@ -35,9 +35,9 @@ function KuzzleUser(kuzzleSecurity, id, content) {
   }
 }
 
-KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+User.prototype = Object.create(KuzzleSecurityDocument.prototype, {
   constructor: {
-    value: KuzzleUser
+    value: User
   }
 });
 
@@ -45,9 +45,9 @@ KuzzleUser.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  * Set profiles in content
  * @param {array} profileIds - an array of profiles ids string
  *
- * @returns {KuzzleUser} this
+ * @returns {User} this
  */
-KuzzleUser.prototype.setProfiles = function (profileIds) {
+User.prototype.setProfiles = function (profileIds) {
   if (!Array.isArray(profileIds) || typeof profileIds[0] !== 'string') {
     throw new Error('Parameter "profileIds" must be an array of strings');
   }
@@ -61,9 +61,9 @@ KuzzleUser.prototype.setProfiles = function (profileIds) {
  * Add a profile
  * @param {string} profileId - a profile ids string
  *
- * @returns {KuzzleUser} this
+ * @returns {User} this
  */
-KuzzleUser.prototype.addProfile = function (profileId) {
+User.prototype.addProfile = function (profileId) {
   if (typeof profileId !== 'string') {
     throw new Error('Parameter "profileId" must be a string');
   }
@@ -88,9 +88,9 @@ KuzzleUser.prototype.addProfile = function (profileId) {
  *
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleUser} this
+ * @returns {User} this
  */
-KuzzleUser.prototype.save = function (options, cb) {
+User.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -116,9 +116,9 @@ KuzzleUser.prototype.save = function (options, cb) {
  *
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleUser} this
+ * @returns {User} this
  */
-KuzzleUser.prototype.saveRestricted = function (options, cb) {
+User.prototype.saveRestricted = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -140,7 +140,7 @@ KuzzleUser.prototype.saveRestricted = function (options, cb) {
  *
  * @return {object} JSON object representing this User
  */
-KuzzleUser.prototype.serialize = function () {
+User.prototype.serialize = function () {
   return {_id: this.id, body: this.content};
 };
 
@@ -149,8 +149,8 @@ KuzzleUser.prototype.serialize = function () {
  *
  * @return {array} the associated profiles IDs
  */
-KuzzleUser.prototype.getProfiles = function () {
+User.prototype.getProfiles = function () {
   return this.content.profileIds;
 };
 
-module.exports = KuzzleUser;
+module.exports = User;

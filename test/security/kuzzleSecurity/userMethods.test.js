@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
-  KuzzleUser = require('../../../src/security/kuzzleUser');
+  User = require('../../../src/security/kuzzleUser');
 
 describe('KuzzleSecurity user methods', function () {
   var
@@ -56,7 +56,7 @@ describe('KuzzleSecurity user methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       should(kuzzle.security.getUser(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
 
         should(res.content.profileIds).be.an.Array();
         should(res.content.profileIds[0]).be.a.String();
@@ -68,7 +68,7 @@ describe('KuzzleSecurity user methods', function () {
     it('should send the right query to Kuzzle with id as profile', function (done) {
       should(kuzzle.security.getUser(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
 
         should(res.content.profileIds).be.an.Array();
         should(res.content.profileIds[0]).be.a.String();
@@ -125,7 +125,7 @@ describe('KuzzleSecurity user methods', function () {
         should(res.users.length).be.exactly(result.result.hits.length);
 
         res.users.forEach(function (item) {
-          should(item).be.instanceof(KuzzleUser);
+          should(item).be.instanceof(User);
 
           should(item.content.profileIds).be.an.Array();
           should(item.content.profileIds[0]).be.a.String();
@@ -155,7 +155,7 @@ describe('KuzzleSecurity user methods', function () {
         should(res.users.length).be.exactly(result.result.hits.length);
 
         res.users.forEach(function (item) {
-          should(item).be.instanceof(KuzzleUser);
+          should(item).be.instanceof(User);
 
           should(item.content.profileIds).be.an.Array();
           should(item.content.profileIds[0]).be.a.String();
@@ -210,7 +210,7 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -230,7 +230,7 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -242,7 +242,7 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -282,7 +282,7 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.createRestrictedUser(result.result._id, result.result._source, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -334,8 +334,8 @@ describe('KuzzleSecurity user methods', function () {
 
       should(kuzzle.security.updateUser(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.an.instanceOf(KuzzleUser);
-        should(res).containDeep(new KuzzleUser(kuzzle.security, result.result._id, result.result._source));
+        should(res).be.an.instanceOf(User);
+        should(res).containDeep(new User(kuzzle.security, result.result._id, result.result._source));
         done();
       }));
     });
@@ -406,7 +406,7 @@ describe('KuzzleSecurity user methods', function () {
   describe('#UserFactory', function () {
     it('should return an instance of Profile', function (done) {
       var user = kuzzle.security.userFactory('test', {profileIds: ['myProfile']});
-      should(user).instanceof(KuzzleUser);
+      should(user).instanceof(User);
       done();
     });
 

@@ -2,9 +2,9 @@ var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
   Role = require('../../../src/security/kuzzleRole'),
-  KuzzleUser = require('../../../src/security/kuzzleUser');
+  User = require('../../../src/security/kuzzleUser');
 
-describe('KuzzleUser methods', function () {
+describe('User methods', function () {
   var
     kuzzle,
     kuzzleUser,
@@ -43,7 +43,7 @@ describe('KuzzleUser methods', function () {
       error = null;
 
       result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
+      kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceUser',
         controller: 'security'
@@ -51,7 +51,7 @@ describe('KuzzleUser methods', function () {
     });
 
     it('should throw an error if the user has not profile parameter', function (done) {
-      kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, {some: 'content'});
+      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
 
       should((function () {
         kuzzleUser.save();
@@ -66,7 +66,7 @@ describe('KuzzleUser methods', function () {
 
       should(kuzzleUser.save(function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -91,7 +91,7 @@ describe('KuzzleUser methods', function () {
       error = null;
 
       result = { result: {_id: 'myUser', _source: {some: 'content'}} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, result.result._id, result.result._source);
+      kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createRestrictedUser',
         controller: 'security'
@@ -104,7 +104,7 @@ describe('KuzzleUser methods', function () {
 
       should(kuzzleUser.saveRestricted(function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -142,7 +142,7 @@ describe('KuzzleUser methods', function () {
 
       should(kuzzleUser.update({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleUser);
+        should(res).be.instanceof(User);
         done();
       }));
     });
@@ -180,7 +180,7 @@ describe('KuzzleUser methods', function () {
   describe('#setProfiles', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
+      kuzzleUser = new User(kuzzle.security, 'myUser', {profileIds: ['profile1']});
     });
 
     it('should throw an error if the profileIds parameter is null', function (done) {
@@ -218,7 +218,7 @@ describe('KuzzleUser methods', function () {
   describe('#addProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'myUser', {profileIds: ['profile1']});
+      kuzzleUser = new User(kuzzle.security, 'myUser', {profileIds: ['profile1']});
     });
 
     it('should throw an error if the profileId parameter is null', function (done) {
@@ -264,7 +264,7 @@ describe('KuzzleUser methods', function () {
   describe('#serialize', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
     });
 
     it('should serialize with correct attributes', function (done) {
@@ -283,7 +283,7 @@ describe('KuzzleUser methods', function () {
       error = null;
 
       result = { result: {_id: 'user'} };
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
       expectedQuery = {
         action: 'deleteUser',
         controller: 'security'
@@ -319,7 +319,7 @@ describe('KuzzleUser methods', function () {
     it('should return the associated profiles', function () {
       var profileIds = ['profile'];
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new KuzzleUser(kuzzle.security, 'user', {some: 'content', profileIds});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds});
       should(kuzzleUser.getProfiles()).be.eql(profileIds);
     });
   });
