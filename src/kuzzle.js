@@ -1,6 +1,6 @@
 var
   uuid = require('uuid'),
-  KuzzleDataCollection = require('./kuzzleDataCollection'),
+  Collection = require('./kuzzleCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
   KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
   KuzzleUser = require('./security/kuzzleUser'),
@@ -934,12 +934,12 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
 };
 
 /**
- * Create a new instance of a KuzzleDataCollection object.
+ * Create a new instance of a Collection object.
  * If no index is specified, takes the default index.
  *
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param {string} [index] - The name of the data index containing the data collection
- * @returns {KuzzleDataCollection} A KuzzleDataCollection instance
+ * @returns {Collection} A Collection instance
  */
 Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   this.isValid();
@@ -961,7 +961,7 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, collection, index);
+    this.collections[index][collection] = new Collection(this, collection, index);
   }
 
   return this.collections[index][collection];

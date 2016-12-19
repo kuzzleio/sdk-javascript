@@ -3,10 +3,10 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = rewire('../../src/kuzzleDataCollection');
+  Collection = rewire('../../src/kuzzleCollection');
 
-describe('KuzzleDataCollection constructor', function () {
-  it('should initialize properties and return a valid KuzzleDataCollection object', function () {
+describe('Collection constructor', function () {
+  it('should initialize properties and return a valid Collection object', function () {
     var
       kuzzle = new Kuzzle('foo'),
       index = 'barfoo',
@@ -14,12 +14,12 @@ describe('KuzzleDataCollection constructor', function () {
       c;
 
     kuzzle.headers.some = 'headers';
-    c = new KuzzleDataCollection(kuzzle, collection, index);
+    c = new Collection(kuzzle, collection, index);
 
     // the collection "headers" should be a hard copy of the kuzzle ones
     kuzzle.headers = { someother: 'headers' };
 
-    should(c).be.instanceof(KuzzleDataCollection);
+    should(c).be.instanceof(Collection);
     should(c).have.propertyWithDescriptor('index', { enumerable: true, writable: false, configurable: false });
     should(c).have.propertyWithDescriptor('collection', { enumerable: true, writable: false, configurable: false });
     should(c).have.propertyWithDescriptor('kuzzle', { enumerable: true, writable: false, configurable: false });
@@ -38,7 +38,7 @@ describe('KuzzleDataCollection constructor', function () {
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo');
-    dataCollection = new KuzzleDataCollection(kuzzle, 'bar', 'foo');
+    dataCollection = new Collection(kuzzle, 'bar', 'foo');
 
     should.exist(dataCollection.countPromise);
     should.exist(dataCollection.createPromise);
@@ -70,7 +70,7 @@ describe('KuzzleDataCollection constructor', function () {
   it('should throw an error if no collection or no index is provided', function () {
     var kuzzle = new Kuzzle('foo');
 
-    should((function () { new KuzzleDataCollection(kuzzle);})).throw();
-    should((function () { new KuzzleDataCollection(kuzzle, 'foo');})).throw();
+    should((function () { new Collection(kuzzle);})).throw();
+    should((function () { new Collection(kuzzle, 'foo');})).throw();
   });
 });

@@ -15,7 +15,7 @@
  *   - providing a documentID to the constructor will automatically call refresh, unless a content is also provided
  *
  *
- * @param {object} kuzzleDataCollection - an instanciated KuzzleDataCollection object
+ * @param {object} kuzzleDataCollection - an instanciated Collection object
  * @param {string} [documentId] - ID of an existing document
  * @param {object} [content] - Initializes this document with the provided content
  * @constructor

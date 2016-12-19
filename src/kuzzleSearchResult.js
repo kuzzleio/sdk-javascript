@@ -1,6 +1,6 @@
 /**
  *
- * @param {KuzzleDataCollection} dataCollection
+ * @param {Collection} dataCollection
  * @param {int} total
  * @param {KuzzleDocument[]} documents
  * @param {object} [aggregations]

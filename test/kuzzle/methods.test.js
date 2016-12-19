@@ -4,7 +4,7 @@ var
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
+  Collection = require('../../src/kuzzleCollection'),
   KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
   KuzzleUser = require('../../src/security/kuzzleUser');
 
@@ -198,8 +198,8 @@ describe('Kuzzle methods', function () {
     it('should create and store the data collection instance if needed', function () {
       var collection = kuzzle.dataCollectionFactory('foo', 'bar');
 
-      should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
-      should(collection).be.instanceof(KuzzleDataCollection);
+      should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(Collection);
+      should(collection).be.instanceof(Collection);
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
@@ -214,7 +214,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.setDefaultIndex(defaultIndex);
       collection = kuzzle.dataCollectionFactory('foo');
-      should(collection).be.instanceof(KuzzleDataCollection);
+      should(collection).be.instanceof(Collection);
       should(collection.index).be.eql(defaultIndex);
     });
 

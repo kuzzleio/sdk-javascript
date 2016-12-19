@@ -4,13 +4,13 @@ var
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
-  KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
+  Collection = rewire('../../src/kuzzleCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
   KuzzleRoom = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
-describe('KuzzleDataCollection methods', function () {
+describe('Collection methods', function () {
   var
     expectedQuery,
     error,
@@ -146,12 +146,12 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should throw an error if no scrollId is set', () => {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(() => { collection.scroll(); }).throw('KuzzleDataCollection.scroll: scrollId required');
+      should(() => { collection.scroll(); }).throw('Collection.scroll: scrollId required');
     });
 
     it('should throw an error if no callback is given', () => {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(() => { collection.scroll('scrollId'); }).throw('KuzzleDataCollection.scroll: a callback argument is required for read queries');
+      should(() => { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
     it('should parse the given parameters', done => {
@@ -943,7 +943,7 @@ describe('KuzzleDataCollection methods', function () {
       refreshed = false;
 
     beforeEach(function () {
-      revert = KuzzleDataCollection.__set__('KuzzleDocument', function (collection) {
+      revert = Collection.__set__('KuzzleDocument', function (collection) {
         var doc = new KuzzleDocument(collection, 'foo', {});
 
         doc.refresh = function (cb) {
@@ -975,7 +975,7 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
-        collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index),
+        collection = new Collection(kuzzle, expectedQuery.collection, expectedQuery.index),
         options = { queuable: false };
       expectedQuery.options = options;
 
@@ -989,7 +989,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
+      var collection = new Collection(kuzzle, expectedQuery.collection, expectedQuery.index);
 
       collection.updateDocument('foo');
       should(emitted).be.true();
@@ -1008,7 +1008,7 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      var collection = new KuzzleDataCollection(kuzzle, expectedQuery.collection, expectedQuery.index);
+      var collection = new Collection(kuzzle, expectedQuery.collection, expectedQuery.index);
       error = 'foobar';
       this.timeout(50);
 
