@@ -29,7 +29,7 @@ function Security(kuzzle) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['role', 'profile', 'userFactory', 'isActionAllowed'];
+        var blacklist = ['role', 'profile', 'user', 'isActionAllowed'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -623,7 +623,7 @@ Security.prototype.deleteUser = function (id, options, cb) {
  * @param {object} content - user content
  * @constructor
  */
-Security.prototype.userFactory = function(id, content) {
+Security.prototype.user = function(id, content) {
   return new User(this, id, content);
 };
 

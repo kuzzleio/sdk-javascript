@@ -405,13 +405,13 @@ describe('Security user methods', function () {
 
   describe('#UserFactory', function () {
     it('should return an instance of Profile', function (done) {
-      var user = kuzzle.security.userFactory('test', {profileIds: ['myProfile']});
+      var user = kuzzle.security.user('test', {profileIds: ['myProfile']});
       should(user).instanceof(User);
       done();
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () {kuzzle.security.userFactory(null);})).throw(Error);
+      should((function () {kuzzle.security.user(null);})).throw(Error);
       done();
     });
   });
