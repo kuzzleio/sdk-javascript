@@ -2,7 +2,7 @@ var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
   KuzzleProfile = require('../../../src/security/kuzzleProfile'),
-  KuzzleRole = require('../../../src/security/kuzzleRole');
+  Role = require('../../../src/security/kuzzleRole');
 
 describe('KuzzleProfile methods', function () {
   var
@@ -98,7 +98,7 @@ describe('KuzzleProfile methods', function () {
       error = null;
 
       result = { result: {_id: 'myProfile', _index: '%kuzzle', _type: 'profiles'} };
-      kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
+      kuzzleRole = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateProfile',
         controller: 'security'
@@ -213,7 +213,7 @@ describe('KuzzleProfile methods', function () {
       done();
     });
 
-    it('should add the KuzzleRole in roles list', function (done) {
+    it('should add the Role in roles list', function (done) {
       kuzzleProfile.setPolicies([{roleId:'role1'}, {roleId:'role2'}]);
       should(kuzzleProfile.content.policies).be.an.Array();
       should(kuzzleProfile.content.policies.length).be.exactly(2);

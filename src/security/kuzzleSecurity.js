@@ -1,5 +1,5 @@
 var
-  KuzzleRole = require('./kuzzleRole'),
+  Role = require('./kuzzleRole'),
   KuzzleProfile = require('./kuzzleProfile'),
   KuzzleUser = require('./kuzzleUser');
 
@@ -66,7 +66,7 @@ KuzzleSecurity.prototype.getRole = function (id, options, cb) {
   self.kuzzle.callbackRequired('KuzzleSecurity.getRole', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
-    cb(err, err ? undefined : new KuzzleRole(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new Role(self, response.result._id, response.result._source));
   });
 };
 
@@ -101,7 +101,7 @@ KuzzleSecurity.prototype.searchRoles = function (filters, options, cb) {
     }
 
     documents = result.result.hits.map(function (doc) {
-      return new KuzzleRole(self, doc._id, doc._source);
+      return new Role(self, doc._id, doc._source);
     });
 
     cb(null, { total: result.result.total, roles: documents });
@@ -144,7 +144,7 @@ KuzzleSecurity.prototype.createRole = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new KuzzleRole(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new Role(self, res.result._id, res.result._source));
   });
 };
 
@@ -174,7 +174,7 @@ KuzzleSecurity.prototype.updateRole = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err) {
-    cb(err, err ? undefined : new KuzzleRole(self, id, content));
+    cb(err, err ? undefined : new Role(self, id, content));
   });
 
   return this;
@@ -209,7 +209,7 @@ KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
 };
 
 /**
- * Instantiate a new KuzzleRole object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Role object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {string} id - role id
@@ -217,7 +217,7 @@ KuzzleSecurity.prototype.deleteRole = function (id, options, cb) {
  * @constructor
  */
 KuzzleSecurity.prototype.roleFactory = function(id, content) {
-  return new KuzzleRole(this, id, content);
+  return new Role(this, id, content);
 };
 
 

@@ -1,9 +1,9 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/kuzzle'),
-  KuzzleRole = require('../../../src/security/kuzzleRole');
+  Role = require('../../../src/security/kuzzleRole');
 
-describe('KuzzleRole methods', function () {
+describe('Role methods', function () {
   var
     kuzzle,
     kuzzleRole,
@@ -48,7 +48,7 @@ describe('KuzzleRole methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole', _source: {indexes : {}}} };
-      kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, result.result._source);
+      kuzzleRole = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceRole',
         controller: 'security'
@@ -61,7 +61,7 @@ describe('KuzzleRole methods', function () {
 
       should(kuzzleRole.save(function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
@@ -88,7 +88,7 @@ describe('KuzzleRole methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole', _index: '%kuzzle', _type: 'roles'} };
-      kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, {indexes : {}});
+      kuzzleRole = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateRole',
         controller: 'security'
@@ -101,7 +101,7 @@ describe('KuzzleRole methods', function () {
 
       should(kuzzleRole.update({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
@@ -143,7 +143,7 @@ describe('KuzzleRole methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole'} };
-      kuzzleRole = new KuzzleRole(kuzzle.security, result.result._id, result.result._source);
+      kuzzleRole = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'deleteRole',
         controller: 'security'

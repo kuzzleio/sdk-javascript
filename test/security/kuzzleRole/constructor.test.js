@@ -3,9 +3,9 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleRole = require('../../../src/security/kuzzleRole');
+  Role = require('../../../src/security/kuzzleRole');
 
-describe('KuzzleRole constructor', function () {
+describe('Role constructor', function () {
   var
     kuzzle;
 
@@ -19,7 +19,7 @@ describe('KuzzleRole constructor', function () {
 
   it('should throw an error if no id is provided', done => {
     try {
-      new KuzzleRole(kuzzle.security, null, null);
+      new Role(kuzzle.security, null, null);
     }
     catch (e) {
       should(e).be.Error();
@@ -34,15 +34,15 @@ describe('KuzzleRole constructor', function () {
       kuzzleRole;
 
     kuzzle = new Kuzzle('foo');
-    kuzzleRole = new KuzzleRole(kuzzle.security, 'id', {some: 'content'});
+    kuzzleRole = new Role(kuzzle.security, 'id', {some: 'content'});
 
-    should(kuzzleRole).be.instanceof(KuzzleRole);
+    should(kuzzleRole).be.instanceof(Role);
     should(kuzzleRole).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
     should(kuzzleRole.deleteActionName).be.exactly('deleteRole');
   });
 
   it('should expose functions', function () {
-    var kuzzleRole = new KuzzleRole(kuzzle.security, 'test', {});
+    var kuzzleRole = new Role(kuzzle.security, 'test', {});
 
     should.exist(kuzzleRole.setContent);
     should.exist(kuzzleRole.serialize);
@@ -51,13 +51,13 @@ describe('KuzzleRole constructor', function () {
   });
 
   it('should handle provided arguments correctly', function () {
-    var kuzzleRole = new KuzzleRole(kuzzle.security, 'test', {});
+    var kuzzleRole = new Role(kuzzle.security, 'test', {});
 
-    should(kuzzleRole).be.instanceof(KuzzleRole);
+    should(kuzzleRole).be.instanceof(Role);
     should(kuzzleRole.id).be.exactly('test');
     should(kuzzleRole.content).be.empty();
 
-    kuzzleRole = new KuzzleRole(kuzzle.security, 'test', {some: 'content'});
+    kuzzleRole = new Role(kuzzle.security, 'test', {some: 'content'});
     should(kuzzleRole.id).be.exactly('test');
     should(kuzzleRole.content).match({some: 'content'});
   });

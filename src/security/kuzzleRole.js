@@ -1,6 +1,6 @@
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
-function KuzzleRole(kuzzleSecurity, id, content) {
+function Role(kuzzleSecurity, id, content) {
 
   KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
 
@@ -29,9 +29,9 @@ function KuzzleRole(kuzzleSecurity, id, content) {
 
 }
 
-KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+Role.prototype = Object.create(KuzzleSecurityDocument.prototype, {
   constructor: {
-    value: KuzzleRole
+    value: Role
   }
 });
 
@@ -44,9 +44,9 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleRole} this object
+ * @returns {Role} this object
  */
-KuzzleRole.prototype.save = function (options, cb) {
+Role.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -63,4 +63,4 @@ KuzzleRole.prototype.save = function (options, cb) {
   return this;
 };
 
-module.exports = KuzzleRole;
+module.exports = Role;
