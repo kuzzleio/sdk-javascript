@@ -298,15 +298,15 @@ describe('Security roles methods', function () {
     });
   });
 
-  describe('#roleFactory', function () {
+  describe('#role', function () {
     it('should return an instance of Role', function (done) {
-      var role = kuzzle.security.roleFactory('test', {index: {}});
+      var role = kuzzle.security.role('test', {index: {}});
       should(role).instanceof(Role);
       done();
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () {kuzzle.security.roleFactory(null);})).throw(Error);
+      should((function () {kuzzle.security.role(null);})).throw(Error);
       done();
     });
   });
