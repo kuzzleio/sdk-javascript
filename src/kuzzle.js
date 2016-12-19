@@ -941,7 +941,7 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  * @param {string} [index] - The name of the data index containing the data collection
  * @returns {Collection} A Collection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
+Kuzzle.prototype.collection = function(collection, index) {
   this.isValid();
 
   if (!index) {

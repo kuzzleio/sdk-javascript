@@ -50,7 +50,7 @@ describe('CollectionMapping methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {_source: { properties: { foo: {type: 'date'}}}}};
       error = null;
@@ -143,7 +143,7 @@ describe('CollectionMapping methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
       error = null;
@@ -254,7 +254,7 @@ describe('CollectionMapping methods', function () {
   describe('#set', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should allow setting a field mapping', function () {
@@ -274,7 +274,7 @@ describe('CollectionMapping methods', function () {
   describe('#setHeaders', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should allow setting headers', function () {

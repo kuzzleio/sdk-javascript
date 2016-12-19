@@ -31,7 +31,7 @@ describe('Kuzzle constructor', () => {
       kuzzle = new Kuzzle('nowhere');
 
       should.exist(kuzzle.addListener);
-      should.exist(kuzzle.dataCollectionFactory);
+      should.exist(kuzzle.collection);
       should.exist(kuzzle.flushQueue);
       should.exist(kuzzle.getAllStatistics);
       should.exist(kuzzle.getJwtToken);

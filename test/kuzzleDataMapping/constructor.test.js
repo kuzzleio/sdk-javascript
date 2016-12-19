@@ -16,7 +16,7 @@ describe('CollectionMapping constructor', function () {
   });
 
   beforeEach(function () {
-    collection = kuzzle.dataCollectionFactory('foo');
+    collection = kuzzle.collection('foo');
   });
 
   it('should create a new instance even if no mapping has been provided', function () {
@@ -55,7 +55,7 @@ describe('CollectionMapping constructor', function () {
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    mapping = new CollectionMapping(kuzzle.dataCollectionFactory('foo'));
+    mapping = new CollectionMapping(kuzzle.collection('foo'));
 
     should.exist(mapping.applyPromise);
     should.exist(mapping.refreshPromise);

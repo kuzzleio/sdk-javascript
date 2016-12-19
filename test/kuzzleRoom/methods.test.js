@@ -61,7 +61,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
@@ -133,7 +133,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
@@ -252,7 +252,7 @@ describe('Room methods', function () {
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       room = new Room(dataCollection);
     });
 
@@ -287,7 +287,7 @@ describe('Room methods', function () {
         body: {}
       };
 
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       room = new Room(dataCollection);
       room.roomId = 'foobar';
       kuzzle.subscriptions.foobar = {};
@@ -356,7 +356,7 @@ describe('Room methods', function () {
       var stub = function () { dequeued++; };
 
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       room = new Room(dataCollection);
       room.count = stub;
       room.renew = stub;
@@ -387,7 +387,7 @@ describe('Room methods', function () {
       called = false;
       error = result = undefined;
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       room = new Room(dataCollection);
       room.callback = function (err, res) { called = true; error = err; result = res; };
     });

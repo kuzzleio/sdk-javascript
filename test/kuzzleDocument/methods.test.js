@@ -50,7 +50,7 @@ describe('Document methods', function () {
   describe('#toJSON', function () {
     before(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should serialize itself properly', function () {
@@ -79,7 +79,7 @@ describe('Document methods', function () {
   describe('#toString', function () {
     before(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should stringify itself properly', function () {
@@ -97,7 +97,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = {};
       error = null;
@@ -183,7 +183,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {_id: 'foo', _version: 42, _source: {some: 'content'}}};
       error = null;
@@ -272,7 +272,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = {result: { _id: 'foo', _version: 42}};
       error = null;
@@ -349,7 +349,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = {};
       error = null;
@@ -387,7 +387,7 @@ describe('Document methods', function () {
   describe('#setContent', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should update the content if "replace" is falsey', function () {
@@ -413,7 +413,7 @@ describe('Document methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foo', channel: 'bar'}};
       error = null;
@@ -454,7 +454,7 @@ describe('Document methods', function () {
   describe('#setHeaders', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
     });
 
     it('should properly set headers', function () {

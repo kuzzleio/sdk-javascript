@@ -24,7 +24,7 @@ describe('Document constructor', function () {
       refreshed = true;
     };
     refreshed = false;
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {

@@ -21,7 +21,7 @@ describe('Document constructor', function () {
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {}, filters: {from:0, size: 1}};
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
     document = new Document(dataCollection, 'banana', {foo: 'bar'});
     aggregations = {};
   });

@@ -21,7 +21,7 @@ describe('KuzzleSearchResult methods', function () {
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {from:0, size: 1}, filters: {}};
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
     firstDocument = new Document(dataCollection, 'banana', {foo: 'bar'});
     secondDocument = new Document(dataCollection, 'papagayo', {foo: 'bar'});
   });

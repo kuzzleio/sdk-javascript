@@ -168,35 +168,35 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#dataCollectionFactory', function () {
+  describe('#collection', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
     });
 
     it('should throw an error if arguments are not strings', () => {
       kuzzle.defaultIndex = 'foobar';
-      should(function () { kuzzle.dataCollectionFactory(undefined); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(undefined, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(null); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(null, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(123); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(123, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', 123); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', {foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', ['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(['bar'], 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(undefined); }).throw(/string expected/);
+      should(function () { kuzzle.collection(undefined, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(null); }).throw(/string expected/);
+      should(function () { kuzzle.collection(null, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(123); }).throw(/string expected/);
+      should(function () { kuzzle.collection(123, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', 123); }).throw(/string expected/);
+      should(function () { kuzzle.collection({foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.collection({foo: 'bar'}, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', {foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.collection(['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', ['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.collection(['bar'], 'foo'); }).throw(/string expected/);
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
       kuzzle.disconnect();
-      should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
+      should(function () { kuzzle.collection('foo'); }).throw(Error);
     });
 
     it('should create and store the data collection instance if needed', function () {
-      var collection = kuzzle.dataCollectionFactory('foo', 'bar');
+      var collection = kuzzle.collection('foo', 'bar');
 
       should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(Collection);
       should(collection).be.instanceof(Collection);
@@ -204,7 +204,7 @@ describe('Kuzzle methods', function () {
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
       kuzzle.collections.foo = { bar: 'qux'};
-      should(kuzzle.dataCollectionFactory('bar', 'foo')).be.a.String().and.be.exactly('qux');
+      should(kuzzle.collection('bar', 'foo')).be.a.String().and.be.exactly('qux');
     });
 
     it('should use the default index if no index is provided', function () {
@@ -213,13 +213,13 @@ describe('Kuzzle methods', function () {
         defaultIndex = 'bar';
 
       kuzzle.setDefaultIndex(defaultIndex);
-      collection = kuzzle.dataCollectionFactory('foo');
+      collection = kuzzle.collection('foo');
       should(collection).be.instanceof(Collection);
       should(collection.index).be.eql(defaultIndex);
     });
 
     it('should throw an error if no index is provided and no default index has been set', () => {
-      should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(/no index specified/);
+      should(function () { kuzzle.collection('foo'); }).throw(/no index specified/);
     });
   });
 

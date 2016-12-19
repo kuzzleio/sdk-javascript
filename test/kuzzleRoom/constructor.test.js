@@ -15,7 +15,7 @@ describe('Room constructor', function () {
     kuzzle = new Kuzzle('nowhere', {defaultIndex: 'bar'});
 
     kuzzle.headers = {foo: 'bar'};
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {
