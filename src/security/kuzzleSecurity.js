@@ -423,13 +423,13 @@ Security.prototype.profile = function(id, content) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-Security.prototype.getUser = function (id, options, cb) {
+Security.prototype.fetchUser = function (id, options, cb) {
   var
     data = {_id: id},
     self = this;
 
   if (!id || typeof id !== 'string') {
-    throw new Error('Id parameter is mandatory for getUser function');
+    throw new Error('Id parameter is mandatory for fetchUser function');
   }
 
   if (!cb && typeof options === 'function') {
@@ -437,9 +437,9 @@ Security.prototype.getUser = function (id, options, cb) {
     options = null;
   }
 
-  self.kuzzle.callbackRequired('Security.getUser', cb);
+  self.kuzzle.callbackRequired('Security.fetchUser', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('fetchUser'), data, options, function (err, response) {
     cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
   });
 };

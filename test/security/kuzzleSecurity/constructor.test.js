@@ -32,7 +32,7 @@ describe('kuzzleSecurity constructor', function () {
     should.exist(kuzzle.security.searchProfilesPromise);
     should.exist(kuzzle.security.deleteProfilePromise);
     should.exist(kuzzle.security.createUserPromise);
-    should.exist(kuzzle.security.getUserPromise);
+    should.exist(kuzzle.security.fetchUserPromise);
     should.exist(kuzzle.security.searchUsersPromise);
     should.exist(kuzzle.security.deleteUserPromise);
 

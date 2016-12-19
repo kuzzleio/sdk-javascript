@@ -40,21 +40,21 @@ describe('Security user methods', function () {
       }
     };
 
-  describe('#getUser', function () {
+  describe('#fetchUser', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
       result = { result: {_id: 'foobar', _source: {profileIds: ['profile']}}};
       expectedQuery = {
-        action: 'getUser',
+        action: 'fetchUser',
         controller: 'security',
         _id: 'foobar'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getUser(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchUser(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
 
@@ -66,7 +66,7 @@ describe('Security user methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as profile', function (done) {
-      should(kuzzle.security.getUser(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchUser(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
 
@@ -78,18 +78,18 @@ describe('Security user methods', function () {
     });
 
     it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzle.security.getUser('test'); }).throw(Error);
+      should(function () { kuzzle.security.fetchUser('test'); }).throw(Error);
     });
 
     it('should throw an error when no id is provided', function () {
-      should(function () { kuzzle.security.getUser(null, function () {}); }).throw(Error);
+      should(function () { kuzzle.security.fetchUser(null, function () {}); }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'error';
       this.timeout(50);
 
-      kuzzle.security.getUser('foobar', function (err, res) {
+      kuzzle.security.fetchUser('foobar', function (err, res) {
         should(err).be.exactly('error');
         should(res).be.undefined();
         done();
