@@ -40,7 +40,7 @@ describe('Security profiles methods', function () {
       }
     };
 
-  describe('#getProfile', function () {
+  describe('#fetchProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
@@ -60,14 +60,14 @@ describe('Security profiles methods', function () {
         }
       };
       expectedQuery = {
-        action: 'getProfile',
+        action: 'fetchProfile',
         controller: 'security',
         _id: 'foobar'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchProfile(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Profile);
 
@@ -83,7 +83,7 @@ describe('Security profiles methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchProfile(result.result._id, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Profile);
 
@@ -103,18 +103,18 @@ describe('Security profiles methods', function () {
     });
 
     it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzle.security.getProfile('test'); }).throw(Error);
+      should(function () { kuzzle.security.fetchProfile('test'); }).throw(Error);
     });
 
     it('should throw an error when no id is provided', function () {
-      should(function () { kuzzle.security.getProfile(null, function () {}); }).throw(Error);
+      should(function () { kuzzle.security.fetchProfile(null, function () {}); }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'error';
       this.timeout(50);
 
-      kuzzle.security.getProfile('foobar', function (err, res) {
+      kuzzle.security.fetchProfile('foobar', function (err, res) {
         should(err).be.exactly('error');
         should(res).be.undefined();
         done();

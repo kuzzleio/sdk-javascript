@@ -24,11 +24,11 @@ describe('kuzzleSecurity constructor', function () {
     kuzzle = new Kuzzle('foo');
 
     should.exist(kuzzle.security.createRolePromise);
-    should.exist(kuzzle.security.getRolePromise);
+    should.exist(kuzzle.security.fetchRolePromise);
     should.exist(kuzzle.security.searchRolesPromise);
     should.exist(kuzzle.security.deleteRolePromise);
     should.exist(kuzzle.security.createProfilePromise);
-    should.exist(kuzzle.security.getProfilePromise);
+    should.exist(kuzzle.security.fetchProfilePromise);
     should.exist(kuzzle.security.searchProfilesPromise);
     should.exist(kuzzle.security.deleteProfilePromise);
     should.exist(kuzzle.security.createUserPromise);

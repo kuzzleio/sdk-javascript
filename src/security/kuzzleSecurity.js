@@ -47,13 +47,13 @@ function Security(kuzzle) {
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  */
-Security.prototype.getRole = function (id, options, cb) {
+Security.prototype.fetchRole = function (id, options, cb) {
   var
     data,
     self = this;
 
   if (!id) {
-    throw new Error('Id parameter is mandatory for getRole function');
+    throw new Error('Id parameter is mandatory for fetchRole function');
   }
 
   if (!cb && typeof options === 'function') {
@@ -63,9 +63,9 @@ Security.prototype.getRole = function (id, options, cb) {
 
   data = {_id: id};
 
-  self.kuzzle.callbackRequired('Security.getRole', cb);
+  self.kuzzle.callbackRequired('Security.fetchRole', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('fetchRole'), data, options, function (err, response) {
     cb(err, err ? undefined : new Role(self, response.result._id, response.result._source));
   });
 };
@@ -229,7 +229,7 @@ Security.prototype.role = function(id, content) {
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} cb - returns Kuzzle's response
  */
-Security.prototype.getProfile = function (id, options, cb) {
+Security.prototype.fetchProfile = function (id, options, cb) {
   var
     data,
     self = this;
@@ -240,15 +240,15 @@ Security.prototype.getProfile = function (id, options, cb) {
   }
 
   if (!id || typeof id !== 'string') {
-    throw new Error('Id parameter is mandatory for getProfile function');
+    throw new Error('Id parameter is mandatory for fetchProfile function');
   }
 
 
   data = {_id: id};
 
-  self.kuzzle.callbackRequired('Security.getProfile', cb);
+  self.kuzzle.callbackRequired('Security.fetchProfile', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('fetchProfile'), data, options, function (error, response) {
     cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source));
   });
 };
