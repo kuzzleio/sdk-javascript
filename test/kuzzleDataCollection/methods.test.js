@@ -1033,8 +1033,8 @@ describe('Collection methods', function () {
       should(kuzzle.collection('foo').room()).be.instanceof(Room);
     });
 
-    it('dataMappingFactory should return a CollectionMapping object', function () {
-      should(kuzzle.collection('foo').dataMappingFactory({})).be.instanceof(CollectionMapping);
+    it('collectionMapping should return a CollectionMapping object', function () {
+      should(kuzzle.collection('foo').collectionMapping({})).be.instanceof(CollectionMapping);
     });
   });
 });

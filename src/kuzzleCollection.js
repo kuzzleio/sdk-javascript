@@ -668,7 +668,7 @@ Collection.prototype.room = function (options) {
  * @param {object} [mapping] - mapping to instantiate the CollectionMapping object with
  * @constructor
  */
-Collection.prototype.dataMappingFactory = function (mapping) {
+Collection.prototype.collectionMapping = function (mapping) {
   return new CollectionMapping(this, mapping);
 };
 
