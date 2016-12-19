@@ -2,7 +2,7 @@ var
   uuid = require('uuid'),
   Collection = require('./kuzzleCollection'),
   KuzzleSecurity = require('./security/kuzzleSecurity'),
-  KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
+  MemoryStorage = require('./kuzzleMemoryStorage'),
   User = require('./security/kuzzleUser'),
   networkWrapper = require('./networkWrapper');
 
@@ -282,7 +282,7 @@ function Kuzzle (host, options, cb) {
   });
 
   Object.defineProperty(this, 'memoryStorage', {
-    value: new KuzzleMemoryStorage(this),
+    value: new MemoryStorage(this),
     enumerable: true
   });
 

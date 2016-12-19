@@ -1,12 +1,12 @@
 var
   should = require('should'),
   Kuzzle = require('../stubs/kuzzle.stub'),
-  KuzzleMemoryStorage = require('../../src/kuzzleMemoryStorage');
+  MemoryStorage = require('../../src/kuzzleMemoryStorage');
 
-describe('KuzzleMemoryStorage methods', () => {
+describe('MemoryStorage methods', () => {
   var
     kuzzle = new Kuzzle('foo'),
-    ms = new KuzzleMemoryStorage(kuzzle);
+    ms = new MemoryStorage(kuzzle);
 
   describe('#regular case', () => {
     it('should parse the given arguments (no options)', () => {

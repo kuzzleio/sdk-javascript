@@ -2,22 +2,22 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  KuzzleMemoryStorage = require('../../src/kuzzleMemoryStorage'),
+  MemoryStorage = require('../../src/kuzzleMemoryStorage'),
   Kuzzle = rewire('../../src/kuzzle');
 
-describe('KuzzleMemoryStorage constructor', function () {
-  it('should initialize properties and return a valid KuzzleMemoryStorage object', () => {
+describe('MemoryStorage constructor', function () {
+  it('should initialize properties and return a valid MemoryStorage object', () => {
     var
       kuzzle = new Kuzzle('foo'),
       ms;
 
     kuzzle.headers.some = 'headers';
-    ms = new KuzzleMemoryStorage(kuzzle);
+    ms = new MemoryStorage(kuzzle);
 
     // the collection "headers" should be a hard copy of the kuzzle ones
     kuzzle.headers = { someother: 'headers' };
 
-    should(ms).be.an.instanceOf(KuzzleMemoryStorage);
+    should(ms).be.an.instanceOf(MemoryStorage);
     should(ms).have.propertyWithDescriptor('kuzzle', {enumerable: true, writable: false, configurable: false});
     should(ms).have.propertyWithDescriptor('headers', {enumerable: true, writable: true, configurable: false});
     should(ms.headers.some).be.exactly('headers');
@@ -33,7 +33,7 @@ describe('KuzzleMemoryStorage constructor', function () {
     Kuzzle.prototype.bluebird = bluebird;
 
     kuzzle = new Kuzzle('foo');
-    ms = new KuzzleMemoryStorage(kuzzle);
+    ms = new MemoryStorage(kuzzle);
 
     functions = Object.getOwnPropertyNames(Object.getPrototypeOf(ms)).filter(p => (typeof ms[p] === 'function' && ['constructor', 'setHeaders'].indexOf(p) === -1));
     should(functions.length).be.eql(119);
@@ -47,7 +47,7 @@ describe('KuzzleMemoryStorage constructor', function () {
   it('should set headers using setHeaders', function () {
     var
       kuzzle = new Kuzzle('foo'),
-      ms = new KuzzleMemoryStorage(kuzzle);
+      ms = new MemoryStorage(kuzzle);
 
     ms.setHeaders({foo: 'bar'}, true);
     should(ms.headers).match({foo: 'bar'});
