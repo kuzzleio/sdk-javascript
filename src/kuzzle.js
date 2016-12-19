@@ -754,7 +754,7 @@ function emitRequest (request, cb) {
 
   this.network.send(request);
 
-  // Track requests made to allow KuzzleRoom.subscribeToSelf to work
+  // Track requests made to allow Room.subscribeToSelf to work
   self.requestHistory[request.requestId] = Date.now();
 }
 

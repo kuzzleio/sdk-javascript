@@ -426,7 +426,7 @@ describe('KuzzleDocument methods', function () {
       };
     });
 
-    it('should return a new KuzzleRoom object', function () {
+    it('should return a new Room object', function () {
       var
         document = new KuzzleDocument(dataCollection);
 

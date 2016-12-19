@@ -2,7 +2,7 @@ var
   KuzzleSearchResult = require('./kuzzleSearchResult'),
   KuzzleDocument = require('./kuzzleDocument'),
   CollectionMapping = require('./kuzzleCollectionMapping'),
-  KuzzleRoom = require('./kuzzleRoom'),
+  Room = require('./kuzzleRoom'),
   KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
 
 /**
@@ -568,7 +568,7 @@ Collection.prototype.subscribe = function (filters, options, cb) {
   this.kuzzle.callbackRequired('Collection.subscribe', cb);
 
   subscribeResult = new KuzzleSubscribeResult();
-  room = new KuzzleRoom(this, options);
+  room = new Room(this, options);
 
   room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
 
@@ -651,14 +651,14 @@ Collection.prototype.documentFactory = function (id, content) {
 };
 
 /**
- * Instantiate a new KuzzleRoom object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Room object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {object} [options] - subscription configuration
  * @constructor
  */
 Collection.prototype.roomFactory = function (options) {
-  return new KuzzleRoom(this, options);
+  return new Room(this, options);
 };
 
 /**

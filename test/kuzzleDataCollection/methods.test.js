@@ -7,7 +7,7 @@ var
   Collection = rewire('../../src/kuzzleCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   CollectionMapping = require('../../src/kuzzleCollectionMapping'),
-  KuzzleRoom = require('../../src/kuzzleRoom'),
+  Room = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('Collection methods', function () {
@@ -869,7 +869,7 @@ describe('Collection methods', function () {
       };
     });
 
-    it('should instantiate a new KuzzleRoom object', function () {
+    it('should instantiate a new Room object', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
       should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
@@ -1029,8 +1029,8 @@ describe('Collection methods', function () {
       should(kuzzle.dataCollectionFactory('foo').documentFactory('foo', { foo: 'bar'})).be.instanceof(KuzzleDocument);
     });
 
-    it('roomFactory should return a new KuzzleRoom object', function () {
-      should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(KuzzleRoom);
+    it('roomFactory should return a new Room object', function () {
+      should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(Room);
     });
 
     it('dataMappingFactory should return a CollectionMapping object', function () {
