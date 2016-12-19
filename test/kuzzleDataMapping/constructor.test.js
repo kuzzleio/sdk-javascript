@@ -3,9 +3,9 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataMapping = rewire('../../src/kuzzleDataMapping');
+  CollectionMapping = rewire('../../src/kuzzleCollectionMapping');
 
-describe('KuzzleDataMapping constructor', function () {
+describe('CollectionMapping constructor', function () {
   var
     kuzzle,
     collection;
@@ -20,20 +20,20 @@ describe('KuzzleDataMapping constructor', function () {
   });
 
   it('should create a new instance even if no mapping has been provided', function () {
-    var mapping = new KuzzleDataMapping(collection);
+    var mapping = new CollectionMapping(collection);
     should(mapping.mapping).be.an.Object().and.be.empty();
   });
 
   it('should take mappings from arguments if provided', function () {
     var
       mappings = { foo: {type: 'string'}, bar: {type: 'float'}},
-      mapping = new KuzzleDataMapping(collection, mappings);
+      mapping = new CollectionMapping(collection, mappings);
 
     should(mapping.mapping).match(mappings);
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var mapping = new KuzzleDataMapping(collection);
+    var mapping = new CollectionMapping(collection);
 
     should(mapping).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(mapping).have.propertyWithDescriptor('mapping', { enumerable: true, writable: true, configurable: false });
@@ -45,7 +45,7 @@ describe('KuzzleDataMapping constructor', function () {
       mapping;
 
     collection.headers = headers;
-    mapping = new KuzzleDataMapping(collection);
+    mapping = new CollectionMapping(collection);
     should(mapping.headers).match(headers);
   });
 
@@ -55,7 +55,7 @@ describe('KuzzleDataMapping constructor', function () {
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    mapping = new KuzzleDataMapping(kuzzle.dataCollectionFactory('foo'));
+    mapping = new CollectionMapping(kuzzle.dataCollectionFactory('foo'));
 
     should.exist(mapping.applyPromise);
     should.exist(mapping.refreshPromise);

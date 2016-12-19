@@ -1,7 +1,7 @@
 var
   KuzzleSearchResult = require('./kuzzleSearchResult'),
   KuzzleDocument = require('./kuzzleDocument'),
-  KuzzleDataMapping = require('./kuzzleDataMapping'),
+  CollectionMapping = require('./kuzzleCollectionMapping'),
   KuzzleRoom = require('./kuzzleRoom'),
   KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
 
@@ -332,10 +332,10 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
 
 
 /**
- * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
+ * Instantiates a CollectionMapping object containing the current mapping of this collection.
  *
  * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  */
 Collection.prototype.getMapping = function (options, cb) {
   var kuzzleMapping;
@@ -347,7 +347,7 @@ Collection.prototype.getMapping = function (options, cb) {
 
   this.kuzzle.callbackRequired('Collection.getMapping', cb);
 
-  kuzzleMapping = new KuzzleDataMapping(this);
+  kuzzleMapping = new CollectionMapping(this);
   kuzzleMapping.refresh(options, cb);
 };
 
@@ -662,14 +662,14 @@ Collection.prototype.roomFactory = function (options) {
 };
 
 /**
- * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new CollectionMapping object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
- * @param {object} [mapping] - mapping to instantiate the KuzzleDataMapping object with
+ * @param {object} [mapping] - mapping to instantiate the CollectionMapping object with
  * @constructor
  */
 Collection.prototype.dataMappingFactory = function (mapping) {
-  return new KuzzleDataMapping(this, mapping);
+  return new CollectionMapping(this, mapping);
 };
 
 /**

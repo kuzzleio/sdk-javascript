@@ -6,7 +6,7 @@ var
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   Collection = rewire('../../src/kuzzleCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
-  KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
+  CollectionMapping = require('../../src/kuzzleCollectionMapping'),
   KuzzleRoom = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
@@ -704,7 +704,7 @@ describe('Collection methods', function () {
       };
     });
 
-    it('should instantiate a new KuzzleDataMapping object', function (done) {
+    it('should instantiate a new CollectionMapping object', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = { queuable: false };
@@ -713,7 +713,7 @@ describe('Collection methods', function () {
 
       collection.getMapping(options, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleDataMapping);
+        should(res).be.instanceof(CollectionMapping);
         done();
       });
       should(emitted).be.true();
@@ -1033,8 +1033,8 @@ describe('Collection methods', function () {
       should(kuzzle.dataCollectionFactory('foo').roomFactory()).be.instanceof(KuzzleRoom);
     });
 
-    it('dataMappingFactory should return a KuzzleDataMapping object', function () {
-      should(kuzzle.dataCollectionFactory('foo').dataMappingFactory({})).be.instanceof(KuzzleDataMapping);
+    it('dataMappingFactory should return a CollectionMapping object', function () {
+      should(kuzzle.dataCollectionFactory('foo').dataMappingFactory({})).be.instanceof(CollectionMapping);
     });
   });
 });
