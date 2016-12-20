@@ -1,10 +1,8 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDocument = rewire('../../src/kuzzleDocument'),
-  KuzzleRoom = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('KuzzleDocument methods', function () {
@@ -107,7 +105,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'delete',
-        controller: 'write',
+        controller: 'document',
         body: {},
         _id: 'foo'
       };
@@ -178,7 +176,7 @@ describe('KuzzleDocument methods', function () {
         should(res).be.undefined();
         done();
       });
-    })
+    });
   });
 
   describe('#refresh', function () {
@@ -193,7 +191,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'get',
-        controller: 'read',
+        controller: 'document',
         body: {},
         _id: 'foo'
       };
@@ -282,7 +280,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'createOrReplace',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -344,7 +342,7 @@ describe('KuzzleDocument methods', function () {
         should(res).be.undefined();
         done();
       });
-    })
+    });
   });
 
   describe('#publish', function () {
@@ -359,7 +357,7 @@ describe('KuzzleDocument methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'publish',
-        controller: 'write',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -422,8 +420,8 @@ describe('KuzzleDocument methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
+        action: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -461,7 +459,7 @@ describe('KuzzleDocument methods', function () {
 
     it('should properly set headers', function () {
       var
-        document = new KuzzleDocument(dataCollection);
+        document = new KuzzleDocument(dataCollection),
         header = {_id: 'foobar'};
 
       should(document.setHeaders(header)).be.exactly(document);

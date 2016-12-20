@@ -2,8 +2,8 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
   Kuzzle = rewire('../../src/kuzzle'),
+  KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   KuzzleDataCollection = rewire('../../src/kuzzleDataCollection'),
   KuzzleDocument = require('../../src/kuzzleDocument'),
   KuzzleDataMapping = require('../../src/kuzzleDataMapping'),
@@ -51,38 +51,40 @@ describe('KuzzleDataCollection methods', function () {
     emitted,
     kuzzle;
 
-  describe('#advancedSearch', function () {
+  describe('#search', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ]}};
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
       error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
         action: 'search',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
 
-    it('should send the right search query to kuzzle', function (done) {
+    it('should send the right search query to kuzzle and retrieve the scrollId if exists', function (done) {
       var
         collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
         options = {queuable: false},
-        filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
+        filters = { scroll: '30s', and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
 
       this.timeout(50);
       expectedQuery.options = options;
       expectedQuery.body = filters;
 
-      collection.advancedSearch(filters, options, function (err, res) {
+      collection.search(filters, options, function (err, res) {
         should(err).be.null();
-        should(res).be.an.Object();
+        should(res).be.an.instanceOf(KuzzleSearchResult);
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
+        should(res.searchArgs.options.scrollId).be.exactly('banana');
+        should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
           should(item).be.instanceof(KuzzleDocument);
@@ -94,22 +96,22 @@ describe('KuzzleDataCollection methods', function () {
 
     it('should raise an error if no callback is provided', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
-      should(function () { collection.advancedSearch(); }).throw(Error);
+      should(function () { collection.search(); }).throw(Error);
       should(emitted).be.false();
-      should(function () { collection.advancedSearch({}); }).throw(Error);
+      should(function () { collection.search({}); }).throw(Error);
       should(emitted).be.false();
-      should(function () { collection.advancedSearch({}, {}); }).throw(Error);
+      should(function () { collection.search({}, {}); }).throw(Error);
       should(emitted).be.false();
     });
 
     it('should handle the callback argument correctly', function () {
       var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
 
-      collection.advancedSearch({}, function () {});
+      collection.search({}, function () {});
       should(emitted).be.true();
 
       emitted = false;
-      collection.advancedSearch({}, {}, function () {});
+      collection.search({}, {}, function () {});
       should(emitted).be.true();
     });
 
@@ -118,11 +120,101 @@ describe('KuzzleDataCollection methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      collection.advancedSearch({}, function (err, res) {
+      collection.search({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
+    });
+  });
+
+  describe('#scroll', function () {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'scroll',
+        controller: 'document',
+        body: {}
+      };
+    });
+
+    it('should throw an error if no scrollId is set', () => {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      should(() => { collection.scroll(); }).throw('KuzzleDataCollection.scroll: scrollId required');
+    });
+
+    it('should throw an error if no callback is given', () => {
+      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      should(() => { collection.scroll('scrollId'); }).throw('KuzzleDataCollection.scroll: a callback argument is required for read queries');
+    });
+
+    it('should parse the given parameters', done => {
+      var
+        queryScrollStub,
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        scrollId = 'scrollId',
+        filters = {},
+        options = {scroll: '30s'},
+        cb = () => {
+          done();
+        };
+
+      queryScrollStub = function (args, query, opts, callback) {
+        should(args.controller).be.exactly('document');
+        should(args.action).be.exactly('scroll');
+        should(opts.scroll).be.exactly(options.scroll);
+        should(opts.scrollId).be.exactly(scrollId);
+
+        callback(null, {
+          result: {
+            total: 1,
+            _scroll_id: 'banana',
+            hits: [
+              {
+                _id: 'foo',
+                _source: {bar: 'baz'}
+              }
+            ]
+          }
+        });
+      };
+
+      kuzzle.query = queryScrollStub;
+
+      collection.scroll(scrollId, options, filters, cb);
+    });
+
+    it('should parse the given parameters even if no options is given', done => {
+      var
+        queryScrollStub,
+        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        scrollId = 'scrollId',
+        cb = () => {
+          done();
+        };
+
+      queryScrollStub = function (args, query, opts, callback) {
+        should(args.controller).be.exactly('document');
+        should(args.action).be.exactly('scroll');
+        should(opts.scrollId).be.exactly(scrollId);
+
+        callback(null, {
+          result: {
+            total: 0,
+            hits: []
+          }
+        });
+      };
+
+      kuzzle.query = queryScrollStub;
+
+      collection.scroll(scrollId, cb);
     });
   });
 
@@ -137,7 +229,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'count',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
@@ -202,8 +294,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'createCollection',
-        controller: 'write'
+        action: 'create',
+        controller: 'collection'
       };
     });
 
@@ -256,7 +348,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'create',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -374,7 +466,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'delete',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -449,7 +541,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'get',
-        controller: 'read',
+        controller: 'document',
         body: {}
       };
     });
@@ -507,22 +599,28 @@ describe('KuzzleDataCollection methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       emitted = false;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'get',
+        controller: 'document',
+        body: {}
+      };
     });
 
-    it('should forward the query to the advancedSearch method', function () {
+    it('should forward the query to the search method', function () {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
+        collection = kuzzle.dataCollectionFactory('collection'),
         options = { queuable: false };
 
-      collection.advancedSearch = function () { emitted = true; };
-      expectedQuery.options = options;
+      collection.search = function () { emitted = true; };
 
       collection.fetchAllDocuments(options, function () {});
       should(emitted).be.true();
     });
 
     it('should raise an error if no callback is provided', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      var collection = kuzzle.dataCollectionFactory('collection');
       should(function () { collection.fetchAllDocuments(); }).throw(Error);
       should(emitted).be.false();
       should(function () { collection.fetchAllDocuments({}); }).throw(Error);
@@ -530,27 +628,63 @@ describe('KuzzleDataCollection methods', function () {
     });
 
     it('should handle the callback argument correctly', function () {
-      var collection = kuzzle.dataCollectionFactory(expectedQuery.collection);
+      var
+        collection = kuzzle.dataCollectionFactory('collection'),
+        mockSearchResult = new KuzzleSearchResult(
+          collection,
+          1,
+          [new KuzzleDocument(collection, 'banana', {answer: 42})],
+          {},
+          {options: {}, filters: {from: 0, size: 1000}}
+        );
 
-      collection.advancedSearch = function () { emitted = true; };
+      collection.search = function (filters, options, cb) {
+        cb(null, mockSearchResult);
+      };
 
-      collection.fetchAllDocuments(function () {});
+      collection.fetchAllDocuments(function () {emitted = true;});
       should(emitted).be.true();
 
       emitted = false;
-      collection.fetchAllDocuments({}, function () {});
+      collection.fetchAllDocuments({}, function () {emitted = true;});
       should(emitted).be.true();
     });
 
     it('should handle the from and size options', () => {
       var
-        collection = kuzzle.dataCollectionFactory(expectedQuery.collection),
-        stub = sinon.stub(collection, 'advancedSearch');
+        collection = kuzzle.dataCollectionFactory('collection'),
+        stub = sinon.stub(collection, 'search');
 
       collection.fetchAllDocuments({from: 123, size: 456}, function () {});
       should(stub.calledOnce).be.true();
-      should(stub.calledWithMatch({from: 123, size: 456})).be.true();
+      should(stub.calledWithMatch({}, {from: 123, size: 456})).be.true();
       stub.restore();
+    });
+
+    it('should handle the scroll options', () => {
+      var
+        collection = kuzzle.dataCollectionFactory('collection'),
+        stub = sinon.stub(collection, 'search');
+
+      collection.fetchAllDocuments({scroll: '30s'}, function () {});
+      should(stub.calledOnce).be.true();
+      should(stub.calledWithMatch({}, {from: 0, size: 1000, scroll: '30s'})).be.true();
+      stub.restore();
+    });
+
+    it('should transfer error if any', done => {
+      var
+        collection = kuzzle.dataCollectionFactory('collection');
+
+      collection.search = function (filters, options, cb) {
+        cb(new Error('foobar'));
+      };
+
+      collection.fetchAllDocuments(function (er) {
+        should(er).be.an.instanceOf(Error);
+        should(er.message).be.exactly('foobar');
+        done();
+      });
     });
   });
 
@@ -565,7 +699,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'getMapping',
-        controller: 'admin',
+        controller: 'collection',
         body: {}
       };
     });
@@ -628,7 +762,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'publish',
-        controller: 'write',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -667,7 +801,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'createOrReplace',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });
@@ -729,8 +863,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
+        action: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
     });
@@ -766,8 +900,8 @@ describe('KuzzleDataCollection methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'truncateCollection',
-        controller: 'admin',
+        action: 'truncate',
+        controller: 'collection',
         body: {}
       };
     });
@@ -830,7 +964,7 @@ describe('KuzzleDataCollection methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'update',
-        controller: 'write',
+        controller: 'document',
         body: {}
       };
     });

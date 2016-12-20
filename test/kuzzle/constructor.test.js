@@ -157,6 +157,8 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should allow passing a callback and respond once initialized', function (done) {
+      var kuzzle;
+
       this.timeout(500);
 
       networkStub.onConnect = function (cb) {
@@ -165,12 +167,13 @@ describe('Kuzzle constructor', () => {
         });
       };
 
-      new Kuzzle('nowhere', () => {
+      kuzzle = new Kuzzle('nowhere', () => {
+        kuzzle.state = 'disconnected';
         try {
           kuzzle.isValid();
           done('Error: the kuzzle object should have been invalidated');
         }
-        catch(e) {
+        catch (e) {
           done();
         }
       });
@@ -209,23 +212,9 @@ describe('Kuzzle constructor', () => {
     });
 
     it('should throw an error if no URL is provided', () => {
-      try {
+      should(() => {
         new Kuzzle();
-        should.fail('success', 'failure', 'Constructor should fail with no URL provided', '');
-      }
-      catch (e) {
-
-      }
-    });
-
-    it('should throw an error if no index is provied', () => {
-      try {
-        new Kuzzle('foo');
-        should.fail('success', 'failure', 'Constructor should fail with no Index provided', '');
-      }
-      catch (e) {
-
-      }
+      }).throw();
     });
 
     describe('#connect', function () {
@@ -277,7 +266,7 @@ describe('Kuzzle constructor', () => {
           listenerCalled = false;
 
         kuzzle.state = 'initializing';
-        kuzzle.addListener('connected', function () { listenerCalled = true; });
+        kuzzle.addListener('connected', function () {listenerCalled = true;});
 
         networkStub.onConnect = function (cb) {
           process.nextTick(function () {
@@ -295,10 +284,9 @@ describe('Kuzzle constructor', () => {
 
       it('should first disconnect if it was connected', function () {
         var
-          kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
-          disconnectStub = sinon.stub();
+          kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-        kuzzle.disconnect = disconnectStub;
+        kuzzle.disconnect = sinon.stub();
         kuzzle.connect();
 
         should(kuzzle.disconnect.called).be.false();
@@ -335,7 +323,9 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should registered listeners upon receiving a error event', function (done) {
-          var kuzzle = new Kuzzle('nowhere');
+          var
+            listenerCalled,
+            kuzzle = new Kuzzle('nowhere');
 
           kuzzle.addListener('error', function () { listenerCalled = true; });
 
@@ -357,10 +347,9 @@ describe('Kuzzle constructor', () => {
         });
 
         it('should call the provided callback on a connection success', function (done) {
-          var kuzzle;
           this.timeout(50);
 
-          kuzzle = new Kuzzle('nowhere', function (err, res) {
+          new Kuzzle('nowhere', function (err, res) {
             try {
               should(err).be.null();
               should(res).be.instanceof(Kuzzle);
@@ -381,7 +370,7 @@ describe('Kuzzle constructor', () => {
           this.timeout(50);
 
           kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
-          kuzzle.subscriptions['foo'] = {
+          kuzzle.subscriptions.foo = {
             bar: {
               renew: function () { renewed = true; }
             }
@@ -526,7 +515,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
 
-          kuzzle.subscriptions['foo'] = { bar: stubKuzzleRoom };
+          kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
 
           setTimeout(() => {
             try {
@@ -552,7 +541,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
 
-          kuzzle.subscriptions['foo'] = {
+          kuzzle.subscriptions.foo = {
             bar: stubKuzzleRoom
           };
 
@@ -597,7 +586,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
           kuzzle.jwtToken = 'foobar';
-          kuzzle.addListener('jwtTokenExpired', function () { eventEmitted = true });
+          kuzzle.addListener('jwtTokenExpired', function () {eventEmitted = true;});
 
           kuzzle.checkToken = function (token, cb) {
             should(token).be.eql(kuzzle.jwtToken);
@@ -619,12 +608,9 @@ describe('Kuzzle constructor', () => {
       });
     });
 
-    describe("#login", () => {
+    describe('#login', () => {
       var
-        loginCalled = false,
         loginStub = function(strategy, credentials, expiresIn, cb) {
-          loginCalled = true;
-
           if (typeof cb === 'function') {
             if (strategy === 'error') {
               cb(new Error());
@@ -734,7 +720,7 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.query = function(queryArgs, query, options, cb) {
+        kuzzle.query = function() {
           done();
         };
         kuzzle.login('local');
@@ -751,7 +737,7 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.query = function(queryArgs, query, options, cb) {
+        kuzzle.query = function() {
           done();
         };
 
@@ -768,7 +754,7 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.query = function(queryArgs, query, options, cb) {
+        kuzzle.query = function() {
           done();
         };
 
@@ -886,7 +872,7 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.query = function(queryArgs, query, options, cb) {
+        kuzzle.query = function(queryArgs, query) {
           should(query.expiresIn).be.undefined();
           done();
         };
@@ -905,7 +891,7 @@ describe('Kuzzle constructor', () => {
           connect: 'manual'
         });
 
-        kuzzle.query = function(queryArgs, query, options, cb) {
+        kuzzle.query = function(queryArgs, query) {
           should(query.expiresIn).be.undefined();
           done();
         };
@@ -950,7 +936,7 @@ describe('Kuzzle constructor', () => {
           cb(new Error());
         };
 
-        kuzzle.logout(function(error, k) {
+        kuzzle.logout(function(error) {
           should(error).be.an.instanceOf(Error);
           done();
         });
@@ -972,12 +958,12 @@ describe('Kuzzle constructor', () => {
         };
 
         try {
-          kuzzle.login('local', loginCredentials, '1h', function(error, k) {
+          kuzzle.login('local', loginCredentials, '1h', function(error) {
             should(error).be.an.instanceOf(Error);
             done();
           });
         }
-        catch(err) {
+        catch (err) {
           done(err);
         }
       });
@@ -1009,7 +995,6 @@ describe('Kuzzle constructor', () => {
       it('should forward token when logged in', function () {
         var
           kuzzle,
-          query = { body: { some: 'query'}},
           now = Date.now();
 
         this.timeout(200);
@@ -1030,7 +1015,7 @@ describe('Kuzzle constructor', () => {
         should(kuzzle.offlineQueue[0].query.action).be.exactly('action');
         should(kuzzle.offlineQueue[0].query.controller).be.exactly('controller');
         should(kuzzle.offlineQueue[0].query.index).be.exactly('index');
-        should(kuzzle.offlineQueue[0].query.headers.authorization).be.exactly('Bearer fake-token');
+        should(kuzzle.offlineQueue[0].query.jwt).be.exactly('fake-token');
       });
     });
   });

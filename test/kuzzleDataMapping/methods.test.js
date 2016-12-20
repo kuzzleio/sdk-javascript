@@ -1,7 +1,6 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleDataMapping = rewire('../../src/kuzzleDataMapping');
 
@@ -59,7 +58,7 @@ describe('KuzzleDataMapping methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'updateMapping',
-        controller: 'admin',
+        controller: 'collection',
         body: result.result._source
       };
     });
@@ -152,7 +151,7 @@ describe('KuzzleDataMapping methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'getMapping',
-        controller: 'admin',
+        controller: 'collection',
         body: {}
       };
     });

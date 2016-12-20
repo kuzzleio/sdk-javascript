@@ -40,7 +40,6 @@ describe('KuzzleDataCollection constructor', function () {
     kuzzle = new Kuzzle('foo');
     dataCollection = new KuzzleDataCollection(kuzzle, 'bar', 'foo');
 
-    should.exist(dataCollection.advancedSearchPromise);
     should.exist(dataCollection.countPromise);
     should.exist(dataCollection.createPromise);
     should.exist(dataCollection.createDocumentPromise);
@@ -71,7 +70,7 @@ describe('KuzzleDataCollection constructor', function () {
   it('should throw an error if no collection or no index is provided', function () {
     var kuzzle = new Kuzzle('foo');
 
-    should((function () { new KuzzleDataCollection(kuzzle)})).throw();
-    should((function () { new KuzzleDataCollection(kuzzle, 'foo')})).throw();
+    should((function () { new KuzzleDataCollection(kuzzle);})).throw();
+    should((function () { new KuzzleDataCollection(kuzzle, 'foo');})).throw();
   });
 });

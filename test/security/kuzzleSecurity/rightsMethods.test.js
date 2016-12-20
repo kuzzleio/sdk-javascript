@@ -112,11 +112,11 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should throw if called with no arguments', function () {
-      should(function () { kuzzle.security.getUserRights() }).throw(Error);
+      should(function () {kuzzle.security.getUserRights();}).throw(Error);
     });
 
     it('should throw if called with no callback', function () {
-      should(function () { kuzzle.security.getUserRights(expectedQuery._id) }).throw(Error);
+      should(function () {kuzzle.security.getUserRights(expectedQuery._id);}).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
@@ -178,14 +178,14 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should throw if called with no callback', function () {
-      should(function () { kuzzle.getMyRights() }).throw(Error);
+      should(function () {kuzzle.getMyRights();}).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzle.getMyRights( function (err, res) {
+      kuzzle.getMyRights(function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -275,15 +275,15 @@ describe('KuzzleSecurity user rights methods', function () {
     });
 
     it('should throw if called with no arguments', function () {
-      should(function () { kuzzle.security.isActionAllowed() }).throw(Error);
+      should(function () {kuzzle.security.isActionAllowed();}).throw(Error);
     });
 
     it('should throw if called with no action, nor controller', function () {
-      should(function () { kuzzle.security.isActionAllowed(exampleRights) }).throw(Error);
+      should(function () {kuzzle.security.isActionAllowed(exampleRights);}).throw(Error);
     });
 
     it('should throw if called with no action', function () {
-      should(function () { kuzzle.security.isActionAllowed(exampleRights, 'write') }).throw(Error);
+      should(function () {kuzzle.security.isActionAllowed(exampleRights, 'write');}).throw(Error);
     });
   });
 });
