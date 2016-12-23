@@ -42,7 +42,7 @@ module.exports = {
     new webpack.DefinePlugin({
       global: 'window'
     }),
-    new webpack.BannerPlugin('Javascript SDK version ' + version),
+    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false
