@@ -1,5 +1,7 @@
-var webpack = require('webpack');
-var path = require('path');
+var
+  webpack = require('webpack'),
+  path = require('path'),
+  version = require('./package.json').version;
 
 module.exports = {
   entry: './src/kuzzle.js',
@@ -40,6 +42,7 @@ module.exports = {
     new webpack.DefinePlugin({
       global: 'window'
     }),
+    new webpack.BannerPlugin('Javascript SDK version ' + version),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false
