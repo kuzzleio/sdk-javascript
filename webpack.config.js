@@ -14,7 +14,7 @@ module.exports = {
   devtool: 'source-map',
   node: {
     console: false,
-    global: false,
+    global: true,
     process: false,
     Buffer: false,
     __filename: false,
