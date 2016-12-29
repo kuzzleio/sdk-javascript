@@ -6,6 +6,7 @@ module.exports = {
   output: {
     path: './dist',
     filename: 'kuzzle.js',
+    library: 'Kuzzle',
     libraryTarget: 'umd'
   },
   watch: false,
@@ -13,7 +14,7 @@ module.exports = {
   devtool: 'source-map',
   node: {
     console: false,
-    global: false,
+    global: true,
     process: false,
     Buffer: false,
     __filename: false,
