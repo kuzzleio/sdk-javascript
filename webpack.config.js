@@ -6,7 +6,7 @@ module.exports = {
   output: {
     path: './dist',
     filename: 'kuzzle.js',
-		library: 'Kuzzle',
+    library: 'Kuzzle',
     libraryTarget: 'umd'
   },
   watch: false,
