@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
-  Profile = require('../../../src/security/kuzzleProfile');
+  Profile = require('../../../src/security/Profile');
 
 describe('Security profiles methods', function () {
   var
