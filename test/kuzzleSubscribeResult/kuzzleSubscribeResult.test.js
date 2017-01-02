@@ -1,6 +1,6 @@
 var
   should = require('should'),
-  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
+  KuzzleSubscribeResult = require('../../src/SubscribeResult');
 
 describe('KuzzleSubscribeResult object', function () {
   var ksr;

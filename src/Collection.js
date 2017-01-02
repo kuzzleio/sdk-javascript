@@ -3,7 +3,7 @@ var
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./Room'),
-  KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
+  KuzzleSubscribeResult = require('./SubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.

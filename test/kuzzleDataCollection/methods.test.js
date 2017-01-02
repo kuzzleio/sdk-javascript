@@ -8,7 +8,7 @@ var
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
+  KuzzleSubscribeResult = require('../../src/SubscribeResult');
 
 describe('Collection methods', function () {
   var

@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/kuzzle'),
   Document = rewire('../../src/Document'),
-  KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
+  KuzzleSubscribeResult = require('../../src/SubscribeResult');
 
 describe('Document methods', function () {
   var
