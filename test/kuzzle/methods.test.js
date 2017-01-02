@@ -4,7 +4,7 @@ var
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/kuzzle'),
-  Collection = require('../../src/kuzzleCollection'),
+  Collection = require('../../src/Collection.js'),
   Security = require('../../src/security/kuzzleSecurity'),
   User = require('../../src/security/kuzzleUser');
 

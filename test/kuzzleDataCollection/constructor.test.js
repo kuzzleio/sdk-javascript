@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  Collection = rewire('../../src/kuzzleCollection');
+  Collection = rewire('../../src/Collection.js');
 
 describe('Collection constructor', function () {
   it('should initialize properties and return a valid Collection object', function () {

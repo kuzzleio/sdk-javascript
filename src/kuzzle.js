@@ -1,6 +1,6 @@
 var
   uuid = require('uuid'),
-  Collection = require('./kuzzleCollection'),
+  Collection = require('./Collection.js'),
   Security = require('./security/kuzzleSecurity'),
   MemoryStorage = require('./kuzzleMemoryStorage'),
   User = require('./security/kuzzleUser'),

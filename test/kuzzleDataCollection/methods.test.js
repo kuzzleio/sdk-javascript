@@ -4,7 +4,7 @@ var
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
-  Collection = rewire('../../src/kuzzleCollection'),
+  Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/kuzzleDocument'),
   CollectionMapping = require('../../src/kuzzleCollectionMapping'),
   Room = require('../../src/kuzzleRoom'),

@@ -1,9 +1,9 @@
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+  SecurityDocument = require('./kuzzleSecurityDocument');
 
 function Profile(kuzzleSecurity, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+  SecurityDocument.call(this, kuzzleSecurity, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -30,7 +30,7 @@ function Profile(kuzzleSecurity, id, content) {
 
 }
 
-Profile.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+Profile.prototype = Object.create(SecurityDocument.prototype, {
   constructor: {
     value: Profile
   }

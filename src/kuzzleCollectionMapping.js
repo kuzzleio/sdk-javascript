@@ -15,24 +15,24 @@
  *
  *  The CollectionMapping object allow to get the current mapping of a data collection and to modify it if needed.
  *
- * @param {object} kuzzleDataCollection - Instance of the inherited Collection object
+ * @param {object} collection - Instance of the inherited Collection object
  * @param {object} [mapping] - mappings
  * @constructor
  */
-function CollectionMapping(kuzzleDataCollection, mapping) {
+function CollectionMapping(collection, mapping) {
   Object.defineProperties(this, {
     //read-only properties
     collection: {
-      value: kuzzleDataCollection,
+      value: collection,
       enumerable: true
     },
     kuzzle: {
-      value: kuzzleDataCollection.kuzzle,
+      value: collection.kuzzle,
       enumerable: true
     },
     // writable properties
     headers: {
-      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      value: JSON.parse(JSON.stringify(collection.headers)),
       enumerable: true,
       writable: true
     },
