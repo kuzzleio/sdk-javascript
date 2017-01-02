@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  CollectionMapping = rewire('../../src/kuzzleCollectionMapping');
+  CollectionMapping = rewire('../../src/CollectionMapping');
 
 describe('CollectionMapping constructor', function () {
   var
