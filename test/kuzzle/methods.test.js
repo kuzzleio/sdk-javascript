@@ -6,7 +6,7 @@ var
   Kuzzle = rewire('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
   Security = require('../../src/security/Security'),
-  User = require('../../src/security/kuzzleUser');
+  User = require('../../src/security/User');
 
 describe('Kuzzle methods', function () {
   var

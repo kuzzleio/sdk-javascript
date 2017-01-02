@@ -3,7 +3,7 @@ var
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
-  User = require('./security/kuzzleUser'),
+  User = require('./security/User'),
   networkWrapper = require('./networkWrapper');
 
 /**

@@ -1,7 +1,7 @@
 var
   Role = require('./Role'),
   Profile = require('./Profile'),
-  User = require('./kuzzleUser');
+  User = require('./User');
 
 /**
  * Kuzzle security constructor

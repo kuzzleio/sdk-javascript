@@ -2,7 +2,7 @@ var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
   Role = require('../../../src/security/Role'),
-  User = require('../../../src/security/kuzzleUser');
+  User = require('../../../src/security/User');
 
 describe('User methods', function () {
   var
