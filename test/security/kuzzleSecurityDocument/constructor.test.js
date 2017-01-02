@@ -3,7 +3,7 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/Kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
+  KuzzleSecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument constructor', function () {
   var

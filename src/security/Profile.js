@@ -1,5 +1,5 @@
 var
-  SecurityDocument = require('./kuzzleSecurityDocument');
+  SecurityDocument = require('./SecurityDocument');
 
 function Profile(Security, id, content) {
 

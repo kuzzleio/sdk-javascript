@@ -1,5 +1,5 @@
 var
-  KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+  KuzzleSecurityDocument = require('./SecurityDocument');
 
 /**
  * @param {Security} Security
