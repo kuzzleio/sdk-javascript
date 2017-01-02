@@ -319,7 +319,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
         console.warn('Collection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using Collection.search or Collection.scroll instead'); // eslint-disable-line no-console
       }
 
-      searchResult.documents.forEach(document => {
+      searchResult.documents.forEach(function(document) {
         documents.push(document);
       });
       searchResult.next(getNextDocuments);

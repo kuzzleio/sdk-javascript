@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 if [ "${TRAVIS_BRANCH}" = "master"  -a "${TRAVIS_PULL_REQUEST}" = "false" ]
 then
