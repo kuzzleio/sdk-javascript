@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "2.2.2",
+  "version": "2.3.3",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -20,7 +20,7 @@
   "scripts": {
     "test": "npm run --silent lint && npm run unit-testing",
     "unit-testing": "istanbul cover _mocha  -- --recursive",
-    "lint": "eslint --max-warnings=0 ./lib ./test",
+    "lint": "eslint --max-warnings=0 ./src ./test",
     "build": "node build.js"
   },
   "browser": "src/kuzzle.js",
@@ -29,8 +29,9 @@
   "dependencies": {
     "bluebird": "3.4.6",
     "bufferutil": "^1.2.1",
-    "uuid": "3.0.0",
+    "eslint-loader": "^1.6.1",
     "utf-8-validate": "^1.2.1",
+    "uuid": "3.0.0",
     "ws": "^1.1.1"
   },
   "devDependencies": {
@@ -38,14 +39,8 @@
     "webpack": "^1.13.1",
     "eslint": "^3.7.1",
     "eslint-friendly-formatter": "^2.0.6",
-    "eslint-loader": "^1.5.0",
     "browserify": "13.1.0",
     "codecov": "^1.0.1",
-    "grunt": "1.0.1",
-    "grunt-browserify": "^5.0.0",
-    "grunt-contrib-uglify": "2.0.0",
-    "grunt-webpack": "^1.0.14",
-    "gruntify-eslint": "^3.0.0",
     "istanbul": "0.4.5",
     "istanbul-middleware": "0.2.2",
     "mocha": "3.1.0",

@@ -16,7 +16,7 @@
  *  The KuzzleDataMapping object allow to get the current mapping of a data collection and to modify it if needed.
  *
  * @param {object} kuzzleDataCollection - Instance of the inherited KuzzleDataCollection object
- * @param {object} mapping - mappings
+ * @param {object} [mapping] - mappings
  * @constructor
  */
 function KuzzleDataMapping(kuzzleDataCollection, mapping) {
@@ -73,7 +73,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.collection.buildQueryArgs('admin', 'updateMapping'), data, options, function (err) {
+  self.kuzzle.query(this.collection.buildQueryArgs('collection', 'updateMapping'), data, options, function (err) {
     if (err) {
       return cb && cb(err);
     }
@@ -103,7 +103,7 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
     options = null;
   }
 
-  this.kuzzle.query(this.collection.buildQueryArgs('admin', 'getMapping'), data, options, function (err, res) {
+  this.kuzzle.query(this.collection.buildQueryArgs('collection', 'getMapping'), data, options, function (err, res) {
     if (err) {
       return cb ? cb(err) : false;
     }

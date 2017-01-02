@@ -54,7 +54,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {hits: []}};
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getAllStats'
       };
     });
@@ -96,7 +96,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {hits: []}};
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getLastStats'
       };
     });
@@ -115,7 +115,7 @@ describe('Kuzzle methods', function () {
 
     it('should return statistics frames starting from the given timestamp', function () {
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getStats',
         body: { startTime: 123 }
       };
@@ -159,7 +159,7 @@ describe('Kuzzle methods', function () {
       // testing: getStatistics(timestamp, options callback);
       emitted = false;
       expectedQuery = {
-        controller: 'admin',
+        controller: 'server',
         action: 'getStats',
         body: { startTime: 123 }
       };
@@ -255,8 +255,8 @@ describe('Kuzzle methods', function () {
         }
       }}};
       expectedQuery = {
-        controller: 'read',
-        action: 'serverInfo'
+        controller: 'server',
+        action: 'info'
       };
     });
 
@@ -297,8 +297,8 @@ describe('Kuzzle methods', function () {
       result = {result: {collections: {stored: [], realtime: []}}};
       expectedQuery = {
         index: 'foo',
-        controller: 'read',
-        action: 'listCollections',
+        controller: 'collection',
+        action: 'list',
         body: {type: 'all'}
       };
     });
@@ -345,12 +345,12 @@ describe('Kuzzle methods', function () {
     });
 
     it('should handle from option correctly', function (done) {
-      expectedQuery.body.from = 'foobar';
+      expectedQuery.from = 'foobar';
       kuzzle.listCollections('foo', {from: 'foobar'}, () => done());
     });
 
     it('should handle size option correctly', function (done) {
-      expectedQuery.body.size = 'foobar';
+      expectedQuery.size = 'foobar';
       kuzzle.listCollections('foo', {size: 'foobar'}, () => done());
     });
 
@@ -374,8 +374,8 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {indexes: ['foo', 'bar']}};
       expectedQuery = {
-        controller: 'read',
-        action: 'listIndexes'
+        controller: 'index',
+        action: 'list'
       };
     });
 
@@ -424,7 +424,7 @@ describe('Kuzzle methods', function () {
       error = null;
       result = {result: {now: Date.now()}};
       expectedQuery = {
-        controller: 'read',
+        controller: 'server',
         action: 'now'
       };
     });
@@ -855,9 +855,68 @@ describe('Kuzzle methods', function () {
       args = spy.firstCall.args;
 
       should(args[0].index).be.exactly(index);
-      should(args[0].controller).be.exactly('admin');
-      should(args[0].action).be.exactly('refreshIndex');
+      should(args[0].controller).be.exactly('index');
+      should(args[0].action).be.exactly('refresh');
       should(args[2]).be.exactly(options);
+      should(args[3]).be.exactly(cb);
+    });
+
+  });
+
+  describe('#createIndex', function () {
+    beforeEach(() => {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should throw an error if no index is set', () => {
+      should(() => { kuzzle.createIndex(); }).throw('Kuzzle.createIndex: index required');
+    });
+
+    it('should use the default index if no index is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.createIndex();
+
+      should(spy.calledOnce).be.true();
+      should(spy.firstCall.args[1].index).be.exactly(kuzzle.defaultIndex);
+    });
+
+    it('should parse the given parameters', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        options = {foo: 'bar'},
+        cb = () => {},
+        args;
+
+      kuzzle.createIndex(index, options, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].action).be.exactly('createIndex');
+      should(args[1].index).be.exactly(index);
+      should(args[2]).be.exactly(options);
+      should(args[3]).be.exactly(cb);
+    });
+
+    it('should parse the given parameters even if no options is given', () => {
+      var
+        spy = sandbox.stub(kuzzle, 'query').returns(),
+        index = 'index',
+        cb = () => {},
+        args;
+
+      kuzzle.createIndex(index, cb);
+
+      should(spy.calledOnce).be.true();
+      args = spy.firstCall.args;
+
+      should(args[0].action).be.exactly('createIndex');
+      should(args[1].index).be.exactly(index);
+      should(args[2]).be.null();
       should(args[3]).be.exactly(cb);
     });
 
@@ -899,7 +958,7 @@ describe('Kuzzle methods', function () {
       kuzzle.getAutoRefresh(index, options, cb);
       should(spy.calledOnce).be.true();
       should(spy.calledWithExactly(
-        { index: index, controller: 'admin', action: 'getAutoRefresh' },
+        { index: index, controller: 'index', action: 'getAutoRefresh' },
         {},
         options,
         cb)
@@ -909,7 +968,7 @@ describe('Kuzzle methods', function () {
       kuzzle.getAutoRefresh(cb);
       should(spy.calledTwice).be.true();
       should(spy.secondCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'getAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'getAutoRefresh' },
         {},
         undefined,
         cb)
@@ -937,7 +996,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(true, cb);
       should(spy.calledOnce).be.true();
       should(spy.calledWith(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: true } },
         undefined,
         cb
@@ -964,7 +1023,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(autoRefresh, options, cb);
       should(spy.calledOnce).be.true();
       should(spy.firstCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'admin', action: 'setAutoRefresh' },
+        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: autoRefresh }},
         options,
         cb
@@ -973,7 +1032,7 @@ describe('Kuzzle methods', function () {
       kuzzle.setAutoRefresh(index, autoRefresh);
       should(spy.calledTwice).be.true();
       should(spy.secondCall.calledWithExactly(
-        { index: index, controller: 'admin', action: 'setAutoRefresh' },
+        { index: index, controller: 'index', action: 'setAutoRefresh' },
         { body: { autoRefresh: autoRefresh }},
         undefined,
         undefined

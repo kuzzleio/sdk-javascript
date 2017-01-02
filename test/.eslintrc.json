@@ -5,5 +5,8 @@
     "no-new": 0,
     "new-cap": 0,
     "no-console": 0
+  },
+  "parserOptions": {
+    "ecmaVersion": 6
   }
 }

@@ -1,11 +1,14 @@
-var webpack = require('webpack');
-var path = require('path');
+var
+  webpack = require('webpack'),
+  path = require('path'),
+  version = require('./package.json').version;
 
 module.exports = {
   entry: './src/kuzzle.js',
   output: {
     path: './dist',
     filename: 'kuzzle.js',
+    library: 'Kuzzle',
     libraryTarget: 'umd'
   },
   watch: false,
@@ -13,7 +16,7 @@ module.exports = {
   devtool: 'source-map',
   node: {
     console: false,
-    global: false,
+    global: true,
     process: false,
     Buffer: false,
     __filename: false,
@@ -24,7 +27,7 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
-        loader: 'eslint',
+        loader: 'eslint-loader',
         include: path.resolve(__dirname, './src/'),
         exclude: /node_modules/
       }
@@ -40,6 +43,7 @@ module.exports = {
     new webpack.DefinePlugin({
       global: 'window'
     }),
+    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false

@@ -1,4 +1,5 @@
 var
+  KuzzleSearchResult = require('./kuzzleSearchResult'),
   KuzzleDocument = require('./kuzzleDocument'),
   KuzzleDataMapping = require('./kuzzleDataMapping'),
   KuzzleRoom = require('./kuzzleRoom'),
@@ -15,6 +16,11 @@ var
 /**
  * A data collection is a set of data managed by Kuzzle. It acts like a data table for persistent documents,
  * or like a room for pub/sub messages.
+ *
+ * @property {string} collection
+ * @property {string} index
+ * @property {Kuzzle} kuzzle
+ * @property {Array.<string>} collection
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @param {string} collection - name of the data collection to handle
  * @param {string} index - Index containing the data collection
@@ -73,61 +79,6 @@ function KuzzleDataCollection(kuzzle, collection, index) {
 }
 
 /**
- * Executes an advanced search on the data collection.
- *
- * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
- * usually a couple of seconds.
- * That means that a document that was just been created won’t be returned by this function.
- *
- * @param {object} filters - Filters in Elasticsearch Query DSL format
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Handles the query response
- */
-KuzzleDataCollection.prototype.advancedSearch = function (filters, options, cb) {
-  var
-    query,
-    self = this;
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.callbackRequired('KuzzleDataCollection.advancedSearch', cb);
-
-  query = self.kuzzle.addHeaders({body: filters}, this.headers);
-
-  self.kuzzle.query(this.buildQueryArgs('read', 'search'), query, options, function (error, result) {
-    var
-      response,
-      documents = [];
-
-    if (error) {
-      return cb(error);
-    }
-
-    result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
-
-      newDocument.version = doc._version;
-
-      documents.push(newDocument);
-    });
-
-    response = {
-      total: result.result.total,
-      documents: documents
-    };
-
-    if (result.result.aggregations) {
-      response.aggregations = result.result.aggregations;
-    }
-
-    cb(null, response);
-  });
-};
-
-/**
  * Returns the number of documents matching the provided set of filters.
  *
  * There is a small delay between documents creation and their existence in our advanced search layer,
@@ -151,7 +102,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.buildQueryArgs('read', 'count'), query, options, function (error, result) {
+  this.kuzzle.query(this.buildQueryArgs('document', 'count'), query, options, function (error, result) {
     cb(error, result && result.result.count);
   });
 };
@@ -174,7 +125,7 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'createCollection'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, cb);
 
   return this;
 };
@@ -229,7 +180,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
 
   data = self.kuzzle.addHeaders(data, self.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     var doc;
 
     if (err) {
@@ -280,7 +231,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
 
   data = this.kuzzle.addHeaders(data, this.headers);
 
-  this.kuzzle.query(this.buildQueryArgs('write', action), data, options, cb && function (err, res) {
+  this.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     if (err) {
       cb(err);
     }
@@ -312,7 +263,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
   self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('read', 'get'), data, options, function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'get'), data, options, function (err, res) {
     var document;
 
     if (err) {
@@ -332,27 +283,51 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  * @param {responseCallback} cb - Handles the query response
  */
 KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
-  var filters = {};
+  var
+    warnEmitted = false,
+    documents = [],
+    filters = {};
 
   if (!cb && typeof options === 'function') {
     cb = options;
-    options = null;
+    options = {};
   }
 
   // copying pagination options to the search filter
-  if (options) {
-    if (options.from) {
-      filters.from = options.from;
-    }
-
-    if (options.size) {
-      filters.size = options.size;
-    }
+  if (!options) {
+    options = {};
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAll', cb);
+  if (!options.from) {
+    options.from = 0;
+  }
 
-  this.advancedSearch(filters, options, cb);
+  if (!options.size) {
+    options.size = 1000;
+  }
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
+
+  this.search(filters, options, function getNextDocuments (error, searchResult) {
+    if (error) {
+      return cb(error);
+    }
+
+    if (searchResult instanceof KuzzleSearchResult) {
+      if (searchResult.total > 10000 && !warnEmitted) {
+        warnEmitted = true;
+        console.warn('KuzzleDataCollection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using KuzzleDataCollection.search or KuzzleDataCollection.scroll instead'); // eslint-disable-line no-console
+      }
+
+      searchResult.documents.forEach(function(document) {
+        documents.push(document);
+      });
+      searchResult.next(getNextDocuments);
+    }
+    else {
+      cb(null, documents);
+    }
+  });
 };
 
 
@@ -398,7 +373,7 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options, cb)
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('write', 'publish'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('realtime', 'publish'), data, options, cb);
 
   return this;
 };
@@ -431,7 +406,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', 'createOrReplace'), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'createOrReplace'), data, options, cb && function (err, res) {
     var document;
 
     if (err) {
@@ -441,6 +416,131 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
     document = new KuzzleDocument(self, res.result._id, res.result._source);
     document.version = res.result._version;
     cb(null, document);
+  });
+
+  return this;
+};
+
+/**
+ * Executes an advanced search on the data collection.
+ *
+ * /!\ There is a small delay between documents creation and their existence in our advanced search layer,
+ * usually a couple of seconds.
+ * That means that a document that was just been created won’t be returned by this function.
+ *
+ * @param {object} filters - Filters in Elasticsearch Query DSL format
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+
+KuzzleDataCollection.prototype.search = function (filters, options, cb) {
+  var
+    query,
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  self.kuzzle.callbackRequired('KuzzleDataCollection.search', cb);
+
+  query = self.kuzzle.addHeaders({body: filters}, this.headers);
+
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
+    var documents = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (doc) {
+      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+
+      newDocument.version = doc._version;
+
+      documents.push(newDocument);
+    });
+
+    if (result.result._scroll_id) {
+      options.scrollId = result.result._scroll_id;
+    }
+
+    cb(null, new KuzzleSearchResult(
+      self,
+      result.result.total,
+      documents,
+      result.result.aggregations ? result.result.aggregations : [],
+      {options: options, filters: filters}
+    ));
+  });
+};
+
+/**
+ * A "scroll" option can be passed to search queries, creating persistent
+ * paginated results.
+ * This method can be used to manually get the next page of a search result,
+ * instead of using KuzzleSearchResult.next()
+ *
+ * @param {string} scrollId
+ * @param {object} [options]
+ * @param {object} [filters]
+ * @param {responseCallback} cb
+ */
+KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb) {
+  var
+    request = {body: {}},
+    self = this;
+
+  if (!scrollId) {
+    throw new Error('KuzzleDataCollection.scroll: scrollId required');
+  }
+
+  if (!cb) {
+    cb = filters;
+    filters = null;
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  if (!options) {
+    options = {};
+  }
+
+  options.scrollId = scrollId;
+
+  this.kuzzle.callbackRequired('KuzzleDataCollection.scroll', cb);
+
+  this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
+    var documents = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (doc) {
+      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+
+      newDocument.version = doc._version;
+
+      documents.push(newDocument);
+    });
+
+    if (result.result._scroll_id) {
+      options.scrollId = result.result._scroll_id;
+    }
+
+    cb(null, new KuzzleSearchResult(
+      self,
+      result.result.total,
+      documents,
+      result.result.aggregations ? result.result.aggregations : [],
+      {options: options, filters: filters}
+    ));
   });
 
   return this;
@@ -492,7 +592,7 @@ KuzzleDataCollection.prototype.truncate = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('admin', 'truncateCollection'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('collection', 'truncate'), data, options, cb);
 
   return this;
 };
@@ -526,7 +626,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
 
   data = self.kuzzle.addHeaders(data, this.headers);
 
-  self.kuzzle.query(this.buildQueryArgs('write', 'update'), data, options, cb && function (err, res) {
+  self.kuzzle.query(this.buildQueryArgs('document', 'update'), data, options, cb && function (err, res) {
     if (err) {
       return cb(err);
     }

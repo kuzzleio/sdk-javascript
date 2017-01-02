@@ -146,7 +146,7 @@ KuzzleDocument.prototype.delete = function (options, cb) {
     throw new Error('KuzzleDocument.delete: cannot delete a document without a document ID');
   }
 
-  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'delete'), this.serialize(), options, cb && function (err) {
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'delete'), this.serialize(), options, cb && function (err) {
     cb(err, err ? undefined : self.id);
   });
 };
@@ -172,7 +172,7 @@ KuzzleDocument.prototype.refresh = function (options, cb) {
 
   this.kuzzle.callbackRequired('KuzzleDocument.refresh', cb);
 
-  self.kuzzle.query(self.dataCollection.buildQueryArgs('read', 'get'), {_id: self.id}, options, function (error, res) {
+  self.kuzzle.query(self.dataCollection.buildQueryArgs('document', 'get'), {_id: self.id}, options, function (error, res) {
     var newDocument;
 
     if (error) {
@@ -211,7 +211,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'createOrReplace'), data, options, function (error, res) {
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'createOrReplace'), data, options, function (error, res) {
     if (error) {
       return cb && cb(error);
     }
@@ -240,7 +240,7 @@ KuzzleDocument.prototype.save = function (options, cb) {
 KuzzleDocument.prototype.publish = function (options) {
   var data = this.serialize();
 
-  this.kuzzle.query(this.dataCollection.buildQueryArgs('write', 'publish'), data, options);
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('realtime', 'publish'), data, options);
 
   return this;
 };

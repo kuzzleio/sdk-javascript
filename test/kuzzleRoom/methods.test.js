@@ -70,7 +70,7 @@ describe('KuzzleRoom methods', function () {
         index: 'bar',
         collection: 'foo',
         action: 'count',
-        controller: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
       room = new KuzzleRoom(dataCollection);
@@ -141,8 +141,8 @@ describe('KuzzleRoom methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'on',
-        controller: 'subscribe',
+        action: 'subscribe',
+        controller: 'realtime',
         body: {}
       };
       room = new KuzzleRoom(dataCollection);
@@ -283,8 +283,8 @@ describe('KuzzleRoom methods', function () {
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
-        action: 'off',
-        controller: 'subscribe',
+        action: 'unsubscribe',
+        controller: 'realtime',
         body: {}
       };
 

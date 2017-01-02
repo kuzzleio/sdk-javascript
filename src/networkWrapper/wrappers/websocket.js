@@ -162,11 +162,17 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.off = function (roomId, callback) {
-    var index;
+    var index = -1;
 
     if (this.listeners[roomId]) {
-      index = this.listeners[roomId].findIndex(function (listener) {
-        return listener.fn === callback;
+      // Array.findIndex is not supported by internet explorer
+      this.listeners[roomId].some(function (listener, i) {
+        if (listener.fn === callback) {
+          index = i;
+          return true;
+        }
+
+        return false;
       });
 
       if (index !== -1) {
