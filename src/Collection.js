@@ -1,5 +1,5 @@
 var
-  KuzzleSearchResult = require('./kuzzleSearchResult'),
+  KuzzleSearchResult = require('./SearchResult'),
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./Room'),

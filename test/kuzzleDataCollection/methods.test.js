@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
+  KuzzleSearchResult = require('../../src/SearchResult'),
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),

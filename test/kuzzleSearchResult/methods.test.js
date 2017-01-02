@@ -4,7 +4,7 @@ var
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
   Document = require('../../src/Document'),
-  KuzzleSearchResult = rewire('../../src/kuzzleSearchResult');
+  KuzzleSearchResult = rewire('../../src/SearchResult');
 
 describe('KuzzleSearchResult methods', function () {
   var
