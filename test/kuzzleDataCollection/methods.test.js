@@ -5,7 +5,7 @@ var
   Kuzzle = rewire('../../src/kuzzle'),
   KuzzleSearchResult = require('../../src/kuzzleSearchResult'),
   Collection = rewire('../../src/Collection.js'),
-  Document = require('../../src/kuzzleDocument'),
+  Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/kuzzleRoom'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');

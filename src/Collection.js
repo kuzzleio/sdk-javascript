@@ -1,6 +1,6 @@
 var
   KuzzleSearchResult = require('./kuzzleSearchResult'),
-  Document = require('./kuzzleDocument'),
+  Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./kuzzleRoom'),
   KuzzleSubscribeResult = require('./kuzzleSubscribeResult');

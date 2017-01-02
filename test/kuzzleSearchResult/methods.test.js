@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  Document = require('../../src/kuzzleDocument'),
+  Document = require('../../src/Document'),
   KuzzleSearchResult = rewire('../../src/kuzzleSearchResult');
 
 describe('KuzzleSearchResult methods', function () {
