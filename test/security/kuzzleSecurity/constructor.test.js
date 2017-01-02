@@ -3,10 +3,10 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/Kuzzle'),
-  Security = require('../../../src/security/kuzzleSecurity');
+  Security = require('../../../src/security/Security');
 
-describe('kuzzleSecurity constructor', function () {
-  it('should initialize properties and return a valid kuzzleSecurity object', function () {
+describe('Security constructor', function () {
+  it('should initialize properties and return a valid Security object', function () {
     var
       kuzzle = new Kuzzle('foo');
 

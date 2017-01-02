@@ -5,7 +5,7 @@ var
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
-  Security = require('../../src/security/kuzzleSecurity'),
+  Security = require('../../src/security/Security'),
   User = require('../../src/security/kuzzleUser');
 
 describe('Kuzzle methods', function () {

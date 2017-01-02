@@ -1,9 +1,9 @@
 var
   SecurityDocument = require('./kuzzleSecurityDocument');
 
-function Profile(kuzzleSecurity, id, content) {
+function Profile(Security, id, content) {
 
-  SecurityDocument.call(this, kuzzleSecurity, id, content);
+  SecurityDocument.call(this, Security, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -17,8 +17,8 @@ function Profile(kuzzleSecurity, id, content) {
   });
 
   // promisifying
-  if (kuzzleSecurity.kuzzle.bluebird) {
-    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+  if (Security.kuzzle.bluebird) {
+    return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['hydrate', 'save'];
@@ -59,7 +59,7 @@ Profile.prototype.save = function (options, cb) {
 
   data = this.serialize();
 
-  self.kuzzle.query(self.kuzzleSecurity.buildQueryArgs('createOrReplaceProfile'), data, options, cb && function (error) {
+  self.kuzzle.query(self.Security.buildQueryArgs('createOrReplaceProfile'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 

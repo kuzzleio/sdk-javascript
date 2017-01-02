@@ -34,7 +34,7 @@ describe('KuzzleSecurityDocument constructor', function () {
     var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
 
     should(securityDocument).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
-    should(securityDocument).have.propertyWithDescriptor('kuzzleSecurity', { enumerable: false, writable: false, configurable: false });
+    should(securityDocument).have.propertyWithDescriptor('Security', { enumerable: false, writable: false, configurable: false });
     should(securityDocument).have.propertyWithDescriptor('id', { enumerable: true, writable: false, configurable: false });
     should(securityDocument).have.propertyWithDescriptor('content', { enumerable: true, writable: true, configurable: false });
   });

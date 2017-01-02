@@ -1,8 +1,8 @@
 var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
-function Role(kuzzleSecurity, id, content) {
+function Role(Security, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+  KuzzleSecurityDocument.call(this, Security, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -16,8 +16,8 @@ function Role(kuzzleSecurity, id, content) {
   });
 
   // promisifying
-  if (kuzzleSecurity.kuzzle.bluebird) {
-    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+  if (Security.kuzzle.bluebird) {
+    return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['save'];
@@ -56,7 +56,7 @@ Role.prototype.save = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, options, cb && function (error) {
+  self.kuzzle.query(this.Security.buildQueryArgs('createOrReplaceRole'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 

@@ -2,14 +2,14 @@ var
   KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
 
 /**
- * @param {Security} kuzzleSecurity
+ * @param {Security} Security
  * @param {string} id
  * @param {Object} content
  * @constructor
  */
-function User(kuzzleSecurity, id, content) {
+function User(Security, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+  KuzzleSecurityDocument.call(this, Security, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -23,8 +23,8 @@ function User(kuzzleSecurity, id, content) {
   });
 
   // promisifying
-  if (kuzzleSecurity.kuzzle.bluebird) {
-    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+  if (Security.kuzzle.bluebird) {
+    return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['save', 'saveRestricted'];
@@ -100,7 +100,7 @@ User.prototype.save = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
+  self.kuzzle.query(this.Security.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 
@@ -128,7 +128,7 @@ User.prototype.saveRestricted = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createRestrictedUser'), data, options, cb && function (error) {
+  self.kuzzle.query(this.Security.buildQueryArgs('createRestrictedUser'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 
