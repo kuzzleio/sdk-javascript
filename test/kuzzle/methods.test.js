@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
   Security = require('../../src/security/kuzzleSecurity'),
   User = require('../../src/security/kuzzleUser');

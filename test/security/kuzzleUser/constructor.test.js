@@ -2,7 +2,7 @@ var
   should = require('should'),
   bluebird = require('bluebird'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/kuzzle'),
+  Kuzzle = rewire('../../../src/Kuzzle'),
   User = require('../../../src/security/kuzzleUser');
 
 describe('User constructor', function () {

@@ -1,7 +1,7 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   CollectionMapping = rewire('../../src/CollectionMapping');
 
 describe('CollectionMapping methods', function () {

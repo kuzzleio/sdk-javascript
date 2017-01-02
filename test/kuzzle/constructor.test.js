@@ -5,7 +5,7 @@ var
   bluebird = require('bluebird'),
   proxyquire = require('proxyquire'),
   NetworkWrapper = require('../../src/networkWrapper/wrappers/websocket'),
-  kuzzleSource = '../../src/kuzzle';
+  kuzzleSource = '../../src/Kuzzle';
 
 describe('Kuzzle constructor', () => {
   var

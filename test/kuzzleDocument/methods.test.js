@@ -1,7 +1,7 @@
 var
   should = require('should'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   Document = rewire('../../src/Document'),
   KuzzleSubscribeResult = require('../../src/SubscribeResult');
 

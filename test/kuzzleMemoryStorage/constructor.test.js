@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   MemoryStorage = require('../../src/MemoryStorage'),
-  Kuzzle = rewire('../../src/kuzzle');
+  Kuzzle = rewire('../../src/Kuzzle');
 
 describe('MemoryStorage constructor', function () {
   it('should initialize properties and return a valid MemoryStorage object', () => {

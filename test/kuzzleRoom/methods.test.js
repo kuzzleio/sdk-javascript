@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   Room = rewire('../../src/Room');
 
 describe('Room methods', function () {

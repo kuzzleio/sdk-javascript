@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   Document = rewire('../../src/Document');
 
 describe('Document constructor', function () {

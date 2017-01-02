@@ -1,6 +1,6 @@
 var
   should = require('should'),
-  Kuzzle = require('../../../src/kuzzle'),
+  Kuzzle = require('../../../src/Kuzzle'),
   Profile = require('../../../src/security/kuzzleProfile'),
   Role = require('../../../src/security/kuzzleRole');
 

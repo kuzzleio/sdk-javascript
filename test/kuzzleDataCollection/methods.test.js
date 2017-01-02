@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = rewire('../../src/kuzzle'),
+  Kuzzle = rewire('../../src/Kuzzle'),
   KuzzleSearchResult = require('../../src/SearchResult'),
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
