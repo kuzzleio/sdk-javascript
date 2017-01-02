@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/kuzzle'),
-  Room = rewire('../../src/kuzzleRoom');
+  Room = rewire('../../src/Room');
 
 describe('Room constructor', function () {
   var

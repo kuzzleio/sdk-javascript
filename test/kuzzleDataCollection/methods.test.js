@@ -7,7 +7,7 @@ var
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
-  Room = require('../../src/kuzzleRoom'),
+  Room = require('../../src/Room'),
   KuzzleSubscribeResult = require('../../src/kuzzleSubscribeResult');
 
 describe('Collection methods', function () {
