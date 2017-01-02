@@ -1,12 +1,12 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
-  Role = require('../../../src/security/kuzzleRole');
+  Role = require('../../../src/security/Role');
 
 describe('Role methods', function () {
   var
     kuzzle,
-    kuzzleRole,
+    role,
     result,
     expectedQuery,
     error = null,
@@ -48,7 +48,7 @@ describe('Role methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole', _source: {indexes : {}}} };
-      kuzzleRole = new Role(kuzzle.security, result.result._id, result.result._source);
+      role = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'createOrReplaceRole',
         controller: 'security'
@@ -59,7 +59,7 @@ describe('Role methods', function () {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
 
-      should(kuzzleRole.save(function (err, res) {
+      should(role.save(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Role);
         done();
@@ -73,7 +73,7 @@ describe('Role methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzleRole.save(function (err, res) {
+      role.save(function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -88,7 +88,7 @@ describe('Role methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole', _index: '%kuzzle', _type: 'roles'} };
-      kuzzleRole = new Role(kuzzle.security, result.result._id, {indexes : {}});
+      role = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateRole',
         controller: 'security'
@@ -99,7 +99,7 @@ describe('Role methods', function () {
       expectedQuery.body = {'foo': 'bar'};
       expectedQuery._id = result.result._id;
 
-      should(kuzzleRole.update({'foo': 'bar'}, function (err, res) {
+      should(role.update({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Role);
         done();
@@ -113,7 +113,7 @@ describe('Role methods', function () {
       error = 'foobar';
       this.timeout(50);
 
-      kuzzleRole.update({'foo': 'bar'}, function (err, res) {
+      role.update({'foo': 'bar'}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -127,7 +127,7 @@ describe('Role methods', function () {
       this.timeout(50);
 
       try {
-        kuzzleRole.update();
+        role.update();
       }
       catch (e) {
         should(e).be.instanceOf(Error);
@@ -143,7 +143,7 @@ describe('Role methods', function () {
       error = null;
 
       result = { result: {_id: 'myRole'} };
-      kuzzleRole = new Role(kuzzle.security, result.result._id, result.result._source);
+      role = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
         action: 'deleteRole',
         controller: 'security'
@@ -154,7 +154,7 @@ describe('Role methods', function () {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
 
-      should(kuzzleRole.delete(function (err, res) {
+      should(role.delete(function (err, res) {
         should(err).be.null();
         should(res).be.exactly(result.result._id);
         done();
@@ -167,7 +167,7 @@ describe('Role methods', function () {
 
       error = 'foobar';
 
-      kuzzleRole.delete(function (err, res) {
+      role.delete(function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();

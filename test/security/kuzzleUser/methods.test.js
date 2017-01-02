@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
-  Role = require('../../../src/security/kuzzleRole'),
+  Role = require('../../../src/security/Role'),
   User = require('../../../src/security/kuzzleUser');
 
 describe('User methods', function () {
@@ -129,7 +129,7 @@ describe('User methods', function () {
       error = null;
 
       result = { result: {_id: 'myUser', _index: '%kuzzle', _type: 'users'} };
-      kuzzleRole = new Role(kuzzle.security, result.result._id, {indexes : {}});
+      role = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateUser',
         controller: 'security'

@@ -1,5 +1,5 @@
 var
-  Role = require('./kuzzleRole'),
+  Role = require('./Role'),
   Profile = require('./Profile'),
   User = require('./kuzzleUser');
 

@@ -2,7 +2,7 @@ var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
   Profile = require('../../../src/security/Profile'),
-  Role = require('../../../src/security/kuzzleRole');
+  Role = require('../../../src/security/Role');
 
 describe('Profile methods', function () {
   var
@@ -98,7 +98,7 @@ describe('Profile methods', function () {
       error = null;
 
       result = { result: {_id: 'myProfile', _index: '%kuzzle', _type: 'profiles'} };
-      kuzzleRole = new Role(kuzzle.security, result.result._id, {indexes : {}});
+      role = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateProfile',
         controller: 'security'
