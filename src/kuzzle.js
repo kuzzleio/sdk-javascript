@@ -2,7 +2,7 @@ var
   uuid = require('uuid'),
   Collection = require('./Collection.js'),
   Security = require('./security/kuzzleSecurity'),
-  MemoryStorage = require('./kuzzleMemoryStorage'),
+  MemoryStorage = require('./MemoryStorage'),
   User = require('./security/kuzzleUser'),
   networkWrapper = require('./networkWrapper');
 

@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  MemoryStorage = require('../../src/kuzzleMemoryStorage'),
+  MemoryStorage = require('../../src/MemoryStorage'),
   Kuzzle = rewire('../../src/kuzzle');
 
 describe('MemoryStorage constructor', function () {

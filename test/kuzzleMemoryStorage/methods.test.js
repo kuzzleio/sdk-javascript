@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../stubs/kuzzle.stub'),
-  MemoryStorage = require('../../src/kuzzleMemoryStorage');
+  MemoryStorage = require('../../src/MemoryStorage');
 
 describe('MemoryStorage methods', () => {
   var
