@@ -23,7 +23,7 @@ var
  * @param {object} [options] - subscription optional configuration
  * @constructor
  */
-function KuzzleRoom(kuzzleDataCollection, options) {
+function Room(kuzzleDataCollection, options) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
@@ -127,10 +127,10 @@ function KuzzleRoom(kuzzleDataCollection, options) {
  *
  * @param {responseCallback} cb - Handles the query response
  */
-KuzzleRoom.prototype.count = function (cb) {
+Room.prototype.count = function (cb) {
   var data;
 
-  this.kuzzle.callbackRequired('KuzzleRoom.count', cb);
+  this.kuzzle.callbackRequired('Room.count', cb);
 
   data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
@@ -140,7 +140,7 @@ KuzzleRoom.prototype.count = function (cb) {
   }
 
   if (!this.roomId) {
-    throw new Error('KuzzleRoom.count: cannot count subscriptions on an inactive room');
+    throw new Error('Room.count: cannot count subscriptions on an inactive room');
   }
 
   this.kuzzle.query(this.collection.buildQueryArgs('realtime', 'count'), data, function (err, res) {
@@ -155,7 +155,7 @@ KuzzleRoom.prototype.count = function (cb) {
  * @param {responseCallback} notificationCB - called for each new notification
  * @param {responseCallback} [cb] - handles the query response
  */
-KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
+Room.prototype.renew = function (filters, notificationCB, cb) {
   var
     now = Date.now(),
     subscribeQuery = {
@@ -175,7 +175,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
     cb = self.onDoneCB;
   }
 
-  self.kuzzle.callbackRequired('KuzzleRoom.renew', notificationCB);
+  self.kuzzle.callbackRequired('Room.renew', notificationCB);
 
   /*
     Skip subscription renewal if another one was performed a moment before
@@ -250,7 +250,7 @@ KuzzleRoom.prototype.renew = function (filters, notificationCB, cb) {
  *
  * @return {*} this
  */
-KuzzleRoom.prototype.unsubscribe = function () {
+Room.prototype.unsubscribe = function () {
   var
     self = this,
     room = self.roomId,
@@ -298,7 +298,7 @@ KuzzleRoom.prototype.unsubscribe = function () {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-KuzzleRoom.prototype.setHeaders = function (content, replace) {
+Room.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
@@ -358,4 +358,4 @@ function isReady() {
   return this.kuzzle.state === 'connected' && !this.subscribing;
 }
 
-module.exports = KuzzleRoom;
+module.exports = Room;

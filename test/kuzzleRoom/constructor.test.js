@@ -2,10 +2,10 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleRoom = rewire('../../src/kuzzleRoom');
+  Kuzzle = rewire('../../src/Kuzzle'),
+  Room = rewire('../../src/Room');
 
-describe('KuzzleRoom constructor', function () {
+describe('Room constructor', function () {
   var
     kuzzle,
     dataCollection;
@@ -15,11 +15,11 @@ describe('KuzzleRoom constructor', function () {
     kuzzle = new Kuzzle('nowhere', {defaultIndex: 'bar'});
 
     kuzzle.headers = {foo: 'bar'};
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {
-    var room = new KuzzleRoom(dataCollection);
+    var room = new Room(dataCollection);
 
     should(room.metadata).be.an.Object().and.be.empty();
     should(room.subscribeToSelf).be.true();
@@ -31,7 +31,7 @@ describe('KuzzleRoom constructor', function () {
     should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();
 
-    room = new KuzzleRoom(dataCollection, {
+    room = new Room(dataCollection, {
       scope: 'in',
       state: 'pending',
       users: 'all',
@@ -47,7 +47,7 @@ describe('KuzzleRoom constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var room = new KuzzleRoom(dataCollection);
+    var room = new Room(dataCollection);
 
     should(room).have.propertyWithDescriptor('collection', {enumerable: true, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: true, configurable: false});
@@ -65,7 +65,7 @@ describe('KuzzleRoom constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var room = new KuzzleRoom(dataCollection);
+    var room = new Room(dataCollection);
 
     should.exist(room.countPromise);
     should.not.exist(room.renewPromise);

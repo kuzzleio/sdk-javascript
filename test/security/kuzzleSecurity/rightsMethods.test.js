@@ -1,8 +1,8 @@
 var
   should = require('should'),
-  Kuzzle = require('../../../src/kuzzle');
+  Kuzzle = require('../../../src/Kuzzle');
 
-describe('KuzzleSecurity user rights methods', function () {
+describe('Security user rights methods', function () {
   var
     kuzzle,
     expectedQuery,

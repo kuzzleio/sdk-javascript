@@ -1,6 +1,6 @@
 var
   rewire = require('rewire'),
-  Kuzzle = rewire('../../src/kuzzle');
+  Kuzzle = rewire('../../src/Kuzzle');
 
 function ErrorCallback (F) {
   function f() {

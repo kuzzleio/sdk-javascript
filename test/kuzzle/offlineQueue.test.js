@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = rewire('../../src/kuzzle');
+  Kuzzle = rewire('../../src/Kuzzle');
 
 describe('Offline queue management', () => {
   describe('#cleanQueue', function () {
@@ -13,7 +13,7 @@ describe('Offline queue management', () => {
 
     beforeEach(function () {
       var pastTime = 60000;
-      
+
       kuzzle = new Kuzzle('foo');
 
       // queuing a bunch of requests from 1min ago to right now, 10s apart

@@ -2,10 +2,10 @@ var
   should = require('should'),
   bluebird = require('bluebird'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile');
+  Kuzzle = rewire('../../../src/Kuzzle'),
+  Profile = require('../../../src/security/Profile');
 
-describe('KuzzleProfile constructor', function () {
+describe('Profile constructor', function () {
   var
     kuzzle;
 
@@ -19,7 +19,7 @@ describe('KuzzleProfile constructor', function () {
 
   it('should throw an error if no id is provided', function(done) {
     try {
-      new KuzzleProfile(kuzzle.security, null, null);
+      new Profile(kuzzle.security, null, null);
     }
     catch (e) {
       should(e).be.Error();
@@ -29,38 +29,38 @@ describe('KuzzleProfile constructor', function () {
     return done(new Error('Constructor doesn\'t throw an Error'));
   });
 
-  it('should initialize properties and return a valid KuzzleProfile object', function () {
+  it('should initialize properties and return a valid Profile object', function () {
     var
-      kuzzleProfile;
+      profile;
 
     kuzzle = new Kuzzle('foo');
-    kuzzleProfile = new KuzzleProfile(kuzzle.security, 'id', {some: 'content'});
+    profile = new Profile(kuzzle.security, 'id', {some: 'content'});
 
-    should(kuzzleProfile).be.instanceof(KuzzleProfile);
-    should(kuzzleProfile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
-    should(kuzzleProfile.deleteActionName).be.exactly('deleteProfile');
+    should(profile).be.instanceof(Profile);
+    should(profile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
+    should(profile.deleteActionName).be.exactly('deleteProfile');
   });
 
   it('should expose functions', function () {
-    var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
+    var profile = new Profile(kuzzle.security, 'test', {});
 
-    should.exist(kuzzleProfile.save);
-    should.exist(kuzzleProfile.addPolicy);
-    should.exist(kuzzleProfile.savePromise);
-    should.exist(kuzzleProfile.setPolicies);
-    should.exist(kuzzleProfile.deletePromise);
-    should.exist(kuzzleProfile.serialize);
+    should.exist(profile.save);
+    should.exist(profile.addPolicy);
+    should.exist(profile.savePromise);
+    should.exist(profile.setPolicies);
+    should.exist(profile.deletePromise);
+    should.exist(profile.serialize);
   });
 
   it('should handle provided arguments correctly', function () {
-    var kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {});
+    var profile = new Profile(kuzzle.security, 'test', {});
 
-    should(kuzzleProfile).be.instanceof(KuzzleProfile);
-    should(kuzzleProfile.id).be.exactly('test');
-    should(kuzzleProfile.content).be.empty();
+    should(profile).be.instanceof(Profile);
+    should(profile.id).be.exactly('test');
+    should(profile.content).be.empty();
 
-    kuzzleProfile = new KuzzleProfile(kuzzle.security, 'test', {some: 'content'});
-    should(kuzzleProfile.id).be.exactly('test');
-    should(kuzzleProfile.content).match({some: 'content'});
+    profile = new Profile(kuzzle.security, 'test', {some: 'content'});
+    should(profile.id).be.exactly('test');
+    should(profile.content).match({some: 'content'});
   });
 });

@@ -2,9 +2,9 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDocument = require('../../src/kuzzleDocument'),
-  KuzzleSearchResult = rewire('../../src/kuzzleSearchResult');
+  Kuzzle = rewire('../../src/Kuzzle'),
+  Document = require('../../src/Document'),
+  KuzzleSearchResult = rewire('../../src/SearchResult');
 
 describe('KuzzleSearchResult methods', function () {
   var
@@ -21,9 +21,9 @@ describe('KuzzleSearchResult methods', function () {
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {from:0, size: 1}, filters: {}};
-    dataCollection = kuzzle.dataCollectionFactory('foo');
-    firstDocument = new KuzzleDocument(dataCollection, 'banana', {foo: 'bar'});
-    secondDocument = new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'});
+    dataCollection = kuzzle.collection('foo');
+    firstDocument = new Document(dataCollection, 'banana', {foo: 'bar'});
+    secondDocument = new Document(dataCollection, 'papagayo', {foo: 'bar'});
   });
 
   describe('#next', function () {
@@ -45,7 +45,7 @@ describe('KuzzleSearchResult methods', function () {
         mockScrollResult = new KuzzleSearchResult(
           dataCollection,
           1,
-          [new KuzzleDocument(dataCollection, 'papagayo', {foo: 'bar'})],
+          [new Document(dataCollection, 'papagayo', {foo: 'bar'})],
           {},
           {options: {scrollId: 'papagayo', from: 0, size: 1}}
         ),

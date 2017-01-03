@@ -3,10 +3,10 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
-  Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDataCollection = require('../../src/kuzzleDataCollection'),
-  KuzzleSecurity = require('../../src/security/kuzzleSecurity'),
-  KuzzleUser = require('../../src/security/kuzzleUser');
+  Kuzzle = rewire('../../src/Kuzzle'),
+  Collection = require('../../src/Collection.js'),
+  Security = require('../../src/security/Security'),
+  User = require('../../src/security/User');
 
 describe('Kuzzle methods', function () {
   var
@@ -168,43 +168,43 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#dataCollectionFactory', function () {
+  describe('#collection', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo');
     });
 
     it('should throw an error if arguments are not strings', () => {
       kuzzle.defaultIndex = 'foobar';
-      should(function () { kuzzle.dataCollectionFactory(undefined); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(undefined, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(null); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(null, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(123); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(123, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', 123); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory({foo: 'bar'}, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', {foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory('foo', ['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.dataCollectionFactory(['bar'], 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(undefined); }).throw(/string expected/);
+      should(function () { kuzzle.collection(undefined, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(null); }).throw(/string expected/);
+      should(function () { kuzzle.collection(null, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection(123); }).throw(/string expected/);
+      should(function () { kuzzle.collection(123, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', 123); }).throw(/string expected/);
+      should(function () { kuzzle.collection({foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.collection({foo: 'bar'}, 'foo'); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', {foo: 'bar'}); }).throw(/string expected/);
+      should(function () { kuzzle.collection(['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.collection('foo', ['bar']); }).throw(/string expected/);
+      should(function () { kuzzle.collection(['bar'], 'foo'); }).throw(/string expected/);
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
       kuzzle.disconnect();
-      should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(Error);
+      should(function () { kuzzle.collection('foo'); }).throw(Error);
     });
 
     it('should create and store the data collection instance if needed', function () {
-      var collection = kuzzle.dataCollectionFactory('foo', 'bar');
+      var collection = kuzzle.collection('foo', 'bar');
 
-      should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(KuzzleDataCollection);
-      should(collection).be.instanceof(KuzzleDataCollection);
+      should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(Collection);
+      should(collection).be.instanceof(Collection);
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
       kuzzle.collections.foo = { bar: 'qux'};
-      should(kuzzle.dataCollectionFactory('bar', 'foo')).be.a.String().and.be.exactly('qux');
+      should(kuzzle.collection('bar', 'foo')).be.a.String().and.be.exactly('qux');
     });
 
     it('should use the default index if no index is provided', function () {
@@ -213,13 +213,13 @@ describe('Kuzzle methods', function () {
         defaultIndex = 'bar';
 
       kuzzle.setDefaultIndex(defaultIndex);
-      collection = kuzzle.dataCollectionFactory('foo');
-      should(collection).be.instanceof(KuzzleDataCollection);
+      collection = kuzzle.collection('foo');
+      should(collection).be.instanceof(Collection);
       should(collection.index).be.eql(defaultIndex);
     });
 
     it('should throw an error if no index is provided and no default index has been set', () => {
-      should(function () { kuzzle.dataCollectionFactory('foo'); }).throw(/no index specified/);
+      should(function () { kuzzle.collection('foo'); }).throw(/no index specified/);
     });
   });
 
@@ -602,7 +602,7 @@ describe('Kuzzle methods', function () {
       should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
     });
 
-    it('should send correct query and return a KuzzleUser', function (done) {
+    it('should send correct query and return a User', function (done) {
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
@@ -616,7 +616,7 @@ describe('Kuzzle methods', function () {
       };
 
       kuzzle.whoAmI(function (err, res) {
-        should(res).instanceof(KuzzleUser);
+        should(res).instanceof(User);
         done();
       });
     });
@@ -681,12 +681,12 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#security', function () {
-    it('should be an instance of KuzzleSecurity', function () {
+    it('should be an instance of Security', function () {
       kuzzle = new Kuzzle('nowhere', {
         connect: 'manual'
       });
 
-      should(kuzzle.security).be.an.instanceOf(KuzzleSecurity);
+      should(kuzzle.security).be.an.instanceOf(Security);
     });
   });
 
