@@ -1,6 +1,6 @@
 var
   uuid = require('uuid'),
-  KuzzleDocument = require('./kuzzleDocument');
+  Document = require('./Document');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -320,13 +320,15 @@ function notificationCallback (data) {
     return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 
-  if (data.controller === 'write') {
-    data.document = new KuzzleDocument(this.collection, data.result._id, data.result._source);
+  if (data.controller === 'document') {
+    data.type = 'document';
+    data.document = new Document(this.collection, data.result._id, data.result._source);
     delete data.result;
   }
 
-  if (data.controller === 'subscribe') {
-    data.count = data.result.count;
+  if (data.controller === 'realtime') {
+    data.type = 'user';
+    data.user = {count: data.result.count};
     delete data.result;
   }
 
