@@ -13,26 +13,26 @@
  *  (currently handled by ElasticSearch), and your searches may suffer from below-average performances, depending on
  *  the amount of data you stored in a collection and the complexity of your database.
  *
- *  The KuzzleDataMapping object allow to get the current mapping of a data collection and to modify it if needed.
+ *  The CollectionMapping object allow to get the current mapping of a data collection and to modify it if needed.
  *
- * @param {object} kuzzleDataCollection - Instance of the inherited KuzzleDataCollection object
+ * @param {object} collection - Instance of the inherited Collection object
  * @param {object} [mapping] - mappings
  * @constructor
  */
-function KuzzleDataMapping(kuzzleDataCollection, mapping) {
+function CollectionMapping(collection, mapping) {
   Object.defineProperties(this, {
     //read-only properties
     collection: {
-      value: kuzzleDataCollection,
+      value: collection,
       enumerable: true
     },
     kuzzle: {
-      value: kuzzleDataCollection.kuzzle,
+      value: collection.kuzzle,
       enumerable: true
     },
     // writable properties
     headers: {
-      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      value: JSON.parse(JSON.stringify(collection.headers)),
       enumerable: true,
       writable: true
     },
@@ -63,7 +63,7 @@ function KuzzleDataMapping(kuzzleDataCollection, mapping) {
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleDataMapping.prototype.apply = function (options, cb) {
+CollectionMapping.prototype.apply = function (options, cb) {
   var
     self = this,
     data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
@@ -93,7 +93,7 @@ KuzzleDataMapping.prototype.apply = function (options, cb) {
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-KuzzleDataMapping.prototype.refresh = function (options, cb) {
+CollectionMapping.prototype.refresh = function (options, cb) {
   var
     self = this,
     data = this.kuzzle.addHeaders({}, this.headers);
@@ -139,9 +139,9 @@ KuzzleDataMapping.prototype.refresh = function (options, cb) {
  *
  * @param {string} field - Name of the field from which the mapping is to be added or updated
  * @param {object} mapping - corresponding field mapping
- * @returns {KuzzleDataMapping}
+ * @returns {CollectionMapping}
  */
-KuzzleDataMapping.prototype.set = function (field, mapping) {
+CollectionMapping.prototype.set = function (field, mapping) {
   this.mapping[field] = mapping;
 
   return this;
@@ -156,9 +156,9 @@ KuzzleDataMapping.prototype.set = function (field, mapping) {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-KuzzleDataMapping.prototype.setHeaders = function (content, replace) {
+CollectionMapping.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
 
-module.exports = KuzzleDataMapping;
+module.exports = CollectionMapping;

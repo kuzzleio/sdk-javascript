@@ -2,10 +2,10 @@ var
   should = require('should'),
   rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleDocument = rewire('../../src/kuzzleDocument');
+  Kuzzle = rewire('../../src/Kuzzle'),
+  Document = rewire('../../src/Document');
 
-describe('KuzzleDocument constructor', function () {
+describe('Document constructor', function () {
   var
     kuzzle,
     refreshed = false,
@@ -24,34 +24,34 @@ describe('KuzzleDocument constructor', function () {
       refreshed = true;
     };
     refreshed = false;
-    dataCollection = kuzzle.dataCollectionFactory('foo');
+    dataCollection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {
-    var document = new KuzzleDocument(dataCollection);
+    var document = new Document(dataCollection);
 
-    should(document).be.instanceof(KuzzleDocument);
+    should(document).be.instanceof(Document);
     should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).be.empty();
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
-    document = new KuzzleDocument(dataCollection, { some: 'content' });
+    document = new Document(dataCollection, { some: 'content' });
     should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).match({some: 'content'});
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
-    document = new KuzzleDocument(dataCollection, 'id', { some: 'content', _version: 123 });
+    document = new Document(dataCollection, 'id', { some: 'content', _version: 123 });
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).match({some: 'content'});
     should(document.version).be.exactly(123);
     should(document.collection).be.exactly('foo');
 
-    document = new KuzzleDocument(dataCollection, 'id');
+    document = new Document(dataCollection, 'id');
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).be.empty();
@@ -60,7 +60,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var document = new KuzzleDocument(dataCollection);
+    var document = new Document(dataCollection);
 
     should(document).have.propertyWithDescriptor('collection', { enumerable: true, writable: false, configurable: false });
     should(document).have.propertyWithDescriptor('content', { enumerable: true, writable: true, configurable: false });
@@ -70,7 +70,7 @@ describe('KuzzleDocument constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var document = new KuzzleDocument(dataCollection);
+    var document = new Document(dataCollection);
 
     should.exist(document.deletePromise);
     should.not.exist(document.publishPromise);

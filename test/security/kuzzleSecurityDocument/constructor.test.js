@@ -2,8 +2,8 @@ var
   should = require('should'),
   bluebird = require('bluebird'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
+  Kuzzle = rewire('../../../src/Kuzzle'),
+  KuzzleSecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument constructor', function () {
   var
@@ -34,7 +34,7 @@ describe('KuzzleSecurityDocument constructor', function () {
     var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
 
     should(securityDocument).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
-    should(securityDocument).have.propertyWithDescriptor('kuzzleSecurity', { enumerable: false, writable: false, configurable: false });
+    should(securityDocument).have.propertyWithDescriptor('Security', { enumerable: false, writable: false, configurable: false });
     should(securityDocument).have.propertyWithDescriptor('id', { enumerable: true, writable: false, configurable: false });
     should(securityDocument).have.propertyWithDescriptor('content', { enumerable: true, writable: true, configurable: false });
   });

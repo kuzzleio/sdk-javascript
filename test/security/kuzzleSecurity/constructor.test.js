@@ -2,15 +2,15 @@ var
   should = require('should'),
   bluebird = require('bluebird'),
   rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/kuzzle'),
-  KuzzleSecurity = require('../../../src/security/kuzzleSecurity');
+  Kuzzle = rewire('../../../src/Kuzzle'),
+  Security = require('../../../src/security/Security');
 
-describe('kuzzleSecurity constructor', function () {
-  it('should initialize properties and return a valid kuzzleSecurity object', function () {
+describe('Security constructor', function () {
+  it('should initialize properties and return a valid Security object', function () {
     var
       kuzzle = new Kuzzle('foo');
 
-    should(kuzzle.security).be.instanceof(KuzzleSecurity);
+    should(kuzzle.security).be.instanceof(Security);
     should(kuzzle.security).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
     should(kuzzle.security).have.propertyWithDescriptor('buildQueryArgs', { enumerable: false, writable: false, configurable: false });
     should(kuzzle.security.kuzzle).be.exactly(kuzzle);
@@ -24,15 +24,15 @@ describe('kuzzleSecurity constructor', function () {
     kuzzle = new Kuzzle('foo');
 
     should.exist(kuzzle.security.createRolePromise);
-    should.exist(kuzzle.security.getRolePromise);
+    should.exist(kuzzle.security.fetchRolePromise);
     should.exist(kuzzle.security.searchRolesPromise);
     should.exist(kuzzle.security.deleteRolePromise);
     should.exist(kuzzle.security.createProfilePromise);
-    should.exist(kuzzle.security.getProfilePromise);
+    should.exist(kuzzle.security.fetchProfilePromise);
     should.exist(kuzzle.security.searchProfilesPromise);
     should.exist(kuzzle.security.deleteProfilePromise);
     should.exist(kuzzle.security.createUserPromise);
-    should.exist(kuzzle.security.getUserPromise);
+    should.exist(kuzzle.security.fetchUserPromise);
     should.exist(kuzzle.security.searchUsersPromise);
     should.exist(kuzzle.security.deleteUserPromise);
 
