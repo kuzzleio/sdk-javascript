@@ -1,9 +1,9 @@
 var
   should = require('should'),
-  Kuzzle = require('../../../src/kuzzle'),
-  KuzzleRole = require('../../../src/security/kuzzleRole');
+  Kuzzle = require('../../../src/Kuzzle'),
+  Role = require('../../../src/security/Role');
 
-describe('KuzzleSecurity roles methods', function () {
+describe('Security roles methods', function () {
   var
     kuzzle,
     expectedQuery,
@@ -40,40 +40,40 @@ describe('KuzzleSecurity roles methods', function () {
       }
     };
 
-  describe('#getRole', function () {
+  describe('#fetchRole', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       error = null;
       result = { result: {_id: 'foobar', _source: {} }};
       expectedQuery = {
-        action: 'getRole',
+        action: 'fetchRole',
         controller: 'security',
         _id: 'foobar'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getRole(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchRole(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
 
     it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzle.security.getRole('test'); }).throw(Error);
+      should(function () { kuzzle.security.fetchRole('test'); }).throw(Error);
     });
 
     it('should throw an error when no id is provided', function () {
-      should(function () { kuzzle.security.getRole(null, function () {}); }).throw(Error);
+      should(function () { kuzzle.security.fetchRole(null, function () {}); }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'error';
       this.timeout(50);
 
-      kuzzle.security.getRole('foobar', function (err, res) {
+      kuzzle.security.fetchRole('foobar', function (err, res) {
         should(err).be.exactly('error');
         should(res).be.undefined();
         done();
@@ -109,7 +109,7 @@ describe('KuzzleSecurity roles methods', function () {
         should(res.roles.length).be.exactly(result.result.hits.length);
 
         res.roles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleRole);
+          should(item).be.instanceof(Role);
         });
 
         done();
@@ -159,7 +159,7 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(kuzzle.security.createRole(result.result._id, result.result._source, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
@@ -179,7 +179,7 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(kuzzle.security.createRole(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
@@ -191,7 +191,7 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(kuzzle.security.createRole(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleRole);
+        should(res).be.instanceof(Role);
         done();
       }));
     });
@@ -231,7 +231,7 @@ describe('KuzzleSecurity roles methods', function () {
 
       should(kuzzle.security.updateRole(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceOf(KuzzleRole);
+        should(res).be.instanceOf(Role);
         done();
       }));
     });
@@ -298,15 +298,15 @@ describe('KuzzleSecurity roles methods', function () {
     });
   });
 
-  describe('#roleFactory', function () {
+  describe('#role', function () {
     it('should return an instance of Role', function (done) {
-      var role = kuzzle.security.roleFactory('test', {index: {}});
-      should(role).instanceof(KuzzleRole);
+      var role = kuzzle.security.role('test', {index: {}});
+      should(role).instanceof(Role);
       done();
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () {kuzzle.security.roleFactory(null);})).throw(Error);
+      should((function () {kuzzle.security.role(null);})).throw(Error);
       done();
     });
   });

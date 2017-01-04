@@ -1,7 +1,7 @@
 var
   should = require('should'),
-  Kuzzle = require('../../../src/kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/kuzzleSecurityDocument');
+  Kuzzle = require('../../../src/Kuzzle'),
+  KuzzleSecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument methods', function () {
   var

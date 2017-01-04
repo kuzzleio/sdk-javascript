@@ -2,10 +2,10 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = rewire('../../src/kuzzle'),
-  KuzzleRoom = rewire('../../src/kuzzleRoom');
+  Kuzzle = rewire('../../src/Kuzzle'),
+  Room = rewire('../../src/Room');
 
-describe('KuzzleRoom methods', function () {
+describe('Room methods', function () {
   var
     expectedQuery,
     error,
@@ -61,7 +61,7 @@ describe('KuzzleRoom methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
@@ -72,7 +72,7 @@ describe('KuzzleRoom methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new KuzzleRoom(dataCollection);
+      room = new Room(dataCollection);
       room.roomId = 'foobar';
     });
 
@@ -129,11 +129,11 @@ describe('KuzzleRoom methods', function () {
 
     beforeEach(function () {
       dequeued = false;
-      revert = KuzzleRoom.__set__('dequeue', function () {dequeued = true;});
+      revert = Room.__set__('dequeue', function () {dequeued = true;});
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.dataCollectionFactory('foo');
+      dataCollection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
@@ -144,7 +144,7 @@ describe('KuzzleRoom methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new KuzzleRoom(dataCollection);
+      room = new Room(dataCollection);
     });
 
     afterEach(function () {
@@ -252,8 +252,8 @@ describe('KuzzleRoom methods', function () {
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
-      room = new KuzzleRoom(dataCollection);
+      dataCollection = kuzzle.collection('foo');
+      room = new Room(dataCollection);
     });
 
     it('should set headers properly', function () {
@@ -287,8 +287,8 @@ describe('KuzzleRoom methods', function () {
         body: {}
       };
 
-      dataCollection = kuzzle.dataCollectionFactory('foo');
-      room = new KuzzleRoom(dataCollection);
+      dataCollection = kuzzle.collection('foo');
+      room = new Room(dataCollection);
       room.roomId = 'foobar';
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar[room.id] = room;
@@ -301,7 +301,7 @@ describe('KuzzleRoom methods', function () {
       should(kuzzle.subscriptions.foobar).be.undefined();
     });
 
-    it('should not emit an unsubscribe request if another KuzzleRoom is listening to that room', function () {
+    it('should not emit an unsubscribe request if another Room is listening to that room', function () {
       kuzzle.subscriptions.foobar.foo = {};
       should(room.unsubscribe()).be.exactly(room);
       should(socketOff).be.true();
@@ -348,7 +348,7 @@ describe('KuzzleRoom methods', function () {
 
   describe('#dequeue', function () {
     var
-      dequeue = KuzzleRoom.__get__('dequeue'),
+      dequeue = Room.__get__('dequeue'),
       room,
       dequeued;
 
@@ -356,8 +356,8 @@ describe('KuzzleRoom methods', function () {
       var stub = function () { dequeued++; };
 
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
-      room = new KuzzleRoom(dataCollection);
+      dataCollection = kuzzle.collection('foo');
+      room = new Room(dataCollection);
       room.count = stub;
       room.renew = stub;
       room.unsubscribe = stub;
@@ -379,7 +379,7 @@ describe('KuzzleRoom methods', function () {
 
   describe('#notificationCallback', function () {
     var
-      notifCB = KuzzleRoom.__get__('notificationCallback'),
+      notifCB = Room.__get__('notificationCallback'),
       room,
       called;
 
@@ -387,8 +387,8 @@ describe('KuzzleRoom methods', function () {
       called = false;
       error = result = undefined;
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.dataCollectionFactory('foo');
-      room = new KuzzleRoom(dataCollection);
+      dataCollection = kuzzle.collection('foo');
+      room = new Room(dataCollection);
       room.callback = function (err, res) { called = true; error = err; result = res; };
     });
 

@@ -5,7 +5,7 @@ var
   bluebird = require('bluebird'),
   proxyquire = require('proxyquire'),
   NetworkWrapper = require('../../src/networkWrapper/wrappers/websocket'),
-  kuzzleSource = '../../src/kuzzle';
+  kuzzleSource = '../../src/Kuzzle';
 
 describe('Kuzzle constructor', () => {
   var
@@ -31,7 +31,7 @@ describe('Kuzzle constructor', () => {
       kuzzle = new Kuzzle('nowhere');
 
       should.exist(kuzzle.addListener);
-      should.exist(kuzzle.dataCollectionFactory);
+      should.exist(kuzzle.collection);
       should.exist(kuzzle.flushQueue);
       should.exist(kuzzle.getAllStatistics);
       should.exist(kuzzle.getJwtToken);

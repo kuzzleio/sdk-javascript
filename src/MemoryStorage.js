@@ -28,7 +28,7 @@
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @constructor
  */
-function KuzzleMemoryStorage(kuzzle) {
+function MemoryStorage(kuzzle) {
   Object.defineProperties(this, {
     // read-only properties
     kuzzle: {
@@ -173,7 +173,7 @@ function KuzzleMemoryStorage(kuzzle) {
   commands.zscore = commands.zrevrank;
 
   Object.keys(commands).forEach(function (command) {
-    KuzzleMemoryStorage.prototype[command] = function () {
+    MemoryStorage.prototype[command] = function () {
       var
         args = Array.prototype.slice.call(arguments),
         options = null,
@@ -231,4 +231,4 @@ function KuzzleMemoryStorage(kuzzle) {
 
 })();
 
-module.exports = KuzzleMemoryStorage;
+module.exports = MemoryStorage;

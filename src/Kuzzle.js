@@ -1,9 +1,9 @@
 var
   uuid = require('uuid'),
-  KuzzleDataCollection = require('./kuzzleDataCollection'),
-  KuzzleSecurity = require('./security/kuzzleSecurity'),
-  KuzzleMemoryStorage = require('./kuzzleMemoryStorage'),
-  KuzzleUser = require('./security/kuzzleUser'),
+  Collection = require('./Collection.js'),
+  Security = require('./security/Security'),
+  MemoryStorage = require('./MemoryStorage'),
+  User = require('./security/User'),
   networkWrapper = require('./networkWrapper');
 
 /**
@@ -249,7 +249,7 @@ function Kuzzle (host, options, cb) {
    * Create an attribute security that embed all methods to manage Role, Profile and User
    */
   Object.defineProperty(this, 'security', {
-    value: new KuzzleSecurity(this),
+    value: new Security(this),
     enumerable: true
   });
 
@@ -282,7 +282,7 @@ function Kuzzle (host, options, cb) {
   });
 
   Object.defineProperty(this, 'memoryStorage', {
-    value: new KuzzleMemoryStorage(this),
+    value: new MemoryStorage(this),
     enumerable: true
   });
 
@@ -610,7 +610,7 @@ Kuzzle.prototype.whoAmI = function (callback) {
       return callback(err);
     }
 
-    callback(null, new KuzzleUser(self.security, response.result._id, response.result._source));
+    callback(null, new User(self.security, response.result._id, response.result._source));
   });
 };
 
@@ -754,7 +754,7 @@ function emitRequest (request, cb) {
 
   this.network.send(request);
 
-  // Track requests made to allow KuzzleRoom.subscribeToSelf to work
+  // Track requests made to allow Room.subscribeToSelf to work
   self.requestHistory[request.requestId] = Date.now();
 }
 
@@ -934,14 +934,14 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
 };
 
 /**
- * Create a new instance of a KuzzleDataCollection object.
+ * Create a new instance of a Collection object.
  * If no index is specified, takes the default index.
  *
  * @param {string} collection - The name of the data collection you want to manipulate
  * @param {string} [index] - The name of the data index containing the data collection
- * @returns {KuzzleDataCollection} A KuzzleDataCollection instance
+ * @returns {Collection} A Collection instance
  */
-Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
+Kuzzle.prototype.collection = function(collection, index) {
   this.isValid();
 
   if (!index) {
@@ -961,7 +961,7 @@ Kuzzle.prototype.dataCollectionFactory = function(collection, index) {
   }
 
   if (!this.collections[index][collection]) {
-    this.collections[index][collection] = new KuzzleDataCollection(this, collection, index);
+    this.collections[index][collection] = new Collection(this, collection, index);
   }
 
   return this.collections[index][collection];

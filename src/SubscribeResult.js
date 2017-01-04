@@ -1,5 +1,5 @@
 /**
- * Sugar-code handling the result of a KuzzleRoom.renew call
+ * Sugar-code handling the result of a Room.renew call
  * @constructor
  */
 function KuzzleSubscribeResult() {
@@ -27,7 +27,7 @@ KuzzleSubscribeResult.prototype.onDone = function (cb) {
  * Calls all registered callbacks
  *
  * @param {Object} error object
- * @param {KuzzleRoom} room
+ * @param {Room} room
  */
 KuzzleSubscribeResult.prototype.done = function (error, room) {
   this.error = error;

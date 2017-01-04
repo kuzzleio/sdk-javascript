@@ -1,9 +1,9 @@
 var
-  KuzzleSearchResult = require('./kuzzleSearchResult'),
-  KuzzleDocument = require('./kuzzleDocument'),
-  KuzzleDataMapping = require('./kuzzleDataMapping'),
-  KuzzleRoom = require('./kuzzleRoom'),
-  KuzzleSubscribeResult = require('./kuzzleSubscribeResult');
+  KuzzleSearchResult = require('./SearchResult'),
+  Document = require('./Document'),
+  CollectionMapping = require('./CollectionMapping'),
+  Room = require('./Room'),
+  KuzzleSubscribeResult = require('./SubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -26,9 +26,9 @@ var
  * @param {string} index - Index containing the data collection
  * @constructor
  */
-function KuzzleDataCollection(kuzzle, collection, index) {
+function Collection(kuzzle, collection, index) {
   if (!index || !collection) {
-    throw new Error('The KuzzleDataCollection object constructor needs an index and a collection arguments');
+    throw new Error('The Collection object constructor needs an index and a collection arguments');
   }
 
   Object.defineProperties(this, {
@@ -89,7 +89,7 @@ function KuzzleDataCollection(kuzzle, collection, index) {
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
-KuzzleDataCollection.prototype.count = function (filters, options, cb) {
+Collection.prototype.count = function (filters, options, cb) {
   var
     query;
 
@@ -98,7 +98,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
     options = null;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.count', cb);
+  this.kuzzle.callbackRequired('Collection.count', cb);
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
@@ -116,7 +116,7 @@ KuzzleDataCollection.prototype.count = function (filters, options, cb) {
  * @param {responseCallback} [cb] - returns Kuzzle's response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.create = function (options, cb) {
+Collection.prototype.create = function (options, cb) {
   var data = {};
 
   if (!cb && typeof options === 'function') {
@@ -141,12 +141,12 @@ KuzzleDataCollection.prototype.create = function (options, cb) {
  *        Update the existing document otherwise
  *
  * @param {string} [id] - (optional) document identifier
- * @param {object} document - either an instance of a KuzzleDocument object, or a document
+ * @param {object} document - either an instance of a Document object, or a document
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {Object} this
  */
-KuzzleDataCollection.prototype.createDocument = function (id, document, options, cb) {
+Collection.prototype.createDocument = function (id, document, options, cb) {
   var
     self = this,
     data = {},
@@ -164,7 +164,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
     options = null;
   }
 
-  if (document instanceof KuzzleDocument) {
+  if (document instanceof Document) {
     data = document.serialize();
   } else {
     data.body = document;
@@ -187,7 +187,7 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
       return cb(err);
     }
 
-    doc = new KuzzleDocument(self, res.result._id, res.result._source);
+    doc = new Document(self, res.result._id, res.result._source);
     doc.version = res.result._version;
     cb(null, doc);
   });
@@ -209,9 +209,9 @@ KuzzleDataCollection.prototype.createDocument = function (id, document, options,
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleDataCollection} this
+ * @returns {Collection} this
  */
-KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
+Collection.prototype.deleteDocument = function (arg, options, cb) {
   var
     action,
     data = {};
@@ -250,7 +250,7 @@ KuzzleDataCollection.prototype.deleteDocument = function (arg, options, cb) {
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
-KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb) {
+Collection.prototype.fetchDocument = function (documentId, options, cb) {
   var
     data = {_id: documentId},
     self = this;
@@ -260,7 +260,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
     options = null;
   }
 
-  self.kuzzle.callbackRequired('KuzzleDataCollection.fetch', cb);
+  self.kuzzle.callbackRequired('Collection.fetch', cb);
   data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'get'), data, options, function (err, res) {
@@ -270,7 +270,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
       return cb(err);
     }
 
-    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document = new Document(self, res.result._id, res.result._source);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -282,7 +282,7 @@ KuzzleDataCollection.prototype.fetchDocument = function (documentId, options, cb
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
-KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
+Collection.prototype.fetchAllDocuments = function (options, cb) {
   var
     warnEmitted = false,
     documents = [],
@@ -306,7 +306,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     options.size = 1000;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.fetchAllDocuments', cb);
+  this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
 
   this.search(filters, options, function getNextDocuments (error, searchResult) {
     if (error) {
@@ -316,7 +316,7 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
     if (searchResult instanceof KuzzleSearchResult) {
       if (searchResult.total > 10000 && !warnEmitted) {
         warnEmitted = true;
-        console.warn('KuzzleDataCollection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using KuzzleDataCollection.search or KuzzleDataCollection.scroll instead'); // eslint-disable-line no-console
+        console.warn('Collection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using Collection.search or Collection.scroll instead'); // eslint-disable-line no-console
       }
 
       searchResult.documents.forEach(function(document) {
@@ -332,12 +332,12 @@ KuzzleDataCollection.prototype.fetchAllDocuments = function (options, cb) {
 
 
 /**
- * Instantiates a KuzzleDataMapping object containing the current mapping of this collection.
+ * Instantiates a CollectionMapping object containing the current mapping of this collection.
  *
  * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Returns an instantiated KuzzleDataMapping object
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  */
-KuzzleDataCollection.prototype.getMapping = function (options, cb) {
+Collection.prototype.getMapping = function (options, cb) {
   var kuzzleMapping;
 
   if (!cb && typeof options === 'function') {
@@ -345,9 +345,9 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
     options = null;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.getMapping', cb);
+  this.kuzzle.callbackRequired('Collection.getMapping', cb);
 
-  kuzzleMapping = new KuzzleDataMapping(this);
+  kuzzleMapping = new CollectionMapping(this);
   kuzzleMapping.refresh(options, cb);
 };
 
@@ -358,15 +358,15 @@ KuzzleDataCollection.prototype.getMapping = function (options, cb) {
  *    - metadata (object, default: null):
  *        Additional information passed to notifications to other users
  *
- * @param {object} document - either a KuzzleDocument instance or a JSON object
+ * @param {object} document - either a Document instance or a JSON object
  * @param {object} [options] - optional arguments
  * @param {responseCallback} [cb] - Returns a raw Kuzzle response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.publishMessage = function (document, options, cb) {
+Collection.prototype.publishMessage = function (document, options, cb) {
   var data = {};
 
-  if (document instanceof KuzzleDocument) {
+  if (document instanceof Document) {
     data = document.serialize();
   } else {
     data.body = document;
@@ -388,10 +388,10 @@ KuzzleDataCollection.prototype.publishMessage = function (document, options, cb)
  * @param {string} documentId - Unique document identifier of the document to replace
  * @param {object} content - JSON object representing the new document version
  * @param {object} [options] - additional arguments
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, options, cb) {
+Collection.prototype.replaceDocument = function (documentId, content, options, cb) {
   var
     self = this,
     data = {
@@ -413,7 +413,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
       return cb(err);
     }
 
-    document = new KuzzleDocument(self, res.result._id, res.result._source);
+    document = new Document(self, res.result._id, res.result._source);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -433,7 +433,7 @@ KuzzleDataCollection.prototype.replaceDocument = function (documentId, content, 
  * @param {responseCallback} cb - Handles the query response
  */
 
-KuzzleDataCollection.prototype.search = function (filters, options, cb) {
+Collection.prototype.search = function (filters, options, cb) {
   var
     query,
     self = this;
@@ -443,7 +443,7 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
     options = {};
   }
 
-  self.kuzzle.callbackRequired('KuzzleDataCollection.search', cb);
+  self.kuzzle.callbackRequired('Collection.search', cb);
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
@@ -456,7 +456,7 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+      var newDocument = new Document(self, doc._id, doc._source);
 
       newDocument.version = doc._version;
 
@@ -488,13 +488,13 @@ KuzzleDataCollection.prototype.search = function (filters, options, cb) {
  * @param {object} [filters]
  * @param {responseCallback} cb
  */
-KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb) {
+Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
     request = {body: {}},
     self = this;
 
   if (!scrollId) {
-    throw new Error('KuzzleDataCollection.scroll: scrollId required');
+    throw new Error('Collection.scroll: scrollId required');
   }
 
   if (!cb) {
@@ -513,7 +513,7 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
 
   options.scrollId = scrollId;
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.scroll', cb);
+  this.kuzzle.callbackRequired('Collection.scroll', cb);
 
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
@@ -523,7 +523,7 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new KuzzleDocument(self, doc._id, doc._source);
+      var newDocument = new Document(self, doc._id, doc._source);
 
       newDocument.version = doc._version;
 
@@ -555,7 +555,7 @@ KuzzleDataCollection.prototype.scroll = function (scrollId, options, filters, cb
  * @param {responseCallback} cb - called for each new notification
  * @returns {*} KuzzleSubscribeResult object
  */
-KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
+Collection.prototype.subscribe = function (filters, options, cb) {
   var
     room,
     subscribeResult;
@@ -565,10 +565,10 @@ KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
     options = null;
   }
 
-  this.kuzzle.callbackRequired('KuzzleDataCollection.subscribe', cb);
+  this.kuzzle.callbackRequired('Collection.subscribe', cb);
 
   subscribeResult = new KuzzleSubscribeResult();
-  room = new KuzzleRoom(this, options);
+  room = new Room(this, options);
 
   room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
 
@@ -583,7 +583,7 @@ KuzzleDataCollection.prototype.subscribe = function (filters, options, cb) {
  * @param {responseCallback} [cb] - returns Kuzzle's response
  * @returns {*} this
  */
-KuzzleDataCollection.prototype.truncate = function (options, cb) {
+Collection.prototype.truncate = function (options, cb) {
   var data = {};
 
   if (!cb && typeof options === 'function') {
@@ -608,10 +608,10 @@ KuzzleDataCollection.prototype.truncate = function (options, cb) {
  * @param {string} documentId - Unique document identifier of the document to update
  * @param {object} content - JSON object containing changes to perform on the document
  * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Returns an instantiated KuzzleDocument object
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
  * @return {object} this
  */
-KuzzleDataCollection.prototype.updateDocument = function (documentId, content, options, cb) {
+Collection.prototype.updateDocument = function (documentId, content, options, cb) {
   var
     data = {
       _id: documentId,
@@ -631,7 +631,7 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
       return cb(err);
     }
 
-    (new KuzzleDocument(self, res.result._id)).refresh(cb);
+    (new Document(self, res.result._id)).refresh(cb);
   });
 
   return self;
@@ -639,37 +639,37 @@ KuzzleDataCollection.prototype.updateDocument = function (documentId, content, o
 
 
 /**
- * Instantiate a new KuzzleDocument object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Document object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {string} id - document id
  * @param {object} content - document content
  * @constructor
  */
-KuzzleDataCollection.prototype.documentFactory = function (id, content) {
-  return new KuzzleDocument(this, id, content);
+Collection.prototype.document = function (id, content) {
+  return new Document(this, id, content);
 };
 
 /**
- * Instantiate a new KuzzleRoom object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new Room object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
  * @param {object} [options] - subscription configuration
  * @constructor
  */
-KuzzleDataCollection.prototype.roomFactory = function (options) {
-  return new KuzzleRoom(this, options);
+Collection.prototype.room = function (options) {
+  return new Room(this, options);
 };
 
 /**
- * Instantiate a new KuzzleDataMapping object. Workaround to the module.exports limitation, preventing multiple
+ * Instantiate a new CollectionMapping object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
- * @param {object} [mapping] - mapping to instantiate the KuzzleDataMapping object with
+ * @param {object} [mapping] - mapping to instantiate the CollectionMapping object with
  * @constructor
  */
-KuzzleDataCollection.prototype.dataMappingFactory = function (mapping) {
-  return new KuzzleDataMapping(this, mapping);
+Collection.prototype.collectionMapping = function (mapping) {
+  return new CollectionMapping(this, mapping);
 };
 
 /**
@@ -681,9 +681,9 @@ KuzzleDataCollection.prototype.dataMappingFactory = function (mapping) {
  * @param content - new headers content
  * @param [replace] - default: false = append the content. If true: replace the current headers with tj
  */
-KuzzleDataCollection.prototype.setHeaders = function (content, replace) {
+Collection.prototype.setHeaders = function (content, replace) {
   this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
 
-module.exports = KuzzleDataCollection;
+module.exports = Collection;

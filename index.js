@@ -1,6 +1,6 @@
 var
   bluebird = require('bluebird'),
-  Kuzzle = require('./src/kuzzle');
+  Kuzzle = require('./src/Kuzzle');
 
 // Adds on the fly methods promisification
 Kuzzle.prototype.bluebird = bluebird;

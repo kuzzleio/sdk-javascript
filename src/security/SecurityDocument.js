@@ -1,4 +1,4 @@
-function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
+function KuzzleSecurityDocument(Security, id, content) {
 
   if (!id) {
     throw new Error('A security document must have an id');
@@ -8,10 +8,10 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   Object.defineProperties(this, {
     // private properties
     kuzzle: {
-      value: kuzzleSecurity.kuzzle
+      value: Security.kuzzle
     },
-    kuzzleSecurity: {
-      value: kuzzleSecurity
+    Security: {
+      value: Security
     },
     // read-only properties
     // writable properties
@@ -31,8 +31,8 @@ function KuzzleSecurityDocument(kuzzleSecurity, id, content) {
   }
 
   // promisifying
-  if (kuzzleSecurity.kuzzle.bluebird) {
-    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+  if (Security.kuzzle.bluebird) {
+    return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['delete', 'update'];
@@ -88,7 +88,7 @@ KuzzleSecurityDocument.prototype.delete = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.deleteActionName), {_id: this.id}, options, function (error, res) {
+  self.kuzzle.query(this.Security.buildQueryArgs(this.deleteActionName), {_id: this.id}, options, function (error, res) {
     if (error) {
       return cb ? cb(error) : false;
     }
@@ -124,7 +124,7 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
   data._id = self.id;
   data.body = content;
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs(this.updateActionName), data, options, function (error, response) {
+  self.kuzzle.query(this.Security.buildQueryArgs(this.updateActionName), data, options, function (error, response) {
     if (error) {
       return cb ? cb(error) : false;
     }

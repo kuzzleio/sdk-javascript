@@ -2,9 +2,9 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = require('../../src/kuzzle'),
+  Kuzzle = require('../../src/Kuzzle'),
   EventEmitter = require('events').EventEmitter,
-  kuzzleSource = '../../src/kuzzle';
+  kuzzleSource = '../../src/Kuzzle';
 
 
 describe('Query management', function () {

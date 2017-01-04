@@ -1,8 +1,8 @@
-var KuzzleSecurityDocument = require('./kuzzleSecurityDocument');
+var KuzzleSecurityDocument = require('./SecurityDocument');
 
-function KuzzleRole(kuzzleSecurity, id, content) {
+function Role(Security, id, content) {
 
-  KuzzleSecurityDocument.call(this, kuzzleSecurity, id, content);
+  KuzzleSecurityDocument.call(this, Security, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -16,8 +16,8 @@ function KuzzleRole(kuzzleSecurity, id, content) {
   });
 
   // promisifying
-  if (kuzzleSecurity.kuzzle.bluebird) {
-    return kuzzleSecurity.kuzzle.bluebird.promisifyAll(this, {
+  if (Security.kuzzle.bluebird) {
+    return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['save'];
@@ -29,9 +29,9 @@ function KuzzleRole(kuzzleSecurity, id, content) {
 
 }
 
-KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+Role.prototype = Object.create(KuzzleSecurityDocument.prototype, {
   constructor: {
-    value: KuzzleRole
+    value: Role
   }
 });
 
@@ -44,9 +44,9 @@ KuzzleRole.prototype = Object.create(KuzzleSecurityDocument.prototype, {
  *
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleRole} this object
+ * @returns {Role} this object
  */
-KuzzleRole.prototype.save = function (options, cb) {
+Role.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -56,11 +56,11 @@ KuzzleRole.prototype.save = function (options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.kuzzleSecurity.buildQueryArgs('createOrReplaceRole'), data, options, cb && function (error) {
+  self.kuzzle.query(this.Security.buildQueryArgs('createOrReplaceRole'), data, options, cb && function (error) {
     cb(error, error ? undefined : self);
   });
 
   return this;
 };
 
-module.exports = KuzzleRole;
+module.exports = Role;

@@ -1,9 +1,9 @@
 var
   should = require('should'),
-  Kuzzle = require('../../../src/kuzzle'),
-  KuzzleProfile = require('../../../src/security/kuzzleProfile');
+  Kuzzle = require('../../../src/Kuzzle'),
+  Profile = require('../../../src/security/Profile');
 
-describe('KuzzleSecurity profiles methods', function () {
+describe('Security profiles methods', function () {
   var
     kuzzle,
     expectedQuery,
@@ -40,7 +40,7 @@ describe('KuzzleSecurity profiles methods', function () {
       }
     };
 
-  describe('#getProfile', function () {
+  describe('#fetchProfile', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
@@ -60,16 +60,16 @@ describe('KuzzleSecurity profiles methods', function () {
         }
       };
       expectedQuery = {
-        action: 'getProfile',
+        action: 'fetchProfile',
         controller: 'security',
         _id: 'foobar'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchProfile(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
 
         should(res.content.policies).be.an.Array();
         should(res.content.policies).not.be.empty();
@@ -83,9 +83,9 @@ describe('KuzzleSecurity profiles methods', function () {
     });
 
     it('should send the right query to Kuzzle with id as roles when hydrate is false', function (done) {
-      should(kuzzle.security.getProfile(result.result._id, function (err, res) {
+      should(kuzzle.security.fetchProfile(result.result._id, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
 
         should(res.content.policies).be.an.Array();
         should(res.content.policies).not.be.empty();
@@ -103,18 +103,18 @@ describe('KuzzleSecurity profiles methods', function () {
     });
 
     it('should raise an error if no callback is provided', function () {
-      should(function () { kuzzle.security.getProfile('test'); }).throw(Error);
+      should(function () { kuzzle.security.fetchProfile('test'); }).throw(Error);
     });
 
     it('should throw an error when no id is provided', function () {
-      should(function () { kuzzle.security.getProfile(null, function () {}); }).throw(Error);
+      should(function () { kuzzle.security.fetchProfile(null, function () {}); }).throw(Error);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       error = 'error';
       this.timeout(50);
 
-      kuzzle.security.getProfile('foobar', function (err, res) {
+      kuzzle.security.fetchProfile('foobar', function (err, res) {
         should(err).be.exactly('error');
         should(res).be.undefined();
         done();
@@ -152,7 +152,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -182,7 +182,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -210,7 +210,7 @@ describe('KuzzleSecurity profiles methods', function () {
         should(res.profiles.length).be.exactly(result.result.hits.length);
 
         res.profiles.forEach(function (item) {
-          should(item).be.instanceof(KuzzleProfile);
+          should(item).be.instanceof(Profile);
 
           item.content.policies.forEach(function (policy) {
             should(policy).be.an.Object();
@@ -265,7 +265,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -285,7 +285,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -297,7 +297,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.createProfile(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceof(KuzzleProfile);
+        should(res).be.instanceof(Profile);
         done();
       }));
     });
@@ -347,7 +347,7 @@ describe('KuzzleSecurity profiles methods', function () {
 
       should(kuzzle.security.updateProfile(result.result._id, {'foo': 'bar'}, function (err, res) {
         should(err).be.null();
-        should(res).be.instanceOf(KuzzleProfile);
+        should(res).be.instanceOf(Profile);
         done();
       }));
     });
@@ -416,13 +416,13 @@ describe('KuzzleSecurity profiles methods', function () {
 
   describe('#ProfileFactory', function () {
     it('should return an instance of Profile', function (done) {
-      var role = kuzzle.security.profileFactory('test', {policies: [{roleId:'myRole'}]});
-      should(role).instanceof(KuzzleProfile);
+      var role = kuzzle.security.profile('test', {policies: [{roleId:'myRole'}]});
+      should(role).instanceof(Profile);
       done();
     });
 
     it('should throw an error if no id is provided', function (done) {
-      should((function () {kuzzle.security.profileFactory(null);})).throw(Error);
+      should((function () {kuzzle.security.profile(null);})).throw(Error);
       done();
     });
   });
