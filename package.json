@@ -27,26 +27,25 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "3.4.6",
+    "bluebird": "3.4.7",
     "bufferutil": "^1.2.1",
     "eslint-loader": "^1.6.1",
-    "utf-8-validate": "^1.2.1",
-    "uuid": "3.0.0",
+    "utf-8-validate": "^2.0.0",
+    "uuid": "3.0.1",
     "ws": "^1.1.1"
   },
   "devDependencies": {
-    "ora": "^0.3.0",
+    "ora": "^0.4.0",
     "webpack": "^1.13.1",
     "eslint": "^3.7.1",
     "eslint-friendly-formatter": "^2.0.6",
-    "browserify": "13.1.0",
     "codecov": "^1.0.1",
     "istanbul": "0.4.5",
     "istanbul-middleware": "0.2.2",
-    "mocha": "3.1.0",
+    "mocha": "3.2.0",
     "proxyquire": "^1.7.10",
     "rewire": "^2.5.2",
-    "should": "11.1.0",
+    "should": "11.1.2",
     "sinon": "^1.17.5"
   }
 }
