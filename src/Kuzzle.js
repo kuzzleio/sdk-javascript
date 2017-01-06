@@ -538,7 +538,7 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
     options = null;
   }
 
-  this.query({controller: 'admin', action: 'createIndex'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+  this.query({controller: 'index', action: 'create'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
 
   return this;
 };
