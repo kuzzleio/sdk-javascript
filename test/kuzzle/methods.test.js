@@ -896,7 +896,8 @@ describe('Kuzzle methods', function () {
       should(spy.calledOnce).be.true();
       args = spy.firstCall.args;
 
-      should(args[0].action).be.exactly('createIndex');
+      should(args[0].controller).be.exactly('index');
+      should(args[0].action).be.exactly('create');
       should(args[1].index).be.exactly(index);
       should(args[2]).be.exactly(options);
       should(args[3]).be.exactly(cb);
@@ -914,7 +915,8 @@ describe('Kuzzle methods', function () {
       should(spy.calledOnce).be.true();
       args = spy.firstCall.args;
 
-      should(args[0].action).be.exactly('createIndex');
+      should(args[0].controller).be.exactly('index');
+      should(args[0].action).be.exactly('create');
       should(args[1].index).be.exactly(index);
       should(args[2]).be.null();
       should(args[3]).be.exactly(cb);
