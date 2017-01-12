@@ -24,7 +24,8 @@
     "build": "node build.js"
   },
   "browser": "src/kuzzle.js",
-  "main": "index.js",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "3.4.6",
