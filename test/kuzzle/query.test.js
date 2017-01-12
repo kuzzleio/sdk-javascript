@@ -255,6 +255,21 @@ describe('Query management', function () {
       should(errorRaised).be.true();
     });
 
+    it('should discard the request if not connected and if queuing is deactivated', function () {
+      var
+        errorRaised = false;
+
+      callback = () => {
+        errorRaised = true;
+      };
+
+      kuzzle.state = 'reconnecting';
+      kuzzle.queuing = false;
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, callback);
+      should(emitted).be.false();
+      should(errorRaised).be.true();
+    });
+
     it('should queue the request during offline mode, if queuing has been activated', function (done) {
       var
         query = { body: { some: 'query'}},
@@ -270,6 +285,33 @@ describe('Query management', function () {
       });
 
       kuzzle.query(queryArgs, query, cb);
+
+      process.nextTick(() => {
+        should(emitted).be.false();
+        should(kuzzle.offlineQueue.length).be.exactly(1);
+        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+        should(kuzzle.offlineQueue[0].query).match(query);
+        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+        should(eventFired).be.true();
+        done();
+      });
+    });
+
+    it('should queue the request during offline mode, if queuable is set to true', function (done) {
+      var
+        query = { body: { some: 'query'}},
+        cb = function () {},
+        now = Date.now(),
+        eventFired = false;
+
+      kuzzle.state = 'offline';
+      kuzzle.queuing = false;
+      kuzzle.addListener('offlineQueuePush', object => {
+        eventFired = true;
+        should(object.query.body).be.eql(query.body);
+      });
+
+      kuzzle.query(queryArgs, query, {queuable: true}, cb);
 
       process.nextTick(() => {
         should(emitted).be.false();
