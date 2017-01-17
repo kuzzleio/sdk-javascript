@@ -538,7 +538,7 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
     options = null;
   }
 
-  this.query({controller: 'admin', action: 'createIndex'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+  this.query({controller: 'index', action: 'create'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
 
   return this;
 };
@@ -1339,16 +1339,18 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   if (self.state === 'connected' || (options && options.queuable === false)) {
     if (self.state === 'connected') {
       emitRequest.call(this, object, cb);
-    } else if (cb) {
-      cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
+    } else {
+      discardRequest(object, cb);
     }
-  } else if (self.queuing || ['initializing', 'connecting'].indexOf(self.state) !== -1) {
+  } else if (self.queuing || (options && options.queuable === true) || ['initializing', 'connecting'].indexOf(self.state) !== -1) {
     cleanQueue.call(this, object, cb);
-
     if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
       self.emitEvent('offlineQueuePush', {query: object, cb: cb});
     }
+  }
+  else {
+    discardRequest(object, cb);
   }
 
   return self;
@@ -1485,5 +1487,11 @@ Kuzzle.prototype.stopQueuing = function () {
 
   return this;
 };
+
+function discardRequest(object, cb) {
+  if (cb) {
+    cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
+  }
+}
 
 module.exports = Kuzzle;
