@@ -490,7 +490,7 @@ Collection.prototype.search = function (filters, options, cb) {
  */
 Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
-    request,
+    request = {body:{}},
     self = this;
 
   if (!scrollId) {
@@ -515,14 +515,7 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     throw new Error('Collection.scroll: scroll is required');
   }
 
-  request = {
-    body: {
-      scroll: options.scroll,
-      scrollId: scrollId
-    }
-  };
-
-  delete options.scroll;
+  options.scrollId = scrollId;
 
   this.kuzzle.callbackRequired('Collection.scroll', cb);
 
