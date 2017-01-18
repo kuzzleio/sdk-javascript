@@ -518,7 +518,7 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   request = {
     body: {
       scroll: options.scroll,
-      scroll_id: scrollId
+      scrollId: scrollId
     }
   };
 
