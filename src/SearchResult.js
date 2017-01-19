@@ -94,6 +94,15 @@ KuzzleSearchResult.prototype.next = function (cb) {
         return;
       }
 
+      // from and size parameters are not valid for a scroll action
+      if (options.from) {
+        delete options.from;
+      }
+
+      if (options.size) {
+        delete options.size;
+      }
+
       this.dataCollection.scroll(
         options.scrollId,
         options,

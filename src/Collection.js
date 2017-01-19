@@ -490,11 +490,11 @@ Collection.prototype.search = function (filters, options, cb) {
  */
 Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
-    request = {body: {}},
+    request = {body:{}},
     self = this;
 
   if (!scrollId) {
-    throw new Error('Collection.scroll: scrollId required');
+    throw new Error('Collection.scroll: scrollId is required');
   }
 
   if (!cb) {
@@ -509,6 +509,10 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
 
   if (!options) {
     options = {};
+  }
+
+  if (!options.scroll) {
+    throw new Error('Collection.scroll: scroll is required');
   }
 
   options.scrollId = scrollId;

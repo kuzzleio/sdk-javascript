@@ -146,12 +146,17 @@ describe('Collection methods', function () {
 
     it('should throw an error if no scrollId is set', () => {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll(); }).throw('Collection.scroll: scrollId required');
+      should(() => { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
+    });
+
+    it('should throw an error if no scroll is provided', () => {
+      var collection = kuzzle.collection(expectedQuery.collection);
+      should(() => { collection.scroll('scrollId'); }).throw('Collection.scroll: scroll is required');
     });
 
     it('should throw an error if no callback is given', () => {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
+      should(() => { collection.scroll('scrollId', {scroll: '1m'}); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
     it('should parse the given parameters', done => {
@@ -188,33 +193,6 @@ describe('Collection methods', function () {
       kuzzle.query = queryScrollStub;
 
       collection.scroll(scrollId, options, filters, cb);
-    });
-
-    it('should parse the given parameters even if no options is given', done => {
-      var
-        queryScrollStub,
-        collection = kuzzle.collection(expectedQuery.collection),
-        scrollId = 'scrollId',
-        cb = () => {
-          done();
-        };
-
-      queryScrollStub = function (args, query, opts, callback) {
-        should(args.controller).be.exactly('document');
-        should(args.action).be.exactly('scroll');
-        should(opts.scrollId).be.exactly(scrollId);
-
-        callback(null, {
-          result: {
-            total: 0,
-            hits: []
-          }
-        });
-      };
-
-      kuzzle.query = queryScrollStub;
-
-      collection.scroll(scrollId, cb);
     });
   });
 

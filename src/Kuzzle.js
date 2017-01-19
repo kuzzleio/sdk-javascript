@@ -1283,12 +1283,20 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.refresh = options.refresh;
     }
 
-    if (options.from) {
+    if (typeof options.from !== 'undefined' && options.from !== null) {
       object.from = options.from;
     }
 
     if (options.size) {
       object.size = options.size;
+    }
+
+    if (options.scroll) {
+      object.scroll = options.scroll;
+    }
+
+    if (options.scrollId) {
+      object.scrollId = options.scrollId;
     }
 
     if (options.metadata) {
