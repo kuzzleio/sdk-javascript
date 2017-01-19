@@ -1295,6 +1295,10 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.scroll = options.scroll;
     }
 
+    if (options.scrollId) {
+      object.scrollId = options.scrollId;
+    }
+
     if (options.metadata) {
       Object.keys(options.metadata).forEach(function (meta) {
         object.metadata[meta] = options.metadata[meta];
