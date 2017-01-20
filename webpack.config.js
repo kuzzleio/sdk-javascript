@@ -4,10 +4,10 @@ var
   version = require('./package.json').version;
 
 module.exports = {
-  entry: './src/kuzzle.js',
+  entry: './src/Kuzzle.js',
   output: {
     path: './dist',
-    filename: 'kuzzle.js',
+    filename: 'Kuzzle.js',
     library: 'Kuzzle',
     libraryTarget: 'umd'
   },
