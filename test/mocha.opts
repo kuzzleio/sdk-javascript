@@ -1,0 +1,4 @@
+--bail
+--require should-sinon
+--reporter spec
+--recursive
