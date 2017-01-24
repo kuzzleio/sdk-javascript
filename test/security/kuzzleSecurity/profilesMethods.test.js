@@ -60,7 +60,7 @@ describe('Security profiles methods', function () {
         }
       };
       expectedQuery = {
-        action: 'fetchProfile',
+        action: 'getProfile',
         controller: 'security',
         _id: 'foobar'
       };

@@ -47,7 +47,7 @@ describe('Security user methods', function () {
       error = null;
       result = { result: {_id: 'foobar', _source: {profileIds: ['profile']}}};
       expectedQuery = {
-        action: 'fetchUser',
+        action: 'getUser',
         controller: 'security',
         _id: 'foobar'
       };
