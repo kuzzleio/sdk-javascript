@@ -1,12 +1,15 @@
-var
+'use strict';
+
+const
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
+  Document = require('../../src/Document'),
   Kuzzle = rewire('../../src/Kuzzle'),
   Room = rewire('../../src/Room');
 
 describe('Room methods', function () {
-  var
+  let
     expectedQuery,
     error,
     result,
@@ -378,38 +381,77 @@ describe('Room methods', function () {
   });
 
   describe('#notificationCallback', function () {
-    var
+    let
       notifCB = Room.__get__('notificationCallback'),
-      room,
-      called;
+      room;
 
     beforeEach(function () {
-      called = false;
       error = result = undefined;
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       dataCollection = kuzzle.collection('foo');
       room = new Room(dataCollection);
-      room.callback = function (err, res) { called = true; error = err; result = res; };
+      room.callback = sinon.spy();
     });
 
     it('should call back with an error if query returns an error', function () {
       notifCB.call(room, {error: 'foobar', result: {}});
-      should(result).be.undefined();
-      should(error).be.exactly('foobar');
+      should(room.callback)
+        .be.calledOnce()
+        .be.calledWith('foobar');
+      should(room.callback.firstCall.args)
+        .have.length(1);
     });
 
-    it('should return the result when one is provided', function () {
-      var msg = {error: null, result: {foo: 'bar'}};
-      notifCB.call(room, msg);
-      should(result).match(msg);
-      should(error).be.null();
+    it('should handle document notifications', () => {
+      notifCB.call(room, {
+        controller: 'document',
+        result: {
+          _id: 'id',
+          _source: {
+            foo: 'bar'
+          }
+        }
+      });
+
+      should(room.callback)
+        .be.calledOnce()
+        .be.calledWithMatch(null, {
+          controller: 'document',
+          type: 'document',
+          document: {
+            id: 'id',
+            content: {
+              foo: 'bar'
+            }
+          }
+        });
+      should(room.callback.firstCall.args[1].document)
+        .be.an.instanceOf(Document);
     });
 
-    it('should delete the result from history if emitted by this instance', function () {
+    it('should handle user notifications', () => {
+      notifCB.call(room, {
+        controller: 'realtime',
+        result: { count: 3 }
+      });
+
+      should(room.callback)
+        .be.calledOnce()
+        .be.calledWithMatch(null, {
+          type: 'user',
+          user: {
+            count: 3
+          }
+        });
+    });
+
+    it('should delete the result from history if emitted by this instance', () => {
       room.subscribeToSelf = true;
       kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
-      should(called).be.true();
+
+      should(room.callback)
+        .be.calledOnce();
       should(kuzzle.requestHistory).be.empty();
     });
 
@@ -417,7 +459,9 @@ describe('Room methods', function () {
       room.subscribeToSelf = false;
       kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, requestId: 'bar', action: 'foo'});
-      should(called).be.false();
+
+      should(room.callback)
+        .have.callCount(0);
       should(kuzzle.requestHistory).be.empty();
     });
 

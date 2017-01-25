@@ -29,11 +29,11 @@ function Document(kuzzleDataCollection, documentId, content) {
     },
     dataCollection: {
       value: kuzzleDataCollection,
-      enumerable: true
+      enumerable: false
     },
     kuzzle: {
       value: kuzzleDataCollection.kuzzle,
-      enumerable: true
+      enumerable: false
     },
     // writable properties
     id: {

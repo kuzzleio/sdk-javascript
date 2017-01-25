@@ -47,7 +47,7 @@ describe('Security roles methods', function () {
       error = null;
       result = { result: {_id: 'foobar', _source: {} }};
       expectedQuery = {
-        action: 'fetchRole',
+        action: 'getRole',
         controller: 'security',
         _id: 'foobar'
       };
