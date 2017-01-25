@@ -65,7 +65,7 @@ Security.prototype.fetchRole = function (id, options, cb) {
 
   self.kuzzle.callbackRequired('Security.fetchRole', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('fetchRole'), data, options, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
     cb(err, err ? undefined : new Role(self, response.result._id, response.result._source));
   });
 };
@@ -248,7 +248,7 @@ Security.prototype.fetchProfile = function (id, options, cb) {
 
   self.kuzzle.callbackRequired('Security.fetchProfile', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('fetchProfile'), data, options, function (error, response) {
+  self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
     cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source));
   });
 };
@@ -439,7 +439,7 @@ Security.prototype.fetchUser = function (id, options, cb) {
 
   self.kuzzle.callbackRequired('Security.fetchUser', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('fetchUser'), data, options, function (err, response) {
+  self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
     cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
   });
 };
