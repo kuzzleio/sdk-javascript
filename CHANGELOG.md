@@ -1,10 +1,10 @@
-# next
+# 3.1.0
 
-## Breaking changes
+* Fill changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/3.1.0
 
-* Align notification response formats #146
+## Breaking Changes
 
-*__note:__ the # at the end of lines are the pull request numbers on GitHub*
+* Align notification responses format #147
 
 # 2.2.0
 
