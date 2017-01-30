@@ -95,7 +95,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       }
 
       // from and size parameters are not valid for a scroll action
-      if (options.from) {
+      if (typeof options.from !== 'undefined') {
         delete options.from;
       }
 
