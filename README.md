@@ -33,9 +33,6 @@ The complete SDK documentation is available [here](http://kuzzleio.github.io/sdk
 The SDK Javascript implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
 The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
 
-For this reason, there is a slight difference with the [generic SDK documentation](http://kuzzleio.github.io/sdk-documentation): instead of 1 available `port` option, there are actually a `wsPort` and a `ioPort` options.  
-These options are defaulted to Kuzzle default protocol plugins.
-
 What protocol is used when you connect to Kuzzle depends on multiple factors:
 
 #### NodeJS
@@ -141,7 +138,7 @@ kuzzle
 
 ## Migrating from SDK v1.x
 
-* Kuzzle constructor has been changed. Instead of an URL, you have to provide a resolvable server name, or an IP address. If you need to specify a port different than the provided default values, you can do so using these two new options: `wsPort` (WebSocket port) and `ioPort` (Socket.IO port)
+* Kuzzle constructor has been changed. Instead of an URL, you have to provide a resolvable server name, or an IP address. If you need to specify a port different than the provided default value, you can do so using the `port` option.
 
 ## License
 

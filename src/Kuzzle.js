@@ -113,13 +113,8 @@ function Kuzzle (host, options, cb) {
       writable: true,
       enumerable: true
     },
-    wsPort: {
-      value: (options && typeof options.wsPort === 'number') ? options.wsPort : 7513,
-      enumerable: true,
-      writable: true
-    },
-    ioPort: {
-      value: (options && typeof options.ioPort === 'number') ? options.ioPort : 7512,
+    port: {
+      value: (options && typeof options.port === 'number') ? options.port : 7512,
       enumerable: true,
       writable: true
     },
@@ -322,7 +317,7 @@ Kuzzle.prototype.connect = function () {
     self.disconnect();
   }
 
-  self.network = networkWrapper(self.host, self.wsPort, self.ioPort, self.sslConnection);
+  self.network = networkWrapper(self.host, self.port, self.sslConnection);
 
   if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
     if (self.connectCB) {
