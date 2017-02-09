@@ -4,7 +4,7 @@
  * @param {Document[]} documents
  * @param {object} [aggregations]
  * @param {object} [searchArgs]
- * @param {KuzzleSearchResult} [previous]
+ * @param previous
  * @property {Collection} dataCollection
  * @property {number} fetchedDocument
  * @constructor
@@ -60,8 +60,9 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
 KuzzleSearchResult.prototype.next = function (cb) {
   var
     filters,
-    options = Object.assign({}, this.searchArgs.options),
-    self = this;
+    options = Object.assign({}, this.searchArgs.options);
+
+  options.previous = this;
 
   // retrieve next results with scroll if original search use it
   if (options.scrollId) {
@@ -84,7 +85,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       options,
       this.searchArgs.filters || {},
       function(error, newSearchResults) {
-        handleNextSearchResults(error, self, newSearchResults, cb);
+        handleNextSearchResults(error, newSearchResults, cb);
       }
     );
 
@@ -108,7 +109,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       filters,
       options,
       function(error, newSearchResults) {
-        handleNextSearchResults(error, self, newSearchResults, cb);
+        handleNextSearchResults(error, newSearchResults, cb);
       }
     );
 
@@ -120,17 +121,14 @@ KuzzleSearchResult.prototype.next = function (cb) {
 
 /**
  * @param {Error} error
- * @param {KuzzleSearchResult} currentSearchResults
  * @param {KuzzleSearchResult} newSearchResults
  * @param {Function} cb
  */
-function handleNextSearchResults (error, currentSearchResults, newSearchResults, cb) {
+function handleNextSearchResults (error, newSearchResults, cb) {
   if (error) {
     cb(error);
     return;
   }
-
-  newSearchResults.fetchedDocument += currentSearchResults.fetchedDocument;
 
   cb(null, newSearchResults);
 }
