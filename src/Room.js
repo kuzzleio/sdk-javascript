@@ -320,13 +320,12 @@ function notificationCallback (data) {
     return this.kuzzle.emitEvent('jwtTokenExpired');
   }
 
-  if (data.controller === 'document') {
+  if (data.controller === 'document' || (data.controller === 'realtime' && data.action === 'publish')) {
     data.type = 'document';
     data.document = new Document(this.collection, data.result._id, data.result._source);
     delete data.result;
   }
-
-  if (data.controller === 'realtime') {
+  else if (data.controller === 'realtime') {
     data.type = 'user';
     data.user = {count: data.result.count};
     delete data.result;

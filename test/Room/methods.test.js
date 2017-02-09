@@ -429,6 +429,34 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
+    it('should handle realtime publish notifications', () => {
+      notifCB.call(room, {
+        controller: 'realtime',
+        action: 'publish',
+        result: {
+          _source: {
+            foo: 'bar'
+          }
+        }
+      });
+
+      should(room.callback)
+        .be.calledOnce()
+        .be.calledWithMatch(null, {
+          controller: 'realtime',
+          action: 'publish',
+          type: 'document',
+          document: {
+            id: undefined,
+            content: {
+              foo: 'bar'
+            }
+          }
+        });
+      should(room.callback.firstCall.args[1].document)
+        .be.an.instanceOf(Document);
+    });
+
     it('should handle user notifications', () => {
       notifCB.call(room, {
         controller: 'realtime',
