@@ -80,14 +80,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
       delete options.size;
     }
 
-    this.dataCollection.scroll(
-      options.scrollId,
-      options,
-      this.searchArgs.filters || {},
-      function(error, newSearchResults) {
-        handleNextSearchResults(error, newSearchResults, cb);
-      }
-    );
+    this.dataCollection.scroll(options.scrollId, options, this.searchArgs.filters || {}, cb);
 
     return;
   }
@@ -105,32 +98,12 @@ KuzzleSearchResult.prototype.next = function (cb) {
       return;
     }
 
-    this.dataCollection.search(
-      filters,
-      options,
-      function(error, newSearchResults) {
-        handleNextSearchResults(error, newSearchResults, cb);
-      }
-    );
+    this.dataCollection.search(filters, options, cb);
 
     return;
   }
 
   cb(new Error('Unable to retrieve next results from search: missing scrollId or from/size params'));
 };
-
-/**
- * @param {Error} error
- * @param {KuzzleSearchResult} newSearchResults
- * @param {Function} cb
- */
-function handleNextSearchResults (error, newSearchResults, cb) {
-  if (error) {
-    cb(error);
-    return;
-  }
-
-  cb(null, newSearchResults);
-}
 
 module.exports = KuzzleSearchResult;
