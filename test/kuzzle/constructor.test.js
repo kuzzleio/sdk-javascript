@@ -70,8 +70,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('wsPort', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('ioPort', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('port', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: false, configurable: false });
     });
 
@@ -89,8 +88,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.replayInterval).be.exactly(10);
       should(kuzzle.reconnectionDelay).be.exactly(1000);
       should(kuzzle.defaultIndex).be.undefined();
-      should(kuzzle.wsPort).be.exactly(7513);
-      should(kuzzle.ioPort).be.exactly(7512);
+      should(kuzzle.port).be.exactly(7512);
       should(kuzzle.sslConnection).be.false();
     });
 
@@ -108,8 +106,7 @@ describe('Kuzzle constructor', () => {
           replayInterval: 99999,
           reconnectionDelay: 666,
           defaultIndex: 'foobar',
-          wsPort: 1234,
-          ioPort: 4567,
+          port: 1234,
           sslConnection: true
         },
         kuzzle = new Kuzzle('nowhere', options);
@@ -125,8 +122,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
       should(kuzzle.replayInterval).be.exactly(options.replayInterval);
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
-      should(kuzzle.wsPort).be.exactly(options.wsPort);
-      should(kuzzle.ioPort).be.exactly(options.ioPort);
+      should(kuzzle.port).be.exactly(options.port);
       should(kuzzle.sslConnection).be.exactly(options.sslConnection);
     });
 

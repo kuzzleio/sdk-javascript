@@ -61,7 +61,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
   var
     filters,
     options = Object.assign({}, this.searchArgs.options);
-
+  
   options.previous = this;
 
   // retrieve next results with scroll if original search use it
@@ -72,7 +72,7 @@ KuzzleSearchResult.prototype.next = function (cb) {
     }
 
     // from and size parameters are not valid for a scroll action
-    if (options.from) {
+    if (typeof options.from !== 'undefined') {
       delete options.from;
     }
 
