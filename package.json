@@ -48,5 +48,8 @@
     "should-sinon": "0.0.5",
     "sinon": "^1.17.7",
     "webpack": "^1.13.1"
+  },
+  "engines": {
+    "node": ">= 6.9.1"
   }
 }
