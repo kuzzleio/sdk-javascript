@@ -31,7 +31,7 @@ describe('Collection constructor', function () {
     should(c.headers.someother).be.undefined();
   });
 
-  it('should promisify the right functions', () => {
+  it('should promisify the right functions', function () {
     var
       kuzzle,
       dataCollection;

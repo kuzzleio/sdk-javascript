@@ -264,9 +264,9 @@ function Kuzzle (host, options, cb) {
       }
 
       eventProperties.listeners.forEach(function (listener) {
-        process.nextTick(function () {
+        setTimeout(function () {
           listener.fn.apply(undefined, args);
-        });
+        }, 0);
       });
 
       // Events without the 'lastEmitted' property can be emitted without minimum time between emissions

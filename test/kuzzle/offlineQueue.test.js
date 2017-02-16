@@ -4,7 +4,7 @@ var
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/Kuzzle');
 
-describe('Offline queue management', () => {
+describe('Offline queue management', function () {
   describe('#cleanQueue', function () {
     var
       cleanQueue = Kuzzle.__get__('cleanQueue'),
@@ -30,14 +30,14 @@ describe('Offline queue management', () => {
 
       // setting the request TTL to 5s
       kuzzle.queueTTL = 5000;
-      kuzzle.addListener('offlineQueuePop', () => {
+      kuzzle.addListener('offlineQueuePop', function () {
         eventFired = true;
       });
 
       cleanQueue.call(kuzzle);
 
       // should keep only the latest requests, dating from a few ms ago
-      setTimeout(() => {
+      setTimeout(function () {
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).be.above(now - kuzzle.queueTTL);
         should(eventFired).be.true();
@@ -59,17 +59,17 @@ describe('Offline queue management', () => {
         eventFired = false;
 
       kuzzle.queueMaxSize = 1;
-      kuzzle.addListener('offlineQueuePop', () => {
+      kuzzle.addListener('offlineQueuePop', function () {
         eventFired = true;
       });
       cleanQueue.call(kuzzle);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0]).match(lastRequest);
         should(eventFired).be.true();
         done();
-      });
+      }, 0);
     });
 
     it('should not remove any request if queueMaxSize is 0', function () {
@@ -108,10 +108,10 @@ describe('Offline queue management', () => {
         eventFired = 0;
 
       this.timeout(200);
-      kuzzle.addListener('offlineQueuePop', () => eventFired++);
+      kuzzle.addListener('offlineQueuePop', function () { eventFired++; });
       dequeue.call(kuzzle);
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(kuzzle.network.send.callCount).be.exactly(numRequests);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
@@ -133,10 +133,10 @@ describe('Offline queue management', () => {
           {query: {requestId: 'foo2', action: 'action', controller: 'controller'}}
         ];
       };
-      kuzzle.addListener('offlineQueuePop', () => eventFired++);
+      kuzzle.addListener('offlineQueuePop', function () {eventFired++; });
       dequeue.call(kuzzle);
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(kuzzle.network.send.callCount).be.exactly(numRequests + 2);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);
@@ -158,10 +158,10 @@ describe('Offline queue management', () => {
           {query: {requestId: '50000', action: 'action', controller: 'controller'}}
         ];
       };
-      kuzzle.addListener('offlineQueuePop', () => eventFired++);
+      kuzzle.addListener('offlineQueuePop', function () { eventFired++; });
       dequeue.call(kuzzle);
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(kuzzle.network.send.callCount).be.exactly(numRequests + 1);
         should(kuzzle.offlineQueue).be.an.Array();
         should(kuzzle.offlineQueue.length).be.exactly(0);

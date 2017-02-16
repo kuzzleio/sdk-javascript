@@ -130,7 +130,7 @@ describe('CollectionMapping methods', function () {
       should(emitted).be.true();
 
       emitted = false;
-      mapping.apply((err, res) => {
+      mapping.apply(function (err, res) {
         should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
@@ -200,7 +200,7 @@ describe('CollectionMapping methods', function () {
       should(emitted).be.true();
 
       emitted = false;
-      mapping.refresh((err, res) => {
+      mapping.refresh(function (err, res) {
         should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
@@ -213,7 +213,7 @@ describe('CollectionMapping methods', function () {
 
       result = { result: {foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
 
-      mapping.refresh((err, res) => {
+      mapping.refresh(function (err, res) {
         should(emitted).be.true();
         should(err).be.an.Error();
         should(err.message).startWith('No mapping found for index');
@@ -227,7 +227,7 @@ describe('CollectionMapping methods', function () {
 
       result = { result: {bar: { mappings: { foobar: { properties: { foo: {type: 'date'}}}}}}};
 
-      mapping.refresh((err, res) => {
+      mapping.refresh(function (err, res) {
         should(emitted).be.true();
         should(err).be.an.Error();
         should(err.message).startWith('No mapping found for collection');
@@ -236,12 +236,12 @@ describe('CollectionMapping methods', function () {
       });
     });
 
-    it('should return an empty mapping if the stored mapping is empty', done => {
+    it('should return an empty mapping if the stored mapping is empty', function (done) {
       var mapping = new CollectionMapping(dataCollection);
 
       result = { result: {bar: { mappings: { foo: {}}}}};
 
-      mapping.refresh((err, res) => {
+      mapping.refresh(function (err, res) {
         should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);

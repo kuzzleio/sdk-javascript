@@ -32,11 +32,15 @@ describe('Query management', function () {
     it('should fire a jwtTokenExpired event if the token has expired', function (done) {
       var listenerJwtTokenExpired = false;
 
-      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit('bar', {
-        error: {
-          message: 'Token expired'
-        }
-      }));
+      kuzzle.network.send = function () {
+        setTimeout(function () {
+          kuzzle.network.emit('bar', {
+            error: {
+              message: 'Token expired'
+            }
+          });
+        }, 0);
+      };
 
       kuzzle.addListener('jwtTokenExpired', function() {
         listenerJwtTokenExpired = true;
@@ -45,22 +49,26 @@ describe('Query management', function () {
       this.timeout(150);
 
       emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
-        process.nextTick(() => {
+        setTimeout(function () {
           should(listenerJwtTokenExpired).be.exactly(true);
           should(error.message).be.exactly('Token expired');
           done();
-        });
+        }, 0);
       });
     });
 
     it('should fire a queryError if an error occurred', function (done) {
       var listenerQueryError = false;
 
-      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit('bar', {
-        error: {
-          message: 'foo-bar'
-        }
-      }));
+      kuzzle.network.send = function () {
+        setTimeout(function () {
+          kuzzle.network.emit('bar', {
+            error: {
+              message: 'foo-bar'
+            }
+          });
+        }, 0);
+      };
 
       kuzzle.addListener('queryError', function() {
         listenerQueryError = true;
@@ -69,11 +77,11 @@ describe('Query management', function () {
       this.timeout(150);
 
       emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
-        process.nextTick(() => {
+        setTimeout(function () {
           should(listenerQueryError).be.exactly(true);
           should(error.message).be.exactly('foo-bar');
           done();
-        });
+        }, 0);
       });
     });
 
@@ -93,7 +101,12 @@ describe('Query management', function () {
 
       this.timeout(50);
 
-      kuzzle.network.send = () => process.nextTick(() => kuzzle.network.emit(request.requestId, response));
+      kuzzle.network.send = function () {
+        setTimeout(function () {
+          kuzzle.network.emit(request.requestId, response);
+        }, 0);
+      };
+
       emitRequest.call(kuzzle, request, cb);
     });
   });
@@ -146,11 +159,11 @@ describe('Query management', function () {
       should(callback).be.exactly(cb);
     });
 
-    it('should invoke the callback with an error if no query is provided', () => {
-      should(() => kuzzle.query(queryArgs, () => {})).throw(Error);
-      should(() => kuzzle.query(queryArgs, ['foo', 'bar'])).throw(Error);
-      should(() => kuzzle.query(queryArgs)).throw(Error);
-      should(() => kuzzle.query(queryArgs, 'foobar')).throw(Error);
+    it('should invoke the callback with an error if no query is provided', function () {
+      should(function () { kuzzle.query(queryArgs, function () {}); }).throw(Error);
+      should(function () { kuzzle.query(queryArgs, ['foo', 'bar']); }).throw(Error);
+      should(function () { kuzzle.query(queryArgs); }).throw(Error);
+      should(function () { kuzzle.query(queryArgs, 'foobar'); }).throw(Error);
     });
 
     it('should handle options metadata properly', function () {
@@ -239,7 +252,7 @@ describe('Query management', function () {
       var
         errorRaised = false;
 
-      callback = () => {
+      callback = function () {
         errorRaised = true;
       };
 
@@ -259,7 +272,7 @@ describe('Query management', function () {
       var
         errorRaised = false;
 
-      callback = () => {
+      callback = function () {
         errorRaised = true;
       };
 
@@ -279,14 +292,14 @@ describe('Query management', function () {
 
       kuzzle.state = 'offline';
       kuzzle.queuing = true;
-      kuzzle.addListener('offlineQueuePush', object => {
+      kuzzle.addListener('offlineQueuePush', function (object) {
         eventFired = true;
         should(object.query.body).be.eql(query.body);
       });
 
       kuzzle.query(queryArgs, query, cb);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
@@ -294,7 +307,7 @@ describe('Query management', function () {
         should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
         should(eventFired).be.true();
         done();
-      });
+      }, 0);
     });
 
     it('should queue the request during offline mode, if queuable is set to true', function (done) {
@@ -306,14 +319,14 @@ describe('Query management', function () {
 
       kuzzle.state = 'offline';
       kuzzle.queuing = false;
-      kuzzle.addListener('offlineQueuePush', object => {
+      kuzzle.addListener('offlineQueuePush', function (object) {
         eventFired = true;
         should(object.query.body).be.eql(query.body);
       });
 
       kuzzle.query(queryArgs, query, {queuable: true}, cb);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
@@ -321,7 +334,7 @@ describe('Query management', function () {
         should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
         should(eventFired).be.true();
         done();
-      });
+      }, 0);
     });
 
     it('should queue the request if a queue filter has been defined and if it allows queuing', function (done) {
@@ -331,7 +344,7 @@ describe('Query management', function () {
         now = Date.now(),
         eventFired = false;
 
-      kuzzle.addListener('offlineQueuePush', object => {
+      kuzzle.addListener('offlineQueuePush', function (object) {
         eventFired = true;
         should(object.query.body).be.eql(query.body);
       });
@@ -341,7 +354,7 @@ describe('Query management', function () {
       kuzzle.queuing = true;
       kuzzle.query(queryArgs, query, cb);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         should(kuzzle.offlineQueue.length).be.exactly(1);
         should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
@@ -349,7 +362,7 @@ describe('Query management', function () {
         should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
         should(eventFired).be.true();
         done();
-      });
+      }, 0);
     });
 
     it('should discard the request if a queue filter has been defined and if it does not allows queuing', function (done) {
@@ -358,7 +371,7 @@ describe('Query management', function () {
         cb = function () {},
         eventFired = false;
 
-      kuzzle.addListener('offlineQueuePush', () => {
+      kuzzle.addListener('offlineQueuePush', function () {
         eventFired = true;
       });
       kuzzle.state = 'offline';
@@ -366,12 +379,12 @@ describe('Query management', function () {
       kuzzle.queuing = true;
       kuzzle.query(queryArgs, query, cb);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(eventFired).be.false();
         done();
-      });
+      }, 0);
     });
 
     it('should discard the request if in offline mode but queuing has not yet been activated', function (done) {
@@ -380,19 +393,19 @@ describe('Query management', function () {
         cb = function () {},
         eventFired = false;
 
-      kuzzle.addListener('offlineQueuePush', () => {
+      kuzzle.addListener('offlineQueuePush', function () {
         eventFired = true;
       });
       kuzzle.state = 'offline';
       kuzzle.queuing = false;
       kuzzle.query(queryArgs, query, cb);
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         should(kuzzle.offlineQueue.length).be.exactly(0);
         should(eventFired).be.false();
         done();
-      });
+      }, 0);
     });
 
     it('should not set jwtToken if we execute auth/checkToken', function () {

@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/Kuzzle');
 
-describe('Listeners management', () => {
+describe('Listeners management', function () {
   var
     kuzzle,
     listenerIds;
@@ -35,13 +35,13 @@ describe('Listeners management', () => {
     });
 
     it('should throw an error if trying to adding a listener to an unknown event', function () {
-      should(() => {
+      should(function () {
         kuzzle.addListener('foo', function () {});
       }).throw();
     });
 
     it('should throw an error when providing a non-function listener argument', function () {
-      should(() => {
+      should(function () {
         kuzzle.addListener('connected', 'bar');
       }).throw();
     });
@@ -82,11 +82,15 @@ describe('Listeners management', () => {
 
   describe('#removeListener', function () {
     it('should remove any one listener from the listener list', function () {
-      var listener = kuzzle.eventListeners.connected.listeners.filter(l => l.id === listenerIds[2]);
+      var listener = kuzzle.eventListeners.connected.listeners.filter(function (l) {
+        return l.id === listenerIds[2];
+      });
 
       should(listener.length).be.exactly(1);
       kuzzle.removeListener('connected', listenerIds[2]);
-      listener = kuzzle.eventListeners.connected.listeners.filter(l => l.id === listenerIds[2]);
+      listener = kuzzle.eventListeners.connected.listeners.filter(function (l) {
+        return l.id === listenerIds[2];
+      });
       should(listener.length).be.exactly(0);
       should(kuzzle.eventListeners.connected.listeners.length).be.exactly(3);
       should(kuzzle.eventListeners.error.listeners.length).be.exactly(3);

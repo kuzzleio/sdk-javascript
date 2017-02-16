@@ -7,7 +7,7 @@ var
   NetworkWrapper = require('../../src/networkWrapper/wrappers/websocket'),
   kuzzleSource = '../../src/Kuzzle';
 
-describe('Kuzzle constructor', () => {
+describe('Kuzzle constructor', function () {
   var
     Kuzzle,
     networkStub;
@@ -25,7 +25,7 @@ describe('Kuzzle constructor', () => {
       });
     });
 
-    it('should expose the documented functions', () => {
+    it('should expose the documented functions', function () {
       var kuzzle;
 
       kuzzle = new Kuzzle('nowhere');
@@ -52,7 +52,7 @@ describe('Kuzzle constructor', () => {
       should.exist(kuzzle.unsetJwtToken);
     });
 
-    it('should expose the documented properties', () => {
+    it('should expose the documented properties', function () {
       var kuzzle = new Kuzzle('nowhere');
 
       should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
@@ -74,7 +74,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: false, configurable: false });
     });
 
-    it('should have properties with the documented default values', () => {
+    it('should have properties with the documented default values', function () {
       var kuzzle = new Kuzzle('nowhere');
 
       should(kuzzle.autoQueue).be.false();
@@ -92,7 +92,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.sslConnection).be.false();
     });
 
-    it('should initialize correctly properties using the "options" argument', () => {
+    it('should initialize correctly properties using the "options" argument', function () {
       var
         options = {
           autoQueue: true,
@@ -126,7 +126,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.sslConnection).be.exactly(options.sslConnection);
     });
 
-    it('should handle the offlineMode option properly', () => {
+    it('should handle the offlineMode option properly', function () {
       var kuzzle = new Kuzzle('nowhere', {offlineMode: 'auto'});
 
       should(kuzzle.autoQueue).be.true();
@@ -135,7 +135,7 @@ describe('Kuzzle constructor', () => {
       should(kuzzle.autoResubscribe).be.true();
     });
 
-    it('should handle the connect option properly', () => {
+    it('should handle the connect option properly', function () {
       var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
       should(kuzzle.state).be.exactly('ready');
@@ -146,7 +146,7 @@ describe('Kuzzle constructor', () => {
       should(networkStub.connect.called).be.true();
     });
 
-    it('should return a new instance even if not called with "new"', () => {
+    it('should return a new instance even if not called with "new"', function () {
       var kuzzle = Kuzzle('nowhere');
 
       kuzzle.should.be.instanceof(Kuzzle);
@@ -163,7 +163,7 @@ describe('Kuzzle constructor', () => {
         });
       };
 
-      kuzzle = new Kuzzle('nowhere', () => {
+      kuzzle = new Kuzzle('nowhere', function () {
         kuzzle.state = 'disconnected';
         try {
           kuzzle.isValid();
@@ -175,7 +175,7 @@ describe('Kuzzle constructor', () => {
       });
     });
 
-    it('should promisify the right functions', () => {
+    it('should promisify the right functions', function () {
       var kuzzle;
 
       Kuzzle.prototype.bluebird = bluebird;
@@ -207,8 +207,8 @@ describe('Kuzzle constructor', () => {
       should.not.exist(kuzzle.stopQueuingPromise);
     });
 
-    it('should throw an error if no URL is provided', () => {
-      should(() => {
+    it('should throw an error if no URL is provided', function () {
+      should(function () {
         new Kuzzle();
       }).throw();
     });
@@ -219,7 +219,7 @@ describe('Kuzzle constructor', () => {
 
         this.timeout(200);
 
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.state).be.exactly('connected');
@@ -235,7 +235,7 @@ describe('Kuzzle constructor', () => {
 
         this.timeout(200);
 
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, (err, res) => {
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.state).be.exactly('reconnecting');
@@ -247,7 +247,7 @@ describe('Kuzzle constructor', () => {
       });
 
       it('should try to connect when the instance is in a not-connected state', function () {
-        ['initializing', 'ready', 'disconnected', 'error', 'offline'].forEach(state => {
+        ['initializing', 'ready', 'disconnected', 'error', 'offline'].forEach(function (state) {
           var kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
           kuzzle.state = state;
@@ -272,7 +272,7 @@ describe('Kuzzle constructor', () => {
 
         kuzzle.connect();
 
-        setTimeout(() => {
+        setTimeout(function () {
           should(listenerCalled).be.true();
           done();
         }, 10);
@@ -291,10 +291,10 @@ describe('Kuzzle constructor', () => {
         should(kuzzle.disconnect.called).be.true();
       });
 
-      describe('=> on connection error', () => {
+      describe('=> on connection error', function () {
         beforeEach(function () {
           networkStub.onConnectError = function (cb) {
-            process.nextTick(() => cb('error'));
+            process.nextTick(function () { cb('error'); });
           };
         });
 
@@ -325,7 +325,7 @@ describe('Kuzzle constructor', () => {
 
           kuzzle.addListener('error', function () { listenerCalled = true; });
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(listenerCalled).be.true();
               done();
@@ -337,9 +337,11 @@ describe('Kuzzle constructor', () => {
         });
       });
 
-      describe('=> on connection success', () => {
-        beforeEach(() => {
-          networkStub.onConnect = cb => process.nextTick(() => cb());
+      describe('=> on connection success', function () {
+        beforeEach(function () {
+          networkStub.onConnect = function (cb) {
+            setTimeout(function () { cb(); }, 0);
+          };
         });
 
         it('should call the provided callback on a connection success', function (done) {
@@ -375,7 +377,7 @@ describe('Kuzzle constructor', () => {
           kuzzle.connect();
           should(kuzzle.state).be.exactly('connecting');
 
-          setTimeout(() => {
+          setTimeout(function () {
             should(renewed).be.true();
             done();
           }, 20);
@@ -405,9 +407,11 @@ describe('Kuzzle constructor', () => {
         });
       });
 
-      describe('=> on disconnection', () => {
+      describe('=> on disconnection', function () {
         beforeEach(function () {
-          networkStub.onDisconnect = cb => process.nextTick(() => cb());
+          networkStub.onDisconnect = function (cb) {
+            setTimeout(function () { cb(); }, 0);
+          };
         });
 
         it('should enter offline mode and call listeners', function (done) {
@@ -419,7 +423,7 @@ describe('Kuzzle constructor', () => {
 
           kuzzle.addListener('disconnected', function () { listenerCalled = true; });
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.false();
@@ -437,7 +441,7 @@ describe('Kuzzle constructor', () => {
           var kuzzle = new Kuzzle('nowhere', {autoQueue: true});
           this.timeout(200);
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.true();
@@ -455,7 +459,7 @@ describe('Kuzzle constructor', () => {
 
           this.timeout(200);
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('offline');
               should(kuzzle.queuing).be.false();
@@ -469,9 +473,11 @@ describe('Kuzzle constructor', () => {
         });
       });
 
-      describe('=> on reconnection', () => {
+      describe('=> on reconnection', function () {
         beforeEach(function () {
-          networkStub.onReconnect = cb => process.nextTick(() => cb());
+          networkStub.onReconnect = function (cb) {
+            setTimeout(function () { cb(); }, 0);
+          };
         });
 
         it('should exit offline mode when reconnecting', function (done) {
@@ -484,7 +490,7 @@ describe('Kuzzle constructor', () => {
           kuzzle.addListener('reconnected', function () { listenersCalled = true; });
           kuzzle.queuing = true;
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('connected');
               should(listenersCalled).be.true();
@@ -513,7 +519,7 @@ describe('Kuzzle constructor', () => {
 
           kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.true();
@@ -541,7 +547,7 @@ describe('Kuzzle constructor', () => {
             bar: stubKuzzleRoom
           };
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('connected');
               should(renewCalled).be.false();
@@ -562,7 +568,7 @@ describe('Kuzzle constructor', () => {
 
           kuzzle.queuing = true;
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('connected');
               should(kuzzle.queuing).be.false();
@@ -589,7 +595,7 @@ describe('Kuzzle constructor', () => {
             cb(null, {valid: false});
           };
 
-          setTimeout(() => {
+          setTimeout(function () {
             try {
               should(kuzzle.state).be.exactly('connected');
               should(kuzzle.jwtToken).be.undefined();
@@ -604,7 +610,7 @@ describe('Kuzzle constructor', () => {
       });
     });
 
-    describe('#login', () => {
+    describe('#login', function () {
       var
         loginStub = function(strategy, credentials, expiresIn, cb) {
           if (typeof cb === 'function') {
@@ -617,8 +623,10 @@ describe('Kuzzle constructor', () => {
           }
         };
 
-      beforeEach(() => {
-        networkStub.onConnect = cb => process.nextTick(() => cb());
+      beforeEach(function () {
+        networkStub.onConnect = function (cb) {
+          setTimeout(function () { cb(); }, 0);
+        };
       });
 
       it('should call the provided callback on a connection & login success', function (done) {
@@ -665,13 +673,13 @@ describe('Kuzzle constructor', () => {
           }
         }, function (err, res) {
           try {
-            process.nextTick(() => {
+            setTimeout(function () {
               should(err).be.null();
               should(res).be.instanceof(Kuzzle);
               should(res.state).be.exactly('connected');
               should(listenerConnected).be.exactly(true);
               done();
-            });
+            }, 0);
           }
           catch (e) {
             done(e);
@@ -824,7 +832,7 @@ describe('Kuzzle constructor', () => {
           cb({message: 'foobar'});
         };
 
-        kuzzle.addListener('loginAttempt', status => {
+        kuzzle.addListener('loginAttempt', function (status) {
           should(status.success).be.false();
           should(status.error).be.eql('foobar');
           eventEmitted = true;
@@ -832,10 +840,10 @@ describe('Kuzzle constructor', () => {
 
         kuzzle.login('local', {});
 
-        process.nextTick(() => {
+        setTimeout(function () {
           should(eventEmitted).be.true();
           done();
-        });
+        }, 0);
       });
 
       it('should not forward an event if there is no JWT token in the response', function (done) {
@@ -846,15 +854,15 @@ describe('Kuzzle constructor', () => {
           cb(null, {result: {}});
         };
 
-        kuzzle.addListener('loginAttempt', () => {
+        kuzzle.addListener('loginAttempt', function () {
           done('test failed');
         });
 
         kuzzle.login('local', {});
 
-        process.nextTick(() => {
+        setTimeout(function () {
           done();
-        });
+        }, 0);
       });
 
       it('should handle optional arguments correctly', function (done) {
@@ -914,7 +922,7 @@ describe('Kuzzle constructor', () => {
           cb(null, {});
         };
 
-        kuzzle.logout(() => {});
+        kuzzle.logout(function () {});
         should(unsetJwtToken).be.exactly(true);
       });
 
