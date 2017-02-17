@@ -72,6 +72,9 @@ function WSNode(host, port, ssl) {
       if (data.room && self.listeners[data.room]) {
         poke(self.listeners, data.room, data);
       }
+      else {
+        poke(self.listeners, 'discarded', data);
+      }
     };
   };
 
