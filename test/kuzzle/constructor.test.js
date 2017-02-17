@@ -619,6 +619,7 @@ describe('Kuzzle constructor', () => {
 
       beforeEach(() => {
         networkStub.onConnect = cb => process.nextTick(() => cb());
+        networkStub.on = (event, cb) => cb();
       });
 
       it('should call the provided callback on a connection & login success', function (done) {
@@ -682,6 +683,19 @@ describe('Kuzzle constructor', () => {
         kuzzle.addListener('connected', function() {
           listenerConnected = true;
         });
+        kuzzle.connect();
+      });
+
+      it('should send event discarded on network event discarded', function (done) {
+        var
+          kuzzle = new Kuzzle('nowhere', {
+            connect: 'manual'
+          });
+
+        kuzzle.addListener('discarded', function () {
+          done();
+        });
+
         kuzzle.connect();
       });
 
