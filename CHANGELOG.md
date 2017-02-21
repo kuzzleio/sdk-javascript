@@ -1,3 +1,7 @@
+# 3.4.0
+
+Fill changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/3.4.0
+
 # 3.1.0
 
 * Fill changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/3.1.0
