@@ -17,7 +17,7 @@ describe('KuzzleSecurityDocument constructor', function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
   });
 
-  it('should throw an error if no id is provided', done => {
+  it('should throw an error if no id is provided', function (done) {
     try {
       new KuzzleSecurityDocument(kuzzle.security, null, null);
     }

@@ -1,6 +1,4 @@
-'use strict';
-
-const
+var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
@@ -9,7 +7,7 @@ const
   Room = rewire('../../src/Room');
 
 describe('Room methods', function () {
-  let
+  var
     expectedQuery,
     error,
     result,
@@ -198,7 +196,7 @@ describe('Room methods', function () {
     it('should start dequeuing if subscribed successfully', function (done) {
       room.renew({}, function () {});
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(dequeued).be.true();
         done();
       }, 10);
@@ -221,7 +219,7 @@ describe('Room methods', function () {
     it('should register itself to Kuzzle and skip subscription if not connected', function (done) {
       kuzzle.state = 'foo';
       room.renew({}, function () {});
-      setTimeout(() => {
+      setTimeout(function () {
         should(dequeued).be.false();
         should(emitted).be.false();
         should(room.lastRenewal).be.null();
@@ -242,7 +240,7 @@ describe('Room methods', function () {
       room.renew({}, function () {});
       room.renew({}, function () {});
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(renewals).be.eql(1);
         should(room.lastRenewal).be.within(before, after);
         done();
@@ -321,7 +319,7 @@ describe('Room methods', function () {
       should(emitted).be.false();
       should(kuzzle.subscriptions.foobar).be.undefined();
       kuzzle.subscriptions.pending = {};
-      setTimeout(() => {
+      setTimeout(function () {
         should(emitted).be.true();
         done();
       }, 100);
@@ -336,7 +334,7 @@ describe('Room methods', function () {
       kuzzle.subscriptions.pending = {};
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar.foo = {};
-      setTimeout(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         done();
       }, 100);
@@ -381,7 +379,7 @@ describe('Room methods', function () {
   });
 
   describe('#notificationCallback', function () {
-    let
+    var
       notifCB = Room.__get__('notificationCallback'),
       room;
 
@@ -402,7 +400,7 @@ describe('Room methods', function () {
         .have.length(1);
     });
 
-    it('should handle document notifications', () => {
+    it('should handle document notifications', function () {
       notifCB.call(room, {
         controller: 'document',
         result: {
@@ -429,7 +427,7 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
-    it('should handle realtime publish notifications', () => {
+    it('should handle realtime publish notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
         action: 'publish',
@@ -457,7 +455,7 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
-    it('should handle user notifications', () => {
+    it('should handle user notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
         result: { count: 3 }
@@ -473,7 +471,7 @@ describe('Room methods', function () {
         });
     });
 
-    it('should delete the result from history if emitted by this instance', () => {
+    it('should delete the result from history if emitted by this instance', function () {
       room.subscribeToSelf = true;
       kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
@@ -498,7 +496,7 @@ describe('Room methods', function () {
         eventEmitted = null,
         context = {
           kuzzle: {
-            emitEvent: event => {
+            emitEvent: function (event) {
               eventEmitted = event;
             }
           }

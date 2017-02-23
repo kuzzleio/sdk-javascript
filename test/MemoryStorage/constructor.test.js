@@ -6,7 +6,7 @@ var
   Kuzzle = rewire('../../src/Kuzzle');
 
 describe('MemoryStorage constructor', function () {
-  it('should initialize properties and return a valid MemoryStorage object', () => {
+  it('should initialize properties and return a valid MemoryStorage object', function () {
     var
       kuzzle = new Kuzzle('foo'),
       ms;
@@ -24,7 +24,7 @@ describe('MemoryStorage constructor', function () {
     should(ms.headers.someother).be.undefined();
   });
 
-  it('should promisify all methods', () => {
+  it('should promisify all methods', function () {
     var
       kuzzle,
       ms,
@@ -35,9 +35,13 @@ describe('MemoryStorage constructor', function () {
     kuzzle = new Kuzzle('foo');
     ms = new MemoryStorage(kuzzle);
 
-    functions = Object.getOwnPropertyNames(Object.getPrototypeOf(ms)).filter(p => (typeof ms[p] === 'function' && ['constructor', 'setHeaders'].indexOf(p) === -1));
+    functions = Object.getOwnPropertyNames(Object.getPrototypeOf(ms)).filter(function (p) {
+      return (typeof ms[p] === 'function' && ['constructor', 'setHeaders'].indexOf(p) === -1);
+    });
+
     should(functions.length).be.eql(119);
-    functions.forEach(f => {
+
+    functions.forEach(function (f) {
       should(ms[f + 'Promise']).be.a.Function();
     });
 

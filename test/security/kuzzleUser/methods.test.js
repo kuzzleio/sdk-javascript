@@ -319,7 +319,7 @@ describe('User methods', function () {
     it('should return the associated profiles', function () {
       var profileIds = ['profile'];
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: profileIds});
       should(kuzzleUser.getProfiles()).be.eql(profileIds);
     });
   });

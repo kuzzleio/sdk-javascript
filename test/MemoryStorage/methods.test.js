@@ -3,14 +3,14 @@ var
   Kuzzle = require('../stubs/kuzzle.stub'),
   MemoryStorage = require('../../src/MemoryStorage');
 
-describe('MemoryStorage methods', () => {
+describe('MemoryStorage methods', function () {
   var
     kuzzle = new Kuzzle('foo'),
     ms = new MemoryStorage(kuzzle);
 
-  describe('#regular case', () => {
-    it('should parse the given arguments (no options)', () => {
-      ms.append('foo', 'bar', (err, r) => {
+  describe('#regular case', function () {
+    it('should parse the given arguments (no options)', function () {
+      ms.append('foo', 'bar', function (err, r) {
         should(r.args).match({
           controller: 'ms',
           action: 'append'
@@ -23,8 +23,8 @@ describe('MemoryStorage methods', () => {
       });
     });
 
-    it('should parse the given arguments (w options)', () => {
-      ms.append('foo', 'bar', { queuable: true}, (err, r) => {
+    it('should parse the given arguments (w options)', function () {
+      ms.append('foo', 'bar', { queuable: true}, function (err, r) {
         should(r.args).match({
           controller: 'ms',
           action: 'append'
@@ -38,8 +38,8 @@ describe('MemoryStorage methods', () => {
       });
     });
 
-    it('should handle arguments with multiple cardinality', () => {
-      ms.sinter('foo', (err, r) => {
+    it('should handle arguments with multiple cardinality', function () {
+      ms.sinter('foo', function (err, r) {
         should(r.args).match({
           controller: 'ms',
           action: 'sinter'
@@ -50,7 +50,7 @@ describe('MemoryStorage methods', () => {
         should.not.exist(r.query.body);
       });
 
-      ms.sinter(['foo', 'bar'], (err, r) => {
+      ms.sinter(['foo', 'bar'], function (err, r) {
         should(r.args).match({
           controller: 'ms',
           action: 'sinter'
@@ -62,8 +62,8 @@ describe('MemoryStorage methods', () => {
     });
   });
 
-  describe('#functions with optional parameters', () => {
-    it('should parse all given arguments', () => {
+  describe('#functions with optional parameters', function () {
+    it('should parse all given arguments', function () {
       ms.zadd('foo', {
         nx: true,
         xx: true,
@@ -75,7 +75,7 @@ describe('MemoryStorage methods', () => {
           {score: 's1', member: 'm1'},
           {score: 's2', member: 'm2'}
         ]
-      }, (err, r) => {
+      }, function (err, r) {
         should(r.args).match({
           controller: 'ms',
           action: 'zadd'

@@ -16,7 +16,7 @@ describe('Security constructor', function () {
     should(kuzzle.security.kuzzle).be.exactly(kuzzle);
   });
 
-  it('should promisify the right functions', () => {
+  it('should promisify the right functions', function () {
     var
       kuzzle;
 

@@ -51,8 +51,7 @@
     "yoda": [2, "never"]
   },
   "env": {
-    "node": true,
-    "mocha": true
+    "browser": true
   },
   "parserOptions": {
     "ecmaVersion": 5
