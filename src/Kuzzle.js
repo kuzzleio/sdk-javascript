@@ -58,7 +58,8 @@ function Kuzzle (host, options, cb) {
         loginAttempt: {lastEmitted: null, listeners: []},
         offlineQueuePush: {listeners: []},
         offlineQueuePop: {listeners: []},
-        queryError: {listeners: []}
+        queryError: {listeners: []},
+        discarded: {listeners: []}
       }
     },
     eventTimeout: {
@@ -338,6 +339,10 @@ Kuzzle.prototype.connect = function () {
     if (self.connectCB) {
       self.connectCB(null, self);
     }
+  });
+
+  self.network.on('discarded', function (data) {
+    self.emitEvent('discarded', data);
   });
 
   self.network.onConnectError(function (error) {

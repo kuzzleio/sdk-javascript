@@ -188,6 +188,20 @@ describe('WebSocket networking module', function () {
     should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
+  it('should send the message on room "discarded" if no room specified', function () {
+    var
+      cb = sinon.stub(),
+      payload = {};
+
+    websocket.on('discarded', cb);
+    websocket.connect();
+
+    clientStub.onmessage({data: JSON.stringify(payload)});
+
+    should(cb.calledOnce).be.true();
+    should(cb.alwaysCalledWithMatch(payload)).be.true();
+  });
+
   it('should be able to unregister a callback on an event', function () {
     var
       cb = sinon.stub();
