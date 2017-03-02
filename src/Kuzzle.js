@@ -95,9 +95,10 @@ function Kuzzle (host, options, cb) {
       },
       writable: true
     },
-    // read-only properties
+    // configuration properties
     autoReconnect: {
       value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
+      writable: true,
       enumerable: true
     },
     defaultIndex: {
@@ -107,6 +108,7 @@ function Kuzzle (host, options, cb) {
     },
     reconnectionDelay: {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
+      writable: true,
       enumerable: true
     },
     host: {
@@ -121,6 +123,7 @@ function Kuzzle (host, options, cb) {
     },
     sslConnection: {
       value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
+      writable: true,
       enumerable: true
     },
     autoQueue: {
