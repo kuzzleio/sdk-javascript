@@ -129,7 +129,7 @@ describe('Collection methods', function () {
   });
 
   describe('#scroll', function () {
-    beforeEach(() => {
+    beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
@@ -144,29 +144,29 @@ describe('Collection methods', function () {
       };
     });
 
-    it('should throw an error if no scrollId is set', () => {
+    it('should throw an error if no scrollId is set', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
+      should(function () { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
     });
 
-    it('should throw an error if no scroll is provided', () => {
+    it('should throw an error if no scroll is provided', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll('scrollId'); }).throw('Collection.scroll: scroll is required');
+      should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: scroll is required');
     });
 
-    it('should throw an error if no callback is given', () => {
+    it('should throw an error if no callback is given', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll('scrollId', {scroll: '1m'}); }).throw('Collection.scroll: a callback argument is required for read queries');
+      should(function () { collection.scroll('scrollId', {scroll: '1m'}); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
-    it('should parse the given parameters', done => {
+    it('should parse the given parameters', function (done) {
       var
         queryScrollStub,
         collection = kuzzle.collection(expectedQuery.collection),
         scrollId = 'scrollId',
         filters = {},
         options = {scroll: '30s'},
-        cb = () => {
+        cb = function () {
           done();
         };
 
@@ -644,7 +644,7 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should handle the from and size options', () => {
+    it('should handle the from and size options', function () {
       var
         collection = kuzzle.collection('collection'),
         stub = sinon.stub(collection, 'search');
@@ -655,7 +655,7 @@ describe('Collection methods', function () {
       stub.restore();
     });
 
-    it('should handle the scroll options', () => {
+    it('should handle the scroll options', function () {
       var
         collection = kuzzle.collection('collection'),
         stub = sinon.stub(collection, 'search');
@@ -666,7 +666,7 @@ describe('Collection methods', function () {
       stub.restore();
     });
 
-    it('should transfer error if any', done => {
+    it('should transfer error if any', function (done) {
       var
         collection = kuzzle.collection('collection');
 

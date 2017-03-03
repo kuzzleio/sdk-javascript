@@ -3,7 +3,7 @@ var
   Kuzzle = require('../../src/Kuzzle');
 
 
-describe('Event emitter', () => {
+describe('Event emitter', function () {
   var
     kuzzle,
     emitEvent;
@@ -34,10 +34,10 @@ describe('Event emitter', () => {
 
     emitEvent.call(context, 'foo');
 
-    process.nextTick(() => {
+    setTimeout(function () {
       should(listenersCalled).be.eql(3);
       done();
-    });
+    }, 0);
   });
 
   it('should allow providing any number of arguments', function (done) {
@@ -60,27 +60,27 @@ describe('Event emitter', () => {
 
     emitEvent.call(context, 'foo');
 
-    process.nextTick(() => {
+    setTimeout(function () {
       should(argsCount).be.eql(0);
       emitEvent.call(context, 'foo', 'bar');
 
-      process.nextTick(() => {
+      setTimeout(function () {
         should(argsCount).be.eql(1);
         argsCount = 0;
         emitEvent.call(context, 'foo', 'bar', ['foo', 'bar']);
 
-        process.nextTick(() => {
+        setTimeout(function () {
           should(argsCount).be.eql(2);
           argsCount = 0;
           emitEvent.call(context, 'foo', {foo: 'bar'}, 'bar', ['foo', 'bar']);
 
-          process.nextTick(() => {
+          setTimeout(function () {
             should(argsCount).be.eql(3);
             done();
-          });
-        });
-      });
-    });
+          }, 0);
+        }, 0);
+      }, 0);
+    }, 0);
   });
 
   it('should not re-emit an event before event timeout', function (done) {
@@ -106,17 +106,17 @@ describe('Event emitter', () => {
     emitEvent.call(context, 'foo');
     emitEvent.call(context, 'foo');
 
-    process.nextTick(() => {
+    setTimeout(function () {
       should(listenerCalled).be.eql(1);
 
-      setTimeout(() => {
+      setTimeout(function () {
         emitEvent.call(context, 'foo');
 
-        process.nextTick(() => {
+        setTimeout(function () {
           should(listenerCalled).be.eql(2);
           done();
-        });
+        }, 0);
       }, 30);
-    });
+    }, 0);
   });
 });

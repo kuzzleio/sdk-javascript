@@ -8,29 +8,29 @@ var
  * @global window
  */
 
-describe('Network Wrapper', () => {
-  afterEach(() => {
-    window = undefined;
-    WebSocket = undefined;
+describe('Network Wrapper', function () {
+  afterEach(function () {
+    window = undefined; // eslint-disable-line
+    WebSocket = undefined; // eslint-disable-line
   });
 
-  it('should instantiate a WebSocket object if not in a Web Browser', () => {
+  it('should instantiate a WebSocket object if not in a Web Browser', function () {
     should(Wrapper()).be.instanceof(WS);
   });
 
-  it('should instantiate a WebSocket object if in a Web Browser with WS support', () => {
-    window = 'foo';
-    WebSocket = 'bar';
+  it('should instantiate a WebSocket object if in a Web Browser with WS support', function () {
+    window = 'foo'; // eslint-disable-line
+    WebSocket = 'bar'; // eslint-disable-line
     should(Wrapper()).be.instanceof(WS);
   });
 
-  it('should instantiate a SocketIO object if in a Web Browser without WS support', () => {
-    window = { io: 'foobar' };
+  it('should instantiate a SocketIO object if in a Web Browser without WS support', function () {
+    window = { io: 'foobar' }; // eslint-disable-line
     should(Wrapper()).be.instanceof(SocketIO);
   });
 
-  it('should throw if in WebBrowser without WS support nor SocketIO library', () => {
-    window = 'foo';
-    should(() => Wrapper()).throw('Aborting: no websocket support detected and no socket.io library loaded either.');
+  it('should throw if in WebBrowser without WS support nor SocketIO library', function () {
+    window = 'foo'; // eslint-disable-line
+    should(function () { Wrapper(); }).throw('Aborting: no websocket support detected and no socket.io library loaded either.');
   });
 });

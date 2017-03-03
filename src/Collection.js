@@ -478,7 +478,8 @@ Collection.prototype.search = function (filters, options, cb) {
       result.result.total,
       documents,
       result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters}
+      {options: options, filters: filters},
+      options.previous || null
     ));
   });
 };
@@ -549,7 +550,8 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
       result.result.total,
       documents,
       result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters}
+      {options: options, filters: filters},
+      options.previous || null
     ));
   });
 

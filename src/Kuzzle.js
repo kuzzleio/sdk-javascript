@@ -58,7 +58,8 @@ function Kuzzle (host, options, cb) {
         loginAttempt: {lastEmitted: null, listeners: []},
         offlineQueuePush: {listeners: []},
         offlineQueuePop: {listeners: []},
-        queryError: {listeners: []}
+        queryError: {listeners: []},
+        discarded: {listeners: []}
       }
     },
     eventTimeout: {
@@ -94,9 +95,10 @@ function Kuzzle (host, options, cb) {
       },
       writable: true
     },
-    // read-only properties
+    // configuration properties
     autoReconnect: {
       value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
+      writable: true,
       enumerable: true
     },
     defaultIndex: {
@@ -106,6 +108,7 @@ function Kuzzle (host, options, cb) {
     },
     reconnectionDelay: {
       value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
+      writable: true,
       enumerable: true
     },
     host: {
@@ -120,6 +123,7 @@ function Kuzzle (host, options, cb) {
     },
     sslConnection: {
       value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
+      writable: true,
       enumerable: true
     },
     autoQueue: {
@@ -264,9 +268,9 @@ function Kuzzle (host, options, cb) {
       }
 
       eventProperties.listeners.forEach(function (listener) {
-        process.nextTick(function () {
+        setTimeout(function () {
           listener.fn.apply(undefined, args);
-        });
+        }, 0);
       });
 
       // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
@@ -338,6 +342,10 @@ Kuzzle.prototype.connect = function () {
     if (self.connectCB) {
       self.connectCB(null, self);
     }
+  });
+
+  self.network.on('discarded', function (data) {
+    self.emitEvent('discarded', data);
   });
 
   self.network.onConnectError(function (error) {
