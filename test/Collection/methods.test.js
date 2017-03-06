@@ -424,12 +424,28 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should be able to handle the updateIfExist option', function () {
+    it('should be able to handle the ifExist=replace option', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
       expectedQuery.action = 'createOrReplace';
 
-      collection.createDocument(result.result._source, {updateIfExist: true});
+      collection.createDocument(result.result._source, {ifExist: 'replace'});
       should(emitted).be.true();
+    });
+
+    it('should be able to handle the ifExist=error option', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+      expectedQuery.action = 'create';
+
+      collection.createDocument(result.result._source, {ifExist: 'error'});
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if the ifExist option is invalid', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+
+      should(function () {
+        collection.createDocument(result.result._source, {ifExist: 'foobar'});
+      }).throw();
     });
   });
 
