@@ -15,24 +15,24 @@
  *   - providing a documentID to the constructor will automatically call refresh, unless a content is also provided
  *
  *
- * @param {object} kuzzleDataCollection - an instanciated Collection object
+ * @param {Collection} collection - an instanciated Collection object
  * @param {string} [documentId] - ID of an existing document
  * @param {object} [content] - Initializes this document with the provided content
  * @constructor
  */
-function Document(kuzzleDataCollection, documentId, content) {
+function Document(collection, documentId, content) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: collection.collection,
       enumerable: true
     },
     dataCollection: {
-      value: kuzzleDataCollection,
+      value: collection,
       enumerable: false
     },
     kuzzle: {
-      value: kuzzleDataCollection.kuzzle,
+      value: collection.kuzzle,
       enumerable: false
     },
     // writable properties
@@ -47,7 +47,7 @@ function Document(kuzzleDataCollection, documentId, content) {
       enumerable: true
     },
     headers: {
-      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      value: JSON.parse(JSON.stringify(collection.headers)),
       enumerable: true,
       writable: true
     },

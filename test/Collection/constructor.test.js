@@ -10,11 +10,11 @@ describe('Collection constructor', function () {
     var
       kuzzle = new Kuzzle('foo'),
       index = 'barfoo',
-      collection = 'foobar',
+      collectionName = 'foobar',
       c;
 
     kuzzle.headers.some = 'headers';
-    c = new Collection(kuzzle, collection, index);
+    c = new Collection(kuzzle, collectionName, index);
 
     // the collection "headers" should be a hard copy of the kuzzle ones
     kuzzle.headers = { someother: 'headers' };
@@ -25,7 +25,7 @@ describe('Collection constructor', function () {
     should(c).have.propertyWithDescriptor('kuzzle', { enumerable: true, writable: false, configurable: false });
     should(c).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(c.index).be.exactly(index);
-    should(c.collection).be.exactly(collection);
+    should(c.collection).be.exactly(collectionName);
     should(c.kuzzle).be.exactly(kuzzle);
     should(c.headers.some).be.exactly('headers');
     should(c.headers.someother).be.undefined();
@@ -34,25 +34,25 @@ describe('Collection constructor', function () {
   it('should promisify the right functions', function () {
     var
       kuzzle,
-      dataCollection;
+      collection;
 
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('foo');
-    dataCollection = new Collection(kuzzle, 'bar', 'foo');
+    collection = new Collection(kuzzle, 'bar', 'foo');
 
-    should.exist(dataCollection.countPromise);
-    should.exist(dataCollection.createPromise);
-    should.exist(dataCollection.createDocumentPromise);
-    should.exist(dataCollection.deleteDocumentPromise);
-    should.exist(dataCollection.fetchDocumentPromise);
-    should.exist(dataCollection.fetchAllDocumentsPromise);
-    should.exist(dataCollection.getMappingPromise);
-    should.not.exist(dataCollection.publishPromise);
-    should.exist(dataCollection.replaceDocumentPromise);
-    should.not.exist(dataCollection.setHeadersPromise);
-    should.not.exist(dataCollection.subscribePromise);
-    should.exist(dataCollection.truncatePromise);
-    should.exist(dataCollection.updateDocumentPromise);
+    should.exist(collection.countPromise);
+    should.exist(collection.createPromise);
+    should.exist(collection.createDocumentPromise);
+    should.exist(collection.deleteDocumentPromise);
+    should.exist(collection.fetchDocumentPromise);
+    should.exist(collection.fetchAllDocumentsPromise);
+    should.exist(collection.getMappingPromise);
+    should.not.exist(collection.publishPromise);
+    should.exist(collection.replaceDocumentPromise);
+    should.not.exist(collection.setHeadersPromise);
+    should.not.exist(collection.subscribePromise);
+    should.exist(collection.truncatePromise);
+    should.exist(collection.updateDocumentPromise);
   });
 
   it('should set headers using setHeaders', function () {

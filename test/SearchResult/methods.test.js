@@ -4,12 +4,12 @@ var
   bluebird = require('bluebird'),
   Kuzzle = rewire('../../src/Kuzzle'),
   Document = require('../../src/Document'),
-  KuzzleSearchResult = rewire('../../src/SearchResult');
+  SearchResult = rewire('../../src/SearchResult');
 
-describe('KuzzleSearchResult methods', function () {
+describe('SearchResult methods', function () {
   var
     kuzzle,
-    dataCollection,
+    collection,
     firstDocument,
     secondDocument,
     searchArgs;
@@ -21,35 +21,37 @@ describe('KuzzleSearchResult methods', function () {
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchArgs = {options: {from:0, size: 1}, filters: {}};
-    dataCollection = kuzzle.collection('foo');
-    firstDocument = new Document(dataCollection, 'banana', {foo: 'bar'});
-    secondDocument = new Document(dataCollection, 'papagayo', {foo: 'bar'});
+    collection = kuzzle.collection('foo');
+    firstDocument = new Document(collection, 'banana', {foo: 'bar'});
+    secondDocument = new Document(collection, 'papagayo', {foo: 'bar'});
   });
 
-  describe('#next', function () {
+  describe('#fetchNext', function () {
     it('should be able to do a scroll request', function (done) {
       var
-        mockScrollResult = new KuzzleSearchResult(
-          dataCollection,
+        mockScrollResult = new SearchResult(
+          collection,
           1,
-          [new Document(dataCollection, 'papagayo', {foo: 'bar'})],
+          [new Document(collection, 'papagayo', {foo: 'bar'})],
           {},
-          {options: {scrollId: 'papagayo', from: 0, size: 1}}
+          {options: {scrollId: 'papagayo', scroll: '1m', from: 0, size: 1}}
         ),
         firstSearchResult;
 
-      dataCollection.scroll = function(scrollId, options, filters, cb) {
+      collection.scroll = function(scrollId, scroll, options, filters, cb) {
         cb(null, mockScrollResult);
       };
 
       searchArgs.options.scrollId = 'banana';
+      searchArgs.options.scroll = '1m';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error, result) {
-        should(result).be.an.instanceOf(KuzzleSearchResult);
-        should(result.documents).be.an.Array();
-        should(result.documents.length).be.exactly(1);
+      firstSearchResult.fetchNext(function(error, result) {
+        console.log(error);
+        should(result).be.an.instanceOf(SearchResult);
+        should(result.getDocuments()).be.an.Array();
+        should(result.getDocuments().length).be.exactly(1);
         done();
       });
     });
@@ -58,15 +60,16 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      dataCollection.scroll = function(scrollId, options, filters, cb) {
+      collection.scroll = function(scrollId, scroll, options, filters, cb) {
         cb(new Error('foobar scroll'));
       };
 
       searchArgs.options.scrollId = 'banana';
+      searchArgs.options.scroll = '1m';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error) {
+      firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('foobar scroll');
         done();
@@ -77,14 +80,14 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      dataCollection.search = function(filters, options, cb) {
-        cb(null, new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, {options: options, filters: filters}));
+      collection.search = function(filters, options, cb) {
+        cb(null, new SearchResult(collection, 2, [secondDocument], {}, {options: options, filters: filters}));
       };
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error, result) {
-        should(result).be.an.instanceOf(KuzzleSearchResult);
+      firstSearchResult.fetchNext(function(error, result) {
+        should(result).be.an.instanceOf(SearchResult);
         should(result.documents).be.an.Array();
         should(result.documents.length).be.exactly(1);
         should(result.searchArgs.options.from).be.exactly(1);
@@ -96,13 +99,13 @@ describe('KuzzleSearchResult methods', function () {
       var
         firstSearchResult;
 
-      dataCollection.search = function(filters, options, cb) {
+      collection.search = function(filters, options, cb) {
         cb(new Error('foobar search'));
       };
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error) {
+      firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('foobar search');
         done();
@@ -111,9 +114,9 @@ describe('KuzzleSearchResult methods', function () {
 
     it('should be resolve null if all documents is fetched', function (done) {
       var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
+        firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error, result) {
+      firstSearchResult.fetchNext(function(error, result) {
         should(result).be.null();
         done();
       });
@@ -124,10 +127,11 @@ describe('KuzzleSearchResult methods', function () {
         firstSearchResult;
 
       searchArgs.options.scrollId = 'banana';
+      searchArgs.options.scroll = '1m';
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error, result) {
+      firstSearchResult.fetchNext(function(error, result) {
         should(result).be.null();
         done();
       });
@@ -139,9 +143,9 @@ describe('KuzzleSearchResult methods', function () {
 
       searchArgs.options = {};
 
-      firstSearchResult = new KuzzleSearchResult(dataCollection, 1, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
 
-      firstSearchResult.next(function(error) {
+      firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('Unable to retrieve next results from search: missing scrollId or from/size params');
         done();

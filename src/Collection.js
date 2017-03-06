@@ -3,7 +3,7 @@ var
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./Room'),
-  KuzzleSubscribeResult = require('./SubscribeResult');
+  SubscribeResult = require('./SubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -308,7 +308,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
 
   this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
 
-  this.search(filters, options, function getNextDocuments (error, searchResult) {
+  this.search(filters, options, function fetchNextDocuments (error, searchResult) {
     if (error) {
       return cb(error);
     }
@@ -322,7 +322,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
       searchResult.documents.forEach(function(document) {
         documents.push(document);
       });
-      searchResult.next(getNextDocuments);
+      searchResult.fetchNext(fetchNextDocuments);
     }
     else {
       cb(null, documents);
@@ -485,17 +485,22 @@ Collection.prototype.search = function (filters, options, cb) {
  * instead of using KuzzleSearchResult.next()
  *
  * @param {string} scrollId
+ * @param {string} scroll
  * @param {object} [options]
  * @param {object} [filters]
  * @param {responseCallback} cb
  */
-Collection.prototype.scroll = function (scrollId, options, filters, cb) {
+Collection.prototype.scroll = function (scrollId, scroll, options, filters, cb) {
   var
     request = {body:{}},
     self = this;
 
   if (!scrollId) {
     throw new Error('Collection.scroll: scrollId is required');
+  }
+
+  if (!scroll) {
+    throw new Error('Collection.scroll: scroll is required');
   }
 
   if (!cb) {
@@ -512,11 +517,8 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     options = {};
   }
 
-  if (!options.scroll) {
-    throw new Error('Collection.scroll: scroll is required');
-  }
-
   options.scrollId = scrollId;
+  options.scroll = scroll;
 
   this.kuzzle.callbackRequired('Collection.scroll', cb);
 
@@ -573,7 +575,7 @@ Collection.prototype.subscribe = function (filters, options, cb) {
 
   this.kuzzle.callbackRequired('Collection.subscribe', cb);
 
-  subscribeResult = new KuzzleSubscribeResult();
+  subscribeResult = new SubscribeResult();
   room = new Room(this, options);
 
   room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
