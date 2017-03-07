@@ -471,8 +471,9 @@ Collection.prototype.search = function (filters, options, cb) {
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters},
+      result.result.aggregations ? result.result.aggregations : {},
+      options,
+      filters,
       options.previous || null
     ));
   });
@@ -545,8 +546,9 @@ Collection.prototype.scroll = function (scrollId, scroll, options, filters, cb) 
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters},
+      {},
+      options,
+      filters,
       options.previous || null
     ));
   });

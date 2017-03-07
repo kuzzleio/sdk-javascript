@@ -12,7 +12,8 @@ describe('SearchResult methods', function () {
     collection,
     firstDocument,
     secondDocument,
-    searchArgs;
+    searchOptions,
+    searchFilters;
 
   before(function () {
     Kuzzle.prototype.bluebird = bluebird;
@@ -20,7 +21,8 @@ describe('SearchResult methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    searchArgs = {options: {from:0, size: 1}, filters: {}};
+    searchOptions = {from:0, size: 1};
+    searchFilters = {};
     collection = kuzzle.collection('foo');
     firstDocument = new Document(collection, 'banana', {foo: 'bar'});
     secondDocument = new Document(collection, 'papagayo', {foo: 'bar'});
@@ -42,13 +44,12 @@ describe('SearchResult methods', function () {
         cb(null, mockScrollResult);
       };
 
-      searchArgs.options.scrollId = 'banana';
-      searchArgs.options.scroll = '1m';
+      searchOptions.scrollId = 'banana';
+      searchOptions.scroll = '1m';
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error, result) {
-        console.log(error);
         should(result).be.an.instanceOf(SearchResult);
         should(result.getDocuments()).be.an.Array();
         should(result.getDocuments().length).be.exactly(1);
@@ -64,10 +65,10 @@ describe('SearchResult methods', function () {
         cb(new Error('foobar scroll'));
       };
 
-      searchArgs.options.scrollId = 'banana';
-      searchArgs.options.scroll = '1m';
+      searchOptions.scrollId = 'banana';
+      searchOptions.scroll = '1m';
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -81,16 +82,16 @@ describe('SearchResult methods', function () {
         firstSearchResult;
 
       collection.search = function(filters, options, cb) {
-        cb(null, new SearchResult(collection, 2, [secondDocument], {}, {options: options, filters: filters}));
+        cb(null, new SearchResult(collection, 2, [secondDocument], {}, options, filters));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
         should(result.documents).be.an.Array();
         should(result.documents.length).be.exactly(1);
-        should(result.searchArgs.options.from).be.exactly(1);
+        should(result.options.from).be.exactly(1);
         done();
       });
     });
@@ -103,7 +104,7 @@ describe('SearchResult methods', function () {
         cb(new Error('foobar search'));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -114,7 +115,7 @@ describe('SearchResult methods', function () {
 
     it('should be resolve null if all documents is fetched', function (done) {
       var
-        firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
+        firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.null();
@@ -126,10 +127,10 @@ describe('SearchResult methods', function () {
       var
         firstSearchResult;
 
-      searchArgs.options.scrollId = 'banana';
-      searchArgs.options.scroll = '1m';
+      searchOptions.scrollId = 'banana';
+      searchOptions.scroll = '1m';
 
-      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.null();
@@ -141,9 +142,9 @@ describe('SearchResult methods', function () {
       var
         firstSearchResult;
 
-      searchArgs.options = {};
+      searchOptions = {};
 
-      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchArgs);
+      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
 
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);

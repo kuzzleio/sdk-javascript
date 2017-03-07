@@ -83,7 +83,7 @@ describe('Collection methods', function () {
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
-        should(res.searchArgs.options.scrollId).be.exactly('banana');
+        should(res.options.scrollId).be.exactly('banana');
         should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {

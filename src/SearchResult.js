@@ -3,17 +3,19 @@
  * @param {int} total
  * @param {Document[]} documents
  * @param {object} aggregations
- * @param {object} searchArgs
+ * @param {object} options
+ * @param {object} filters
  * @param {SearchResult} previous
  * @property {Collection} collection
  * @property {number} total
  * @property {Document[]} documents
  * @property {object} aggregations
- * @property {object} searchArgs
+ * @property {object} options
+ * @property {object} filters
  * @property {number} fetchedDocument
  * @constructor
  */
-function SearchResult (collection, total, documents, aggregations, searchArgs, previous) {
+function SearchResult (collection, total, documents, aggregations, options, filters, previous) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -32,8 +34,12 @@ function SearchResult (collection, total, documents, aggregations, searchArgs, p
       value: aggregations || {},
       enumerable: true
     },
-    searchArgs: {
-      value: searchArgs || {},
+    options: {
+      value: options || {},
+      enumerable: true
+    },
+    filters: {
+      value: filters || {},
       enumerable: true
     },
     // writable properties
@@ -65,7 +71,7 @@ function SearchResult (collection, total, documents, aggregations, searchArgs, p
 SearchResult.prototype.fetchNext = function (cb) {
   var
     filters,
-    options = Object.assign({}, this.searchArgs.options);
+    options = Object.assign({}, this.options);
   
   options.previous = this;
 
@@ -85,14 +91,14 @@ SearchResult.prototype.fetchNext = function (cb) {
       delete options.size;
     }
 
-    this.collection.scroll(options.scrollId, options.scroll, options, this.searchArgs.filters || {}, cb);
+    this.collection.scroll(options.scrollId, options.scroll, options, this.filters || {}, cb);
 
     return;
   }
 
   // retrieve next results with from/size if original search use it
   if (options.from !== undefined && options.size !== undefined) {
-    filters = Object.assign({}, this.searchArgs.filters);
+    filters = Object.assign({}, this.filters);
 
     // check if we need to do next request to fetch all matching documents
     options.from += options.size;
@@ -133,10 +139,17 @@ SearchResult.prototype.getAggregations = function () {
 };
 
 /**
+ * @returns {Object}
+ */
+SearchResult.prototype.getOptions = function() {
+  return this.options;
+};
+
+/**
  * @returns {object}
  */
-SearchResult.prototype.getSearchArgs = function () {
-  return this.searchArgs;
+SearchResult.prototype.getFilters = function() {
+  return this.filters;
 };
 
 /**
