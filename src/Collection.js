@@ -490,7 +490,7 @@ Collection.prototype.search = function (filters, options, cb) {
  */
 Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
-    request = {body:{}},
+    request = {},
     self = this;
 
   if (!scrollId) {
@@ -507,17 +507,13 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     options = {};
   }
 
-  if (!options) {
-    options = {};
-  }
-
-  if (!options.scroll) {
-    throw new Error('Collection.scroll: scroll is required');
-  }
-
-  options.scrollId = scrollId;
-
   this.kuzzle.callbackRequired('Collection.scroll', cb);
+
+  request.scrollId = scrollId;
+
+  if (options && options.scroll) {
+    request.scroll = options.scroll;
+  }
 
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
