@@ -5,11 +5,22 @@ var
   getKeys = {getter: true, required: ['keys']},
   getMember = {getter: true, required: ['_id', 'member']},
   getxScan = {getter: true, required: ['_id', 'cursor'], opts: ['match', 'count']},
-  getZrange = {getter: true, required: ['_id', 'min', 'max'], opts: ['limit', 'options']},
+  getZrange = {
+    getter: true,
+    required: ['_id', 'start', 'stop'],
+    opts: assignZrangeOptions,
+    mapResults: mapZrangeResults
+  },
+  getZrangeBy = {
+    getter: true,
+    required: ['_id', 'min', 'max'],
+    opts: assignZrangeOptions,
+    mapResults: mapZrangeResults
+  },
   setId = {required: ['_id']},
   setIdValue = {required: ['_id', 'value']},
   setIdFieldValue = {required: ['_id', 'field', 'value']},
-  setIdEntries = {required: ['_id', 'entries']};
+  setEntries = {required: ['entries']};
 
 // Redis commands
 var
@@ -54,13 +65,13 @@ var
     hdel: {required: ['_id', 'fields']},
     hexists: getIdField,
     hget: getIdField,
-    hgetall: getId,
+    hgetall: {getter: true, required: ['_id'], mapResults: mapKeyValueResults},
     hincrby: setIdFieldValue,
     hincrbyfloat: {required: ['_id', 'field', 'value'], mapResults: parseFloat},
     hkeys: getId,
     hlen: getId,
     hmget: {getter: true, required: ['_id', 'fields']},
-    hmset: setIdEntries,
+    hmset: {required: ['_id', 'entries']},
     hscan: getxScan,
     hset: setIdFieldValue,
     hsetnx: setIdFieldValue,
@@ -69,7 +80,7 @@ var
     incr: setId,
     incrby: setIdValue,
     incrbyfloat: {required: ['_id', 'value'], mapResults: parseFloat},
-    keys: {getter: true, required: ['_id', 'pattern']},
+    keys: {getter: true, required: ['pattern']},
     lindex: {getter: true, required: ['_id', 'index']},
     linsert: {required: ['_id', 'position', 'pivot', 'value']},
     llen: getId,
@@ -81,8 +92,8 @@ var
     lset: {required: ['_id', 'index', 'value']},
     ltrim: {required: ['_id', 'start', 'stop']},
     mget: getKeys,
-    mset: setIdEntries,
-    msetnx: setIdEntries,
+    mset: setEntries,
+    msetnx: setEntries,
     object: {getter: true, required: ['_id', 'subcommand']},
     persist: setId,
     pexpire: {required: ['_id', 'milliseconds']},
@@ -103,7 +114,7 @@ var
     sadd: {required: ['_id', 'members']},
     scan: {getter: true, required: ['cursor'], opts: ['match', 'count']},
     scard: getId,
-    sdiff: getKeys,
+    sdiff: {getter: true, required: ['_id', 'keys']},
     sdiffstore: {required: ['_id', 'keys', 'destination']},
     set: {required: ['_id', 'value'], opts: ['ex', 'px', 'nx', 'xx']},
     setex: {required: ['_id', 'value', 'seconds']},
@@ -113,15 +124,15 @@ var
     sismember: getMember,
     smembers: getId,
     smove: {required: ['_id', 'destination', 'member']},
-    sort: {required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
+    sort: {getter: true, required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
     spop: {required: ['_id'], opts: ['count'], mapResults: mapStringToArray },
-    srandmember: {getter: true, required: ['_id'], opts: ['count']},
+    srandmember: {getter: true, required: ['_id'], opts: ['count'], mapResults: mapStringToArray},
     srem: {required: ['_id', 'members']},
     sscan: getxScan,
     strlen: getId,
     sunion: getKeys,
-    sunionstore: {required: ['keys', 'destination']},
-    time: {getter: true},
+    sunionstore: {required: ['destination', 'keys']},
+    time: {getter: true, mapResults: mapArrayStringToArrayInt},
     touch: {required: ['keys']},
     ttl: getId,
     type: getId,
@@ -131,17 +142,17 @@ var
     zincrby: {required: ['_id', 'member', 'value']},
     zinterstore: {required: ['_id', 'keys'], opts: ['weights', 'aggregate']},
     zlexcount: {getter: true, required: ['_id', 'min', 'max']},
-    zrange: {getter: true, required: ['_id', 'start', 'stop'], opts: ['options']},
+    zrange: getZrange,
     zrangebylex: {getter: true, required: ['_id', 'min', 'max'], opts: ['limit']},
     zrevrangebylex: {getter: true, required: ['_id', 'min', 'max'], opts: ['limit']},
-    zrangebyscore: getZrange,
+    zrangebyscore: getZrangeBy,
     zrank: getMember,
     zrem: {required: ['_id', 'members']},
     zremrangebylex: {required: ['_id', 'min', 'max']},
     zremrangebyrank: {required: ['_id', 'start', 'stop']},
     zremrangebyscore: {required: ['_id', 'min', 'max']},
-    zrevrange: {getter: true, required: ['_id', 'start', 'stop'], opts: ['options']},
-    zrevrangebyscore: getZrange,
+    zrevrange: getZrange,
+    zrevrangebyscore: getZrangeBy,
     zrevrank: getMember,
     zscan: getxScan,
     zscore: getMember,
@@ -221,8 +232,9 @@ function MemoryStorage(kuzzle) {
 
       if (args.length && typeof args[args.length - 1] === 'function') {
         cb = args.pop();
-        commands[command].getter && this.kuzzle.callbackRequired('MemoryStorage.' + command, cb);
       }
+
+      commands[command].getter && this.kuzzle.callbackRequired('MemoryStorage.' + command, cb);
 
       if (!commands[command].getter) {
         data.body = {};
@@ -248,13 +260,10 @@ function MemoryStorage(kuzzle) {
         throw new Error('MemoryStorage.' + command + ': Invalid optional parameter (expected an object)');
       }
 
-      options = args[0];
+      if (args.length) {
+        options = Object.assign({}, args[0]);
 
-      if (args.length && commands[command].opts) {
-        if (typeof commands[command].opts === 'function') {
-          commands[command].opts(data, options);
-        }
-        else {
+        if (Array.isArray(commands[command].opts)) {
           commands[command].opts.forEach(function (opt) {
             if (options[opt] !== null && options[opt] !== undefined) {
               assignParameter(data, commands[command].getter, opt, options[opt]);
@@ -262,6 +271,14 @@ function MemoryStorage(kuzzle) {
             }
           });
         }
+      }
+
+      /*
+       Options function mapper does not necessarily need
+       options to be passed by clients.
+       */
+      if (typeof commands[command].opts === 'function') {
+        commands[command].opts(data, options || {});
       }
 
       this.kuzzle.query(query, data, options, cb && function (err, res) {
@@ -303,7 +320,7 @@ function assignParameter(data, getter, name, value) {
  * Assign the provided options for the georadius* redis functions
  * to the request object, as expected by Kuzzle API
  *
- * Mutates the provided options object
+ * Mutates the provided data and options objects
  *
  * @param {object} data
  * @param {object} options
@@ -333,6 +350,23 @@ function assignGeoRadiusOptions(data, options) {
 
   if (parsed.length > 0) {
     data.options = parsed;
+  }
+}
+
+/**
+ * Force the WITHSCORES option on z*range* routes
+ *
+ * Mutates the provided data and options objects
+ *
+ * @param {object} data
+ * @param {object} options
+ */
+function assignZrangeOptions(data, options) {
+  data.options = ['withscores'];
+
+  if (options.limit) {
+    data.limit = options.limit;
+    delete options.limit;
   }
 }
 
@@ -405,6 +439,80 @@ function mapGeoRadiusResults(results) {
  */
 function mapStringToArray (results) {
   return Array.isArray(results) ? results : [results];
+}
+
+/**
+ * Map an array of strings to an array of integers
+ *
+ * @param {Array.<string>} results
+ * @return {Array.<Number>}
+ */
+function mapArrayStringToArrayInt(results) {
+  return results.map(function (value) {
+    return parseInt(value);
+  });
+}
+
+/**
+ * Map results like ['key', 'value', 'key', 'value', ...]
+ * to a JSON object {key: 'value', ...}
+ *
+ * @param {Array.<string>} results
+ * @return {Object}
+ */
+function mapKeyValueResults(results) {
+  var
+    buffer = null,
+    mapped = {};
+
+  results.forEach(function (value) {
+    if (buffer === null) {
+      buffer = value;
+    }
+    else {
+      mapped[buffer] = value;
+      buffer = null;
+    }
+  });
+
+  return mapped;
+}
+
+/**
+ * Map zrange results with WITHSCORES:
+ * [
+ *  "member1",
+ *  "score of member1",
+ *  "member2",
+ *  "score of member2"
+ * ]
+ *
+ * into the following format:
+ * [
+ *  {"member": "member1", "score": <score of member1>},
+ *  {"member": "member2", "score": <score of member2>},
+ * ]
+ *
+ *
+ * @param {Array.<string>} results
+ * @return {Array.<Object>}
+ */
+function mapZrangeResults(results) {
+  var
+    buffer = null,
+    mapped = [];
+
+  results.forEach(function (value) {
+    if (buffer === null) {
+      buffer = value;
+    }
+    else {
+      mapped.push({member: buffer, score: parseFloat(value)});
+      buffer = null;
+    }
+  });
+
+  return mapped;
 }
 
 module.exports = MemoryStorage;
