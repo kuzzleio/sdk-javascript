@@ -486,22 +486,17 @@ Collection.prototype.search = function (filters, options, cb) {
  * instead of using KuzzleSearchResult.next()
  *
  * @param {string} scrollId
- * @param {string} scroll
  * @param {object} [options]
  * @param {object} [filters]
  * @param {responseCallback} cb
  */
-Collection.prototype.scroll = function (scrollId, scroll, options, filters, cb) {
+Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
     request = {body:{}},
     self = this;
 
   if (!scrollId) {
     throw new Error('Collection.scroll: scrollId is required');
-  }
-
-  if (!scroll) {
-    throw new Error('Collection.scroll: scroll is required');
   }
 
   if (!cb) {
@@ -519,7 +514,6 @@ Collection.prototype.scroll = function (scrollId, scroll, options, filters, cb) 
   }
 
   options.scrollId = scrollId;
-  options.scroll = scroll;
 
   this.kuzzle.callbackRequired('Collection.scroll', cb);
 

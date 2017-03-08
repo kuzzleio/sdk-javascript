@@ -149,14 +149,9 @@ describe('Collection methods', function () {
       should(function () { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
     });
 
-    it('should throw an error if no scroll is provided', function () {
-      var collection = kuzzle.collection(expectedQuery.collection);
-      should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: scroll is required');
-    });
-
     it('should throw an error if no callback is given', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(function () { collection.scroll('scrollId', '1m'); }).throw('Collection.scroll: a callback argument is required for read queries');
+      should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
     it('should parse the given parameters', function (done) {
@@ -164,7 +159,6 @@ describe('Collection methods', function () {
         queryScrollStub,
         collection = kuzzle.collection(expectedQuery.collection),
         scrollId = 'scrollId',
-        scroll = '30s',
         filters = {},
         options = {},
         cb = function () {
@@ -193,7 +187,7 @@ describe('Collection methods', function () {
 
       kuzzle.query = queryScrollStub;
 
-      collection.scroll(scrollId, scroll, options, filters, cb);
+      collection.scroll(scrollId, options, filters, cb);
     });
   });
 

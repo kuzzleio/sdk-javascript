@@ -76,7 +76,7 @@ SearchResult.prototype.fetchNext = function (cb) {
   options.previous = this;
 
   // retrieve next results with scroll if original search use it
-  if (options.scrollId && options.scroll) {
+  if (options.scrollId) {
     if (this.fetchedDocument >= this.getTotal()) {
       cb(null, null);
       return;
@@ -91,7 +91,7 @@ SearchResult.prototype.fetchNext = function (cb) {
       delete options.size;
     }
 
-    this.collection.scroll(options.scrollId, options.scroll, options, this.filters || {}, cb);
+    this.collection.scroll(options.scrollId, options, this.filters || {}, cb);
 
     return;
   }

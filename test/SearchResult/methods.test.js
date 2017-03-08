@@ -40,12 +40,11 @@ describe('SearchResult methods', function () {
         ),
         firstSearchResult;
 
-      collection.scroll = function(scrollId, scroll, options, filters, cb) {
+      collection.scroll = function(scrollId, options, filters, cb) {
         cb(null, mockScrollResult);
       };
 
       searchOptions.scrollId = 'banana';
-      searchOptions.scroll = '1m';
 
       firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
@@ -61,12 +60,11 @@ describe('SearchResult methods', function () {
       var
         firstSearchResult;
 
-      collection.scroll = function(scrollId, scroll, options, filters, cb) {
+      collection.scroll = function(scrollId, options, filters, cb) {
         cb(new Error('foobar scroll'));
       };
 
       searchOptions.scrollId = 'banana';
-      searchOptions.scroll = '1m';
 
       firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
 
