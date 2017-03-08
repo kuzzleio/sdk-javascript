@@ -56,7 +56,7 @@ describe('Kuzzle constructor', function () {
       var kuzzle = new Kuzzle('nowhere');
 
       should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
@@ -67,11 +67,11 @@ describe('Kuzzle constructor', function () {
       should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('port', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: false, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('sslConnection', { enumerable: true, writable: true, configurable: false });
     });
 
     it('should have properties with the documented default values', function () {

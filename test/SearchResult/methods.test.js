@@ -27,19 +27,6 @@ describe('KuzzleSearchResult methods', function () {
   });
 
   describe('#next', function () {
-    it('should return the next SearchResult if it has already fetched', function (done) {
-      var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
-
-      firstSearchResult.next(function(error, next) {
-        should(error).be.exactly(null);
-        should(next).be.exactly(secondSearchResult);
-        done();
-      });
-
-    });
-
     it('should be able to do a scroll request', function (done) {
       var
         mockScrollResult = new KuzzleSearchResult(
@@ -63,7 +50,6 @@ describe('KuzzleSearchResult methods', function () {
         should(result).be.an.instanceOf(KuzzleSearchResult);
         should(result.documents).be.an.Array();
         should(result.documents.length).be.exactly(1);
-        should(result._previous).be.exactly(firstSearchResult);
         done();
       });
     });
@@ -158,20 +144,6 @@ describe('KuzzleSearchResult methods', function () {
       firstSearchResult.next(function(error) {
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('Unable to retrieve next results from search: missing scrollId or from/size params');
-        done();
-      });
-    });
-  });
-
-  describe('#previous', function () {
-    it('should call the callback with the previous SearchResult', function (done) {
-      var
-        firstSearchResult = new KuzzleSearchResult(dataCollection, 2, [firstDocument], {}, searchArgs),
-        secondSearchResult = new KuzzleSearchResult(dataCollection, 2, [secondDocument], {}, searchArgs, firstSearchResult);
-
-      secondSearchResult.previous(function(error, previous) {
-        should(error).be.exactly(null);
-        should(previous).be.exactly(firstSearchResult);
         done();
       });
     });
