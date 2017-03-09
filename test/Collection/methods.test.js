@@ -506,7 +506,7 @@ describe('Collection methods', function () {
         filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
 
       this.timeout(50);
-      expectedQuery.body = filters;
+      expectedQuery.body = {query: filters};
       expectedQuery.action = 'deleteByQuery';
       result = { result: {ids: ['foo', 'bar'] }};
 
