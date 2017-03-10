@@ -168,8 +168,8 @@ describe('Collection methods', function () {
       queryScrollStub = function (args, query, opts, callback) {
         should(args.controller).be.exactly('document');
         should(args.action).be.exactly('scroll');
-        should(opts.scroll).be.exactly(options.scroll);
-        should(opts.scrollId).be.exactly(scrollId);
+        should(query.scroll).be.exactly(options.scroll);
+        should(query.scrollId).be.exactly(scrollId);
 
         callback(null, {
           result: {
@@ -419,12 +419,28 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should be able to handle the updateIfExist option', function () {
+    it('should be able to handle the ifExist=replace option', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
       expectedQuery.action = 'createOrReplace';
 
-      collection.createDocument(result.result._source, {updateIfExist: true});
+      collection.createDocument(result.result._source, {ifExist: 'replace'});
       should(emitted).be.true();
+    });
+
+    it('should be able to handle the ifExist=error option', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+      expectedQuery.action = 'create';
+
+      collection.createDocument(result.result._source, {ifExist: 'error'});
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if the ifExist option is invalid', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+
+      should(function () {
+        collection.createDocument(result.result._source, {ifExist: 'foobar'});
+      }).throw();
     });
   });
 

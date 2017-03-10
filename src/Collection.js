@@ -136,9 +136,10 @@ Collection.prototype.create = function (options, cb) {
  * Takes an optional argument object with the following properties:
  *    - metadata (object, default: null):
  *        Additional information passed to notifications to other users
- *    - updateIfExist (boolean, default: false):
- *        If the same document already exists: throw an error if sets to false.
- *        Update the existing document otherwise
+ *    - ifExist (string, allowed values: "error" (default), "replace"):
+ *        If the same document already exists:
+ *          - resolves with an error if set to "error".
+ *          - replaces the existing document if set to "replace"
  *
  * @param {string} [id] - (optional) document identifier
  * @param {object} document - either an instance of a Document object, or a document
@@ -170,8 +171,13 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
     data.body = document;
   }
 
-  if (options) {
-    action = options.updateIfExist ? 'createOrReplace' : 'create';
+  if (options && options.ifExist) {
+    if (options.ifExist === 'replace') {
+      action = 'createOrReplace';
+    }
+    else if (options.ifExist !== 'error') {
+      throw new Error('Invalid value for the "ifExist" option: ' + options.ifExist);
+    }
   }
 
   if (id) {
@@ -492,7 +498,7 @@ Collection.prototype.search = function (filters, options, cb) {
  */
 Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   var
-    request = {body:{}},
+    request = {},
     self = this;
 
   if (!scrollId) {
@@ -509,13 +515,13 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     options = {};
   }
 
-  if (!options) {
-    options = {};
-  }
-
-  options.scrollId = scrollId;
-
   this.kuzzle.callbackRequired('Collection.scroll', cb);
+
+  request.scrollId = scrollId;
+
+  if (options && options.scroll) {
+    request.scroll = options.scroll;
+  }
 
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
