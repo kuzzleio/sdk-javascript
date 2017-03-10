@@ -21,6 +21,7 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
     * [Basic usage](#basic-usage-js)
 * [Building manually](#building-manually)
 * [Migrating from SDK v1.x](#migrating-from-sdk-v1.x)
+* [Note](#note)
 * [License](#license)
 
 ## SDK Documentation
@@ -138,6 +139,10 @@ kuzzle
 ## Migrating from SDK v1.x
 
 * Kuzzle constructor has been changed. Instead of an URL, you have to provide a resolvable server name, or an IP address. If you need to specify a port different than the provided default value, you can do so using the `port` option.
+
+## Note
+
+* bufferutil and utf-8-validate have been moved to peerDependencies
 
 ## License
 
