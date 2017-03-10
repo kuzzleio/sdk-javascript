@@ -52,7 +52,7 @@ describe('Room methods', function () {
     },
     emitted,
     kuzzle,
-    dataCollection;
+    collection;
 
 
   describe('#count', function () {
@@ -62,7 +62,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
@@ -73,7 +73,7 @@ describe('Room methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new Room(dataCollection);
+      room = new Room(collection);
       room.roomId = 'foobar';
     });
 
@@ -134,7 +134,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
@@ -145,7 +145,7 @@ describe('Room methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new Room(dataCollection);
+      room = new Room(collection);
     });
 
     afterEach(function () {
@@ -253,8 +253,8 @@ describe('Room methods', function () {
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
     });
 
     it('should set headers properly', function () {
@@ -288,8 +288,8 @@ describe('Room methods', function () {
         body: {}
       };
 
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.roomId = 'foobar';
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar[room.id] = room;
@@ -357,8 +357,8 @@ describe('Room methods', function () {
       var stub = function () { dequeued++; };
 
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.count = stub;
       room.renew = stub;
       room.unsubscribe = stub;
@@ -386,8 +386,8 @@ describe('Room methods', function () {
     beforeEach(function () {
       error = result = undefined;
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.callback = sinon.spy();
     });
 

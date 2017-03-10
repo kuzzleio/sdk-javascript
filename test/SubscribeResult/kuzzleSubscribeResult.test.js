@@ -1,12 +1,12 @@
 var
   should = require('should'),
-  KuzzleSubscribeResult = require('../../src/SubscribeResult');
+  SubscribeResult = require('../../src/SubscribeResult');
 
 describe('KuzzleSubscribeResult object', function () {
   var ksr;
 
   beforeEach(function () {
-    ksr = new KuzzleSubscribeResult();
+    ksr = new SubscribeResult();
   });
 
   it('should expose the right prototypes', function() {

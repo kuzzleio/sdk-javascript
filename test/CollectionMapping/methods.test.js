@@ -44,13 +44,13 @@ describe('CollectionMapping methods', function () {
     },
     emitted,
     kuzzle,
-    dataCollection;
+    collection;
 
   describe('#apply', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {_source: { properties: { foo: {type: 'date'}}}}};
       error = null;
@@ -66,7 +66,7 @@ describe('CollectionMapping methods', function () {
     it('should call the right updateMapping query when invoked', function (done) {
       var
         refreshed = false,
-        mapping = new CollectionMapping(dataCollection, result.result._source.properties);
+        mapping = new CollectionMapping(collection, result.result._source.properties);
 
       this.timeout(50);
       expectedQuery.options = { queuable: false};
@@ -87,7 +87,7 @@ describe('CollectionMapping methods', function () {
     it('should handle arguments correctly', function () {
       var
         refreshed = false,
-        mapping = new CollectionMapping(dataCollection, result.result._source.properties);
+        mapping = new CollectionMapping(collection, result.result._source.properties);
 
       mapping.refresh = function (options, cb) {
         refreshed = true;
@@ -121,7 +121,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should invoke the callback with an error if one occurs', function (done) {
-      var mapping = new CollectionMapping(dataCollection, result.result._source.properties);
+      var mapping = new CollectionMapping(collection, result.result._source.properties);
 
       this.timeout(50);
       error = 'foobar';
@@ -143,7 +143,7 @@ describe('CollectionMapping methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {bar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
       error = null;
@@ -157,7 +157,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should call the right getMapping query when invoked', function (done) {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       this.timeout(50);
       expectedQuery.options = { queuable: false};
@@ -166,13 +166,13 @@ describe('CollectionMapping methods', function () {
         should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(mapping);
-        should(res.mapping).match(result.result[dataCollection.index].mappings.foo.properties);
+        should(res.mapping).match(result.result[collection.index].mappings.foo.properties);
         done();
       })).be.exactly(mapping);
     });
 
     it('should handle arguments correctly', function () {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       mapping.refresh(function () {});
       should(emitted).be.true();
@@ -191,7 +191,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should invoke the callback with an error if one occurs', function (done) {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       this.timeout(50);
       error = 'foobar';
@@ -209,7 +209,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       result = { result: {foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
 
@@ -223,7 +223,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       result = { result: {bar: { mappings: { foobar: { properties: { foo: {type: 'date'}}}}}}};
 
@@ -237,7 +237,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should return an empty mapping if the stored mapping is empty', function (done) {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       result = { result: {bar: { mappings: { foo: {}}}}};
 
@@ -254,11 +254,11 @@ describe('CollectionMapping methods', function () {
   describe('#set', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should allow setting a field mapping', function () {
-      var mapping = new CollectionMapping(dataCollection);
+      var mapping = new CollectionMapping(collection);
 
       should(mapping.set('foo', { type: 'date'})).be.exactly(mapping);
       should(mapping.mapping.foo).match({type: 'date'});
@@ -274,12 +274,12 @@ describe('CollectionMapping methods', function () {
   describe('#setHeaders', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should allow setting headers', function () {
       var
-        mapping = new CollectionMapping(dataCollection),
+        mapping = new CollectionMapping(collection),
         header = {_id: 'foobar'};
 
       should(mapping.setHeaders(header)).be.exactly(mapping);

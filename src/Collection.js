@@ -3,7 +3,7 @@ var
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./Room'),
-  KuzzleSubscribeResult = require('./SubscribeResult');
+  SubscribeResult = require('./SubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -314,7 +314,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
 
   this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
 
-  this.search(filters, options, function getNextDocuments (error, searchResult) {
+  this.search(filters, options, function fetchNextDocuments (error, searchResult) {
     if (error) {
       return cb(error);
     }
@@ -328,7 +328,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
       searchResult.documents.forEach(function(document) {
         documents.push(document);
       });
-      searchResult.next(getNextDocuments);
+      searchResult.fetchNext(fetchNextDocuments);
     }
     else {
       cb(null, documents);
@@ -477,8 +477,9 @@ Collection.prototype.search = function (filters, options, cb) {
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters},
+      result.result.aggregations ? result.result.aggregations : {},
+      options,
+      filters,
       options.previous || null
     ));
   });
@@ -545,8 +546,9 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters},
+      {},
+      options,
+      filters,
       options.previous || null
     ));
   });
@@ -575,7 +577,7 @@ Collection.prototype.subscribe = function (filters, options, cb) {
 
   this.kuzzle.callbackRequired('Collection.subscribe', cb);
 
-  subscribeResult = new KuzzleSubscribeResult();
+  subscribeResult = new SubscribeResult();
   room = new Room(this, options);
 
   room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
