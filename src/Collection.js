@@ -226,7 +226,7 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
     data._id = arg;
     action = 'delete';
   } else {
-    data.body = arg;
+    data.body = {query: arg};
     action = 'deleteByQuery';
   }
 
