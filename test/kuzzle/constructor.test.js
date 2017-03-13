@@ -301,7 +301,7 @@ describe('Kuzzle constructor', function () {
         it('should call the provided callback on a connection error', function (done) {
           var kuzzle;
 
-          this.timeout(50);
+          this.timeout(200);
 
           kuzzle = new Kuzzle('nowhere', function (err, res) {
             try {
@@ -345,7 +345,7 @@ describe('Kuzzle constructor', function () {
         });
 
         it('should call the provided callback on a connection success', function (done) {
-          this.timeout(50);
+          this.timeout(200);
 
           new Kuzzle('nowhere', function (err, res) {
             try {
@@ -365,7 +365,7 @@ describe('Kuzzle constructor', function () {
             kuzzle,
             renewed = false;
 
-          this.timeout(50);
+          this.timeout(200);
 
           kuzzle = new Kuzzle('nowhere', {connect: 'manual', autoResubscribe: false});
           kuzzle.subscriptions.foo = {

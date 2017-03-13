@@ -3,7 +3,7 @@ var
   bluebird = require('bluebird'),
   rewire = require('rewire'),
   Kuzzle = rewire('../../../src/Kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/SecurityDocument');
+  SecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument constructor', function () {
   var
@@ -19,7 +19,7 @@ describe('KuzzleSecurityDocument constructor', function () {
 
   it('should throw an error if no id is provided', function (done) {
     try {
-      new KuzzleSecurityDocument(kuzzle.security, null, null);
+      new SecurityDocument(kuzzle.security, null, null);
     }
     catch (e) {
       should(e).be.Error();
@@ -31,7 +31,7 @@ describe('KuzzleSecurityDocument constructor', function () {
 
 
   it('should expose securityDocument properties with the right permissions', function () {
-    var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
+    var securityDocument = new SecurityDocument(kuzzle.security, 'test', {});
 
     should(securityDocument).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
     should(securityDocument).have.propertyWithDescriptor('Security', { enumerable: false, writable: false, configurable: false });
@@ -40,20 +40,20 @@ describe('KuzzleSecurityDocument constructor', function () {
   });
 
   it('should expose functions', function () {
-    var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
+    var securityDocument = new SecurityDocument(kuzzle.security, 'test', {});
 
     should.exist(securityDocument.setContent);
     should.exist(securityDocument.serialize);
   });
 
   it('should handle provided arguments correctly', function () {
-    var securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {});
+    var securityDocument = new SecurityDocument(kuzzle.security, 'test', {});
 
-    should(securityDocument).be.instanceof(KuzzleSecurityDocument);
+    should(securityDocument).be.instanceof(SecurityDocument);
     should(securityDocument.id).be.exactly('test');
     should(securityDocument.content).be.empty();
 
-    securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'test', {some: 'content'});
+    securityDocument = new SecurityDocument(kuzzle.security, 'test', {some: 'content'});
     should(securityDocument.id).be.exactly('test');
     should(securityDocument.content).match({some: 'content'});
   });

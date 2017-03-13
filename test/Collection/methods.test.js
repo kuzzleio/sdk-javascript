@@ -3,12 +3,12 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/Kuzzle'),
-  KuzzleSearchResult = require('../../src/SearchResult'),
+  SearchResult = require('../../src/SearchResult'),
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  KuzzleSubscribeResult = require('../../src/SubscribeResult');
+  SubscribeResult = require('../../src/SubscribeResult');
 
 describe('Collection methods', function () {
   var
@@ -79,11 +79,11 @@ describe('Collection methods', function () {
 
       collection.search(filters, options, function (err, res) {
         should(err).be.null();
-        should(res).be.an.instanceOf(KuzzleSearchResult);
+        should(res).be.an.instanceOf(SearchResult);
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
-        should(res.searchArgs.options.scrollId).be.exactly('banana');
+        should(res.options.scrollId).be.exactly('banana');
         should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
@@ -151,7 +151,7 @@ describe('Collection methods', function () {
 
     it('should throw an error if no callback is given', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(function () { collection.scroll('scrollId', {scroll: '1m'}); }).throw('Collection.scroll: a callback argument is required for read queries');
+      should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
     it('should parse the given parameters', function (done) {
@@ -160,7 +160,7 @@ describe('Collection methods', function () {
         collection = kuzzle.collection(expectedQuery.collection),
         scrollId = 'scrollId',
         filters = {},
-        options = {scroll: '30s'},
+        options = {},
         cb = function () {
           done();
         };
@@ -506,7 +506,7 @@ describe('Collection methods', function () {
         filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
 
       this.timeout(50);
-      expectedQuery.body = filters;
+      expectedQuery.body = {query: filters};
       expectedQuery.action = 'deleteByQuery';
       result = { result: {ids: ['foo', 'bar'] }};
 
@@ -619,7 +619,7 @@ describe('Collection methods', function () {
     it('should handle the callback argument correctly', function () {
       var
         collection = kuzzle.collection('collection'),
-        mockSearchResult = new KuzzleSearchResult(
+        mockSearchResult = new SearchResult(
           collection,
           1,
           [new Document(collection, 'banana', {answer: 42})],
@@ -861,14 +861,14 @@ describe('Collection methods', function () {
     it('should instantiate a new Room object', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
+      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(SubscribeResult);
       should(emitted).be.true();
     });
 
     it('should handle arguments correctly', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleSubscribeResult);
+      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(SubscribeResult);
       should(emitted).be.true();
     });
 

@@ -9,7 +9,7 @@ describe('Document constructor', function () {
   var
     kuzzle,
     refreshed = false,
-    dataCollection;
+    collection;
 
   before(function () {
     Kuzzle.prototype.bluebird = bluebird;
@@ -24,11 +24,11 @@ describe('Document constructor', function () {
       refreshed = true;
     };
     refreshed = false;
-    dataCollection = kuzzle.collection('foo');
+    collection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {
-    var document = new Document(dataCollection);
+    var document = new Document(collection);
 
     should(document).be.instanceof(Document);
     should(refreshed).be.false();
@@ -37,21 +37,21 @@ describe('Document constructor', function () {
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
-    document = new Document(dataCollection, { some: 'content' });
+    document = new Document(collection, { some: 'content' });
     should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).match({some: 'content'});
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
-    document = new Document(dataCollection, 'id', { some: 'content', _version: 123 });
+    document = new Document(collection, 'id', { some: 'content', _version: 123 });
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).match({some: 'content'});
     should(document.version).be.exactly(123);
     should(document.collection).be.exactly('foo');
 
-    document = new Document(dataCollection, 'id');
+    document = new Document(collection, 'id');
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).be.empty();
@@ -60,7 +60,7 @@ describe('Document constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var document = new Document(dataCollection);
+    var document = new Document(collection);
 
     should(document).have.propertyWithDescriptor('collection', { enumerable: true, writable: false, configurable: false });
     should(document).have.propertyWithDescriptor('content', { enumerable: true, writable: true, configurable: false });
@@ -70,7 +70,7 @@ describe('Document constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var document = new Document(dataCollection);
+    var document = new Document(collection);
 
     should.exist(document.deletePromise);
     should.not.exist(document.publishPromise);

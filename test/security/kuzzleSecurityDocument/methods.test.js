@@ -1,7 +1,7 @@
 var
   should = require('should'),
   Kuzzle = require('../../../src/Kuzzle'),
-  KuzzleSecurityDocument = require('../../../src/security/SecurityDocument');
+  SecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument methods', function () {
   var
@@ -10,7 +10,7 @@ describe('KuzzleSecurityDocument methods', function () {
 
   describe('#toJSON', function () {
     before(function () {
-      securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'myId', {some: 'content'});
+      securityDocument = new SecurityDocument(kuzzle.security, 'myId', {some: 'content'});
     });
 
     it('should serialize itself properly', function () {
@@ -25,7 +25,7 @@ describe('KuzzleSecurityDocument methods', function () {
 
   describe('#setContent', function () {
     before(function () {
-      securityDocument = new KuzzleSecurityDocument(kuzzle.security, 'myId', {some: 'content'});
+      securityDocument = new SecurityDocument(kuzzle.security, 'myId', {some: 'content'});
     });
 
     it('should replace the current security document', function () {
