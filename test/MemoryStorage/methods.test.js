@@ -407,7 +407,7 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key'},
       {},
-      ['foo', 'bar', 'baz', 'qux'],
+      {foo: 'bar', baz: 'qux'},
       {foo: 'bar', baz: 'qux'}
     );
   });

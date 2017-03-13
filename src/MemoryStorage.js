@@ -65,7 +65,7 @@ var
     hdel: {required: ['_id', 'fields']},
     hexists: getIdField,
     hget: getIdField,
-    hgetall: {getter: true, required: ['_id'], mapResults: mapKeyValueResults},
+    hgetall: {getter: true, required: ['_id']},
     hincrby: setIdFieldValue,
     hincrbyfloat: {required: ['_id', 'field', 'value'], mapResults: parseFloat},
     hkeys: getId,
@@ -451,31 +451,6 @@ function mapArrayStringToArrayInt(results) {
   return results.map(function (value) {
     return parseInt(value);
   });
-}
-
-/**
- * Map results like ['key', 'value', 'key', 'value', ...]
- * to a JSON object {key: 'value', ...}
- *
- * @param {Array.<string>} results
- * @return {Object}
- */
-function mapKeyValueResults(results) {
-  var
-    buffer = null,
-    mapped = {};
-
-  results.forEach(function (value) {
-    if (buffer === null) {
-      buffer = value;
-    }
-    else {
-      mapped[buffer] = value;
-      buffer = null;
-    }
-  });
-
-  return mapped;
 }
 
 /**
