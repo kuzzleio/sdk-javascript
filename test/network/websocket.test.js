@@ -176,7 +176,7 @@ describe('WebSocket networking module', function () {
     clientStub.onmessage({data: JSON.stringify(payload)});
 
     setTimeout(function () {
-      should(websocket.eventEmitter.eventListeners.foobar.listeners.length).be.equal(0);
+      should(websocket.eventEmitter.eventListeners.foobar).be.undefined();
       should(websocket.eventEmitter.eventListeners.barfoo.listeners.length).be.equal(1);
       should(cb.calledTwice).be.true();
       should(cb.alwaysCalledWithMatch(payload)).be.true();
@@ -236,7 +236,7 @@ describe('WebSocket networking module', function () {
     should(websocket.eventEmitter.eventListeners.foobar.listeners).match([{fn: cb}]);
 
     websocket.off('foobar', cb);
-    should(websocket.eventEmitter.eventListeners.foobar.listeners.length).be.equal(0);
+    should(websocket.eventEmitter.eventListeners.foobar).be.undefined();
   });
 
   it('should do nothing if trying to unregister an non-existent event/callback', function () {
@@ -292,11 +292,11 @@ describe('WebSocket networking module', function () {
     websocket.connect();
     websocket.close();
 
-    should(websocket.eventEmitter.eventListeners.foobar.listeners).be.empty();
-    should(websocket.eventEmitter.eventListeners.error.listeners).be.empty();
-    should(websocket.eventEmitter.eventListeners.connect.listeners).be.empty();
-    should(websocket.eventEmitter.eventListeners.reconnect.listeners).be.empty();
-    should(websocket.eventEmitter.eventListeners.disconnect.listeners).be.empty();
+    should(websocket.eventEmitter.eventListeners.foobar).be.undefined();
+    should(websocket.eventEmitter.eventListeners.error).be.undefined();
+    should(websocket.eventEmitter.eventListeners.connect).be.undefined();
+    should(websocket.eventEmitter.eventListeners.reconnect).be.undefined();
+    should(websocket.eventEmitter.eventListeners.disconnect).be.undefined();
     should(websocket.client).be.null();
     should(clientStub.close.called).be.true();
     should(websocket.wasConnected).be.false();

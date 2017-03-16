@@ -125,7 +125,11 @@ EventEmitter.prototype.removeListener = function (event, listenerId) {
 
   this.eventListeners[event].listeners.forEach(function (listener, index) {
     if (listener.id === listenerId) {
-      self.eventListeners[event].listeners.splice(index, 1);
+      if (self.eventListeners[event].listeners.length === 1) {
+        delete self.eventListeners[event];
+      } else {
+        self.eventListeners[event].listeners.splice(index, 1);
+      }
     }
   });
 
@@ -148,10 +152,10 @@ EventEmitter.prototype.removeAllListeners = function (event) {
       throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
     }
 
-    this.eventListeners[event].listeners = [];
+    delete this.eventListeners[event];
   } else {
     knownEvents.forEach(function (eventName) {
-      self.eventListeners[eventName].listeners = [];
+      delete self.eventListeners[eventName];
     });
   }
 
