@@ -496,8 +496,10 @@ describe('Room methods', function () {
         eventEmitted = null,
         context = {
           kuzzle: {
-            emitEvent: function (event) {
-              eventEmitted = event;
+            eventEmitter: {
+              emitEvent: function (event) {
+                eventEmitted = event;
+              }
             }
           }
         };

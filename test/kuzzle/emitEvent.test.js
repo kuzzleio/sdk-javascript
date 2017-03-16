@@ -10,7 +10,7 @@ describe('Event emitter', function () {
 
   before(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
-    emitEvent = kuzzle.emitEvent;
+    emitEvent = kuzzle.eventEmitter.emitEvent;
   });
 
   it('should call all added listeners for a given event', function (done) {

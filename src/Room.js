@@ -317,7 +317,7 @@ function notificationCallback (data) {
 
   if (data.action === 'jwtTokenExpired') {
     this.kuzzle.jwtToken = undefined;
-    return this.kuzzle.emitEvent('jwtTokenExpired');
+    return this.kuzzle.eventEmitter.emitEvent('jwtTokenExpired');
   }
 
   if (data.controller === 'document' || (data.controller === 'realtime' && data.action === 'publish')) {

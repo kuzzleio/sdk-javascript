@@ -1,5 +1,6 @@
 var
   uuid = require('uuid'),
+  EventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
@@ -47,20 +48,6 @@ function Kuzzle (host, options, cb) {
     },
     connectCB: {
       value: cb
-    },
-    eventListeners: {
-      value: {
-        connected: {lastEmitted: null, listeners: []},
-        error: {lastEmitted: null, listeners: []},
-        disconnected: {lastEmitted: null, listeners: []},
-        reconnected: {lastEmitted: null, listeners: []},
-        jwtTokenExpired: {lastEmitted: null, listeners: []},
-        loginAttempt: {lastEmitted: null, listeners: []},
-        offlineQueuePush: {listeners: []},
-        offlineQueuePop: {listeners: []},
-        queryError: {listeners: []},
-        discarded: {listeners: []}
-      }
     },
     eventTimeout: {
       value: 200
@@ -210,6 +197,8 @@ function Kuzzle (host, options, cb) {
     }
   }
 
+  this.eventEmitter = new EventEmitter(this.eventTimeout);
+
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
   Object.defineProperty(this, 'isValid', {
     value: function () {
@@ -250,34 +239,6 @@ function Kuzzle (host, options, cb) {
   Object.defineProperty(this, 'security', {
     value: new Security(this),
     enumerable: true
-  });
-
-  /**
-   * Emit an event to all registered listeners
-   * An event cannot be emitted multiple times before a timeout has been reached.
-   */
-  Object.defineProperty(this, 'emitEvent', {
-    value: function emitEvent(event) {
-      var
-        now = Date.now(),
-        args = Array.prototype.slice.call(arguments, 1),
-        eventProperties = this.eventListeners[event];
-
-      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
-        return false;
-      }
-
-      eventProperties.listeners.forEach(function (listener) {
-        setTimeout(function () {
-          listener.fn.apply(undefined, args);
-        }, 0);
-      });
-
-      // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
-      if (eventProperties.lastEmitted !== undefined) {
-        eventProperties.lastEmitted = now;
-      }
-    }
   });
 
   Object.defineProperty(this, 'memoryStorage', {
@@ -337,7 +298,7 @@ Kuzzle.prototype.connect = function () {
     self.state = 'connected';
     renewAllSubscriptions.call(self);
     dequeue.call(self);
-    self.emitEvent('connected');
+    self.eventEmitter.emitEvent('connected');
 
     if (self.connectCB) {
       self.connectCB(null, self);
@@ -345,7 +306,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.on('discarded', function (data) {
-    self.emitEvent('discarded', data);
+    self.eventEmitter.emitEvent('discarded', data);
   });
 
   self.network.onConnectError(function (error) {
@@ -353,7 +314,7 @@ Kuzzle.prototype.connect = function () {
 
     connectionError.internal = error;
     self.state = 'error';
-    self.emitEvent('error', connectionError);
+    self.eventEmitter.emitEvent('error', connectionError);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
@@ -371,7 +332,7 @@ Kuzzle.prototype.connect = function () {
       self.queuing = true;
     }
 
-    self.emitEvent('disconnected');
+    self.eventEmitter.emitEvent('disconnected');
   });
 
   self.network.onReconnect(function () {
@@ -388,7 +349,7 @@ Kuzzle.prototype.connect = function () {
       }
 
       // alert listeners
-      self.emitEvent('reconnected');
+      self.eventEmitter.emitEvent('reconnected');
     };
 
     self.state = 'connected';
@@ -398,7 +359,7 @@ Kuzzle.prototype.connect = function () {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
           self.jwtToken = undefined;
-          self.emitEvent('jwtTokenExpired');
+          self.eventEmitter.emitEvent('jwtTokenExpired');
         }
 
         reconnect();
@@ -423,7 +384,7 @@ Kuzzle.prototype.setJwtToken = function(token) {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
       this.jwtToken = token.result.jwt;
     } else {
-      this.emitEvent('loginAttempt', {
+      this.eventEmitter.emitEvent('loginAttempt', {
         success: false,
         error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
       });
@@ -431,12 +392,12 @@ Kuzzle.prototype.setJwtToken = function(token) {
       return this;
     }
   } else {
-    this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    this.eventEmitter.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
     return this;
   }
 
   renewAllSubscriptions.call(this);
-  this.emitEvent('loginAttempt', {success: true});
+  this.eventEmitter.emitEvent('loginAttempt', {success: true});
   return this;
 };
 
@@ -515,7 +476,7 @@ Kuzzle.prototype.login = function (strategy) {
     }
     else {
       cb && cb(error);
-      self.emitEvent('loginAttempt', {success: false, error: error.message});
+      self.eventEmitter.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
 };
@@ -690,7 +651,7 @@ function cleanQueue () {
       self.offlineQueue
         .splice(0, lastDocumentIndex + 1)
         .forEach(function (droppedRequest) {
-          self.emitEvent('offlineQueuePop', droppedRequest.query);
+          self.eventEmitter.emitEvent('offlineQueuePop', droppedRequest.query);
         });
     }
   }
@@ -699,7 +660,7 @@ function cleanQueue () {
     self.offlineQueue
       .splice(0, self.offlineQueue.length - self.queueMaxSize)
       .forEach(function (droppedRequest) {
-        self.emitEvent('offlineQueuePop', droppedRequest.query);
+        self.eventEmitter.emitEvent('offlineQueuePop', droppedRequest.query);
       });
   }
 }
@@ -739,14 +700,14 @@ function emitRequest (request, cb) {
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
-        self.emitEvent('jwtTokenExpired', request, cb);
+        self.eventEmitter.emitEvent('jwtTokenExpired', request, cb);
       }
 
       if (response.error) {
         error = new Error(response.error.message);
         Object.assign(error, response.error);
         error.status = response.status;
-        self.emitEvent('queryError', error, request, cb);
+        self.eventEmitter.emitEvent('queryError', error, request, cb);
       }
 
       if (cb) {
@@ -772,7 +733,7 @@ function dequeue () {
     dequeuingProcess = function () {
       if (self.offlineQueue.length > 0) {
         emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
-        self.emitEvent('offlineQueuePop', self.offlineQueue.shift());
+        self.eventEmitter.emitEvent('offlineQueuePop', self.offlineQueue.shift());
 
         setTimeout(function () {
           dequeuingProcess();
@@ -842,15 +803,23 @@ function removeAllSubscriptions() {
  *
  * The ID returned by this function is required to remove this listener at a later time.
  *
- * @param {string} event - name of the global event to subscribe to (see the 'eventListeners' object property)
+ * @param {string} event - name of the global event to subscribe to
  * @param {function} listener - callback to invoke each time an event is fired
  * @returns {string} Unique listener ID
  */
 Kuzzle.prototype.addListener = function(event, listener) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    listenerType = typeof listener,
-    listenerId;
+  var knownEvents = [
+    'connected',
+    'error',
+    'disconnected',
+    'reconnected',
+    'jwtTokenExpired',
+    'loginAttempt',
+    'offlineQueuePush',
+    'offlineQueuePop',
+    'queryError',
+    'discarded'
+  ];
 
   this.isValid();
 
@@ -858,13 +827,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
-  if (listenerType !== 'function') {
-    throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
-  }
-
-  listenerId = uuid.v4();
-  this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
-  return listenerId;
+  return this.eventEmitter.addListener(event, listener);
 };
 
 
@@ -1357,7 +1320,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     cleanQueue.call(this, object, cb);
     if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      self.emitEvent('offlineQueuePush', {query: object, cb: cb});
+      self.eventEmitter.emitEvent('offlineQueuePush', {query: object, cb: cb});
     }
   }
   else {
@@ -1374,21 +1337,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
  * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeAllListeners = function (event) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    self = this;
-
-  if (event) {
-    if (knownEvents.indexOf(event) === -1) {
-      throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
-    }
-
-    this.eventListeners[event].listeners = [];
-  } else {
-    knownEvents.forEach(function (eventName) {
-      self.eventListeners[eventName].listeners = [];
-    });
-  }
+  this.eventEmitter.removeAllListeners(event);
 
   return this;
 };
@@ -1401,19 +1350,7 @@ Kuzzle.prototype.removeAllListeners = function (event) {
  * @returns {Kuzzle} this object
  */
 Kuzzle.prototype.removeListener = function (event, listenerId) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    self = this;
-
-  if (knownEvents.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
-  }
-
-  this.eventListeners[event].listeners.forEach(function (listener, index) {
-    if (listener.id === listenerId) {
-      self.eventListeners[event].listeners.splice(index, 1);
-    }
-  });
+  this.eventEmitter.removeListener(event, listenerId);
 
   return this;
 };
