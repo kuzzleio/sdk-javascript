@@ -1,10 +1,10 @@
 var
   uuid = require('uuid');
 
-function EventEmitter(eventTimeout) {
+function EventEmitter(listeners, eventTimeout) {
   Object.defineProperties(this, {
     eventListeners: {
-      value: {}
+      value: listeners || {}
     },
     eventTimeout: {
       value: eventTimeout || 200,
@@ -125,7 +125,7 @@ EventEmitter.prototype.removeListener = function (event, listenerId) {
 
   this.eventListeners[event].listeners.forEach(function (listener, index) {
     if (listener.id === listenerId) {
-      if (self.eventListeners[event].listeners.length === 1) {
+      if (self.eventListeners[event].listeners.length === 1 && self.eventListeners[event].lastEmitted === undefined) {
         delete self.eventListeners[event];
       } else {
         self.eventListeners[event].listeners.splice(index, 1);
@@ -151,11 +151,18 @@ EventEmitter.prototype.removeAllListeners = function (event) {
     if (knownEvents.indexOf(event) === -1) {
       throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
     }
-
-    delete this.eventListeners[event];
+    if (self.eventListeners[event].lastEmitted === undefined) {
+      delete self.eventListeners[event];
+    } else {
+      self.eventListeners[event].listeners = [];
+    }
   } else {
     knownEvents.forEach(function (eventName) {
-      delete self.eventListeners[eventName];
+      if (self.eventListeners[eventName].lastEmitted === undefined) {
+        delete self.eventListeners[eventName];
+      } else {
+        self.eventListeners[eventName].listeners = [];
+      }
     });
   }
 

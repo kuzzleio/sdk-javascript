@@ -53,17 +53,17 @@ describe('Listeners management', function () {
 
       should(kuzzle.eventEmitter.eventListeners.connected.listeners.length).be.exactly(4);
       should(kuzzle.eventEmitter.eventListeners.error.listeners.length).be.exactly(3);
-      should(kuzzle.eventEmitter.eventListeners.disconnected).be.undefined();
+      should(kuzzle.eventEmitter.eventListeners.disconnected.listeners.length).be.exactly(0);
       should(kuzzle.eventEmitter.eventListeners.reconnected.listeners.length).be.exactly(1);
     });
 
     it('should remove all registered listeners on all events when providing no event argument', function () {
       kuzzle.removeAllListeners();
 
-      should(kuzzle.eventEmitter.eventListeners.connected).be.undefined();
-      should(kuzzle.eventEmitter.eventListeners.error).be.undefined();
-      should(kuzzle.eventEmitter.eventListeners.disconnected).be.undefined();
-      should(kuzzle.eventEmitter.eventListeners.reconnected).be.undefined();
+      should(kuzzle.eventEmitter.eventListeners.connected.listeners.length).be.exactly(0);
+      should(kuzzle.eventEmitter.eventListeners.error.listeners.length).be.exactly(0);
+      should(kuzzle.eventEmitter.eventListeners.disconnected.listeners.length).be.exactly(0);
+      should(kuzzle.eventEmitter.eventListeners.reconnected.listeners.length).be.exactly(0);
     });
 
     it('should throw an error when an unknown event is provided', function () {

@@ -49,6 +49,20 @@ function Kuzzle (host, options, cb) {
     connectCB: {
       value: cb
     },
+    eventListeners: {
+      value: {
+        connected: {lastEmitted: null, listeners: []},
+        error: {lastEmitted: null, listeners: []},
+        disconnected: {lastEmitted: null, listeners: []},
+        reconnected: {lastEmitted: null, listeners: []},
+        jwtTokenExpired: {lastEmitted: null, listeners: []},
+        loginAttempt: {lastEmitted: null, listeners: []},
+        offlineQueuePush: {listeners: []},
+        offlineQueuePop: {listeners: []},
+        queryError: {listeners: []},
+        discarded: {listeners: []}
+      }
+    },
     eventTimeout: {
       value: 200
     },
@@ -197,8 +211,6 @@ function Kuzzle (host, options, cb) {
     }
   }
 
-  this.eventEmitter = new EventEmitter(this.eventTimeout);
-
   // Helper function ensuring that this Kuzzle object is still valid before performing a query
   Object.defineProperty(this, 'isValid', {
     value: function () {
@@ -246,6 +258,16 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
+  Object.defineProperty(this, 'eventActions', {
+    value: Object.keys(this.eventListeners),
+    writeable: false,
+    enumerable: true
+  });
+
+  Object.defineProperty(this, 'eventEmitter', {
+    value: new EventEmitter(this.eventListeners, this.eventTimeout),
+    enumerable: true
+  });
 
   if (!options || !options.connect || options.connect === 'auto') {
     this.connect();
@@ -808,22 +830,9 @@ function removeAllSubscriptions() {
  * @returns {string} Unique listener ID
  */
 Kuzzle.prototype.addListener = function(event, listener) {
-  var knownEvents = [
-    'connected',
-    'error',
-    'disconnected',
-    'reconnected',
-    'jwtTokenExpired',
-    'loginAttempt',
-    'offlineQueuePush',
-    'offlineQueuePop',
-    'queryError',
-    'discarded'
-  ];
-
   this.isValid();
 
-  if (knownEvents.indexOf(event) === -1) {
+  if (this.eventActions.indexOf(event) === -1) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
