@@ -434,7 +434,7 @@ describe('Kuzzle constructor', function () {
             catch (e) {
               done(e);
             }
-          }, 10);
+          }, 100);
         });
 
         it('should enable queuing if autoQueue is set to true', function (done) {
