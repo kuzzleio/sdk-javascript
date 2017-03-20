@@ -155,7 +155,7 @@ var
     zrevrangebyscore: getZrangeBy,
     zrevrank: getMember,
     zscan: getxScan,
-    zscore: getMember,
+    zscore: {getter: true, required: ['_id', 'member'], mapResults: parseFloat},
     zunionstore: {required: ['_id', 'keys'], opts: ['weights', 'aggregate']}
   };
 
