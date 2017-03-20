@@ -1488,8 +1488,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', member: 'foo'},
       {},
-      3,
-      3
+      '3.14159',
+      3.14159
     );
   });
 
