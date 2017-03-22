@@ -1,10 +1,10 @@
 var
   uuid = require('uuid');
 
-function EventEmitter(listeners, eventTimeout) {
+function EventEmitter(eventTimeout) {
   Object.defineProperties(this, {
     eventListeners: {
-      value: listeners || {}
+      value: {}
     },
     eventTimeout: {
       value: eventTimeout || 200,
@@ -135,6 +135,21 @@ EventEmitter.prototype.removeListener = function (event, listenerId) {
 
   return self;
 };
+
+/**
+ * Unregisters a callback from a room.
+ *
+ * @param {string} roomId
+ * @param {function} callback
+*/
+EventEmitter.prototype.off = function (event, callback) {
+  var listenerId = this.getListener(event, callback);
+
+  if (listenerId) {
+    this.removeListener(event, listenerId);
+  }
+};
+
 
 /**
  * Removes all listeners, either from a specific event or from all events

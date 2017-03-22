@@ -3,6 +3,8 @@ var
 
 function WSNode(host, port, ssl) {
   var self = this;
+  EventEmitter.call(this);
+
   this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
   this.host = host;
   this.port = port;
@@ -13,7 +15,9 @@ function WSNode(host, port, ssl) {
   this.lasturl = null;
   this.stopRetryingToConnect = false;
 
-  this.eventEmitter = new EventEmitter();
+  Object.defineProperty(this, 'eventListeners', {
+    value: {}
+  });
 
   /**
    * Creates a new socket from the provided arguments
@@ -37,10 +41,10 @@ function WSNode(host, port, ssl) {
 
     this.client.onopen = function () {
       if (self.wasConnected) {
-        self.eventEmitter.emitEvent('reconnect');
+        self.emitEvent('reconnect');
       }
       else {
-        self.eventEmitter.emitEvent('connect');
+        self.emitEvent('connect');
       }
       self.wasConnected = true;
       self.stopRetryingToConnect = false;
@@ -48,7 +52,7 @@ function WSNode(host, port, ssl) {
 
     this.client.onclose = function (code, message) {
       if (code === 1000) {
-        self.eventEmitter.emitEvent('disconnect');
+        self.emitEvent('disconnect');
       }
       else {
         onClientError.call(self, autoReconnect, reconnectionDelay, message);
@@ -63,10 +67,10 @@ function WSNode(host, port, ssl) {
       var data = JSON.parse(payload.data || payload);
 
       if (data.room) {
-        self.eventEmitter.emitEvent(data.room, data);
+        self.emitEvent(data.room, data);
       }
       else {
-        self.eventEmitter.emitEvent('discarded', data);
+        self.emitEvent('discarded', data);
       }
     };
   };
@@ -77,7 +81,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnect = function (callback) {
-    this.eventEmitter.addListener('connect', callback);
+    this.addListener('connect', callback);
   };
 
   /**
@@ -85,7 +89,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnectError = function (callback) {
-    this.eventEmitter.addListener('error', callback);
+    this.addListener('error', callback);
   };
 
   /**
@@ -93,7 +97,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onDisconnect = function (callback) {
-    this.eventEmitter.addListener('disconnect', callback);
+    this.addListener('disconnect', callback);
   };
 
   /**
@@ -101,7 +105,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onReconnect = function (callback) {
-    this.eventEmitter.addListener('reconnect', callback);
+    this.addListener('reconnect', callback);
   };
 
   /**
@@ -112,7 +116,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.once = function (roomId, callback) {
-    this.eventEmitter.addListener(roomId, callback, true);
+    this.addListener(roomId, callback, true);
   };
 
   /**
@@ -122,23 +126,8 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.on = function (roomId, callback) {
-    this.eventEmitter.addListener(roomId, callback);
+    this.addListener(roomId, callback);
   };
-
-  /**
-   * Unregisters a callback from a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.off = function (roomId, callback) {
-    var listenerId = this.eventEmitter.getListener(roomId, callback);
-
-    if (listenerId) {
-      this.eventEmitter.removeListener(roomId, listenerId);
-    }
-  };
-
 
   /**
    * Sends a payload to the connected server
@@ -155,13 +144,14 @@ function WSNode(host, port, ssl) {
    * Closes the connection
    */
   this.close = function () {
-    this.eventEmitter.removeAllListeners();
+    this.removeAllListeners();
     this.wasConnected = false;
     this.client.close();
     this.client = null;
     self.stopRetryingToConnect = true;
   };
 }
+WSNode.prototype = new EventEmitter();
 
 /**
  * Called when the connection closes with an error state
@@ -181,7 +171,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  self.eventEmitter.emitEvent('error', message);
+  self.emitEvent('error', message);
 }
 
 module.exports = WSNode;

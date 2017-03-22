@@ -30,6 +30,7 @@ function Kuzzle (host, options, cb) {
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(host, options, cb);
   }
+  EventEmitter.call(this);
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -264,11 +265,6 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
-  Object.defineProperty(this, 'eventEmitter', {
-    value: new EventEmitter(this.eventListeners, this.eventTimeout),
-    enumerable: true
-  });
-
   if (!options || !options.connect || options.connect === 'auto') {
     this.connect();
   } else {
@@ -292,6 +288,8 @@ function Kuzzle (host, options, cb) {
     });
   }
 }
+
+Kuzzle.prototype = new EventEmitter();
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -320,7 +318,7 @@ Kuzzle.prototype.connect = function () {
     self.state = 'connected';
     renewAllSubscriptions.call(self);
     dequeue.call(self);
-    self.eventEmitter.emitEvent('connected');
+    self.emitEvent('connected');
 
     if (self.connectCB) {
       self.connectCB(null, self);
@@ -328,7 +326,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.on('discarded', function (data) {
-    self.eventEmitter.emitEvent('discarded', data);
+    self.emitEvent('discarded', data);
   });
 
   self.network.onConnectError(function (error) {
@@ -336,7 +334,7 @@ Kuzzle.prototype.connect = function () {
 
     connectionError.internal = error;
     self.state = 'error';
-    self.eventEmitter.emitEvent('error', connectionError);
+    self.emitEvent('error', connectionError);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
@@ -354,7 +352,7 @@ Kuzzle.prototype.connect = function () {
       self.queuing = true;
     }
 
-    self.eventEmitter.emitEvent('disconnected');
+    self.emitEvent('disconnected');
   });
 
   self.network.onReconnect(function () {
@@ -371,7 +369,7 @@ Kuzzle.prototype.connect = function () {
       }
 
       // alert listeners
-      self.eventEmitter.emitEvent('reconnected');
+      self.emitEvent('reconnected');
     };
 
     self.state = 'connected';
@@ -381,7 +379,7 @@ Kuzzle.prototype.connect = function () {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
           self.jwtToken = undefined;
-          self.eventEmitter.emitEvent('jwtTokenExpired');
+          self.emitEvent('jwtTokenExpired');
         }
 
         reconnect();
@@ -406,7 +404,7 @@ Kuzzle.prototype.setJwtToken = function(token) {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
       this.jwtToken = token.result.jwt;
     } else {
-      this.eventEmitter.emitEvent('loginAttempt', {
+      this.emitEvent('loginAttempt', {
         success: false,
         error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
       });
@@ -414,12 +412,12 @@ Kuzzle.prototype.setJwtToken = function(token) {
       return this;
     }
   } else {
-    this.eventEmitter.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
+    this.emitEvent('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
     return this;
   }
 
   renewAllSubscriptions.call(this);
-  this.eventEmitter.emitEvent('loginAttempt', {success: true});
+  this.emitEvent('loginAttempt', {success: true});
   return this;
 };
 
@@ -498,7 +496,7 @@ Kuzzle.prototype.login = function (strategy) {
     }
     else {
       cb && cb(error);
-      self.eventEmitter.emitEvent('loginAttempt', {success: false, error: error.message});
+      self.emitEvent('loginAttempt', {success: false, error: error.message});
     }
   });
 };
@@ -673,7 +671,7 @@ function cleanQueue () {
       self.offlineQueue
         .splice(0, lastDocumentIndex + 1)
         .forEach(function (droppedRequest) {
-          self.eventEmitter.emitEvent('offlineQueuePop', droppedRequest.query);
+          self.emitEvent('offlineQueuePop', droppedRequest.query);
         });
     }
   }
@@ -682,7 +680,7 @@ function cleanQueue () {
     self.offlineQueue
       .splice(0, self.offlineQueue.length - self.queueMaxSize)
       .forEach(function (droppedRequest) {
-        self.eventEmitter.emitEvent('offlineQueuePop', droppedRequest.query);
+        self.emitEvent('offlineQueuePop', droppedRequest.query);
       });
   }
 }
@@ -722,14 +720,14 @@ function emitRequest (request, cb) {
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
-        self.eventEmitter.emitEvent('jwtTokenExpired', request, cb);
+        self.emitEvent('jwtTokenExpired', request, cb);
       }
 
       if (response.error) {
         error = new Error(response.error.message);
         Object.assign(error, response.error);
         error.status = response.status;
-        self.eventEmitter.emitEvent('queryError', error, request, cb);
+        self.emitEvent('queryError', error, request, cb);
       }
 
       if (cb) {
@@ -755,7 +753,7 @@ function dequeue () {
     dequeuingProcess = function () {
       if (self.offlineQueue.length > 0) {
         emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
-        self.eventEmitter.emitEvent('offlineQueuePop', self.offlineQueue.shift());
+        self.emitEvent('offlineQueuePop', self.offlineQueue.shift());
 
         setTimeout(function () {
           dequeuingProcess();
@@ -836,9 +834,8 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
-  return this.eventEmitter.addListener(event, listener);
+  return EventEmitter.prototype.addListener.call(this, event, listener);
 };
-
 
 /**
  * Kuzzle monitors active connections, and ongoing/completed/failed requests.
@@ -1329,7 +1326,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     cleanQueue.call(this, object, cb);
     if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      self.eventEmitter.emitEvent('offlineQueuePush', {query: object, cb: cb});
+      self.emitEvent('offlineQueuePush', {query: object, cb: cb});
     }
   }
   else {
@@ -1337,31 +1334,6 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   return self;
-};
-
-/**
- * Removes all listeners, either from a specific event or from all events
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @returns {Kuzzle} this object
- */
-Kuzzle.prototype.removeAllListeners = function (event) {
-  this.eventEmitter.removeAllListeners(event);
-
-  return this;
-};
-
-/**
- * Removes a listener from an event.
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @param {string} listenerId - The ID returned by addListener
- * @returns {Kuzzle} this object
- */
-Kuzzle.prototype.removeListener = function (event, listenerId) {
-  this.eventEmitter.removeListener(event, listenerId);
-
-  return this;
 };
 
 /**
