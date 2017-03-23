@@ -20,15 +20,12 @@ describe('Event emitter', function () {
         listenersCalled++;
       },
       context = {
-        eventListeners: {
-          foo: {
-            lastEmitted: null,
-            listeners: [
-              {fn: listener},
-              {fn: listener},
-              {fn: listener}
-            ]
-          }
+        _events: {
+          foo: [
+            listener,
+            listener,
+            listener
+          ]
         }
       };
 
@@ -48,13 +45,10 @@ describe('Event emitter', function () {
       },
       context = {
         eventTimeout: -100,
-        eventListeners: {
-          foo: {
-            lastEmitted: null,
-            listeners: [
-              {fn: listener}
-            ]
-          }
+        _events: {
+          foo: [
+            listener
+          ]
         }
       };
 
@@ -90,14 +84,13 @@ describe('Event emitter', function () {
         listenerCalled++;
       },
       context = {
-        eventTimeout: 20,
-        eventListeners: {
-          foo: {
-            lastEmitted: null,
-            listeners: [
-              {fn: listener}
-            ]
-          }
+        protectedEvents: {
+          foo: {timeout: 20}
+        },
+        _events: {
+          foo: [
+            listener
+          ]
         }
       };
 

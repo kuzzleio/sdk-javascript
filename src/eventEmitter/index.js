@@ -1,187 +1,196 @@
-var
-  uuid = require('uuid');
+var NodeEmitter;
 
 function EventEmitter(eventTimeout) {
   Object.defineProperties(this, {
-    eventListeners: {
-      value: {}
-    },
     eventTimeout: {
       value: eventTimeout || 200,
       writeable: false
     }
   });
+
+  if (typeof window !== 'undefined') {
+    this._events = {};
+    this._onceEvents = {};
+  }
+  this.removeAllListeners();
 }
 
-/**
- * Emit an event to all registered listeners
- * An event cannot be emitted multiple times before a timeout has been reached.
- */
-EventEmitter.prototype.emitEvent = function emitEvent(event) {
-  var
-    self = this,
-    now = Date.now(),
-    args = Array.prototype.slice.call(arguments, 1),
-    eventProperties = this.eventListeners[event];
+if (typeof window === 'undefined') {
+  NodeEmitter = require('events');
+  EventEmitter.prototype = new NodeEmitter();
+} else {
 
-  if (!eventProperties) {
-    return false;
-  }
+  EventEmitter.prototype.on = function(eventName, listener) {
+    var
+      listenerType = typeof listener,
+      listeners;
 
-  if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
-    return false;
-  }
-
-  eventProperties.listeners.forEach(function (listener) {
-    setTimeout(function () {
-      if (listener.once) {
-        self.removeListener(event, listener.id);
-      }
-      listener.fn.apply(undefined, args);
-    }, 0);
-  });
-
-  // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
-  if (eventProperties.lastEmitted !== undefined) {
-    eventProperties.lastEmitted = now;
-  }
-};
-
-
-/**
- * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
- * insertion.
- *
- * The ID returned by this function is required to remove this listener at a later time.
- *
- * @param {string} event - name of the global event to subscribe to (see the 'eventListeners' object property)
- * @param {function} listener - callback to invoke each time an event is fired
- * @param {boolean} once - true if the listener should be triggered only once and then removed.
- * @returns {string} Unique listener ID
- */
-EventEmitter.prototype.addListener = function(event, listener, once) {
-  var
-    listenerType = typeof listener,
-    listenerId;
-
-  if (listenerType !== 'function') {
-    throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
-  }
-
-  if (!this.eventListeners[event]) {
-    this.eventListeners[event] = {listeners: []};
-  }
-
-  listenerId = uuid.v4();
-
-  this.eventListeners[event].listeners.push({id: listenerId, fn: listener, once: (once === true)});
-  return listenerId;
-};
-
-/**
- * Removes a listener from an event.
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @param {function} fn - callback to match the listener
- * @returns {string} the listener ID
- */
-EventEmitter.prototype.getListener = function (event, fn) {
-  var
-    listenerType = typeof fn,
-    listenerId = false;
-
-  if (!this.eventListeners[event || fn === undefined]) {
-    return false;
-  }
-
-  if (listenerType !== 'function') {
-    throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
-  }
-
-  this.eventListeners[event].listeners.forEach(function (listener) {
-    if (listener.fn === fn) {
-      listenerId = listener.id;
+    if (!eventName || !listener) {
+      return;
     }
-  });
 
-  return listenerId;
-};
-
-/**
- * Removes a listener from an event.
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @param {string} listenerId - The ID returned by addListener
- * @returns {EventEmitter} this object
- */
-EventEmitter.prototype.removeListener = function (event, listenerId) {
-  var
-    self = this,
-    knownEvents = Object.keys(this.eventListeners);
-
-  if (knownEvents.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
-  }
-
-  this.eventListeners[event].listeners.forEach(function (listener, index) {
-    if (listener.id === listenerId) {
-      if (self.eventListeners[event].listeners.length === 1 && self.eventListeners[event].lastEmitted === undefined) {
-        delete self.eventListeners[event];
-      } else {
-        self.eventListeners[event].listeners.splice(index, 1);
-      }
+    if (listenerType !== 'function') {
+      throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
     }
-  });
 
-  return self;
-};
-
-/**
- * Unregisters a callback from a room.
- *
- * @param {string} roomId
- * @param {function} callback
-*/
-EventEmitter.prototype.off = function (event, callback) {
-  var listenerId = this.getListener(event, callback);
-
-  if (listenerId) {
-    this.removeListener(event, listenerId);
-  }
-};
-
-
-/**
- * Removes all listeners, either from a specific event or from all events
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @returns {EventEmitter} this object
- */
-EventEmitter.prototype.removeAllListeners = function (event) {
-  var
-    self = this,
-    knownEvents = Object.keys(this.eventListeners);
-
-  if (event) {
-    if (knownEvents.indexOf(event) === -1) {
-      throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+    listeners = this.listeners(eventName);
+    // only add once
+    if (listeners.indexOf(listener) === -1) {
+      listeners.push(listener);
     }
-    if (self.eventListeners[event].lastEmitted === undefined) {
-      delete self.eventListeners[event];
+
+    // Handles `newListener` event (see https://nodejs.org/api/events.html#events_event_newlistener)
+    this.emit('newListener', eventName, listener);
+
+    return this;
+  };
+  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+  EventEmitter.prototype.prependListener = function(eventName, listener) {
+    var listeners;
+
+    if (!eventName || !listener) {
+      return;
+    }
+
+    listeners = this.listeners(eventName);
+    // only add once
+    if (listeners.indexOf(listener) === -1) {
+      this._events[eventName] = new Array(listener).concat(listeners);
+    }
+
+    // Handles `newListener` event (see https://nodejs.org/api/events.html#events_event_newlistener)
+    this.emit('newListener', eventName, listener);
+
+    return this;
+  };
+
+  EventEmitter.prototype.once = function(eventName, listener) {
+    var onceListeners;
+
+    if (!eventName || !listener) {
+      return;
+    }
+
+
+    this.on(eventName, listener);
+    onceListeners = this._onceEvents[eventName] = this._onceEvents[eventName] || {};
+    onceListeners[listener] = true;
+
+    return this;
+  };
+
+  EventEmitter.prototype.prependOnceListener = function(eventName, listener) {
+    var onceListeners;
+
+    if (!eventName || !listener) {
+      return;
+    }
+    this.prependListener(eventName, listener);
+    onceListeners = this._onceEvents[eventName] = this._onceEvents[eventName] || {};
+    onceListeners[listener] = true;
+
+    return this;
+  };
+
+  EventEmitter.prototype.removeListener = function(eventName, listener) {
+    var
+      index,
+      listeners = this._events[eventName];
+
+    if (!listeners || !listeners.length) {
+      return;
+    }
+
+    index = listeners.indexOf(listener);
+    if (index !== -1) {
+      listeners.splice(index, 1);
+    }
+    if (listeners.length === 0) {
+      delete this._events[eventName];
+    }
+
+    // Handles `removeListener` event (see https://nodejs.org/api/events.html#events_event_removeListener)
+    this.emit('removeListener', eventName, listener);
+
+    return this;
+  };
+
+  EventEmitter.prototype.removeAllListeners = function(eventName) {
+    if (eventName) {
+      delete this._events[eventName];
+      delete this._onceEvents[eventName];
     } else {
-      self.eventListeners[event].listeners = [];
+      this._events = [];
+      this._onceEvents = [];
     }
-  } else {
-    knownEvents.forEach(function (eventName) {
-      if (self.eventListeners[eventName].lastEmitted === undefined) {
-        delete self.eventListeners[eventName];
-      } else {
-        self.eventListeners[eventName].listeners = [];
-      }
-    });
-  }
 
-  return self;
-};
+    return this;
+  };
+
+  EventEmitter.prototype.emit = function(eventName) {
+    var
+      i = 0,
+      listeners,
+      args,
+      onceListeners,
+      notifyList;
+
+    listeners = this._events && this._events[eventName];
+
+    if (!listeners || !listeners.length) {
+      return;
+    }
+
+    args = Array.prototype.slice.call(arguments, 1);
+    // once stuff
+    onceListeners = this._onceEvents && this._onceEvents[eventName] || {};
+
+    notifyList = new Array();
+
+    listener = listeners[i];
+    while (listener) {
+      // trigger listener
+      notifyList.push(listener);
+      // get next listener
+      if (onceListeners[listener]) {
+        // remove listener
+        this.removeListener(eventName,listener);
+        // unset once flag
+        delete onceListeners[listener];
+      } else {
+        i++;
+      }
+      listener = listeners[i];
+    }
+    for (item in notifyList) {
+      // trigger listener
+      if (notifyList[item] !== undefined) {
+        notifyList[item].apply(this, args);
+      }
+    }
+
+    return this;
+  };
+
+  EventEmitter.prototype.eventNames = function () {
+    return Object.keys(this._events);
+  };
+
+  EventEmitter.prototype.listenerCount = function (eventName) {
+    return this._events[eventName] && this._events[eventName].length || 0;
+  };
+
+  EventEmitter.prototype.listeners = function (eventName) {
+    if (this._events[eventName] === undefined) {
+      this._events[eventName] = [];
+    }
+    return this._events[eventName];
+  };
+
+}
+// Aliases:
+EventEmitter.prototype.emitEvent = EventEmitter.prototype.emit;
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
 
 module.exports = EventEmitter;

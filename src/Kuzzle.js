@@ -50,19 +50,20 @@ function Kuzzle (host, options, cb) {
     connectCB: {
       value: cb
     },
-    eventListeners: {
-      value: {
-        connected: {lastEmitted: null, listeners: []},
-        error: {lastEmitted: null, listeners: []},
-        disconnected: {lastEmitted: null, listeners: []},
-        reconnected: {lastEmitted: null, listeners: []},
-        jwtTokenExpired: {lastEmitted: null, listeners: []},
-        loginAttempt: {lastEmitted: null, listeners: []},
-        offlineQueuePush: {listeners: []},
-        offlineQueuePop: {listeners: []},
-        queryError: {listeners: []},
-        discarded: {listeners: []}
-      }
+    eventActions: {
+      value: [
+        'connected',
+        'kerror',
+        'disconnected',
+        'reconnected',
+        'jwtTokenExpired',
+        'loginAttempt',
+        'offlineQueuePush',
+        'offlineQueuePop',
+        'queryError',
+        'discarded'
+      ],
+      writeable: false
     },
     eventTimeout: {
       value: 200
@@ -259,10 +260,16 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
-  Object.defineProperty(this, 'eventActions', {
-    value: Object.keys(this.eventListeners),
-    writeable: false,
-    enumerable: true
+  Object.defineProperty(this, 'protectedEvents', {
+    value: {
+      connected: {timeout: this.eventTimeout},
+      error: {timeout: this.eventTimeout},
+      disconnected: {timeout: this.eventTimeout},
+      reconnected: {timeout: this.eventTimeout},
+      jwtTokenExpired: {timeout: this.eventTimeout},
+      loginAttempt: {timeout: this.eventTimeout}
+    },
+    writeable: false
   });
 
   if (!options || !options.connect || options.connect === 'auto') {
@@ -290,6 +297,26 @@ function Kuzzle (host, options, cb) {
 }
 
 Kuzzle.prototype = new EventEmitter();
+
+/**
+* Emit an event to all registered listeners
+* An event cannot be emitted multiple times before a timeout has been reached.
+*/
+Kuzzle.prototype.emit = function(eventName) {
+  var
+    now = Date.now(),
+    protectedEvent = this.protectedEvents && this.protectedEvents[eventName];
+
+  if (protectedEvent) {
+    if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - protectedEvent.timeout) {
+      return false;
+    }
+    protectedEvent.lastEmitted = now;
+  }
+  EventEmitter.prototype.emit.apply(this, arguments);
+};
+Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
+Kuzzle.prototype.off = Kuzzle.prototype.removeListener;
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -334,7 +361,7 @@ Kuzzle.prototype.connect = function () {
 
     connectionError.internal = error;
     self.state = 'error';
-    self.emitEvent('error', connectionError);
+    self.emitEvent('kerror', connectionError);
 
     if (self.connectCB) {
       self.connectCB(connectionError);

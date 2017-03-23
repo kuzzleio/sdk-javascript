@@ -15,10 +15,6 @@ function WSNode(host, port, ssl) {
   this.lasturl = null;
   this.stopRetryingToConnect = false;
 
-  Object.defineProperty(this, 'eventListeners', {
-    value: {}
-  });
-
   /**
    * Creates a new socket from the provided arguments
    *
@@ -89,7 +85,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnectError = function (callback) {
-    this.addListener('error', callback);
+    this.addListener('wserror', callback);
   };
 
   /**
@@ -106,27 +102,6 @@ function WSNode(host, port, ssl) {
    */
   this.onReconnect = function (callback) {
     this.addListener('reconnect', callback);
-  };
-
-  /**
-   * Registers a callback on a room. Once 1 message is received, fires the
-   * callback and unregister it afterward.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.once = function (roomId, callback) {
-    this.addListener(roomId, callback, true);
-  };
-
-  /**
-   * Registers a callback on a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.on = function (roomId, callback) {
-    this.addListener(roomId, callback);
   };
 
   /**
@@ -171,7 +146,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  self.emitEvent('error', message);
+  self.emitEvent('wserror', message);
 }
 
 module.exports = WSNode;
