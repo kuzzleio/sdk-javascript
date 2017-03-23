@@ -53,7 +53,7 @@ function Kuzzle (host, options, cb) {
     eventActions: {
       value: [
         'connected',
-        'kerror',
+        'networkError',
         'disconnected',
         'reconnected',
         'jwtTokenExpired',
@@ -361,7 +361,7 @@ Kuzzle.prototype.connect = function () {
 
     connectionError.internal = error;
     self.state = 'error';
-    self.emitEvent('kerror', connectionError);
+    self.emitEvent('networkError', connectionError);
 
     if (self.connectCB) {
       self.connectCB(connectionError);

@@ -25,9 +25,9 @@ describe('Listeners management', function () {
     listenerIds.push(kuzzle.addListener('connected', stublistener2));
     listenerIds.push(kuzzle.addListener('connected', stublistener3));
     listenerIds.push(kuzzle.addListener('connected', stublistener4));
-    kuzzle.addListener('kerror', stublistener1);
-    kuzzle.addListener('kerror', stublistener2);
-    kuzzle.addListener('kerror', stublistener3);
+    kuzzle.addListener('networkError', stublistener1);
+    kuzzle.addListener('networkError', stublistener2);
+    kuzzle.addListener('networkError', stublistener3);
     kuzzle.addListener('disconnected', stublistener1);
     kuzzle.addListener('disconnected', stublistener2);
     kuzzle.addListener('reconnected', stublistener3);
@@ -36,7 +36,7 @@ describe('Listeners management', function () {
   describe('#addListener', function () {
     it('should properly add new listeners to events', function () {
       should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('kerror').length).be.exactly(3);
+      should(kuzzle.listeners('networkError').length).be.exactly(3);
       should(kuzzle.listeners('disconnected').length).be.exactly(2);
       should(kuzzle.listeners('reconnected').length).be.exactly(1);
     });
@@ -59,7 +59,7 @@ describe('Listeners management', function () {
       kuzzle.removeAllListeners('disconnected');
 
       should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('kerror').length).be.exactly(3);
+      should(kuzzle.listeners('networkError').length).be.exactly(3);
       should(kuzzle.listeners('disconnected').length).be.exactly(0);
       should(kuzzle.listeners('reconnected').length).be.exactly(1);
     });
@@ -68,7 +68,7 @@ describe('Listeners management', function () {
       kuzzle.removeAllListeners();
 
       should(kuzzle.listeners('connected').length).be.exactly(0);
-      should(kuzzle.listeners('kerror').length).be.exactly(0);
+      should(kuzzle.listeners('networkError').length).be.exactly(0);
       should(kuzzle.listeners('disconnected').length).be.exactly(0);
       should(kuzzle.listeners('reconnected').length).be.exactly(0);
     });
@@ -80,7 +80,7 @@ describe('Listeners management', function () {
       }
       catch (e) {
         should(kuzzle.listeners('connected').length).be.exactly(4);
-        should(kuzzle.listeners('kerror').length).be.exactly(3);
+        should(kuzzle.listeners('networkError').length).be.exactly(3);
         should(kuzzle.listeners('disconnected').length).be.exactly(2);
         should(kuzzle.listeners('reconnected').length).be.exactly(1);
       }
@@ -91,7 +91,7 @@ describe('Listeners management', function () {
     it('should remove any one listener from the listener list', function () {
       kuzzle.removeListener('connected', stublistener2);
       should(kuzzle.listeners('connected').length).be.exactly(3);
-      should(kuzzle.listeners('kerror').length).be.exactly(3);
+      should(kuzzle.listeners('networkError').length).be.exactly(3);
       should(kuzzle.listeners('disconnected').length).be.exactly(2);
       should(kuzzle.listeners('reconnected').length).be.exactly(1);
     });
@@ -103,7 +103,7 @@ describe('Listeners management', function () {
       }
       catch (e) {
         should(kuzzle.listeners('connected').length).be.exactly(4);
-        should(kuzzle.listeners('kerror').length).be.exactly(3);
+        should(kuzzle.listeners('networkError').length).be.exactly(3);
         should(kuzzle.listeners('disconnected').length).be.exactly(2);
         should(kuzzle.listeners('reconnected').length).be.exactly(1);
       }
@@ -112,7 +112,7 @@ describe('Listeners management', function () {
     it('should do nothing if the provided listener id does not exist', function () {
       kuzzle.removeListener('connected', function() {});
       should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('kerror').length).be.exactly(3);
+      should(kuzzle.listeners('networkError').length).be.exactly(3);
       should(kuzzle.listeners('disconnected').length).be.exactly(2);
       should(kuzzle.listeners('reconnected').length).be.exactly(1);
     });

@@ -323,7 +323,7 @@ describe('Kuzzle constructor', function () {
             listenerCalled,
             kuzzle = new Kuzzle('nowhere');
 
-          kuzzle.addListener('kerror', function () { listenerCalled = true; });
+          kuzzle.addListener('networkError', function () { listenerCalled = true; });
 
           setTimeout(function () {
             try {

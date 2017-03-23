@@ -85,7 +85,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnectError = function (callback) {
-    this.addListener('wserror', callback);
+    this.addListener('networkError', callback);
   };
 
   /**
@@ -146,7 +146,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  self.emitEvent('wserror', message);
+  self.emitEvent('networkError', message);
 }
 
 module.exports = WSNode;

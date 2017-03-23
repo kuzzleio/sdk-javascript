@@ -89,7 +89,7 @@ describe('WebSocket networking module', function () {
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners('wserror').length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect(true, 10);
     websocket.connect = sinon.stub();
@@ -98,7 +98,7 @@ describe('WebSocket networking module', function () {
     clock.tick(10);
 
     should(cb.calledOnce).be.true();
-    should(websocket.listeners('wserror').length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
     should(websocket.retrying).be.false();
     should(websocket.connect.calledOnce).be.true();
     clock.restore();
@@ -111,7 +111,7 @@ describe('WebSocket networking module', function () {
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners('wserror').length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect(false, 10);
     websocket.connect = sinon.stub();
@@ -119,7 +119,7 @@ describe('WebSocket networking module', function () {
     clock.tick(10);
 
     should(cb.calledOnce).be.true();
-    should(websocket.listeners('wserror').length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
     should(websocket.retrying).be.false();
     should(websocket.connect.calledOnce).be.false();
     clock.restore();
@@ -147,7 +147,7 @@ describe('WebSocket networking module', function () {
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners('wserror').length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
     clientStub.onclose(4666, 'foobar');
@@ -155,7 +155,7 @@ describe('WebSocket networking module', function () {
     setTimeout(function () {
       should(cb.calledOnce).be.true();
       should(cb.calledWith('foobar'));
-      should(websocket.listeners('wserror').length).be.eql(1);
+      should(websocket.listeners('networkError').length).be.eql(1);
       done();
     }, 0);
   });
@@ -299,7 +299,7 @@ describe('WebSocket networking module', function () {
     websocket.close();
 
     should(websocket.listeners('foobar').length).be.exactly(0);
-    should(websocket.listeners('wserror').length).be.exactly(0);
+    should(websocket.listeners('networkError').length).be.exactly(0);
     should(websocket.listeners('connect').length).be.exactly(0);
     should(websocket.listeners('reconnect').length).be.exactly(0);
     should(websocket.listeners('disconnect').length).be.exactly(0);
