@@ -1,9 +1,9 @@
 var
-  EventEmitter = require('../../eventEmitter');
+  KuzzleEventEmitter = require('../../eventEmitter');
 
 function WSNode(host, port, ssl) {
   var self = this;
-  EventEmitter.call(this);
+  KuzzleEventEmitter.call(this);
 
   this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
   this.host = host;
@@ -126,7 +126,7 @@ function WSNode(host, port, ssl) {
     self.stopRetryingToConnect = true;
   };
 }
-WSNode.prototype = new EventEmitter();
+WSNode.prototype = new KuzzleEventEmitter();
 
 /**
  * Called when the connection closes with an error state

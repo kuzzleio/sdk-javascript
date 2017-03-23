@@ -1,6 +1,6 @@
 var
   uuid = require('uuid'),
-  EventEmitter = require('./eventEmitter'),
+  KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
@@ -30,7 +30,7 @@ function Kuzzle (host, options, cb) {
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(host, options, cb);
   }
-  EventEmitter.call(this);
+  KuzzleEventEmitter.call(this);
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -296,7 +296,7 @@ function Kuzzle (host, options, cb) {
   }
 }
 
-Kuzzle.prototype = new EventEmitter();
+Kuzzle.prototype = new KuzzleEventEmitter();
 
 /**
 * Emit an event to all registered listeners
@@ -313,7 +313,7 @@ Kuzzle.prototype.emit = function(eventName) {
     }
     protectedEvent.lastEmitted = now;
   }
-  EventEmitter.prototype.emit.apply(this, arguments);
+  KuzzleEventEmitter.prototype.emit.apply(this, arguments);
 };
 Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
 Kuzzle.prototype.off = Kuzzle.prototype.removeListener;
@@ -861,7 +861,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
-  return EventEmitter.prototype.addListener.call(this, event, listener);
+  return KuzzleEventEmitter.prototype.addListener.call(this, event, listener);
 };
 
 /**

@@ -1,6 +1,6 @@
-var NodeEmitter;
+var EventEmitter;
 
-function EventEmitter(eventTimeout) {
+function KuzzleEventEmitter(eventTimeout) {
   Object.defineProperties(this, {
     eventTimeout: {
       value: eventTimeout || 200,
@@ -16,11 +16,11 @@ function EventEmitter(eventTimeout) {
 }
 
 if (typeof window === 'undefined') {
-  NodeEmitter = require('events');
-  EventEmitter.prototype = new NodeEmitter();
+  EventEmitter = require('events');
+  KuzzleEventEmitter.prototype = new EventEmitter();
 } else {
 
-  EventEmitter.prototype.on = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.on = function(eventName, listener) {
     var
       listenerType = typeof listener,
       listeners;
@@ -44,9 +44,9 @@ if (typeof window === 'undefined') {
 
     return this;
   };
-  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+  KuzzleEventEmitter.prototype.addListener = KuzzleEventEmitter.prototype.on;
 
-  EventEmitter.prototype.prependListener = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.prependListener = function(eventName, listener) {
     var listeners;
 
     if (!eventName || !listener) {
@@ -65,7 +65,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.once = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.once = function(eventName, listener) {
     var onceListeners;
 
     if (!eventName || !listener) {
@@ -80,7 +80,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.prependOnceListener = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.prependOnceListener = function(eventName, listener) {
     var onceListeners;
 
     if (!eventName || !listener) {
@@ -93,7 +93,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.removeListener = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.removeListener = function(eventName, listener) {
     var
       index,
       listeners = this._events[eventName];
@@ -116,7 +116,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.removeAllListeners = function(eventName) {
+  KuzzleEventEmitter.prototype.removeAllListeners = function(eventName) {
     if (eventName) {
       delete this._events[eventName];
       delete this._onceEvents[eventName];
@@ -128,7 +128,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.emit = function(eventName) {
+  KuzzleEventEmitter.prototype.emit = function(eventName) {
     var
       i = 0,
       listeners,
@@ -173,15 +173,15 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  EventEmitter.prototype.eventNames = function () {
+  KuzzleEventEmitter.prototype.eventNames = function () {
     return Object.keys(this._events);
   };
 
-  EventEmitter.prototype.listenerCount = function (eventName) {
+  KuzzleEventEmitter.prototype.listenerCount = function (eventName) {
     return this._events[eventName] && this._events[eventName].length || 0;
   };
 
-  EventEmitter.prototype.listeners = function (eventName) {
+  KuzzleEventEmitter.prototype.listeners = function (eventName) {
     if (this._events[eventName] === undefined) {
       this._events[eventName] = [];
     }
@@ -190,7 +190,7 @@ if (typeof window === 'undefined') {
 
 }
 // Aliases:
-EventEmitter.prototype.emitEvent = EventEmitter.prototype.emit;
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+KuzzleEventEmitter.prototype.emitEvent = KuzzleEventEmitter.prototype.emit;
+KuzzleEventEmitter.prototype.off = KuzzleEventEmitter.prototype.removeListener;
 
-module.exports = EventEmitter;
+module.exports = KuzzleEventEmitter;
