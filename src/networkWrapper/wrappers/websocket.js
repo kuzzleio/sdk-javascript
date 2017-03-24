@@ -127,6 +127,7 @@ function WSNode(host, port, ssl) {
   };
 }
 WSNode.prototype = Object.create(KuzzleEventEmitter.prototype);
+WSNode.prototype.constructor = WSNode;
 
 
 /**

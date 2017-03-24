@@ -296,6 +296,7 @@ function Kuzzle (host, options, cb) {
   }
 }
 Kuzzle.prototype = Object.create(KuzzleEventEmitter.prototype);
+Kuzzle.prototype.constructor = Kuzzle;
 
 /**
 * Emit an event to all registered listeners

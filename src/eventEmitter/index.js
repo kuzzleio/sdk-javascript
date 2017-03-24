@@ -15,6 +15,7 @@ function KuzzleEventEmitter(eventTimeout) {
 
 if (typeof window === 'undefined') {
   KuzzleEventEmitter.prototype = new (require('events'))();
+  KuzzleEventEmitter.prototype.constructor = KuzzleEventEmitter;
 } else {
 
   KuzzleEventEmitter.prototype.on = function(eventName, listener) {
