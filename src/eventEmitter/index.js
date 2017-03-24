@@ -1,5 +1,3 @@
-var EventEmitter;
-
 function KuzzleEventEmitter(eventTimeout) {
   Object.defineProperties(this, {
     eventTimeout: {
@@ -16,8 +14,7 @@ function KuzzleEventEmitter(eventTimeout) {
 }
 
 if (typeof window === 'undefined') {
-  EventEmitter = require('events');
-  KuzzleEventEmitter.prototype = new EventEmitter();
+  KuzzleEventEmitter.prototype = new (require('events'))();
 } else {
 
   KuzzleEventEmitter.prototype.on = function(eventName, listener) {
