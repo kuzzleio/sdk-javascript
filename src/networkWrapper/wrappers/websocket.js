@@ -126,7 +126,8 @@ function WSNode(host, port, ssl) {
     self.stopRetryingToConnect = true;
   };
 }
-WSNode.prototype = new KuzzleEventEmitter();
+WSNode.prototype = Object.create(KuzzleEventEmitter.prototype);
+
 
 /**
  * Called when the connection closes with an error state

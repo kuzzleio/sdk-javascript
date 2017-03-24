@@ -295,8 +295,7 @@ function Kuzzle (host, options, cb) {
     });
   }
 }
-
-Kuzzle.prototype = new KuzzleEventEmitter();
+Kuzzle.prototype = Object.create(KuzzleEventEmitter.prototype);
 
 /**
 * Emit an event to all registered listeners
