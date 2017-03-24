@@ -304,7 +304,7 @@ Kuzzle.prototype = Object.create(KuzzleEventEmitter.prototype);
 Kuzzle.prototype.emit = function(eventName) {
   var
     now = Date.now(),
-    protectedEvent = this.protectedEvents && this.protectedEvents[eventName];
+    protectedEvent = this.protectedEvents[eventName];
 
   if (protectedEvent) {
     if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - protectedEvent.timeout) {

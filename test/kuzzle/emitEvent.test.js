@@ -20,6 +20,7 @@ describe('Event emitter', function () {
         listenersCalled++;
       },
       context = {
+        protectedEvents: {},
         _events: {
           foo: [
             listener,
@@ -44,6 +45,7 @@ describe('Event emitter', function () {
         argsCount = arguments.length;
       },
       context = {
+        protectedEvents: {},
         eventTimeout: -100,
         _events: {
           foo: [
