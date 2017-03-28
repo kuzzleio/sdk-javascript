@@ -8,6 +8,7 @@ function WSNode(host, port, ssl) {
   this.wasConnected = false;
   this.retrying = false;
   this.lasturl = null;
+  this.stopRetryingToConnect = false;
 
   /*
    Listeners are stored using the following format:
@@ -51,6 +52,7 @@ function WSNode(host, port, ssl) {
         poke(self.listeners, 'connect');
       }
       self.wasConnected = true;
+      self.stopRetryingToConnect = false;
     };
 
     this.client.onclose = function (code, message) {
@@ -215,6 +217,7 @@ function WSNode(host, port, ssl) {
     this.wasConnected = false;
     this.client.close();
     this.client = null;
+    self.stopRetryingToConnect = true;
   };
 }
 
@@ -264,7 +267,7 @@ function poke (listeners, roomId, payload) {
 function onClientError(autoReconnect, reconnectionDelay, message) {
   var self = this;
 
-  if (autoReconnect && !self.retrying) {
+  if (autoReconnect && !self.retrying && !self.stopRetryingToConnect) {
     self.retrying = true;
     setTimeout(function () {
       self.retrying = false;
