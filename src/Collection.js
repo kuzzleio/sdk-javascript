@@ -634,6 +634,10 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
     options = null;
   }
 
+  if (options && options.retryOnConflict) {
+    data.retryOnConflict = options.retryOnConflict;
+  }
+
   data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'update'), data, options, cb && function (err, res) {

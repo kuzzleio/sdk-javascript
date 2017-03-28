@@ -965,8 +965,9 @@ describe('Collection methods', function () {
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
         collection = new Collection(kuzzle, expectedQuery.collection, expectedQuery.index),
-        options = { queuable: false };
+        options = { queuable: false, retryOnConflict: 42 };
       expectedQuery.options = options;
+      expectedQuery.retryOnConflict = 42;
 
       should(collection.updateDocument(result.result._id, result.result._source, options, function (err, res) {
         should(err).be.null();
