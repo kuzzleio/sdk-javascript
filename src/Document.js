@@ -58,7 +58,7 @@ function Document(collection, documentId, content, kuzzleInfo) {
       writable: true
     },
     kuzzleInfo: {
-      value: kuzzleInfo || null,
+      value: kuzzleInfo || {},
       enumerable: true,
       writable: false
     }

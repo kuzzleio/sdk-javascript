@@ -56,7 +56,16 @@ describe('Collection methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
-      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
+      result = {
+        result: {
+          _scroll_id: 'banana',
+          total: 123,
+          hits: [
+            {_id: 'foobar', _source: { foo: 'bar'}, _kuzzle_info: {author: 'toto'}}
+          ],
+          aggregations: {someAggregate: {}}
+        }
+      };
       error = null;
       expectedQuery = {
         index: 'bar',
