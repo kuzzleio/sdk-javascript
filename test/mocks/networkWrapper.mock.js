@@ -8,10 +8,12 @@ function NetworkWrapperMock (host, port, sslConnection) {
   this.host = host;
   this.port = port;
   this.sslConnection = sslConnection;
+  this.connectCalled = false;
 
   this.removeAllListeners();
 
   this.connect = function() {
+    this.connectCalled = true;
     process.nextTick(function () {
       switch (self.host) {
         case 'nowhere':

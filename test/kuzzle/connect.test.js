@@ -20,15 +20,20 @@ describe('Kuzzle connect', function () {
     networkWrapperRevert();
   });
 
+  it('should return the current Kuzzle instance', function () {
+    var
+      kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
+      connectedKuzzle = kuzzle.connect();
+
+    should(connectedKuzzle).be.exactly(kuzzle);
+  });
+
   it('should return immediately if already connected', function (done) {
-    var kuzzle;
-
-    this.timeout(200);
-
-    kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
       should(res.state).be.exactly('connected');
+      should(res.network.connectCalled).be.false();
       done();
     });
 
@@ -37,19 +42,28 @@ describe('Kuzzle connect', function () {
   });
 
   it('should return immediately if trying to reconnect', function (done) {
-    var kuzzle;
-
-    this.timeout(200);
-
-    kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
       should(res.state).be.exactly('reconnecting');
+      should(res.network.connectCalled).be.false();
       done();
     });
 
     kuzzle.state = 'reconnecting';
     kuzzle.connect();
+  });
+
+  it('should first disconnect if it was connected', function () {
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+
+    kuzzle.disconnect = sinon.stub();
+
+    kuzzle.connect();
+    should(kuzzle.disconnect.called).be.false();
+
+    kuzzle.connect();
+    should(kuzzle.disconnect.called).be.true();
   });
 
   it('should try to connect when the instance is in a not-connected state', function () {
@@ -58,127 +72,88 @@ describe('Kuzzle connect', function () {
 
       kuzzle.state = state;
       should(kuzzle.connect()).be.exactly(kuzzle);
+      should(kuzzle.network.connectCalled).be.true();
       should(kuzzle.state).be.exactly('connecting');
     });
   });
 
-  it('should registered listeners upon receiving a connect event', function (done) {
-    var
-      kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
-      listenerCalled = false;
-
-    kuzzle.state = 'initializing';
-    kuzzle.addListener('connected', function () {listenerCalled = true;});
-
-    kuzzle.connect();
-
-    setTimeout(function () {
-      should(listenerCalled).be.true();
-      done();
-    }, 10);
-
-  });
-
-  it('should first disconnect if it was connected', function () {
-    var
-      kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
-
-    kuzzle.disconnect = sinon.stub();
-    kuzzle.connect();
-
-    should(kuzzle.disconnect.called).be.false();
-
-    kuzzle.connect();
-    should(kuzzle.disconnect.called).be.true();
-  });
-
   describe('=> on connection error', function () {
     it('should call the provided callback on a connection error', function (done) {
-      var kuzzle;
-
-      this.timeout(200);
-      kuzzle = new Kuzzle('nowhere', function (err, res) {
-        try {
-          should(err).be.instanceOf(Error);
-          should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere"');
-          should(err.internal.message).be.exactly('Mock Error');
-          should(res).be.undefined();
-          should(kuzzle.state).be.exactly('error');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
+      var kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
+        should(err).be.instanceOf(Error);
+        should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere"');
+        should(err.internal.message).be.exactly('Mock Error');
+        should(res).be.undefined();
+        should(kuzzle.state).be.exactly('error');
+        done();
       });
+      kuzzle.connect();
     });
 
     it('should registered listeners upon receiving a error event', function (done) {
       var
-        listenerCalled,
-        kuzzle = new Kuzzle('nowhere');
+        errorStub = sinon.stub(),
+        kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
 
-      kuzzle.addListener('networkError', function () { listenerCalled = true; });
+      kuzzle.addListener('networkError', errorStub);
 
-      setTimeout(function () {
-        try {
-          should(listenerCalled).be.true();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+      kuzzle.connect();
+      process.nextTick(function () {
+        should(errorStub).be.calledOnce();
+        done();
+      });
     });
   });
 
   describe('=> on connection success', function () {
     it('should call the provided callback on a connection success', function (done) {
-      this.timeout(200);
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(Kuzzle);
+        should(res.state).be.exactly('connected');
+        done();
+      });
+      kuzzle.connect();
+    });
 
-      new Kuzzle('somewhere', function (err, res) {
-        try {
-          should(err).be.null();
-          should(res).be.instanceof(Kuzzle);
-          should(res.state).be.exactly('connected');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
+    it('should registered listeners upon receiving a connect event', function (done) {
+      var
+        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
+        connectedStub = sinon.stub();
+
+      kuzzle.addListener('connected', connectedStub);
+
+      kuzzle.connect();
+      process.nextTick(function () {
+        should(connectedStub).be.calledOnce();
+        done();
       });
     });
 
     it('should renew subscriptions automatically on a connection success', function (done) {
       var
-        kuzzle,
-        renewed = false;
+        kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoResubscribe: false}),
+        renewStub = sinon.stub();
 
-      this.timeout(200);
-
-      kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoResubscribe: false});
       kuzzle.subscriptions.foo = {
         bar: {
-          renew: function () { renewed = true; }
+          renew: renewStub
         }
       };
 
       kuzzle.connect();
       should(kuzzle.state).be.exactly('connecting');
 
-      setTimeout(function () {
-        should(renewed).be.true();
+      process.nextTick(function () {
+        should(renewStub).be.calledOnce();
         done();
-      }, 20);
+      });
     });
 
     it('should dequeue requests automatically on a connection success', function (done) {
       var
         dequeueStub = sinon.stub(),
-        kuzzle;
-
-      this.timeout(500);
-
-      kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReplay: false, autoQueue: false});
+        kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReplay: false, autoQueue: false});
 
       kuzzle.queuing = true;
       kuzzle.offlineQueue.push({query: 'foo'});
@@ -186,179 +161,165 @@ describe('Kuzzle connect', function () {
       kuzzle.connect();
 
       setTimeout(function () {
-        should(dequeueStub.called).be.true();
+        should(dequeueStub).be.calledOnce();
         should(kuzzle.state).be.exactly('connected');
         should(kuzzle.queuing).be.false();
         should(kuzzle.offlineQueue).be.empty();
         done();
-      }, 20);
+      },100);
     });
   });
 
   describe('=> on disconnection', function () {
-    it('should enter offline mode and call listeners', function () {
+    it('should enter offline mode and call listeners', function (done) {
       var
-        kuzzle = new Kuzzle('somewhere'),
-        listenerCalled = false;
+        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
+          kuzzle.network.disconnect();
+        }),
+        disconnectStub = sinon.stub();
 
-      kuzzle.addListener('disconnected', function () { listenerCalled = true; });
+      kuzzle.addListener('disconnected', disconnectStub);
+      kuzzle.connect();
 
-      kuzzle.network.disconnect();
-
-      should(kuzzle.state).be.exactly('offline');
-      should(kuzzle.queuing).be.false();
-      should(listenerCalled).be.true();
-      kuzzle.isValid();
-    });
-
-    it('should enable queuing if autoQueue is set to true', function () {
-      var kuzzle = new Kuzzle('somewhere', {autoQueue: true});
-
-      kuzzle.network.disconnect();
-      should(kuzzle.state).be.exactly('offline');
-      should(kuzzle.queuing).be.true();
-      kuzzle.isValid();
-    });
-
-    it('should invalidated the instance if autoReconnect is set to false', function () {
-      var kuzzle = new Kuzzle('somewhere', {autoReconnect: false});
-
-      kuzzle.network.disconnect();
-      should(kuzzle.state).be.exactly('disconnected');
-      should(kuzzle.queuing).be.false();
-      should(function () {
+      process.nextTick(function() {
+        should(kuzzle.state).be.exactly('offline');
+        should(kuzzle.queuing).be.false();
+        should(disconnectStub).be.calledOnce();
         kuzzle.isValid();
-      }).throw();
+        done();
+      });
+    });
+
+    it('should enable queuing if autoQueue is set to true', function (done) {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoQueue: true}, function() {
+        kuzzle.network.disconnect();
+      });
+
+      kuzzle.connect();
+      process.nextTick(function() {
+        should(kuzzle.state).be.exactly('offline');
+        should(kuzzle.queuing).be.true();
+        kuzzle.isValid();
+        done();
+      });
+    });
+
+    it('should invalidate the instance if autoReconnect is set to false', function () {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReconnect: false}, function() {
+        kuzzle.network.disconnect();
+      });
+
+      kuzzle.connect();
+      process.nextTick(function() {
+        should(kuzzle.state).be.exactly('disconnected');
+        should(kuzzle.queuing).be.false();
+        should(function () {
+          kuzzle.isValid();
+        }).throw();
+        done();
+      });
     });
   });
 
   describe('=> on reconnection', function () {
     it('should exit offline mode when reconnecting', function (done) {
       var
-        kuzzle = new Kuzzle('somewhereagain'),
-        listenersCalled = false;
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
+        reconnectStub = sinon.stub();
 
-      this.timeout(200);
-
-      kuzzle.addListener('reconnected', function () { listenersCalled = true; });
+      kuzzle.addListener('reconnected', reconnectStub);
       kuzzle.queuing = true;
+      kuzzle.connect();
 
-      setTimeout(function () {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(listenersCalled).be.true();
-          // should not switch queuing to 'false' automatically by default
-          should(kuzzle.queuing).be.true();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+      process.nextTick(function () {
+        should(kuzzle.state).be.exactly('connected');
+        should(reconnectStub).be.calledOnce();
+        // should not switch queuing to 'false' automatically by default
+        should(kuzzle.queuing).be.true();
+        kuzzle.isValid();
+        done();
+      });
     });
 
     it('should renew subscriptions automatically when exiting offline mode', function (done) {
       var
-        kuzzle = new Kuzzle('somewhereagain'),
-        renewCalled = false,
-        stubKuzzleRoom = {
-          callback: function () { renewCalled = true; },
-          renew: function (cb) { cb(); }
-        };
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
+        renewStub = sinon.stub();
 
-
-      this.timeout(200);
-
-      kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
-
-      setTimeout(function () {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(renewCalled).be.true();
-          kuzzle.isValid();
-          done();
+      kuzzle.subscriptions.foo = {
+        bar: {
+          renew: renewStub
         }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+      };
+      kuzzle.connect();
+
+      process.nextTick(function () {
+        should(kuzzle.state).be.exactly('connected');
+        should(renewStub).be.calledOnce();
+        kuzzle.isValid();
+        done();
+      });
     });
 
     it('should not renew subscriptions if autoResubscribe is set to false', function (done) {
       var
-        kuzzle = new Kuzzle('somewhereagain', {autoResubscribe: false}),
-        renewCalled = false,
-        stubKuzzleRoom = {
-          callback: function () { renewCalled = true; },
-          renew: function (cb) { cb(); }
-        };
-
-      this.timeout(200);
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual', autoResubscribe: false}),
+        renewStub = sinon.stub();
 
       kuzzle.subscriptions.foo = {
-        bar: stubKuzzleRoom
+        bar: {
+          renew: renewStub
+        }
       };
+      kuzzle.connect();
 
-      setTimeout(function () {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(renewCalled).be.false();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+      process.nextTick(function () {
+        should(kuzzle.state).be.exactly('connected');
+        should(renewStub).not.be.called();
+        kuzzle.isValid();
+        done();
+      });
     });
 
     it('should replay pending requests automatically if autoReplay is set to true', function (done) {
       var
-        kuzzle = new Kuzzle('somewhereagain', {autoReplay: true});
-
-      this.timeout(200);
+        dequeueStub = sinon.stub(),
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual', autoReplay: true});
 
       kuzzle.queuing = true;
+      kuzzle.offlineQueue.push({query: 'foo'});
+      kuzzle.addListener('offlineQueuePop', dequeueStub);
+      kuzzle.connect();
 
       setTimeout(function () {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(kuzzle.queuing).be.false();
-          kuzzle.isValid();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+        should(dequeueStub).be.calledOnce();
+        should(kuzzle.state).be.exactly('connected');
+        should(kuzzle.queuing).be.false();
+        kuzzle.isValid();
+        done();
+      }, 100);
     });
 
     it('should empty the JWT Token if it has expired', function (done) {
       var
-        kuzzle = new Kuzzle('somewhereagain', {}),
-        eventEmitted = false;
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
+        jwtTokenExpiredStub = sinon.stub();
 
-      this.timeout(200);
-      kuzzle.jwtToken = 'foobar';
-      kuzzle.addListener('jwtTokenExpired', function () {eventEmitted = true;});
-
-      kuzzle.checkToken = function (token, cb) {
+      sinon.stub(kuzzle, 'checkToken', function (token, cb) {
         should(token).be.eql(kuzzle.jwtToken);
         cb(null, {valid: false});
-      };
+      });
 
-      setTimeout(function () {
-        try {
-          should(kuzzle.state).be.exactly('connected');
-          should(kuzzle.jwtToken).be.undefined();
-          should(eventEmitted).be.true();
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, 10);
+      kuzzle.jwtToken = 'foobar';
+      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
+      kuzzle.connect();
+
+      process.nextTick(function () {
+        should(kuzzle.state).be.exactly('connected');
+        should(kuzzle.jwtToken).be.undefined();
+        should(jwtTokenExpiredStub).be.calledOnce();
+        done();
+      });
     });
   });
 });
