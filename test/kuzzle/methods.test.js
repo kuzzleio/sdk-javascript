@@ -71,7 +71,7 @@ describe('Kuzzle methods', function () {
       should(emitted).be.true();
 
       emitted = false;
-      passedOptions = {queuable: true, metadata: {foo: 'bar'}};
+      passedOptions = {queuable: true, volatile: {foo: 'bar'}};
       kuzzle.getAllStatistics(passedOptions, function () {});
     });
 

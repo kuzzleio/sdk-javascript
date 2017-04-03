@@ -21,7 +21,7 @@ describe('Room constructor', function () {
   it('should handle provided arguments correctly', function () {
     var room = new Room(collection);
 
-    should(room.metadata).be.an.Object().and.be.empty();
+    should(room.volatile).be.an.Object().and.be.empty();
     should(room.subscribeToSelf).be.true();
     should(room.scope).be.exactly('all');
     should(room.state).be.exactly('done');
@@ -35,11 +35,11 @@ describe('Room constructor', function () {
       scope: 'in',
       state: 'pending',
       users: 'all',
-      metadata: {some: 'metadata'},
+      volatile: {some: 'metadata'},
       subscribeToSelf: false
     });
 
-    should(room.metadata).match({some: 'metadata'});
+    should(room.volatile).match({some: 'metadata'});
     should(room.subscribeToSelf).be.false();
     should(room.scope).be.exactly('in');
     should(room.state).be.exactly('pending');
@@ -55,7 +55,7 @@ describe('Room constructor', function () {
     should(room).have.propertyWithDescriptor('scope', {enumerable: false, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('state', {enumerable: false, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('users', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('metadata', {enumerable: true, writable: true, configurable: false});
+    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true, configurable: false});
     should(room).have.propertyWithDescriptor('subscribeToSelf', {
       enumerable: true,
       writable: true,

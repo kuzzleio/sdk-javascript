@@ -127,7 +127,7 @@ Document.prototype.toString = function () {
  * Deletes this document in Kuzzle.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters
@@ -194,7 +194,7 @@ Document.prototype.refresh = function (options, cb) {
  * of this object.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters
@@ -231,7 +231,7 @@ Document.prototype.save = function (options, cb) {
  * Sends the content of this document as a realtime message.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters

@@ -91,8 +91,8 @@ function Room(collection, options) {
       enumerable: true,
       writable: true
     },
-    metadata: {
-      value: (options && options.metadata) ? options.metadata : {},
+    volatile: {
+      value: (options && options.volatile) ? options.volatile : {},
       enumerable: true,
       writable: true
     },
@@ -214,7 +214,7 @@ Room.prototype.renew = function (filters, notificationCB, cb) {
   subscribeQuery.body = self.filters;
   subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {metadata: self.metadata}, function (error, response) {
+  self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {volatile: self.volatile}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 
