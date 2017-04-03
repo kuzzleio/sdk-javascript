@@ -10,11 +10,10 @@ function KuzzleEventEmitter(eventTimeout) {
     this._events = {};
     this._onceEvents = {};
   }
-  this.removeAllListeners();
 }
 
 if (typeof window === 'undefined') {
-  KuzzleEventEmitter.prototype = new (require('events'))();
+  KuzzleEventEmitter.prototype = require('events').prototype;
   KuzzleEventEmitter.prototype.constructor = KuzzleEventEmitter;
 } else {
 
