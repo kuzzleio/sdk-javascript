@@ -30,7 +30,7 @@ function Kuzzle (host, options, cb) {
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(host, options, cb);
   }
-  KuzzleEventEmitter.call(this);
+  KuzzleEventEmitter.call(this, options && options.eventTimeout);
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -64,9 +64,6 @@ function Kuzzle (host, options, cb) {
         'discarded'
       ],
       writeable: false
-    },
-    eventTimeout: {
-      value: 200
     },
     queuing: {
       value: false,

@@ -1,7 +1,7 @@
 function KuzzleEventEmitter(eventTimeout) {
   Object.defineProperties(this, {
     eventTimeout: {
-      value: eventTimeout || 200,
+      value: typeof eventTimeout === 'number' ? eventTimeout : 200,
       writeable: false
     }
   });
