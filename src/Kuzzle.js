@@ -195,7 +195,7 @@ function Kuzzle (host, options, cb) {
       writable: true
     },
     offlineQueueLoader: {
-      value: null,
+      value: undefined,
       enumerable: true,
       writable: true
     }
