@@ -5,11 +5,12 @@ var
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle constructor', function () {
-
   var connectStub;
+
   beforeEach(function () {
     connectStub = sinon.stub(Kuzzle.prototype, 'connect');
   });
+
   afterEach(function() {
     connectStub.restore();
   });

@@ -6,7 +6,6 @@ var
   Kuzzle = rewire('../../src/Kuzzle');
 
 describe('Kuzzle connect', function () {
-
   var networkWrapperRevert;
 
   beforeEach(function () {
@@ -16,6 +15,7 @@ describe('Kuzzle connect', function () {
       }
     });
   });
+
   afterEach(function() {
     networkWrapperRevert();
   });
