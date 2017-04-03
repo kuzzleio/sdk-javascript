@@ -48,7 +48,9 @@ function NetworkWrapperMock (host, port, sslConnection) {
     this.addListener('reconnect', callback);
   };
 
-  this.send = function () {};
+  this.send = function (request) {
+    self.emit(request.requestId, request.response);
+  };
 
   this.close = function () {
     this.removeAllListeners();

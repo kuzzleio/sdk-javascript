@@ -1348,6 +1348,8 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
       self.emitEvent('offlineQueuePush', {query: object, cb: cb});
+    } else {
+      discardRequest(object, cb);
     }
   }
   else {

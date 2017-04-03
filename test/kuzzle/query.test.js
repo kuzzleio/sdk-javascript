@@ -1,94 +1,74 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = require('../../src/Kuzzle'),
-  EventEmitter = require('events').EventEmitter,
-  kuzzleSource = '../../src/Kuzzle';
+  rewire = require('rewire'),
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  Kuzzle = rewire('../../src/Kuzzle');
 
 
 describe('Query management', function () {
   describe('#emitRequest', function () {
     var
-      emitRequest = rewire(kuzzleSource).__get__('emitRequest'),
+      emitRequest = Kuzzle.__get__('emitRequest'),
       kuzzle;
 
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.network = new EventEmitter;
-      kuzzle.network.send = sinon.stub();
+      kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+      kuzzle.network = new NetworkWrapperMock('somewhere');
     });
 
     it('should emit the request when asked to', function () {
       var
         start = Date.now(),
-        request = {requestId: 'bar'};
+        request = {requestId: 'bar'},
+        spy = sinon.spy(kuzzle.network, 'send');
 
       emitRequest.call(kuzzle, request);
-      should(kuzzle.network.send.calledWith(request)).be.true();
+      should(spy).be.calledWithMatch(request);
       should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
     it('should fire a jwtTokenExpired event if the token has expired', function (done) {
-      var listenerJwtTokenExpired = false;
+      var
+        jwtTokenExpiredStub = sinon.stub(),
+        response = {
+          error: {
+            message: 'Token expired'
+          }
+        };
 
-      kuzzle.network.send = function () {
-        setTimeout(function () {
-          kuzzle.network.emit('bar', {
-            error: {
-              message: 'Token expired'
-            }
-          });
-        }, 0);
-      };
+      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
 
-      kuzzle.addListener('jwtTokenExpired', function() {
-        listenerJwtTokenExpired = true;
-      });
-
-      this.timeout(150);
-
-      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
-        setTimeout(function () {
-          should(listenerJwtTokenExpired).be.exactly(true);
-          should(error.message).be.exactly('Token expired');
-          done();
-        }, 0);
+      emitRequest.call(kuzzle, {requestId: 'foobar', response: response}, function(error) {
+        should(jwtTokenExpiredStub).be.calledOnce();
+        should(error.message).be.exactly('Token expired');
+        done();
       });
     });
 
     it('should fire a queryError if an error occurred', function (done) {
-      var listenerQueryError = false;
+      var
+        queryErrorStub = sinon.stub(),
+        response = {
+          error: {
+            message: 'foo-bar'
+          }
+        };
 
-      kuzzle.network.send = function () {
-        setTimeout(function () {
-          kuzzle.network.emit('bar', {
-            error: {
-              message: 'foo-bar'
-            }
-          });
-        }, 0);
-      };
+      kuzzle.addListener('queryError', queryErrorStub);
 
-      kuzzle.addListener('queryError', function() {
-        listenerQueryError = true;
-      });
-
-      this.timeout(150);
-
-      emitRequest.call(kuzzle, {requestId: 'bar'}, function(error) {
-        setTimeout(function () {
-          should(listenerQueryError).be.exactly(true);
-          should(error.message).be.exactly('foo-bar');
-          done();
-        }, 0);
+      emitRequest.call(kuzzle, {requestId: 'bar', response: response}, function(error) {
+        should(queryErrorStub).be.calledOnce();
+        should(error.message).be.exactly('foo-bar');
+        done();
       });
     });
 
     it('should launch the callback once a response has been received', function (done) {
       var
         response = {result: 'foo', error: {foo: 'bar', message: 'foobar'}, status: 42},
-        request = {requestId: 'someEvent'},
+        request = {requestId: 'someEvent', response: response},
         cb = function (err, res) {
           should(err).be.instanceOf(Error);
           should(err.message).be.exactly(response.error.message);
@@ -99,23 +79,15 @@ describe('Query management', function () {
           done();
         };
 
-      this.timeout(50);
-
-      kuzzle.network.send = function () {
-        setTimeout(function () {
-          kuzzle.network.emit(request.requestId, response);
-        }, 0);
-      };
-
       emitRequest.call(kuzzle, request, cb);
     });
   });
 
   describe('#query', function () {
     var
-      requestObject,
-      emitted,
-      callback,
+      emitRequestRevert,
+      emitRequestStub,
+      queryBody = {body: {some: 'query'}},
       queryArgs = {
         controller: 'controller',
         action: 'action',
@@ -125,42 +97,58 @@ describe('Query management', function () {
       kuzzle;
 
     before(function () {
-      Kuzzle = rewire(kuzzleSource);
-      Kuzzle.__set__('emitRequest', function (object, cb) {
-        emitted = true;
-        requestObject = object;
-        callback = cb;
-      });
+      emitRequestStub = sinon.stub();
+      emitRequestRevert = Kuzzle.__set__('emitRequest', emitRequestStub);
+    });
+
+    after(function () {
+      emitRequestRevert();
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
       kuzzle.state = 'connected';
-      requestObject = {};
-      callback = null;
-      emitted = false;
+      emitRequestStub.reset();
     });
 
     it('should generate a valid request object', function () {
-      kuzzle.query(queryArgs, { body: { some: 'query'}});
-      should(requestObject.index).be.exactly('index');
-      should(requestObject.controller).be.exactly('controller');
-      should(requestObject.collection).be.exactly('collection');
-      should(requestObject.action).be.exactly('action');
-      should(requestObject.body).match({some: 'query'});
-      should(requestObject.requestId).not.be.undefined().and.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+      kuzzle.query(queryArgs, queryBody);
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWith({
+        action: 'action',
+        body: { some: 'query' },
+        collection: 'collection',
+        controller: 'controller',
+        index: 'index',
+        metadata: {},
+        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+      });
     });
 
     it('should manage arguments properly if no options are provided', function () {
-      var cb = function () {};
+      var cb = sinon.stub();
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, cb);
+      kuzzle.query(queryArgs, queryBody, cb);
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWith({
+        action: 'action',
+        body: { some: 'query' },
+        collection: 'collection',
+        controller: 'controller',
+        index: 'index',
+        metadata: {},
+        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+      }, sinon.match(function(f) {return f === cb;}));
+    });
 
-      should(callback).be.exactly(cb);
+    it('should not define optional members if none was provided', function () {
+      kuzzle.query({controller: 'foo', action: 'bar'}, queryBody);
+      should(emitRequestStub).be.calledWithMatch({collection: undefined});
+      should(emitRequestStub).be.calledWithMatch({index: undefined});
     });
 
     it('should invoke the callback with an error if no query is provided', function () {
-      should(function () { kuzzle.query(queryArgs, function () {}); }).throw(Error);
+      should(function () { kuzzle.query(queryArgs, sinon.stub()); }).throw(Error);
       should(function () { kuzzle.query(queryArgs, ['foo', 'bar']); }).throw(Error);
       should(function () { kuzzle.query(queryArgs); }).throw(Error);
       should(function () { kuzzle.query(queryArgs, 'foobar'); }).throw(Error);
@@ -173,38 +161,39 @@ describe('Query management', function () {
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {volatile: volatile});
-      should(requestObject.volatile).match(volatile);
+      kuzzle.query(queryArgs, queryBody, {volatile: volatile});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({volatile: volatile});
+    });
+
+    it('should copy query local metadata over optional ones', function () {
+      var
+        metadata = {
+          foo: 'bar',
+          baz: ['foo', 'bar', 'qux']
+        };
+
+      kuzzle.query(queryArgs, { body: { some: 'query'}, metadata: {foo: 'foo'}}, {metadata: metadata});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({metadata: {foo: 'foo', baz: metadata.baz}});
     });
 
     it('should handle option refresh properly', function () {
-      var
-        refresh = 'foo';
-
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {refresh: refresh});
-      should(requestObject.refresh).match(refresh);
+      kuzzle.query(queryArgs, queryBody, {refresh: 'foo'});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({refresh: 'foo'});
     });
 
     it('should handle option size properly', function () {
-      var
-        size = 'foo';
-
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {size: size});
-      should(requestObject.size).match(size);
+      kuzzle.query(queryArgs, queryBody, {size: 'foo'});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({size: 'foo'});
     });
 
     it('should handle option from properly', function () {
-      var
-        from = 'foo';
-
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {from: from});
-      should(requestObject.from).match(from);
-    });
-
-    it('should exit early if the query is not queuable and the SDK is offline', function () {
-      kuzzle.state = 'offline';
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
-      should(emitted).be.false();
+      kuzzle.query(queryArgs, queryBody, {from: 'foo'});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({from: 'foo'});
     });
 
     it('should copy query local volatile over optional ones', function () {
@@ -215,226 +204,195 @@ describe('Query management', function () {
         };
 
       kuzzle.query(queryArgs, { body: { some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
-      should(requestObject.volatile.foo).be.exactly('foo');
-      should(requestObject.volatile.baz).match(volatile.baz);
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({volatile: {foo: 'foo'}});
+      should(emitRequestStub).be.calledWithMatch({volatile: {baz: volatile.baz}});
     });
 
-    it('should not define optional members if none was provided', function () {
-      kuzzle.query({controller: 'foo', action: 'bar'}, { body: { some: 'query'}});
-      should(requestObject.collection).be.undefined();
-      should(requestObject.index).be.undefined();
+    it('should handle option scroll properly', function () {
+      kuzzle.query(queryArgs, queryBody, {scroll: 'foo'});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({scroll: 'foo'});
+    });
+
+    it('should handle option scrollId properly', function () {
+      kuzzle.query(queryArgs, queryBody, {scrollId: 'foo'});
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({scrollId: 'foo'});
     });
 
     it('should add global headers without overwriting any existing query headers', function () {
       kuzzle.headers = { foo: 'bar', bar: 'foo' };
       kuzzle.query(queryArgs, { foo: 'foo', body: {some: 'query'}});
-      should(requestObject.foo).be.exactly('foo');
-      should(requestObject.bar).be.exactly('foo');
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({foo: 'foo', bar: 'foo'});
     });
 
     it('should not generate a new request ID if one is already defined', function () {
       kuzzle.query(queryArgs, { body: { some: 'query'}, requestId: 'foobar'});
-      should(requestObject.requestId).be.exactly('foobar');
+      should(emitRequestStub).be.calledOnce();
+      should(emitRequestStub).be.calledWithMatch({requestId: 'foobar'});
+    });
+
+    it('should exit early if the query is not queuable and the SDK is offline', function () {
+      kuzzle.state = 'offline';
+      kuzzle.query(queryArgs, queryBody, {queuable: false});
+      should(emitRequestStub).not.be.called();
     });
 
     it('should emit the request directly without waiting the end of dequeuing if queuable is false', function () {
-      kuzzle.state = 'connected';
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
-      should(emitted).be.true();
-
-      emitted = false;
-      kuzzle.queuing = true;
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false});
-      should(emitted).be.true();
+      kuzzle.state = 'offline';
+      kuzzle.query(queryArgs, queryBody, {queuable: false});
+      should(emitRequestStub).not.be.called();
     });
 
-    it('should discard the request if not connected and if queuable is false', function () {
+    it('should queue the request during offline mode, if queuing has been activated', function () {
       var
-        errorRaised = false;
+        now = Date.now(),
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
 
-      callback = function () {
-        errorRaised = true;
-      };
-
-      kuzzle.state = 'reconnecting';
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false}, callback);
-      should(emitted).be.false();
-      should(errorRaised).be.true();
-
-      errorRaised = false;
+      kuzzle.addListener('offlineQueuePush', queueStub);
+      kuzzle.state = 'offline';
       kuzzle.queuing = true;
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {queuable: false}, callback);
-      should(emitted).be.false();
-      should(errorRaised).be.true();
+
+      kuzzle.query(queryArgs, queryBody, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+      should(kuzzle.offlineQueue[0].query).match(queryBody);
+      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      should(queueStub).be.calledOnce();
+    });
+
+    it('should queue the request during offline mode, if queuable is set to true', function () {
+      var
+        now = Date.now(),
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
+
+      kuzzle.addListener('offlineQueuePush', queueStub);
+      kuzzle.state = 'offline';
+      kuzzle.queuing = false;
+
+      kuzzle.query(queryArgs, queryBody, {queuable: true}, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+      should(kuzzle.offlineQueue[0].query).match(queryBody);
+      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      should(queueStub).be.calledOnce();
+    });
+
+    it('should queue the request if state is connecting even if queuing is deactivated', function () {
+      var
+        now = Date.now(),
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
+
+      kuzzle.addListener('offlineQueuePush', queueStub);
+      kuzzle.state = 'connecting';
+      kuzzle.queuing = false;
+
+      kuzzle.query(queryArgs, queryBody, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+      should(kuzzle.offlineQueue[0].query).match(queryBody);
+      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      should(queueStub).be.calledOnce();
     });
 
     it('should discard the request if not connected and if queuing is deactivated', function () {
       var
-        errorRaised = false;
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
 
-      callback = function () {
-        errorRaised = true;
-      };
-
-      kuzzle.state = 'reconnecting';
+      kuzzle.addListener('offlineQueuePush', queueStub);
+      kuzzle.state = 'offline';
       kuzzle.queuing = false;
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, callback);
-      should(emitted).be.false();
-      should(errorRaised).be.true();
+
+      kuzzle.query(queryArgs, queryBody, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue).be.empty();
+      should(queueStub).not.be.called();
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithMatch(new Error('Discarded request'));
     });
 
-    it('should queue the request during offline mode, if queuing has been activated', function (done) {
+    it('should queue the request if a queue filter has been defined and if it allows queuing', function () {
       var
-        query = { body: { some: 'query'}},
-        cb = function () {},
         now = Date.now(),
-        eventFired = false;
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
 
+      kuzzle.addListener('offlineQueuePush', queueStub);
       kuzzle.state = 'offline';
       kuzzle.queuing = true;
-      kuzzle.addListener('offlineQueuePush', function (object) {
-        eventFired = true;
-        should(object.query.body).be.eql(query.body);
-      });
-
-      kuzzle.query(queryArgs, query, cb);
-
-      setTimeout(function () {
-        should(emitted).be.false();
-        should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
-        should(kuzzle.offlineQueue[0].query).match(query);
-        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
-        should(eventFired).be.true();
-        done();
-      }, 0);
-    });
-
-    it('should queue the request during offline mode, if queuable is set to true', function (done) {
-      var
-        query = { body: { some: 'query'}},
-        cb = function () {},
-        now = Date.now(),
-        eventFired = false;
-
-      kuzzle.state = 'offline';
-      kuzzle.queuing = false;
-      kuzzle.addListener('offlineQueuePush', function (object) {
-        eventFired = true;
-        should(object.query.body).be.eql(query.body);
-      });
-
-      kuzzle.query(queryArgs, query, {queuable: true}, cb);
-
-      setTimeout(function () {
-        should(emitted).be.false();
-        should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
-        should(kuzzle.offlineQueue[0].query).match(query);
-        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
-        should(eventFired).be.true();
-        done();
-      }, 0);
-    });
-
-    it('should queue the request if a queue filter has been defined and if it allows queuing', function (done) {
-      var
-        query = { body: { some: 'query'}},
-        cb = function () {},
-        now = Date.now(),
-        eventFired = false;
-
-      kuzzle.addListener('offlineQueuePush', function (object) {
-        eventFired = true;
-        should(object.query.body).be.eql(query.body);
-      });
-
-      kuzzle.state = 'offline';
       kuzzle.queueFilter = function () { return true; };
-      kuzzle.queuing = true;
-      kuzzle.query(queryArgs, query, cb);
 
-      setTimeout(function () {
-        should(emitted).be.false();
-        should(kuzzle.offlineQueue.length).be.exactly(1);
-        should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
-        should(kuzzle.offlineQueue[0].query).match(query);
-        should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
-        should(eventFired).be.true();
-        done();
-      }, 0);
+      kuzzle.query(queryArgs, queryBody, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue.length).be.exactly(1);
+      should(kuzzle.offlineQueue[0].ts).not.be.undefined().and.be.approximately(now, 10);
+      should(kuzzle.offlineQueue[0].query).match(queryBody);
+      should(kuzzle.offlineQueue[0].cb).be.exactly(cb);
+      should(queueStub).be.calledOnce();
     });
 
-    it('should discard the request if a queue filter has been defined and if it does not allows queuing', function (done) {
+    it('should discard the request if a queue filter has been defined and if it does not allows queuing', function () {
       var
-        query = { body: { some: 'query'}},
-        cb = function () {},
-        eventFired = false;
+        queueStub = sinon.stub(),
+        cb = sinon.stub();
 
-      kuzzle.addListener('offlineQueuePush', function () {
-        eventFired = true;
-      });
+      kuzzle.addListener('offlineQueuePush', queueStub);
       kuzzle.state = 'offline';
+      kuzzle.queuing = true;
       kuzzle.queueFilter = function () { return false; };
-      kuzzle.queuing = true;
-      kuzzle.query(queryArgs, query, cb);
 
-      setTimeout(function () {
-        should(emitted).be.false();
-        should(kuzzle.offlineQueue.length).be.exactly(0);
-        should(eventFired).be.false();
-        done();
-      }, 0);
+      kuzzle.query(queryArgs, queryBody, cb);
+
+      should(emitRequestStub).not.be.called();
+      should(kuzzle.offlineQueue).be.empty();
+      should(queueStub).not.be.called();
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithMatch(new Error('Discarded request'));
     });
 
-    it('should discard the request if in offline mode but queuing has not yet been activated', function (done) {
-      var
-        query = { body: { some: 'query'}},
-        cb = function () {},
-        eventFired = false;
-
-      kuzzle.addListener('offlineQueuePush', function () {
-        eventFired = true;
-      });
+    it('should set jwtToken except for auth/checkToken', function () {
       kuzzle.state = 'offline';
-      kuzzle.queuing = false;
-      kuzzle.query(queryArgs, query, cb);
-
-      setTimeout(function () {
-        should(emitted).be.false();
-        should(kuzzle.offlineQueue.length).be.exactly(0);
-        should(eventFired).be.false();
-        done();
-      }, 0);
-    });
-
-    it('should not set jwtToken if we execute auth/checkToken', function () {
-      this.timeout(200);
-
-      Kuzzle = rewire(kuzzleSource);
-
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
       kuzzle.queuing = true;
       kuzzle.jwtToken = 'fake-token';
 
-      kuzzle.query({collection: 'collection', controller: 'auth', action: 'checkToken', index: 'index'}, {});
+      kuzzle.query({controller: 'foo', action: 'bar'}, {});
+      kuzzle.query({controller: 'auth', action: 'checkToken'}, {});
 
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].query.headers).be.undefined();
+      should(kuzzle.offlineQueue.length).be.exactly(2);
+      should(kuzzle.offlineQueue[0].query).match({
+        controller: 'foo',
+        action: 'bar',
+        jwt: 'fake-token'
+      });
+      should(kuzzle.offlineQueue[0].query.jwt).be.equal('fake-token');
+      should(kuzzle.offlineQueue[1].query).match({
+        controller: 'auth',
+        action: 'checkToken'
+      });
+      should(kuzzle.offlineQueue[1].query.jwt).be.undefined();
     });
   });
 
   describe('#cleanHistory', function () {
     it('should be started by kuzzle constructor', function () {
-      var
-        cleanStub = sinon.stub(),
-        K = rewire(kuzzleSource);
+      var cleanStub = sinon.stub();
 
-      K.__set__('cleanHistory', cleanStub);
-      new K('foo', {connect: 'manual'});
+      Kuzzle.__set__('cleanHistory', cleanStub);
+      new Kuzzle('foo', {connect: 'manual'});
 
       should(cleanStub.calledOnce).be.true();
     });
