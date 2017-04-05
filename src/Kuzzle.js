@@ -30,7 +30,7 @@ function Kuzzle (host, options, cb) {
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(host, options, cb);
   }
-  KuzzleEventEmitter.call(this, options && options.eventTimeout);
+  KuzzleEventEmitter.call(this);
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -257,6 +257,13 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
+  Object.defineProperties(this, {
+    eventTimeout: {
+      value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200,
+      writeable: false
+    }
+  });
+
   Object.defineProperty(this, 'protectedEvents', {
     value: {
       connected: {timeout: this.eventTimeout},
@@ -313,7 +320,6 @@ Kuzzle.prototype.emit = function(eventName) {
   KuzzleEventEmitter.prototype.emit.apply(this, arguments);
 };
 Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
-Kuzzle.prototype.off = Kuzzle.prototype.removeListener;
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -852,7 +858,7 @@ Kuzzle.prototype.addListener = function(event, listener) {
   this.isValid();
 
   if (this.eventActions.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+    throw new Error('[' + event + '] is not a known event. Known events: ' + this.eventActions.toString());
   }
 
   return KuzzleEventEmitter.prototype.addListener.call(this, event, listener);
