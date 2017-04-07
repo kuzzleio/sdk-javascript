@@ -322,4 +322,17 @@ describe('Kuzzle connect', function () {
       });
     });
   });
+
+  describe('#disconnect', function () {
+    it('should clean up and invalidate the instance if called', function () {
+      var kuzzle = new Kuzzle('somewhere');
+
+      kuzzle.collections = { foo: {}, bar: {}, baz: {} };
+      kuzzle.disconnect();
+
+      should(kuzzle.network).be.null();
+      should(kuzzle.collections).be.empty();
+      should(function () { kuzzle.isValid(); }).throw(Error);
+    });
+  });
 });

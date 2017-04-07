@@ -2,7 +2,8 @@ var
   should = require('should'),
   sinon = require('sinon'),
   bluebird = require('bluebird'),
-  Kuzzle = require('../../src/Kuzzle');
+  Kuzzle = require('../../src/Kuzzle'),
+  Security = require('../../src/security/Security');
 
 describe('Kuzzle constructor', function () {
   var connectStub;
@@ -107,6 +108,11 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.replayInterval).be.exactly(10);
     should(kuzzle.reconnectionDelay).be.exactly(1000);
     should(kuzzle.sslConnection).be.false();
+  });
+
+  it('should have right internal properties', function () {
+    var kuzzle = new Kuzzle('somewhere');
+    should(kuzzle.security).be.an.instanceOf(Security);
   });
 
   it('should initialize correctly properties using the "options" argument', function () {

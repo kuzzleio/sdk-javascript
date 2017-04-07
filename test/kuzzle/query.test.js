@@ -111,6 +111,11 @@ describe('Query management', function () {
       emitRequestStub.reset();
     });
 
+    it('should throw an error if the kuzzle instance has been invalidated', function () {
+      kuzzle.state = 'disconnected';
+      should(function () { kuzzle.query(queryArgs, queryBody); }).throw(Error);
+    });
+
     it('should generate a valid request object', function () {
       kuzzle.query(queryArgs, queryBody);
       should(emitRequestStub).be.calledOnce();
