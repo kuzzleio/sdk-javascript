@@ -552,7 +552,7 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
     options = null;
   }
 
-  this.query({controller: 'index', action: 'create'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+  this.query({controller: 'index', action: 'create', index: index}, {}, options, typeof cb !== 'function' ? null : cb);
 
   return this;
 };
@@ -586,10 +586,10 @@ Kuzzle.prototype.logout = function (cb) {
  * Checks whether a given jwt token still represents a valid session in Kuzzle.
  *
  * @param  {string}   token     The jwt token to check
- * @param  {function} callback  The callback to be called when the response is
+ * @param  {function} cb  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
  */
-Kuzzle.prototype.checkToken = function (token, callback) {
+Kuzzle.prototype.checkToken = function (token, cb) {
   var
     request = {
       body: {
@@ -597,34 +597,26 @@ Kuzzle.prototype.checkToken = function (token, callback) {
       }
     };
 
-  this.callbackRequired('Kuzzle.checkToken', callback);
+  this.callbackRequired('Kuzzle.checkToken', cb);
 
-  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, function (err, response) {
-    if (err) {
-      return callback(err);
-    }
-
-    callback(null, response.result);
+  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, function (err, res) {
+    cb(err, err ? undefined : res.result);
   });
 };
 
 /**
  * Fetches the current user.
  *
- * @param  {function} callback  The callback to be called when the response is
+ * @param  {function} cb  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
  */
-Kuzzle.prototype.whoAmI = function (callback) {
+Kuzzle.prototype.whoAmI = function (cb) {
   var self = this;
 
-  self.callbackRequired('Kuzzle.whoAmI', callback);
+  self.callbackRequired('Kuzzle.whoAmI', cb);
 
-  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, response) {
-    if (err) {
-      return callback(err);
-    }
-
-    callback(null, new User(self.security, response.result._id, response.result._source));
+  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, res) {
+    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source));
   });
 };
 
@@ -645,11 +637,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
   self.callbackRequired('Kuzzle.getMyRights', cb);
 
   self.query({controller: 'auth', action:'getMyRights'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.hits);
+    cb(err, err ? undefined : res.result.hits);
   });
 };
 
@@ -880,11 +868,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query({controller:'server', action: 'getAllStats'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.hits);
+    cb(err, err ? undefined : res.result.hits);
   });
 };
 
@@ -985,7 +969,6 @@ Kuzzle.prototype.flushQueue = function () {
  */
 Kuzzle.prototype.listCollections = function () {
   var
-    collectionType = 'all',
     index,
     options,
     cb,
@@ -1016,26 +999,10 @@ Kuzzle.prototype.listCollections = function () {
 
   this.callbackRequired('Kuzzle.listCollections', cb);
 
-  if (options && options.type) {
-    collectionType = options.type;
-  }
-
-  query = {body: {type: collectionType}};
-
-  if (options && options.from) {
-    query.body.from = options.from;
-  }
-
-  if (options && options.size) {
-    query.body.size = options.size;
-  }
+  query = {type: options && options.type || 'all'};
 
   this.query({index: index, controller: 'collection', action: 'list'}, query, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.collections);
+    cb(err, err ? undefined : res.result.collections);
   });
 };
 
@@ -1090,11 +1057,7 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
   this.callbackRequired('Kuzzle.getServerInfo', cb);
 
   this.query({controller: 'server', action: 'info'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.serverInfo);
+    cb(err, err ? undefined : res.result.serverInfo);
   });
 };
 
@@ -1239,7 +1202,7 @@ Kuzzle.prototype.now = function (options, cb) {
   this.callbackRequired('Kuzzle.now', cb);
 
   this.query({controller: 'server', action: 'now'}, {}, options, function (err, res) {
-    cb(err, res && res.result.now);
+    cb(err, err ? undefined : res.result.now);
   });
 };
 
