@@ -1,3 +1,43 @@
+# [4.0.0](https://github.com/kuzzleio/sdk-javascript/releases/tag/4.0.0) (2017-04-10)
+
+[Full Changelog](https://github.com/kuzzleio/sdk-javascript/compare/4.0.0...4.0.0)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0-RC9.6 | 1.0.0-RC9 |
+
+#### Breaking changes
+
+- [ [#201](https://github.com/kuzzleio/sdk-javascript/pull/201) ] Rename metadata into volatile   ([AnthonySendra](https://github.com/AnthonySendra))
+
+#### Bug fixes
+
+- [ [#194](https://github.com/kuzzleio/sdk-javascript/pull/194) ] Stop calling onClientError when disconnect is called   ([jenow](https://github.com/jenow))
+- [ [#193](https://github.com/kuzzleio/sdk-javascript/pull/193) ] Wrap filter in query for deleteDocument   ([jenow](https://github.com/jenow))
+
+#### Enhancements
+
+- [ [#199](https://github.com/kuzzleio/sdk-javascript/pull/199) ] Add support for the new retryOnConflict option   ([scottinet](https://github.com/scottinet))
+- [ [#191](https://github.com/kuzzleio/sdk-javascript/pull/191) ] Standardize memory storage object   ([scottinet](https://github.com/scottinet))
+
+#### Exclude
+
+- [ [#196](https://github.com/kuzzleio/sdk-javascript/pull/196) ] Fix ms.hgetall return value interpretation   ([scottinet](https://github.com/scottinet))
+- [ [#198](https://github.com/kuzzleio/sdk-javascript/pull/198) ] Fix ms.zscore return value type   ([scottinet](https://github.com/scottinet))
+
+#### Others
+
+- [ [#195](https://github.com/kuzzleio/sdk-javascript/pull/195) ] Moved bufferutil and utf-8-validate to peerDependencies   ([jenow](https://github.com/jenow))
+- [ [#190](https://github.com/kuzzleio/sdk-javascript/pull/190) ] Align SearchResult and scroll with other SDKs   ([dbengsch](https://github.com/dbengsch))
+- [ [#182](https://github.com/kuzzleio/sdk-javascript/pull/182) ] Collection.createDocument: rename the updateIfExist option   ([scottinet](https://github.com/scottinet))
+- [ [#188](https://github.com/kuzzleio/sdk-javascript/pull/188) ] Make all options given to kuzzle constructor writable   ([benoitvidis](https://github.com/benoitvidis))
+- [ [#177](https://github.com/kuzzleio/sdk-javascript/pull/177) ] Remove previous and next cache in SearchResult   ([dbengsch](https://github.com/dbengsch))
+- [ [#177](https://github.com/kuzzleio/sdk-javascript/pull/177) ] Remove previous and next cache in SearchResult   ([dbengsch](https://github.com/dbengsch))
+- [ [#184](https://github.com/kuzzleio/sdk-javascript/pull/184) ] Browsers compatibility fix   ([scottinet](https://github.com/scottinet))
+---
+
 # 3.4.0
 
 Fill changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/3.4.0
