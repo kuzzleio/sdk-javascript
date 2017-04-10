@@ -166,15 +166,15 @@ describe('Query management', function () {
       should(function () { kuzzle.query(queryArgs, 'foobar'); }).throw(Error);
     });
 
-    it('should handle options metadata properly', function () {
+    it('should handle options volatile properly', function () {
       var
-        metadata = {
+        volatile = {
           foo: 'bar',
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}}, {metadata: metadata});
-      should(requestObject.metadata).match(metadata);
+      kuzzle.query(queryArgs, { body: { some: 'query'}}, {volatile: volatile});
+      should(requestObject.volatile).match(volatile);
     });
 
     it('should handle option refresh properly', function () {
@@ -207,16 +207,16 @@ describe('Query management', function () {
       should(emitted).be.false();
     });
 
-    it('should copy query local metadata over optional ones', function () {
+    it('should copy query local volatile over optional ones', function () {
       var
-        metadata = {
+        volatile = {
           foo: 'bar',
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}, metadata: {foo: 'foo'}}, {metadata: metadata});
-      should(requestObject.metadata.foo).be.exactly('foo');
-      should(requestObject.metadata.baz).match(metadata.baz);
+      kuzzle.query(queryArgs, { body: { some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
+      should(requestObject.volatile.foo).be.exactly('foo');
+      should(requestObject.volatile.baz).match(volatile.baz);
     });
 
     it('should not define optional members if none was provided', function () {

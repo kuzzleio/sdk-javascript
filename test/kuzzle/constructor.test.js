@@ -65,7 +65,7 @@ describe('Kuzzle constructor', function () {
       should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('queueTTL', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
-      should(kuzzle).have.propertyWithDescriptor('metadata', { enumerable: true, writable: true, configurable: false });
+      should(kuzzle).have.propertyWithDescriptor('volatile', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true, writable: true, configurable: false });
       should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
@@ -84,7 +84,7 @@ describe('Kuzzle constructor', function () {
       should(kuzzle.queueTTL).be.exactly(120000);
       should(kuzzle.queueMaxSize).be.exactly(500);
       should(kuzzle.headers).be.an.Object().and.be.empty();
-      should(kuzzle.metadata).be.an.Object().and.be.empty();
+      should(kuzzle.volatile).be.an.Object().and.be.empty();
       should(kuzzle.replayInterval).be.exactly(10);
       should(kuzzle.reconnectionDelay).be.exactly(1000);
       should(kuzzle.defaultIndex).be.undefined();
@@ -102,7 +102,7 @@ describe('Kuzzle constructor', function () {
           queueTTL: 123,
           queueMaxSize: 42,
           headers: {foo: 'bar'},
-          metadata: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
+          volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
           replayInterval: 99999,
           reconnectionDelay: 666,
           defaultIndex: 'foobar',
@@ -119,7 +119,7 @@ describe('Kuzzle constructor', function () {
       should(kuzzle.queueTTL).be.exactly(options.queueTTL);
       should(kuzzle.queueMaxSize).be.exactly(options.queueMaxSize);
       should(kuzzle.headers).be.an.Object().and.match(options.headers);
-      should(kuzzle.metadata).be.an.Object().and.match(options.metadata);
+      should(kuzzle.volatile).be.an.Object().and.match(options.volatile);
       should(kuzzle.replayInterval).be.exactly(options.replayInterval);
       should(kuzzle.reconnectionDelay).be.exactly(options.reconnectionDelay);
       should(kuzzle.port).be.exactly(options.port);
