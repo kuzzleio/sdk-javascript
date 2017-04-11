@@ -1,6 +1,4 @@
-'use strict';
-
-const
+var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
@@ -9,7 +7,7 @@ const
   Room = rewire('../../src/Room');
 
 describe('Room methods', function () {
-  let
+  var
     expectedQuery,
     error,
     result,
@@ -54,7 +52,7 @@ describe('Room methods', function () {
     },
     emitted,
     kuzzle,
-    dataCollection;
+    collection;
 
 
   describe('#count', function () {
@@ -64,7 +62,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {count: 42 }};
       error = null;
@@ -75,7 +73,7 @@ describe('Room methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new Room(dataCollection);
+      room = new Room(collection);
       room.roomId = 'foobar';
     });
 
@@ -136,7 +134,7 @@ describe('Room methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.state = 'connected';
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foobar', channel: 'barfoo' }};
       error = null;
@@ -147,7 +145,7 @@ describe('Room methods', function () {
         controller: 'realtime',
         body: {}
       };
-      room = new Room(dataCollection);
+      room = new Room(collection);
     });
 
     afterEach(function () {
@@ -198,7 +196,7 @@ describe('Room methods', function () {
     it('should start dequeuing if subscribed successfully', function (done) {
       room.renew({}, function () {});
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(dequeued).be.true();
         done();
       }, 10);
@@ -221,7 +219,7 @@ describe('Room methods', function () {
     it('should register itself to Kuzzle and skip subscription if not connected', function (done) {
       kuzzle.state = 'foo';
       room.renew({}, function () {});
-      setTimeout(() => {
+      setTimeout(function () {
         should(dequeued).be.false();
         should(emitted).be.false();
         should(room.lastRenewal).be.null();
@@ -242,7 +240,7 @@ describe('Room methods', function () {
       room.renew({}, function () {});
       room.renew({}, function () {});
 
-      setTimeout(() => {
+      setTimeout(function () {
         should(renewals).be.eql(1);
         should(room.lastRenewal).be.within(before, after);
         done();
@@ -255,8 +253,8 @@ describe('Room methods', function () {
 
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
     });
 
     it('should set headers properly', function () {
@@ -290,8 +288,8 @@ describe('Room methods', function () {
         body: {}
       };
 
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.roomId = 'foobar';
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar[room.id] = room;
@@ -321,7 +319,7 @@ describe('Room methods', function () {
       should(emitted).be.false();
       should(kuzzle.subscriptions.foobar).be.undefined();
       kuzzle.subscriptions.pending = {};
-      setTimeout(() => {
+      setTimeout(function () {
         should(emitted).be.true();
         done();
       }, 100);
@@ -336,7 +334,7 @@ describe('Room methods', function () {
       kuzzle.subscriptions.pending = {};
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar.foo = {};
-      setTimeout(() => {
+      setTimeout(function () {
         should(emitted).be.false();
         done();
       }, 100);
@@ -359,8 +357,8 @@ describe('Room methods', function () {
       var stub = function () { dequeued++; };
 
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.count = stub;
       room.renew = stub;
       room.unsubscribe = stub;
@@ -381,15 +379,15 @@ describe('Room methods', function () {
   });
 
   describe('#notificationCallback', function () {
-    let
+    var
       notifCB = Room.__get__('notificationCallback'),
       room;
 
     beforeEach(function () {
       error = result = undefined;
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
-      room = new Room(dataCollection);
+      collection = kuzzle.collection('foo');
+      room = new Room(collection);
       room.callback = sinon.spy();
     });
 
@@ -402,7 +400,7 @@ describe('Room methods', function () {
         .have.length(1);
     });
 
-    it('should handle document notifications', () => {
+    it('should handle document notifications', function () {
       notifCB.call(room, {
         controller: 'document',
         result: {
@@ -429,7 +427,7 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
-    it('should handle realtime publish notifications', () => {
+    it('should handle realtime publish notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
         action: 'publish',
@@ -457,7 +455,7 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
-    it('should handle user notifications', () => {
+    it('should handle user notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
         result: { count: 3 }
@@ -473,7 +471,7 @@ describe('Room methods', function () {
         });
     });
 
-    it('should delete the result from history if emitted by this instance', () => {
+    it('should delete the result from history if emitted by this instance', function () {
       room.subscribeToSelf = true;
       kuzzle.requestHistory.bar = {};
       notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
@@ -498,7 +496,7 @@ describe('Room methods', function () {
         eventEmitted = null,
         context = {
           kuzzle: {
-            emitEvent: event => {
+            emitEvent: function (event) {
               eventEmitted = event;
             }
           }

@@ -19,11 +19,11 @@ var
  * Once you have subscribed, if a pub/sub message is published matching your filters, or if a matching stored
  * document change (because it is created, updated or deleted), then you’ll receive a notification about it.
  *
- * @param {object} kuzzleDataCollection - an instantiated and valid kuzzle object
+ * @param {object} collection - an instantiated and valid kuzzle object
  * @param {object} [options] - subscription optional configuration
  * @constructor
  */
-function Room(kuzzleDataCollection, options) {
+function Room(collection, options) {
   // Define properties
   Object.defineProperties(this, {
     // private properties
@@ -73,11 +73,11 @@ function Room(kuzzleDataCollection, options) {
     },
     // read-only properties
     collection: {
-      value: kuzzleDataCollection,
+      value: collection,
       enumerable: true
     },
     kuzzle: {
-      value: kuzzleDataCollection.kuzzle,
+      value: collection.kuzzle,
       enumerable: true
     },
     // writable properties
@@ -87,12 +87,12 @@ function Room(kuzzleDataCollection, options) {
       writable: true
     },
     headers: {
-      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      value: JSON.parse(JSON.stringify(collection.headers)),
       enumerable: true,
       writable: true
     },
-    metadata: {
-      value: (options && options.metadata) ? options.metadata : {},
+    volatile: {
+      value: (options && options.volatile) ? options.volatile : {},
       enumerable: true,
       writable: true
     },
@@ -214,7 +214,7 @@ Room.prototype.renew = function (filters, notificationCB, cb) {
   subscribeQuery.body = self.filters;
   subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, this.headers);
 
-  self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {metadata: self.metadata}, function (error, response) {
+  self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {volatile: self.volatile}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];
     self.subscribing = false;
 

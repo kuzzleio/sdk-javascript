@@ -7,6 +7,10 @@
     "no-console": 0
   },
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 5
+  },
+  "env": {
+    "browser": true,
+    "mocha": true
   }
 }

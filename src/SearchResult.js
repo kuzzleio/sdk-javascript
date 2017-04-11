@@ -1,18 +1,26 @@
 /**
- *
- * @param {Collection} dataCollection
+ * @param {Collection} collection
  * @param {int} total
  * @param {Document[]} documents
- * @param {object} [aggregations]
- * @param {object} [searchArgs]
- * @param {KuzzleSearchResult} [previous]
+ * @param {object} aggregations
+ * @param {object} options
+ * @param {object} filters
+ * @param {SearchResult} previous
+ * @property {Collection} collection
+ * @property {number} total
+ * @property {Document[]} documents
+ * @property {object} aggregations
+ * @property {object} options
+ * @property {object} filters
+ * @property {number} fetchedDocument
  * @constructor
  */
-function KuzzleSearchResult (dataCollection, total, documents, aggregations, searchArgs, previous) {
+function SearchResult (collection, total, documents, aggregations, options, filters, previous) {
   Object.defineProperties(this, {
     // read-only properties
-    dataCollection: {
-      value: dataCollection,
+    collection: {
+      value: collection,
+      enumerable: true
     },
     total: {
       value: total,
@@ -26,37 +34,28 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
       value: aggregations || {},
       enumerable: true
     },
-    searchArgs: {
-      value: searchArgs || {},
+    options: {
+      value: options || {},
+      enumerable: true
+    },
+    filters: {
+      value: filters || {},
       enumerable: true
     },
     // writable properties
     fetchedDocument: {
-      value: documents.length,
+      value: previous instanceof SearchResult ? documents.length + previous.fetchedDocument : documents.length,
       enumerable: true,
-      writable: true
-    },
-    _previous: {
-      value: previous || null,
-      writable: true
-    },
-    _next: {
-      value: null,
       writable: true
     }
   });
 
-  if (this._previous instanceof KuzzleSearchResult) {
-    this._previous._next = this;
-    this.fetchedDocument += this._previous.fetchedDocument;
-  }
-
   // promisifying
-  if (this.dataCollection.kuzzle.bluebird) {
-    return this.dataCollection.kuzzle.bluebird.promisifyAll(this, {
+  if (this.collection.kuzzle.bluebird) {
+    return this.collection.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['previous', 'next'];
+        var whitelist = ['fetchNext'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -66,81 +65,51 @@ function KuzzleSearchResult (dataCollection, total, documents, aggregations, sea
   return this;
 }
 
-
-/**
- * @param cb
- * @returns {*}
- */
-KuzzleSearchResult.prototype.previous = function (cb) {
-  cb(null, this._previous);
-
-  return this;
-};
-
 /**
  * @param {function} cb
  */
-KuzzleSearchResult.prototype.next = function (cb) {
+SearchResult.prototype.fetchNext = function (cb) {
   var
     filters,
-    options = Object.assign({}, this.searchArgs.options),
-    self = this;
+    options = Object.assign({}, this.options);
+  
+  options.previous = this;
 
-  if (!this._next) {
-    // retrieve next results with scroll if original search use it
-    if (options.scrollId) {
-      if (this.fetchedDocument >= this.total) {
-        cb(null, null);
-        return;
-      }
-
-      // from and size parameters are not valid for a scroll action
-      if (typeof options.from !== 'undefined') {
-        delete options.from;
-      }
-
-      if (options.size) {
-        delete options.size;
-      }
-
-      this.dataCollection.scroll(
-        options.scrollId,
-        options,
-        this.searchArgs.filters || {},
-        function(error, newSearchResults) {
-          handleNextSearchResults(error, self, newSearchResults, cb);
-        }
-      );
-
+  // retrieve next results with scroll if original search use it
+  if (options.scrollId) {
+    if (this.fetchedDocument >= this.getTotal()) {
+      cb(null, null);
       return;
     }
-    // retrieve next results with from/size if original search use it
-    else if (options.from !== undefined && options.size !== undefined) {
-      filters = Object.assign({}, this.searchArgs.filters);
 
-      // check if we need to do next request to fetch all matching documents
-      options.from += options.size;
-
-      if (options.from >= this.total) {
-        cb(null, null);
-
-        return;
-      }
-
-      this.dataCollection.search(
-        filters,
-        options,
-        function(error, newSearchResults) {
-          handleNextSearchResults(error, self, newSearchResults, cb);
-        }
-      );
-
-      return;
+    // from and size parameters are not valid for a scroll action
+    if (typeof options.from !== 'undefined') {
+      delete options.from;
     }
+
+    if (options.size) {
+      delete options.size;
+    }
+
+    this.collection.scroll(options.scrollId, options, this.filters || {}, cb);
+
+    return;
   }
 
-  if (this._next instanceof KuzzleSearchResult) {
-    cb(null, this._next);
+  // retrieve next results with from/size if original search use it
+  if (options.from !== undefined && options.size !== undefined) {
+    filters = Object.assign({}, this.filters);
+
+    // check if we need to do next request to fetch all matching documents
+    options.from += options.size;
+
+    if (options.from >= this.getTotal()) {
+      cb(null, null);
+
+      return;
+    }
+
+    this.collection.search(filters, options, cb);
 
     return;
   }
@@ -149,24 +118,52 @@ KuzzleSearchResult.prototype.next = function (cb) {
 };
 
 /**
- * @param {Error} error
- * @param {KuzzleSearchResult} currentSearchResults
- * @param {KuzzleSearchResult} newSearchResults
- * @param {Function} cb
+ * @returns {Document[]}
  */
-function handleNextSearchResults (error, currentSearchResults, newSearchResults, cb) {
-  if (error) {
-    cb(error);
-    return;
-  }
+SearchResult.prototype.getDocuments = function () {
+  return this.documents;
+};
 
-  newSearchResults.fetchedDocument += currentSearchResults.fetchedDocument;
+/**
+ * @returns {number}
+ */
+SearchResult.prototype.getTotal = function () {
+  return this.total;
+};
 
-  newSearchResults._previous = currentSearchResults;
-  currentSearchResults._next = newSearchResults;
+/**
+ * @returns {object}
+ */
+SearchResult.prototype.getAggregations = function () {
+  return this.aggregations;
+};
 
+/**
+ * @returns {Object}
+ */
+SearchResult.prototype.getOptions = function() {
+  return this.options;
+};
 
-  cb(null, newSearchResults);
-}
+/**
+ * @returns {object}
+ */
+SearchResult.prototype.getFilters = function() {
+  return this.filters;
+};
 
-module.exports = KuzzleSearchResult;
+/**
+ * @returns {object}
+ */
+SearchResult.prototype.getCollection = function () {
+  return this.collection;
+};
+
+/**
+ * @returns {number}
+ */
+SearchResult.prototype.getFetchedDocument = function () {
+  return this.fetchedDocument;
+};
+
+module.exports = SearchResult;

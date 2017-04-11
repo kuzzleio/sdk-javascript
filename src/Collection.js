@@ -3,7 +3,7 @@ var
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
   Room = require('./Room'),
-  KuzzleSubscribeResult = require('./SubscribeResult');
+  SubscribeResult = require('./SubscribeResult');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -134,11 +134,12 @@ Collection.prototype.create = function (options, cb) {
  * Create a new document in Kuzzle.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
- *    - updateIfExist (boolean, default: false):
- *        If the same document already exists: throw an error if sets to false.
- *        Update the existing document otherwise
+ *    - ifExist (string, allowed values: "error" (default), "replace"):
+ *        If the same document already exists:
+ *          - resolves with an error if set to "error".
+ *          - replaces the existing document if set to "replace"
  *
  * @param {string} [id] - (optional) document identifier
  * @param {object} document - either an instance of a Document object, or a document
@@ -170,8 +171,13 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
     data.body = document;
   }
 
-  if (options) {
-    action = options.updateIfExist ? 'createOrReplace' : 'create';
+  if (options && options.ifExist) {
+    if (options.ifExist === 'replace') {
+      action = 'createOrReplace';
+    }
+    else if (options.ifExist !== 'error') {
+      throw new Error('Invalid value for the "ifExist" option: ' + options.ifExist);
+    }
   }
 
   if (id) {
@@ -203,7 +209,7 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
  * That means that a document that was just been created won’t be returned by this function
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
@@ -220,7 +226,7 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
     data._id = arg;
     action = 'delete';
   } else {
-    data.body = arg;
+    data.body = {query: arg};
     action = 'deleteByQuery';
   }
 
@@ -308,7 +314,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
 
   this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
 
-  this.search(filters, options, function getNextDocuments (error, searchResult) {
+  this.search(filters, options, function fetchNextDocuments (error, searchResult) {
     if (error) {
       return cb(error);
     }
@@ -322,7 +328,7 @@ Collection.prototype.fetchAllDocuments = function (options, cb) {
       searchResult.documents.forEach(function(document) {
         documents.push(document);
       });
-      searchResult.next(getNextDocuments);
+      searchResult.fetchNext(fetchNextDocuments);
     }
     else {
       cb(null, documents);
@@ -355,7 +361,7 @@ Collection.prototype.getMapping = function (options, cb) {
  * Publish a realtime message
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} document - either a Document instance or a JSON object
@@ -382,7 +388,7 @@ Collection.prototype.publishMessage = function (document, options, cb) {
  * Replace an existing document with a new one.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string} documentId - Unique document identifier of the document to replace
@@ -471,8 +477,10 @@ Collection.prototype.search = function (filters, options, cb) {
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters}
+      result.result.aggregations ? result.result.aggregations : {},
+      options,
+      filters,
+      options.previous || null
     ));
   });
 };
@@ -538,8 +546,10 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
       self,
       result.result.total,
       documents,
-      result.result.aggregations ? result.result.aggregations : [],
-      {options: options, filters: filters}
+      {},
+      options,
+      filters,
+      options.previous || null
     ));
   });
 
@@ -567,7 +577,7 @@ Collection.prototype.subscribe = function (filters, options, cb) {
 
   this.kuzzle.callbackRequired('Collection.subscribe', cb);
 
-  subscribeResult = new KuzzleSubscribeResult();
+  subscribeResult = new SubscribeResult();
   room = new Room(this, options);
 
   room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
@@ -602,7 +612,7 @@ Collection.prototype.truncate = function (options, cb) {
  * Update parts of a document
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string} documentId - Unique document identifier of the document to update
@@ -622,6 +632,10 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (options && options.retryOnConflict) {
+    data.retryOnConflict = options.retryOnConflict;
   }
 
   data = self.kuzzle.addHeaders(data, this.headers);

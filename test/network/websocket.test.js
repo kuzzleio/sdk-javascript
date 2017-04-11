@@ -3,20 +3,20 @@ var
   sinon = require('sinon'),
   WS = require('../../src/networkWrapper/wrappers/websocket');
 
-describe('WebSocket networking module', () => {
+describe('WebSocket networking module', function () {
   var
     websocket,
     wsargs,
     clientStub;
 
-  beforeEach(() => {
+  beforeEach(function () {
     clientStub = {
       send: sinon.stub(),
       close: sinon.stub()
     };
 
-    window = 'foobar';
-    WebSocket = function () {
+    window = 'foobar'; // eslint-disable-line
+    WebSocket = function () { // eslint-disable-line
       wsargs = Array.prototype.slice.call(arguments);
       return clientStub;
     };
@@ -24,12 +24,12 @@ describe('WebSocket networking module', () => {
     websocket = new WS('address', 'port', false);
   });
 
-  afterEach(() => {
-    WebSocket = undefined;
-    window = undefined;
+  afterEach(function () {
+    WebSocket = undefined; // eslint-disable-line
+    window = undefined; // eslint-disable-line
   });
 
-  it('should initialize a WS connection properly', () => {
+  it('should initialize a WS connection properly', function () {
     clientStub.on = sinon.stub();
     websocket.connect('autoReconnect', 'reconnectionDelay');
     should(wsargs).match(['ws://address:port']);
@@ -39,19 +39,19 @@ describe('WebSocket networking module', () => {
     should(clientStub.onmessage).not.be.undefined();
   });
 
-  it('should initialize a WS secure connection', () => {
+  it('should initialize a WS secure connection', function () {
     clientStub.on = sinon.stub();
     websocket.ssl = true;
     websocket.connect('autoReconnect', 'reconnectionDelay');
     should(wsargs).match(['wss://address:port']);
   });
 
-  it('should call listeners on a "open" event', () => {
+  it('should call listeners on a "open" event', function () {
     var cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.onConnect(cb);
-    websocket.listeners.reconnect.push(() => {throw (new Error('wrong event called'));});
+    websocket.listeners.reconnect.push(function () {throw (new Error('wrong event called'));});
     should(websocket.listeners.connect.length).be.eql(1);
 
     websocket.connect();
@@ -61,13 +61,13 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.connect.length).be.eql(1);
   });
 
-  it('should call listeners on a "reconnect" event', () => {
+  it('should call listeners on a "reconnect" event', function () {
     var cb = sinon.stub();
 
     websocket.wasConnected = true;
     websocket.lasturl = 'ws://address:port';
     websocket.onReconnect(cb);
-    websocket.listeners.connect.push({fn: () => {throw (new Error('wrong event called'));}});
+    websocket.listeners.connect.push({fn: function () {throw (new Error('wrong event called'));}});
     should(websocket.listeners.reconnect.length).be.eql(1);
 
     websocket.connect();
@@ -77,7 +77,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.reconnect.length).be.eql(1);
   });
 
-  it('should try to reconnect on a connection error with autoReconnect = true', () => {
+  it('should try to reconnect on a connection error with autoReconnect = true', function () {
     var
       cb = sinon.stub(),
       clock = sinon.useFakeTimers();
@@ -99,7 +99,7 @@ describe('WebSocket networking module', () => {
     clock.restore();
   });
 
-  it('should not try to reconnect on a connection error with autoReconnect = false', () => {
+  it('should not try to reconnect on a connection error with autoReconnect = false', function () {
     var
       cb = sinon.stub(),
       clock = sinon.useFakeTimers();
@@ -120,7 +120,7 @@ describe('WebSocket networking module', () => {
     clock.restore();
   });
 
-  it('should call listeners on a "disconnect" event', () => {
+  it('should call listeners on a "disconnect" event', function () {
     var cb = sinon.stub();
 
     websocket.retrying = false;
@@ -134,7 +134,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.disconnect.length).be.eql(1);
   });
 
-  it('should call error listeners on a disconnect event with an abnormal websocket code', () => {
+  it('should call error listeners on a disconnect event with an abnormal websocket code', function () {
     var cb = sinon.stub();
 
     websocket.retrying = false;
@@ -149,7 +149,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.error.length).be.eql(1);
   });
 
-  it('should be able to register ephemeral callbacks on an event', () => {
+  it('should be able to register ephemeral callbacks on an event', function () {
     var
       cb = sinon.stub(),
       payload = {room: 'foobar'};
@@ -170,7 +170,7 @@ describe('WebSocket networking module', () => {
     should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
-  it('should be able to register persistent callbacks on an event', () => {
+  it('should be able to register persistent callbacks on an event', function () {
     var
       cb = sinon.stub(),
       payload = {room: 'foobar'};
@@ -188,7 +188,7 @@ describe('WebSocket networking module', () => {
     should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
-  it('should send the message on room "discarded" if no room specified', () => {
+  it('should send the message on room "discarded" if no room specified', function () {
     var
       cb = sinon.stub(),
       payload = {};
@@ -202,7 +202,7 @@ describe('WebSocket networking module', () => {
     should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
-  it('should be able to unregister a callback on an event', () => {
+  it('should be able to unregister a callback on an event', function () {
     var
       cb = sinon.stub();
 
@@ -219,7 +219,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.foobar).be.undefined();
   });
 
-  it('should do nothing if trying to unregister an non-existent event/callback', () => {
+  it('should do nothing if trying to unregister an non-existent event/callback', function () {
     var
       cb = sinon.stub();
 
@@ -236,7 +236,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
   });
 
-  it('should send data payload through websocket', () => {
+  it('should send data payload through websocket', function () {
     var data = {foo: 'bar'};
 
     clientStub.readyState = clientStub.OPEN = true;
@@ -247,7 +247,7 @@ describe('WebSocket networking module', () => {
     should(clientStub.send.calledWith(JSON.stringify(data))).be.true();
   });
 
-  it('should discard messages if the socket is not ready', () => {
+  it('should discard messages if the socket is not ready', function () {
     var data = {foo: 'bar'};
 
     clientStub.readyState = 'foo';
@@ -258,7 +258,7 @@ describe('WebSocket networking module', () => {
     should(clientStub.send.called).be.false();
   });
 
-  it('should properly close a connection when asked', () => {
+  it('should properly close a connection when asked', function () {
     var
       cb = sinon.stub();
 

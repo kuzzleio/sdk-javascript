@@ -146,7 +146,7 @@ function Kuzzle (host, options, cb) {
       enumerable: true,
       writable: true
     },
-    metadata: {
+    volatile: {
       value: {},
       enumerable: true,
       writable: true
@@ -268,9 +268,9 @@ function Kuzzle (host, options, cb) {
       }
 
       eventProperties.listeners.forEach(function (listener) {
-        process.nextTick(function () {
+        setTimeout(function () {
           listener.fn.apply(undefined, args);
-        });
+        }, 0);
       });
 
       // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
@@ -1252,7 +1252,7 @@ Kuzzle.prototype.now = function (options, cb) {
  * Base method used to send read queries to Kuzzle
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} queryArgs - Query configuration
@@ -1266,7 +1266,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     object = {
       action: queryArgs.action,
       controller: queryArgs.controller,
-      metadata: this.metadata
+      volatile: this.volatile
     },
     self = this;
 
@@ -1302,9 +1302,9 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       object.scrollId = options.scrollId;
     }
 
-    if (options.metadata) {
-      Object.keys(options.metadata).forEach(function (meta) {
-        object.metadata[meta] = options.metadata[meta];
+    if (options.volatile) {
+      Object.keys(options.volatile).forEach(function (meta) {
+        object.volatile[meta] = options.volatile[meta];
       });
     }
   }
@@ -1313,14 +1313,14 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     throw new Error('Invalid query parameter: ' + query);
   }
 
-  if (query.metadata) {
-    Object.keys(query.metadata).forEach(function (meta) {
-      object.metadata[meta] = query.metadata[meta];
+  if (query.volatile) {
+    Object.keys(query.volatile).forEach(function (meta) {
+      object.volatile[meta] = query.volatile[meta];
     });
   }
 
   for (attr in query) {
-    if (attr !== 'metadata' && query.hasOwnProperty(attr)) {
+    if (attr !== 'volatile' && query.hasOwnProperty(attr)) {
       object[attr] = query[attr];
     }
   }

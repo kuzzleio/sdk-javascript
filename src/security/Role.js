@@ -1,8 +1,8 @@
-var KuzzleSecurityDocument = require('./SecurityDocument');
+var SecurityDocument = require('./SecurityDocument');
 
 function Role(Security, id, content) {
 
-  KuzzleSecurityDocument.call(this, Security, id, content);
+  SecurityDocument.call(this, Security, id, content);
 
   // Define properties
   Object.defineProperties(this, {
@@ -29,7 +29,7 @@ function Role(Security, id, content) {
 
 }
 
-Role.prototype = Object.create(KuzzleSecurityDocument.prototype, {
+Role.prototype = Object.create(SecurityDocument.prototype, {
   constructor: {
     value: Role
   }

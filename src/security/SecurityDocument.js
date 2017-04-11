@@ -1,4 +1,4 @@
-function KuzzleSecurityDocument(Security, id, content) {
+function SecurityDocument(Security, id, content) {
 
   if (!id) {
     throw new Error('A security document must have an id');
@@ -48,9 +48,9 @@ function KuzzleSecurityDocument(Security, id, content) {
  * Changes made by this function won’t be applied until the save method is called.
  *
  * @param {Object} data - New securityDocument content
- * @return {KuzzleSecurityDocument} this
+ * @return {SecurityDocument} this
  */
-KuzzleSecurityDocument.prototype.setContent = function (data) {
+SecurityDocument.prototype.setContent = function (data) {
   this.content = data;
   return this;
 };
@@ -60,7 +60,7 @@ KuzzleSecurityDocument.prototype.setContent = function (data) {
  *
  * @return {object} pojo representing this securityDocument
  */
-KuzzleSecurityDocument.prototype.serialize = function () {
+SecurityDocument.prototype.serialize = function () {
   var
     data = {};
 
@@ -79,7 +79,7 @@ KuzzleSecurityDocument.prototype.serialize = function () {
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  */
-KuzzleSecurityDocument.prototype.delete = function (options, cb) {
+SecurityDocument.prototype.delete = function (options, cb) {
   var
     self = this;
 
@@ -105,9 +105,9 @@ KuzzleSecurityDocument.prototype.delete = function (options, cb) {
  * @param {object} content - Content to add to KuzzleSecurityDocument
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {KuzzleSecurityDocument} this
+ * @returns {SecurityDocument} this
  */
-KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
+SecurityDocument.prototype.update = function (content, options, cb) {
   var
     data = {},
     self = this;
@@ -139,4 +139,4 @@ KuzzleSecurityDocument.prototype.update = function (content, options, cb) {
   return this;
 };
 
-module.exports = KuzzleSecurityDocument;
+module.exports = SecurityDocument;

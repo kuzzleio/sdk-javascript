@@ -3,12 +3,12 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   Kuzzle = rewire('../../src/Kuzzle'),
-  KuzzleSearchResult = require('../../src/SearchResult'),
+  SearchResult = require('../../src/SearchResult'),
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  KuzzleSubscribeResult = require('../../src/SubscribeResult');
+  SubscribeResult = require('../../src/SubscribeResult');
 
 describe('Collection methods', function () {
   var
@@ -79,11 +79,11 @@ describe('Collection methods', function () {
 
       collection.search(filters, options, function (err, res) {
         should(err).be.null();
-        should(res).be.an.instanceOf(KuzzleSearchResult);
+        should(res).be.an.instanceOf(SearchResult);
         should(res.total).be.a.Number().and.be.exactly(result.result.total);
         should(res.documents).be.an.Array();
         should(res.documents.length).be.exactly(result.result.hits.length);
-        should(res.searchArgs.options.scrollId).be.exactly('banana');
+        should(res.options.scrollId).be.exactly('banana');
         should(res.aggregations).be.deepEqual(result.result.aggregations);
 
         res.documents.forEach(function (item) {
@@ -129,7 +129,7 @@ describe('Collection methods', function () {
   });
 
   describe('#scroll', function () {
-    beforeEach(() => {
+    beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       emitted = false;
@@ -144,24 +144,24 @@ describe('Collection methods', function () {
       };
     });
 
-    it('should throw an error if no scrollId is set', () => {
+    it('should throw an error if no scrollId is set', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
+      should(function () { collection.scroll(); }).throw('Collection.scroll: scrollId is required');
     });
 
-    it('should throw an error if no callback is given', () => {
+    it('should throw an error if no callback is given', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
-      should(() => { collection.scroll('scrollId', {scroll: '1m'}); }).throw('Collection.scroll: a callback argument is required for read queries');
+      should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
-    it('should parse the given parameters', done => {
+    it('should parse the given parameters', function (done) {
       var
         queryScrollStub,
         collection = kuzzle.collection(expectedQuery.collection),
         scrollId = 'scrollId',
         filters = {},
-        options = {scroll: '30s'},
-        cb = () => {
+        options = {},
+        cb = function () {
           done();
         };
 
@@ -419,12 +419,28 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should be able to handle the updateIfExist option', function () {
+    it('should be able to handle the ifExist=replace option', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
       expectedQuery.action = 'createOrReplace';
 
-      collection.createDocument(result.result._source, {updateIfExist: true});
+      collection.createDocument(result.result._source, {ifExist: 'replace'});
       should(emitted).be.true();
+    });
+
+    it('should be able to handle the ifExist=error option', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+      expectedQuery.action = 'create';
+
+      collection.createDocument(result.result._source, {ifExist: 'error'});
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if the ifExist option is invalid', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+
+      should(function () {
+        collection.createDocument(result.result._source, {ifExist: 'foobar'});
+      }).throw();
     });
   });
 
@@ -490,7 +506,7 @@ describe('Collection methods', function () {
         filters = { and: [ {term: {foo: 'bar'}}, { ids: ['baz', 'qux'] } ] };
 
       this.timeout(50);
-      expectedQuery.body = filters;
+      expectedQuery.body = {query: filters};
       expectedQuery.action = 'deleteByQuery';
       result = { result: {ids: ['foo', 'bar'] }};
 
@@ -603,7 +619,7 @@ describe('Collection methods', function () {
     it('should handle the callback argument correctly', function () {
       var
         collection = kuzzle.collection('collection'),
-        mockSearchResult = new KuzzleSearchResult(
+        mockSearchResult = new SearchResult(
           collection,
           1,
           [new Document(collection, 'banana', {answer: 42})],
@@ -623,7 +639,7 @@ describe('Collection methods', function () {
       should(emitted).be.true();
     });
 
-    it('should handle the from and size options', () => {
+    it('should handle the from and size options', function () {
       var
         collection = kuzzle.collection('collection'),
         stub = sinon.stub(collection, 'search');
@@ -634,7 +650,7 @@ describe('Collection methods', function () {
       stub.restore();
     });
 
-    it('should handle the scroll options', () => {
+    it('should handle the scroll options', function () {
       var
         collection = kuzzle.collection('collection'),
         stub = sinon.stub(collection, 'search');
@@ -645,7 +661,7 @@ describe('Collection methods', function () {
       stub.restore();
     });
 
-    it('should transfer error if any', done => {
+    it('should transfer error if any', function (done) {
       var
         collection = kuzzle.collection('collection');
 
@@ -845,14 +861,14 @@ describe('Collection methods', function () {
     it('should instantiate a new Room object', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(KuzzleSubscribeResult);
+      should(collection.subscribe(expectedQuery.body, {}, function () {})).be.instanceof(SubscribeResult);
       should(emitted).be.true();
     });
 
     it('should handle arguments correctly', function () {
       var collection = kuzzle.collection(expectedQuery.collection);
 
-      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(KuzzleSubscribeResult);
+      should(collection.subscribe(expectedQuery.body, function () {})).be.instanceof(SubscribeResult);
       should(emitted).be.true();
     });
 
@@ -949,8 +965,9 @@ describe('Collection methods', function () {
     it('should send the right updateDocument query to Kuzzle', function (done) {
       var
         collection = new Collection(kuzzle, expectedQuery.collection, expectedQuery.index),
-        options = { queuable: false };
+        options = { queuable: false, retryOnConflict: 42 };
       expectedQuery.options = options;
+      expectedQuery.retryOnConflict = 42;
 
       should(collection.updateDocument(result.result._id, result.result._source, options, function (err, res) {
         should(err).be.null();

@@ -8,38 +8,38 @@ var
 describe('Room constructor', function () {
   var
     kuzzle,
-    dataCollection;
+    collection;
 
   before(function () {
     Kuzzle.prototype.bluebird = bluebird;
     kuzzle = new Kuzzle('nowhere', {defaultIndex: 'bar'});
 
     kuzzle.headers = {foo: 'bar'};
-    dataCollection = kuzzle.collection('foo');
+    collection = kuzzle.collection('foo');
   });
 
   it('should handle provided arguments correctly', function () {
-    var room = new Room(dataCollection);
+    var room = new Room(collection);
 
-    should(room.metadata).be.an.Object().and.be.empty();
+    should(room.volatile).be.an.Object().and.be.empty();
     should(room.subscribeToSelf).be.true();
     should(room.scope).be.exactly('all');
     should(room.state).be.exactly('done');
     should(room.users).be.exactly('none');
-    should(room.collection).be.exactly(dataCollection);
+    should(room.collection).be.exactly(collection);
     should(room.filters).be.null();
     should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();
 
-    room = new Room(dataCollection, {
+    room = new Room(collection, {
       scope: 'in',
       state: 'pending',
       users: 'all',
-      metadata: {some: 'metadata'},
+      volatile: {some: 'metadata'},
       subscribeToSelf: false
     });
 
-    should(room.metadata).match({some: 'metadata'});
+    should(room.volatile).match({some: 'metadata'});
     should(room.subscribeToSelf).be.false();
     should(room.scope).be.exactly('in');
     should(room.state).be.exactly('pending');
@@ -47,7 +47,7 @@ describe('Room constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var room = new Room(dataCollection);
+    var room = new Room(collection);
 
     should(room).have.propertyWithDescriptor('collection', {enumerable: true, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: true, configurable: false});
@@ -55,7 +55,7 @@ describe('Room constructor', function () {
     should(room).have.propertyWithDescriptor('scope', {enumerable: false, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('state', {enumerable: false, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('users', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('metadata', {enumerable: true, writable: true, configurable: false});
+    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true, configurable: false});
     should(room).have.propertyWithDescriptor('subscribeToSelf', {
       enumerable: true,
       writable: true,
@@ -65,7 +65,7 @@ describe('Room constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var room = new Room(dataCollection);
+    var room = new Room(collection);
 
     should.exist(room.countPromise);
     should.not.exist(room.renewPromise);

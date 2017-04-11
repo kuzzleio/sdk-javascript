@@ -3,7 +3,7 @@ var
   rewire = require('rewire'),
   Kuzzle = rewire('../../src/Kuzzle'),
   Document = rewire('../../src/Document'),
-  KuzzleSubscribeResult = require('../../src/SubscribeResult');
+  SubscribeResult = require('../../src/SubscribeResult');
 
 describe('Document methods', function () {
   var
@@ -45,17 +45,17 @@ describe('Document methods', function () {
     },
     emitted,
     kuzzle,
-    dataCollection;
+    collection;
 
   describe('#toJSON', function () {
     before(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should serialize itself properly', function () {
       var
-        document = new Document(dataCollection, {some: 'content'}),
+        document = new Document(collection, {some: 'content'}),
         serialized = document.serialize();
 
       should(serialized._id).be.undefined();
@@ -79,12 +79,12 @@ describe('Document methods', function () {
   describe('#toString', function () {
     before(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should stringify itself properly', function () {
       var
-        document = new Document(dataCollection, 'id', {some: 'content', _version: 42}),
+        document = new Document(collection, 'id', {some: 'content', _version: 42}),
         serialized = document.serialize(),
         stringified = document.toString();
 
@@ -97,7 +97,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = {};
       error = null;
@@ -114,7 +114,7 @@ describe('Document methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         options = { queuable: false },
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       expectedQuery.options = options;
       document.id = 'foo';
@@ -123,7 +123,7 @@ describe('Document methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.id = 'foo';
       document.delete(function () {});
@@ -143,14 +143,14 @@ describe('Document methods', function () {
     });
 
     it('should throw an error if no ID has been set', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       should(function () { document.delete(); }).throw(Error);
       should(emitted).be.false();
     });
 
     it('should resolve the callback with its own id as a result', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
       document.id = 'foo';
@@ -164,7 +164,7 @@ describe('Document methods', function () {
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
       document.id = 'foo';
@@ -183,7 +183,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {_id: 'foo', _version: 42, _source: {some: 'content'}}};
       error = null;
@@ -200,7 +200,7 @@ describe('Document methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         options = { queuable: false },
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       expectedQuery.options = options;
       document.id = 'foo';
@@ -210,14 +210,14 @@ describe('Document methods', function () {
 
     it('should throw an error if no callback is provided', function () {
       var
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       document.id = 'foo';
       should(function () { document.refresh(); }).throw();
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.id = 'foo';
       document.refresh(function () {});
@@ -229,14 +229,14 @@ describe('Document methods', function () {
     });
 
     it('should throw an error if no ID has been set', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       should(function () { document.refresh(); }).throw(Error);
       should(emitted).be.false();
     });
 
     it('should resolve the callback with itself as a result', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
       document.id = 'foo';
@@ -253,7 +253,7 @@ describe('Document methods', function () {
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
       document.id = 'foo';
@@ -272,7 +272,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = {result: { _id: 'foo', _version: 42}};
       error = null;
@@ -288,7 +288,7 @@ describe('Document methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         options = { queuable: false },
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       expectedQuery.options = options;
       document.id = 'foo';
@@ -297,7 +297,7 @@ describe('Document methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.save(function () {});
       should(emitted).be.true();
@@ -316,7 +316,7 @@ describe('Document methods', function () {
     });
 
     it('should resolve the callback with itself as a result', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
 
@@ -331,7 +331,7 @@ describe('Document methods', function () {
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       this.timeout(50);
       error = 'foobar';
@@ -349,7 +349,7 @@ describe('Document methods', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = {};
       error = null;
@@ -365,7 +365,7 @@ describe('Document methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         options = { queuable: false },
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       expectedQuery.options = options;
       should(document.publish(options)).be.exactly(document);
@@ -373,7 +373,7 @@ describe('Document methods', function () {
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.publish();
       should(emitted).be.true();
@@ -387,11 +387,11 @@ describe('Document methods', function () {
   describe('#setContent', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should update the content if "replace" is falsey', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.content = { foo: 'foo', bar: 'bar' };
       should(document.setContent({foo: 'foobar'})).be.exactly(document);
@@ -400,7 +400,7 @@ describe('Document methods', function () {
     });
 
     it('should replace the current content if "replace" is true', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.content = { foo: 'foo', bar: 'bar' };
       should(document.setContent({foo: 'foobar'}, true)).be.exactly(document);
@@ -413,7 +413,7 @@ describe('Document methods', function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       kuzzle.query = queryStub;
       kuzzle.state = 'connected';
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
       emitted = false;
       result = { result: {roomId: 'foo', channel: 'bar'}};
       error = null;
@@ -428,15 +428,15 @@ describe('Document methods', function () {
 
     it('should return a new Room object', function () {
       var
-        document = new Document(dataCollection);
+        document = new Document(collection);
 
       document.id = 'foo';
-      should(document.subscribe({}, function () {})).be.instanceof(KuzzleSubscribeResult);
+      should(document.subscribe({}, function () {})).be.instanceof(SubscribeResult);
       should(emitted).be.true();
     });
 
     it('should handle arguments properly', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       document.id = 'foo';
       document.subscribe(function () {});
@@ -444,7 +444,7 @@ describe('Document methods', function () {
     });
 
     it('should throw an error if no ID is provided', function () {
-      var document = new Document(dataCollection);
+      var document = new Document(collection);
 
       should(function () { document.subscribe(function () {}); }).throw(Error);
       should(emitted).be.false();
@@ -454,12 +454,12 @@ describe('Document methods', function () {
   describe('#setHeaders', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      dataCollection = kuzzle.collection('foo');
+      collection = kuzzle.collection('foo');
     });
 
     it('should properly set headers', function () {
       var
-        document = new Document(dataCollection),
+        document = new Document(collection),
         header = {_id: 'foobar'};
 
       should(document.setHeaders(header)).be.exactly(document);

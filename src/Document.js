@@ -15,24 +15,24 @@
  *   - providing a documentID to the constructor will automatically call refresh, unless a content is also provided
  *
  *
- * @param {object} kuzzleDataCollection - an instanciated Collection object
+ * @param {Collection} collection - an instanciated Collection object
  * @param {string} [documentId] - ID of an existing document
  * @param {object} [content] - Initializes this document with the provided content
  * @constructor
  */
-function Document(kuzzleDataCollection, documentId, content) {
+function Document(collection, documentId, content) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
-      value: kuzzleDataCollection.collection,
+      value: collection.collection,
       enumerable: true
     },
     dataCollection: {
-      value: kuzzleDataCollection,
+      value: collection,
       enumerable: false
     },
     kuzzle: {
-      value: kuzzleDataCollection.kuzzle,
+      value: collection.kuzzle,
       enumerable: false
     },
     // writable properties
@@ -47,7 +47,7 @@ function Document(kuzzleDataCollection, documentId, content) {
       enumerable: true
     },
     headers: {
-      value: JSON.parse(JSON.stringify(kuzzleDataCollection.headers)),
+      value: JSON.parse(JSON.stringify(collection.headers)),
       enumerable: true,
       writable: true
     },
@@ -127,7 +127,7 @@ Document.prototype.toString = function () {
  * Deletes this document in Kuzzle.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters
@@ -194,7 +194,7 @@ Document.prototype.refresh = function (options, cb) {
  * of this object.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters
@@ -231,7 +231,7 @@ Document.prototype.save = function (options, cb) {
  * Sends the content of this document as a realtime message.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters

@@ -1,5 +1,4 @@
-var
-  SecurityDocument = require('./SecurityDocument');
+var SecurityDocument = require('./SecurityDocument');
 
 function Profile(Security, id, content) {
 
