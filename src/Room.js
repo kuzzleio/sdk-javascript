@@ -322,7 +322,7 @@ function notificationCallback (data) {
 
   if (data.controller === 'document' || (data.controller === 'realtime' && data.action === 'publish')) {
     data.type = 'document';
-    data.document = new Document(this.collection, data.result._id, data.result._source, data.result._kuzzle_info);
+    data.document = new Document(this.collection, data.result._id, data.result._source, data.result._meta);
     delete data.result;
   }
   else if (data.controller === 'realtime') {

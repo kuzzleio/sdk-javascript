@@ -193,7 +193,7 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
       return cb(err);
     }
 
-    doc = new Document(self, res.result._id, res.result._source, res.result._kuzzle_info);
+    doc = new Document(self, res.result._id, res.result._source, res.result._meta);
     doc.version = res.result._version;
     cb(null, doc);
   });
@@ -276,7 +276,7 @@ Collection.prototype.fetchDocument = function (documentId, options, cb) {
       return cb(err);
     }
 
-    document = new Document(self, res.result._id, res.result._source, res.result._kuzzle_info);
+    document = new Document(self, res.result._id, res.result._source, res.result._meta);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -419,7 +419,7 @@ Collection.prototype.replaceDocument = function (documentId, content, options, c
       return cb(err);
     }
 
-    document = new Document(self, res.result._id, res.result._source, res.result._kuzzle_info);
+    document = new Document(self, res.result._id, res.result._source, res.result._meta);
     document.version = res.result._version;
     cb(null, document);
   });
@@ -462,7 +462,7 @@ Collection.prototype.search = function (filters, options, cb) {
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new Document(self, doc._id, doc._source, doc._kuzzle_info);
+      var newDocument = new Document(self, doc._id, doc._source, doc._meta);
 
       newDocument.version = doc._version;
 
@@ -531,7 +531,7 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
     }
 
     result.result.hits.forEach(function (doc) {
-      var newDocument = new Document(self, doc._id, doc._source, doc._kuzzle_info);
+      var newDocument = new Document(self, doc._id, doc._source, doc._meta);
 
       newDocument.version = doc._version;
 
