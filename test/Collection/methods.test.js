@@ -61,7 +61,7 @@ describe('Collection methods', function () {
           _scroll_id: 'banana',
           total: 123,
           hits: [
-            {_id: 'foobar', _source: { foo: 'bar'}, _kuzzle_info: {author: 'toto'}}
+            {_id: 'foobar', _source: { foo: 'bar'}, _meta: {author: 'toto'}}
           ],
           aggregations: {someAggregate: {}}
         }

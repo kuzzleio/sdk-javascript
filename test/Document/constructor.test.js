@@ -34,7 +34,7 @@ describe('Document constructor', function () {
     should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).be.empty();
-    should(document.kuzzleInfo).be.empty();
+    should(document.meta).be.empty();
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
@@ -42,7 +42,7 @@ describe('Document constructor', function () {
     should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).match({some: 'content'});
-    should(document.kuzzleInfo).be.empty();
+    should(document.meta).be.empty();
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
@@ -50,7 +50,7 @@ describe('Document constructor', function () {
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).match({some: 'content'});
-    should(document.kuzzleInfo).be.empty();
+    should(document.meta).be.empty();
     should(document.version).be.exactly(123);
     should(document.collection).be.exactly('foo');
 
@@ -58,7 +58,7 @@ describe('Document constructor', function () {
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).be.empty();
-    should(document.kuzzleInfo).be.empty();
+    should(document.meta).be.empty();
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
@@ -66,7 +66,7 @@ describe('Document constructor', function () {
     should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).match({some: 'content'});
-    should(document.kuzzleInfo).match({author: 'toto'});
+    should(document.meta).match({author: 'toto'});
     should(document.version).be.exactly(123);
     should(document.collection).be.exactly('foo');
   });
@@ -79,7 +79,7 @@ describe('Document constructor', function () {
     should(document).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(document).have.propertyWithDescriptor('id', { enumerable: true, writable: true, configurable: false });
     should(document).have.propertyWithDescriptor('version', { enumerable: true, writable: true, configurable: false });
-    should(document).have.propertyWithDescriptor('kuzzleInfo', { enumerable: true, writable: false, configurable: false });
+    should(document).have.propertyWithDescriptor('meta', { enumerable: true, writable: false, configurable: false });
   });
 
   it('should promisify the right functions', function () {
