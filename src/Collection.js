@@ -134,7 +134,7 @@ Collection.prototype.create = function (options, cb) {
  * Create a new document in Kuzzle.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *    - ifExist (string, allowed values: "error" (default), "replace"):
  *        If the same document already exists:
@@ -209,7 +209,7 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
  * That means that a document that was just been created won’t be returned by this function
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string|object} arg - Either a document ID (will delete only this particular document), or a set of filters
@@ -361,7 +361,7 @@ Collection.prototype.getMapping = function (options, cb) {
  * Publish a realtime message
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} document - either a Document instance or a JSON object
@@ -388,7 +388,7 @@ Collection.prototype.publishMessage = function (document, options, cb) {
  * Replace an existing document with a new one.
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string} documentId - Unique document identifier of the document to replace
@@ -612,7 +612,7 @@ Collection.prototype.truncate = function (options, cb) {
  * Update parts of a document
  *
  * Takes an optional argument object with the following properties:
- *    - metadata (object, default: null):
+ *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {string} documentId - Unique document identifier of the document to update
