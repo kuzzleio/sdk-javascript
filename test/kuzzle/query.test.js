@@ -125,7 +125,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        metadata: {},
+        volatile: {},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -141,7 +141,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        metadata: {},
+        volatile: {},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, sinon.match(function(f) {return f === cb;}));
     });
@@ -171,16 +171,16 @@ describe('Query management', function () {
       should(emitRequestStub).be.calledWithMatch({volatile: volatile});
     });
 
-    it('should copy query local metadata over optional ones', function () {
+    it('should copy query local volatile over optional ones', function () {
       var
-        metadata = {
+        volatile = {
           foo: 'bar',
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}, metadata: {foo: 'foo'}}, {metadata: metadata});
+      kuzzle.query(queryArgs, { body: { some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
       should(emitRequestStub).be.calledOnce();
-      should(emitRequestStub).be.calledWithMatch({metadata: {foo: 'foo', baz: metadata.baz}});
+      should(emitRequestStub).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
     });
 
     it('should handle option refresh properly', function () {
@@ -199,19 +199,6 @@ describe('Query management', function () {
       kuzzle.query(queryArgs, queryBody, {from: 'foo'});
       should(emitRequestStub).be.calledOnce();
       should(emitRequestStub).be.calledWithMatch({from: 'foo'});
-    });
-
-    it('should copy query local volatile over optional ones', function () {
-      var
-        volatile = {
-          foo: 'bar',
-          baz: ['foo', 'bar', 'qux']
-        };
-
-      kuzzle.query(queryArgs, { body: { some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
-      should(emitRequestStub).be.calledOnce();
-      should(emitRequestStub).be.calledWithMatch({volatile: {foo: 'foo'}});
-      should(emitRequestStub).be.calledWithMatch({volatile: {baz: volatile.baz}});
     });
 
     it('should handle option scroll properly', function () {
