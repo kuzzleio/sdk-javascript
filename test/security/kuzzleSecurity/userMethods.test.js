@@ -1,5 +1,6 @@
 var
   should = require('should'),
+  sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
   User = require('../../../src/security/User');
 
@@ -223,26 +224,103 @@ describe('Security user methods', function () {
       done();
     });
 
-    it('should construct a createOrReplaceUser action if option replaceIfExist is set to true', function (done) {
-      expectedQuery.body = result.result._source;
+    it('should construct a replaceUser action if option replaceIfExist is set to true', function (done) {
+      var spy;
+
+      expectedQuery.body = [{}, result.result._source];
       expectedQuery._id = result.result._id;
-      expectedQuery.action = 'createOrReplaceUser';
+
+      kuzzle.query = function (args, query, options, cb) {
+        should(args.controller).be.exactly(expectedQuery.controller);
+
+        if (expectedQuery.options) {
+          should(options).match(expectedQuery.options);
+        }
+
+        if (expectedQuery.body) {
+          if (!query.body) {
+            query.body = {};
+          }
+
+          should(expectedQuery.body).containEql(query.body);
+        } else {
+          should(query.body).be.undefined();
+        }
+
+        if (expectedQuery._id) {
+          should(query._id).be.exactly(expectedQuery._id);
+        }
+
+        if (cb) {
+          if (error) {
+            return cb(error);
+          }
+
+          cb(error, result);
+        }
+      };
+      spy = sinon.spy(kuzzle, 'query');
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
+        should(spy).be.calledTwice();
+
+        should(spy.getCall(0).args[0].action).be.exactly('getUser');
+        should(spy.getCall(0).args[1]).deepEqual({_id: 'foobar', body: {}});
+
+        should(spy.getCall(1).args[0].action).be.exactly('replaceUser');
+        should(spy.getCall(1).args[1]).deepEqual({_id: 'foobar', body: {profileIds: ['myProfile']}});
+
         should(err).be.null();
         should(res).be.instanceof(User);
         done();
       }));
     });
 
-    it('should construct a createUser action if option replaceIfExist is set to false', function (done) {
+    it('should throw an error if replaceIfExist is false but user already exists', function (done) {
       expectedQuery.body = result.result._source;
       expectedQuery._id = result.result._id;
-      expectedQuery.action = 'createUser';
+
+      kuzzle.query = function (args, query, options, cb) {
+        should(args.controller).be.exactly(expectedQuery.controller);
+
+        if (expectedQuery.options) {
+          should(options).match(expectedQuery.options);
+        }
+
+        if (expectedQuery.body) {
+          if (!query.body) {
+            query.body = {};
+          }
+
+          should(expectedQuery.body).containEql(query.body);
+        } else {
+          should(query.body).be.undefined();
+        }
+
+        if (expectedQuery._id) {
+          should(query._id).be.exactly(expectedQuery._id);
+        }
+
+        if (cb) {
+          if (error) {
+            return cb(error);
+          }
+
+          cb(error, result);
+        }
+      };
+      spy = sinon.spy(kuzzle, 'query');
 
       should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(User);
+        should(err).be.Object().with.property('message');
+        should(err.message).be.exactly('Security.createUser: User was found and shouldn\'t be replaced');
+        should(res).be.Undefined();
+
+        should(spy).be.calledOnce();
+
+        should(spy.getCall(0).args[0].action).be.exactly('getUser');
+        should(spy.getCall(0).args[1]).deepEqual({_id: 'foobar', body: {}});
+
         done();
       }));
     });
