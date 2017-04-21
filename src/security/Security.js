@@ -519,6 +519,33 @@ Security.prototype.createUser = function (id, content, options, cb) {
 };
 
 /**
+ * Replace an user in Kuzzle.
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - attribute `profileIds` in `content` must only contain an array of profile ids
+ * @param {object|responseCallback} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+Security.prototype.replaceUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {_id: id, body: content};
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('Security.replaceUser: cannot replace a user without a user ID');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.buildQueryArgs('replaceUser'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+  });
+};
+
+/**
  * Create a new restricted user in Kuzzle.
  *
  * This function will create a new user. It is not usable to update an existing user.
