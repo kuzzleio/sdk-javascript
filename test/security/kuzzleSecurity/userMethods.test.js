@@ -316,6 +316,43 @@ describe('Security user methods', function () {
     });
   });
 
+  describe('#replaceUser', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      error = null;
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profileIds: ['foobar']} } };
+      expectedQuery = {
+        action: 'replaceUser',
+        controller: 'security'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function(done) {
+      expectedQuery._id = 'foobar';
+      expectedQuery.body = {'profileIds': ['foobar']};
+
+      should(kuzzle.security.replaceUser(expectedQuery._id, expectedQuery.body, function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceOf(User);
+        should(res).containDeep(new User(kuzzle.security, result.result._id, result.result._source));
+        done();
+      }));
+    });
+
+    it('should send the right query to Kuzzle even without callback', function (done) {
+      expectedQuery.body = {'foo': 'bar'};
+      expectedQuery._id = result.result._id;
+
+      kuzzle.security.replaceUser(result.result._id, {'foo': 'bar'});
+      done();
+    });
+
+    it('should throw an error if no id is provided', function () {
+      should(function () { kuzzle.security.replaceUser(null, {'foo': 'bar'}); }).throw(Error);
+    });
+  });
+
   describe('#updateUser', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
