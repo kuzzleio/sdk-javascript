@@ -509,13 +509,25 @@ Security.prototype.createUser = function (id, content, options, cb) {
     options = null;
   }
 
-  if (options) {
-    action = options.replaceIfExist ? 'createOrReplaceUser' : 'createUser';
-  }
+  if (options && options.hasOwnProperty('replaceIfExist')) {
+    self.fetchUser(id, function (fetchError, fetchResult) {
+      if (fetchResult instanceof User) {
+        if (options.replaceIfExist !== true) {
+          return cb(new Error('Security.createUser: User was found and shouldn\'t be replaced'));
+        }
+        action = 'replaceUser';
+      }
 
-  self.kuzzle.query(this.buildQueryArgs(action), data, null, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
-  });
+      self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
+        cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+      });
+    });
+  }
+  else {
+    self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
+      cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+    });
+  }
 };
 
 /**
