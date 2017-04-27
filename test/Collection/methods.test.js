@@ -519,6 +519,68 @@ describe('Collection methods', function () {
     });
   });
 
+  describe('#documentExists', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      emitted = false;
+      result = { result: true };
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'exists',
+        controller: 'document',
+        body: {}
+      };
+    });
+
+    it('should send the right documentExists query to Kuzzle', function(done) {
+      var collection = kuzzle.collection(expectedQuery.collection),
+        options = { queuable: false };
+
+      expectedQuery.options = options;
+
+      collection.documentExists(result.result._id, options, function (err, res) {
+        should(err).be.null();
+        should(res).be.true();
+        done();
+      });
+      should(emitted).be.true();
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+
+      should(function () { collection.documentExists(); }).throw(Error);
+      should(function () { collection.documentExists({}); }).throw(Error);
+      should(function () { collection.documentExists({}, {}); }).throw(Error);
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var collection = kuzzle.collection(expectedQuery.collection);
+
+      collection.documentExists({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      collection.documentExists({}, {}, function () {});
+      should(emitted).be.true();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      var collection = kuzzle.collection(expectedQuery.collection);
+      error = 'foobar';
+      this.timeout(50);
+
+      collection.documentExists({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#fetchDocument', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});

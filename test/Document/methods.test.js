@@ -179,6 +179,92 @@ describe('Document methods', function () {
     });
   });
 
+  describe('#exists', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle.query = queryStub;
+      collection = kuzzle.collection('foo');
+      emitted = false;
+      result = { result: true };
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'exists',
+        controller: 'document',
+        body: {},
+        _id: 'foo'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      var
+        options = { queuable: false },
+        document = new Document(collection);
+
+      expectedQuery.options = options;
+      document.id = 'foo';
+      should(document.exists(options));
+      should(emitted).be.true();
+    });
+
+    it('should handle arguments correctly', function () {
+      var document = new Document(collection);
+
+      document.id = 'foo';
+      document.exists(function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      document.exists();
+      should(emitted).be.true();
+
+      emitted = false;
+      document.exists({}, function () {});
+      should(emitted).be.true();
+
+      emitted = false;
+      document.exists({});
+      should(emitted).be.true();
+    });
+
+    it('should throw an error if no ID has been set', function () {
+      var document = new Document(collection);
+
+      should(function () { document.exists(); }).throw(Error);
+      should(emitted).be.false();
+    });
+
+    it('should resolve the callback with true as the result', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+      document.id = 'foo';
+
+      document.exists(function (err, res) {
+        should(emitted).be.true();
+        should(err).be.null();
+        should(res).be.true();
+        done();
+      });
+    });
+
+    it('should revolve the callback with an error if one occurs', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+      document.id = 'foo';
+      error = 'foobar';
+
+      document.exists(function (err, res) {
+        should(emitted).be.true();
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
   describe('#refresh', function () {
     beforeEach(function () {
       kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
