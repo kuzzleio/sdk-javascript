@@ -848,11 +848,8 @@ function removeAllSubscriptions() {
  * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
  * insertion.
  *
- * The ID returned by this function is required to remove this listener at a later time.
- *
  * @param {string} event - name of the global event to subscribe to
  * @param {function} listener - callback to invoke each time an event is fired
- * @returns {string} Unique listener ID
  */
 Kuzzle.prototype.addListener = function(event, listener) {
   this.isValid();
