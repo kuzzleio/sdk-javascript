@@ -46,35 +46,40 @@ describe('WebSocket networking module', function () {
     should(wsargs).match(['wss://address:port']);
   });
 
-  it('should call listeners on a "open" event', function () {
+  it('should call listeners on a "open" event', function (done) {
     var cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.onConnect(cb);
-    websocket.listeners.reconnect.push(function () {throw (new Error('wrong event called'));});
-    should(websocket.listeners.connect.length).be.eql(1);
+    should(websocket.listeners('connect').length).be.eql(1);
+    should(websocket.listeners('reconnect').length).be.exactly(0);
 
     websocket.connect();
     clientStub.onopen();
-
-    should(cb.calledOnce).be.true();
-    should(websocket.listeners.connect.length).be.eql(1);
+    setTimeout(function () {
+      should(cb.calledOnce).be.true();
+      should(websocket.listeners('connect').length).be.eql(1);
+      done();
+    }, 0);
   });
 
-  it('should call listeners on a "reconnect" event', function () {
+  it('should call listeners on a "reconnect" event', function (done) {
     var cb = sinon.stub();
 
     websocket.wasConnected = true;
     websocket.lasturl = 'ws://address:port';
     websocket.onReconnect(cb);
-    websocket.listeners.connect.push({fn: function () {throw (new Error('wrong event called'));}});
-    should(websocket.listeners.reconnect.length).be.eql(1);
+    should(websocket.listeners('connect').length).be.exactly(0);
+    should(websocket.listeners('reconnect').length).be.eql(1);
 
     websocket.connect();
     clientStub.onopen();
 
-    should(cb.calledOnce).be.true();
-    should(websocket.listeners.reconnect.length).be.eql(1);
+    setTimeout(function () {
+      should(cb.calledOnce).be.true();
+      should(websocket.listeners('reconnect').length).be.eql(1);
+      done();
+    }, 0);
   });
 
   it('should try to reconnect on a connection error with autoReconnect = true', function () {
@@ -84,7 +89,7 @@ describe('WebSocket networking module', function () {
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners.error.length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect(true, 10);
     websocket.connect = sinon.stub();
@@ -93,7 +98,7 @@ describe('WebSocket networking module', function () {
     clock.tick(10);
 
     should(cb.calledOnce).be.true();
-    should(websocket.listeners.error.length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
     should(websocket.retrying).be.false();
     should(websocket.connect.calledOnce).be.true();
     clock.restore();
@@ -106,7 +111,7 @@ describe('WebSocket networking module', function () {
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners.error.length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect(false, 10);
     websocket.connect = sinon.stub();
@@ -114,81 +119,97 @@ describe('WebSocket networking module', function () {
     clock.tick(10);
 
     should(cb.calledOnce).be.true();
-    should(websocket.listeners.error.length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
     should(websocket.retrying).be.false();
     should(websocket.connect.calledOnce).be.false();
     clock.restore();
   });
 
-  it('should call listeners on a "disconnect" event', function () {
+  it('should call listeners on a "disconnect" event', function (done) {
     var cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.onDisconnect(cb);
-    should(websocket.listeners.disconnect.length).be.eql(1);
+    should(websocket.listeners('disconnect').length).be.eql(1);
 
     websocket.connect();
     clientStub.onclose(1000);
 
-    should(cb.calledOnce).be.true();
-    should(websocket.listeners.disconnect.length).be.eql(1);
+    setTimeout(function () {
+      should(cb.calledOnce).be.true();
+      should(websocket.listeners('disconnect').length).be.eql(1);
+      done();
+    }, 0);
   });
 
-  it('should call error listeners on a disconnect event with an abnormal websocket code', function () {
+  it('should call error listeners on a disconnect event with an abnormal websocket code', function (done) {
     var cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.onConnectError(cb);
-    should(websocket.listeners.error.length).be.eql(1);
+    should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
     clientStub.onclose(4666, 'foobar');
 
-    should(cb.calledOnce).be.true();
-    should(cb.calledWith('foobar'));
-    should(websocket.listeners.error.length).be.eql(1);
+    setTimeout(function () {
+      should(cb.calledOnce).be.true();
+      should(cb.calledWith('foobar'));
+      should(websocket.listeners('networkError').length).be.eql(1);
+      done();
+    }, 0);
   });
 
-  it('should be able to register ephemeral callbacks on an event', function () {
+  it('should be able to register ephemeral callbacks on an event', function (done) {
     var
-      cb = sinon.stub(),
+      cb1,
+      cb2,
+      cb3,
       payload = {room: 'foobar'};
 
-    websocket.once('foobar', cb);
-    websocket.once('foobar', cb);
-    websocket.once('barfoo', cb);
+    websocket.once('foobar', function(arg) {cb1 = arg;});
+    websocket.once('foobar', function(arg) {cb2 = arg;});
+    websocket.once('barfoo', function(arg) {cb3 = arg;});
     websocket.connect();
 
-    should(websocket.listeners.foobar).match([{fn: cb, keep: false}, {fn: cb, keep: false}]);
-    should(websocket.listeners.barfoo).match([{fn: cb, keep: false}]);
+    should(websocket.listeners('foobar').length).be.equal(2);
+    should(websocket.listeners('barfoo').length).be.equal(1);
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    should(websocket.listeners.foobar).be.undefined();
-    should(websocket.listeners.barfoo).match([{fn: cb, keep: false}]);
-    should(cb.calledTwice).be.true();
-    should(cb.alwaysCalledWithMatch(payload)).be.true();
+    setTimeout(function () {
+      should(websocket.listeners('foobar').length).be.exactly(0);
+      should(websocket.listeners('barfoo').length).be.equal(1);
+      should(cb1).match(payload);
+      should(cb2).match(payload);
+      should(cb3).be.undefined();
+      done();
+    }, 0);
   });
 
-  it('should be able to register persistent callbacks on an event', function () {
+  it('should be able to register persistent callbacks on an event', function (done) {
     var
-      cb = sinon.stub(),
+      cb1,
+      cb2,
       payload = {room: 'foobar'};
 
-    websocket.on('foobar', cb);
-    websocket.on('foobar', cb);
+    websocket.on('foobar', function(arg) {cb1 = arg;});
+    websocket.on('foobar', function(arg) {cb2 = arg;});
     websocket.connect();
 
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
+    should(websocket.listeners('foobar').length).be.equal(2);
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
-    should(cb.calledTwice).be.true();
-    should(cb.alwaysCalledWithMatch(payload)).be.true();
+    setTimeout(function () {
+      should(websocket.listeners('foobar').length).be.equal(2);
+      should(cb1).match(payload);
+      should(cb2).match(payload);
+      done();
+    }, 0);
   });
 
-  it('should send the message on room "discarded" if no room specified', function () {
+  it('should send the message on room "discarded" if no room specified', function (done) {
     var
       cb = sinon.stub(),
       payload = {};
@@ -198,42 +219,47 @@ describe('WebSocket networking module', function () {
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    should(cb.calledOnce).be.true();
-    should(cb.alwaysCalledWithMatch(payload)).be.true();
+    setTimeout(function () {
+      should(cb.calledOnce).be.true();
+      should(cb.alwaysCalledWithMatch(payload)).be.true();
+      done();
+    }, 0);
   });
 
   it('should be able to unregister a callback on an event', function () {
     var
-      cb = sinon.stub();
+      cb1 = function(arg) {cb1 = arg;},
+      cb2 = function(arg) {cb2 = arg;};
 
-    websocket.on('foobar', cb);
-    websocket.on('foobar', cb);
+    websocket.on('foobar', cb1);
+    websocket.on('foobar', cb2);
     websocket.connect();
 
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
+    should(websocket.listeners('foobar').length).be.equal(2);
 
-    websocket.off('foobar', cb);
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}]);
+    websocket.off('foobar', cb1);
+    should(websocket.listeners('foobar').length).be.equal(1);
 
-    websocket.off('foobar', cb);
-    should(websocket.listeners.foobar).be.undefined();
+    websocket.off('foobar', cb2);
+    should(websocket.listeners('foobar').length).be.exactly(0);
   });
 
   it('should do nothing if trying to unregister an non-existent event/callback', function () {
     var
-      cb = sinon.stub();
+      cb1 = function(arg) {cb1 = arg;},
+      cb2 = function(arg) {cb2 = arg;};
 
-    websocket.on('foobar', cb);
-    websocket.on('foobar', cb);
+    websocket.on('foobar', cb1);
+    websocket.on('foobar', cb2);
     websocket.connect();
 
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
+    should(websocket.listeners('foobar').length).be.equal(2);
 
-    websocket.off('foo', cb);
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
+    websocket.off('foo', cb1);
+    should(websocket.listeners('foobar').length).be.equal(2);
 
     websocket.off('foobar', sinon.stub());
-    should(websocket.listeners.foobar).match([{fn: cb, keep: true}, {fn: cb, keep: true}]);
+    should(websocket.listeners('foobar').length).be.equal(2);
   });
 
   it('should send data payload through websocket', function () {
@@ -272,11 +298,11 @@ describe('WebSocket networking module', function () {
     websocket.connect();
     websocket.close();
 
-    should(websocket.listeners.foobar).be.undefined();
-    should(websocket.listeners.error).be.empty();
-    should(websocket.listeners.connect).be.empty();
-    should(websocket.listeners.reconnect).be.empty();
-    should(websocket.listeners.disconnect).be.empty();
+    should(websocket.listeners('foobar').length).be.exactly(0);
+    should(websocket.listeners('networkError').length).be.exactly(0);
+    should(websocket.listeners('connect').length).be.exactly(0);
+    should(websocket.listeners('reconnect').length).be.exactly(0);
+    should(websocket.listeners('disconnect').length).be.exactly(0);
     should(websocket.client).be.null();
     should(clientStub.close.called).be.true();
     should(websocket.wasConnected).be.false();

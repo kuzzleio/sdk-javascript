@@ -291,6 +291,8 @@ describe('Room methods', function () {
       collection = kuzzle.collection('foo');
       room = new Room(collection);
       room.roomId = 'foobar';
+      room.channel = 'barfoo';
+      room.notifier = sinon.stub();
       kuzzle.subscriptions.foobar = {};
       kuzzle.subscriptions.foobar[room.id] = room;
     });
