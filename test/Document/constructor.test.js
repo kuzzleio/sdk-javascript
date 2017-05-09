@@ -1,29 +1,18 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  Document = rewire('../../src/Document');
+  Kuzzle = require('../../src/Kuzzle'),
+  Document = require('../../src/Document');
 
 describe('Document constructor', function () {
   var
     kuzzle,
-    refreshed = false,
     collection;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    kuzzle.query = function () {
-      var cb = arguments[arguments.length - 1];
-
-      cb(null, {_source: {some: 'content'}, _version: 42});
-      refreshed = true;
-    };
-    refreshed = false;
+    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
+    kuzzle.bluebird = bluebird;
     collection = kuzzle.collection('foo');
   });
 
@@ -31,28 +20,24 @@ describe('Document constructor', function () {
     var document = new Document(collection);
 
     should(document).be.instanceof(Document);
-    should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).be.empty();
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
     document = new Document(collection, { some: 'content' });
-    should(refreshed).be.false();
     should(document.id).be.undefined();
     should(document.content).match({some: 'content'});
     should(document.version).be.undefined();
     should(document.collection).be.exactly('foo');
 
     document = new Document(collection, 'id', { some: 'content', _version: 123 });
-    should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).match({some: 'content'});
     should(document.version).be.exactly(123);
     should(document.collection).be.exactly('foo');
 
     document = new Document(collection, 'id');
-    should(refreshed).be.false();
     should(document.id).be.exactly('id');
     should(document.content).be.empty();
     should(document.version).be.undefined();

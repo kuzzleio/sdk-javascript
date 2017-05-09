@@ -1,58 +1,25 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  Document = rewire('../../src/Document'),
+  sinon = require('sinon'),
+  Kuzzle = require('../../src/Kuzzle'),
+  Collection = require('../../src/Collection.js'),
+  Document = require('../../src/Document'),
   SubscribeResult = require('../../src/SubscribeResult');
 
 describe('Document methods', function () {
   var
     expectedQuery,
-    error,
     result,
-    queryStub = function (args, query, options, cb) {
-      emitted = true;
-      should(args.index).be.exactly(expectedQuery.index);
-      should(args.collection).be.exactly(expectedQuery.collection);
-      should(args.controller).be.exactly(expectedQuery.controller);
-      should(args.action).be.exactly(expectedQuery.action);
-
-      if (expectedQuery.options) {
-        should(options).match(expectedQuery.options);
-      }
-
-      if (expectedQuery.body) {
-        if (!query.body) {
-          query.body = {};
-        }
-
-        should(query.body).match(expectedQuery.body);
-      } else {
-        should(Object.keys(query).length).be.exactly(0);
-      }
-
-      if (expectedQuery._id) {
-        should(query._id).be.exactly(expectedQuery._id);
-      }
-
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
-        cb(error, result);
-      }
-    },
-    emitted,
     kuzzle,
     collection;
 
-  describe('#toJSON', function () {
-    before(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      collection = kuzzle.collection('foo');
-    });
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.query = sinon.stub();
+    collection = new Collection(kuzzle, 'foo', 'bar');
+  });
 
+  describe('#toJSON', function () {
     it('should serialize itself properly', function () {
       var
         document = new Document(collection, {some: 'content'}),
@@ -77,11 +44,6 @@ describe('Document methods', function () {
   });
 
   describe('#toString', function () {
-    before(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      collection = kuzzle.collection('foo');
-    });
-
     it('should stringify itself properly', function () {
       var
         document = new Document(collection, 'id', {some: 'content', _version: 42}),
@@ -95,19 +57,12 @@ describe('Document methods', function () {
 
   describe('#delete', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      collection = kuzzle.collection('foo');
-      emitted = false;
       result = {};
-      error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
         action: 'delete',
-        controller: 'document',
-        body: {},
-        _id: 'foo'
+        controller: 'document'
       };
     });
 
@@ -116,37 +71,38 @@ describe('Document methods', function () {
         options = { queuable: false },
         document = new Document(collection);
 
-      expectedQuery.options = options;
       document.id = 'foo';
-      should(document.delete(options));
-      should(emitted).be.true();
+      document.delete(options);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}}, options);
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(collection);
+      var
+        document = new Document(collection),
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
 
       document.id = 'foo';
-      document.delete(function () {});
-      should(emitted).be.true();
+      document.delete(cb1);
+      document.delete({}, cb2);
+      should(kuzzle.query).be.calledTwice();
 
-      emitted = false;
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
       document.delete();
-      should(emitted).be.true();
-
-      emitted = false;
-      document.delete({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
       document.delete({});
-      should(emitted).be.true();
+      should(kuzzle.query).be.calledTwice();
     });
 
     it('should throw an error if no ID has been set', function () {
       var document = new Document(collection);
 
       should(function () { document.delete(); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
     it('should resolve the callback with its own id as a result', function (done) {
@@ -156,11 +112,11 @@ describe('Document methods', function () {
       document.id = 'foo';
 
       document.delete(function (err, res) {
-        should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(document.id);
         done();
       });
+      kuzzle.query.yield(null, result);
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
@@ -168,32 +124,24 @@ describe('Document methods', function () {
 
       this.timeout(50);
       document.id = 'foo';
-      error = 'foobar';
 
       document.delete(function (err, res) {
-        should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#refresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      collection = kuzzle.collection('foo');
-      emitted = false;
       result = { result: {_id: 'foo', _version: 42, _source: {some: 'content'}}};
-      error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
         action: 'get',
-        controller: 'document',
-        body: {},
-        _id: 'foo'
+        controller: 'document'
       };
     });
 
@@ -202,10 +150,17 @@ describe('Document methods', function () {
         options = { queuable: false },
         document = new Document(collection);
 
-      expectedQuery.options = options;
       document.id = 'foo';
-      should(document.refresh(options, function () {})).be.undefined();
-      should(emitted).be.true();
+      document.refresh(options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo'}, options, sinon.match.func);
+    });
+
+    it('should throw an error if no ID has been set', function () {
+      var document = new Document(collection);
+
+      should(function () { document.refresh(sinon.stub()); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if no callback is provided', function () {
@@ -214,25 +169,24 @@ describe('Document methods', function () {
 
       document.id = 'foo';
       should(function () { document.refresh(); }).throw();
+      should(kuzzle.query).not.be.called();
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(collection);
+      var
+        document = new Document(collection),
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
 
       document.id = 'foo';
-      document.refresh(function () {});
-      should(emitted).be.true();
+      document.refresh(cb1);
+      document.refresh({}, cb2);
 
-      emitted = false;
-      document.refresh({}, function () {});
-      should(emitted).be.true();
-    });
+      should(kuzzle.query).be.calledTwice();
 
-    it('should throw an error if no ID has been set', function () {
-      var document = new Document(collection);
-
-      should(function () { document.refresh(); }).throw(Error);
-      should(emitted).be.false();
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
     });
 
     it('should resolve the callback with itself as a result', function (done) {
@@ -242,7 +196,6 @@ describe('Document methods', function () {
       document.id = 'foo';
 
       document.refresh(function (err, res) {
-        should(emitted).be.true();
         should(err).be.null();
         should(res).be.instanceof(Document).and.not.be.eql(document);
         should(res.id).be.eql(document.id);
@@ -250,6 +203,8 @@ describe('Document methods', function () {
         should(res.content).match({some:'content'});
         done();
       });
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
@@ -257,31 +212,24 @@ describe('Document methods', function () {
 
       this.timeout(50);
       document.id = 'foo';
-      error = 'foobar';
 
       document.refresh(function (err, res) {
-        should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#save', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      collection = kuzzle.collection('foo');
-      emitted = false;
       result = {result: { _id: 'foo', _version: 42}};
-      error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
         action: 'createOrReplace',
-        controller: 'document',
-        body: {}
+        controller: 'document'
       };
     });
 
@@ -290,29 +238,30 @@ describe('Document methods', function () {
         options = { queuable: false },
         document = new Document(collection);
 
-      expectedQuery.options = options;
       document.id = 'foo';
       should(document.save(options)).be.exactly(document);
-      should(emitted).be.true();
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}}, options);
     });
 
     it('should handle arguments correctly', function () {
-      var document = new Document(collection);
+      var
+        document = new Document(collection),
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
 
-      document.save(function () {});
-      should(emitted).be.true();
+      document.save(cb1);
+      document.save({}, cb2);
+      should(kuzzle.query).be.calledTwice();
 
-      emitted = false;
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
       document.save();
-      should(emitted).be.true();
-
-      emitted = false;
-      document.save({}, function () {});
-      should(emitted).be.true();
-
-      emitted = false;
       document.save({});
-      should(emitted).be.true();
+      should(kuzzle.query).be.calledTwice();
     });
 
     it('should resolve the callback with itself as a result', function (done) {
@@ -321,44 +270,37 @@ describe('Document methods', function () {
       this.timeout(50);
 
       document.save(function (err, res) {
-        should(emitted).be.true();
         should(err).be.null();
         should(res).be.exactly(document);
         should(res.id).be.exactly('foo');
         should(res.version).be.exactly(42);
         done();
       });
+      kuzzle.query.yield(null, result);
     });
 
     it('should revolve the callback with an error if one occurs', function (done) {
       var document = new Document(collection);
 
       this.timeout(50);
-      error = 'foobar';
 
       document.save(function (err, res) {
-        should(emitted).be.true();
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#publish', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      collection = kuzzle.collection('foo');
-      emitted = false;
       result = {};
-      error = null;
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
         action: 'publish',
-        controller: 'realtime',
-        body: {}
+        controller: 'realtime'
       };
     });
 
@@ -367,29 +309,21 @@ describe('Document methods', function () {
         options = { queuable: false },
         document = new Document(collection);
 
-      expectedQuery.options = options;
       should(document.publish(options)).be.exactly(document);
-      should(emitted).be.true();
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {body: {}}, options);
     });
 
     it('should handle arguments correctly', function () {
       var document = new Document(collection);
 
       document.publish();
-      should(emitted).be.true();
-
-      emitted = false;
       document.publish({});
-      should(emitted).be.true();
+      should(kuzzle.query).be.calledTwice();
     });
   });
 
   describe('#setContent', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      collection = kuzzle.collection('foo');
-    });
-
     it('should update the content if "replace" is falsey', function () {
       var document = new Document(collection);
 
@@ -410,53 +344,32 @@ describe('Document methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      kuzzle.state = 'connected';
-      collection = kuzzle.collection('foo');
-      emitted = false;
-      result = { result: {roomId: 'foo', channel: 'bar'}};
-      error = null;
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'subscribe',
-        controller: 'realtime',
-        body: {}
-      };
+      collection.subscribe = sinon.stub().returns(new SubscribeResult());
     });
 
-    it('should return a new Room object', function () {
+    it('should call collection.subscribe() method with the right arguments', function () {
       var
+        filters = {ids: {values: ['foo']}},
+        options = {foo: 'bar'},
         document = new Document(collection);
 
       document.id = 'foo';
-      should(document.subscribe({}, function () {})).be.instanceof(SubscribeResult);
-      should(emitted).be.true();
-    });
-
-    it('should handle arguments properly', function () {
-      var document = new Document(collection);
-
-      document.id = 'foo';
-      document.subscribe(function () {});
-      should(emitted).be.true();
+      should(document.subscribe(options, sinon.stub())).be.instanceof(SubscribeResult);
+      should(document.subscribe(sinon.stub())).be.instanceof(SubscribeResult);
+      should(collection.subscribe).be.calledTwice();
+      should(collection.subscribe.firstCall).be.calledWith(filters, options, sinon.match.func);
+      should(collection.subscribe.secondCall).be.calledWith(filters, null, sinon.match.func);
     });
 
     it('should throw an error if no ID is provided', function () {
       var document = new Document(collection);
 
       should(function () { document.subscribe(function () {}); }).throw(Error);
-      should(emitted).be.false();
+      should(collection.subscribe).not.be.called();
     });
   });
 
   describe('#setHeaders', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      collection = kuzzle.collection('foo');
-    });
-
     it('should properly set headers', function () {
       var
         document = new Document(collection),
