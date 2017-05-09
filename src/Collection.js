@@ -102,8 +102,8 @@ Collection.prototype.count = function (filters, options, cb) {
 
   query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
-  this.kuzzle.query(this.buildQueryArgs('document', 'count'), query, options, function (error, result) {
-    cb(error, result && result.result.count);
+  this.kuzzle.query(this.buildQueryArgs('document', 'count'), query, options, function (err, res) {
+    cb(err, err ? undefined : res.result.count);
   });
 };
 

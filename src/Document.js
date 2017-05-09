@@ -107,8 +107,11 @@ Document.prototype.serialize = function () {
     data._id = this.id;
   }
 
+  if (this.version) {
+    data._version = this.version;
+  }
+
   data.body = this.content;
-  data._version = this.version;
   data = this.kuzzle.addHeaders(data, this.headers);
 
   return data;
