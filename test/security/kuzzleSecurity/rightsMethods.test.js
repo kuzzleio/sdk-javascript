@@ -1,43 +1,13 @@
 var
   should = require('should'),
+  sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle');
 
 describe('Security user rights methods', function () {
   var
     kuzzle,
     expectedQuery,
-    result,
-    error,
-    queryStub = function (args, query, options, cb) {
-      should(args.controller).be.exactly(expectedQuery.controller);
-      should(args.action).be.exactly(expectedQuery.action);
-
-      if (expectedQuery.options) {
-        should(options).match(expectedQuery.options);
-      }
-
-      if (expectedQuery.body) {
-        if (!query.body) {
-          query.body = {};
-        }
-
-        should(query.body).match(expectedQuery.body);
-      } else {
-        should(query.body).be.undefined();
-      }
-
-      if (expectedQuery._id) {
-        should(query._id).be.exactly(expectedQuery._id);
-      }
-
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
-        cb(error, result);
-      }
-    };
+    result;
 
   var exampleRights = [
     {
@@ -90,78 +60,80 @@ describe('Security user rights methods', function () {
     }
   ];
 
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.query = sinon.stub();
+  });
+
   describe('#getUserRights', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
       result = { result: { hits: exampleRights } };
       expectedQuery = {
         action: 'getUserRights',
-        controller: 'security',
-        _id: 'foobar'
+        controller: 'security'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
+      this.timeout(50);
+
+      should(kuzzle.security.getUserRights('foobar', function (err, res) {
         should(err).be.null();
         should(res).be.exactly(exampleRights);
         done();
       }));
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'foobar'}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should throw if called with no arguments', function () {
       should(function () {kuzzle.security.getUserRights();}).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw if called with no callback', function () {
-      should(function () {kuzzle.security.getUserRights(expectedQuery._id);}).throw(Error);
+      should(function () {kuzzle.security.getUserRights('foobar');}).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      error = 'foobar';
       this.timeout(50);
 
-      kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
+      kuzzle.security.getUserRights('foobar', function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
-    });
 
-    it('should call callback with an array', function (done) {
-      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
-        should(err).be.exactly(null);
-        should(res).be.an.instanceOf(Array);
-        done();
-      }));
+      kuzzle.query.yield('foobar');
     });
 
     it('should call callback with an array containing rights (if not empty)', function (done) {
-      should(kuzzle.security.getUserRights(expectedQuery._id, function (err, res) {
+      this.timeout(50);
+
+      kuzzle.security.getUserRights('foobar', function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
 
-        if (res.length > 0) {
-          should(res[0]).have.ownProperty('controller');
-          should(res[0]).have.ownProperty('action');
-          should(res[0]).have.ownProperty('index');
-          should(res[0]).have.ownProperty('collection');
-          should(res[0]).have.ownProperty('value');
-          should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
-        }
+        should(res[0]).have.ownProperty('controller');
+        should(res[0]).have.ownProperty('action');
+        should(res[0]).have.ownProperty('index');
+        should(res[0]).have.ownProperty('collection');
+        should(res[0]).have.ownProperty('value');
+        should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
 
         done();
-      }));
+      });
+
+      kuzzle.query.yield(null, result);
     });
   });
 
   describe('#getMyRights', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
       result = { result: { hits: exampleRights } };
       expectedQuery = {
         action: 'getMyRights',
@@ -170,19 +142,26 @@ describe('Security user rights methods', function () {
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.getMyRights(function (err, res) {
+      this.timeout(50);
+
+      kuzzle.getMyRights(function (err, res) {
         should(err).be.null();
         should(res).be.exactly(exampleRights);
         done();
-      }));
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should throw if called with no callback', function () {
       should(function () {kuzzle.getMyRights();}).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      error = 'foobar';
       this.timeout(50);
 
       kuzzle.getMyRights(function (err, res) {
@@ -190,40 +169,32 @@ describe('Security user rights methods', function () {
         should(res).be.undefined();
         done();
       });
-    });
 
-    it('should call callback with an array', function (done) {
-      should(kuzzle.getMyRights(function (err, res) {
-        should(err).be.exactly(null);
-        should(res).be.an.instanceOf(Array);
-        done();
-      }));
+      kuzzle.query.yield('foobar');
     });
 
     it('should call callback with an array containing rights (if not empty)', function (done) {
-      should(kuzzle.getMyRights(function (err, res) {
+      this.timeout(50);
+
+      kuzzle.getMyRights(function (err, res) {
         should(err).be.exactly(null);
         should(res).be.an.instanceOf(Array);
 
-        if (res.length > 0) {
-          should(res[0]).have.ownProperty('controller');
-          should(res[0]).have.ownProperty('action');
-          should(res[0]).have.ownProperty('index');
-          should(res[0]).have.ownProperty('collection');
-          should(res[0]).have.ownProperty('value');
-          should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
-        }
+        should(res[0]).have.ownProperty('controller');
+        should(res[0]).have.ownProperty('action');
+        should(res[0]).have.ownProperty('index');
+        should(res[0]).have.ownProperty('collection');
+        should(res[0]).have.ownProperty('value');
+        should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
 
         done();
-      }));
+      });
+
+      kuzzle.query.yield(null, result);
     });
   });
 
   describe('#isActionAllowed', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-    });
-
     it('should return "allowed" to ("read", "get")', function() {
       should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'get'))
         .be.exactly('allowed');

@@ -95,6 +95,10 @@ User.prototype.save = function (options, cb) {
     data = this.serialize(),
     self = this;
 
+  if (!this.content.profileIds) {
+    throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
+  }
+
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;

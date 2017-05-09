@@ -8,86 +8,53 @@ describe('Security user methods', function () {
   var
     kuzzle,
     expectedQuery,
-    result,
-    error,
-    queryStub = function (args, query, options, cb) {
-      should(args.controller).be.exactly(expectedQuery.controller);
-      should(args.action).be.exactly(expectedQuery.action);
+    result;
 
-      if (expectedQuery.options) {
-        should(options).match(expectedQuery.options);
-      }
-
-      if (expectedQuery.body) {
-        if (!query.body) {
-          query.body = {};
-        }
-
-        should(query.body).match(expectedQuery.body);
-      } else {
-        should(query.body).be.undefined();
-      }
-
-      if (expectedQuery._id) {
-        should(query._id).be.exactly(expectedQuery._id);
-      }
-
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
-        cb(error, result);
-      }
-    };
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.query = sinon.stub();
+  });
 
   describe('#fetchUser', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
       result = { result: {_id: 'foobar', _source: {profileIds: ['profile']}}};
       expectedQuery = {
         action: 'getUser',
-        controller: 'security',
-        _id: 'foobar'
+        controller: 'security'
       };
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      should(kuzzle.security.fetchUser(result.result._id, function (err, res) {
+      this.timeout(50);
+
+      kuzzle.security.fetchUser('foobar', function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
 
         should(res.content.profileIds).be.an.Array();
         should(res.content.profileIds[0]).be.a.String();
+        should(res.content.profileIds[0]).be.exactly('profile');
 
         done();
-      }));
-    });
+      });
 
-    it('should send the right query to Kuzzle with id as profile', function (done) {
-      should(kuzzle.security.fetchUser(result.result._id, function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(User);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'foobar'}, null, sinon.match.func);
 
-        should(res.content.profileIds).be.an.Array();
-        should(res.content.profileIds[0]).be.a.String();
-
-        done();
-      }));
+      kuzzle.query.yield(null, result);
     });
 
     it('should raise an error if no callback is provided', function () {
       should(function () { kuzzle.security.fetchUser('test'); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error when no id is provided', function () {
       should(function () { kuzzle.security.fetchUser(null, function () {}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      error = 'error';
       this.timeout(50);
 
       kuzzle.security.fetchUser('foobar', function (err, res) {
@@ -95,14 +62,13 @@ describe('Security user methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('error');
     });
   });
 
   describe('#searchUsers', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
       result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {profileIds : ['myProfile']}} ]}};
       expectedQuery = {
         action: 'searchUsers',
@@ -112,93 +78,62 @@ describe('Security user methods', function () {
 
     it('should send the right search query to kuzzle and return user with string', function (done) {
       var
-        filters = {};
+        options = {opt: 'val'},
+        filters = {foo: 'bar'};
 
       this.timeout(50);
-      expectedQuery.body = {};
 
-      should(kuzzle.security.searchUsers(filters, function (err, res) {
+      should(kuzzle.security.searchUsers(filters, options, function (err, res) {
         should(err).be.null();
         should(res).be.an.Object();
-        should(res.total).be.a.Number().and.be.exactly(result.result.total);
+        should(res.total).be.a.Number().and.be.exactly(123);
         should(res.users).be.an.Array();
         should(res.users).not.be.empty();
-        should(res.users.length).be.exactly(result.result.hits.length);
+        should(res.users.length).be.exactly(1);
 
         res.users.forEach(function (item) {
           should(item).be.instanceof(User);
 
+          should(item.id).be.exactly('foobar');
+
           should(item.content.profileIds).be.an.Array();
           should(item.content.profileIds[0]).be.a.String();
+          should(item.content.profileIds[0]).be.exactly('myProfile');
         });
 
         done();
       }));
-    });
 
-    it('should send the right search query to kuzzle and return user', function (done) {
-      var
-        filters = {};
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: filters}, options, sinon.match.func);
 
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
-        profileIds: ['myProfile']
-      }}]}};
-
-      this.timeout(50);
-      expectedQuery.body = filters;
-
-      should(kuzzle.security.searchUsers(filters, function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object();
-        should(res.total).be.a.Number().and.be.exactly(result.result.total);
-        should(res.users).be.an.Array();
-        should(res.users).not.be.empty();
-        should(res.users.length).be.exactly(result.result.hits.length);
-
-        res.users.forEach(function (item) {
-          should(item).be.instanceof(User);
-
-          should(item.content.profileIds).be.an.Array();
-          should(item.content.profileIds[0]).be.a.String();
-        });
-
-        done();
-      }));
+      kuzzle.query.yield(null, result);
     });
 
     it('should raise an error if no callback is provided', function () {
-      var
-        filters = {};
-
-      should(function () { kuzzle.security.searchUsers(filters); }).throw(Error);
+      should(function () { kuzzle.security.searchUsers({}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      var
-        filters = {};
-
-      result = { result: { total: 123, hits: [ {_id: 'foobar', _source: {
-        profileIds: ['myProfile']
-      }}]}};
-
-      expectedQuery.body = filters;
-      error = 'foobar';
       this.timeout(50);
 
-      kuzzle.security.searchUsers(filters, function (err, res) {
+      kuzzle.security.searchUsers({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#createUser', function () {
+    var content = {profileIds: ['myProfile']};
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
-      result = { result: {_id: 'foobar', _source: {profileIds: ['myProfile']}} };
+      kuzzle.security.fetchUser = sinon.stub();
+      result = { result: {_id: 'foobar', _source: content}};
       expectedQuery = {
         action: 'createUser',
         controller: 'security'
@@ -206,132 +141,59 @@ describe('Security user methods', function () {
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      should(kuzzle.security.createUser(result.result._id, result.result._source, function (err, res) {
+      should(kuzzle.security.createUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
         done();
       }));
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
-
-      kuzzle.security.createUser(result.result._id, result.result._source);
-      done();
+    it('should send the right query to Kuzzle even without callback', function () {
+      kuzzle.security.createUser('foobar', content);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
     });
 
-    it('should construct a replaceUser action if option replaceIfExist is set to true', function (done) {
-      var spy;
+    it('should construct a replaceUser action if option replaceIfExist is set to true', function () {
+      kuzzle.security.createUser('foobar', content, {replaceIfExist: true});
+      should(kuzzle.security.fetchUser).be.calledOnce();
+      should(kuzzle.security.fetchUser).be.calledWith('foobar', sinon.match.func);
 
-      expectedQuery.body = [{}, result.result._source];
-      expectedQuery._id = result.result._id;
-
-      kuzzle.query = function (args, query, options, cb) {
-        should(args.controller).be.exactly(expectedQuery.controller);
-
-        if (expectedQuery.options) {
-          should(options).match(expectedQuery.options);
-        }
-
-        if (expectedQuery.body) {
-          if (!query.body) {
-            query.body = {};
-          }
-
-          should(expectedQuery.body).containEql(query.body);
-        } else {
-          should(query.body).be.undefined();
-        }
-
-        if (expectedQuery._id) {
-          should(query._id).be.exactly(expectedQuery._id);
-        }
-
-        if (cb) {
-          if (error) {
-            return cb(error);
-          }
-
-          cb(error, result);
-        }
-      };
-      spy = sinon.spy(kuzzle, 'query');
-
-      should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: true}, function (err, res) {
-        should(spy).be.calledTwice();
-
-        should(spy.getCall(0).args[0].action).be.exactly('getUser');
-        should(spy.getCall(0).args[1]).deepEqual({_id: 'foobar', body: {}});
-
-        should(spy.getCall(1).args[0].action).be.exactly('replaceUser');
-        should(spy.getCall(1).args[1]).deepEqual({_id: 'foobar', body: {profileIds: ['myProfile']}});
-
-        should(err).be.null();
-        should(res).be.instanceof(User);
-        done();
-      }));
+      expectedQuery.action = 'replaceUser';
+      kuzzle.security.fetchUser.yield(null, new User(kuzzle.security, 'foobar'));
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content});
     });
 
     it('should throw an error if replaceIfExist is false but user already exists', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      kuzzle.query = function (args, query, options, cb) {
-        should(args.controller).be.exactly(expectedQuery.controller);
-
-        if (expectedQuery.options) {
-          should(options).match(expectedQuery.options);
-        }
-
-        if (expectedQuery.body) {
-          if (!query.body) {
-            query.body = {};
-          }
-
-          should(expectedQuery.body).containEql(query.body);
-        } else {
-          should(query.body).be.undefined();
-        }
-
-        if (expectedQuery._id) {
-          should(query._id).be.exactly(expectedQuery._id);
-        }
-
-        if (cb) {
-          if (error) {
-            return cb(error);
-          }
-
-          cb(error, result);
-        }
-      };
-      spy = sinon.spy(kuzzle, 'query');
-
-      should(kuzzle.security.createUser(result.result._id, result.result._source, {replaceIfExist: false}, function (err, res) {
+      kuzzle.security.createUser('foobar', content, {replaceIfExist: false}, function (err, res) {
         should(err).be.Object().with.property('message');
         should(err.message).be.exactly('Security.createUser: User was found and shouldn\'t be replaced');
         should(res).be.Undefined();
-
-        should(spy).be.calledOnce();
-
-        should(spy.getCall(0).args[0].action).be.exactly('getUser');
-        should(spy.getCall(0).args[1]).deepEqual({_id: 'foobar', body: {}});
-
         done();
-      }));
+      });
+      should(kuzzle.security.fetchUser).be.calledOnce();
+      should(kuzzle.security.fetchUser).be.calledWith('foobar', sinon.match.func);
+
+      expectedQuery.action = 'replaceUser';
+      kuzzle.security.fetchUser.yield(null, new User(kuzzle.security, 'foobar'));
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if no id provided', function () {
       should(function () { kuzzle.security.createUser(null); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = result.result._source;
-      error = 'foobar';
       this.timeout(50);
 
       kuzzle.security.createUser(result.result._id, result.result._source, function (err, res) {
@@ -339,15 +201,16 @@ describe('Security user methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#createRestrictedUser', function () {
+    var content = {some: 'body'};
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
-      result = {result: {_id: 'foobar', _source: {some: 'body'}}};
+      result = {result: {_id: 'foobar', _source: content}};
       expectedQuery = {
         action: 'createRestrictedUser',
         controller: 'security'
@@ -355,35 +218,36 @@ describe('Security user methods', function () {
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      should(kuzzle.security.createRestrictedUser(result.result._id, result.result._source, function (err, res) {
+      kuzzle.security.createRestrictedUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
         done();
-      }));
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      kuzzle.query.yield(null, result);
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
-
-      kuzzle.security.createRestrictedUser(result.result._id, result.result._source);
-      done();
+    it('should send the right query to Kuzzle even without callback', function () {
+      kuzzle.security.createRestrictedUser('foobar', content);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
     });
 
     it('should throw an error if no id provided', function () {
       should(function () { kuzzle.security.createRestrictedUser(null); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if profileIds is provided', function () {
-      should(function () { kuzzle.security.createRestrictedUser(result.result._id, {profileIds: ['someProfile']}); }).throw(Error);
+      should(function () { kuzzle.security.createRestrictedUser('foobar', {profileIds: ['someProfile']}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = result.result._source;
-      error = 'foobar';
       this.timeout(50);
 
       kuzzle.security.createRestrictedUser(result.result._id, result.result._source, function (err, res) {
@@ -391,15 +255,16 @@ describe('Security user methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#replaceUser', function () {
+    var content = {profileIds: ['foobar']};
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profileIds: ['foobar']} } };
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: content}};
       expectedQuery = {
         action: 'replaceUser',
         controller: 'security'
@@ -407,36 +272,36 @@ describe('Security user methods', function () {
     });
 
     it('should send the right query to Kuzzle', function(done) {
-      expectedQuery._id = 'foobar';
-      expectedQuery.body = {'profileIds': ['foobar']};
-
-      should(kuzzle.security.replaceUser(expectedQuery._id, expectedQuery.body, function (err, res) {
+      kuzzle.security.replaceUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.instanceOf(User);
         should(res).containDeep(new User(kuzzle.security, result.result._id, result.result._source));
         done();
-      }));
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
-
-      kuzzle.security.replaceUser(result.result._id, {'foo': 'bar'});
-      done();
+    it('should send the right query to Kuzzle even without callback', function () {
+      kuzzle.security.replaceUser('foobar', {'foo': 'bar'});
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {foo: 'bar'}}, undefined, undefined);
     });
 
     it('should throw an error if no id is provided', function () {
       should(function () { kuzzle.security.replaceUser(null, {'foo': 'bar'}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
   });
 
   describe('#updateUser', function () {
+    var content = {profileIds: ['foobar']};
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: {profileIds: ['foobar']} } };
+      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users', _source: content}};
       expectedQuery = {
         action: 'updateUser',
         controller: 'security'
@@ -444,32 +309,32 @@ describe('Security user methods', function () {
     });
 
     it('should send the right query to Kuzzle', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      should(kuzzle.security.updateUser(result.result._id, {'foo': 'bar'}, function (err, res) {
+      should(kuzzle.security.updateUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.an.instanceOf(User);
-        should(res).containDeep(new User(kuzzle.security, result.result._id, result.result._source));
+        should(res).containDeep(new User(kuzzle.security, 'foobar', content));
         done();
       }));
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      kuzzle.query.yield(null, result);
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
-
-      kuzzle.security.updateUser(result.result._id, {'foo': 'bar'});
-      done();
+    it('should send the right query to Kuzzle even without callback', function () {
+      kuzzle.security.updateUser('foobar', {'foo': 'bar'});
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {foo: 'bar'}}, undefined, undefined);
     });
 
     it('should throw an error if no id provided', function () {
       should(function () { kuzzle.security.updateUser(null); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      error = 'foobar';
       this.timeout(50);
 
       kuzzle.security.updateUser(result.result._id, {'foo': 'bar'}, function (err, res) {
@@ -477,37 +342,41 @@ describe('Security user methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#deleteUser', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
       result = { result: {_id: 'foobar'} };
       expectedQuery = {
         action: 'deleteUser',
-        controller: 'security',
-        _id: result.result._id
+        controller: 'security'
       };
     });
 
     it('should send the right delete query to Kuzzle', function (done) {
-      should(kuzzle.security.deleteUser(result.result._id, function (err, res) {
+      this.timeout(50);
+
+      should(kuzzle.security.deleteUser('foobar', function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.exactly('foobar');
         done();
       }));
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, null, sinon.match.func);
+      kuzzle.query.yield(null, result);
     });
 
-    it('should send the right delete query to Kuzzle even without callback', function (done) {
-      kuzzle.security.deleteUser(result.result._id);
-      done();
+    it('should send the right delete query to Kuzzle even without callback', function () {
+      kuzzle.security.deleteUser('foobar');
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, undefined, undefined);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      error = 'foobar';
       this.timeout(50);
 
       kuzzle.security.deleteUser(result.result._id, function (err, res) {
@@ -515,19 +384,22 @@ describe('Security user methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#UserFactory', function () {
-    it('should return an instance of Profile', function (done) {
+    it('should return an instance of User', function () {
       var user = kuzzle.security.user('test', {profileIds: ['myProfile']});
       should(user).instanceof(User);
-      done();
+      should(user.content.profileIds).be.an.Array();
+      should(user.content.profileIds.length).be.exactly(1);
+      should(user.content.profileIds[0]).be.exactly('myProfile');
     });
 
-    it('should throw an error if no id is provided', function (done) {
+    it('should throw an error if no id is provided', function () {
       should((function () {kuzzle.security.user(null);})).throw(Error);
-      done();
     });
   });
 });
