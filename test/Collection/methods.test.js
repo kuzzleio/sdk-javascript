@@ -92,9 +92,7 @@ describe('Collection methods', function () {
         should(res).be.undefined();
         done();
       });
-
       kuzzle.query.yield('foobar');
-
     });
   });
 
@@ -520,7 +518,6 @@ describe('Collection methods', function () {
         should(res).be.undefined();
         done();
       });
-
       kuzzle.query.yield('foobar');
     });
   });
@@ -645,7 +642,6 @@ describe('Collection methods', function () {
         should(res).be.undefined();
         done();
       });
-
       kuzzle.query.yield('foobar');
     });
   });
@@ -899,7 +895,6 @@ describe('Collection methods', function () {
         should(res).be.undefined();
         done();
       });
-
       kuzzle.query.yield('foobar');
     });
   });
