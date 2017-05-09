@@ -1,3 +1,16 @@
+# [4.0.1](https://github.com/kuzzleio/sdk-javascript/releases/tag/4.0.1) (2017-05-9)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0-RC9.6 | 1.0.0-RC9 |
+
+#### Enhancements
+
+- [ [#200](https://github.com/kuzzleio/sdk-javascript/pull/200) ] Add kuzzle info in Document object   ([AnthonySendra](https://github.com/AnthonySendra))
+---
+
 # 3.4.0
 
 Fill changes list: https://github.com/kuzzleio/sdk-javascript/releases/tag/3.4.0
