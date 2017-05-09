@@ -58,7 +58,7 @@ describe('Collection methods', function () {
       });
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: filters}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {body: filters}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -132,7 +132,7 @@ describe('Collection methods', function () {
       });
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {scrollId: 'scrollId'}, {});
+      should(kuzzle.query).calledWith(expectedQuery, {scrollId: 'scrollId'}, {}, sinon.match.func);
 
       kuzzle.query.yield(null, result);
 
@@ -164,7 +164,7 @@ describe('Collection methods', function () {
       });
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: filters}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {body: filters}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -225,7 +225,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -282,7 +282,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: content}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {body: content}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -355,7 +355,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: content});
+      should(kuzzle.query).calledWith(expectedQuery, {body: content}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -405,7 +405,7 @@ describe('Collection methods', function () {
       }));
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -455,7 +455,7 @@ describe('Collection methods', function () {
         done();
       });
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: {query: filters}});
+      should(kuzzle.query).calledWith(expectedQuery, {body: {query: filters}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -483,7 +483,7 @@ describe('Collection methods', function () {
         done();
       });
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar'}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -538,7 +538,7 @@ describe('Collection methods', function () {
 
       collection.fetchAllDocuments(options, sinon.stub());
       should(collection.search).be.calledOnce();
-      should(collection.search).be.calledWith({}, options);
+      should(collection.search).be.calledWith({}, options, sinon.match.func);
     });
 
     it('should raise an error if no callback is provided', function () {
@@ -565,13 +565,13 @@ describe('Collection methods', function () {
     it('should handle the from and size options', function () {
       collection.fetchAllDocuments({from: 123, size: 456}, sinon.stub());
       should(collection.search).be.calledOnce();
-      should(collection.search).be.calledWith({}, {from: 123, size: 456});
+      should(collection.search).be.calledWith({}, {from: 123, size: 456}, sinon.match.func);
     });
 
     it('should handle the scroll options', function () {
       collection.fetchAllDocuments({scroll: '30s'}, function () {});
       should(collection.search).be.calledOnce();
-      should(collection.search).be.calledWith({}, {from: 0, size: 1000, scroll: '30s'});
+      should(collection.search).be.calledWith({}, {from: 0, size: 1000, scroll: '30s'}, sinon.match.func);
     });
 
     it('should transfer error if any', function (done) {
@@ -609,7 +609,7 @@ describe('Collection methods', function () {
         done();
       });
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -701,7 +701,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -791,7 +791,7 @@ describe('Collection methods', function () {
 
       should(collection.truncate(options, sinon.stub())).be.exactly(collection);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery);
+      should(kuzzle.query).calledWith(expectedQuery, {}, options, sinon.match.func);
     });
 
     it('should handle arguments correctly', function () {
@@ -861,7 +861,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', retryOnConflict: 42, body: content}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', retryOnConflict: 42, body: content}, options, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
