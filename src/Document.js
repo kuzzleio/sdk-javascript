@@ -18,9 +18,10 @@
  * @param {Collection} collection - an instanciated Collection object
  * @param {string} [documentId] - ID of an existing document
  * @param {object} [content] - Initializes this document with the provided content
+ * @param {object} [meta] - Initializes this document with the provided meta
  * @constructor
  */
-function Document(collection, documentId, content) {
+function Document(collection, documentId, content, meta) {
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -55,6 +56,11 @@ function Document(collection, documentId, content) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    meta: {
+      value: meta || {},
+      enumerable: true,
+      writable: false
     }
   });
 
@@ -108,6 +114,7 @@ Document.prototype.serialize = function () {
   }
 
   data.body = this.content;
+  data.meta = this.meta;
   data._version = this.version;
   data = this.kuzzle.addHeaders(data, this.headers);
 
@@ -179,7 +186,7 @@ Document.prototype.refresh = function (options, cb) {
       return cb(error);
     }
 
-    newDocument = new Document(self.dataCollection, self.id, res.result._source);
+    newDocument = new Document(self.dataCollection, self.id, res.result._source, res.result._meta);
     newDocument.version = res.result._version;
 
     cb(null, newDocument);

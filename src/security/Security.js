@@ -509,11 +509,50 @@ Security.prototype.createUser = function (id, content, options, cb) {
     options = null;
   }
 
-  if (options) {
-    action = options.replaceIfExist ? 'createOrReplaceUser' : 'createUser';
+  if (options && options.hasOwnProperty('replaceIfExist')) {
+    self.fetchUser(id, function (fetchError, fetchResult) {
+      if (fetchResult instanceof User) {
+        if (options.replaceIfExist !== true) {
+          return cb(new Error('Security.createUser: User was found and shouldn\'t be replaced'));
+        }
+        action = 'replaceUser';
+      }
+
+      self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
+        cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+      });
+    });
+  }
+  else {
+    self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
+      cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+    });
+  }
+};
+
+/**
+ * Replace an user in Kuzzle.
+ *
+ * @param {string} id - user identifier
+ * @param {object} content - attribute `profileIds` in `content` must only contain an array of profile ids
+ * @param {object|responseCallback} [options] - (optional) arguments
+ * @param {responseCallback} [cb] - (optional) Handles the query response
+ */
+Security.prototype.replaceUser = function (id, content, options, cb) {
+  var
+    self = this,
+    data = {_id: id, body: content};
+
+  if (!id || typeof id !== 'string') {
+    throw new Error('Security.replaceUser: cannot replace a user without a user ID');
   }
 
-  self.kuzzle.query(this.buildQueryArgs(action), data, null, cb && function (err, res) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.buildQueryArgs('replaceUser'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 };
