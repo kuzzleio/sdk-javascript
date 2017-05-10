@@ -26,7 +26,16 @@ describe('Collection methods', function () {
 
   describe('#search', function () {
     beforeEach(function () {
-      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ], aggregations: {someAggregate: {}}}};
+      result = {
+        result: {
+          _scroll_id: 'banana',
+          total: 123,
+          hits: [
+            {_id: 'foobar', _source: { foo: 'bar'}, _meta: {author: 'toto'}}
+          ],
+          aggregations: {someAggregate: {}}
+        }
+      };
       expectedQuery = {
         index: 'bar',
         collection: 'foo',
@@ -355,7 +364,7 @@ describe('Collection methods', function () {
       })).be.exactly(collection);
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: content}, null, sinon.match.func);
+      should(kuzzle.query).calledWith(expectedQuery, {body: content, meta: {}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -672,7 +681,7 @@ describe('Collection methods', function () {
 
       collection.publishMessage(new Document(collection, content), options);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: content}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {body: content, meta: {}}, options);
     });
   });
 

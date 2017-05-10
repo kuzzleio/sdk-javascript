@@ -74,7 +74,7 @@ describe('Document methods', function () {
       document.id = 'foo';
       document.delete(options);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
     });
 
     it('should handle arguments correctly', function () {
@@ -241,7 +241,7 @@ describe('Document methods', function () {
       document.id = 'foo';
       should(document.save(options)).be.exactly(document);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
     });
 
     it('should handle arguments correctly', function () {
@@ -311,7 +311,7 @@ describe('Document methods', function () {
 
       should(document.publish(options)).be.exactly(document);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: {}}, options);
+      should(kuzzle.query).calledWith(expectedQuery, {body: {}, meta: {}}, options);
     });
 
     it('should handle arguments correctly', function () {

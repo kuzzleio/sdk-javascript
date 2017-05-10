@@ -26,7 +26,13 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 ## SDK Documentation
 
-The complete SDK documentation is available [here](http://kuzzleio.github.io/sdk-documentation)
+The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/?javascript#kuzzle)
+
+## Report an issue
+
+Use following meta repository to report issues on SDK:
+
+https://github.com/kuzzleio/kuzzle-sdk/issues
 
 ## Protocols used
 
