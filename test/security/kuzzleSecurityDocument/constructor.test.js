@@ -1,34 +1,19 @@
 var
   should = require('should'),
-  bluebird = require('bluebird'),
-  rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/Kuzzle'),
+  Kuzzle = require('../../../src/Kuzzle'),
   SecurityDocument = require('../../../src/security/SecurityDocument');
 
 describe('KuzzleSecurityDocument constructor', function () {
   var
     kuzzle;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
-
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
   });
 
-  it('should throw an error if no id is provided', function (done) {
-    try {
-      new SecurityDocument(kuzzle.security, null, null);
-    }
-    catch (e) {
-      should(e).be.Error();
-      return done();
-    }
-
-    return done(new Error('Constructor doesn\'t throw an Error'));
+  it('should throw an error if no id is provided', function () {
+    should(function() { new SecurityDocument(kuzzle.security, null, null);}).throw(Error);
   });
-
 
   it('should expose securityDocument properties with the right permissions', function () {
     var securityDocument = new SecurityDocument(kuzzle.security, 'test', {});

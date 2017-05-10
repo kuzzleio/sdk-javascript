@@ -1,11 +1,4 @@
-function KuzzleEventEmitter(eventTimeout) {
-  Object.defineProperties(this, {
-    eventTimeout: {
-      value: eventTimeout || 200,
-      writeable: false
-    }
-  });
-
+function KuzzleEventEmitter() {
   if (typeof window !== 'undefined') {
     this._events = {};
     this._onceEvents = {};

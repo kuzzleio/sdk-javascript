@@ -1,6 +1,6 @@
 var
   should = require('should'),
-  Kuzzle = require('../stubs/kuzzle.stub'),
+  Kuzzle = require('../../src/Kuzzle'),
   MemoryStorage = require('../../src/MemoryStorage'),
   sinon = require('sinon');
 
@@ -8,20 +8,15 @@ describe('MemoryStorage methods', function () {
   var
     kuzzle,
     ms,
-    sandbox = sinon.sandbox.create(),
-    emptyFunc = function () {},
-    queryStub;
+    emptyFunc = function () {};
 
-  before(function () {
-    kuzzle = new Kuzzle('foo');
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
     kuzzle.bluebird = require('bluebird');
+    kuzzle.query = sinon.stub();
     ms = new MemoryStorage(kuzzle);
   });
 
-  beforeEach(function () {
-    sandbox.restore();
-    queryStub = sandbox.stub(kuzzle, 'query');
-  });
 
   function testReadCommand(command, args, opts, expArgs, expOpts, result, expected, defaultOpts) {
     var
@@ -33,12 +28,12 @@ describe('MemoryStorage methods', function () {
     should(function () {ms[command].apply(ms, args.concat(opts));}).throw('MemoryStorage.' + command + ': a callback argument is required for read queries');
 
     ms[command].apply(ms, args.concat(emptyFunc));
-    should(queryStub).calledWith(query, expectedQueryArgs, null, sinon.match.func);
+    should(kuzzle.query).calledWith(query, expectedQueryArgs, null, sinon.match.func);
 
     ms[command].apply(ms, args.concat(opts, emptyFunc));
-    should(queryStub).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
+    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
 
-    queryStub.yields(null, {result: result});
+    kuzzle.query.yields(null, {result: result});
     return ms[command + 'Promise'].apply(ms, args)
       .then(function (res) {
         should(res).be.eql(expected);
@@ -57,18 +52,18 @@ describe('MemoryStorage methods', function () {
     expectedQueryArgsWithOpts.body = Object.assign({}, expArgs.body, expOpts);
 
     ms[command].apply(ms, args);
-    should(queryStub).calledWith(query, expArgs, null, undefined);
+    should(kuzzle.query).calledWith(query, expArgs, null, undefined);
 
     ms[command].apply(ms, args.concat(opts));
-    should(queryStub).calledWith(query, expectedQueryArgsWithOpts, {}, undefined);
+    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, undefined);
 
     ms[command].apply(ms, args.concat(emptyFunc));
-    should(queryStub).calledWith(query, expArgs, null, sinon.match.func);
+    should(kuzzle.query).calledWith(query, expArgs, null, sinon.match.func);
 
     ms[command].apply(ms, args.concat(opts, emptyFunc));
-    should(queryStub).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
+    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
 
-    queryStub.yields(null, {result: result});
+    kuzzle.query.yields(null, {result: result});
     return ms[command + 'Promise'].apply(ms, args)
       .then(function (res) {
         should(res).be.eql(expected);

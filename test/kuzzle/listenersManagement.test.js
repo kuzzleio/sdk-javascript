@@ -1,120 +1,84 @@
 var
   should = require('should'),
   rewire = require('rewire'),
+  sinon = require('sinon'),
   Kuzzle = rewire('../../src/Kuzzle');
 
-describe('Listeners management', function () {
+describe('Kuzzle listeners management', function () {
   var
-    kuzzle,
-    stublistener1,
-    stublistener2,
-    stublistener3,
-    stublistener4,
-    listenerIds;
+    addListenerStub = sinon.stub(),
+    emitStub = sinon.stub(),
+    kuzzle;
+
+  before(function () {
+    var KuzzleEventEmitterMock = function() {};
+
+    KuzzleEventEmitterMock.prototype.addListener = addListenerStub;
+    KuzzleEventEmitterMock.prototype.emit = emitStub;
+    Kuzzle.__set__({
+      KuzzleEventEmitter: KuzzleEventEmitterMock
+    });
+  });
+
 
   beforeEach(function () {
-    stublistener1 = function () {};
-    stublistener2 = function () {};
-    stublistener3 = function () {};
-    stublistener4 = function () {};
-
-    kuzzle = new Kuzzle('foo', 'this is not an index');
-    listenerIds = [];
-
-    listenerIds.push(kuzzle.addListener('connected', stublistener1));
-    listenerIds.push(kuzzle.addListener('connected', stublistener2));
-    listenerIds.push(kuzzle.addListener('connected', stublistener3));
-    listenerIds.push(kuzzle.addListener('connected', stublistener4));
-    kuzzle.addListener('networkError', stublistener1);
-    kuzzle.addListener('networkError', stublistener2);
-    kuzzle.addListener('networkError', stublistener3);
-    kuzzle.addListener('disconnected', stublistener1);
-    kuzzle.addListener('disconnected', stublistener2);
-    kuzzle.addListener('reconnected', stublistener3);
+    kuzzle = new Kuzzle('foo', {connect: 'manual', eventTimeout: 20});
+    addListenerStub.reset();
+    emitStub.reset();
   });
 
-  describe('#addListener', function () {
-    it('should properly add new listeners to events', function () {
-      should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('networkError').length).be.exactly(3);
-      should(kuzzle.listeners('disconnected').length).be.exactly(2);
-      should(kuzzle.listeners('reconnected').length).be.exactly(1);
-    });
+  it('should only listen to allowed events', function() {
+    var
+      i,
+      knownEvents = [
+        'connected',
+        'networkError',
+        'disconnected',
+        'reconnected',
+        'jwtTokenExpired',
+        'loginAttempt',
+        'offlineQueuePush',
+        'offlineQueuePop',
+        'queryError',
+        'discarded'
+      ];
 
-    it('should throw an error if trying to adding a listener to an unknown event', function () {
-      should(function () {
-        kuzzle.addListener('foo', function () {});
-      }).throw();
-    });
+    should(function() {kuzzle.addListener('foo', sinon.stub());}).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());
+    for (i = 0; i < knownEvents.length; i++) {
+      kuzzle.addListener(knownEvents[i], sinon.stub());
+    }
 
-    it('should throw an error when providing a non-function listener argument', function () {
-      should(function () {
-        kuzzle.addListener('connected', 'bar');
-      }).throw();
-    });
+    should(addListenerStub.callCount).be.exactly(10);
+    for (i = 0; i < knownEvents.length; i++) {
+      should(addListenerStub.getCall(i)).be.calledWith(knownEvents[i]);
+    }
   });
 
-  describe('#removeAllListeners', function () {
-    it('should remove all registered listeners on a given event when asked to', function () {
-      kuzzle.removeAllListeners('disconnected');
+  it('should not re-emit an event before event timeout', function (done) {
 
-      should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('networkError').length).be.exactly(3);
-      should(kuzzle.listeners('disconnected').length).be.exactly(0);
-      should(kuzzle.listeners('reconnected').length).be.exactly(1);
-    });
+    kuzzle.emit('connected', 'foo');
+    kuzzle.emit('connected', 'foo');
+    kuzzle.emit('connected', 'foo');
+    kuzzle.emit('connected', 'foo');
+    kuzzle.emit('offlineQueuePush', 'bar');
 
-    it('should remove all registered listeners on all events when providing no event argument', function () {
-      kuzzle.removeAllListeners();
+    setTimeout(function () {
+      should(emitStub).be.calledTwice();
+      should(emitStub.firstCall).be.calledWith('connected', 'foo');
+      should(emitStub.secondCall).be.calledWith('offlineQueuePush', 'bar');
 
-      should(kuzzle.listeners('connected').length).be.exactly(0);
-      should(kuzzle.listeners('networkError').length).be.exactly(0);
-      should(kuzzle.listeners('disconnected').length).be.exactly(0);
-      should(kuzzle.listeners('reconnected').length).be.exactly(0);
-    });
+      emitStub.reset();
+      setTimeout(function () {
+        kuzzle.emit('connected', 'bar');
+        kuzzle.emit('connected', 'bar');
 
-    it('should throw an error when an unknown event is provided', function () {
-      try {
-        kuzzle.removeAllListeners('foo');
-        should.fail('success', 'failure', 'Should have failed removing listeners with an unknown event', '');
-      }
-      catch (e) {
-        should(kuzzle.listeners('connected').length).be.exactly(4);
-        should(kuzzle.listeners('networkError').length).be.exactly(3);
-        should(kuzzle.listeners('disconnected').length).be.exactly(2);
-        should(kuzzle.listeners('reconnected').length).be.exactly(1);
-      }
-    });
+        setTimeout(function () {
+          should(emitStub).be.calledOnce();
+          should(emitStub).be.calledWith('connected', 'bar');
+          done();
+        }, 0);
+      }, 30);
+    }, 0);
   });
 
-  describe('#removeListener', function () {
-    it('should remove any one listener from the listener list', function () {
-      kuzzle.removeListener('connected', stublistener2);
-      should(kuzzle.listeners('connected').length).be.exactly(3);
-      should(kuzzle.listeners('networkError').length).be.exactly(3);
-      should(kuzzle.listeners('disconnected').length).be.exactly(2);
-      should(kuzzle.listeners('reconnected').length).be.exactly(1);
-    });
-
-    it('should throw an error when trying to remove a listener from an unknown event', function () {
-      try {
-        kuzzle.removeListener('foo', function() {});
-        should.fail('success', 'failure', 'Should have failed removing listeners with an unknown event', '');
-      }
-      catch (e) {
-        should(kuzzle.listeners('connected').length).be.exactly(4);
-        should(kuzzle.listeners('networkError').length).be.exactly(3);
-        should(kuzzle.listeners('disconnected').length).be.exactly(2);
-        should(kuzzle.listeners('reconnected').length).be.exactly(1);
-      }
-    });
-
-    it('should do nothing if the provided listener id does not exist', function () {
-      kuzzle.removeListener('connected', function() {});
-      should(kuzzle.listeners('connected').length).be.exactly(4);
-      should(kuzzle.listeners('networkError').length).be.exactly(3);
-      should(kuzzle.listeners('disconnected').length).be.exactly(2);
-      should(kuzzle.listeners('reconnected').length).be.exactly(1);
-    });
-  });
 });

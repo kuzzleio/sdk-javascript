@@ -1,40 +1,23 @@
 var
   should = require('should'),
   bluebird = require('bluebird'),
-  rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/Kuzzle'),
+  Kuzzle = require('../../../src/Kuzzle'),
   Role = require('../../../src/security/Role');
 
 describe('Role constructor', function () {
   var
     kuzzle;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
-
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
   });
 
-  it('should throw an error if no id is provided', function (done) {
-    try {
-      new Role(kuzzle.security, null, null);
-    }
-    catch (e) {
-      should(e).be.Error();
-      return done();
-    }
-
-    return done(new Error('Constructor doesn\'t throw an Error'));
+  it('should throw an error if no id is provided', function () {
+    should(function() { new Role(kuzzle.security, null, null);}).throw(Error);
   });
 
-  it('should initialize properties and return a valid Profile object', function () {
-    var
-      role;
-
-    kuzzle = new Kuzzle('foo');
-    role = new Role(kuzzle.security, 'id', {some: 'content'});
+  it('should initialize properties and return a valid Role object', function () {
+    var role = new Role(kuzzle.security, 'id', {some: 'content'});
 
     should(role).be.instanceof(Role);
     should(role).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
@@ -42,7 +25,10 @@ describe('Role constructor', function () {
   });
 
   it('should expose functions', function () {
-    var role = new Role(kuzzle.security, 'test', {});
+    var role;
+
+    kuzzle.bluebird = bluebird;
+    role = new Role(kuzzle.security, 'test', {});
 
     should.exist(role.setContent);
     should.exist(role.serialize);

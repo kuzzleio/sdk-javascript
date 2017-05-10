@@ -1,10 +1,9 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
+  Kuzzle = require('../../src/Kuzzle'),
   Document = require('../../src/Document'),
-  SearchResult = rewire('../../src/SearchResult');
+  SearchResult = require('../../src/SearchResult');
 
 describe('SearchResult constructor', function () {
   var
@@ -14,10 +13,6 @@ describe('SearchResult constructor', function () {
     document,
     aggregations,
     collection;
-
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
@@ -62,7 +57,10 @@ describe('SearchResult constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var searchResult = new SearchResult(collection, 2, [document], aggregations, searchOptions, searchFilters);
+    var searchResult;
+
+    kuzzle.bluebird = bluebird;
+    searchResult = new SearchResult(collection, 2, [document], aggregations, searchOptions, searchFilters);
 
     should.exist(searchResult.fetchNextPromise);
   });

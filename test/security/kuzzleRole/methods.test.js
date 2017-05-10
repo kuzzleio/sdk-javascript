@@ -1,5 +1,6 @@
 var
   should = require('should'),
+  sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
   Role = require('../../../src/security/Role');
 
@@ -8,45 +9,15 @@ describe('Role methods', function () {
     kuzzle,
     role,
     result,
-    expectedQuery,
-    error = null,
-    queryStub = function (args, query, options, cb) {
-      should(args.controller).be.exactly(expectedQuery.controller);
-      should(args.action).be.exactly(expectedQuery.action);
+    expectedQuery;
 
-      if (expectedQuery.options) {
-        should(options).match(expectedQuery.options);
-      }
-
-      if (expectedQuery.body) {
-        if (!query.body) {
-          query.body = {};
-        }
-
-        should(query.body).match(expectedQuery.body);
-      } else {
-        should(query.body).be.undefined();
-      }
-
-      if (expectedQuery._id) {
-        should(query._id).be.exactly(expectedQuery._id);
-      }
-
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
-        cb(error, result);
-      }
-    };
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.query = sinon.stub();
+  });
 
   describe('#save', function () {
-    before(function () {
-      kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzle.query = queryStub;
-      error = null;
-
+    beforeEach(function () {
       result = { result: {_id: 'myRole', _source: {indexes : {}}} };
       role = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
@@ -56,21 +27,21 @@ describe('Role methods', function () {
     });
 
     it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
       should(role.save(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Role);
         done();
       }));
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myRole', body: {indexes : {}}}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
-
-      error = 'foobar';
       this.timeout(50);
 
       role.save(function (err, res) {
@@ -78,17 +49,15 @@ describe('Role methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 
   describe('#update', function () {
-    before(function () {
-      kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzle.query = queryStub;
-      error = null;
-
+    beforeEach(function () {
       result = { result: {_id: 'myRole', _index: '%kuzzle', _type: 'roles'} };
-      role = new Role(kuzzle.security, result.result._id, {indexes : {}});
+      role = new Role(kuzzle.security, 'myRole', {indexes : {}});
       expectedQuery = {
         action: 'updateRole',
         controller: 'security'
@@ -96,21 +65,21 @@ describe('Role methods', function () {
     });
 
     it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      should(role.update({'foo': 'bar'}, function (err, res) {
+      role.update({'foo': 'bar'}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Role);
         done();
-      }));
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myRole', body: {foo: 'bar'}}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
-
-      error = 'foobar';
       this.timeout(50);
 
       role.update({'foo': 'bar'}, function (err, res) {
@@ -118,30 +87,18 @@ describe('Role methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
 
-    it('should raise an error if no content given', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-      expectedQuery._id = result.result._id;
-
-      this.timeout(50);
-
-      try {
-        role.update();
-      }
-      catch (e) {
-        should(e).be.instanceOf(Error);
-        done();
-      }
+    it('should raise an error if no content given', function () {
+      should(function() {role.update();}).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
   });
 
   describe('#delete', function () {
-    before(function () {
-      kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzle.query = queryStub;
-      error = null;
-
+    beforeEach(function () {
       result = { result: {_id: 'myRole'} };
       role = new Role(kuzzle.security, result.result._id, result.result._source);
       expectedQuery = {
@@ -151,20 +108,21 @@ describe('Role methods', function () {
     });
 
     it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+      this.timeout(50);
 
-      should(role.delete(function (err, res) {
+      role.delete(function (err, res) {
         should(err).be.null();
-        should(res).be.exactly(result.result._id);
+        should(res).be.exactly('myRole');
         done();
-      }));
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myRole'}, null, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
-
       error = 'foobar';
 
       role.delete(function (err, res) {
@@ -172,6 +130,8 @@ describe('Role methods', function () {
         should(res).be.undefined();
         done();
       });
+
+      kuzzle.query.yield('foobar');
     });
   });
 });
