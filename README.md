@@ -12,16 +12,14 @@ For UI and linked objects developers, Kuzzle is an open-source solution that han
 
 You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
+* [Basic usage](#basic-usage)
 * [SDK Documentation](#sdk-documentation)
+* [Report an issue](#report-an-issue)
 * [Protocols used](#protocols-used)
 * [Installation](#installation)
   * [NodeJS](#nodejs)
-    * [Basic usage](#basic-usage-node)
   * [Javascript](#javascript)
-    * [Basic usage](#basic-usage-js)
 * [Building manually](#building-manually)
-* [Migrating from SDK v1.x](#migrating-from-sdk-v1.x)
-* [Note](#note)
 * [License](#license)
 
 ## Basic usage
