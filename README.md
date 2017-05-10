@@ -28,6 +28,12 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/?javascript#kuzzle)
 
+## Report an issue
+
+Use following meta repository to report issues on SDK:
+
+https://github.com/kuzzleio/kuzzle-sdk/issues
+
 ## Protocols used
 
 The SDK Javascript implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
