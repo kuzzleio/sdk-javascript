@@ -52,7 +52,11 @@ User.prototype.setProfiles = function (profileIds) {
     throw new Error('Parameter "profileIds" must be an array of strings');
   }
 
-  this.content.profileIds = profileIds;
+  if (!this.content.content) {
+    this.content.content = {};
+  }
+
+  this.content.content.profileIds = profileIds;
 
   return this;
 };
@@ -68,12 +72,16 @@ User.prototype.addProfile = function (profileId) {
     throw new Error('Parameter "profileId" must be a string');
   }
 
-  if (!this.content.profileIds) {
-    this.content.profileIds = [];
+  if (!this.content.content) {
+    this.content.content = {};
   }
 
-  if (this.content.profileIds.indexOf(profileId) === -1) {
-    this.content.profileIds.push(profileId);
+  if (!this.content.content.profileIds) {
+    this.content.content.profileIds = [];
+  }
+
+  if (this.content.content.profileIds.indexOf(profileId) === -1) {
+    this.content.content.profileIds.push(profileId);
   }
 
   return this;
@@ -182,7 +190,7 @@ User.prototype.serialize = function () {
  * @return {array} the associated profiles IDs
  */
 User.prototype.getProfiles = function () {
-  return this.content.profileIds;
+  return this.content.content.profileIds;
 };
 
 /**
@@ -191,7 +199,7 @@ User.prototype.getProfiles = function () {
  * @param {object} content - Content to add to KuzzleSecurityDocument
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
- * @returns {SecurityDocument} this
+ * @returns {User} this
  */
 User.prototype.update = function (content, options, cb) {
   var
