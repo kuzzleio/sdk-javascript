@@ -71,6 +71,8 @@ User.prototype.setCredentials = function (credentials) {
   }
 
   this.credentials = credentials;
+
+  return this;
 };
 
 /**
