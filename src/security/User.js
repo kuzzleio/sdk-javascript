@@ -27,7 +27,7 @@ function User(Security, id, content) {
     return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['save', 'saveRestricted'];
+        var whitelist = ['create', 'replace', 'saveRestricted'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -80,21 +80,16 @@ User.prototype.addProfile = function (profileId) {
 };
 
 /**
- * Saves this user into Kuzzle.
- *
- * If this is a new user, this function will create it in Kuzzle.
- * Otherwise, this method will replace the latest version of this user in Kuzzle by the current content
- * of this object.
+ * Creates this user into Kuzzle
  *
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {User} this
  */
-User.prototype.save = function (options, cb) {
+User.prototype.create = function (options, cb) {
   var
     data = this.serialize(),
-    self = this,
-    action = 'createUser';
+    self = this;
 
   if (!this.content.content.profileIds) {
     throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
@@ -105,18 +100,43 @@ User.prototype.save = function (options, cb) {
     options = null;
   }
 
-  this.Security.fetchUser(this.id, function (fetchError, fetchResult) {
-    if (fetchResult instanceof User) {
-      action = 'replaceUser';
-      data.body = data.body.content;
-    }
-
-    self.kuzzle.query(self.Security.buildQueryArgs(action), data, null, cb && function (err) {
-      cb(err, err ? undefined : self);
-    });
+  this.kuzzle.query(this.Security.buildQueryArgs('createUser'), data, null, cb && function (err) {
+    cb(err, err ? undefined : self);
   });
 
-  return self;
+  return this;
+};
+
+
+/**
+ * Replaces the latest version of this user in Kuzzle by the current content of this object.
+ *
+ * @param {object|responseCallback} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {User} this
+ */
+User.prototype.replace = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (!this.content.content.profileIds) {
+    throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
+  }
+
+  data.body = data.body.content;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+
+  this.kuzzle.query(this.Security.buildQueryArgs('replaceUser'), data, null, cb && function (err) {
+    cb(err, err ? undefined : self);
+  });
+
+  return this;
 };
 
 /**

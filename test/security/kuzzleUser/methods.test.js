@@ -18,25 +18,59 @@ describe('User methods', function () {
     kuzzle.query = sinon.stub();
   });
 
-  describe('#save', function () {
+  describe('#create', function () {
+    beforeEach(function () {
+      sandbox.reset();
+      result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
+      kuzzleUser = new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}});
+    });
+
+    it('should call createUser if the user does not exist', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, null);
+
+      should(kuzzleUser.create(function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(User);
+        should(kuzzle.query.args[0][0]).be.match({
+          controller: 'security',
+          action: 'createUser'
+        });
+        done();
+      }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, 'error');
+
+      kuzzleUser.create(function (err, res) {
+        should(err).be.exactly('error');
+        should(res).be.undefined();
+        done();
+      });
+    });
+  });
+
+  describe('#replace', function () {
     beforeEach(function () {
       sandbox.reset();
       kuzzle = new Kuzzle('http://localhost:7512');
-      error = null;
-      result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
+      result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}});
     });
 
     it('should call replaceUser if the user already exist', function (done) {
       kuzzle.query = sandbox.stub();
       kuzzle.query
-        .onCall(0).callsArgWith(3, null, result)
-        .onCall(1).callsArgWith(3, null);
+        .onCall(0).callsArgWith(3, null);
 
-      should(kuzzleUser.save(function (err, res) {
+      should(kuzzleUser.replace(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
-        should(kuzzle.query.args[1][0]).be.match({
+        should(kuzzle.query.args[0][0]).be.match({
           controller: 'security',
           action: 'replaceUser'
         });
@@ -44,41 +78,16 @@ describe('User methods', function () {
       }));
     });
 
-    it('should call createUser if the user does not exist', function (done) {
-      kuzzle.query = sandbox.stub();
-      kuzzle.query
-        .onCall(0).callsArgWith(3, 'error')
-        .onCall(1).callsArgWith(3, null);
-
-      should(kuzzleUser.save(function (err, res) {
-        should(err).be.null();
-        should(res).be.instanceof(User);
-        should(kuzzle.query.args[1][0]).be.match({
-          controller: 'security',
-          action: 'createUser'
-        });
-        done();
-      }));
-
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myUser', body: content}, null, sinon.match.func);
-
-      kuzzle.query.yield(null, result);
-    });
-
     it('should call the callback with an error if one occurs', function (done) {
       kuzzle.query = sandbox.stub();
       kuzzle.query
-        .onCall(0).callsArgWith(3, null, result)
-        .onCall(1).callsArgWith(3, 'error');
+        .onCall(0).callsArgWith(3, 'error');
 
-      kuzzleUser.save(function (err, res) {
+      kuzzleUser.replace(function (err, res) {
         should(err).be.exactly('error');
         should(res).be.undefined();
         done();
       });
-
-      kuzzle.query.yield('foobar');
     });
   });
 
