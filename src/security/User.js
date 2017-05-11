@@ -96,6 +96,10 @@ User.prototype.save = function (options, cb) {
     self = this,
     action = 'createUser';
 
+  if (!this.content.content.profileIds) {
+    throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
+  }
+
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;

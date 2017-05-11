@@ -1,14 +1,13 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
   MemoryStorage = require('../../src/MemoryStorage'),
-  Kuzzle = rewire('../../src/Kuzzle');
+  Kuzzle = require('../../src/Kuzzle');
 
 describe('MemoryStorage constructor', function () {
   it('should initialize properties and return a valid MemoryStorage object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       ms;
 
     kuzzle.headers.some = 'headers';
@@ -32,7 +31,7 @@ describe('MemoryStorage constructor', function () {
 
     Kuzzle.prototype.bluebird = bluebird;
 
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
     ms = new MemoryStorage(kuzzle);
 
     functions = Object.getOwnPropertyNames(Object.getPrototypeOf(ms)).filter(function (p) {
@@ -50,7 +49,7 @@ describe('MemoryStorage constructor', function () {
 
   it('should set headers using setHeaders', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       ms = new MemoryStorage(kuzzle);
 
     ms.setHeaders({foo: 'bar'}, true);
@@ -63,7 +62,7 @@ describe('MemoryStorage constructor', function () {
   it('auto-generated functions should throw if the wrong number of parameters is provided', function () {
     var
       emptyFunc = function () {},
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       ms = new MemoryStorage(kuzzle);
 
     should(function () {ms.dbsize('foo', {}, emptyFunc);}).throw('MemoryStorage.dbsize: Too many parameters provided');

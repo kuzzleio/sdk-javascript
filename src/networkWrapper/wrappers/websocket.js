@@ -1,5 +1,10 @@
+var
+  KuzzleEventEmitter = require('../../eventEmitter');
+
 function WSNode(host, port, ssl) {
   var self = this;
+  KuzzleEventEmitter.call(this);
+
   this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
   this.host = host;
   this.port = port;
@@ -9,20 +14,6 @@ function WSNode(host, port, ssl) {
   this.retrying = false;
   this.lasturl = null;
   this.stopRetryingToConnect = false;
-
-  /*
-   Listeners are stored using the following format:
-   roomId: {
-   fn: callback_function,
-   once: boolean
-   }
-   */
-  this.listeners = {
-    error: [],
-    connect: [],
-    disconnect: [],
-    reconnect: []
-  };
 
   /**
    * Creates a new socket from the provided arguments
@@ -46,10 +37,10 @@ function WSNode(host, port, ssl) {
 
     this.client.onopen = function () {
       if (self.wasConnected) {
-        poke(self.listeners, 'reconnect');
+        self.emitEvent('reconnect');
       }
       else {
-        poke(self.listeners, 'connect');
+        self.emitEvent('connect');
       }
       self.wasConnected = true;
       self.stopRetryingToConnect = false;
@@ -57,7 +48,7 @@ function WSNode(host, port, ssl) {
 
     this.client.onclose = function (code, message) {
       if (code === 1000) {
-        poke(self.listeners, 'disconnect');
+        self.emitEvent('disconnect');
       }
       else {
         onClientError.call(self, autoReconnect, reconnectionDelay, message);
@@ -71,11 +62,11 @@ function WSNode(host, port, ssl) {
     this.client.onmessage = function (payload) {
       var data = JSON.parse(payload.data || payload);
 
-      if (data.room && self.listeners[data.room]) {
-        poke(self.listeners, data.room, data);
+      if (data.room) {
+        self.emitEvent(data.room, data);
       }
-      else if (self.listeners.discarded) {
-        poke(self.listeners, 'discarded', data);
+      else {
+        self.emitEvent('discarded', data);
       }
     };
   };
@@ -86,10 +77,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnect = function (callback) {
-    this.listeners.connect.push({
-      fn: callback,
-      keep: true
-    });
+    this.addListener('connect', callback);
   };
 
   /**
@@ -97,10 +85,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnectError = function (callback) {
-    this.listeners.error.push({
-      fn: callback,
-      keep: true
-    });
+    this.addListener('networkError', callback);
   };
 
   /**
@@ -108,10 +93,7 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onDisconnect = function (callback) {
-    this.listeners.disconnect.push({
-      fn: callback,
-      keep: true
-    });
+    this.addListener('disconnect', callback);
   };
 
   /**
@@ -119,78 +101,8 @@ function WSNode(host, port, ssl) {
    * @param {function} callback
    */
   this.onReconnect = function (callback) {
-    this.listeners.reconnect.push({
-      fn: callback,
-      keep: true
-    });
+    this.addListener('reconnect', callback);
   };
-
-  /**
-   * Registers a callback on a room. Once 1 message is received, fires the
-   * callback and unregister it afterward.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.once = function (roomId, callback) {
-    if (!this.listeners[roomId]) {
-      this.listeners[roomId] = [];
-    }
-
-    this.listeners[roomId].push({
-      fn: callback,
-      keep: false
-    });
-  };
-
-  /**
-   * Registers a callback on a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.on = function (roomId, callback) {
-    if (!this.listeners[roomId]) {
-      this.listeners[roomId] = [];
-    }
-
-    this.listeners[roomId].push({
-      fn: callback,
-      keep: true
-    });
-  };
-
-  /**
-   * Unregisters a callback from a room.
-   *
-   * @param {string} roomId
-   * @param {function} callback
-   */
-  this.off = function (roomId, callback) {
-    var index = -1;
-
-    if (this.listeners[roomId]) {
-      // Array.findIndex is not supported by internet explorer
-      this.listeners[roomId].some(function (listener, i) {
-        if (listener.fn === callback) {
-          index = i;
-          return true;
-        }
-
-        return false;
-      });
-
-      if (index !== -1) {
-        if (this.listeners[roomId].length === 1 && ['error', 'connect', 'disconnect', 'reconnect'].indexOf(roomId) === -1) {
-          delete this.listeners[roomId];
-        }
-        else {
-          this.listeners[roomId].splice(index, 1);
-        }
-      }
-    }
-  };
-
 
   /**
    * Sends a payload to the connected server
@@ -207,55 +119,16 @@ function WSNode(host, port, ssl) {
    * Closes the connection
    */
   this.close = function () {
-    this.listeners = {
-      error: [],
-      connect: [],
-      disconnect: [],
-      reconnect: []
-    };
-
+    this.removeAllListeners();
     this.wasConnected = false;
     this.client.close();
     this.client = null;
     self.stopRetryingToConnect = true;
   };
 }
+WSNode.prototype = Object.create(KuzzleEventEmitter.prototype);
+WSNode.prototype.constructor = WSNode;
 
-/**
- * Executes all registered listeners in the provided
- * "listeners" structure.
- *
- * Listeners are of the following format:
- * [
- *    { fn: callback, once: boolean },
- *    ...
- * ]
- *
- * @private
- * @param {Object} listeners
- * @param {string} roomId
- * @param {Object} [payload]
- */
-function poke (listeners, roomId, payload) {
-  var
-    i,
-    length = listeners[roomId].length;
-
-  for (i = 0; i < length; ++i) {
-    listeners[roomId][i].fn(payload);
-
-    if (!listeners[roomId][i].keep) {
-      if (listeners[roomId].length > 1) {
-        listeners[roomId].splice(i, 1);
-        --i;
-        --length;
-      }
-      else {
-        delete listeners[roomId];
-      }
-    }
-  }
-}
 
 /**
  * Called when the connection closes with an error state
@@ -275,7 +148,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  poke(self.listeners, 'error', message);
+  self.emitEvent('networkError', message);
 }
 
 module.exports = WSNode;
