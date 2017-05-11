@@ -143,13 +143,13 @@ describe('Security user methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       this.timeout(50);
 
-      should(kuzzle.security.createUser('foobar', content, function (err, res) {
+      should(kuzzle.security.createUser('foobar', {content: content, credentials: {some: 'credentials'}}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
         done();
       }));
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {content: content, credentials: {some: 'credentials'}}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
