@@ -1,8 +1,9 @@
 var
   should = require('should'),
+  sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
-  Role = require('../../../src/security/Role'),
-  User = require('../../../src/security/User');
+  User = require('../../../src/security/User'),
+  sandbox = sinon.sandbox.create();
 
 describe('User methods', function () {
   var
@@ -38,46 +39,55 @@ describe('User methods', function () {
 
   describe('#save', function () {
     beforeEach(function () {
+      sandbox.reset();
       kuzzle = new Kuzzle('http://localhost:7512');
-      kuzzle.query = queryStub;
       error = null;
-
       result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
-      kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
-      expectedQuery = {
-        action: 'createOrReplaceUser',
-        controller: 'security'
-      };
+      kuzzleUser = new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}});
     });
 
-    it('should throw an error if the user has not profile parameter', function (done) {
-      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
-
-      should((function () {
-        kuzzleUser.save();
-      })).throw(Error);
-
-      done();
-    });
-
-    it('should send the right query to kuzzle', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
+    it('should call replaceUser if the user already exist', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, null, result)
+        .onCall(1).callsArgWith(3, null);
 
       should(kuzzleUser.save(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
+        should(kuzzle.query.args[1][0]).be.match({
+          controller: 'security',
+          action: 'replaceUser'
+        });
+        done();
+      }));
+    });
+
+    it('should call createUser if the user does not exist', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, 'error')
+        .onCall(1).callsArgWith(3, null);
+
+      should(kuzzleUser.save(function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(User);
+        should(kuzzle.query.args[1][0]).be.match({
+          controller: 'security',
+          action: 'createUser'
+        });
         done();
       }));
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = result.result._source;
-      expectedQuery._id = result.result._id;
-      error = 'foobar';
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, null, result)
+        .onCall(1).callsArgWith(3, 'error');
 
       kuzzleUser.save(function (err, res) {
-        should(err).be.exactly('foobar');
+        should(err).be.exactly('error');
         should(res).be.undefined();
         done();
       });
@@ -129,7 +139,6 @@ describe('User methods', function () {
       error = null;
 
       result = { result: {_id: 'myUser', _index: '%kuzzle', _type: 'users'} };
-      role = new Role(kuzzle.security, result.result._id, {indexes : {}});
       expectedQuery = {
         action: 'updateUser',
         controller: 'security'
@@ -237,7 +246,7 @@ describe('User methods', function () {
       done();
     });
 
-    it('should  add the profile if it does not already exists in list', function (done) {
+    it('should add the profile if it does not already exists in list', function (done) {
       kuzzleUser.addProfile('profile2');
 
       should(kuzzleUser.content.profileIds).be.eql(['profile1', 'profile2']);

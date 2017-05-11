@@ -613,7 +613,7 @@ Kuzzle.prototype.whoAmI = function (callback) {
       return callback(err);
     }
 
-    callback(null, new User(self.security, response.result._id, response.result._source));
+    callback(null, new User(self.security, response.result._id, {content: response.result._source, credentials: {}}));
   });
 };
 

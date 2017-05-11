@@ -93,15 +93,23 @@ User.prototype.addProfile = function (profileId) {
 User.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
-    self = this;
+    self = this,
+    action = 'createUser';
 
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;
   }
 
-  self.kuzzle.query(this.Security.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
-    cb(error, error ? undefined : self);
+  this.Security.fetchUser(this.id, function (fetchError, fetchResult) {
+    if (fetchResult instanceof User) {
+      action = 'replaceUser';
+      data.body = data.body.content;
+    }
+
+    self.kuzzle.query(self.Security.buildQueryArgs(action), data, null, cb && function (err) {
+      cb(err, err ? undefined : self);
+    });
   });
 
   return self;
