@@ -832,7 +832,7 @@ describe('Kuzzle methods', function () {
       should(kuzzle.query).be.calledOnce();
       should(kuzzle.query).be.calledWith(expectedQuery, {});
       should(cb).be.calledOnce();
-      should(cb).be.calledWithExactly(null, {result: {acknowledged: true}});
+      should(cb).be.calledWithExactly(null, {acknowledged: true});
     });
 
     it('should execute the callback with an error if an error occurs', function () {

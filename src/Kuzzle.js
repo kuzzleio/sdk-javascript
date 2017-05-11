@@ -552,7 +552,9 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
     options = null;
   }
 
-  this.query({controller: 'index', action: 'create', index: index}, {}, options, typeof cb !== 'function' ? null : cb);
+  this.query({controller: 'index', action: 'create', index: index}, {}, options, typeof cb !== 'function' ? null : function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
 
   return this;
 };
