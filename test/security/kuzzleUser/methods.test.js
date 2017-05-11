@@ -25,6 +25,16 @@ describe('User methods', function () {
       kuzzleUser = new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}});
     });
 
+    it('should throw an error if the user has not profile parameter', function (done) {
+      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
+
+      should((function () {
+        kuzzleUser.create();
+      })).throw(Error);
+
+      done();
+    });
+
     it('should call createUser if the user does not exist', function (done) {
       kuzzle.query = sandbox.stub();
       kuzzle.query
@@ -60,6 +70,17 @@ describe('User methods', function () {
       kuzzle = new Kuzzle('http://localhost:7512');
       result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}});
+    });
+
+
+    it('should throw an error if the user has not profile parameter', function (done) {
+      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
+
+      should((function () {
+        kuzzleUser.replace();
+      })).throw(Error);
+
+      done();
     });
 
     it('should call replaceUser if the user already exist', function (done) {
