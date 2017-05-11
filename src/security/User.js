@@ -19,6 +19,11 @@ function User(Security, id, content) {
     },
     updateActionName: {
       value: 'updateUser'
+    },
+    credentials: {
+      value: {},
+      writable: true,
+      enumerable: true
     }
   });
 
@@ -52,13 +57,20 @@ User.prototype.setProfiles = function (profileIds) {
     throw new Error('Parameter "profileIds" must be an array of strings');
   }
 
-  if (!this.content.content) {
-    this.content.content = {};
-  }
-
-  this.content.content.profileIds = profileIds;
+  this.content.profileIds = profileIds;
 
   return this;
+};
+
+/**
+ * @param {object} credentials
+ */
+User.prototype.setCredentials = function (credentials) {
+  if (typeof credentials !== 'object') {
+    throw new Error('Parameter "credentials" must be a object');
+  }
+
+  this.credentials = credentials;
 };
 
 /**
@@ -72,16 +84,12 @@ User.prototype.addProfile = function (profileId) {
     throw new Error('Parameter "profileId" must be a string');
   }
 
-  if (!this.content.content) {
-    this.content.content = {};
+  if (!this.content.profileIds) {
+    this.content.profileIds = [];
   }
 
-  if (!this.content.content.profileIds) {
-    this.content.content.profileIds = [];
-  }
-
-  if (this.content.content.profileIds.indexOf(profileId) === -1) {
-    this.content.content.profileIds.push(profileId);
+  if (this.content.profileIds.indexOf(profileId) === -1) {
+    this.content.profileIds.push(profileId);
   }
 
   return this;
@@ -96,10 +104,10 @@ User.prototype.addProfile = function (profileId) {
  */
 User.prototype.create = function (options, cb) {
   var
-    data = this.serialize(),
+    data = this.creationSerialize(),
     self = this;
 
-  if (!this.content.content.profileIds) {
+  if (!this.content.profileIds) {
     throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
   }
 
@@ -128,11 +136,9 @@ User.prototype.replace = function (options, cb) {
     data = this.serialize(),
     self = this;
 
-  if (!this.content.content.profileIds) {
+  if (!this.content.profileIds) {
     throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
   }
-
-  data.body = data.body.content;
 
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
@@ -185,52 +191,21 @@ User.prototype.serialize = function () {
 };
 
 /**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this User
+ */
+User.prototype.creationSerialize = function () {
+  return {_id: this.id, body: {content: this.content, credentials: this.credentials}};
+};
+
+/**
  * Return the associated profiles IDs
  *
  * @return {array} the associated profiles IDs
  */
 User.prototype.getProfiles = function () {
-  return this.content.content.profileIds;
-};
-
-/**
- * Update the current KuzzleSecurityDocument into Kuzzle.
- *
- * @param {object} content - Content to add to KuzzleSecurityDocument
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
- * @returns {User} this
- */
-User.prototype.update = function (content, options, cb) {
-  var
-    data = {},
-    self = this;
-
-  if (typeof content !== 'object') {
-    throw new Error('Parameter "content" must be a object');
-  }
-
-  if (options && cb === undefined && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  data._id = self.id;
-  data.body = content;
-
-  self.kuzzle.query(this.Security.buildQueryArgs(this.updateActionName), data, options, function (error, response) {
-    if (error) {
-      return cb ? cb(error) : false;
-    }
-
-    self.setContent({content: response.result._source, credentials: {}});
-
-    if (cb) {
-      cb(null, self);
-    }
-  });
-
-  return this;
+  return this.content.profileIds;
 };
 
 module.exports = User;

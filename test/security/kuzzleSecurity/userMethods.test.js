@@ -31,9 +31,9 @@ describe('Security user methods', function () {
         should(err).be.null();
         should(res).be.instanceof(User);
 
-        should(res.content.content.profileIds).be.an.Array();
-        should(res.content.content.profileIds[0]).be.a.String();
-        should(res.content.content.profileIds[0]).be.exactly('profile');
+        should(res.content.profileIds).be.an.Array();
+        should(res.content.profileIds[0]).be.a.String();
+        should(res.content.profileIds[0]).be.exactly('profile');
 
         done();
       });
@@ -96,9 +96,9 @@ describe('Security user methods', function () {
 
           should(item.id).be.exactly('foobar');
 
-          should(item.content.content.profileIds).be.an.Array();
-          should(item.content.content.profileIds[0]).be.a.String();
-          should(item.content.content.profileIds[0]).be.exactly('myProfile');
+          should(item.content.profileIds).be.an.Array();
+          should(item.content.profileIds[0]).be.a.String();
+          should(item.content.profileIds[0]).be.exactly('myProfile');
         });
 
         done();
@@ -247,7 +247,7 @@ describe('Security user methods', function () {
       kuzzle.security.replaceUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.instanceOf(User);
-        should(res).containDeep(new User(kuzzle.security, result.result._id, {content: result.result._source, credentials: {}}));
+        should(res).containDeep(new User(kuzzle.security, result.result._id, result.result._source));
         done();
       });
 
@@ -286,7 +286,7 @@ describe('Security user methods', function () {
       should(kuzzle.security.updateUser('foobar', content, function (err, res) {
         should(err).be.null();
         should(res).be.an.instanceOf(User);
-        should(res).containDeep(new User(kuzzle.security, 'foobar', {content: content, credentials: {}}));
+        should(res).containDeep(new User(kuzzle.security, 'foobar', content));
         done();
       }));
 

@@ -440,7 +440,7 @@ Security.prototype.fetchUser = function (id, options, cb) {
   self.kuzzle.callbackRequired('Security.fetchUser', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
-    cb(err, err ? undefined : new User(self, response.result._id, {content: response.result._source, credentials: {}}));
+    cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
   });
 };
 
@@ -474,7 +474,7 @@ Security.prototype.searchUsers = function (filters, options, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      return new User(self, doc._id, {content:doc._source, credentials: {}});
+      return new User(self, doc._id, doc._source);
     });
 
     cb(null, { total: response.result.total, users: documents });
@@ -531,7 +531,7 @@ Security.prototype.replaceUser = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs('replaceUser'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, {content: res.result._source, credentials: {}}));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 };
 
@@ -565,7 +565,7 @@ Security.prototype.createRestrictedUser = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs('createRestrictedUser'), data, null, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, {content: res.result._source, credentials: {}}));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 };
 
@@ -598,7 +598,7 @@ Security.prototype.updateUser = function (id, content, options, cb) {
   data.body = content;
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, {content: res.result._source, credentials: {}}));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
   });
 
   return this;

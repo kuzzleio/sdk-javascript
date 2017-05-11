@@ -551,7 +551,7 @@ describe('Kuzzle methods', function () {
     it('should call query with the right arguments', function () {
       var
         cb = sinon.stub(),
-        user = new User(kuzzle.security, 'foobar', {content: result.result._source, credentials: {}}),
+        user = new User(kuzzle.security, 'foobar', result.result._source),
         expectedQuery = {
           controller: 'auth',
           action: 'getCurrentUser'
