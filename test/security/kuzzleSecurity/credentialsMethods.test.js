@@ -23,9 +23,7 @@ describe('Credentials methods', function() {
         args = spy.firstCall.args;
 
         should(spy.calledOnce).be.true();
-        console.log('##', args[0]);
         should(args[0].controller).be.exactly('security');
-        console.log(args[0]);
         should(args[0].action).be.exactly('createCredentials');
         should(args[2]).be.exactly(null);
         done();

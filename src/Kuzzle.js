@@ -976,8 +976,8 @@ Kuzzle.prototype.addListener = function(event, listener) {
 
   this.isValid();
 
-  if (this.eventActions.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + this.eventActions.value.toString());
+  if (knownEvents.indexOf(event) === -1) {
+    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
   }
 
   if (listenerType !== 'function') {
