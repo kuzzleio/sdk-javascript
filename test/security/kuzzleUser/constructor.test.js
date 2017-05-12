@@ -31,7 +31,8 @@ describe('User constructor', function () {
     kuzzleUser = new User(kuzzle.security, 'test', {});
 
     should.exist(kuzzleUser.setProfiles);
-    should.exist(kuzzleUser.savePromise);
+    should.exist(kuzzleUser.createPromise);
+    should.exist(kuzzleUser.replacePromise);
     should.exist(kuzzleUser.serialize);
     should.exist(kuzzleUser.deletePromise);
   });

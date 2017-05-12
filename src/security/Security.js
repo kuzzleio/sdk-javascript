@@ -484,11 +484,6 @@ Security.prototype.searchUsers = function (filters, options, cb) {
 /**
  * Create a new user in Kuzzle.
  *
- * Takes an optional argument object with the following property:
- *    - replaceIfExist (boolean, default: false):
- *        If the same user already exists: throw an error if sets to false.
- *        Replace the existing user otherwise
- *
  * @param {string} id - user identifier
  * @param {object} content - attribute `profileIds` in `content` must only contain an array of profile ids
  * @param {object|responseCallback} [options] - (optional) arguments
@@ -497,8 +492,7 @@ Security.prototype.searchUsers = function (filters, options, cb) {
 Security.prototype.createUser = function (id, content, options, cb) {
   var
     self = this,
-    data = {_id: id, body: content},
-    action = 'createUser';
+    data = {_id: id, body: content};
 
   if (!id || typeof id !== 'string') {
     throw new Error('Security.createUser: cannot create a user without a user ID');
@@ -509,25 +503,9 @@ Security.prototype.createUser = function (id, content, options, cb) {
     options = null;
   }
 
-  if (options && options.hasOwnProperty('replaceIfExist')) {
-    self.fetchUser(id, function (fetchError, fetchResult) {
-      if (fetchResult instanceof User) {
-        if (options.replaceIfExist !== true) {
-          return cb(new Error('Security.createUser: User was found and shouldn\'t be replaced'));
-        }
-        action = 'replaceUser';
-      }
-
-      self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
-        cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
-      });
-    });
-  }
-  else {
-    self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
-      cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
-    });
-  }
+  self.kuzzle.query(self.buildQueryArgs('createUser'), data, null, cb && function (err, res) {
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+  });
 };
 
 /**

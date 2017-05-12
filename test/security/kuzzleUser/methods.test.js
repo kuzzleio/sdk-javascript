@@ -2,7 +2,8 @@ var
   should = require('should'),
   sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
-  User = require('../../../src/security/User');
+  User = require('../../../src/security/User'),
+  sandbox = sinon.sandbox.create();
 
 describe('User methods', function () {
   var
@@ -17,48 +18,97 @@ describe('User methods', function () {
     kuzzle.query = sinon.stub();
   });
 
-  describe('#save', function () {
+  describe('#create', function () {
     beforeEach(function () {
-      result = { result: {_id: 'myUser', _source: content} };
-      kuzzleUser = new User(kuzzle.security, 'myUser', content);
-      expectedQuery = {
-        action: 'createOrReplaceUser',
-        controller: 'security'
-      };
+      sandbox.reset();
+      result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
+      kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });
 
-    it('should throw an error if the user has no "profile" parameter', function () {
-      kuzzleUser = new User(kuzzle.security, 'myUser', {some: 'content'});
+    it('should throw an error if the user has not profile parameter', function (done) {
+      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
 
-      should(function () {kuzzleUser.save();}).throw(Error);
-      should(kuzzle.query).not.be.called();
+      should((function () {
+        kuzzleUser.create();
+      })).throw(Error);
+
+      done();
     });
 
-    it('should send the right query to kuzzle', function (done) {
-      this.timeout(50);
+    it('should call createUser if the user does not exist', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, null);
 
-      should(kuzzleUser.save(function (err, res) {
+      should(kuzzleUser.create(function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
+        should(kuzzle.query.args[0][0]).be.match({
+          controller: 'security',
+          action: 'createUser'
+        });
         done();
       }));
-
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myUser', body: content}, null, sinon.match.func);
-
-      kuzzle.query.yield(null, result);
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      this.timeout(50);
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, 'error');
 
-      kuzzleUser.save(function (err, res) {
-        should(err).be.exactly('foobar');
+      kuzzleUser.create(function (err, res) {
+        should(err).be.exactly('error');
         should(res).be.undefined();
         done();
       });
+    });
+  });
 
-      kuzzle.query.yield('foobar');
+  describe('#replace', function () {
+    beforeEach(function () {
+      sandbox.reset();
+      kuzzle = new Kuzzle('http://localhost:7512');
+      result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
+      kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
+    });
+
+
+    it('should throw an error if the user has not profile parameter', function (done) {
+      kuzzleUser = new User(kuzzle.security, result.result._id, {some: 'content'});
+
+      should((function () {
+        kuzzleUser.replace();
+      })).throw(Error);
+
+      done();
+    });
+
+    it('should call replaceUser if the user already exist', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, null);
+
+      should(kuzzleUser.replace(function (err, res) {
+        should(err).be.null();
+        should(res).be.instanceof(User);
+        should(kuzzle.query.args[0][0]).be.match({
+          controller: 'security',
+          action: 'replaceUser'
+        });
+        done();
+      }));
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      kuzzle.query = sandbox.stub();
+      kuzzle.query
+        .onCall(0).callsArgWith(3, 'error');
+
+      kuzzleUser.replace(function (err, res) {
+        should(err).be.exactly('error');
+        should(res).be.undefined();
+        done();
+      });
     });
   });
 
@@ -179,7 +229,7 @@ describe('User methods', function () {
       should((function () {kuzzleUser.addProfile(42);})).throw(Error);
     });
 
-    it('should  add the profile if it does not already exists in list', function () {
+    it('should add the profile if it does not already exists in list', function () {
       kuzzleUser.addProfile('profile2');
       should(kuzzleUser.content.profileIds).be.eql(['profile1', 'profile2']);
     });
@@ -207,6 +257,20 @@ describe('User methods', function () {
 
       should(serialized._id).be.exactly('user');
       should(serialized.body).be.match({some: 'content', profileIds: ['profile']});
+    });
+  });
+
+  describe('#creationSerialize', function () {
+    beforeEach(function () {
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
+      kuzzleUser.setCredentials({some: 'credentials'});
+    });
+
+    it('should serialize with correct attributes', function () {
+      var serialized = kuzzleUser.creationSerialize();
+
+      should(serialized._id).be.exactly('user');
+      should(serialized.body).be.match({content: {some: 'content', profileIds: ['profile']}, credentials: {some: 'credentials'}});
     });
   });
 

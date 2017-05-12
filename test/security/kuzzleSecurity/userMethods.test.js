@@ -1,8 +1,8 @@
 var
   should = require('should'),
-  sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
-  User = require('../../../src/security/User');
+  User = require('../../../src/security/User'),
+  sinon = require('sinon');
 
 describe('Security user methods', function () {
   var
@@ -143,13 +143,13 @@ describe('Security user methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       this.timeout(50);
 
-      should(kuzzle.security.createUser('foobar', content, function (err, res) {
+      should(kuzzle.security.createUser('foobar', {content: content, credentials: {some: 'credentials'}}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(User);
         done();
       }));
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {content: content, credentials: {some: 'credentials'}}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -158,34 +158,6 @@ describe('Security user methods', function () {
       kuzzle.security.createUser('foobar', content);
       should(kuzzle.query).be.calledOnce();
       should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
-    });
-
-    it('should construct a replaceUser action if option replaceIfExist is set to true', function () {
-      kuzzle.security.createUser('foobar', content, {replaceIfExist: true});
-      should(kuzzle.security.fetchUser).be.calledOnce();
-      should(kuzzle.security.fetchUser).be.calledWith('foobar', sinon.match.func);
-
-      expectedQuery.action = 'replaceUser';
-      kuzzle.security.fetchUser.yield(null, new User(kuzzle.security, 'foobar'));
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content});
-    });
-
-    it('should throw an error if replaceIfExist is false but user already exists', function (done) {
-      this.timeout(50);
-
-      kuzzle.security.createUser('foobar', content, {replaceIfExist: false}, function (err, res) {
-        should(err).be.Object().with.property('message');
-        should(err.message).be.exactly('Security.createUser: User was found and shouldn\'t be replaced');
-        should(res).be.Undefined();
-        done();
-      });
-      should(kuzzle.security.fetchUser).be.calledOnce();
-      should(kuzzle.security.fetchUser).be.calledWith('foobar', sinon.match.func);
-
-      expectedQuery.action = 'replaceUser';
-      kuzzle.security.fetchUser.yield(null, new User(kuzzle.security, 'foobar'));
-      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if no id provided', function () {
