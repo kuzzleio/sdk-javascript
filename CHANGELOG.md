@@ -1,3 +1,17 @@
+# [4.0.1](https://github.com/kuzzleio/sdk-javascript/releases/tag/4.0.1) (2017-05-9)
+
+[Full Changelog](https://github.com/kuzzleio/sdk-javascript/compare/4.0.1...4.0.1)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0-RC10 | 1.0.0-RC10 |
+
+#### Enhancements
+
+- [ [#200](https://github.com/kuzzleio/sdk-javascript/pull/200) ] Add kuzzle info in Document object   ([AnthonySendra](https://github.com/AnthonySendra))
+
 # [4.0.0](https://github.com/kuzzleio/sdk-javascript/releases/tag/4.0.0) (2017-04-10)
 
 [Full Changelog](https://github.com/kuzzleio/sdk-javascript/compare/4.0.0...4.0.0)
@@ -36,6 +50,7 @@
 - [ [#177](https://github.com/kuzzleio/sdk-javascript/pull/177) ] Remove previous and next cache in SearchResult   ([dbengsch](https://github.com/dbengsch))
 - [ [#177](https://github.com/kuzzleio/sdk-javascript/pull/177) ] Remove previous and next cache in SearchResult   ([dbengsch](https://github.com/dbengsch))
 - [ [#184](https://github.com/kuzzleio/sdk-javascript/pull/184) ] Browsers compatibility fix   ([scottinet](https://github.com/scottinet))
+
 ---
 
 # 3.4.0

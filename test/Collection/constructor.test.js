@@ -1,14 +1,13 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  Collection = rewire('../../src/Collection.js');
+  Kuzzle = require('../../src/Kuzzle'),
+  Collection = require('../../src/Collection.js');
 
 describe('Collection constructor', function () {
   it('should initialize properties and return a valid Collection object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       index = 'barfoo',
       collectionName = 'foobar',
       c;
@@ -37,7 +36,7 @@ describe('Collection constructor', function () {
       collection;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
     collection = new Collection(kuzzle, 'bar', 'foo');
 
     should.exist(collection.countPromise);
@@ -58,7 +57,7 @@ describe('Collection constructor', function () {
 
   it('should set headers using setHeaders', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       collection = kuzzle.collection('foo', 'bar');
 
     collection.setHeaders({foo: 'bar'}, true);
@@ -69,7 +68,7 @@ describe('Collection constructor', function () {
   });
 
   it('should throw an error if no collection or no index is provided', function () {
-    var kuzzle = new Kuzzle('foo');
+    var kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
     should((function () { new Collection(kuzzle);})).throw();
     should((function () { new Collection(kuzzle, 'foo');})).throw();

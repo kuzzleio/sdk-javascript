@@ -1,40 +1,23 @@
 var
   should = require('should'),
   bluebird = require('bluebird'),
-  rewire = require('rewire'),
-  Kuzzle = rewire('../../../src/Kuzzle'),
+  Kuzzle = require('../../../src/Kuzzle'),
   Profile = require('../../../src/security/Profile');
 
 describe('Profile constructor', function () {
   var
     kuzzle;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
-
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
   });
 
-  it('should throw an error if no id is provided', function(done) {
-    try {
-      new Profile(kuzzle.security, null, null);
-    }
-    catch (e) {
-      should(e).be.Error();
-      return done();
-    }
-
-    return done(new Error('Constructor doesn\'t throw an Error'));
+  it('should throw an error if no id is provided', function() {
+    should(function() { new Profile(kuzzle.security, null, null);}).throw(Error);
   });
 
   it('should initialize properties and return a valid Profile object', function () {
-    var
-      profile;
-
-    kuzzle = new Kuzzle('foo');
-    profile = new Profile(kuzzle.security, 'id', {some: 'content'});
+    var profile = new Profile(kuzzle.security, 'id', {some: 'content'});
 
     should(profile).be.instanceof(Profile);
     should(profile).have.propertyWithDescriptor('deleteActionName', { enumerable: false, writable: false, configurable: false });
@@ -42,7 +25,10 @@ describe('Profile constructor', function () {
   });
 
   it('should expose functions', function () {
-    var profile = new Profile(kuzzle.security, 'test', {});
+    var profile;
+
+    kuzzle.bluebird = bluebird;
+    profile = new Profile(kuzzle.security, 'test', {});
 
     should.exist(profile.save);
     should.exist(profile.addPolicy);
