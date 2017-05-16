@@ -266,6 +266,8 @@ Collection.prototype.documentExists = function (documentId, options, cb) {
     options = null;
   }
 
+  self.kuzzle.callbackRequired('Collection.documentExists', cb);
+
   self.kuzzle.query(this.buildQueryArgs('document', 'exists'), data, options, function (err, res) {
     cb(err, err ? undefined : res.result);
   });
