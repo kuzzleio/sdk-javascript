@@ -470,6 +470,67 @@ describe('Collection methods', function () {
     });
   });
 
+  describe('#documentExists', function () {
+    beforeEach(function () {
+      result = { result: true };
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'exists',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right documentExists query to Kuzzle', function(done) {
+      var options = { queuable: false };
+
+      this.timeout(50);
+
+      collection.documentExists('foo', options, function (err, res) {
+        should(err).be.null();
+        should(res).be.true();
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo'}, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      should(function () { collection.documentExists(); }).throw(Error);
+      should(function () { collection.documentExists({}); }).throw(Error);
+      should(function () { collection.documentExists({}, {}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.documentExists({}, cb1);
+      collection.documentExists({}, {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.documentExists({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
   describe('#fetchDocument', function () {
     beforeEach(function () {
       result = { result: {_id: 'foobar', _source: {foo: 'bar'} }};

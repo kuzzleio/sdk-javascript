@@ -70,6 +70,7 @@ describe('Document constructor', function () {
     var document = new Document(collection);
 
     should.exist(document.deletePromise);
+    should.not.exist(document.existsPromise);
     should.not.exist(document.publishPromise);
     should.exist(document.refreshPromise);
     should.exist(document.savePromise);

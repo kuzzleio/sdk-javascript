@@ -250,6 +250,30 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
 };
 
 /**
+ * Returns a boolean indicating whether or not a document with provided ID exists.
+ *
+ * @param {string} documentId - Unique document identifier
+ * @param {object} options [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+Collection.prototype.documentExists = function (documentId, options, cb) {
+  var
+    data = {_id: documentId},
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('Collection.documentExists', cb);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'exists'), data, options, function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+};
+
+/**
  * Retrieve a single stored document using its unique document ID.
  *
  * @param {string} documentId - Unique document identifier

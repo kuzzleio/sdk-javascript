@@ -162,6 +162,30 @@ Document.prototype.delete = function (options, cb) {
 };
 
 /**
+ * Checks if this document exists in Kuzzle.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+Document.prototype.exists = function (options, cb) {
+  var self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!self.id) {
+    throw new Error('Document.exists: cannot check if the document exists if no id has been provided');
+  }
+
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'exists'), this.serialize(), options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+};
+
+/**
  * Replaces the current content with the last version of this document stored in Kuzzle.
  *
  * @param {object} [options] - Optional parameters
