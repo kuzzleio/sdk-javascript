@@ -521,6 +521,128 @@ Kuzzle.prototype.login = function (strategy) {
 };
 
 /**
+ * Create credentials of the specified <strategy> for the current user.
+ *
+ * @param credentials
+ * @param strategy
+ * @param options
+ * @param cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.createMyCredentials = function (strategy, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'auth', action: 'createMyCredentials'}, {strategy: strategy, body: credentials}, options, function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result._source);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Delete credentials of the specified <strategy> for the current user.
+ *
+ * @param strategy
+ * @param options
+ * @param cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.deleteMyCredentials = function (strategy, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'auth', action: 'deleteMyCredentials'}, {strategy: strategy}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Get credential information of the specified <strategy> for the current user.
+ *
+ * @param strategy
+ * @param options
+ * @param cb
+ */
+Kuzzle.prototype.getMyCredentials = function (strategy, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'auth', action: 'getMyCredentials'}, {strategy: strategy}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
+ * Update credentials of the specified <strategy> for the current user.
+ *
+ * @param strategy
+ * @param credentals
+ * @param options
+ * @param cb
+ * @returns {Kuzzle}
+ */
+Kuzzle.prototype.updateMyCredentials = function (strategy, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'auth', action: 'updateMyCredentials'}, {strategy: strategy, body: credentials}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Validate credentials of the specified <strategy> for the current user.
+ *
+ * @param strategy
+ * @param credentials
+ * @param options
+ * @param cb
+ */
+Kuzzle.prototype.validateMyCredentials = function (strategy, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.query({controller: 'auth', action: 'validateMyCredentials'}, {strategy: strategy, body: credentials}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
  * Create a kuzzle index
  *
  * @param {string} index
