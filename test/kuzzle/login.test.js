@@ -82,12 +82,12 @@ describe('Kuzzle Login', function () {
       kuzzle.login('local', loginCredentials, '1h');
       should(queryStub.firstCall).be.calledWith(
         {controller: 'auth', action: 'login'},
-        {body: {strategy: 'local', username: 'foo', password: 'bar'}},
+        {strategy: 'local', body: {username: 'foo', password: 'bar'}},
         {queuable: false}
       );
       should(queryStub.secondCall).be.calledWith(
         {controller: 'auth', action: 'login'},
-        {body: {strategy: 'local', username: 'foo', password: 'bar', expiresIn: '1h'}},
+        {strategy: 'local', body: {username: 'foo', password: 'bar', expiresIn: '1h'}},
         {queuable: false}
       );
     });
@@ -95,6 +95,16 @@ describe('Kuzzle Login', function () {
 
 
   describe('#Error Login', function () {
+    it('should throw if called without strategy', function (done) {
+      should(function () {
+        kuzzle.login();
+      }).throw(Error);
+      should(function () {
+        kuzzle.login({username: 'foo', password: 'bar'}, '1h');
+      }).throw(Error);
+      done();
+    });
+
     it('should send a failed loginAttempt event if logging in fails', function (done) {
       sandbox.stub(kuzzle, 'query', function(queryArgs, query, options, cb) {
         cb({message: 'foobar'});
