@@ -316,6 +316,55 @@ describe('Security profiles methods', function () {
     });
   });
 
+  describe('#scrollProfiles', function () {
+    beforeEach(function () {
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ] } };
+    });
+
+    it('should throw an error if no scrollId is set', function () {
+      should(function () { kuzzle.security.scrollProfiles(); }).throw('Security.scrollProfiles: scrollId is required');
+    });
+
+    it('should throw an error if no callback is given', function () {
+      should(function () { kuzzle.security.scrollProfiles('scrollId'); }).throw('Security.scrollProfiles: a callback argument is required for read queries');
+    });
+
+    it('should parse the given parameters', function (done) {
+      var
+        queryScrollStub,
+        scrollId = 'scrollId',
+        options = { scroll: '30s' },
+        cb = function () {
+          done();
+        };
+
+      queryScrollStub = function (args, query, opts, callback) {
+        should(args.controller).be.exactly('security');
+        should(args.action).be.exactly('scrollProfiles');
+        should(query.scroll).be.exactly(options.scroll);
+        should(query.scrollId).be.exactly(scrollId);
+
+        callback(null, {
+          result: {
+            total: 1,
+            _scroll_id: 'banana',
+            hits: [
+              {
+                _id: 'foo',
+                _source: {bar: 'baz'}
+              }
+            ]
+          }
+        });
+      };
+
+      kuzzle.query = queryScrollStub;
+
+      kuzzle.security.scrollProfiles(scrollId, options, cb);
+    });
+  });
+
   describe('#ProfileFactory', function () {
     it('should return an instance of Profile', function () {
       var role = kuzzle.security.profile('test', {policies: [{roleId:'myRole'}]});
