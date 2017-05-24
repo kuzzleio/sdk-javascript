@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -27,28 +27,28 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "3.4.7",
+    "bluebird": "3.5.0",
     "eslint-loader": "^1.6.1",
     "uuid": "3.0.1",
-    "ws": "^2.0.3"
+    "ws": "^3.0.0"
   },
   "peerDependencies": {
     "bufferutil": "^2.0.1",
     "utf-8-validate": "^3.0.1"
   },
   "devDependencies": {
-    "codecov": "^1.0.1",
+    "codecov": "^2.2.0",
     "eslint": "^3.15.0",
-    "eslint-friendly-formatter": "^2.0.7",
+    "eslint-friendly-formatter": "^3.0.0",
     "istanbul": "0.4.5",
     "istanbul-middleware": "0.2.2",
-    "mocha": "3.2.0",
+    "mocha": "3.4.1",
     "ora": "^1.1.0",
     "proxyquire": "^1.7.11",
     "rewire": "^2.5.2",
-    "should": "11.2.0",
+    "should": "11.2.1",
     "should-sinon": "0.0.5",
-    "sinon": "^1.17.7",
+    "sinon": "^2.3.1",
     "webpack": "^1.13.1"
   },
   "engines": {

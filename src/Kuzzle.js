@@ -1,5 +1,6 @@
 var
   uuid = require('uuid'),
+  KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
@@ -29,6 +30,7 @@ function Kuzzle (host, options, cb) {
   if (!(this instanceof Kuzzle)) {
     return new Kuzzle(host, options, cb);
   }
+  KuzzleEventEmitter.call(this);
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -48,22 +50,20 @@ function Kuzzle (host, options, cb) {
     connectCB: {
       value: cb
     },
-    eventListeners: {
-      value: {
-        connected: {lastEmitted: null, listeners: []},
-        error: {lastEmitted: null, listeners: []},
-        disconnected: {lastEmitted: null, listeners: []},
-        reconnected: {lastEmitted: null, listeners: []},
-        jwtTokenExpired: {lastEmitted: null, listeners: []},
-        loginAttempt: {lastEmitted: null, listeners: []},
-        offlineQueuePush: {listeners: []},
-        offlineQueuePop: {listeners: []},
-        queryError: {listeners: []},
-        discarded: {listeners: []}
-      }
-    },
-    eventTimeout: {
-      value: 200
+    eventActions: {
+      value: [
+        'connected',
+        'networkError',
+        'disconnected',
+        'reconnected',
+        'jwtTokenExpired',
+        'loginAttempt',
+        'offlineQueuePush',
+        'offlineQueuePop',
+        'queryError',
+        'discarded'
+      ],
+      writeable: false
     },
     queuing: {
       value: false,
@@ -192,7 +192,7 @@ function Kuzzle (host, options, cb) {
       writable: true
     },
     offlineQueueLoader: {
-      value: null,
+      value: undefined,
       enumerable: true,
       writable: true
     }
@@ -252,39 +252,29 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
-  /**
-   * Emit an event to all registered listeners
-   * An event cannot be emitted multiple times before a timeout has been reached.
-   */
-  Object.defineProperty(this, 'emitEvent', {
-    value: function emitEvent(event) {
-      var
-        now = Date.now(),
-        args = Array.prototype.slice.call(arguments, 1),
-        eventProperties = this.eventListeners[event];
-
-      if (eventProperties.lastEmitted && eventProperties.lastEmitted >= now - this.eventTimeout) {
-        return false;
-      }
-
-      eventProperties.listeners.forEach(function (listener) {
-        setTimeout(function () {
-          listener.fn.apply(undefined, args);
-        }, 0);
-      });
-
-      // Events without the 'lastEmitted' property can be emitted without minimum time between emissions
-      if (eventProperties.lastEmitted !== undefined) {
-        eventProperties.lastEmitted = now;
-      }
-    }
-  });
-
   Object.defineProperty(this, 'memoryStorage', {
     value: new MemoryStorage(this),
     enumerable: true
   });
 
+  Object.defineProperties(this, {
+    eventTimeout: {
+      value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200,
+      writeable: false
+    }
+  });
+
+  Object.defineProperty(this, 'protectedEvents', {
+    value: {
+      connected: {timeout: this.eventTimeout},
+      error: {timeout: this.eventTimeout},
+      disconnected: {timeout: this.eventTimeout},
+      reconnected: {timeout: this.eventTimeout},
+      jwtTokenExpired: {timeout: this.eventTimeout},
+      loginAttempt: {timeout: this.eventTimeout}
+    },
+    writeable: false
+  });
 
   if (!options || !options.connect || options.connect === 'auto') {
     this.connect();
@@ -309,6 +299,27 @@ function Kuzzle (host, options, cb) {
     });
   }
 }
+Kuzzle.prototype = Object.create(KuzzleEventEmitter.prototype);
+Kuzzle.prototype.constructor = Kuzzle;
+
+/**
+* Emit an event to all registered listeners
+* An event cannot be emitted multiple times before a timeout has been reached.
+*/
+Kuzzle.prototype.emit = function(eventName) {
+  var
+    now = Date.now(),
+    protectedEvent = this.protectedEvents[eventName];
+
+  if (protectedEvent) {
+    if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - protectedEvent.timeout) {
+      return false;
+    }
+    protectedEvent.lastEmitted = now;
+  }
+  KuzzleEventEmitter.prototype.emit.apply(this, arguments);
+};
+Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
 
 /**
  * Connects to a Kuzzle instance using the provided host name.
@@ -353,7 +364,7 @@ Kuzzle.prototype.connect = function () {
 
     connectionError.internal = error;
     self.state = 'error';
-    self.emitEvent('error', connectionError);
+    self.emitEvent('networkError', connectionError);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
@@ -472,11 +483,13 @@ Kuzzle.prototype.getJwtToken = function() {
 Kuzzle.prototype.login = function (strategy) {
   var
     self = this,
-    request = {
-      strategy: strategy
-    },
+    request = {},
     credentials,
     cb = null;
+
+  if (!strategy || typeof strategy !== 'string') {
+    throw new Error('Kuzzle.login: strategy required');
+  }
 
   // Handle arguments (credentials, expiresIn, cb)
   if (arguments[1]) {
@@ -505,7 +518,7 @@ Kuzzle.prototype.login = function (strategy) {
     });
   }
 
-  this.query({controller: 'auth', action: 'login'}, {body: request}, {queuable: false}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, {body: request, strategy: strategy}, {queuable: false}, function(error, response) {
     if (!error) {
       if (response.result.jwt) {
         self.setJwtToken(response.result.jwt);
@@ -541,7 +554,9 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
     options = null;
   }
 
-  this.query({controller: 'index', action: 'create'}, {index: index}, options, typeof cb !== 'function' ? null : cb);
+  this.query({controller: 'index', action: 'create', index: index}, {}, options, typeof cb !== 'function' ? null : function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
 
   return this;
 };
@@ -575,10 +590,10 @@ Kuzzle.prototype.logout = function (cb) {
  * Checks whether a given jwt token still represents a valid session in Kuzzle.
  *
  * @param  {string}   token     The jwt token to check
- * @param  {function} callback  The callback to be called when the response is
+ * @param  {function} cb  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
  */
-Kuzzle.prototype.checkToken = function (token, callback) {
+Kuzzle.prototype.checkToken = function (token, cb) {
   var
     request = {
       body: {
@@ -586,34 +601,26 @@ Kuzzle.prototype.checkToken = function (token, callback) {
       }
     };
 
-  this.callbackRequired('Kuzzle.checkToken', callback);
+  this.callbackRequired('Kuzzle.checkToken', cb);
 
-  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, function (err, response) {
-    if (err) {
-      return callback(err);
-    }
-
-    callback(null, response.result);
+  this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, function (err, res) {
+    cb(err, err ? undefined : res.result);
   });
 };
 
 /**
  * Fetches the current user.
  *
- * @param  {function} callback  The callback to be called when the response is
+ * @param  {function} cb  The callback to be called when the response is
  *                              available. The signature is `function(error, response)`.
  */
-Kuzzle.prototype.whoAmI = function (callback) {
+Kuzzle.prototype.whoAmI = function (cb) {
   var self = this;
 
-  self.callbackRequired('Kuzzle.whoAmI', callback);
+  self.callbackRequired('Kuzzle.whoAmI', cb);
 
-  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, response) {
-    if (err) {
-      return callback(err);
-    }
-
-    callback(null, new User(self.security, response.result._id, response.result._source));
+  self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, res) {
+    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source));
   });
 };
 
@@ -634,11 +641,7 @@ Kuzzle.prototype.getMyRights = function (options, cb) {
   self.callbackRequired('Kuzzle.getMyRights', cb);
 
   self.query({controller: 'auth', action:'getMyRights'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.hits);
+    cb(err, err ? undefined : res.result.hits);
   });
 };
 
@@ -840,33 +843,18 @@ function removeAllSubscriptions() {
  * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
  * insertion.
  *
- * The ID returned by this function is required to remove this listener at a later time.
- *
- * @param {string} event - name of the global event to subscribe to (see the 'eventListeners' object property)
+ * @param {string} event - name of the global event to subscribe to
  * @param {function} listener - callback to invoke each time an event is fired
- * @returns {string} Unique listener ID
  */
 Kuzzle.prototype.addListener = function(event, listener) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    listenerType = typeof listener,
-    listenerId;
-
   this.isValid();
 
-  if (knownEvents.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
+  if (this.eventActions.indexOf(event) === -1) {
+    throw new Error('[' + event + '] is not a known event. Known events: ' + this.eventActions.toString());
   }
 
-  if (listenerType !== 'function') {
-    throw new Error('Invalid listener type: expected a function, got a ' + listenerType);
-  }
-
-  listenerId = uuid.v4();
-  this.eventListeners[event].listeners.push({id: listenerId, fn: listener});
-  return listenerId;
+  return KuzzleEventEmitter.prototype.addListener.call(this, event, listener);
 };
-
 
 /**
  * Kuzzle monitors active connections, and ongoing/completed/failed requests.
@@ -884,11 +872,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
   this.callbackRequired('Kuzzle.getAllStatistics', cb);
 
   this.query({controller:'server', action: 'getAllStats'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.hits);
+    cb(err, err ? undefined : res.result.hits);
   });
 };
 
@@ -989,7 +973,6 @@ Kuzzle.prototype.flushQueue = function () {
  */
 Kuzzle.prototype.listCollections = function () {
   var
-    collectionType = 'all',
     index,
     options,
     cb,
@@ -1020,26 +1003,10 @@ Kuzzle.prototype.listCollections = function () {
 
   this.callbackRequired('Kuzzle.listCollections', cb);
 
-  if (options && options.type) {
-    collectionType = options.type;
-  }
-
-  query = {body: {type: collectionType}};
-
-  if (options && options.from) {
-    query.body.from = options.from;
-  }
-
-  if (options && options.size) {
-    query.body.size = options.size;
-  }
+  query = {type: options && options.type || 'all'};
 
   this.query({index: index, controller: 'collection', action: 'list'}, query, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.collections);
+    cb(err, err ? undefined : res.result.collections);
   });
 };
 
@@ -1094,11 +1061,7 @@ Kuzzle.prototype.getServerInfo = function (options, cb) {
   this.callbackRequired('Kuzzle.getServerInfo', cb);
 
   this.query({controller: 'server', action: 'info'}, {}, options, function (err, res) {
-    if (err) {
-      return cb(err);
-    }
-
-    cb(null, res.result.serverInfo);
+    cb(err, err ? undefined : res.result.serverInfo);
   });
 };
 
@@ -1243,7 +1206,7 @@ Kuzzle.prototype.now = function (options, cb) {
   this.callbackRequired('Kuzzle.now', cb);
 
   this.query({controller: 'server', action: 'now'}, {}, options, function (err, res) {
-    cb(err, res && res.result.now);
+    cb(err, err ? undefined : res.result.now);
   });
 };
 
@@ -1358,6 +1321,8 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     if (!self.queueFilter || self.queueFilter(object)) {
       self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
       self.emitEvent('offlineQueuePush', {query: object, cb: cb});
+    } else {
+      discardRequest(object, cb);
     }
   }
   else {
@@ -1365,57 +1330,6 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   return self;
-};
-
-/**
- * Removes all listeners, either from a specific event or from all events
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @returns {Kuzzle} this object
- */
-Kuzzle.prototype.removeAllListeners = function (event) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    self = this;
-
-  if (event) {
-    if (knownEvents.indexOf(event) === -1) {
-      throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
-    }
-
-    this.eventListeners[event].listeners = [];
-  } else {
-    knownEvents.forEach(function (eventName) {
-      self.eventListeners[eventName].listeners = [];
-    });
-  }
-
-  return this;
-};
-
-/**
- * Removes a listener from an event.
- *
- * @param {string} event - One of the event described in the Event Handling section of this documentation
- * @param {string} listenerId - The ID returned by addListener
- * @returns {Kuzzle} this object
- */
-Kuzzle.prototype.removeListener = function (event, listenerId) {
-  var
-    knownEvents = Object.keys(this.eventListeners),
-    self = this;
-
-  if (knownEvents.indexOf(event) === -1) {
-    throw new Error('[' + event + '] is not a known event. Known events: ' + knownEvents.toString());
-  }
-
-  this.eventListeners[event].listeners.forEach(function (listener, index) {
-    if (listener.id === listenerId) {
-      self.eventListeners[event].listeners.splice(index, 1);
-    }
-  });
-
-  return this;
 };
 
 /**

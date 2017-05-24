@@ -1,10 +1,9 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
-  bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
+  sinon = require('sinon'),
+  Kuzzle = require('../../src/Kuzzle'),
   Document = require('../../src/Document'),
-  SearchResult = rewire('../../src/SearchResult');
+  SearchResult = require('../../src/SearchResult');
 
 describe('SearchResult methods', function () {
   var
@@ -15,76 +14,73 @@ describe('SearchResult methods', function () {
     searchOptions,
     searchFilters;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-  });
-
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.query = sinon.stub();
     searchOptions = {from:0, size: 1};
     searchFilters = {};
-    collection = kuzzle.collection('foo');
+    collection = kuzzle.collection('foo', 'bar');
     firstDocument = new Document(collection, 'banana', {foo: 'bar'});
     secondDocument = new Document(collection, 'papagayo', {foo: 'bar'});
   });
 
   describe('#fetchNext', function () {
+    beforeEach(function () {
+      collection.scroll = sinon.stub();
+    });
+
     it('should be able to do a scroll request', function (done) {
       var
-        mockScrollResult = new SearchResult(
-          collection,
-          1,
-          [new Document(collection, 'papagayo', {foo: 'bar'})],
-          {},
-          {options: {scrollId: 'papagayo', scroll: '1m', from: 0, size: 1}}
-        ),
         firstSearchResult;
 
-      collection.scroll = function(scrollId, options, filters, cb) {
-        cb(null, mockScrollResult);
-      };
+      this.timeout(50);
 
       searchOptions.scrollId = 'banana';
-
       firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
-
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
         should(result.getDocuments()).be.an.Array();
         should(result.getDocuments().length).be.exactly(1);
         done();
       });
+
+      collection.scroll.yield(null, new SearchResult(
+        collection,
+        1,
+        [new Document(collection, 'papagayo', {foo: 'bar'})],
+        {},
+        {options: {scrollId: 'papagayo', scroll: '1m', from: 0, size: 1}}
+      ));
     });
 
     it('should transfer error if not-able to do a scroll request', function (done) {
       var
         firstSearchResult;
 
-      collection.scroll = function(scrollId, options, filters, cb) {
-        cb(new Error('foobar scroll'));
-      };
+      this.timeout(50);
 
       searchOptions.scrollId = 'banana';
-
       firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
-
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('foobar scroll');
         done();
       });
+
+      collection.scroll.yield(new Error('foobar scroll'));
     });
 
     it('should be able to do a from / next search request', function (done) {
       var
         firstSearchResult;
 
+      this.timeout(50);
+
       collection.search = function(filters, options, cb) {
         cb(null, new SearchResult(collection, 2, [secondDocument], {}, options, filters));
       };
 
       firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
-
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
         should(result.documents).be.an.Array();

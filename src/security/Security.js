@@ -277,7 +277,9 @@ Security.prototype.searchProfiles = function (filters, options, cb) {
   self.kuzzle.callbackRequired('Security.searchProfiles', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchProfiles'), {body: filters}, options, function (error, response) {
-    var documents;
+    var
+      documents,
+      scrollId;
 
     if (error) {
       return cb(error);
@@ -287,7 +289,11 @@ Security.prototype.searchProfiles = function (filters, options, cb) {
       return new Profile(self, doc._id, doc._source);
     });
 
-    cb(null, { total: response.result.total, profiles: documents });
+    if (response.result.scrollId) {
+      scrollId = response.result.scrollId;
+    }
+
+    cb(null, { total: response.result.total, profiles: documents, scrollId: scrollId });
   });
 };
 
@@ -405,6 +411,58 @@ Security.prototype.deleteProfile = function (id, options, cb) {
 };
 
 /**
+ * @param {string} scrollId
+ * @param {object} [options]
+ * @param {responseCallback} cb
+ */
+Security.prototype.scrollProfiles = function (scrollId, options, cb) {
+  var
+    request = {},
+    self = this;
+
+  if (!scrollId) {
+    throw new Error('Security.scrollProfiles: scrollId is required');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  this.kuzzle.callbackRequired('Security.scrollProfiles', cb);
+
+  request.scrollId = scrollId;
+
+  if (options && options.scroll) {
+    request.scroll = options.scroll;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'scrollProfiles'}, request, options, function (error, result) {
+    var profiles = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (profile) {
+      var newProfile = new Profile(self, profile._id, profile._source);
+
+      newProfile.version = profile._version;
+
+      profiles.push(newProfile);
+    });
+
+    cb(null, {
+      total: result.result.total,
+      profiles: profiles,
+      scrollId: scrollId
+    });
+  });
+
+  return this;
+};
+
+/**
  * Instantiate a new Profile object. Workaround to the module.exports limitation, preventing multiple
  * constructors to be exposed without having to use a factory or a composed object.
  *
@@ -467,7 +525,9 @@ Security.prototype.searchUsers = function (filters, options, cb) {
   self.kuzzle.callbackRequired('Security.searchUsers', cb);
 
   self.kuzzle.query(this.buildQueryArgs('searchUsers'), {body: filters}, options, function (error, response) {
-    var documents;
+    var
+      documents,
+      scrollId = null;
 
     if (error) {
       return cb(error);
@@ -477,17 +537,16 @@ Security.prototype.searchUsers = function (filters, options, cb) {
       return new User(self, doc._id, doc._source);
     });
 
-    cb(null, { total: response.result.total, users: documents });
+    if (response.result.scrollId) {
+      scrollId = response.result.scrollId;
+    }
+
+    cb(null, { total: response.result.total, users: documents, scrollId: scrollId });
   });
 };
 
 /**
  * Create a new user in Kuzzle.
- *
- * Takes an optional argument object with the following property:
- *    - replaceIfExist (boolean, default: false):
- *        If the same user already exists: throw an error if sets to false.
- *        Replace the existing user otherwise
  *
  * @param {string} id - user identifier
  * @param {object} content - attribute `profileIds` in `content` must only contain an array of profile ids
@@ -497,8 +556,7 @@ Security.prototype.searchUsers = function (filters, options, cb) {
 Security.prototype.createUser = function (id, content, options, cb) {
   var
     self = this,
-    data = {_id: id, body: content},
-    action = 'createUser';
+    data = {_id: id, body: content};
 
   if (!id || typeof id !== 'string') {
     throw new Error('Security.createUser: cannot create a user without a user ID');
@@ -509,25 +567,9 @@ Security.prototype.createUser = function (id, content, options, cb) {
     options = null;
   }
 
-  if (options && options.hasOwnProperty('replaceIfExist')) {
-    self.fetchUser(id, function (fetchError, fetchResult) {
-      if (fetchResult instanceof User) {
-        if (options.replaceIfExist !== true) {
-          return cb(new Error('Security.createUser: User was found and shouldn\'t be replaced'));
-        }
-        action = 'replaceUser';
-      }
-
-      self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
-        cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
-      });
-    });
-  }
-  else {
-    self.kuzzle.query(self.buildQueryArgs(action), data, null, cb && function (err, res) {
-      cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
-    });
-  }
+  self.kuzzle.query(self.buildQueryArgs('createUser'), data, null, cb && function (err, res) {
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+  });
 };
 
 /**
@@ -649,6 +691,58 @@ Security.prototype.deleteUser = function (id, options, cb) {
 
   this.kuzzle.query(this.buildQueryArgs('deleteUser'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result._id);
+  });
+
+  return this;
+};
+
+/**
+ * @param {string} scrollId
+ * @param {object} [options]
+ * @param {responseCallback} cb
+ */
+Security.prototype.scrollUsers = function (scrollId, options, cb) {
+  var
+    request = {},
+    self = this;
+
+  if (!scrollId) {
+    throw new Error('Security.scrollUsers: scrollId is required');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  this.kuzzle.callbackRequired('Security.scrollUsers', cb);
+
+  request.scrollId = scrollId;
+
+  if (options && options.scroll) {
+    request.scroll = options.scroll;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'scrollUsers'}, request, options, function (error, result) {
+    var users = [];
+
+    if (error) {
+      return cb(error);
+    }
+
+    result.result.hits.forEach(function (user) {
+      var newUser = new User(self, user._id, user._source);
+
+      newUser.version = user._version;
+
+      users.push(newUser);
+    });
+
+    cb(null, {
+      total: result.result.total,
+      users: users,
+      scrollId: scrollId
+    });
   });
 
   return this;
