@@ -313,7 +313,8 @@ describe('Query management', function () {
       should(kuzzle.offlineQueue).be.empty();
       should(queueStub).not.be.called();
       should(cb).be.calledOnce();
-      should(cb).be.calledWithMatch(new Error('Discarded request'));
+      should(cb.firstCall.args[0]).be.instanceOf(Error);
+      should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request:');
     });
 
     it('should queue the request if a queue filter has been defined and if it allows queuing', function () {
@@ -353,7 +354,8 @@ describe('Query management', function () {
       should(kuzzle.offlineQueue).be.empty();
       should(queueStub).not.be.called();
       should(cb).be.calledOnce();
-      should(cb).be.calledWithMatch(new Error('Discarded request'));
+      should(cb.firstCall.args[0]).be.instanceOf(Error);
+      should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request:');
     });
 
     it('should set jwtToken except for auth/checkToken', function () {
