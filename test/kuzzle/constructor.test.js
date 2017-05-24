@@ -832,6 +832,7 @@ describe('Kuzzle constructor', function () {
         });
 
         kuzzle.query = function(queryArgs, query, options, cb) {
+          should(query.strategy).be.eql('local');
           cb(null, {result: {jwt: 'test-toto'}});
         };
 
