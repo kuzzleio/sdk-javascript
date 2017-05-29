@@ -148,7 +148,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  self.emitEvent('networkError', message);
+  self.emitEvent('networkError', new Error(message));
 }
 
 module.exports = WSNode;
