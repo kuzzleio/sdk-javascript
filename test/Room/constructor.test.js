@@ -1,19 +1,16 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  Room = rewire('../../src/Room');
+  Kuzzle = require('../../src/Kuzzle'),
+  Room = require('../../src/Room');
 
 describe('Room constructor', function () {
   var
     kuzzle,
     collection;
 
-  before(function () {
-    Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('nowhere', {defaultIndex: 'bar'});
-
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
     kuzzle.headers = {foo: 'bar'};
     collection = kuzzle.collection('foo');
   });
@@ -65,7 +62,10 @@ describe('Room constructor', function () {
   });
 
   it('should promisify the right functions', function () {
-    var room = new Room(collection);
+    var room;
+
+    kuzzle.bluebird = bluebird;
+    room = new Room(collection);
 
     should.exist(room.countPromise);
     should.not.exist(room.renewPromise);

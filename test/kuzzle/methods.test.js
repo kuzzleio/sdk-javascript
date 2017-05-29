@@ -5,100 +5,85 @@ var
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
-  Security = require('../../src/security/Security'),
   User = require('../../src/security/User');
 
 describe('Kuzzle methods', function () {
   var
-    expectedQuery,
-    passedOptions,
-    error,
-    result,
-    queryStub = function (args, query, options, cb) {
-      emitted = true;
-      should(args.collection).be.undefined();
-      should(args.index).be.eql(expectedQuery.index);
-      should(args.controller).be.exactly(expectedQuery.controller);
-      should(args.action).be.exactly(expectedQuery.action);
-      if (passedOptions) {
-        should(options).match(passedOptions);
+    queryStub = function(queryArgs, query, options, cb) {
+      if (!cb && typeof options === 'function') {
+        cb = options;
+        options = null;
       }
-
-      if (expectedQuery.body) {
-        should(query.body).match(expectedQuery.body);
-      } else {
-        should(Object.keys(query).length).be.exactly(0);
-      }
-
-      if (cb) {
-        if (error) {
-          return cb(error);
-        }
-
+      if (cb && typeof cb === 'function') {
         cb(error, result);
       }
     },
-    emitted,
+    error,
+    result,
     kuzzle;
+
+  beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    sinon.stub(kuzzle, 'query', queryStub);
+    result = null;
+    error = null;
+  });
 
   afterEach(function () {
     sandbox.restore();
   });
 
   describe('#getAllStatistics', function () {
+    var expectedQuery = {
+      controller: 'server',
+      action: 'getAllStats'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
-      result = {result: {hits: []}};
-      expectedQuery = {
-        controller: 'server',
-        action: 'getAllStats'
-      };
+      result = {result: {hits: ['foo', 'bar']}};
     });
 
     it('should throw an error if no callback is provided', function () {
       should(function () { kuzzle.getAllStatistics(); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
       should(function () { kuzzle.getAllStatistics({some: 'options'}); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
     it('should call the query function with the right arguments', function () {
-      kuzzle.getAllStatistics(function () {});
-      should(emitted).be.true();
+      var
+        cb = sinon.stub(),
+        options = {queuable: true, volatile: {foo: 'bar'}};
 
-      emitted = false;
-      passedOptions = {queuable: true, volatile: {foo: 'bar'}};
-      kuzzle.getAllStatistics(passedOptions, function () {});
+      kuzzle.getAllStatistics(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, null);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, ['foo', 'bar']);
+
+      cb.reset();
+      kuzzle.query.reset();
+
+      kuzzle.getAllStatistics(options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, ['foo', 'bar']);
     });
 
-    it('should execute the callback with an error if an error occurs', function (done) {
-      this.timeout(50);
-      error = 'foobar';
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
 
-      kuzzle.getAllStatistics(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
+      error = 'foobar';
+      kuzzle.getAllStatistics(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#getStatistics', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
-      result = {result: {hits: []}};
-      expectedQuery = {
-        controller: 'server',
-        action: 'getLastStats'
-      };
+      result = {result: {hits: ['foo', 'bar']}};
     });
 
     it('should throw an error if no callback is provided', function () {
@@ -108,71 +93,68 @@ describe('Kuzzle methods', function () {
       should(function () { kuzzle.getStatistics(123456, {}); }).throw(Error);
     });
 
-    it('should return the last statistics frame if no timestamp is provided', function () {
-      kuzzle.getStatistics(function () {});
-      should(emitted).be.true();
+    it('should call the query function with getLastStats action if no timestamp is given', function () {
+      var
+        cb = sinon.stub(),
+        expectedQuery = {
+          controller: 'server',
+          action: 'getLastStats'
+        },
+        options = {queuable: true, volatile: {foo: 'bar'}};
+
+      result = {result: {foo: 'bar'}};
+
+      kuzzle.getStatistics(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, null);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, [{foo: 'bar'}]);
+
+      cb.reset();
+      kuzzle.query.reset();
+
+      kuzzle.getStatistics(options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, [{foo: 'bar'}]);
     });
 
     it('should return statistics frames starting from the given timestamp', function () {
-      expectedQuery = {
-        controller: 'server',
-        action: 'getStats',
-        body: { startTime: 123 }
-      };
+      var
+        hits = [
+          {123: {}},
+          {456: {}},
+          {789: {}}
+        ],
+        cb = sinon.stub(),
+        options = {queuable: true, volatile: {foo: 'bar'}},
+        expectedQuery = {
+          controller: 'server',
+          action: 'getStats'
+        };
 
-      result = {
-        result: {
-          hits: [
-            {123: {}},
-            {456: {}},
-            {789: {}}
-          ]
-        }
-      };
+      result = {result: {hits: hits}};
 
-      kuzzle.getStatistics(123, function () {});
-      should(emitted).be.true();
+      kuzzle.getStatistics(123, options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {startTime: 123 }}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, hits);
     });
 
-    it('should execute the provided callback with an error argument if one occurs', function (done) {
+    it('should execute the provided callback with an error argument if one occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-      kuzzle.getStatistics(function (err, res) {
-        should(emitted).be.true();
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-
-    it('should handle arguments properly', function () {
-      /*
-      already tested by previous tests:
-       getStatistics(callback)
-       getStatistics(timestamp, callback)
-       */
-
-      // testing: getStatistics(options, callback)
-      passedOptions = { foo: 'bar' };
-      kuzzle.getStatistics(passedOptions, function () {});
-      should(emitted).be.true();
-
-      // testing: getStatistics(timestamp, options callback);
-      emitted = false;
-      expectedQuery = {
-        controller: 'server',
-        action: 'getStats',
-        body: { startTime: 123 }
-      };
-      kuzzle.getStatistics(123, passedOptions, function () {});
-      should(emitted).be.true();
+      kuzzle.getStatistics(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar');
+      error = 'foobar';
     });
   });
 
   describe('#collection', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should throw an error if arguments are not strings', function () {
       kuzzle.defaultIndex = 'foobar';
       should(function () { kuzzle.collection(undefined); }).throw(/string expected/);
@@ -191,11 +173,15 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
-      kuzzle.disconnect();
+      kuzzle.state = 'disconnected';
       should(function () { kuzzle.collection('foo'); }).throw(Error);
     });
 
-    it('should create and store the data collection instance if needed', function () {
+    it('should throw an error if no index is provided and no default index has been set', function () {
+      should(function () { kuzzle.collection('foo'); }).throw(/no index specified/);
+    });
+
+    it('should create and store the data collection instance', function () {
       var collection = kuzzle.collection('foo', 'bar');
 
       should(kuzzle.collections.bar.foo).not.be.undefined().and.be.instanceof(Collection);
@@ -209,27 +195,22 @@ describe('Kuzzle methods', function () {
 
     it('should use the default index if no index is provided', function () {
       var
-        collection,
-        defaultIndex = 'bar';
+        collection;
 
-      kuzzle.setDefaultIndex(defaultIndex);
+      kuzzle.defaultIndex = 'bar';
       collection = kuzzle.collection('foo');
       should(collection).be.instanceof(Collection);
-      should(collection.index).be.eql(defaultIndex);
-    });
-
-    it('should throw an error if no index is provided and no default index has been set', function () {
-      should(function () { kuzzle.collection('foo'); }).throw(/no index specified/);
+      should(collection.index).be.eql('bar');
     });
   });
 
   describe('#getServerInfo', function () {
+    var expectedQuery = {
+      controller: 'server',
+      action: 'info'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
       result = {result: {serverInfo: {
         kuzzle:
         { version: '0.9.2',
@@ -254,215 +235,202 @@ describe('Kuzzle methods', function () {
           }
         }
       }}};
-      expectedQuery = {
-        controller: 'server',
-        action: 'info'
-      };
-    });
-
-    it('should behave correctly when invoked', function () {
-      kuzzle.getServerInfo(function (err, res) {
-        should(err).be.null();
-        should(res).be.eql(result.result.serverInfo);
-      });
     });
 
     it('should throw an error if no callback is provided', function () {
       should(function () {kuzzle.getServerInfo();}).throw(Error);
-      should(emitted).be.false();
-
       should(function () {kuzzle.getServerInfo({some: 'options'});}).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should execute the callback with an error if one occurs', function (done) {
-      this.timeout(50);
-      error = 'foobar';
+    it('should call the query function with the right arguments', function () {
+      var
+        cb = sinon.stub(),
+        options = {queuable: true, volatile: {foo: 'bar'}};
 
-      kuzzle.getServerInfo('foo', function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
+      kuzzle.getServerInfo(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, null);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.serverInfo);
+
+      kuzzle.query.reset();
+      cb.reset();
+
+      kuzzle.getServerInfo(options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.serverInfo);
+    });
+
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
+      error = 'foobar';
+      kuzzle.getServerInfo(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#listCollections', function () {
+    var expectedQuery = {
+      index: 'foo',
+      controller: 'collection',
+      action: 'list'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
       result = {result: {collections: {stored: [], realtime: []}}};
-      expectedQuery = {
-        index: 'foo',
-        controller: 'collection',
-        action: 'list',
-        body: {type: 'all'}
-      };
     });
 
     it('should throw an error if no callback has been provided', function () {
       should(function () { kuzzle.listCollections('foo'); }).throw(Error);
-      should(emitted).be.false();
       should(function () { kuzzle.listCollections('foo', {}); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if no index has been provided', function () {
-      should(function () {kuzzle.listCollections(function () {});}).throw(Error);
-      should(emitted).be.false();
-      should(function () {kuzzle.listCollections({}, function () {});}).throw(Error);
-      should(emitted).be.false();
+      should(function () {kuzzle.listCollections(sinon.stub());}).throw(Error);
+      should(function () {kuzzle.listCollections({}, sinon.stub());}).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should call query with the right arguments', function (done) {
-      this.timeout(50);
+    it('should call the query function with the right arguments', function () {
+      var cb = sinon.stub();
+
       result = { result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux'] } } };
 
-      kuzzle.listCollections('foo', function (err, res) {
-        should(err).be.null();
-        should(res).be.an.Object().and.match(result.result.collections);
-        done();
-      });
+      kuzzle.listCollections('foo', cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {type: 'all'});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.collections);
+
+      cb.reset();
+      kuzzle.query.reset();
+
+      kuzzle.listCollections('foo', {type: 'foobar'}, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {type: 'foobar'});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.collections);
     });
 
-    it('should execute the callback with an error if one occurs', function (done) {
-      this.timeout(50);
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-
-      kuzzle.listCollections('foo', function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-
-    it('should handle type option correctly', function (done) {
-      expectedQuery.body.type = 'foobar';
-      kuzzle.listCollections('foo', {type: 'foobar'}, function () { done(); });
-    });
-
-    it('should handle from option correctly', function (done) {
-      expectedQuery.from = 'foobar';
-      kuzzle.listCollections('foo', {from: 'foobar'}, function () { done(); });
-    });
-
-    it('should handle size option correctly', function (done) {
-      expectedQuery.size = 'foobar';
-      kuzzle.listCollections('foo', {size: 'foobar'}, function () { done(); });
+      kuzzle.listCollections('foo', cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
 
     it('should use the default index if none is provided', function () {
-      kuzzle.setDefaultIndex('foo');
-      kuzzle.listCollections(function () {});
-      should(emitted).be.true();
-
-      emitted = false;
-      kuzzle.listCollections({some: 'options'}, function () {});
-      should(emitted).be.true();
+      kuzzle.defaultIndex = 'foo';
+      kuzzle.listCollections(sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
     });
   });
 
   describe('#listIndexes', function () {
+    var expectedQuery = {
+      controller: 'index',
+      action: 'list'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
       result = {result: {indexes: ['foo', 'bar']}};
-      expectedQuery = {
-        controller: 'index',
-        action: 'list'
-      };
     });
 
     it('should throw an error if no callback is provided', function () {
       should(function () { kuzzle.listIndexes(); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
 
       should(function () {kuzzle.listIndexes({some: 'options'});}).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should execute the callback with an error if one occurs', function (done) {
-      this.timeout(50);
+    it('should call the query function with the right arguments', function () {
+      var
+        cb = sinon.stub(),
+        options = {queuable: true, volatile: {foo: 'bar'}};
+
+      kuzzle.listIndexes(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, null);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, ['foo', 'bar']);
+
+      cb.reset();
+      kuzzle.query.reset();
+
+      kuzzle.listIndexes(options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, ['foo', 'bar']);
+    });
+
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-
-      kuzzle.listIndexes(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-
-
-  });
-
-  describe('#disconnect', function () {
-    it('should clean up and invalidate the instance if called', function () {
-      kuzzle = new Kuzzle('foo');
-
-      kuzzle.network.close = sinon.stub(kuzzle.network, 'close');
-      kuzzle.collections = { foo: {}, bar: {}, baz: {} };
-      kuzzle.disconnect();
-
-      should(kuzzle.network).be.null();
-      should(kuzzle.collections).be.empty();
-      should(function () { kuzzle.isValid(); }).throw(Error);
+      kuzzle.listIndexes(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#now', function () {
+    var expectedQuery = {
+      controller: 'server',
+      action: 'now'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-      kuzzle.query = queryStub;
-      emitted = false;
-      passedOptions = null;
-      error = null;
       result = {result: {now: Date.now()}};
-      expectedQuery = {
-        controller: 'server',
-        action: 'now'
-      };
     });
 
     it('should throw an error if called without a callback', function () {
       should(function () { kuzzle.now(); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
       should(function () { kuzzle.now({}); }).throw(Error);
-      should(emitted).be.false();
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should call query with the right arguments', function (done) {
-      this.timeout(50);
+    it('should call query with the right arguments', function () {
+      var cb = sinon.stub();
 
-      kuzzle.now(function (err, res) {
-        should(err).be.null();
-        should(res).be.exactly(result.result.now);
-        done();
-      });
+      kuzzle.now(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.now);
+
+      cb.reset();
+      kuzzle.query.reset();
+
+      kuzzle.now({foo: 'bar'}, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, {foo: 'bar'});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result.now);
     });
 
-    it('should execute the callback with an error argument if one occurs', function (done) {
-      this.timeout(50);
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-
-      kuzzle.now(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
+      kuzzle.now(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#setDefaultIndex', function () {
-    before(function () {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should throw an error if the provided index is not a string', function () {
       should((function () {kuzzle.setDefaultIndex();})).throw();
       should((function () {kuzzle.setDefaultIndex({});})).throw();
@@ -483,10 +451,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#setHeaders', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should throw an error if an invalid content object is provided', function () {
       should(function () { kuzzle.setHeaders(); }).throw(Error);
       should(function () { kuzzle.setHeaders(123); }).throw(Error);
@@ -504,543 +468,734 @@ describe('Kuzzle methods', function () {
 
     it('should replace existing headers if asked to', function () {
       kuzzle.setHeaders({foo: 'bar'});
-      kuzzle.setHeaders({}, true);
 
+      kuzzle.setHeaders({bar: 'foo'}, true);
+      should(kuzzle.headers).match({bar: 'foo'});
+      should(kuzzle.headers).not.match({foo: 'bar'});
+
+      kuzzle.setHeaders({}, true);
       should(kuzzle.headers).be.empty();
     });
   });
 
   describe('#checkToken', function () {
-    it('should send the checkToken after call', function () {
-      var
-        stubResults = { foo: 'bar' },
-        token = 'fakeToken-eoijaodmowifnw8h';
+    var token = 'fakeToken-eoijaodmowifnw8h';
 
-      this.timeout(200);
-
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
-      kuzzle.query = function (args, query, opts, cb) {
-        should(args.action).be.eql('checkToken');
-        should(args.controller).be.eql('auth');
-        should(query.body.token).be.eql(token);
-        cb(null, {result: stubResults });
-      };
-
-      kuzzle.state = 'connected';
-
-      kuzzle.checkToken(token, function (err, res) {
-        should(err).be.null();
-        should(res).be.eql(stubResults);
-      });
+    it('should throw an error if no callback is provided', function () {
+      should(function () { kuzzle.checkToken(); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+      should(function () { kuzzle.checkToken(token); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should resolve to an error if Kuzzle respond with one', function () {
+    it('should call query with the right arguments', function () {
       var
-        stubError = { foo: 'bar' },
-        token = 'fakeToken-eoijaodmowifnw8h';
+        now = Date.now(),
+        cb = sinon.stub(),
+        expectedQuery = {
+          controller: 'auth',
+          action: 'checkToken'
+        };
 
-      this.timeout(200);
-
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
-      kuzzle.query = function (args, query, opts, cb) {
-        should(args.action).be.eql('checkToken');
-        should(args.controller).be.eql('auth');
-        should(query.body.token).be.eql(token);
-        cb({error: stubError });
+      result = {
+        result: {
+          valid: true,
+          state: 'Error message',
+          expiresAt: now + 1000
+        }
       };
 
-      kuzzle.state = 'connected';
-
-      kuzzle.checkToken(token, function (err, res) {
-        should(err.error).be.eql(stubError);
-        should(res).be.undefined();
-      });
+      kuzzle.checkToken(token,cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {token: token}}, {queuable: false});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result);
     });
 
-    it('should throw an error when it is called with no callback', function (done) {
-      var
-        token = 'fakeToken-eoijaodmowifnw8h';
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
 
-      this.timeout(200);
-
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
-      kuzzle.queuing = true;
-
-      try {
-        kuzzle.checkToken(token, null);
-      } catch (e) {
-        should(e).be.an.instanceOf(Error);
-      } finally {
-        done();
-      }
+      error = 'foobar';
+      kuzzle.checkToken(token, cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#whoAmI', function () {
-    it('should send the getCurrentUser after call', function () {
-      this.timeout(200);
-
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
-      kuzzle.queuing = true;
-
-      kuzzle.whoAmI(function () {});
-
-      should(kuzzle.offlineQueue.length).be.exactly(1);
-      should(kuzzle.offlineQueue[0].query.action).be.exactly('getCurrentUser');
-      should(kuzzle.offlineQueue[0].query.controller).be.exactly('auth');
-    });
-
-    it('should send correct query and return a User', function (done) {
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-      kuzzle.query = queryStub;
-
-      error = false;
-      result = {result: {_id: 'user', _source: {firstName: 'Ada'}}};
-      expectedQuery = {
-        controller: 'auth',
-        action: 'getCurrentUser'
+    beforeEach(function() {
+      result = {
+        result: {
+          _id: 'foobar',
+          _source: {
+            name: {
+              first: 'John',
+              last: 'Doe'
+            },
+            profile: {
+              _id: 'default',
+              roles: [
+                {_id: 'default'}
+              ]
+            }
+          }
+        }
       };
-
-      kuzzle.whoAmI(function (err, res) {
-        should(res).instanceof(User);
-        done();
-      });
     });
 
-    it('should execute the callback with an error if an error occurs', function (done) {
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-      kuzzle.query = queryStub;
+    it('should throw an error if no callback is provided', function () {
+      should(function () { kuzzle.whoAmI(); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+    });
 
-      this.timeout(50);
+    it('should call query with the right arguments', function () {
+      var
+        cb = sinon.stub(),
+        user = new User(kuzzle.security, 'foobar', result.result._source),
+        expectedQuery = {
+          controller: 'auth',
+          action: 'getCurrentUser'
+        };
+
+      kuzzle.whoAmI(cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, {});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, user);
+    });
+
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-
-      kuzzle.whoAmI(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
+      kuzzle.whoAmI(cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#updateSelf', function () {
+    var expectedQuery = {
+      action: 'updateSelf',
+      controller: 'auth'
+    };
+
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-      kuzzle.query = queryStub;
-      error = null;
-      result = { result: {_id: 'foobar', _index: '%kuzzle', _type: 'users'} };
-      expectedQuery = {
-        action: 'updateSelf',
-        controller: 'auth'
+      result = {
+        result: {
+          _id: 'foobar',
+          _source: {
+            name: {
+              first: 'John',
+              last: 'Doe'
+            }
+          }
+        }
       };
     });
 
-    it('should send the right query to Kuzzle', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
-
-      should(kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
-        should(err).be.null();
-        should(res).be.exactly(result.result);
-        done();
-      }));
+    it('should send the right query to Kuzzle even without callback', function () {
+      kuzzle.updateSelf({foo: 'bar'});
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {foo: 'bar'}});
     });
 
-    it('should send the right query to Kuzzle even without callback', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
+    it('should send the right query to Kuzzle', function () {
+      var cb = sinon.stub();
 
-      kuzzle.updateSelf({'foo': 'bar'});
-      done();
+      kuzzle.updateSelf({foo: 'bar'}, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {foo: 'bar'}});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result.result);
+
     });
 
-    it('should call the callback with an error if one occurs', function (done) {
-      expectedQuery.body = {'foo': 'bar'};
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
       error = 'foobar';
-      this.timeout(50);
-
-      kuzzle.updateSelf({'foo': 'bar'}, function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-    });
-  });
-
-  describe('#security', function () {
-    it('should be an instance of Security', function () {
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
-      should(kuzzle.security).be.an.instanceOf(Security);
+      kuzzle.updateSelf({foo: 'bar'}, cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly('foobar', undefined);
     });
   });
 
   describe('#getJwtToken', function () {
     it('should return the current jwt token', function () {
-      kuzzle = new Kuzzle('nowhere', {
-        connect: 'manual'
-      });
-
       kuzzle.jwtToken = 'testToken';
-
       should(kuzzle.getJwtToken()).be.exactly('testToken');
     });
   });
 
   describe('#unsetJwtToken', function () {
-    var
-      subscriptionsRemoved,
-      revert;
+    var removeAllSubscriptionsStub = sinon.stub();
 
-    it('should unset the token and call removeAllSubscriptions', function (done) {
-      revert = Kuzzle.__set__('removeAllSubscriptions', function () { subscriptionsRemoved = true; });
-
-      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
-      subscriptionsRemoved = false;
-
-      kuzzle.unsetJwtToken();
-
-      process.nextTick(function () {
-        should(kuzzle.getJwtToken()).be.eql(undefined);
-        should(subscriptionsRemoved).be.true();
-        revert();
-        done();
-      });
+    it('should unset the token and call removeAllSubscriptions', function () {
+      Kuzzle.__with__({
+        'removeAllSubscriptions': removeAllSubscriptionsStub
+      })(function() {
+        kuzzle.jwtToken = 'testToken';
+        kuzzle.unsetJwtToken();
+        should(removeAllSubscriptionsStub).be.calledOnce();
+        should(kuzzle.jwtToken).be.undefined();
+      }
+      );
     });
 
-    it('should unsubscribe all rooms when un-setting token', function (done) {
+    it('should unsubscribe all rooms when un-setting token', function () {
       var
-        unsubscribeCalled,
-        stubKuzzleRoom;
-
-      stubKuzzleRoom = {
-        unsubscribe: function () { unsubscribeCalled = true; }
-      };
-
-      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
+        stubKuzzleRoom = {
+          unsubscribe: sinon.stub()
+        };
 
       kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
 
       kuzzle.unsetJwtToken();
 
-      setTimeout(function () {
-        should(unsubscribeCalled).be.true();
-        done();
-      }, 0);
+      should(stubKuzzleRoom.unsubscribe).be.calledOnce();
     });
   });
 
   describe('#setJwtToken', function () {
     var
-      eventEmitted,
-      loginStatus,
-      subscriptionsRenewed,
-      revert;
+      revert,
+      renewAllSubscriptionsStub = sinon.stub(),
+      loginAttemptStub = sinon.stub();
 
     before(function () {
-      revert = Kuzzle.__set__('renewAllSubscriptions', function () { subscriptionsRenewed = true; });
+      revert = Kuzzle.__set__('renewAllSubscriptions', renewAllSubscriptionsStub);
     });
 
     beforeEach(function () {
-      kuzzle = new Kuzzle('nowhere', {connect: 'manual'});
-      kuzzle.addListener('loginAttempt', function (status) {
-        eventEmitted = true;
-        loginStatus = status;
-      });
-      eventEmitted = false;
-      subscriptionsRenewed = false;
+      renewAllSubscriptionsStub.reset();
+      loginAttemptStub.reset();
+      kuzzle.addListener('loginAttempt', loginAttemptStub);
     });
 
     after(function () {
       revert();
     });
 
-    it('should set the token when provided with a string argument', function (done) {
+    it('should set the token when provided with a string argument', function () {
       kuzzle.setJwtToken('foobar');
 
-      setTimeout(function () {
-        should(kuzzle.getJwtToken()).be.eql('foobar');
-        should(subscriptionsRenewed).be.true();
-        should(eventEmitted).be.true();
-        should(loginStatus.success).be.true();
-        done();
-      }, 0);
+      should(kuzzle.jwtToken).be.eql('foobar');
+      should(renewAllSubscriptionsStub).be.calledOnce();
+      should(loginAttemptStub).be.calledOnce();
+      should(loginAttemptStub).be.calledWith({success: true});
     });
 
-    it('should set the token when provided with a kuzzle response argument', function (done) {
+    it('should set the token when provided with a kuzzle response argument', function () {
       kuzzle.setJwtToken({result:{jwt: 'foobar'}});
 
-      setTimeout(function () {
-        should(kuzzle.getJwtToken()).be.eql('foobar');
-        should(subscriptionsRenewed).be.true();
-        should(eventEmitted).be.true();
-        should(loginStatus.success).be.true();
-        done();
-      }, 0);
+      should(kuzzle.jwtToken).be.eql('foobar');
+      should(renewAllSubscriptionsStub).be.calledOnce();
+      should(loginAttemptStub).be.calledOnce();
+      should(loginAttemptStub).be.calledWith({success: true});
     });
 
-    it('should send an "attempt failed" event if provided with an invalid argument type', function (done) {
+    it('should send an "attempt failed" event if provided with an invalid argument type', function () {
       kuzzle.setJwtToken();
 
-      setTimeout(function () {
-        should(kuzzle.getJwtToken()).be.undefined();
-        should(subscriptionsRenewed).be.false();
-        should(eventEmitted).be.true();
-        should(loginStatus.success).be.false();
-        should(loginStatus.error).not.be.undefined();
-        done();
-      }, 0);
+      should(kuzzle.jwtToken).be.undefined();
+      should(renewAllSubscriptionsStub).not.be.calledOnce();
+      should(loginAttemptStub).be.calledOnce();
+      should(loginAttemptStub).be.calledWith({ error: 'Invalid token argument: undefined', success: false });
     });
 
-    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function (done) {
+    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
       kuzzle.setJwtToken({foo: 'bar'});
 
-      setTimeout(function () {
-        should(kuzzle.getJwtToken()).be.undefined();
-        should(subscriptionsRenewed).be.false();
-        should(eventEmitted).be.true();
-        should(loginStatus.success).be.false();
-        should(loginStatus.error).not.be.undefined();
-        done();
-      }, 0);
+      should(kuzzle.jwtToken).be.undefined();
+      should(renewAllSubscriptionsStub).not.be.calledOnce();
+      should(loginAttemptStub).be.calledOnce();
+      should(loginAttemptStub).be.calledWith({ error: 'Cannot find a valid JWT token in the following object: {"foo":"bar"}', success: false });
     });
   });
 
   describe('#refreshIndex', function () {
-    beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+    beforeEach(function() {
+      result = {
+        result: {
+          _shards: {
+            failed: 0,
+            succressful: 5,
+            total: 10
+          }
+        }
+      };
     });
 
-    it('should throw an error if no index is set', function () {
+    it('should throw an error if no index is given and no defaultIndex is set', function () {
       should(function () {kuzzle.refreshIndex();}).throw('Kuzzle.refreshIndex: index required');
     });
 
+    it('should send the right query to Kuzzle even without callback', function () {
+      var expectedQuery = {
+        controller: 'index',
+        action: 'refresh',
+        index: 'foobar'
+      };
+
+      kuzzle.refreshIndex('foobar');
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
+    });
+
     it('should use the default index if no index is given', function () {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns();
+      var expectedQuery = {
+        controller: 'index',
+        action: 'refresh',
+        index: 'defaultIndex'
+      };
 
       kuzzle.defaultIndex = 'defaultIndex';
       kuzzle.refreshIndex();
 
-      should(spy.calledOnce).be.true();
-      should(spy.firstCall.args[0].index).be.exactly(kuzzle.defaultIndex);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
     });
 
-    it('should parse the given parameters', function () {
+    it('should send the right query to Kuzzle', function () {
       var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        index = 'index',
-        options = {foo: 'bar'},
-        cb = function () {},
-        args;
+        cb = sinon.stub(),
+        expectedQuery = {
+          controller: 'index',
+          action: 'refresh',
+          index: 'foobar'
+        };
 
-      kuzzle.refreshIndex(index, options, cb);
-
-      should(spy.calledOnce).be.true();
-      args = spy.firstCall.args;
-
-      should(args[0].index).be.exactly(index);
-      should(args[0].controller).be.exactly('index');
-      should(args[0].action).be.exactly('refresh');
-      should(args[2]).be.exactly(options);
-      should(args[3]).be.exactly(cb);
+      kuzzle.refreshIndex('foobar', cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, result);
     });
 
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
+      error = 'foobar';
+      kuzzle.refreshIndex('index', cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith('foobar');
+    });
   });
 
   describe('#createIndex', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      result = {result: {acknowledged: true}};
     });
 
-    it('should throw an error if no index is set', function () {
+    it('should throw an error if no index is given and no defaultIndex is set', function () {
       should(function () { kuzzle.createIndex(); }).throw('Kuzzle.createIndex: index required');
+    });
+
+    it('should send the right query to Kuzzle even without callback', function () {
+      var expectedQuery = {
+        controller: 'index',
+        action: 'create',
+        index: 'foobar'
+      };
+
+      kuzzle.createIndex('foobar');
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
     });
 
     it('should use the default index if no index is given', function () {
       var
-        spy = sandbox.stub(kuzzle, 'query').returns();
+        expectedQuery = {
+          controller: 'index',
+          action: 'create',
+          index: 'defaultIndex'
+        };
 
       kuzzle.defaultIndex = 'defaultIndex';
       kuzzle.createIndex();
 
-      should(spy.calledOnce).be.true();
-      should(spy.firstCall.args[1].index).be.exactly(kuzzle.defaultIndex);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
     });
 
-    it('should parse the given parameters', function () {
+    it('should send the right query to Kuzzle', function () {
       var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        index = 'index',
-        options = {foo: 'bar'},
-        cb = function () {},
-        args;
+        cb = sinon.stub(),
+        expectedQuery = {
+          controller: 'index',
+          action: 'create',
+          index: 'foobar'
+        };
 
-      kuzzle.createIndex(index, options, cb);
-
-      should(spy.calledOnce).be.true();
-      args = spy.firstCall.args;
-
-      should(args[0].controller).be.exactly('index');
-      should(args[0].action).be.exactly('create');
-      should(args[1].index).be.exactly(index);
-      should(args[2]).be.exactly(options);
-      should(args[3]).be.exactly(cb);
+      kuzzle.createIndex('foobar', cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, {acknowledged: true});
     });
 
-    it('should parse the given parameters even if no options is given', function () {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        index = 'index',
-        cb = function () {},
-        args;
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
 
-      kuzzle.createIndex(index, cb);
-
-      should(spy.calledOnce).be.true();
-      args = spy.firstCall.args;
-
-      should(args[0].controller).be.exactly('index');
-      should(args[0].action).be.exactly('create');
-      should(args[1].index).be.exactly(index);
-      should(args[2]).be.null();
-      should(args[3]).be.exactly(cb);
+      error = 'foobar';
+      kuzzle.createIndex('index', cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith('foobar');
     });
-
   });
 
   describe('#getAutoRefresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      result = {
+        result: 'foobar'
+      };
     });
 
-    it('should throw an error if no index is given', function () {
+    it('should throw an error if no index is given and no defaultIndex is set', function () {
       should(function () { kuzzle.getAutoRefresh(); }).throw('Kuzzle.getAutoRefresh: index required');
     });
 
-    it('should use kuzzle default index if no index is provided', function () {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns();
-
-      kuzzle.defaultIndex = 'defaultIndex';
-
-      kuzzle.getAutoRefresh(function () {});
-
-      should(spy.calledOnce).be.true();
-      should(spy.firstCall.args[0].index).be.exactly(kuzzle.defaultIndex);
-
+    it('should throw an error if no callback is provided', function () {
+      should(function () { kuzzle.getAutoRefresh('index'); }).throw(Error);
+      should(kuzzle.query).not.be.called();
     });
 
-    it('should throw an error if no callback is given', function () {
-      should(function () { kuzzle.getAutoRefresh('index'); }).throw('Kuzzle.getAutoRefresh: a callback argument is required for read queries');
-    });
-
-    it('should parse the given arguments', function () {
+    it('should use the default index if no index is given', function () {
       var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        index = 'index',
-        options = { foo: 'bar'},
-        cb = function () {};
-
-      kuzzle.getAutoRefresh(index, options, cb);
-      should(spy.calledOnce).be.true();
-      should(spy.calledWithExactly(
-        { index: index, controller: 'index', action: 'getAutoRefresh' },
-        {},
-        options,
-        cb)
-      ).be.true();
+        cb = sinon.stub(),
+        expectedQuery = {
+          controller: 'index',
+          action: 'getAutoRefresh',
+          index: 'defaultIndex'
+        };
 
       kuzzle.defaultIndex = 'defaultIndex';
       kuzzle.getAutoRefresh(cb);
-      should(spy.calledTwice).be.true();
-      should(spy.secondCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'index', action: 'getAutoRefresh' },
-        {},
-        undefined,
-        cb)
-      ).be.true();
 
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, {result: 'foobar'});
     });
 
+    it('should send the right query to Kuzzle', function () {
+      var
+        cb = sinon.stub(),
+        options = { foo: 'bar'},
+        expectedQuery = {
+          controller: 'index',
+          action: 'getAutoRefresh',
+          index: 'foobar'
+        };
+
+      kuzzle.getAutoRefresh('foobar', options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, {result: 'foobar'});
+    });
+
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
+      error = 'foobar';
+      kuzzle.getAutoRefresh('foobar', cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith('foobar');
+    });
   });
 
   describe('#setAutoRefresh', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo');
+      result = {
+        result: 'foobar'
+      };
     });
 
     it('should throw an error if no index is given', function () {
       should(function () { kuzzle.setAutoRefresh(); }).throw('Kuzzle.setAutoRefresh: index required');
     });
 
-    it('should use kuzzle default index if none is provided', function () {
-      var
-        spy = sandbox.stub(kuzzle, 'query').returns(),
-        cb = function () {};
-
-      kuzzle.defaultIndex = 'defaultIndex';
-      kuzzle.setAutoRefresh(true, cb);
-      should(spy.calledOnce).be.true();
-      should(spy.calledWith(
-        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
-        { body: { autoRefresh: true } },
-        undefined,
-        cb
-      )).be.true();
-
-    });
-
     it('should throw an error is now autorefresh value is given', function () {
       should(function () {
-        kuzzle.setAutoRefresh('index');
+        kuzzle.setAutoRefresh('foobar');
       }).throw('Kuzzle.setAutoRefresh: autoRefresh value is required');
     });
 
-    it('should parse the given arguments', function () {
-      var
-        index = 'index',
-        autoRefresh = true,
-        options = { foo: 'bar'},
-        cb = function () {},
-        spy = sandbox.stub(kuzzle, 'query').returns();
-
-      kuzzle.defaultIndex = 'defaultIndex';
-
-      kuzzle.setAutoRefresh(autoRefresh, options, cb);
-      should(spy.calledOnce).be.true();
-      should(spy.firstCall.calledWithExactly(
-        { index: kuzzle.defaultIndex, controller: 'index', action: 'setAutoRefresh' },
-        { body: { autoRefresh: autoRefresh }},
-        options,
-        cb
-      )).be.true();
-
-      kuzzle.setAutoRefresh(index, autoRefresh);
-      should(spy.calledTwice).be.true();
-      should(spy.secondCall.calledWithExactly(
-        { index: index, controller: 'index', action: 'setAutoRefresh' },
-        { body: { autoRefresh: autoRefresh }},
-        undefined,
-        undefined
-      )).be.true();
+    it('should send the right query to Kuzzle even without callback', function () {
+      var expectedQuery = {
+        controller: 'index',
+        action: 'setAutoRefresh',
+        index: 'foobar'
+      };
+      kuzzle.setAutoRefresh('foobar', true);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {autoRefresh: true}});
     });
 
+    it('should use kuzzle default index if none is provided', function () {
+      var
+        expectedQuery = {
+          controller: 'index',
+          action: 'setAutoRefresh',
+          index: 'defaultIndex'
+        },
+        cb = sinon.stub();
+
+      kuzzle.defaultIndex = 'defaultIndex';
+      kuzzle.setAutoRefresh(true, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {autoRefresh: true}});
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith(null, {result: 'foobar'});
+
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      var
+        cb = sinon.stub(),
+        options = { foo: 'bar'},
+        expectedQuery = {
+          controller: 'index',
+          action: 'setAutoRefresh',
+          index: 'foobar'
+        };
+
+      kuzzle.setAutoRefresh('foobar', true, options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {body: {autoRefresh: true}}, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, {result: 'foobar'});
+    });
+
+    it('should execute the callback with an error if an error occurs', function () {
+      var cb = sinon.stub();
+
+      error = 'foobar';
+      kuzzle.setAutoRefresh('foobar', true, cb);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith('foobar');
+    });
+  });
+
+  describe('#createMyCredentials', function() {
+    beforeEach(function() {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should trigger callback with an error', function (done) {
+      var
+        cberror = {message: 'i am an error'},
+        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        args;
+
+      kuzzle.createMyCredentials('strategy', {foo: 'bar'}, function (err) {
+        should(err).be.exactly(cberror);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('createMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+
+    it('should call query with right arguments', function (done) {
+      var
+        doc = {_id: '42'},
+        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {_source: doc}}),
+        args;
+
+      kuzzle.createMyCredentials('strategy', {foo: 'bar'}, function (err, res) {
+        should(res).be.exactly(doc);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('createMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+  });
+
+  describe('#deleteMyCredentials', function() {
+    beforeEach(function() {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should trigger callback with an error', function (done) {
+      var
+        cberror = {message: 'i am an error'},
+        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        args;
+
+      kuzzle.deleteMyCredentials('strategy', function (err) {
+        should(err).be.exactly(cberror);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('deleteMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+
+    it('should call query with right arguments', function (done) {
+      var
+        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {acknowledged: true}}),
+        args;
+
+      kuzzle.deleteMyCredentials('strategy', function (err, res) {
+        should(res.acknowledged).be.exactly(true);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('deleteMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+  });
+
+  describe('#getMyCredentials', function() {
+    beforeEach(function() {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should trigger callback with an error', function (done) {
+      var
+        cberror = {message: 'i am an error'},
+        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        args;
+
+      kuzzle.getMyCredentials('strategy', function (err) {
+        should(err).be.exactly(cberror);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('getMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+
+    it('should call query with right arguments', function (done) {
+      var
+        doc = {_id: '42'},
+        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        args;
+
+      kuzzle.getMyCredentials('strategy', function (err, res) {
+        should(res).be.exactly(doc);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('getMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+  });
+
+  describe('#updateMyCredentials', function() {
+    beforeEach(function() {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should trigger callback with an error', function (done) {
+      var
+        cberror = {message: 'i am an error'},
+        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        args;
+
+      kuzzle.updateMyCredentials('strategy', {username: 'foo'}, function (err) {
+        should(err).be.exactly(cberror);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('updateMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+
+    it('should call query with right arguments', function (done) {
+      var
+        doc = {username: 'foo'},
+        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        args;
+
+      kuzzle.updateMyCredentials('strategy', doc, function (err, res) {
+        should(res).be.exactly(doc);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('updateMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+  });
+
+  describe('#validateMyCredentials', function() {
+    beforeEach(function() {
+      kuzzle = new Kuzzle('foo');
+    });
+
+    it('should trigger callback with an error', function (done) {
+      var
+        cberror = {message: 'i am an error'},
+        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        args;
+
+      kuzzle.validateMyCredentials('strategy', {username: 'foo'}, function (err) {
+        should(err).be.exactly(cberror);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('validateMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
+
+    it('should call query with right arguments', function (done) {
+      var
+        doc = {username: 'foo'},
+        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: true}),
+        args;
+
+      kuzzle.validateMyCredentials('strategy', doc, function (err, res) {
+        should(res).be.exactly(true);
+        args = spy.firstCall.args;
+
+        should(spy.calledOnce).be.true();
+
+        should(args[0].controller).be.exactly('auth');
+        should(args[0].action).be.exactly('validateMyCredentials');
+        should(args[2]).be.exactly(null);
+        done();
+      });
+    });
   });
 
 });
