@@ -9,7 +9,8 @@ var
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  SubscribeResult = require('../../src/SubscribeResult');
+  SubscribeResult = require('../../src/SubscribeResult'),
+  Bluebird = require('bluebird');
 
 describe('Collection methods', function () {
   var
@@ -20,6 +21,7 @@ describe('Collection methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle.bluebird = Bluebird;
     kuzzle.query = sinon.stub();
     collection = new Collection(kuzzle, 'foo', 'bar');
   });
@@ -713,6 +715,298 @@ describe('Collection methods', function () {
         done();
       });
       kuzzle.query.yield('foobar');
+    });
+  });
+
+  describe('#mCreate', function () {
+    var
+      content = { documents: [
+        { _id: 'foo1', foo: 'bar' },
+        { _id: 'foo2', foo: 'bar' }
+      ]},
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: { hits: content.documents, total: content.documents.length }};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mCreate',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mCreate query to Kuzzle', function () {
+      collection.mCreate(content.documents, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: content }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mCreate(); }).throw(Error);
+    });
+
+    it('should handle Document objects and promises', function() {
+      content.documents.push(new Document(collection, 'foo3', {foo: 'bar'}));
+
+      should(collection.mCreatePromise(content.documents)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully created documents ids', function (done) {
+      this.timeout(50);
+
+      collection.mCreate(content.documents, function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result);
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+  });
+
+  describe('#mCreateOrReplace', function () {
+    var
+      content = { documents: [
+        { _id: 'foo1', foo: 'bar' },
+        { _id: 'foo2', foo: 'bar' }
+      ]},
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: { hits: content.documents, total: content.documents.length }};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mCreateOrReplace',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mCreateOrReplace query to Kuzzle', function () {
+      collection.mCreateOrReplace(content.documents, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: content }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mCreateOrReplace(); }).throw(Error);
+    });
+
+    it('should handle Document objects and promises', function() {
+      content.documents.push(new Document(collection, 'foo3', {foo: 'bar'}));
+
+      should(collection.mCreateOrReplacePromise(content.documents)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully created or replaced documents ids', function (done) {
+      this.timeout(50);
+
+      collection.mCreateOrReplace(content.documents, function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(result);
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+  });
+
+  describe('#mDelete', function () {
+    var
+      content = { ids: ['foo1', 'foo2']},
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: content };
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mDelete',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mDelete query to Kuzzle', function () {
+      collection.mDelete(content.ids, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: content }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mDelete(); }).throw(Error);
+    });
+
+    it('should handle promises', function() {
+      should(collection.mDeletePromise(content.ids)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully deleted documents ids', function (done) {
+      this.timeout(50);
+
+      collection.mDelete(content.ids, function (err, res) {
+        should(res).should.be.instanceof(Object);
+        should(res).match(result);
+        done();
+      });
+
+      kuzzle.query.yield(null, { result: result });
+    });
+  });
+
+  describe('#mGet', function () {
+    var
+      content = { documents: [
+        { _id: 'foo1', foo: 'bar' },
+        { _id: 'foo2', foo: 'bar' }
+      ]},
+      argument = { ids: ['foo1', 'foo2'] },
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: { hits: content.documents, total: content.documents.length }};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mGet',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mGet query to Kuzzle', function () {
+      collection.mGet(argument.ids, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: argument }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mGet(); }).throw(Error);
+    });
+
+    it('should handle promises', function() {
+      should(collection.mGetPromise(argument.ids)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully retrieved documents', function (done) {
+      this.timeout(50);
+
+      collection.mGet(argument.ids, function (err, res) {
+        should(res).should.be.instanceof(Object);
+        should(res).match(result);
+        done();
+      });
+
+      kuzzle.query.yield(null, { result: result });
+    });
+  });
+
+  describe('#mReplace', function () {
+    var
+      content = { documents: [
+        { _id: 'foo1', foo: 'bar' },
+        { _id: 'foo2', foo: 'bar' }
+      ]},
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: { hits: content.documents, total: content.documents.length }};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mReplace',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mReplace query to Kuzzle', function () {
+      collection.mReplace(content.documents, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: content }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mReplace(); }).throw(Error);
+    });
+
+    it('should handle Document objects and promises', function() {
+      content.documents.push(new Document(collection, 'foo3', {foo: 'bar'}));
+
+      should(collection.mReplacePromise(content.documents)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully replaced documents', function (done) {
+      this.timeout(50);
+
+      collection.mReplace(content.documents, function (err, res) {
+        should(res).should.be.instanceof(Object);
+        should(res).match(result);
+        done();
+      });
+
+      kuzzle.query.yield(null, { result: result });
+    });
+  });
+
+  describe('#mUpdate', function () {
+    var
+      content = { documents: [
+        { _id: 'foo1', foo: 'bar' },
+        { _id: 'foo2', foo: 'bar' }
+      ]},
+      options = { queuable: false };
+
+    beforeEach(function () {
+      result = { _source: { hits: content.documents, total: content.documents.length }};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'mUpdate',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right mUpdate query to Kuzzle', function () {
+      collection.mUpdate(content.documents, options, sinon.stub());
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: content }, options);
+    });
+
+    it('should handle invalid argument', function () {
+      should(function () { collection.mUpdate(); }).throw(Error);
+    });
+
+    it('should handle Document objects and promises', function() {
+      content.documents.push(new Document(collection, 'foo3', {foo: 'bar'}));
+
+      should(collection.mUpdatePromise(content.documents)).be.fulfilled();
+
+      kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should return an array with successfully updated documents', function (done) {
+      this.timeout(50);
+
+      collection.mUpdate(content.documents, function (err, res) {
+        should(res).should.be.instanceof(Object);
+        should(res).match(result);
+        done();
+      });
+
+      kuzzle.query.yield(null, { result: result });
     });
   });
 
