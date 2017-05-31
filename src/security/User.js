@@ -32,7 +32,7 @@ function User(Security, id, content) {
     return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['create', 'replace', 'saveRestricted', 'update'];
+        var whitelist = ['create', 'replace', 'saveRestricted', 'update', 'getProfiles'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -204,10 +204,48 @@ User.prototype.creationSerialize = function () {
 /**
  * Return the associated profiles IDs
  *
- * @return {array} the associated profiles IDs
+ * @return {array.<string>} the associated profiles IDs
  */
-User.prototype.getProfiles = function () {
-  return this.content.profileIds;
+User.prototype.getProfileIds = function () {
+  return this.content.profileIds || [];
+};
+
+/**
+ * Return the associated Profile objects
+ *
+ * @param {object|responseCallback} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+User.prototype.getProfiles = function (options, cb) {
+  var 
+    self = this,
+    fetchedProfiles = [],
+    errored = false;
+
+  if (!self.content.profileIds) {
+    return fetchedProfiles;
+  }
+
+  self.Security.kuzzle.callbackRequired('User.getProfiles', cb);
+
+  self.content.profileIds.forEach(function (profileId) {
+    self.Security.fetchprofile(profileId, option, function (error, profile) {
+      if (error) {
+        if (errored) {
+          return;
+        }
+
+        errored = true; // prevents multiple callback resolutions
+        return cb(error);
+      }
+
+      fetchedProfiles.push(profile);
+
+      if (fetchedProfiled.length === self.content.profileIds.length) {
+        cb(null, fetchProfiles);
+      }
+    });
+  });
 };
 
 module.exports = User;
