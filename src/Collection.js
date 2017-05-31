@@ -389,7 +389,7 @@ Collection.prototype.getMapping = function (options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mCreate = function (documents, options, cb) {
+Collection.prototype.mCreateDocument = function (documents, options, cb) {
   var
     data = {
       body: {},
@@ -428,7 +428,7 @@ Collection.prototype.mCreate = function (documents, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mCreateOrReplace = function (documents, options, cb) {
+Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb) {
   var
     data = {
       body: {},
@@ -467,7 +467,7 @@ Collection.prototype.mCreateOrReplace = function (documents, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mDelete = function (documentIds, options, cb) {
+Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
   var
     data = {
       body: {
@@ -504,7 +504,7 @@ Collection.prototype.mDelete = function (documentIds, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mGet = function (documentIds, options, cb) {
+Collection.prototype.mGetDocument = function (documentIds, options, cb) {
   var
     data = {
       body: {
@@ -541,7 +541,7 @@ Collection.prototype.mGet = function (documentIds, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mReplace = function (documents, options, cb) {
+Collection.prototype.mReplaceDocument = function (documents, options, cb) {
   var
     data = {
       body: {}
@@ -580,7 +580,7 @@ Collection.prototype.mReplace = function (documents, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  * @returns {object} this
  */
-Collection.prototype.mUpdate = function (documents, options, cb) {
+Collection.prototype.mUpdateDocument = function (documents, options, cb) {
   var
     data = {
       body: {}
