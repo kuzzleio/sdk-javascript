@@ -312,11 +312,20 @@ describe('User methods', function () {
     });
   });
 
-  describe('#getProfiles', function () {
+  describe('#getProfileIds', function () {
     it('should return the associated profiles', function () {
       var profileIds = ['profile'];
       kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: profileIds});
-      should(kuzzleUser.getProfiles()).be.eql(profileIds);
+      should(kuzzleUser.getProfileIds()).be.eql(profileIds);
     });
+
+    it('should return an empty array if no profile ID is attached', function () {
+      kuzzleUser = new User(kuzzle.security, 'foo', {});
+      should(kuzzleUser.getProfileIds()).be.an.Array().and.be.empty();
+    });
+  });
+
+  describe('#getProfiles', function () {
+    
   });
 });
