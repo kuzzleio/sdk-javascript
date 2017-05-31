@@ -396,13 +396,13 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
     },
     self = this;
 
-  if (!Array.isArray(documents)) {
-    throw new Error('Collection.mCreate: documents parameter format is invalid (should be an array of documents)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mCreateDocument: documents parameter format is invalid (should be an array of documents)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mCreate', cb);
@@ -435,13 +435,13 @@ Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb
     },
     self = this;
 
-  if (!Array.isArray(documents)) {
-    throw new Error('Collection.mCreateOrReplace: documents parameter format is invalid (should be an array of documents)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mCreateOrReplaceDocument: documents parameter format is invalid (should be an array of documents)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mCreateOrReplace', cb);
@@ -476,13 +476,13 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
     },
     self = this;
 
-  if (!Array.isArray(documentIds)) {
-    throw new Error('Collection.mDelete: documentIds parameter format is invalid (should be an array of IDs)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documentIds)) {
+    return cb(new Error('Collection.mDeleteDocument: documentIds parameter format is invalid (should be an array of IDs)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mDelete', cb);
@@ -513,13 +513,13 @@ Collection.prototype.mGetDocument = function (documentIds, options, cb) {
     },
     self = this;
 
-  if (!Array.isArray(documentIds)) {
-    throw new Error('Collection.mGet: documentIds parameter format is invalid (should be an array of IDs)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documentIds)) {
+    return cb(new Error('Collection.mGetDocument: documentIds parameter format is invalid (should be an array of IDs)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mGet', cb);
@@ -548,13 +548,13 @@ Collection.prototype.mReplaceDocument = function (documents, options, cb) {
     },
     self = this;
 
-  if (!Array.isArray(documents)) {
-    throw new Error('Collection.mReplace: documents parameter format is invalid (should be an array of documents)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mReplaceDocument: documents parameter format is invalid (should be an array of documents)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mReplace', cb);
@@ -587,13 +587,13 @@ Collection.prototype.mUpdateDocument = function (documents, options, cb) {
     },
     self = this;
 
-  if (!Array.isArray(documents)) {
-    throw new Error('Collection.mUpdate: documents parameter format is invalid (should be an array of documents)');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mUpdateDocument: documents parameter format is invalid (should be an array of documents)'));
   }
 
   self.kuzzle.callbackRequired('Collection.mUpdate', cb);
