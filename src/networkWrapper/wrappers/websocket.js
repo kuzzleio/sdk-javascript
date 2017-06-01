@@ -46,17 +46,39 @@ function WSNode(host, port, ssl) {
       self.stopRetryingToConnect = false;
     };
 
-    this.client.onclose = function (code, message) {
-      if (code === 1000) {
+    this.client.onclose = function (closeEvent, message) {
+      var error;
+      var status;
+      var reason = message;
+
+      if (typeof closeEvent === 'number') {
+        status = closeEvent;
+      }
+      else {
+        status = closeEvent.code;
+
+        if (closeEvent.reason) {
+          reason = closeEvent.reason;
+        }
+      }
+
+      if (status === 1000) {
         self.emitEvent('disconnect');
       }
       else {
-        onClientError.call(self, autoReconnect, reconnectionDelay, message);
+        error = new Error(reason);
+        error.status = status;
+
+        onClientNetworkError.call(self, autoReconnect, reconnectionDelay, error);
       }
     };
 
     this.client.onerror = function (error) {
-      onClientError.call(self, autoReconnect, reconnectionDelay, error);
+      if (!(error instanceof Error)) {
+        error = new Error(error);
+      }
+
+      onClientNetworkError.call(self, autoReconnect, reconnectionDelay, error);
     };
 
     this.client.onmessage = function (payload) {
@@ -135,9 +157,9 @@ WSNode.prototype.constructor = WSNode;
  *
  * @param {boolean} autoReconnect
  * @param {number} reconnectionDelay
- * @param {string|Object} message
+ * @param {Error} error
  */
-function onClientError(autoReconnect, reconnectionDelay, message) {
+function onClientNetworkError(autoReconnect, reconnectionDelay, error) {
   var self = this;
 
   if (autoReconnect && !self.retrying && !self.stopRetryingToConnect) {
@@ -148,7 +170,7 @@ function onClientError(autoReconnect, reconnectionDelay, message) {
     }, reconnectionDelay);
   }
 
-  self.emitEvent('networkError', message);
+  self.emitEvent('networkError', error);
 }
 
 module.exports = WSNode;

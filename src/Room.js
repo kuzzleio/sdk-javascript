@@ -157,13 +157,14 @@ Room.prototype.count = function (cb) {
  */
 Room.prototype.renew = function (filters, notificationCB, cb) {
   var
+    self = this,
+    networkListener = null,
     now = Date.now(),
     subscribeQuery = {
-      scope: this.scope,
-      state: this.state,
-      users: this.users
-    },
-    self = this;
+      scope: self.scope,
+      state: self.state,
+      users: self.users
+    };
 
   if (typeof filters === 'function') {
     cb = notificationCB;
@@ -212,7 +213,16 @@ Room.prototype.renew = function (filters, notificationCB, cb) {
   self.kuzzle.subscriptions.pending[self.id] = self;
 
   subscribeQuery.body = self.filters;
-  subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, this.headers);
+  subscribeQuery = self.kuzzle.addHeaders(subscribeQuery, self.headers);
+
+  networkListener = function() {
+    self.subscribing = false;
+
+    self.kuzzle.removeListener('networkError', networkListener);
+  };
+
+  self.kuzzle.removeListener('networkError', networkListener);
+  self.kuzzle.addListener('networkError', networkListener);
 
   self.kuzzle.query(self.collection.buildQueryArgs('realtime', 'subscribe'), subscribeQuery, {volatile: self.volatile}, function (error, response) {
     delete self.kuzzle.subscriptions.pending[self.id];

@@ -3,6 +3,16 @@ function SocketIO(host, port, ssl) {
   this.port = port;
   this.ssl = ssl;
   this.socket = null;
+  this.wasConnected = false;
+  this.forceDisconnect = false;
+  this.handlers = {
+    connect: [],
+    reconnect: [],
+    connectError: [],
+    disconnect: []
+  };
+  this.retrying = false;
+  this.stopRetryingToConnect = false;
 
   /**
    * Creates a new socket from the provided arguments
@@ -12,10 +22,74 @@ function SocketIO(host, port, ssl) {
    * @param {int} reconnectionDelay
    */
   this.connect = function (autoReconnect, reconnectionDelay) {
+    var self = this;
+
     this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
       reconnection: autoReconnect,
       reconnectionDelay: reconnectionDelay,
       forceNew: true
+    });
+
+    this.socket.on('connect', function() {
+      if (self.wasConnected) {
+        self.handlers.reconnect.forEach(function(handler) {
+          handler();
+        });
+      }
+      else {
+        self.handlers.connect.forEach(function(handler) {
+          handler();
+        });
+      }
+
+      self.wasConnected = true;
+      self.stopRetryingToConnect = false;
+    });
+
+    this.socket.on('connect_error', function(error) {
+      self.handlers.connectError.forEach(function(handler) {
+        handler(error);
+      });
+
+      if (autoReconnect && !self.retrying && !self.stopRetryingToConnect) {
+        self.retrying = true;
+        setTimeout(function () {
+          self.retrying = false;
+          self.connect(autoReconnect, reconnectionDelay);
+        }, reconnectionDelay);
+      }
+    });
+
+    this.socket.on('disconnect', function() {
+      if (!self.forceDisconnect) {
+        self.handlers.disconnect.forEach(function(handler) {
+          handler();
+        });
+      }
+
+      self.forceDisconnect = false;
+    });
+
+    this.socket.on('kuzzle_proxy_disconnection', function(error) {
+      self.forceDisconnect = true;
+
+      self.handlers.connectError.forEach(function(handler) {
+        handler(error);
+      });
+
+      if (autoReconnect && !self.retrying) {
+        self.retrying = true;
+        setTimeout(function () {
+          self.retrying = false;
+          self.connect(autoReconnect, reconnectionDelay);
+        }, reconnectionDelay);
+      }
+    });
+
+    this.socket.on('reconnect', function() {
+      self.handlers.reconnect.forEach(function(handler) {
+        handler();
+      });
     });
   };
 
@@ -25,7 +99,9 @@ function SocketIO(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnect = function (callback) {
-    this.socket.on('connect', callback);
+    if (this.handlers.connect.indexOf(callback) === -1) {
+      this.handlers.connect.push(callback);
+    }
   };
 
   /**
@@ -33,7 +109,9 @@ function SocketIO(host, port, ssl) {
    * @param {function} callback
    */
   this.onConnectError = function (callback) {
-    this.socket.on('connect_error', callback);
+    if (this.handlers.connectError.indexOf(callback) === -1) {
+      this.handlers.connectError.push(callback);
+    }
   };
 
   /**
@@ -41,7 +119,9 @@ function SocketIO(host, port, ssl) {
    * @param {function} callback
    */
   this.onDisconnect = function (callback) {
-    this.socket.on('disconnect', callback);
+    if (this.handlers.disconnect.indexOf(callback) === -1) {
+      this.handlers.disconnect.push(callback);
+    }
   };
 
   /**
@@ -49,7 +129,9 @@ function SocketIO(host, port, ssl) {
    * @param {function} callback
    */
   this.onReconnect = function (callback) {
-    this.socket.on('reconnect', callback);
+    if (this.handlers.reconnect.indexOf(callback) === -1) {
+      this.handlers.reconnect.push(callback);
+    }
   };
 
   /**
@@ -99,6 +181,7 @@ function SocketIO(host, port, ssl) {
   this.close = function () {
     this.socket.close();
     this.socket = null;
+    this.stopRetryingToConnect = true;
   };
 }
 

@@ -22,7 +22,6 @@ var
  * @param host - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
- * @constructor
  */
 function Kuzzle (host, options, cb) {
   var self = this;
@@ -80,11 +79,15 @@ function Kuzzle (host, options, cb) {
     subscriptions: {
       /*
        Contains the centralized subscription list in the following format:
-          pending: <number of pending subscriptions>
+          pending: {
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
+          },
           'roomId': {
-            kuzzleRoomID_1: kuzzleRoomInstance_1,
-            kuzzleRoomID_2: kuzzleRoomInstance_2,
-            kuzzleRoomID_...: kuzzleRoomInstance_...
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
           }
 
        This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
