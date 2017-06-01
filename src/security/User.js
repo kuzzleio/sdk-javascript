@@ -222,14 +222,19 @@ User.prototype.getProfiles = function (options, cb) {
     fetchedProfiles = [],
     errored = false;
 
-  if (!self.content.profileIds) {
-    return fetchedProfiles;
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
   }
 
   self.Security.kuzzle.callbackRequired('User.getProfiles', cb);
 
+  if (!self.content.profileIds) {
+    return cb(null, fetchedProfiles);
+  }
+
   self.content.profileIds.forEach(function (profileId) {
-    self.Security.fetchprofile(profileId, option, function (error, profile) {
+    self.Security.fetchProfile(profileId, options, function (error, profile) {
       if (error) {
         if (errored) {
           return;
@@ -241,8 +246,8 @@ User.prototype.getProfiles = function (options, cb) {
 
       fetchedProfiles.push(profile);
 
-      if (fetchedProfiled.length === self.content.profileIds.length) {
-        cb(null, fetchProfiles);
+      if (fetchedProfiles.length === self.content.profileIds.length) {
+        cb(null, fetchedProfiles);
       }
     });
   });
