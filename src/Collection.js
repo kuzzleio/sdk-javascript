@@ -502,7 +502,6 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
  * @param {Array.<string>} documentIds - IDs of the documents to retrieve
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
- * @returns {object} this
  */
 Collection.prototype.mGetDocument = function (documentIds, options, cb) {
   var
@@ -529,8 +528,6 @@ Collection.prototype.mGetDocument = function (documentIds, options, cb) {
   self.kuzzle.query(this.buildQueryArgs('document', 'mGet'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
-
-  return self;
 };
 
 /**
