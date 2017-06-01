@@ -845,4 +845,197 @@ Security.prototype.getUserRights = function (userId, options, cb) {
   });
 };
 
+/**
+ * Create credentials of the specified <strategy> for the user <kuid>.
+ *
+ * @param strategy
+ * @param kuid
+ * @param credentials
+ * @param options
+ * @param cb
+ * @returns {Security}
+ */
+Security.prototype.createCredentials = function (strategy, kuid, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'createCredentials'}, {_id: kuid, strategy: strategy, body: credentials}, options, function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result._source);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Delete credentials of the specified <strategy> for the user <kuid> .
+ *
+ * @param strategy
+ * @param kuid
+ * @param options
+ * @param cb
+ * @returns {Security}
+ */
+Security.prototype.deleteCredentials = function (strategy, kuid, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'deleteCredentials'}, {strategy: strategy, _id: kuid}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Retrieve a list of accepted fields per authentication strategy.
+ *
+ * @param options
+ * @param cb
+ */
+Security.prototype.getAllCredentialFields = function (options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'getAllCredentialFields'}, {}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
+ * Retrieve the list of accepted field names by the specified <strategy>.
+ *
+ * @param strategy
+ * @param options
+ * @param cb
+ */
+Security.prototype.getCredentialFields = function (strategy, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'getCredentialFields'}, {strategy: strategy}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
+ * Get credential information of the specified <strategy> for the user <kuid>.
+ *
+ * @param strategy
+ * @param kuid
+ * @param options
+ * @param cb
+ */
+Security.prototype.getCredentials = function (strategy, kuid, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'getCredentials'}, {strategy: strategy, _id: kuid}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
+ * Check the existence of the specified <strategy>’s credentials for the user <kuid>.
+ *
+ * @param strategy
+ * @param kuid
+ * @param options
+ * @param cb
+ */
+Security.prototype.hasCredentials = function (strategy, kuid, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'hasCredentials'}, {strategy: strategy, _id: kuid}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
+/**
+ * Updates credentials of the specified <strategy> for the user <kuid>.
+ *
+ * @param strategy
+ * @param kuid
+ * @param credentials
+ * @param options
+ * @param cb
+ * @returns {Security}
+ */
+Security.prototype.updateCredentials = function (strategy, kuid, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'updateCredentials'}, {strategy: strategy, _id: kuid, body: credentials}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+
+  return this;
+};
+
+/**
+ * Validate credentials of the specified <strategy> for the user <kuid>.
+ *
+ * @param strategy
+ * @param kuid
+ * @param credentials
+ * @param options
+ * @param cb
+ */
+Security.prototype.validateCredentials = function (strategy, kuid, credentials, options, cb) {
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  this.kuzzle.query({controller: 'security', action: 'validateCredentials'}, {strategy: strategy, _id: kuid, body: credentials}, options, typeof cb !== 'function' ? null : function(err, res) {
+    if (!err) {
+      cb && cb(null, res.result);
+    } else {
+      cb && cb(err);
+    }
+  });
+};
+
 module.exports = Security;
