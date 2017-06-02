@@ -520,19 +520,10 @@ function mapZrangeResults(results) {
  * @return {object}
  */
 function mapScanResults(results) {
-  var mapped = {};
-
-  if (results.length === 0) {
-    return {
-      cursor: 0,
-      values: []
-    };
-  }
-
-  mapped.cursor = results[0];
-  mapped.values = results[1];
-
-  return mapped;
+  return {
+    cursor: results[0],
+    values: results[1]
+  };
 }
 
 module.exports = MemoryStorage;
