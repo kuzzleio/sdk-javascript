@@ -558,10 +558,6 @@ Security.prototype.createUser = function (id, content, options, cb) {
     self = this,
     data = {_id: id, body: content};
 
-  if (!id || typeof id !== 'string') {
-    throw new Error('Security.createUser: cannot create a user without a user ID');
-  }
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
