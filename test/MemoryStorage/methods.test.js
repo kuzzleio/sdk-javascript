@@ -492,7 +492,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', cursor: 0},
       {count: 42, match: 'foo*'},
       [42, ['bar', 'baz', 'qux']],
-      [42, ['bar', 'baz', 'qux']]
+      {cursor: 42, values: ['bar', 'baz', 'qux']}
     );
   });
 
@@ -966,7 +966,7 @@ describe('MemoryStorage methods', function () {
       {cursor: 0},
       {count: 42, match: 'foo*'},
       [42, ['bar', 'baz', 'qux']],
-      [42, ['bar', 'baz', 'qux']]
+      {cursor: 42, values: ['bar', 'baz', 'qux']}
     );
   });
 
@@ -1158,7 +1158,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', cursor: 0},
       {count: 42, match: 'foo*'},
       [42, ['bar', 'baz', 'qux']],
-      [42, ['bar', 'baz', 'qux']]
+      {cursor: 42, values: ['bar', 'baz', 'qux']}
     );
   });
 
@@ -1472,7 +1472,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', cursor: 0},
       {count: 42, match: 'foo*'},
       [42, ['bar', 'baz', 'qux']],
-      [42, ['bar', 'baz', 'qux']]
+      {cursor: 42, values: ['bar', 'baz', 'qux']}
     );
   });
 
