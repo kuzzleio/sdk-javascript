@@ -151,9 +151,9 @@ describe('Security profiles methods', function () {
 
 
   describe('#createProfile', function () {
-    var content = {policies: [{roleId: 'myRole'}]};
+    var policies = [{roleId: 'myRole'}];
     beforeEach(function () {
-      result = { result: {_id: 'foobar', _source: content} };
+      result = { result: {_id: 'foobar', _source: {policies: policies}} };
       expectedQuery = {
         action: 'createProfile',
         controller: 'security'
@@ -163,38 +163,38 @@ describe('Security profiles methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       this.timeout(50);
 
-      should(kuzzle.security.createProfile('foobar', content, function (err, res) {
+      should(kuzzle.security.createProfile('foobar', policies, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Profile);
         done();
       }));
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
 
     it('should send the right query to Kuzzle even without callback', function () {
-      kuzzle.security.createProfile('foobar', content);
+      kuzzle.security.createProfile('foobar', policies);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, undefined, undefined);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}}, undefined, undefined);
     });
 
     it('should construct a createOrReplaceProfile action if option replaceIfExist is set to true', function () {
       expectedQuery.action = 'createOrReplaceProfile';
 
-      should(kuzzle.security.createProfile('foobar', content, {replaceIfExist: true}));
+      should(kuzzle.security.createProfile('foobar', policies, {replaceIfExist: true}));
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content});
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}});
     });
 
     it('should construct a createProfile action if option replaceIfExist is set to false', function () {
       expectedQuery.action = 'createProfile';
 
-      should(kuzzle.security.createProfile('foobar', content, {replaceIfExist: false}));
+      should(kuzzle.security.createProfile('foobar', policies, {replaceIfExist: false}));
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content});
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}});
     });
 
     it('should throw an error if no id provided', function () {
@@ -216,10 +216,7 @@ describe('Security profiles methods', function () {
   });
 
   describe('#updateProfile', function () {
-    var content = {
-      policies: [{roleId: 'foo'}],
-      foo: 'bar'
-    };
+    var policies = [{roleId: 'foo'}];
 
     beforeEach(function () {
       result = {
@@ -227,7 +224,7 @@ describe('Security profiles methods', function () {
           _id: 'foobar',
           _index: '%kuzzle',
           _type: 'profiles',
-          _source: content
+          _source: {policies: policies}
         }
       };
       expectedQuery = {
@@ -239,21 +236,21 @@ describe('Security profiles methods', function () {
     it('should send the right query to Kuzzle', function (done) {
       this.timeout(50);
 
-      kuzzle.security.updateProfile('foobar', content, function (err, res) {
+      kuzzle.security.updateProfile('foobar', policies, function (err, res) {
         should(err).be.null();
         should(res).be.instanceOf(Profile);
         done();
       });
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, sinon.match.func);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}}, null, sinon.match.func);
       kuzzle.query.yield(null, result);
     });
 
     it('should send the right query to Kuzzle even without callback', function () {
-      kuzzle.security.updateProfile('foobar', content);
+      kuzzle.security.updateProfile('foobar', policies);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, undefined, undefined);
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: {policies: policies}}, undefined, undefined);
     });
 
     it('should throw an error if no id provided', function () {
@@ -264,7 +261,7 @@ describe('Security profiles methods', function () {
     it('should call the callback with an error if one occurs', function (done) {
       this.timeout(50);
 
-      kuzzle.security.updateProfile(result.result._id, {'foo': 'bar'}, function (err, res) {
+      kuzzle.security.updateProfile(result.result._id, policies, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
