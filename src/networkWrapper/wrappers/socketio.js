@@ -70,7 +70,7 @@ function SocketIO(host, port, ssl) {
       self.forceDisconnect = false;
     });
 
-    this.socket.on('kuzzle_proxy_disconnection', function(error) {
+    this.socket.on('kuzzle_socketio_disconnect', function(error) {
       self.forceDisconnect = true;
 
       self.handlers.connectError.forEach(function(handler) {
