@@ -81,7 +81,7 @@ describe('Kuzzle connect', function () {
     it('should call the provided callback on a connection error', function (done) {
       var kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
         should(err).be.instanceOf(Error);
-        should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere"');
+        should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere:7512"');
         should(err.internal.message).be.exactly('Mock Error');
         should(res).be.undefined();
         should(kuzzle.state).be.exactly('error');
