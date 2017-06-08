@@ -160,10 +160,11 @@ describe('SocketIO network wrapper', function () {
       should(socketIO.handlers.disconnect).containEql(cb);
     });
 
-    it('should call disconnect handler on disconnect event', function () {
+    it('should call disconnect handler on attended disconnect event', function () {
       var cb = sinon.spy();
 
       socketIO.wasConnected = false;
+      socketIO.forceDisconnect = true;
       socketIO.onDisconnect(cb);
       socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
 
@@ -199,20 +200,17 @@ describe('SocketIO network wrapper', function () {
         .be.calledWith(err);
     });
 
-    it('should call connectError handler on kuzzle proxy disconnection event', function () {
+    it('should call connectError handler on unattended disconnect event', function () {
       var cb = sinon.spy();
-      var err = new Error('foobar');
 
+      socketIO.forceDisconnect = false;
       socketIO.onConnectError(cb);
       socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
 
-      socketIO.socket.emit('kuzzle_socketio_disconnect', err);
+      socketIO.socket.emit('disconnect');
 
       should(cb)
         .be.calledOnce();
-
-      should(cb)
-        .be.calledWith(err);
     });
   });
 

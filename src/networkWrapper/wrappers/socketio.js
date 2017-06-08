@@ -12,7 +12,6 @@ function SocketIO(host, port, ssl) {
     disconnect: []
   };
   this.retrying = false;
-  this.stopRetryingToConnect = false;
 
   /**
    * Creates a new socket from the provided arguments
@@ -43,47 +42,28 @@ function SocketIO(host, port, ssl) {
       }
 
       self.wasConnected = true;
-      self.stopRetryingToConnect = false;
     });
 
     this.socket.on('connect_error', function(error) {
-      self.handlers.connectError.forEach(function(handler) {
-        handler(error);
-      });
-
-      if (autoReconnect && !self.retrying && !self.stopRetryingToConnect) {
-        self.retrying = true;
-        setTimeout(function () {
-          self.retrying = false;
-          self.connect(autoReconnect, reconnectionDelay);
-        }, reconnectionDelay);
-      }
+      onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
     });
 
     this.socket.on('disconnect', function() {
-      if (!self.forceDisconnect) {
+      var error;
+
+      if (self.forceDisconnect) {
         self.handlers.disconnect.forEach(function(handler) {
           handler();
         });
       }
+      else {
+        error = new Error('An error occurred, this may due that kuzzle was not ready yet');
+        error.status = 500;
+
+        onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
+      }
 
       self.forceDisconnect = false;
-    });
-
-    this.socket.on('kuzzle_socketio_disconnect', function(error) {
-      self.forceDisconnect = true;
-
-      self.handlers.connectError.forEach(function(handler) {
-        handler(error);
-      });
-
-      if (autoReconnect && !self.retrying) {
-        self.retrying = true;
-        setTimeout(function () {
-          self.retrying = false;
-          self.connect(autoReconnect, reconnectionDelay);
-        }, reconnectionDelay);
-      }
     });
 
     this.socket.on('reconnect', function() {
@@ -179,10 +159,34 @@ function SocketIO(host, port, ssl) {
    * Closes the connection
    */
   this.close = function () {
+    this.forceDisconnect = true;
+
     this.socket.close();
     this.socket = null;
-    this.stopRetryingToConnect = true;
   };
 }
+
+/**
+ * Called when the connection closes with an error state
+ *
+ * @param {SocketIO}
+ * @param {boolean} autoReconnect
+ * @param {number} reconnectionDelay
+ * @param {Error} error
+ */
+function onClientNetworkError(socketio, autoReconnect, reconnectionDelay, error) {
+  if (autoReconnect && !socketio.retrying && !socketio.stopRetryingToConnect) {
+    socketio.retrying = true;
+    setTimeout(function () {
+      socketio.retrying = false;
+      socketio.connect(autoReconnect, reconnectionDelay);
+    }, reconnectionDelay);
+  }
+
+  socketio.handlers.connectError.forEach(function(handler) {
+    handler(error);
+  });
+}
+
 
 module.exports = SocketIO;
