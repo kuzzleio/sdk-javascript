@@ -146,7 +146,9 @@ describe('Room methods', function () {
       var cb = sinon.stub();
       room.renew({}, cb, cb);
       should(room.subscribing).be.true();
-      kuzzle.emitEvent('networkError', new Error());
+
+      kuzzle.connect();
+      kuzzle.network.emit('networkError', new Error('foo'));
 
       should(room.subscribing).be.false();
       should(kuzzle.query).be.called();

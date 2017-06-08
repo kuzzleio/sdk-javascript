@@ -369,6 +369,8 @@ Kuzzle.prototype.connect = function () {
     self.state = 'error';
     self.emitEvent('networkError', connectionError);
 
+    disableAllSubscriptions.call(self);
+
     if (self.connectCB) {
       self.connectCB(connectionError);
     }
@@ -1542,6 +1544,17 @@ function discardRequest(object, cb) {
   if (cb) {
     cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
   }
+}
+
+function disableAllSubscriptions() {
+  var self = this;
+
+  Object.keys(self.subscriptions).forEach(function (roomId) {
+    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+      var subscription = self.subscriptions[roomId][subscriptionId];
+      subscription.subscribing = false;
+    });
+  });
 }
 
 module.exports = Kuzzle;
