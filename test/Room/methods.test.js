@@ -142,6 +142,18 @@ describe('Room methods', function () {
       should(room.queue).match([{action: 'renew', args: [{}, cb, cb]}]);
     });
 
+    it('should reset subscribing when network error occurs', function () {
+      var cb = sinon.stub();
+      room.renew({}, cb, cb);
+      should(room.subscribing).be.true();
+
+      kuzzle.connect();
+      kuzzle.network.emit('networkError', new Error('foo'));
+
+      should(room.subscribing).be.false();
+      should(kuzzle.query).be.called();
+    });
+
     it('should register itself in the global subscription list', function () {
       room.renew({}, sinon.stub());
       kuzzle.query.yield(null, result);

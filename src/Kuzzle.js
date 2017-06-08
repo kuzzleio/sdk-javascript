@@ -22,7 +22,6 @@ var
  * @param host - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
- * @constructor
  */
 function Kuzzle (host, options, cb) {
   var self = this;
@@ -80,11 +79,15 @@ function Kuzzle (host, options, cb) {
     subscriptions: {
       /*
        Contains the centralized subscription list in the following format:
-          pending: <number of pending subscriptions>
+          pending: {
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
+          },
           'roomId': {
-            kuzzleRoomID_1: kuzzleRoomInstance_1,
-            kuzzleRoomID_2: kuzzleRoomInstance_2,
-            kuzzleRoomID_...: kuzzleRoomInstance_...
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
           }
 
        This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
@@ -360,11 +363,13 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + '"');
+    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + ':' + self.port + '"');
 
     connectionError.internal = error;
     self.state = 'error';
     self.emitEvent('networkError', connectionError);
+
+    disableAllSubscriptions.call(self);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
@@ -1539,6 +1544,17 @@ function discardRequest(object, cb) {
   if (cb) {
     cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
   }
+}
+
+function disableAllSubscriptions() {
+  var self = this;
+
+  Object.keys(self.subscriptions).forEach(function (roomId) {
+    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+      var subscription = self.subscriptions[roomId][subscriptionId];
+      subscription.subscribing = false;
+    });
+  });
 }
 
 module.exports = Kuzzle;
