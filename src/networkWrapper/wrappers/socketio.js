@@ -65,12 +65,6 @@ function SocketIO(host, port, ssl) {
 
       self.forceDisconnect = false;
     });
-
-    this.socket.on('reconnect', function() {
-      self.handlers.reconnect.forEach(function(handler) {
-        handler();
-      });
-    });
   };
 
   /**

@@ -138,17 +138,6 @@ describe('SocketIO network wrapper', function () {
       should(cb.calledOnce).be.true();
     });
 
-    it('should call reconnect handler on connect event when was already connected before', function () {
-      var cb = sinon.spy();
-
-      socketIO.onReconnect(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
-
-      socketIO.socket.emit('reconnect');
-
-      should(cb.calledOnce).be.true();
-    });
-
     it('should register onDisconnect callbacks to the right event', function () {
       var cb = sinon.spy();
 
