@@ -206,7 +206,7 @@ describe('SocketIO network wrapper', function () {
       socketIO.onConnectError(cb);
       socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
 
-      socketIO.socket.emit('kuzzle_proxy_disconnection', err);
+      socketIO.socket.emit('kuzzle_socketio_disconnect', err);
 
       should(cb)
         .be.calledOnce();
