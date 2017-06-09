@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -30,7 +30,7 @@
     "bluebird": "3.4.7",
     "eslint-loader": "^1.6.1",
     "uuid": "3.0.1",
-    "ws": "^2.0.3"
+    "ws": "3.0.0"
   },
   "peerDependencies": {
     "bufferutil": "^2.0.1",

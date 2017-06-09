@@ -4,7 +4,12 @@ var
   getIdField = {getter: true, required: ['_id', 'field']},
   getKeys = {getter: true, required: ['keys']},
   getMember = {getter: true, required: ['_id', 'member']},
-  getxScan = {getter: true, required: ['_id', 'cursor'], opts: ['match', 'count']},
+  getxScan = {
+    getter: true, 
+    required: ['_id', 'cursor'], 
+    opts: ['match', 'count'],
+    mapResults: mapScanResults
+  },
   getZrange = {
     getter: true,
     required: ['_id', 'start', 'stop'],
@@ -112,7 +117,7 @@ var
     rpush: {required: ['_id', 'values']},
     rpushx: setIdValue,
     sadd: {required: ['_id', 'members']},
-    scan: {getter: true, required: ['cursor'], opts: ['match', 'count']},
+    scan: {getter: true, required: ['cursor'], opts: ['match', 'count'], mapResults: mapScanResults},
     scard: getId,
     sdiff: {getter: true, required: ['_id', 'keys']},
     sdiffstore: {required: ['_id', 'keys', 'destination']},
@@ -488,6 +493,37 @@ function mapZrangeResults(results) {
   });
 
   return mapped;
+}
+
+/**
+ * Map *scan calls results, from:
+ * [
+ *   "<cursor>",
+ *   [
+ *     "value1",
+ *     "value2", 
+ *     "..."
+ *   ]
+ * ]
+ *
+ * To:
+ * {
+ *   cursor: <cursor>,
+ *   values: [
+ *     "value1",
+ *     "value2",
+ *     "..."
+ *   ]
+ * }
+ * 
+ * @param  {array.<string|array>} results 
+ * @return {object}
+ */
+function mapScanResults(results) {
+  return {
+    cursor: results[0],
+    values: results[1]
+  };
 }
 
 module.exports = MemoryStorage;

@@ -307,61 +307,6 @@ Collection.prototype.fetchDocument = function (documentId, options, cb) {
 };
 
 /**
- * Retrieves all documents stored in this data collection
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Handles the query response
- */
-Collection.prototype.fetchAllDocuments = function (options, cb) {
-  var
-    warnEmitted = false,
-    documents = [],
-    filters = {};
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = {};
-  }
-
-  // copying pagination options to the search filter
-  if (!options) {
-    options = {};
-  }
-
-  if (!options.from) {
-    options.from = 0;
-  }
-
-  if (!options.size) {
-    options.size = 1000;
-  }
-
-  this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
-
-  this.search(filters, options, function fetchNextDocuments (error, searchResult) {
-    if (error) {
-      return cb(error);
-    }
-
-    if (searchResult instanceof KuzzleSearchResult) {
-      if (searchResult.total > 10000 && !warnEmitted) {
-        warnEmitted = true;
-        console.warn('Collection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using Collection.search or Collection.scroll instead'); // eslint-disable-line no-console
-      }
-
-      searchResult.documents.forEach(function(document) {
-        documents.push(document);
-      });
-      searchResult.fetchNext(fetchNextDocuments);
-    }
-    else {
-      cb(null, documents);
-    }
-  });
-};
-
-
-/**
  * Instantiates a CollectionMapping object containing the current mapping of this collection.
  *
  * @param {object} [options] - Optional parameters

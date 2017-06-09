@@ -45,7 +45,6 @@ describe('Collection constructor', function () {
     should.exist(collection.deleteDocumentPromise);
     should.exist(collection.documentExistsPromise);
     should.exist(collection.fetchDocumentPromise);
-    should.exist(collection.fetchAllDocumentsPromise);
     should.exist(collection.getMappingPromise);
     should.exist(collection.mCreateDocumentPromise);
     should.exist(collection.mCreateOrReplaceDocumentPromise);

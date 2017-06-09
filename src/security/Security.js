@@ -306,11 +306,11 @@ Security.prototype.searchProfiles = function (filters, options, cb) {
  *        Replace the existing profile otherwise
  *
  * @param {string} id - profile identifier
- * @param {object} content - attribute `roles` in `content` must only contains an array of role id
+ * @param {array} policies - list of policies to attach to the new profile
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  */
-Security.prototype.createProfile = function (id, content, options, cb) {
+Security.prototype.createProfile = function (id, policies, options, cb) {
   var
     self = this,
     data = {},
@@ -326,7 +326,10 @@ Security.prototype.createProfile = function (id, content, options, cb) {
   }
 
   data._id = id;
-  data.body = content;
+
+  if (policies) {
+    data.body = { policies: policies };
+  }
 
   if (options) {
     action = options.replaceIfExist ? 'createOrReplaceProfile' : 'createProfile';
@@ -342,12 +345,12 @@ Security.prototype.createProfile = function (id, content, options, cb) {
  * Update a profile in Kuzzle.
  *
  * @param {string} id - profile identifier
- * @param {object} content - a plain javascript object representing the profile's modification
+ * @param {array} policies - the list of policies to apply to this profile
  * @param {object|responseCallback} [options] - (optional) arguments
  * @param {responseCallback} [cb] - (optional) Handles the query response
  * @returns {Security} this object
  */
-Security.prototype.updateProfile = function (id, content, options, cb) {
+Security.prototype.updateProfile = function (id, policies, options, cb) {
   var
     self = this,
     data = {},
@@ -363,7 +366,10 @@ Security.prototype.updateProfile = function (id, content, options, cb) {
   }
 
   data._id = id;
-  data.body = content;
+
+  if (policies) {
+    data.body = {policies: policies};
+  }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
     var updatedContent = {};
