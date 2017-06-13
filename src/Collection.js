@@ -333,61 +333,6 @@ Collection.prototype.fetchDocument = function (documentId, options, cb) {
 };
 
 /**
- * Retrieves all documents stored in this data collection
- *
- * @param {object} [options] - Optional parameters
- * @param {responseCallback} cb - Handles the query response
- */
-Collection.prototype.fetchAllDocuments = function (options, cb) {
-  var
-    warnEmitted = false,
-    documents = [],
-    filters = {};
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = {};
-  }
-
-  // copying pagination options to the search filter
-  if (!options) {
-    options = {};
-  }
-
-  if (!options.from) {
-    options.from = 0;
-  }
-
-  if (!options.size) {
-    options.size = 1000;
-  }
-
-  this.kuzzle.callbackRequired('Collection.fetchAllDocuments', cb);
-
-  this.search(filters, options, function fetchNextDocuments (error, searchResult) {
-    if (error) {
-      return cb(error);
-    }
-
-    if (searchResult instanceof KuzzleSearchResult) {
-      if (searchResult.total > 10000 && !warnEmitted) {
-        warnEmitted = true;
-        console.warn('Collection.fetchAllDocuments may return extremely large amounts of documents, which may cause performance issues. Unless you know what you are doing, consider using Collection.search or Collection.scroll instead'); // eslint-disable-line no-console
-      }
-
-      searchResult.documents.forEach(function(document) {
-        documents.push(document);
-      });
-      searchResult.fetchNext(fetchNextDocuments);
-    }
-    else {
-      cb(null, documents);
-    }
-  });
-};
-
-
-/**
  * Instantiates a CollectionMapping object containing the current mapping of this collection.
  *
  * @param {object} [options] - Optional parameters
@@ -405,6 +350,233 @@ Collection.prototype.getMapping = function (options, cb) {
 
   kuzzleMapping = new CollectionMapping(this);
   kuzzleMapping.refresh(options, cb);
+};
+
+/**
+ * Create the provided documents
+ *
+ * @param {Array.<document>} documents - Array of documents to create
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ * @returns {object} this
+ */
+Collection.prototype.mCreateDocument = function (documents, options, cb) {
+  var
+    data = {
+      body: {},
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mCreateDocument: documents parameter format is invalid (should be an array of documents)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mCreate', cb);
+
+  data.body.documents = documents.map(function (doc) {
+    return (doc instanceof Document) ? doc.serialize() : doc;
+  });
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+  
+  self.kuzzle.query(this.buildQueryArgs('document', 'mCreate'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
+ * Create or replace the provided documents
+ *
+ * @param {Array.<document>} documents - Array of documents to create or replace
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ * @returns {object} this
+ */
+Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb) {
+  var
+    data = {
+      body: {},
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mCreateOrReplaceDocument: documents parameter format is invalid (should be an array of documents)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mCreateOrReplace', cb);
+
+  data.body.documents = documents.map(function (doc) {
+    return (doc instanceof Document) ? doc.serialize() : doc;
+  });
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'mCreateOrReplace'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
+ * Delete specific documents according to given IDs
+ *
+ * @param {Array.<string>} documentIds - IDs of the documents to delete
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ * @returns {object} this
+ */
+Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
+  var
+    data = {
+      body: {
+        ids: documentIds
+      }
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documentIds)) {
+    return cb(new Error('Collection.mDeleteDocument: documentIds parameter format is invalid (should be an array of IDs)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mDelete', cb);
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'mDelete'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
+ * Get specific documents according to given IDs
+ *
+ * @param {Array.<string>} documentIds - IDs of the documents to retrieve
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ */
+Collection.prototype.mGetDocument = function (documentIds, options, cb) {
+  var
+    data = {
+      body: {
+        ids: documentIds
+      }
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documentIds)) {
+    return cb(new Error('Collection.mGetDocument: documentIds parameter format is invalid (should be an array of IDs)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mGet', cb);
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'mGet'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+};
+
+/**
+ * Replace the provided documents
+ *
+ * @param {Array.<document>} documents - Array of documents to replace
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ * @returns {object} this
+ */
+Collection.prototype.mReplaceDocument = function (documents, options, cb) {
+  var
+    data = {
+      body: {}
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mReplaceDocument: documents parameter format is invalid (should be an array of documents)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mReplace', cb);
+
+  data.body.documents = documents.map(function (doc) {
+    return (doc instanceof Document) ? doc.serialize() : doc;
+  });
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'mReplace'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
+ * Update the provided documents
+ *
+ * @param {Array.<document>} documents - Array of documents to update
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
+ * @returns {object} this
+ */
+Collection.prototype.mUpdateDocument = function (documents, options, cb) {
+  var
+    data = {
+      body: {}
+    },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!Array.isArray(documents)) {
+    return cb(new Error('Collection.mUpdateDocument: documents parameter format is invalid (should be an array of documents)'));
+  }
+
+  self.kuzzle.callbackRequired('Collection.mUpdate', cb);
+
+  data.body.documents = documents.map(function (doc) {
+    return (doc instanceof Document) ? doc.serialize() : doc;
+  });
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('document', 'mUpdate'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
 };
 
 /**

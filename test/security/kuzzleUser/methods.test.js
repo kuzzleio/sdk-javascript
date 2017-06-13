@@ -3,6 +3,7 @@ var
   sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
   User = require('../../../src/security/User'),
+  Profile = require('../../../src/security/Profile'),
   sandbox = sinon.sandbox.create();
 
 describe('User methods', function () {
@@ -312,11 +313,71 @@ describe('User methods', function () {
     });
   });
 
-  describe('#getProfiles', function () {
+  describe('#getProfileIds', function () {
     it('should return the associated profiles', function () {
       var profileIds = ['profile'];
       kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: profileIds});
-      should(kuzzleUser.getProfiles()).be.eql(profileIds);
+      should(kuzzleUser.getProfileIds()).be.eql(profileIds);
+    });
+
+    it('should return an empty array if no profile ID is attached', function () {
+      kuzzleUser = new User(kuzzle.security, 'foo', {});
+      should(kuzzleUser.getProfileIds()).be.an.Array().and.be.empty();
+    });
+  });
+
+  describe('#getProfiles', function () {
+    it('should return an empty array if no profile is attached', function (done) {
+      kuzzleUser = new User(kuzzle.security, 'foo', {});
+
+      kuzzleUser.getProfiles(function (error, profiles) {
+        should(error).be.null();
+        should(profiles).be.an.Array().and.be.empty();
+        done();
+      });
+    });
+
+    it('should fetch the attached profiles using the API to build Profile objects', function (done) {
+      kuzzleUser = new User(kuzzle.security, 'foo', {profileIds: ['foo', 'bar', 'baz']});
+      kuzzle.query.yields(null, {
+        result: {
+          _id: 'foobar',
+          _source: {}
+        }
+      });
+
+      kuzzleUser.getProfiles(function (error, profiles) {
+        should(error).be.null();
+        should(profiles).be.an.Array().and.have.lengthOf(3);
+
+        profiles.forEach(function (profile) {
+          should(profile).be.instanceof(Profile);
+        });
+
+        done();
+      });
+    });
+
+    it('should not invoke the callback more than once even if multiple errors occur', function (done) {
+      var callCount = 0;
+
+      kuzzleUser = new User(kuzzle.security, 'foo', {profileIds: ['foo', 'bar', 'baz']});
+      kuzzle.query.yields(new Error('errored'));
+
+      kuzzleUser.getProfiles(function (error, profiles) {
+        callCount++;
+        should(profiles).be.undefined();
+        should(error).be.an.Error().and.have.value('message', 'errored');
+        should(callCount).be.eql(1);
+        done();
+      });
+    });
+
+    it('should throw if no callback is provided', function () {
+      kuzzleUser = new User(kuzzle.security, 'foo', {});
+
+      should(function () { kuzzleUser.getProfiles(); }).throw('User.getProfiles: a callback argument is required for read queries');
+      should(function () { kuzzleUser.getProfiles({}); }).throw('User.getProfiles: a callback argument is required for read queries');
     });
   });
 });
