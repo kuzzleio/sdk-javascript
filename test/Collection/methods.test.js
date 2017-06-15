@@ -519,7 +519,7 @@ describe('Collection methods', function () {
 
   describe('#deleteSpecifications', function () {
     beforeEach(function () {
-      result = { result: true };
+      result = { result: { acknowledged: true } };
       error = null;
       expectedQuery = {
         index: 'bar',
@@ -536,7 +536,7 @@ describe('Collection methods', function () {
 
       should(collection.deleteSpecifications(options, function (err, res) {
         should(err).be.null();
-        should(res).be.True();
+        should(res).be.an.Object().and.match({ acknowledged: true });
         done();
       })).be.exactly(collection);
 
