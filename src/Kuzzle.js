@@ -62,7 +62,7 @@ function Kuzzle (host, options, cb) {
         'queryError',
         'discarded'
       ],
-      writeable: false
+      writable: false
     },
     queuing: {
       value: false,
@@ -198,6 +198,10 @@ function Kuzzle (host, options, cb) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    sdkVersion: {
+      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION,
+      writable: false
     }
   });
 
@@ -1436,6 +1440,8 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   if (!object.requestId) {
     object.requestId = uuid.v4();
   }
+
+  object.volatile.sdkVersion = this.sdkVersion;
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
     if (self.state === 'connected') {
