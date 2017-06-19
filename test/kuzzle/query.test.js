@@ -29,19 +29,19 @@ describe('Query management', function () {
       should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
-    it('should fire a jwtTokenExpired event if the token has expired', function (done) {
+    it('should trigger a tokenExpired event if the token has expired', function (done) {
       var
-        jwtTokenExpiredStub = sinon.stub(),
+        tokenExpiredStub = sinon.stub(),
         response = {
           error: {
             message: 'Token expired'
           }
         };
 
-      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
+      kuzzle.addListener('tokenExpired', tokenExpiredStub);
 
       emitRequest.call(kuzzle, {requestId: 'foobar', response: response}, function(error) {
-        should(jwtTokenExpiredStub).be.calledOnce();
+        should(tokenExpiredStub).be.calledOnce();
         should(error.message).be.exactly('Token expired');
         done();
       });

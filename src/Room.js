@@ -311,22 +311,16 @@ Room.prototype.setHeaders = function (content, replace) {
  * @returns {*}
  */
 function notificationCallback (data) {
-  if (data.error) {
-    return this.callback(data.error);
-  }
-
-  if (data.action === 'jwtTokenExpired') {
+  if (data.type === 'TokenExpired') {
     this.kuzzle.jwtToken = undefined;
-    return this.kuzzle.emitEvent('jwtTokenExpired');
+    return this.kuzzle.emitEvent('tokenExpired');
   }
 
-  if (data.controller === 'document' || (data.controller === 'realtime' && data.action === 'publish')) {
-    data.type = 'document';
+  if (data.type === 'document') {
     data.document = new Document(this.collection, data.result._id, data.result._source, data.result._meta);
     delete data.result;
   }
-  else if (data.controller === 'realtime') {
-    data.type = 'user';
+  else if (data.type === 'user') {
     data.user = {count: data.result.count};
     delete data.result;
   }
