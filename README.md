@@ -22,7 +22,7 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 ## Basic usage
 
-Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/#sdk-play-time)
+Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/getting-started/#sdk-play-time)
 
 ## SDK Documentation
 
