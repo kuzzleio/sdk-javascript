@@ -150,6 +150,51 @@ describe('Collection methods', function () {
     });
   });
 
+  describe('#scrollSpecifications', function () {
+    beforeEach(function () {
+      result = { result: { scrollId: '1337', total: 2, hits: [
+        { _id: 'foo#bar', _source: { foo: 'bar' } },
+        { _id: 'bar#foo', _source: { bar: 'foo' } }
+      ] } };
+      expectedQuery = {
+        action: 'scrollSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should throw an error if no scrollId is set', function () {
+      should(function () { collection.scrollSpecifications(); }).throw('Collection.scrollSpecifications: scrollId is required');
+    });
+
+    it('should throw an error if no callback is given', function () {
+      should(function () { collection.scrollSpecifications('1337'); }).throw('Collection.scrollSpecifications: a callback argument is required for read queries');
+    });
+
+    it('should parse the given parameters', function (done) {
+      var
+        scrollId = 'scrollId',
+        options = {};
+
+      this.timeout(50);
+
+      collection.scrollSpecifications(scrollId, options, function(err, res) {
+        should(err).be.null();
+        should(res).be.an.instanceOf(Object).and.match(result.result);
+        should(res.total).be.a.Number().and.be.exactly(result.result.total);
+        should(res.hits).be.an.Array();
+        should(res.hits.length).be.exactly(result.result.hits.length);
+        should(res.scrollId).be.exactly('1337');
+
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, { scrollId: 'scrollId' }, {}, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+  });
+
   describe('#count', function () {
     beforeEach(function () {
       result = { result: {count: 42 }};
@@ -469,6 +514,76 @@ describe('Collection methods', function () {
       should(kuzzle.query).calledWith(expectedQuery, {body: {query: filters}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
+    });
+  });
+
+  describe('#deleteSpecifications', function () {
+    beforeEach(function () {
+      result = { result: { acknowledged: true } };
+      error = null;
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'deleteSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should send the right deleteSpecifications query to Kuzzle', function (done) {
+      var options = { queuable: false };
+
+      this.timeout(50);
+
+      should(collection.deleteSpecifications(options, function (err, res) {
+        should(err).be.null();
+        should(res).be.an.Object().and.match({ acknowledged: true });
+        done();
+      })).be.exactly(collection);
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { index: expectedQuery.index, collection: expectedQuery.collection }, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should handle arguments correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.deleteSpecifications(cb1);
+      collection.deleteSpecifications({}, cb2);
+
+      should(kuzzle.query).be.calledTwice();
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
+      collection.deleteSpecifications(result.result._id);
+      should(kuzzle.query).be.calledOnce();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.deleteSpecifications(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.deleteSpecifications(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
     });
   });
 
@@ -945,6 +1060,78 @@ describe('Collection methods', function () {
     });
   });
 
+  describe('#getSpecifications', function () {
+    beforeEach(function () {
+      result = {
+        result: {
+          validation: {
+            strict: true,
+            fields: {
+              foo: {
+                mandatory: true,
+                type: 'string',
+                defaultValue: 'bar'
+              }
+            }
+          }
+        }
+      };
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'getSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should send the right getSpecifications query to Kuzzle', function (done) {
+      var options = { queuable: false };
+
+      this.timeout(50);
+
+      collection.getSpecifications(options, function (err, res) {
+        should(err).be.null();
+        should(res).match(result.result);
+        done();
+      });
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { index: expectedQuery.index, collection: expectedQuery.collection }, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      should(function () { collection.getSpecifications(); }).throw(Error);
+      should(function () { collection.getSpecifications({}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.getSpecifications(cb1);
+      collection.getSpecifications({}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.getSpecifications({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
   describe('#publishMessage', function () {
     var content = {foo: 'bar'};
 
@@ -1030,6 +1217,81 @@ describe('Collection methods', function () {
       this.timeout(50);
 
       collection.replaceDocument(result.result._id, result.result._source, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
+  describe('#searchSpecifications', function () {
+    beforeEach(function () {
+      result = {
+        result: {
+          total: 2,
+          hits: [
+            { _id: 'foo#bar', _source: { validation: { strict: true, fields: { foo: { mandatory: true, type: 'string', defaultValue: 'bar' } } } }, index: 'foo', collection: 'bar' },
+            { _id: 'bar#foo', _source: { validation: { strict: true, fields: { bar: { mandatory: true, type: 'string', defaultValue: 'foo' } } } }, index: 'bar', collection: 'foo' },
+          ],
+          scrollId: '1337'
+        }
+      };
+      expectedQuery = {
+        action: 'searchSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should send the right searchSpecifications query to Kuzzle and retrieve the scrollId if exists', function (done) {
+      var
+        options = { scroll: '30s', queuable: false },
+        filters = { match_all: { boost: 1 } };
+
+      this.timeout(50);
+
+      collection.searchSpecifications(filters, options, function (err, res) {
+        should(err).be.null();
+        should(res).be.an.instanceOf(Object).and.match(result.result);
+        should(res.total).be.a.Number().and.be.exactly(result.result.total);
+        should(res.hits).be.an.Array();
+        should(res.hits.length).be.exactly(result.result.hits.length);
+        should(res.scrollId).be.exactly('1337');
+
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, { body: { query: filters } }, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      should(function () { collection.searchSpecifications(); }).throw(Error);
+      should(function () { collection.searchSpecifications({}); }).throw(Error);
+      should(function () { collection.searchSpecifications({}, {}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.searchSpecifications({}, cb1);
+      collection.searchSpecifications({}, {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.searchSpecifications({}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
@@ -1190,6 +1452,151 @@ describe('Collection methods', function () {
       this.timeout(50);
 
       collection.updateDocument(result.result._id, result.result._source, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
+  describe('#updateSpecifications', function () {
+    var
+      content = {
+        strict: true,
+        fields: {
+          foo: {
+            mandatory: true,
+            type: 'string',
+            defaultValue: 'bar'
+          }
+        }
+      };
+
+    beforeEach(function () {
+      result = { result: { bar: { foo: content } } };
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'updateSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should send the right updateSpecifications query to Kuzzle', function (done) {
+      var options = { queuable: false };
+
+      this.timeout(50);
+
+      should(collection.updateSpecifications(content, options, function (err, res) {
+        should(err).be.null();
+        should(res).be.an.Object().and.match(result.result);
+        done();
+      })).be.exactly(collection);
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, { body: { bar: { foo: content } } }, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should handle arguments correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.updateSpecifications(content, cb1);
+      collection.updateSpecifications(content, {}, cb2);
+
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
+      collection.updateSpecifications(content);
+      collection.updateSpecifications(content, {});
+
+      should(kuzzle.query).be.calledTwice();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.updateSpecifications(content, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
+  describe('#validateSpectifications', function () {
+    var
+      content = {
+        strict: true,
+        fields: {
+          foo: {
+            mandatory: true,
+            type: 'string',
+            defaultValue: 'bar'
+          }
+        }
+      };
+
+    beforeEach(function () {
+      result = { result: { valid: true } };
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'validateSpecifications',
+        controller: 'collection'
+      };
+    });
+
+    it('should send the right validateSpecifications query to Kuzzle', function (done) {
+      var options = { queuable: false };
+
+      this.timeout(50);
+
+      collection.validateSpecifications(content, options, function (err, res) {
+        should(err).be.null();
+        should(res).be.True();
+        done();
+      });
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, { body: { bar: { foo: content } } }, options, sinon.match.func);
+
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should raise an error if no callback is provided', function () {
+      should(function () { collection.validateSpecifications(content); }).throw(Error);
+      should(function () { collection.validateSpecifications(content, {}); }).throw(Error);
+      should(kuzzle.query).not.be.called();
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.validateSpecifications(content, cb1);
+      collection.validateSpecifications(content, {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.validateSpecifications(content, {}, function (err, res) {
         should(err).be.exactly('foobar');
         should(res).be.undefined();
         done();
