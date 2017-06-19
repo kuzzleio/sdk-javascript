@@ -35,7 +35,7 @@ describe('Kuzzle listeners management', function () {
         'networkError',
         'disconnected',
         'reconnected',
-        'jwtTokenExpired',
+        'tokenExpired',
         'loginAttempt',
         'offlineQueuePush',
         'offlineQueuePop',
