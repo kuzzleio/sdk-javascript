@@ -76,24 +76,6 @@ SearchResult.prototype.fetchNext = function (cb) {
   
   options.previous = this;
 
-  // retrieve next results using ES's search_after
-  if (options.size && this.filters.sort && options.from === undefined) {
-    if (this.fetchedDocument >= this.getTotal()) {
-      cb(null, null);
-      return;
-    }
-
-    filters = Object.assign(this.filters, {search_after: []});
-
-    filters.sort.forEach(function (sortRule) {
-      filters.search_after.push(self.documents[self.documents.length - 1].content[Object.keys(sortRule)[0]]);
-    });
-
-    this.collection.search(filters, options, cb);
-
-    return;
-  }
-
   // retrieve next results with scroll if original search use it
   if (options.scrollId) {
     if (this.fetchedDocument >= this.getTotal()) {
@@ -111,6 +93,28 @@ SearchResult.prototype.fetchNext = function (cb) {
     }
 
     this.collection.scroll(options.scrollId, options, this.filters || {}, cb);
+
+    return;
+  }
+
+  // retrieve next results using ES's search_after
+  if (options.size && this.filters.sort) {
+    if (this.fetchedDocument >= this.getTotal()) {
+      cb(null, null);
+      return;
+    }
+
+    if (options.from) {
+      delete options.from;
+    }
+
+    filters = Object.assign(this.filters, {search_after: []});
+
+    filters.sort.forEach(function (sortRule) {
+      filters.search_after.push(self.documents[self.documents.length - 1].content[Object.keys(sortRule)[0]]);
+    });
+
+    this.collection.search(filters, options, cb);
 
     return;
   }
