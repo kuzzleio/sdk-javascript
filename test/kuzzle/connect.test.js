@@ -172,8 +172,7 @@ describe('Kuzzle connect', function () {
 
   describe('=> on disconnection', function () {
     it('should enter offline mode and call listeners', function (done) {
-      var
-        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
           kuzzle.network.disconnect();
         }),
         disconnectStub = sinon.stub();

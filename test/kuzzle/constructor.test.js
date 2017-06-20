@@ -116,8 +116,7 @@ describe('Kuzzle constructor', function () {
   });
 
   it('should initialize correctly properties using the "options" argument', function () {
-    var
-      options = {
+    var options = {
         autoQueue: true,
         autoReconnect: false,
         autoReplay: true,
