@@ -29,19 +29,19 @@ describe('Query management', function () {
       should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
-    it('should fire a jwtTokenExpired event if the token has expired', function (done) {
+    it('should trigger a tokenExpired event if the token has expired', function (done) {
       var
-        jwtTokenExpiredStub = sinon.stub(),
+        tokenExpiredStub = sinon.stub(),
         response = {
           error: {
             message: 'Token expired'
           }
         };
 
-      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
+      kuzzle.addListener('tokenExpired', tokenExpiredStub);
 
       emitRequest.call(kuzzle, {requestId: 'foobar', response: response}, function(error) {
-        should(jwtTokenExpiredStub).be.calledOnce();
+        should(tokenExpiredStub).be.calledOnce();
         should(error.message).be.exactly('Token expired');
         done();
       });
@@ -313,7 +313,8 @@ describe('Query management', function () {
       should(kuzzle.offlineQueue).be.empty();
       should(queueStub).not.be.called();
       should(cb).be.calledOnce();
-      should(cb).be.calledWithMatch(new Error('Discarded request'));
+      should(cb.firstCall.args[0]).be.instanceof(Error);
+      should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request');
     });
 
     it('should queue the request if a queue filter has been defined and if it allows queuing', function () {
@@ -353,7 +354,8 @@ describe('Query management', function () {
       should(kuzzle.offlineQueue).be.empty();
       should(queueStub).not.be.called();
       should(cb).be.calledOnce();
-      should(cb).be.calledWithMatch(new Error('Discarded request'));
+      should(cb.firstCall.args[0]).be.instanceof(Error);
+      should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request');
     });
 
     it('should set jwtToken except for auth/checkToken', function () {

@@ -55,7 +55,7 @@ function Kuzzle (host, options, cb) {
         'networkError',
         'disconnected',
         'reconnected',
-        'jwtTokenExpired',
+        'tokenExpired',
         'loginAttempt',
         'offlineQueuePush',
         'offlineQueuePop',
@@ -273,7 +273,7 @@ function Kuzzle (host, options, cb) {
       error: {timeout: this.eventTimeout},
       disconnected: {timeout: this.eventTimeout},
       reconnected: {timeout: this.eventTimeout},
-      jwtTokenExpired: {timeout: this.eventTimeout},
+      tokenExpired: {timeout: this.eventTimeout},
       loginAttempt: {timeout: this.eventTimeout}
     },
     writeable: false
@@ -414,7 +414,7 @@ Kuzzle.prototype.connect = function () {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
           self.jwtToken = undefined;
-          self.emitEvent('jwtTokenExpired');
+          self.emitEvent('tokenExpired');
         }
 
         reconnect();
@@ -869,7 +869,7 @@ function emitRequest (request, cb) {
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
-        self.emitEvent('jwtTokenExpired', request, cb);
+        self.emitEvent('tokenExpired', request, cb);
       }
 
       if (response.error) {

@@ -464,8 +464,6 @@ Security.prototype.scrollProfiles = function (scrollId, options, cb) {
       scrollId: scrollId
     });
   });
-
-  return this;
 };
 
 /**

@@ -250,6 +250,32 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
 };
 
 /**
+ * Deletes the current specifications of this collection
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @return {object} this
+ */
+Collection.prototype.deleteSpecifications = function (options, cb) {
+  var
+    data = { index: this.index, collection: this.collection },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('collection', 'deleteSpecifications'), data, options, function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
  * Returns a boolean indicating whether or not a document with provided ID exists.
  *
  * @param {string} documentId - Unique document identifier
@@ -335,8 +361,7 @@ Collection.prototype.getMapping = function (options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mCreateDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {},
     },
     self = this;
@@ -374,8 +399,7 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {},
     },
     self = this;
@@ -413,8 +437,7 @@ Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb
  * @returns {object} this
  */
 Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
-  var
-    data = {
+  var data = {
       body: {
         ids: documentIds
       }
@@ -449,8 +472,7 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  */
 Collection.prototype.mGetDocument = function (documentIds, options, cb) {
-  var
-    data = {
+  var data = {
       body: {
         ids: documentIds
       }
@@ -484,8 +506,7 @@ Collection.prototype.mGetDocument = function (documentIds, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mReplaceDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {}
     },
     self = this;
@@ -523,8 +544,7 @@ Collection.prototype.mReplaceDocument = function (documents, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mUpdateDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {}
     },
     self = this;
@@ -551,6 +571,30 @@ Collection.prototype.mUpdateDocument = function (documents, options, cb) {
   });
 
   return self;
+};
+
+/**
+ * Retrieves the current specifications of this collection
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+Collection.prototype.getSpecifications = function (options, cb) {
+  var
+    data = { index: this.index, collection: this.collection },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('Collection.getSpecifications', cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('collection', 'getSpecifications'), data, options, function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
 };
 
 /**
@@ -753,6 +797,68 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
 };
 
 /**
+ * Retrieves next result of a search with scroll query.
+ *
+ * @param {string} scrollId
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+Collection.prototype.scrollSpecifications = function (scrollId, options, cb) {
+  var
+    data = { scrollId: scrollId };
+
+  if (!scrollId) {
+    throw new Error('Collection.scrollSpecifications: scrollId is required');
+  }
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  this.kuzzle.callbackRequired('Collection.scrollSpecifications', cb);
+
+  if (options && options.scroll) {
+    data.scroll = options.scroll;
+  }
+
+  this.kuzzle.query(
+    { controller: 'collection', action: 'scrollSpecifications'},
+    this.kuzzle.addHeaders(data, this.headers),
+    options,
+    function (err, res) {
+      cb (err, err ? undefined : res.result);
+    }
+  );
+};
+
+/**
+ * Searches specifications across indexes/collections according to the provided filters
+ *
+ * @param {object} [filters] - Optional filters in ElasticSearch Query DSL format
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+Collection.prototype.searchSpecifications = function (filters, options, cb) {
+  var
+    data = { body: { query: filters } },
+    self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  self.kuzzle.callbackRequired('Collection.searchSpecifications', cb);
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query({ controller: 'collection', action: 'searchSpecifications' }, data, options, function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+};
+
+/**
  * Subscribes to this data collection with a set of filters.
  * To subscribe to the entire data collection, simply provide an empty filter.
  *
@@ -818,8 +924,7 @@ Collection.prototype.truncate = function (options, cb) {
  * @return {object} this
  */
 Collection.prototype.updateDocument = function (documentId, content, options, cb) {
-  var
-    data = {
+  var data = {
       _id: documentId,
       body: content
     },
@@ -847,6 +952,65 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
   return self;
 };
 
+/**
+ * Updates the current specifications of this collection
+ *
+ * @param {object} specifications - Specifications content
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @return {object} this
+ */
+Collection.prototype.updateSpecifications = function (specifications, options, cb) {
+  var
+    collection = {},
+    data = { body: {} },
+    self = this;
+
+  collection[this.collection] = specifications;
+  data.body[this.index] = collection;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('collection', 'updateSpecifications'), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
+  });
+
+  return self;
+};
+
+/**
+ * Validates the provided specifications
+ *
+ * @param {object} specifications - Specifications content
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+Collection.prototype.validateSpecifications = function (specifications, options, cb) {
+  var
+    collection = {},
+    data = { body: {} },
+    self = this;
+
+  collection[this.collection] = specifications;
+  data.body[this.index] = collection;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.callbackRequired('Collection.validateSpecifications', cb);
+  data = self.kuzzle.addHeaders(data, this.headers);
+
+  self.kuzzle.query(this.buildQueryArgs('collection', 'validateSpecifications'), data, options, function (err, res) {
+    cb(err, err ? undefined : res.result.valid);
+  });
+};
 
 /**
  * Instantiate a new Document object. Workaround to the module.exports limitation, preventing multiple

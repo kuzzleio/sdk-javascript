@@ -412,8 +412,7 @@ function mapGeoRadiusResults(results) {
 
   return results.map(function (point) {
     // The point id is always the first item
-    var
-      p = {
+    var p = {
         name: point[0]
       },
       i;
