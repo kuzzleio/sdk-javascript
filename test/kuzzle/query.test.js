@@ -5,13 +5,11 @@ var
   NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
   Kuzzle = rewire('../../src/Kuzzle');
 
-
 describe('Query management', function () {
   describe('#emitRequest', function () {
     var
       emitRequest = Kuzzle.__get__('emitRequest'),
       kuzzle;
-
 
     beforeEach(function () {
       kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
@@ -125,7 +123,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {},
+        volatile: { sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -141,7 +139,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {},
+        volatile: { sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, sinon.match(function(f) {return f === cb;}));
     });
