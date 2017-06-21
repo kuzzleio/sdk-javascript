@@ -1,27 +1,26 @@
 /**
  *
+ * @param protocol
  * @param host
- * @param port
- * @param sslConnection
- * @returns {Object} tnstantiated WebSocket/Socket.IO object
+ * @param options
+ * @returns {Object} Instantiated WebSocket/Socket.IO object
  */
 
-function network(host, port, sslConnection) {
-  // Web browser / NodeJS websocket handling
-  if (typeof window !== 'undefined') {
-    // use native websockets if the browser supports it
-    if (typeof WebSocket !== 'undefined') {
-      return new (require('./wrappers/websocket'))(host, port, sslConnection);
-    }
-    // otherwise fallback to socket.io, if available
-    else if (window.io) {
-      return new (require('./wrappers/socketio'))(host, port, sslConnection);
-    }
-
-    throw new Error('Aborting: no websocket support detected and no socket.io library loaded either.');
+function network(protocol, host, options) {
+  switch (protocol) {
+    case 'websocket':
+      if (typeof window !== 'undefined' && typeof WebSocket === 'undefined') {
+        throw new Error('Aborting: no websocket support detected.');
+      }
+      return new (require('./wrappers/websocket'))(host, options);
+    case 'socketio':
+      if (!window.io) {
+        throw new Error('Aborting: no socket.io library loaded.');
+      }
+      return new (require('./wrappers/socketio'))(host, options);
+    default:
+      throw new Error('Aborting: unknown protocol "' + protocol + '" (only "websocket" and "socketio" are available).');
   }
-
-  return new (require('./wrappers/websocket'))(host, port, sslConnection);
 }
 
 module.exports = network;

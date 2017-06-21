@@ -192,7 +192,7 @@ Room.prototype.renew = function (filters, notificationCB, cb) {
    if not yet connected, register itself to the subscriptions list and wait for the
    main Kuzzle object to renew once online
     */
-  if (self.kuzzle.state !== 'connected') {
+  if (self.kuzzle.network.state !== 'connected') {
     self.callback = notificationCB;
     self.onDoneCB = cb;
     self.kuzzle.subscriptions.pending[self.id] = self;
@@ -346,7 +346,7 @@ function dequeue () {
 }
 
 function isReady() {
-  return this.kuzzle.state === 'connected' && !this.subscribing;
+  return this.kuzzle.network.state === 'connected' && !this.subscribing;
 }
 
 module.exports = Room;

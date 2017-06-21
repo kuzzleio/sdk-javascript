@@ -1,14 +1,11 @@
 var
-  KuzzleEventEmitter = require('../../eventEmitter');
+  RTWrapper = require('./abstract/realtime');
 
-function WSNode(host, port, ssl) {
+function WSNode(host, options) {
   var self = this;
-  KuzzleEventEmitter.call(this);
+  RTWrapper.call(this, host, options);
 
   this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
-  this.host = host;
-  this.port = port;
-  this.ssl = ssl;
   this.client = null;
   this.wasConnected = false;
   this.retrying = false;
@@ -16,24 +13,21 @@ function WSNode(host, port, ssl) {
   this.stopRetryingToConnect = false;
 
   /**
-   * Creates a new socket from the provided arguments
-   *
-   * @constructor
-   * @param {boolean} autoReconnect
-   * @param {int} reconnectionDelay
-   * @returns {Object} Socket
+   * Connect to the websocket server
    */
-  this.connect = function (autoReconnect, reconnectionDelay) {
+  this.connect = function () {
     var
       url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
-      options = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
+      opts = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
+
+    RTWrapper.prototype.connect.call(this);
 
     if (url !== this.lasturl) {
       self.wasConnected = false;
       this.lasturl = url;
     }
 
-    this.client = new this.WebSocket(url, options);
+    this.client = new this.WebSocket(url, opts);
 
     this.client.onopen = function () {
       if (self.wasConnected) {
@@ -69,7 +63,7 @@ function WSNode(host, port, ssl) {
         error = new Error(reason);
         error.status = status;
 
-        onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
+        onClientNetworkError(self, error);
       }
     };
 
@@ -78,7 +72,7 @@ function WSNode(host, port, ssl) {
         error = new Error(error);
       }
 
-      onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
+      onClientNetworkError(self, error);
     };
 
     this.client.onmessage = function (payload) {
@@ -141,32 +135,33 @@ function WSNode(host, port, ssl) {
    * Closes the connection
    */
   this.close = function () {
+    this.state = 'disconnected';
     this.removeAllListeners();
     this.wasConnected = false;
-    this.client.close();
+    if (this.client) {
+      this.client.close();
+    }
     this.client = null;
     self.stopRetryingToConnect = true;
   };
 }
-WSNode.prototype = Object.create(KuzzleEventEmitter.prototype);
-WSNode.prototype.constructor = WSNode;
-
+WSNode.prototype = Object.create(RTWrapper.prototype);
 
 /**
  * Called when the connection closes with an error state
  *
- * @param {WSNode} 
+ * @param {WSNode}
  * @param {boolean} autoReconnect
  * @param {number} reconnectionDelay
  * @param {Error} error
  */
-function onClientNetworkError(ws, autoReconnect, reconnectionDelay, error) {
-  if (autoReconnect && !ws.retrying && !ws.stopRetryingToConnect) {
+function onClientNetworkError(ws, error) {
+  if (ws.autoReconnect && !ws.retrying && !ws.stopRetryingToConnect) {
     ws.retrying = true;
     setTimeout(function () {
       ws.retrying = false;
-      ws.connect(autoReconnect, reconnectionDelay);
-    }, reconnectionDelay);
+      ws.connect(ws.host);
+    }, ws.reconnectionDelay);
   }
 
   ws.emitEvent('networkError', error);

@@ -1,7 +1,9 @@
-function SocketIO(host, port, ssl) {
-  this.host = host;
-  this.port = port;
-  this.ssl = ssl;
+var
+  RTWrapper = require('./abstract/realtime');
+
+function SocketIO(host, options) {
+  RTWrapper.call(this, host, options);
+
   this.socket = null;
   this.wasConnected = false;
   this.forceDisconnect = false;
@@ -14,18 +16,15 @@ function SocketIO(host, port, ssl) {
   this.retrying = false;
 
   /**
-   * Creates a new socket from the provided arguments
+   * Connect to the SocketIO server
    *
-   * @constructor
-   * @param {boolean} autoReconnect
-   * @param {int} reconnectionDelay
    */
-  this.connect = function (autoReconnect, reconnectionDelay) {
-    var self = this;
+  this.connect = function () {
+    RTWrapper.prototype.connect.call(this);
 
     this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
-      reconnection: autoReconnect,
-      reconnectionDelay: reconnectionDelay,
+      reconnection: this.autoReconnect,
+      reconnectionDelay: this.reconnectionDelay,
       forceNew: true
     });
 
@@ -154,11 +153,12 @@ function SocketIO(host, port, ssl) {
    */
   this.close = function () {
     this.forceDisconnect = true;
-
+    this.state = 'disconnected';
     this.socket.close();
     this.socket = null;
   };
 }
+SocketIO.prototype = Object.create(RTWrapper.prototype);
 
 /**
  * Called when the connection closes with an error state
