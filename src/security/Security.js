@@ -615,10 +615,6 @@ Security.prototype.createRestrictedUser = function (id, content, options, cb) {
     self = this,
     data = {_id: id, body: content};
 
-  if (!id || typeof id !== 'string') {
-    throw new Error('Security.createRestrictedUser: cannot create a user without a user ID');
-  }
-
   if (content.profileIds) {
     throw new Error('Security.createRestrictedUser: cannot provide profileIds');
   }

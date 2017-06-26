@@ -204,11 +204,6 @@ describe('Security user methods', function () {
       should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
     });
 
-    it('should throw an error if no id provided', function () {
-      should(function () { kuzzle.security.createRestrictedUser(null); }).throw(Error);
-      should(kuzzle.query).not.be.called();
-    });
-
     it('should throw an error if profileIds is provided', function () {
       should(function () { kuzzle.security.createRestrictedUser('foobar', {profileIds: ['someProfile']}); }).throw(Error);
       should(kuzzle.query).not.be.called();
