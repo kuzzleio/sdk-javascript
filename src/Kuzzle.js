@@ -22,7 +22,6 @@ var
  * @param host - Server name or IP Address to the Kuzzle instance
  * @param [options] - Connection options
  * @param {responseCallback} [cb] - Handles connection response
- * @constructor
  */
 function Kuzzle (host, options, cb) {
   var self = this;
@@ -56,14 +55,14 @@ function Kuzzle (host, options, cb) {
         'networkError',
         'disconnected',
         'reconnected',
-        'jwtTokenExpired',
+        'tokenExpired',
         'loginAttempt',
         'offlineQueuePush',
         'offlineQueuePop',
         'queryError',
         'discarded'
       ],
-      writeable: false
+      writable: false
     },
     queuing: {
       value: false,
@@ -80,11 +79,15 @@ function Kuzzle (host, options, cb) {
     subscriptions: {
       /*
        Contains the centralized subscription list in the following format:
-          pending: <number of pending subscriptions>
+          pending: {
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
+          },
           'roomId': {
-            kuzzleRoomID_1: kuzzleRoomInstance_1,
-            kuzzleRoomID_2: kuzzleRoomInstance_2,
-            kuzzleRoomID_...: kuzzleRoomInstance_...
+            subscriptionUid_1: kuzzleRoomInstance_1,
+            subscriptionUid_2: kuzzleRoomInstance_2,
+            subscriptionUid_...: kuzzleRoomInstance_...
           }
 
        This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
@@ -195,6 +198,10 @@ function Kuzzle (host, options, cb) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    sdkVersion: {
+      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION,
+      writable: false
     }
   });
 
@@ -270,7 +277,7 @@ function Kuzzle (host, options, cb) {
       error: {timeout: this.eventTimeout},
       disconnected: {timeout: this.eventTimeout},
       reconnected: {timeout: this.eventTimeout},
-      jwtTokenExpired: {timeout: this.eventTimeout},
+      tokenExpired: {timeout: this.eventTimeout},
       loginAttempt: {timeout: this.eventTimeout}
     },
     writeable: false
@@ -360,11 +367,13 @@ Kuzzle.prototype.connect = function () {
   });
 
   self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + '"');
+    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + ':' + self.port + '"');
 
     connectionError.internal = error;
     self.state = 'error';
     self.emitEvent('networkError', connectionError);
+
+    disableAllSubscriptions.call(self);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
@@ -409,7 +418,7 @@ Kuzzle.prototype.connect = function () {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
           self.jwtToken = undefined;
-          self.emitEvent('jwtTokenExpired');
+          self.emitEvent('tokenExpired');
         }
 
         reconnect();
@@ -864,7 +873,7 @@ function emitRequest (request, cb) {
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
         self.jwtToken = undefined;
-        self.emitEvent('jwtTokenExpired', request, cb);
+        self.emitEvent('tokenExpired', request, cb);
       }
 
       if (response.error) {
@@ -1432,6 +1441,8 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     object.requestId = uuid.v4();
   }
 
+  object.volatile.sdkVersion = this.sdkVersion;
+
   if (self.state === 'connected' || (options && options.queuable === false)) {
     if (self.state === 'connected') {
       emitRequest.call(this, object, cb);
@@ -1539,6 +1550,17 @@ function discardRequest(object, cb) {
   if (cb) {
     cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
   }
+}
+
+function disableAllSubscriptions() {
+  var self = this;
+
+  Object.keys(self.subscriptions).forEach(function (roomId) {
+    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
+      var subscription = self.subscriptions[roomId][subscriptionId];
+      subscription.subscribing = false;
+    });
+  });
 }
 
 module.exports = Kuzzle;

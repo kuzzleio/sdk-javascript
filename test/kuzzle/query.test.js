@@ -5,13 +5,11 @@ var
   NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
   Kuzzle = rewire('../../src/Kuzzle');
 
-
 describe('Query management', function () {
   describe('#emitRequest', function () {
     var
       emitRequest = Kuzzle.__get__('emitRequest'),
       kuzzle;
-
 
     beforeEach(function () {
       kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
@@ -29,19 +27,19 @@ describe('Query management', function () {
       should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
-    it('should fire a jwtTokenExpired event if the token has expired', function (done) {
+    it('should trigger a tokenExpired event if the token has expired', function (done) {
       var
-        jwtTokenExpiredStub = sinon.stub(),
+        tokenExpiredStub = sinon.stub(),
         response = {
           error: {
             message: 'Token expired'
           }
         };
 
-      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
+      kuzzle.addListener('tokenExpired', tokenExpiredStub);
 
       emitRequest.call(kuzzle, {requestId: 'foobar', response: response}, function(error) {
-        should(jwtTokenExpiredStub).be.calledOnce();
+        should(tokenExpiredStub).be.calledOnce();
         should(error.message).be.exactly('Token expired');
         done();
       });
@@ -125,7 +123,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {},
+        volatile: { sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -141,7 +139,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {},
+        volatile: { sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, sinon.match(function(f) {return f === cb;}));
     });

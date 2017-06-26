@@ -142,6 +142,18 @@ describe('Room methods', function () {
       should(room.queue).match([{action: 'renew', args: [{}, cb, cb]}]);
     });
 
+    it('should reset subscribing when network error occurs', function () {
+      var cb = sinon.stub();
+      room.renew({}, cb, cb);
+      should(room.subscribing).be.true();
+
+      kuzzle.connect();
+      kuzzle.network.emit('networkError', new Error('foo'));
+
+      should(room.subscribing).be.false();
+      should(kuzzle.query).be.called();
+    });
+
     it('should register itself in the global subscription list', function () {
       room.renew({}, sinon.stub());
       kuzzle.query.yield(null, result);
@@ -330,18 +342,10 @@ describe('Room methods', function () {
       room.callback = sinon.stub();
     });
 
-    it('should call back with an error if query returns an error', function () {
-      notifCB.call(room, {error: 'foobar', result: {}});
-      should(room.callback)
-        .be.calledOnce()
-        .be.calledWith('foobar');
-      should(room.callback.firstCall.args)
-        .have.length(1);
-    });
-
     it('should handle document notifications', function () {
       notifCB.call(room, {
         controller: 'document',
+        type: 'document',
         result: {
           _id: 'id',
           _source: {
@@ -370,6 +374,7 @@ describe('Room methods', function () {
       notifCB.call(room, {
         controller: 'realtime',
         action: 'publish',
+        type: 'document',
         result: {
           _source: {
             foo: 'bar'
@@ -397,7 +402,8 @@ describe('Room methods', function () {
     it('should handle user notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
-        result: { count: 3 }
+        result: { count: 3 },
+        type: 'user'
       });
 
       should(room.callback)
@@ -413,7 +419,7 @@ describe('Room methods', function () {
     it('should delete the result from history if emitted by this instance', function () {
       room.subscribeToSelf = true;
       kuzzle.requestHistory.bar = {};
-      notifCB.call(room, {error: null, result: {}, action: 'foo', requestId: 'bar'});
+      notifCB.call(room, {type: 'document', result: {}, action: 'foo', requestId: 'bar'});
 
       should(room.callback)
         .be.calledOnce();
@@ -423,18 +429,18 @@ describe('Room methods', function () {
     it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
       room.subscribeToSelf = false;
       kuzzle.requestHistory.bar = {};
-      notifCB.call(room, {error: null, result: {}, requestId: 'bar', action: 'foo'});
+      notifCB.call(room, {type: 'document', result: {}, requestId: 'bar', action: 'foo'});
 
       should(room.callback).not.be.called();
       should(kuzzle.requestHistory).be.empty();
     });
 
-    it('should fire a "jwtTokenExpired" event when receiving a jwtTokenExpired notification', function () {
+    it('should fire a "tokenExpired" event when receiving a TokenExpired notification', function () {
       kuzzle.emitEvent = sinon.stub();
 
-      notifCB.call(room, {error: null, result: {}, action: 'jwtTokenExpired'});
+      notifCB.call(room, {type: 'TokenExpired'});
       should(kuzzle.emitEvent).be.calledOnce();
-      should(kuzzle.emitEvent).be.calledWith('jwtTokenExpired');
+      should(kuzzle.emitEvent).be.calledWith('tokenExpired');
     });
   });
 });

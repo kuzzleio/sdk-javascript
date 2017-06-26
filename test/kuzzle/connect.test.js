@@ -81,7 +81,7 @@ describe('Kuzzle connect', function () {
     it('should call the provided callback on a connection error', function (done) {
       var kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
         should(err).be.instanceOf(Error);
-        should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere"');
+        should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere:7512"');
         should(err.internal.message).be.exactly('Mock Error');
         should(res).be.undefined();
         should(kuzzle.state).be.exactly('error');
@@ -303,7 +303,7 @@ describe('Kuzzle connect', function () {
     it('should empty the JWT Token if it has expired', function (done) {
       var
         kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
-        jwtTokenExpiredStub = sinon.stub();
+        tokenExpiredStub = sinon.stub();
 
       sinon.stub(kuzzle, 'checkToken', function (token, cb) {
         should(token).be.eql(kuzzle.jwtToken);
@@ -311,13 +311,13 @@ describe('Kuzzle connect', function () {
       });
 
       kuzzle.jwtToken = 'foobar';
-      kuzzle.addListener('jwtTokenExpired', jwtTokenExpiredStub);
+      kuzzle.addListener('tokenExpired', tokenExpiredStub);
       kuzzle.connect();
 
       process.nextTick(function () {
         should(kuzzle.state).be.exactly('connected');
         should(kuzzle.jwtToken).be.undefined();
-        should(jwtTokenExpiredStub).be.calledOnce();
+        should(tokenExpiredStub).be.calledOnce();
         done();
       });
     });

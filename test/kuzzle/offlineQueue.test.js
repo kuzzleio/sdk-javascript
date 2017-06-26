@@ -6,8 +6,10 @@ var
 
 describe('Offline queue management', function () {
   var
+    clock,
     now,
-    kuzzle;
+    kuzzle,
+    reset;
 
   beforeEach(function () {
     var pastTime = 60050;
@@ -16,10 +18,24 @@ describe('Offline queue management', function () {
 
     // queuing a bunch of 7 requests from 1min ago to right now, 10s apart
     now = Date.now();
+    clock = sinon.useFakeTimers(now);
+
+    reset = Kuzzle.__set__({
+      setTimeout: clock.setTimeout,
+      setInterval: clock.setInterval,
+      clearTimeout: clock.clearTimeout,
+      clearInterval: clock.clearInterval
+    });
+
     while (pastTime >= 0) {
       kuzzle.offlineQueue.push({ts: now - pastTime, query: {requestId: pastTime, action: 'foo', controller: 'bar'}, cb: function () {}});
       pastTime -= 10000;
     }
+  });
+
+  afterEach(function () {
+    clock.restore();
+    reset();
   });
 
   describe('#cleanQueue', function () {
@@ -92,31 +108,28 @@ describe('Offline queue management', function () {
       emitRequestStub.reset();
     });
 
-    it('should play all queued requests', function (done) {
+    it('should play all queued requests', function () {
       var
         numRequests = kuzzle.offlineQueue.length,
         eventStub = sinon.stub();
 
-      this.timeout(200);
       kuzzle.addListener('offlineQueuePop', eventStub);
       dequeue.call(kuzzle);
 
-      setTimeout(function () {
-        should(emitRequestStub.callCount).be.exactly(numRequests);
-        should(kuzzle.offlineQueue).be.an.Array();
-        should(kuzzle.offlineQueue.length).be.exactly(0);
-        should(kuzzle.queuing).be.false();
-        should(eventStub.callCount).be.exactly(numRequests);
-        done();
-      }, numRequests * kuzzle.replayInterval + 50);
+      clock.tick(numRequests * kuzzle.replayInterval + 50);
+
+      should(emitRequestStub.callCount).be.exactly(numRequests);
+      should(kuzzle.offlineQueue).be.an.Array();
+      should(kuzzle.offlineQueue.length).be.exactly(0);
+      should(kuzzle.queuing).be.false();
+      should(eventStub.callCount).be.exactly(numRequests);
     });
 
-    it('should also load the queue provided by the offlineQueueLoader property', function (done) {
+    it('should also load the queue provided by the offlineQueueLoader property', function () {
       var
         numRequests = kuzzle.offlineQueue.length,
         eventStub = sinon.stub();
 
-      this.timeout(200);
       kuzzle.offlineQueueLoader = function () {
         return [
           {query: {requestId: 'foo', action: 'action', controller: 'controller'}},
@@ -126,17 +139,16 @@ describe('Offline queue management', function () {
       kuzzle.addListener('offlineQueuePop', eventStub);
       dequeue.call(kuzzle);
 
-      setTimeout(function () {
-        should(emitRequestStub.callCount).be.exactly(numRequests + 2);
-        should(kuzzle.offlineQueue).be.an.Array();
-        should(kuzzle.offlineQueue.length).be.exactly(0);
-        should(kuzzle.queuing).be.false();
-        should(eventStub.callCount).be.exactly(numRequests + 2);
-        done();
-      }, (numRequests +2) * kuzzle.replayInterval + 50);
+      clock.tick((numRequests + 2) * kuzzle.replayInterval + 50);
+
+      should(emitRequestStub.callCount).be.exactly(numRequests + 2);
+      should(kuzzle.offlineQueue).be.an.Array();
+      should(kuzzle.offlineQueue.length).be.exactly(0);
+      should(kuzzle.queuing).be.false();
+      should(eventStub.callCount).be.exactly(numRequests + 2);
     });
 
-    it('should filter duplicates from the offlineQueueLoader and the cached queue ', function (done) {
+    it('should filter duplicates from the offlineQueueLoader and the cached queue ', function () {
       var
         numRequests = kuzzle.offlineQueue.length,
         eventStub = sinon.stub();
@@ -151,14 +163,13 @@ describe('Offline queue management', function () {
       kuzzle.addListener('offlineQueuePop', eventStub);
       dequeue.call(kuzzle);
 
-      setTimeout(function () {
-        should(emitRequestStub.callCount).be.exactly(numRequests + 1);
-        should(kuzzle.offlineQueue).be.an.Array();
-        should(kuzzle.offlineQueue.length).be.exactly(0);
-        should(kuzzle.queuing).be.false();
-        should(eventStub.callCount).be.exactly(numRequests + 1);
-        done();
-      }, (numRequests + 1) * kuzzle.replayInterval + 50);
+      clock.tick((numRequests + 1) * kuzzle.replayInterval + 50);
+
+      should(emitRequestStub.callCount).be.exactly(numRequests + 1);
+      should(kuzzle.offlineQueue).be.an.Array();
+      should(kuzzle.offlineQueue.length).be.exactly(0);
+      should(kuzzle.queuing).be.false();
+      should(eventStub.callCount).be.exactly(numRequests + 1);
     });
 
     it('should throw on erroneous queries returned by the offlineQueueLoader property', function () {

@@ -43,10 +43,11 @@ describe('Collection constructor', function () {
     should.exist(collection.createPromise);
     should.exist(collection.createDocumentPromise);
     should.exist(collection.deleteDocumentPromise);
+    should.exist(collection.deleteSpecificationsPromise);
     should.exist(collection.documentExistsPromise);
     should.exist(collection.fetchDocumentPromise);
-    should.exist(collection.fetchAllDocumentsPromise);
     should.exist(collection.getMappingPromise);
+    should.exist(collection.getSpecificationsPromise);
     should.exist(collection.mCreateDocumentPromise);
     should.exist(collection.mCreateOrReplaceDocumentPromise);
     should.exist(collection.mDeleteDocumentPromise);
@@ -55,10 +56,14 @@ describe('Collection constructor', function () {
     should.exist(collection.mUpdateDocumentPromise);
     should.not.exist(collection.publishPromise);
     should.exist(collection.replaceDocumentPromise);
+    should.exist(collection.scrollSpecificationsPromise);
+    should.exist(collection.searchSpecificationsPromise);
     should.not.exist(collection.setHeadersPromise);
     should.not.exist(collection.subscribePromise);
     should.exist(collection.truncatePromise);
     should.exist(collection.updateDocumentPromise);
+    should.exist(collection.updateSpecificationsPromise);
+    should.exist(collection.validateSpecificationsPromise);
   });
 
   it('should set headers using setHeaders', function () {

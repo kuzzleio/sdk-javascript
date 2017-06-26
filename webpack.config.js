@@ -41,7 +41,8 @@ module.exports = {
     new webpack.IgnorePlugin(/ws/),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({
-      global: 'window'
+      global: 'window',
+      SDKVERSION: JSON.stringify(version)
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
     new webpack.optimize.UglifyJsPlugin({
