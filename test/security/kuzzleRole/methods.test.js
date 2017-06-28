@@ -36,7 +36,7 @@ describe('Role methods', function () {
       }));
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myRole', body: {indexes : {}}}, null, sinon.match.func);
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myRole', body: {indexes : {}}, meta: {}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -94,6 +94,20 @@ describe('Role methods', function () {
     it('should raise an error if no content given', function () {
       should(function() {role.update();}).throw(Error);
       should(kuzzle.query).not.be.called();
+    });
+  });
+
+  describe('#serialize', function () {
+    beforeEach(function () {
+      role = new Role(kuzzle.security, 'myRole', {indexes : {}}, {createdAt: '123456789'});
+    });
+
+    it('should serialize with correct attributes', function () {
+      var serialized = role.serialize();
+
+      should(serialized._id).be.exactly('myRole');
+      should(serialized.body).match({indexes : {}});
+      should(serialized.meta).match({createdAt: '123456789'});
     });
   });
 
