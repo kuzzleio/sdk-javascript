@@ -160,11 +160,6 @@ describe('Security user methods', function () {
       should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
     });
 
-    it('should throw an error if no id provided', function () {
-      should(function () { kuzzle.security.createUser(null); }).throw(Error);
-      should(kuzzle.query).not.be.called();
-    });
-
     it('should call the callback with an error if one occurs', function (done) {
       this.timeout(50);
 
@@ -207,11 +202,6 @@ describe('Security user methods', function () {
       kuzzle.security.createRestrictedUser('foobar', content);
       should(kuzzle.query).be.calledOnce();
       should(kuzzle.query).calledWith(expectedQuery, {_id: 'foobar', body: content}, null, undefined);
-    });
-
-    it('should throw an error if no id provided', function () {
-      should(function () { kuzzle.security.createRestrictedUser(null); }).throw(Error);
-      should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if profileIds is provided', function () {
