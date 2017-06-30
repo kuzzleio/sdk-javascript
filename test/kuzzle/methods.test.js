@@ -8,8 +8,7 @@ var
   User = require('../../src/security/User');
 
 describe('Kuzzle methods', function () {
-  var
-    queryStub = function(queryArgs, query, options, cb) {
+  var queryStub = function(queryArgs, query, options, cb) {
       if (!cb && typeof options === 'function') {
         cb = options;
         options = null;
@@ -24,7 +23,7 @@ describe('Kuzzle methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
-    sinon.stub(kuzzle, 'query', queryStub);
+    sandbox.stub(kuzzle, 'query').callsFake(queryStub);
     result = null;
     error = null;
   });
@@ -62,7 +61,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledWithExactly(null, ['foo', 'bar']);
 
       cb.reset();
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
 
       kuzzle.getAllStatistics(options, cb);
       should(kuzzle.query).be.calledOnce();
@@ -111,7 +110,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledWithExactly(null, [{foo: 'bar'}]);
 
       cb.reset();
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
 
       kuzzle.getStatistics(options, cb);
       should(kuzzle.query).be.calledOnce();
@@ -121,8 +120,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should return statistics frames starting from the given timestamp', function () {
-      var
-        hits = [
+      var hits = [
           {123: {}},
           {456: {}},
           {789: {}}
@@ -254,7 +252,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, result.result.serverInfo);
 
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
       cb.reset();
 
       kuzzle.getServerInfo(options, cb);
@@ -309,7 +307,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledWithExactly(null, result.result.collections);
 
       cb.reset();
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
 
       kuzzle.listCollections('foo', {type: 'foobar'}, cb);
       should(kuzzle.query).be.calledOnce();
@@ -365,7 +363,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledWithExactly(null, ['foo', 'bar']);
 
       cb.reset();
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
 
       kuzzle.listIndexes(options, cb);
       should(kuzzle.query).be.calledOnce();
@@ -411,7 +409,7 @@ describe('Kuzzle methods', function () {
       should(cb).be.calledWithExactly(null, result.result.now);
 
       cb.reset();
-      kuzzle.query.reset();
+      kuzzle.query.resetHistory();
 
       kuzzle.now({foo: 'bar'}, cb);
       should(kuzzle.query).be.calledOnce();
@@ -935,8 +933,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should use kuzzle default index if none is provided', function () {
-      var
-        expectedQuery = {
+      var expectedQuery = {
           controller: 'index',
           action: 'setAutoRefresh',
           index: 'defaultIndex'

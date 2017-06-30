@@ -361,8 +361,7 @@ Collection.prototype.getMapping = function (options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mCreateDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {},
     },
     self = this;
@@ -400,8 +399,7 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {},
     },
     self = this;
@@ -439,8 +437,7 @@ Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb
  * @returns {object} this
  */
 Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
-  var
-    data = {
+  var data = {
       body: {
         ids: documentIds
       }
@@ -475,8 +472,7 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
  * @param {responseCallback} cb - Returns an instantiated CollectionMapping object
  */
 Collection.prototype.mGetDocument = function (documentIds, options, cb) {
-  var
-    data = {
+  var data = {
       body: {
         ids: documentIds
       }
@@ -510,8 +506,7 @@ Collection.prototype.mGetDocument = function (documentIds, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mReplaceDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {}
     },
     self = this;
@@ -549,8 +544,7 @@ Collection.prototype.mReplaceDocument = function (documents, options, cb) {
  * @returns {object} this
  */
 Collection.prototype.mUpdateDocument = function (documents, options, cb) {
-  var
-    data = {
+  var data = {
       body: {}
     },
     self = this;
@@ -930,8 +924,7 @@ Collection.prototype.truncate = function (options, cb) {
  * @return {object} this
  */
 Collection.prototype.updateDocument = function (documentId, content, options, cb) {
-  var
-    data = {
+  var data = {
       _id: documentId,
       body: content
     },

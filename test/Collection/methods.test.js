@@ -769,8 +769,7 @@ describe('Collection methods', function () {
   });
 
   describe('#mCreateDocument', function () {
-    var
-      content = { documents: [
+    var content = { documents: [
         { _id: 'foo1', foo: 'bar' },
         { _id: 'foo2', foo: 'bar' }
       ]},
@@ -820,8 +819,7 @@ describe('Collection methods', function () {
   });
 
   describe('#mCreateOrReplaceDocument', function () {
-    var
-      content = { documents: [
+    var content = { documents: [
         { _id: 'foo1', foo: 'bar' },
         { _id: 'foo2', foo: 'bar' }
       ]},
@@ -915,8 +913,7 @@ describe('Collection methods', function () {
   });
 
   describe('#mGetDocument', function () {
-    var
-      content = { documents: [
+    var content = { documents: [
         { _id: 'foo1', foo: 'bar' },
         { _id: 'foo2', foo: 'bar' }
       ]},
@@ -963,8 +960,7 @@ describe('Collection methods', function () {
   });
 
   describe('#mReplaceDocument', function () {
-    var
-      content = { documents: [
+    var content = { documents: [
         { _id: 'foo1', foo: 'bar' },
         { _id: 'foo2', foo: 'bar' }
       ]},
@@ -1012,8 +1008,7 @@ describe('Collection methods', function () {
   });
 
   describe('#mUpdateDocument', function () {
-    var
-      content = { documents: [
+    var content = { documents: [
         { _id: 'foo1', foo: 'bar' },
         { _id: 'foo2', foo: 'bar' }
       ]},
