@@ -133,7 +133,7 @@ describe('User methods', function () {
       }));
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myUser', body: {some: 'content'}}, null, sinon.match.func);
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myUser', body: {some: 'content'}, meta: {}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -250,20 +250,21 @@ describe('User methods', function () {
 
   describe('#serialize', function () {
     beforeEach(function () {
-      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']}, {createdAt: '0123456789'});
     });
 
     it('should serialize with correct attributes', function () {
       var serialized = kuzzleUser.serialize();
 
       should(serialized._id).be.exactly('user');
-      should(serialized.body).be.match({some: 'content', profileIds: ['profile']});
+      should(serialized.body).match({some: 'content', profileIds: ['profile']});
+      should(serialized.meta).match({createdAt: '0123456789'});
     });
   });
 
   describe('#creationSerialize', function () {
     beforeEach(function () {
-      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']});
+      kuzzleUser = new User(kuzzle.security, 'user', {some: 'content', profileIds: ['profile']}, {createdAt: '0123456789'});
       kuzzleUser.setCredentials({some: 'credentials'});
     });
 
@@ -271,7 +272,7 @@ describe('User methods', function () {
       var serialized = kuzzleUser.creationSerialize();
 
       should(serialized._id).be.exactly('user');
-      should(serialized.body).be.match({content: {some: 'content', profileIds: ['profile']}, credentials: {some: 'credentials'}});
+      should(serialized.body).match({content: {some: 'content', profileIds: ['profile']}, credentials: {some: 'credentials'}, meta: {createdAt: '0123456789'}});
     });
   });
 

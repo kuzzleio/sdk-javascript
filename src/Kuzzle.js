@@ -751,7 +751,7 @@ Kuzzle.prototype.whoAmI = function (cb) {
   self.callbackRequired('Kuzzle.whoAmI', cb);
 
   self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, res) {
-    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source, res.result._meta));
   });
 };
 

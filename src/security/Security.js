@@ -66,7 +66,7 @@ Security.prototype.fetchRole = function (id, options, cb) {
   self.kuzzle.callbackRequired('Security.fetchRole', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getRole'), data, options, function (err, response) {
-    cb(err, err ? undefined : new Role(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new Role(self, response.result._id, response.result._source, response.result._meta));
   });
 };
 
@@ -101,7 +101,7 @@ Security.prototype.searchRoles = function (filters, options, cb) {
     }
 
     documents = result.result.hits.map(function (doc) {
-      return new Role(self, doc._id, doc._source);
+      return new Role(self, doc._id, doc._source, doc._meta);
     });
 
     cb(null, { total: result.result.total, roles: documents });
@@ -144,7 +144,7 @@ Security.prototype.createRole = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new Role(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new Role(self, res.result._id, res.result._source, res.result._meta));
   });
 };
 
@@ -173,8 +173,8 @@ Security.prototype.updateRole = function (id, content, options, cb) {
     options = null;
   }
 
-  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err) {
-    cb(err, err ? undefined : new Role(self, id, content));
+  self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
+    cb(err, err ? undefined : new Role(self, id, content, res.result._meta));
   });
 
   return this;
@@ -214,10 +214,11 @@ Security.prototype.deleteRole = function (id, options, cb) {
  *
  * @param {string} id - role id
  * @param {object} content - role content
+ * @param {object} meta - role metadata
  * @constructor
  */
-Security.prototype.role = function(id, content) {
-  return new Role(this, id, content);
+Security.prototype.role = function(id, content, meta) {
+  return new Role(this, id, content, meta);
 };
 
 
@@ -249,7 +250,7 @@ Security.prototype.fetchProfile = function (id, options, cb) {
   self.kuzzle.callbackRequired('Security.fetchProfile', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getProfile'), data, options, function (error, response) {
-    cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source));
+    cb(error, error ? undefined : new Profile(self, response.result._id, response.result._source, response.result._meta));
   });
 };
 
@@ -286,7 +287,7 @@ Security.prototype.searchProfiles = function (filters, options, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      return new Profile(self, doc._id, doc._source);
+      return new Profile(self, doc._id, doc._source, doc._meta);
     });
 
     if (response.result.scrollId) {
@@ -336,7 +337,7 @@ Security.prototype.createProfile = function (id, policies, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new Profile(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new Profile(self, res.result._id, res.result._source, res.result._meta));
   });
 };
 
@@ -382,7 +383,7 @@ Security.prototype.updateProfile = function (id, policies, options, cb) {
       updatedContent[property] = res.result._source[property];
     });
 
-    cb(null, new Profile(self, res.result._id, updatedContent));
+    cb(null, new Profile(self, res.result._id, updatedContent, res.result._meta));
   });
 
   return this;
@@ -451,7 +452,7 @@ Security.prototype.scrollProfiles = function (scrollId, options, cb) {
     }
 
     result.result.hits.forEach(function (profile) {
-      var newProfile = new Profile(self, profile._id, profile._source);
+      var newProfile = new Profile(self, profile._id, profile._source, profile._meta);
 
       newProfile.version = profile._version;
 
@@ -472,10 +473,11 @@ Security.prototype.scrollProfiles = function (scrollId, options, cb) {
  *
  * @param {string} id - profile id
  * @param {object} content - profile content
+ * @param {object} meta - profile metadata
  * @constructor
  */
-Security.prototype.profile = function(id, content) {
-  return new Profile(this, id, content);
+Security.prototype.profile = function(id, content, meta) {
+  return new Profile(this, id, content, meta);
 };
 
 /**
@@ -502,7 +504,7 @@ Security.prototype.fetchUser = function (id, options, cb) {
   self.kuzzle.callbackRequired('Security.fetchUser', cb);
 
   self.kuzzle.query(this.buildQueryArgs('getUser'), data, options, function (err, response) {
-    cb(err, err ? undefined : new User(self, response.result._id, response.result._source));
+    cb(err, err ? undefined : new User(self, response.result._id, response.result._source, response.result._meta));
   });
 };
 
@@ -538,7 +540,7 @@ Security.prototype.searchUsers = function (filters, options, cb) {
     }
 
     documents = response.result.hits.map(function (doc) {
-      return new User(self, doc._id, doc._source);
+      return new User(self, doc._id, doc._source, doc._meta);
     });
 
     if (response.result.scrollId) {
@@ -568,7 +570,7 @@ Security.prototype.createUser = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(self.buildQueryArgs('createUser'), data, null, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source, res.result._meta));
   });
 };
 
@@ -595,7 +597,7 @@ Security.prototype.replaceUser = function (id, content, options, cb) {
   }
 
   self.kuzzle.query(this.buildQueryArgs('replaceUser'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source, res.result._meta));
   });
 };
 
@@ -658,7 +660,7 @@ Security.prototype.updateUser = function (id, content, options, cb) {
   data.body = content;
 
   self.kuzzle.query(this.buildQueryArgs(action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : new User(self, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self, res.result._id, res.result._source, res.result._meta));
   });
 
   return this;
@@ -727,7 +729,7 @@ Security.prototype.scrollUsers = function (scrollId, options, cb) {
     }
 
     result.result.hits.forEach(function (user) {
-      var newUser = new User(self, user._id, user._source);
+      var newUser = new User(self, user._id, user._source, user._meta);
 
       newUser.version = user._version;
 
@@ -750,10 +752,11 @@ Security.prototype.scrollUsers = function (scrollId, options, cb) {
  *
  * @param {string} id - user id
  * @param {object} content - user content
+ * @param {object} meta - user metadata
  * @constructor
  */
-Security.prototype.user = function(id, content) {
-  return new User(this, id, content);
+Security.prototype.user = function(id, content, meta) {
+  return new User(this, id, content, meta);
 };
 
 /**
