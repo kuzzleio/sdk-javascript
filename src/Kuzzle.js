@@ -1,5 +1,5 @@
 var
-  uuid = require('uuid'),
+  uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
@@ -704,7 +704,7 @@ Kuzzle.prototype.logout = function (cb) {
     request = {
       action: 'logout',
       controller: 'auth',
-      requestId: uuid.v4(),
+      requestId: uuidv4(),
       body: {}
     };
 
@@ -1438,7 +1438,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   if (!object.requestId) {
-    object.requestId = uuid.v4();
+    object.requestId = uuidv4();
   }
 
   object.volatile.sdkVersion = this.sdkVersion;
