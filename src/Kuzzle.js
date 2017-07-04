@@ -492,7 +492,10 @@ Kuzzle.prototype.getJwtToken = function() {
 Kuzzle.prototype.login = function (strategy) {
   var
     self = this,
-    request = {},
+    request = {
+      body: {},
+      strategy: strategy
+    },
     credentials,
     cb = null;
 
@@ -523,11 +526,11 @@ Kuzzle.prototype.login = function (strategy) {
 
   if (typeof credentials === 'object') {
     Object.keys(credentials).forEach(function (key) {
-      request[key] = credentials[key];
+      request.body[key] = credentials[key];
     });
   }
 
-  this.query({controller: 'auth', action: 'login'}, {body: request, strategy: strategy}, {queuable: false}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, function(error, response) {
     if (!error) {
       if (response.result.jwt) {
         self.setJwtToken(response.result.jwt);
