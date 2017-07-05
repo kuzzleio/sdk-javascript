@@ -403,16 +403,16 @@ describe('Room methods', function () {
       notifCB.call(room, {
         controller: 'realtime',
         result: { count: 3 },
-        type: 'user'
+        type: 'user',
+        user: 'in'
       });
 
       should(room.callback)
         .be.calledOnce()
         .be.calledWithMatch(null, {
+          result: { count: 3 },
           type: 'user',
-          user: {
-            count: 3
-          }
+          user: 'in',
         });
     });
 

@@ -320,10 +320,6 @@ function notificationCallback (data) {
     data.document = new Document(this.collection, data.result._id, data.result._source, data.result._meta);
     delete data.result;
   }
-  else if (data.type === 'user') {
-    data.user = {count: data.result.count};
-    delete data.result;
-  }
 
   if (this.kuzzle.requestHistory[data.requestId]) {
     if (this.subscribeToSelf) {
