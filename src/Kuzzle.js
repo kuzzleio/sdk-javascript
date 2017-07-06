@@ -496,7 +496,6 @@ Kuzzle.prototype.login = function (strategy) {
       body: {},
       strategy: strategy
     },
-    credentials,
     cb = null;
 
   if (!strategy || typeof strategy !== 'string') {
@@ -506,7 +505,7 @@ Kuzzle.prototype.login = function (strategy) {
   // Handle arguments (credentials, expiresIn, cb)
   if (arguments[1]) {
     if (typeof arguments[1] === 'object') {
-      credentials = arguments[1];
+      request.body = arguments[1];
     } else if (typeof arguments[1] === 'number' || typeof arguments[1] === 'string') {
       request.expiresIn = arguments[1];
     } else if (typeof arguments[1] === 'function') {
@@ -522,12 +521,6 @@ Kuzzle.prototype.login = function (strategy) {
   }
   if (arguments[3] && typeof arguments[3] === 'function') {
     cb = arguments[3];
-  }
-
-  if (typeof credentials === 'object') {
-    Object.keys(credentials).forEach(function (key) {
-      request.body[key] = credentials[key];
-    });
   }
 
   this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, function(error, response) {
