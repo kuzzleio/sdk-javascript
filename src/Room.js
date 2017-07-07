@@ -1,5 +1,5 @@
 var
-  uuid = require('uuid'),
+  uuidv4 = require('uuid/v4'),
   Document = require('./Document');
 
 /**
@@ -36,7 +36,7 @@ function Room(collection, options) {
       writable: true
     },
     id: {
-      value: uuid.v4()
+      value: uuidv4()
     },
     lastRenewal: {
       value: null,
