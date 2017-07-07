@@ -29,6 +29,11 @@ describe('Kuzzle Login', function () {
     it('should handle login with only the strategy', function (done) {
       kuzzle.login('local', function() {
         should(queryStub).be.calledOnce();
+        should(queryStub.firstCall).be.calledWith(
+          {controller: 'auth', action: 'login'},
+          {body: {}, strategy: 'local'},
+          {queuable: false}
+        );
         done();
       });
     });
@@ -36,6 +41,11 @@ describe('Kuzzle Login', function () {
     it('should handle login with credentials', function (done) {
       kuzzle.login('local', loginCredentials, function() {
         should(queryStub).be.calledOnce();
+        should(queryStub.firstCall).be.calledWith(
+          {controller: 'auth', action: 'login'},
+          {body: {username: 'foo', password: 'bar'}, strategy: 'local'},
+          {queuable: false}
+        );
         done();
       });
     });
@@ -43,6 +53,11 @@ describe('Kuzzle Login', function () {
     it('should handle login without credentials and with expiresIn', function (done) {
       kuzzle.login('local', '1h', function() {
         should(queryStub).be.calledOnce();
+        should(queryStub.firstCall).be.calledWith(
+          {controller: 'auth', action: 'login'},
+          {body: {}, strategy: 'local', expiresIn: '1h'},
+          {queuable: false}
+        );
         done();
       });
     });
@@ -50,6 +65,11 @@ describe('Kuzzle Login', function () {
     it('should have the token in login callback', function (done) {
       kuzzle.login('local', loginCredentials, '1h', function() {
         should(kuzzle.jwtToken).be.exactly('test-toto');
+        should(queryStub.firstCall).be.calledWith(
+          {controller: 'auth', action: 'login'},
+          {body: {username: 'foo', password: 'bar'}, strategy: 'local', expiresIn: '1h'},
+          {queuable: false}
+        );
         done();
       });
     });
@@ -65,29 +85,39 @@ describe('Kuzzle Login', function () {
     it('should handle login with only the strategy', function () {
       kuzzle.login('local');
       should(queryStub).be.calledOnce();
+      should(queryStub.firstCall).be.calledWith(
+        {controller: 'auth', action: 'login'},
+        {body: {}, strategy: 'local'},
+        {queuable: false}
+      );
     });
 
     it('should handle login with credentials', function () {
       kuzzle.login('local', loginCredentials);
       should(queryStub).be.calledOnce();
+      should(queryStub.firstCall).be.calledWith(
+        {controller: 'auth', action: 'login'},
+        {body: {username: 'foo', password: 'bar'}, strategy: 'local'},
+        {queuable: false}
+      );
     });
 
     it('should handle login without credentials and with expiresIn', function () {
       kuzzle.login('local', '1h');
       should(queryStub).be.calledOnce();
+      should(queryStub.firstCall).be.calledWith(
+        {controller: 'auth', action: 'login'},
+        {body: {}, strategy: 'local', expiresIn: '1h'},
+        {queuable: false}
+      );
     });
 
     it('should handle optional arguments correctly', function () {
-      kuzzle.login('local', loginCredentials);
       kuzzle.login('local', loginCredentials, '1h');
+      should(queryStub).be.calledOnce();
       should(queryStub.firstCall).be.calledWith(
         {controller: 'auth', action: 'login'},
-        {strategy: 'local', body: {username: 'foo', password: 'bar'}},
-        {queuable: false}
-      );
-      should(queryStub.secondCall).be.calledWith(
-        {controller: 'auth', action: 'login'},
-        {strategy: 'local', body: {username: 'foo', password: 'bar', expiresIn: '1h'}},
+        {body: {username: 'foo', password: 'bar'}, strategy: 'local', expiresIn: '1h'},
         {queuable: false}
       );
     });
