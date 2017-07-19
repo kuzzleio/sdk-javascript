@@ -1,3 +1,84 @@
+# [5.0.6](https://github.com/kuzzleio/sdk-javascript/releases/tag/5.0.6) (2017-07-19)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0 | 1.0.0 |
+
+#### Bug fixes
+
+- [ [#238](https://github.com/kuzzleio/sdk-javascript/pull/238) ] Login: move "expiresIn" option from request.body to request root attribute   ([ballinette](https://github.com/ballinette))
+
+#### Enhancements
+
+- [ [#233](https://github.com/kuzzleio/sdk-javascript/pull/233) ] Allow paginated search using ES's search_after in SearchResult:fetchNext   ([samniisan](https://github.com/samniisan))
+- [ [#236](https://github.com/kuzzleio/sdk-javascript/pull/236) ] Add meta to Security documents (User, Profile, Role)   ([samniisan](https://github.com/samniisan))
+- [ [#229](https://github.com/kuzzleio/sdk-javascript/pull/229) ] Allow creating a user without specifying the id   ([xbill82](https://github.com/xbill82))
+- [ [#232](https://github.com/kuzzleio/sdk-javascript/pull/232) ] Add SDK version into volatile   ([samniisan](https://github.com/samniisan))
+
+#### Others
+
+- [ [#240](https://github.com/kuzzleio/sdk-javascript/pull/240) ] Fixed User Notification response format   ([samniisan](https://github.com/samniisan))
+---
+
+
+# [5.0.5](https://github.com/kuzzleio/sdk-javascript/releases/tag/5.0.5) (2017-06-30)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0 | 1.0.0 |
+
+#### Enhancements
+
+- [ [#232](https://github.com/kuzzleio/sdk-javascript/pull/232) ] Add SDK version into volatile   ([samniisan](https://github.com/samniisan))
+---
+
+
+
+# [5.0.4](https://github.com/kuzzleio/sdk-javascript/releases/tag/5.0.4) (2017-06-20)
+
+### Compatibility
+
+| Kuzzle | Proxy |
+|--------|-------|
+| 1.0.0 | 1.0.0 |
+
+#### Breaking changes
+
+- [ [#234](https://github.com/kuzzleio/sdk-javascript/pull/234) ] Update to new notifications format & event rename ([scottinet](https://github.com/scottinet))
+- [ [#230](https://github.com/kuzzleio/sdk-javascript/pull/230) ] Fix createProfile and updateProfile method signatures ([scottinet](https://github.com/scottinet))
+- [ [#228](https://github.com/kuzzleio/sdk-javascript/pull/228) ] Remove fetchAllDocuments method ([benoitvidis](https://github.com/benoitvidis))
+- [ [#227](https://github.com/kuzzleio/sdk-javascript/pull/227) ] Update MemoryStorage.*scan return value format ([scottinet](https://github.com/scottinet))
+- [ [#225](https://github.com/kuzzleio/sdk-javascript/pull/225) ] Rename getProfiles to getProfileIds and add a proper getProfiles method ([scottinet](https://github.com/scottinet))
+- [ [#218](https://github.com/kuzzleio/sdk-javascript/pull/218) ] Login reshape   ([xbill82](https://github.com/xbill82))
+- [ [#215](https://github.com/kuzzleio/sdk-javascript/pull/215) ] Restructure User to be able to store both content and credentials   ([dbengsch](https://github.com/dbengsch))
+- [ [#210](https://github.com/kuzzleio/sdk-javascript/pull/210) ] Harmonize event emitters implementation   ([ballinette](https://github.com/ballinette))
+
+#### Bug fixes
+
+- [ [#226](https://github.com/kuzzleio/sdk-javascript/pull/226) ] Network error handling ([stafyniaksacha](https://github.com/stafyniaksacha))
+- [ [#222](https://github.com/kuzzleio/sdk-javascript/pull/222) ] NetworkError payload should be an Error object   ([scottinet](https://github.com/scottinet))
+- [ [#214](https://github.com/kuzzleio/sdk-javascript/pull/214) ] createIndex should only return response.result   ([ballinette](https://github.com/ballinette))
+
+#### New features
+
+- [ [#231](https://github.com/kuzzleio/sdk-javascript/pull/231) ] Add specification CRUDL routes ([samniisan](https://github.com/samniisan))
+- [ [#224](https://github.com/kuzzleio/sdk-javascript/pull/224) ] Add support for Document:m* methods  ([samniisan](https://github.com/samniisan))
+- [ [#219](https://github.com/kuzzleio/sdk-javascript/pull/219) ] Add scrollProfile & scrollUsers support   ([samniisan](https://github.com/samniisan))
+- [ [#217](https://github.com/kuzzleio/sdk-javascript/pull/217) ] Added all new credential related routes   ([jenow](https://github.com/jenow))
+- [ [#209](https://github.com/kuzzleio/sdk-javascript/pull/209) ] Add Collection:documentExists & Document:exists methods   ([samniisan](https://github.com/samniisan))
+- [ [#208](https://github.com/kuzzleio/sdk-javascript/pull/208) ] Adds a new replaceUser method to Security   ([samniisan](https://github.com/samniisan))
+
+#### Enhancements
+
+- [ [#210](https://github.com/kuzzleio/sdk-javascript/pull/210) ] Harmonize event emitters implementation   ([ballinette](https://github.com/ballinette))
+
+---
+
+
 # [4.0.1](https://github.com/kuzzleio/sdk-javascript/releases/tag/4.0.1) (2017-05-9)
 
 [Full Changelog](https://github.com/kuzzleio/sdk-javascript/compare/4.0.1...4.0.1)
