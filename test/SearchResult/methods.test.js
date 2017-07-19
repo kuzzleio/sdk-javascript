@@ -29,6 +29,46 @@ describe('SearchResult methods', function () {
       collection.scroll = sinon.stub();
     });
 
+    it('should be able to perform a search-after request', function (done) {
+      var
+        firstSearchResult;
+
+      searchFilters = {sort: [{foo: 'asc'}]};
+
+      this.timeout(50);
+
+      collection.search = function(filters, options, cb) {
+        cb(null, new SearchResult(collection, 2, [secondDocument], {}, {size: 1}, searchFilters));
+      };
+
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, {size: 1}, searchFilters);
+      firstSearchResult.fetchNext(function(error, result) {
+        should(result).be.an.instanceOf(SearchResult);
+        should(result.getDocuments()).be.an.Array();
+        should(result.getDocuments().length).be.exactly(1);
+        done();
+      });
+    });
+
+    it('should transfer error if not-able to do a search-after request', function (done) {
+      var
+        firstSearchResult;
+
+      searchFilters = {sort: [{foo: 'asc'}]};
+
+      collection.search = function(filters, options, cb) {
+        cb(new Error('foobar search'));
+      };
+
+      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, {size: 1}, searchFilters);
+
+      firstSearchResult.fetchNext(function(error) {
+        should(error).be.an.instanceOf(Error);
+        should(error.message).be.exactly('foobar search');
+        done();
+      });
+    });
+
     it('should be able to do a scroll request', function (done) {
       var
         firstSearchResult;

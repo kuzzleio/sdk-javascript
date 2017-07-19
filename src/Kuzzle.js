@@ -1,5 +1,5 @@
 var
-  uuid = require('uuid'),
+  uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Security = require('./security/Security'),
@@ -62,7 +62,7 @@ function Kuzzle (host, options, cb) {
         'queryError',
         'discarded'
       ],
-      writeable: false
+      writable: false
     },
     queuing: {
       value: false,
@@ -198,6 +198,10 @@ function Kuzzle (host, options, cb) {
       value: undefined,
       enumerable: true,
       writable: true
+    },
+    sdkVersion: {
+      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION,
+      writable: false
     }
   });
 
@@ -488,8 +492,10 @@ Kuzzle.prototype.getJwtToken = function() {
 Kuzzle.prototype.login = function (strategy) {
   var
     self = this,
-    request = {},
-    credentials,
+    request = {
+      body: {},
+      strategy: strategy
+    },
     cb = null;
 
   if (!strategy || typeof strategy !== 'string') {
@@ -499,7 +505,7 @@ Kuzzle.prototype.login = function (strategy) {
   // Handle arguments (credentials, expiresIn, cb)
   if (arguments[1]) {
     if (typeof arguments[1] === 'object') {
-      credentials = arguments[1];
+      request.body = arguments[1];
     } else if (typeof arguments[1] === 'number' || typeof arguments[1] === 'string') {
       request.expiresIn = arguments[1];
     } else if (typeof arguments[1] === 'function') {
@@ -517,13 +523,7 @@ Kuzzle.prototype.login = function (strategy) {
     cb = arguments[3];
   }
 
-  if (typeof credentials === 'object') {
-    Object.keys(credentials).forEach(function (key) {
-      request[key] = credentials[key];
-    });
-  }
-
-  this.query({controller: 'auth', action: 'login'}, {body: request, strategy: strategy}, {queuable: false}, function(error, response) {
+  this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, function(error, response) {
     if (!error) {
       if (response.result.jwt) {
         self.setJwtToken(response.result.jwt);
@@ -700,7 +700,7 @@ Kuzzle.prototype.logout = function (cb) {
     request = {
       action: 'logout',
       controller: 'auth',
-      requestId: uuid.v4(),
+      requestId: uuidv4(),
       body: {}
     };
 
@@ -747,7 +747,7 @@ Kuzzle.prototype.whoAmI = function (cb) {
   self.callbackRequired('Kuzzle.whoAmI', cb);
 
   self.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, function (err, res) {
-    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source));
+    cb(err, err ? undefined : new User(self.security, res.result._id, res.result._source, res.result._meta));
   });
 };
 
@@ -1434,8 +1434,10 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   if (!object.requestId) {
-    object.requestId = uuid.v4();
+    object.requestId = uuidv4();
   }
+
+  object.volatile.sdkVersion = this.sdkVersion;
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
     if (self.state === 'connected') {

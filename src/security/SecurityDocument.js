@@ -1,4 +1,4 @@
-function SecurityDocument(Security, id, content) {
+function SecurityDocument(Security, id, content, meta) {
 
   if (!id) {
     throw new Error('A security document must have an id');
@@ -21,6 +21,11 @@ function SecurityDocument(Security, id, content) {
     },
     content: {
       value: {},
+      writable: true,
+      enumerable: true
+    },
+    meta: {
+      value: meta || {},
       writable: true,
       enumerable: true
     }
@@ -69,6 +74,7 @@ SecurityDocument.prototype.serialize = function () {
   }
 
   data.body = this.content;
+  data.meta = this.meta;
 
   return data;
 };

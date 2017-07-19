@@ -693,7 +693,6 @@ Collection.prototype.search = function (filters, options, cb) {
 
   query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
-
   self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
     var documents = [];
 

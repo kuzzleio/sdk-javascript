@@ -1,5 +1,5 @@
 var
-  uuid = require('uuid'),
+  uuidv4 = require('uuid/v4'),
   Document = require('./Document');
 
 /**
@@ -36,7 +36,7 @@ function Room(collection, options) {
       writable: true
     },
     id: {
-      value: uuid.v4()
+      value: uuidv4()
     },
     lastRenewal: {
       value: null,
@@ -318,10 +318,6 @@ function notificationCallback (data) {
 
   if (data.type === 'document') {
     data.document = new Document(this.collection, data.result._id, data.result._source, data.result._meta);
-    delete data.result;
-  }
-  else if (data.type === 'user') {
-    data.user = {count: data.result.count};
     delete data.result;
   }
 

@@ -44,7 +44,7 @@ describe('Profile methods', function () {
       }));
 
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myProfile', body: {policies: []}}, null, sinon.match.func);
+      should(kuzzle.query).be.calledWith(expectedQuery, {_id: 'myProfile', body: {policies: []}, meta: {}}, null, sinon.match.func);
 
       kuzzle.query.yield(null, result);
     });
@@ -159,7 +159,7 @@ describe('Profile methods', function () {
 
   describe('#serialize', function () {
     beforeEach(function () {
-      profile = new Profile(kuzzle.security, 'myProfile', {some: 'content', policies: [{roleId:'role1'}]});
+      profile = new Profile(kuzzle.security, 'myProfile', {some: 'content', policies: [{roleId:'role1'}]}, {createdAt: '123456789'});
     });
 
     it('should serialize with correct attributes', function () {
@@ -167,17 +167,19 @@ describe('Profile methods', function () {
 
       should(serialized._id).be.exactly('myProfile');
       should(serialized.body).match({some: 'content', policies: [{roleId:'role1'}]});
+      should(serialized.meta).match({createdAt: '123456789'});
     });
 
     it('should serialize without policies if no policies attribute is defined', function () {
       var
         serialized;
 
-      profile = new Profile(kuzzle.security, 'myProfile', {some: 'content'});
+      profile = new Profile(kuzzle.security, 'myProfile', {some: 'content'}, {createdAt: '123456789'});
 
       serialized = profile.serialize();
 
       should(serialized._id).be.exactly('myProfile');
+      should(serialized.meta).match({createdAt: '123456789'});
       should.exist(serialized.body.some);
       should.not.exist(serialized.body.policies);
     });

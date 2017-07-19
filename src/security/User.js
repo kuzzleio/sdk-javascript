@@ -7,9 +7,8 @@ var
  * @param {Object} content
  * @constructor
  */
-function User(Security, id, content) {
-
-  KuzzleSecurityDocument.call(this, Security, id, content);
+function User(Security, id, content, meta) {
+  KuzzleSecurityDocument.call(this, Security, id, content, meta);
 
   // Define properties
   Object.defineProperties(this, {
@@ -189,7 +188,7 @@ User.prototype.saveRestricted = function (options, cb) {
  * @return {object} JSON object representing this User
  */
 User.prototype.serialize = function () {
-  return {_id: this.id, body: this.content};
+  return {_id: this.id, body: this.content, meta: this.meta};
 };
 
 /**
@@ -198,7 +197,7 @@ User.prototype.serialize = function () {
  * @return {object} JSON object representing this User
  */
 User.prototype.creationSerialize = function () {
-  return {_id: this.id, body: {content: this.content, credentials: this.credentials}};
+  return {_id: this.id, body: {content: this.content, credentials: this.credentials, meta: this.meta}};
 };
 
 /**
