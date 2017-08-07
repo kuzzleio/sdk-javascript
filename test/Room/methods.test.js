@@ -17,8 +17,8 @@ describe('Room methods', function () {
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
     kuzzle.query = sinon.stub();
-    kuzzle.state = 'connected';
     kuzzle.network = new NetworkWrapperMock();
+    kuzzle.network.state = 'connected';
     collection = kuzzle.collection('foo', 'bar');
   });
 
@@ -147,6 +147,7 @@ describe('Room methods', function () {
       room.renew({}, cb, cb);
       should(room.subscribing).be.true();
 
+      kuzzle.network.state = 'offline';
       kuzzle.connect();
       kuzzle.network.emit('networkError', new Error('foo'));
 
@@ -186,7 +187,7 @@ describe('Room methods', function () {
     });
 
     it('should register itself to Kuzzle and skip subscription if not connected', function () {
-      kuzzle.state = 'foo';
+      kuzzle.network.state = 'foo';
       kuzzle.query.yields(null, result);
       room.renew({}, sinon.stub());
       should(room.lastRenewal).be.null();

@@ -5,21 +5,14 @@ function SocketIO(host, options) {
   RTWrapper.call(this, host, options);
 
   this.socket = null;
-  this.wasConnected = false;
   this.forceDisconnect = false;
-  this.handlers = {
-    connect: [],
-    reconnect: [],
-    connectError: [],
-    disconnect: []
-  };
-  this.retrying = false;
 
   /**
    * Connect to the SocketIO server
    *
    */
   this.connect = function () {
+    var self = this;
     RTWrapper.prototype.connect.call(this);
 
     this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
@@ -29,82 +22,28 @@ function SocketIO(host, options) {
     });
 
     this.socket.on('connect', function() {
-      if (self.wasConnected) {
-        self.handlers.reconnect.forEach(function(handler) {
-          handler();
-        });
-      }
-      else {
-        self.handlers.connect.forEach(function(handler) {
-          handler();
-        });
-      }
-
-      self.wasConnected = true;
+      self.clientConnected();
     });
 
     this.socket.on('connect_error', function(error) {
-      onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
+      self.clientNetworkError(error);
     });
 
     this.socket.on('disconnect', function() {
       var error;
 
       if (self.forceDisconnect) {
-        self.handlers.disconnect.forEach(function(handler) {
-          handler();
-        });
+        self.clientDisconnected();
       }
       else {
         error = new Error('An error occurred, this may due that kuzzle was not ready yet');
         error.status = 500;
 
-        onClientNetworkError(self, autoReconnect, reconnectionDelay, error);
+        self.clientNetworkError(error);
       }
 
       self.forceDisconnect = false;
     });
-  };
-
-  /**
-   * Fires the provided callback whence a connection is established
-   *
-   * @param {function} callback
-   */
-  this.onConnect = function (callback) {
-    if (this.handlers.connect.indexOf(callback) === -1) {
-      this.handlers.connect.push(callback);
-    }
-  };
-
-  /**
-   * Fires the provided callback whenever a connection error is received
-   * @param {function} callback
-   */
-  this.onConnectError = function (callback) {
-    if (this.handlers.connectError.indexOf(callback) === -1) {
-      this.handlers.connectError.push(callback);
-    }
-  };
-
-  /**
-   * Fires the provided callback whenever a disconnection occurred
-   * @param {function} callback
-   */
-  this.onDisconnect = function (callback) {
-    if (this.handlers.disconnect.indexOf(callback) === -1) {
-      this.handlers.disconnect.push(callback);
-    }
-  };
-
-  /**
-   * Fires the provided callback whenever a connection has been reestablished
-   * @param {function} callback
-   */
-  this.onReconnect = function (callback) {
-    if (this.handlers.reconnect.indexOf(callback) === -1) {
-      this.handlers.reconnect.push(callback);
-    }
   };
 
   /**
@@ -159,28 +98,5 @@ function SocketIO(host, options) {
   };
 }
 SocketIO.prototype = Object.create(RTWrapper.prototype);
-
-/**
- * Called when the connection closes with an error state
- *
- * @param {SocketIO}
- * @param {boolean} autoReconnect
- * @param {number} reconnectionDelay
- * @param {Error} error
- */
-function onClientNetworkError(socketio, autoReconnect, reconnectionDelay, error) {
-  if (autoReconnect && !socketio.retrying && !socketio.stopRetryingToConnect) {
-    socketio.retrying = true;
-    setTimeout(function () {
-      socketio.retrying = false;
-      socketio.connect(autoReconnect, reconnectionDelay);
-    }, reconnectionDelay);
-  }
-
-  socketio.handlers.connectError.forEach(function(handler) {
-    handler(error);
-  });
-}
-
 
 module.exports = SocketIO;

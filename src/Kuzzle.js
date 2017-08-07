@@ -130,13 +130,6 @@ function Kuzzle (host, options, cb) {
     });
   }
 
-  // Helper function ensuring that this Kuzzle object is still valid before performing a query
-  Object.defineProperty(this, 'isValid', {
-    value: function () {
-      self.network.isValid();
-    }
-  });
-
   // Helper function copying headers to the query data
   Object.defineProperty(this, 'addHeaders', {
     value: function (query, headers) {
@@ -248,17 +241,18 @@ Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
  */
 Kuzzle.prototype.connect = function () {
   var self = this;
-  if (['connecting', 'connected', 'ready'].indexOf(self.network.state) !== -1) {
-    if (self.connectCB) {
-      self.connectCB(null, self);
+
+  if (this.network.state !== 'offline') {
+    if (this.connectCB) {
+      this.connectCB(null, self);
     }
     return self;
   }
-  self.network.connect();
 
-  self.network.onConnect(function () {
+  this.network.connect();
+
+  this.network.addListener('connect', function () {
     renewAllSubscriptions.call(self);
-    self.network.replayQueue();
     self.emitEvent('connected');
 
     if (self.connectCB) {
@@ -266,11 +260,7 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.network.on('discarded', function (data) {
-    self.emitEvent('discarded', data);
-  });
-
-  self.network.onConnectError(function (error) {
+  this.network.addListener('networkError', function (error) {
     var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.network.host + ':' + self.network.port + '"');
 
     connectionError.internal = error;
@@ -283,27 +273,18 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.network.onDisconnect(function () {
-    if (!self.network.autoReconnect) {
-      self.disconnect();
-    }
-
+  this.network.addListener('disconnect', function () {
+    self.disconnect();
     self.emitEvent('disconnected');
   });
 
-  self.network.onReconnect(function () {
+  this.network.addListener('reconnect', function () {
     var reconnect = function () {
       // renew subscriptions
       if (self.network.autoResubscribe) {
         renewAllSubscriptions.call(self);
       }
 
-      // replay queued requests
-      if (self.network.autoReplay) {
-        self.network.replayQueue();
-      }
-
-      // alert listeners
       self.emitEvent('reconnected');
     };
 
@@ -312,7 +293,7 @@ Kuzzle.prototype.connect = function () {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
           self.jwtToken = undefined;
-          self.network.emitEvent('tokenExpired');
+          self.emitEvent('tokenExpired');
         }
 
         reconnect();
@@ -320,6 +301,10 @@ Kuzzle.prototype.connect = function () {
     } else {
       reconnect();
     }
+  });
+
+  this.network.on('discarded', function (data) {
+    self.emitEvent('discarded', data);
   });
 
   return this;
@@ -749,8 +734,6 @@ function removeAllSubscriptions() {
  * @param {function} listener - callback to invoke each time an event is fired
  */
 Kuzzle.prototype.addListener = function(event, listener) {
-  this.isValid();
-
   if (this.eventActions.indexOf(event) === -1) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + this.eventActions.toString());
   }
@@ -831,8 +814,6 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  * @returns {Collection} A Collection instance
  */
 Kuzzle.prototype.collection = function(collection, index) {
-  this.isValid();
-
   if (!index) {
     if (!this.defaultIndex) {
       throw new Error('Unable to create a new data collection object: no index specified');
@@ -1133,18 +1114,12 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     },
     self = this;
 
-  this.isValid();
-
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
   }
 
   if (options) {
-    if (options.queuable === false && self.network.state === 'offline') {
-      return self;
-    }
-
     if (options.refresh) {
       object.refresh = options.refresh;
     }
@@ -1218,14 +1193,34 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
 };
 
 /**
- * Replays the requests queued during offline mode.
- * Works only if the SDK is connected, and if the autoReplay option is set to false.
+ * Starts the requests queuing.
+ */
+Kuzzle.prototype.startQueuing = function () {
+  this.network.startQueuing();
+  return this;
+};
+
+/**
+ * Stops the requests queuing.
+ */
+Kuzzle.prototype.stopQueuing = function () {
+  this.network.stopQueuing();
+  return this;
+};
+
+/**
+ * @DEPRECATED
+ * See Kuzzle.prototype.playQueue();
  */
 Kuzzle.prototype.replayQueue = function () {
-  if (this.network.state === 'connected' && !this.network.autoReplay) {
-    this.network.replayQueue();
-  }
+  return this.playQueue();
+};
 
+/**
+ * Plays the requests queued during offline mode.
+ */
+Kuzzle.prototype.playQueue = function () {
+  this.network.playQueue();
   return this;
 };
 
@@ -1274,22 +1269,6 @@ Kuzzle.prototype.setHeaders = function (content, replace) {
   }
 
   return self;
-};
-
-/**
- * Starts the requests queuing.
- */
-Kuzzle.prototype.startQueuing = function () {
-  this.network.startQueuing();
-  return this;
-};
-
-/**
- * Stops the requests queuing.
- */
-Kuzzle.prototype.stopQueuing = function () {
-  this.network.stopQueuing();
-  return this;
 };
 
 function disableAllSubscriptions() {

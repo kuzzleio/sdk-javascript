@@ -1,61 +1,56 @@
+var
+  sinon = require('sinon');
+
 /**
  * @param err
  * @constructor
  */
-function NetworkWrapperMock (host, port, sslConnection) {
+function NetworkWrapperMock (host, options) {
   var self = this;
 
   this.host = host;
-  this.port = port;
-  this.sslConnection = sslConnection;
+  this.options = options || {};
+  this.port = this.options.port || 7512;
+  this.state = 'offline';
   this.connectCalled = false;
 
   this.removeAllListeners();
 
   this.connect = function() {
-    this.connectCalled = true;
-    process.nextTick(function () {
+    self.state = 'connecting';
+    self.connectCalled = true;
+    setTimeout(function () {
       switch (self.host) {
         case 'nowhere':
+          self.state = 'error';
           self.emit('networkError', new Error('Mock Error'));
           break;
         case 'somewhereagain':
+          self.state = 'connected';
           self.emit('reconnect');
           break;
         default:
+          self.state = 'connected';
           self.emit('connect');
       }
     });
   };
 
   this.disconnect = function() {
+    self.state = 'offline';
     self.emit('disconnect');
-  };
-
-  this.onConnect = function (callback) {
-    this.addListener('connect', callback);
-  };
-
-  this.onConnectError = function (callback) {
-    this.addListener('networkError', callback);
-  };
-
-  this.onDisconnect = function (callback) {
-    this.addListener('disconnect', callback);
-  };
-
-  this.onReconnect = function (callback) {
-    this.addListener('reconnect', callback);
   };
 
   this.send = function (request) {
     self.emit(request.requestId, request.response);
   };
 
-  this.close = function () {
-    this.removeAllListeners();
-  };
-
+  this.close = sinon.stub();
+  this.query = sinon.stub();
+  this.playQueue = sinon.stub();
+  this.flushQueue = sinon.stub();
+  this.startQueuing = sinon.stub();
+  this.stopQueuing = sinon.stub();
 }
 
 NetworkWrapperMock.prototype = new (require('events'))();

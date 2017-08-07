@@ -7,10 +7,7 @@ function WSNode(host, options) {
 
   this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
   this.client = null;
-  this.wasConnected = false;
-  this.retrying = false;
   this.lasturl = null;
-  this.stopRetryingToConnect = false;
 
   /**
    * Connect to the websocket server
@@ -30,14 +27,7 @@ function WSNode(host, options) {
     this.client = new this.WebSocket(url, opts);
 
     this.client.onopen = function () {
-      if (self.wasConnected) {
-        self.emitEvent('reconnect');
-      }
-      else {
-        self.emitEvent('connect');
-      }
-      self.wasConnected = true;
-      self.stopRetryingToConnect = false;
+      self.clientConnected();
     };
 
     this.client.onclose = function (closeEvent, message) {
@@ -57,13 +47,13 @@ function WSNode(host, options) {
       }
 
       if (status === 1000) {
-        self.emitEvent('disconnect');
+        self.clientDisconnected();
       }
       else {
         error = new Error(reason);
         error.status = status;
 
-        onClientNetworkError(self, error);
+        self.clientNetworkError(error);
       }
     };
 
@@ -72,7 +62,7 @@ function WSNode(host, options) {
         error = new Error(error);
       }
 
-      onClientNetworkError(self, error);
+      self.clientNetworkError(error);
     };
 
     this.client.onmessage = function (payload) {
@@ -85,39 +75,6 @@ function WSNode(host, options) {
         self.emitEvent('discarded', data);
       }
     };
-  };
-
-  /**
-   * Fires the provided callback whence a connection is established
-   *
-   * @param {function} callback
-   */
-  this.onConnect = function (callback) {
-    this.addListener('connect', callback);
-  };
-
-  /**
-   * Fires the provided callback whenever a connection error is received
-   * @param {function} callback
-   */
-  this.onConnectError = function (callback) {
-    this.addListener('networkError', callback);
-  };
-
-  /**
-   * Fires the provided callback whenever a disconnection occurred
-   * @param {function} callback
-   */
-  this.onDisconnect = function (callback) {
-    this.addListener('disconnect', callback);
-  };
-
-  /**
-   * Fires the provided callback whenever a connection has been reestablished
-   * @param {function} callback
-   */
-  this.onReconnect = function (callback) {
-    this.addListener('reconnect', callback);
   };
 
   /**
@@ -146,25 +103,5 @@ function WSNode(host, options) {
   };
 }
 WSNode.prototype = Object.create(RTWrapper.prototype);
-
-/**
- * Called when the connection closes with an error state
- *
- * @param {WSNode}
- * @param {boolean} autoReconnect
- * @param {number} reconnectionDelay
- * @param {Error} error
- */
-function onClientNetworkError(ws, error) {
-  if (ws.autoReconnect && !ws.retrying && !ws.stopRetryingToConnect) {
-    ws.retrying = true;
-    setTimeout(function () {
-      ws.retrying = false;
-      ws.connect(ws.host);
-    }, ws.reconnectionDelay);
-  }
-
-  ws.emitEvent('networkError', error);
-}
 
 module.exports = WSNode;

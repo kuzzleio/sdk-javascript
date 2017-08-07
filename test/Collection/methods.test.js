@@ -1297,8 +1297,8 @@ describe('Collection methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      kuzzle.state = 'connected';
       kuzzle.network = new NetworkWrapperMock();
+      kuzzle.network.state = 'connected';
       result = { result: {roomId: 'foobar' }};
       expectedQuery = {
         index: 'bar',

@@ -1,5 +1,5 @@
 var
-  KuzzleEventEmitter = require('../../eventEmitter');
+  KuzzleEventEmitter = require('../../../eventEmitter');
 
 function RTWrapper(host, options) {
   var self = this;
@@ -111,40 +111,73 @@ function RTWrapper(host, options) {
     }
   }
 
+  this.wasConnected = false;
+  this.stopRetryingToConnect = false;
+  this.retrying = false;
 }
-//RTWrapper.prototype = Object.create(AbstractWrapper.prototype);
+
+RTWrapper.prototype = Object.create(KuzzleEventEmitter.prototype);
+RTWrapper.prototype.constructor = RTWrapper;
 
 RTWrapper.prototype.connect = function() {
-  var self = this;
-
   this.state = 'connecting';
-  this.queuing = true;
-
-  this.onConnect(function () {
-    self.state = 'connected';
-    self.queuing = false;
-  });
-
-  this.onReconnect(function () {
-    self.state = 'connected';
-  });
-
-  this.onConnectError(function() {
-    self.state = 'error';
-  });
-
-  this.onDisconnect(function () {
-    self.state = 'offline';
-    if (self.autoQueue) {
-      self.queuing = true;
-    }
-  });
+  if (this.autoQueue) {
+    this.startQueuing();
+  }
 };
 
-// Helper function ensuring that this Kuzzle object is still valid before performing a query
-RTWrapper.prototype.isValid = function () {
-  if (this.state === 'disconnected') {
-    throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a disconnect call?');
+/**
+ * Called when the client's connection is established
+ */
+RTWrapper.prototype.clientConnected = function() {
+  this.state = 'connected';
+  this.emitEvent(this.wasConnected && 'reconnect' || 'connect');
+  this.wasConnected = true;
+  this.stopRetryingToConnect = false;
+
+  if (this.autoQueue) {
+    this.stopQueuing();
+  }
+
+  if (this.autoReplay) {
+    this.playQueue();
+  }
+};
+
+/**
+ * Called when the client's connection is closed
+ */
+RTWrapper.prototype.clientDisconnected = function() {
+  this.state = 'offline';
+  if (this.autoQueue) {
+    this.startQueuing();
+  }
+
+  this.emitEvent('disconnect');
+};
+
+/**
+ * Called when the client's connection is closed with an error state
+ *
+ * @param {Error} error
+ */
+RTWrapper.prototype.clientNetworkError = function(error) {
+  var self = this;
+
+  this.state = 'offline';
+  if (this.autoQueue) {
+    this.startQueuing();
+  }
+
+  this.emitEvent('networkError', error);
+  if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
+    this.retrying = true;
+    setTimeout(function () {
+      self.retrying = false;
+      self.connect(self.host);
+    }, this.reconnectionDelay);
+  } else {
+    this.emitEvent('disconnect');
   }
 };
 
@@ -158,46 +191,45 @@ RTWrapper.prototype.flushQueue = function () {
 /**
  * Replays the requests queued during offline mode.
  */
-RTWrapper.prototype.replayQueue = function() {
-  cleanQueue.call(this);
-  dequeue.call(this);
+RTWrapper.prototype.playQueue = function() {
+  if (this.state === 'connected') {
+    cleanQueue.call(this);
+    dequeue.call(this);
+  }
 };
 
 /**
  * Starts the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
  */
 RTWrapper.prototype.startQueuing = function () {
-  if (this.state === 'offline' && !this.autoQueue) {
-    this.queuing = true;
-  }
-  return this;
+  this.queuing = true;
 };
 
 /**
  * Stops the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
  */
 RTWrapper.prototype.stopQueuing = function () {
-  if (this.state === 'offline' && !this.autoQueue) {
-    this.queuing = false;
-  }
-
-  return this;
+  this.queuing = false;
 };
 
 RTWrapper.prototype.query = function(object, options, cb) {
-  if (this.state === 'connected' || this.state === 'ready') {
-    emitRequest.call(this, object, cb);
-  } else if (options && options.queuable === false) {
-    discardRequest(object, cb);
-  } else if (this.queuing || (options && options.queuable === true)) {
-    cleanQueue.call(this, object, cb);
-    if (!this.queueFilter || this.queueFilter(object)) {
-      this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      this.emitEvent('offlineQueuePush', {query: object, cb: cb});
-    }
-  } else {
-    discardRequest(object, cb);
+  var queuable = options && (options.queuable !== false) || true;
+
+  if (this.queueFilter) {
+    queuable = queuable && this.queueFilter(object);
   }
+
+  if (this.queuing && queuable) {
+    cleanQueue.call(this, object, cb);
+    this.emitEvent('offlineQueuePush', {query: object, cb: cb});
+    return this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+  }
+
+  if (this.state === 'connected') {
+    return emitRequest.call(this, object, cb);
+  }
+
+  return discardRequest(object, cb);
 };
 
 /**
@@ -208,12 +240,11 @@ RTWrapper.prototype.query = function(object, options, cb) {
  */
 function emitRequest (request, cb) {
   var self = this;
-  if (this.jwtToken !== undefined || cb) {
+  if (request.jwt !== undefined || cb) {
     this.once(request.requestId, function (response) {
       var error = null;
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
-        self.jwtToken = undefined;
         self.emitEvent('tokenExpired', request, cb);
       }
 
@@ -229,11 +260,9 @@ function emitRequest (request, cb) {
       }
     });
   }
-
-  this.send(request);
-
   // Track requests made to allow Room.subscribeToSelf to work
   this.emitEvent('emitRequest', request);
+  this.send(request);
 }
 
 function discardRequest(object, cb) {
@@ -292,8 +321,6 @@ function dequeue () {
         setTimeout(function () {
           dequeuingProcess();
         }, Math.max(0, self.replayInterval));
-      } else {
-        self.queuing = false;
       }
     };
 
@@ -321,8 +348,5 @@ function dequeue () {
 
   dequeuingProcess();
 }
-
-RTWrapper.prototype = Object.create(KuzzleEventEmitter.prototype);
-RTWrapper.prototype.constructor = RTWrapper;
 
 module.exports = RTWrapper;
