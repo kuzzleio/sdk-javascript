@@ -159,7 +159,7 @@ describe('Kuzzle Login', function () {
 
       kuzzle.login('local', {});
 
-      process.nextTick(function () {
+      setTimeout(function () {
         should(loginAttemptStub).not.be.called();
         done();
       });

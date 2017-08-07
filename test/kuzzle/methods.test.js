@@ -23,7 +23,6 @@ describe('Kuzzle methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
-    sandbox.stub(kuzzle, 'query').callsFake(queryStub);
     result = null;
     error = null;
   });
@@ -39,6 +38,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {hits: ['foo', 'bar']}};
     });
 
@@ -82,6 +82,7 @@ describe('Kuzzle methods', function () {
 
   describe('#getStatistics', function () {
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {hits: ['foo', 'bar']}};
     });
 
@@ -209,6 +210,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {serverInfo: {
         kuzzle:
         { version: '0.9.2',
@@ -280,6 +282,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {collections: {stored: [], realtime: []}}};
     });
 
@@ -340,6 +343,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {indexes: ['foo', 'bar']}};
     });
 
@@ -389,6 +393,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {now: Date.now()}};
     });
 
@@ -479,6 +484,10 @@ describe('Kuzzle methods', function () {
   describe('#checkToken', function () {
     var token = 'fakeToken-eoijaodmowifnw8h';
 
+    beforeEach(function() {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
+    });
+
     it('should throw an error if no callback is provided', function () {
       should(function () { kuzzle.checkToken(); }).throw(Error);
       should(kuzzle.query).not.be.called();
@@ -522,6 +531,7 @@ describe('Kuzzle methods', function () {
 
   describe('#whoAmI', function () {
     beforeEach(function() {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: {
           _id: 'foobar',
@@ -579,6 +589,7 @@ describe('Kuzzle methods', function () {
     };
 
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: {
           _id: 'foobar',
@@ -714,6 +725,7 @@ describe('Kuzzle methods', function () {
 
   describe('#refreshIndex', function () {
     beforeEach(function() {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: {
           _shards: {
@@ -783,6 +795,7 @@ describe('Kuzzle methods', function () {
 
   describe('#createIndex', function () {
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {result: {acknowledged: true}};
     });
 
@@ -845,6 +858,7 @@ describe('Kuzzle methods', function () {
 
   describe('#getAutoRefresh', function () {
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: 'foobar'
       };
@@ -906,6 +920,7 @@ describe('Kuzzle methods', function () {
 
   describe('#setAutoRefresh', function () {
     beforeEach(function () {
+      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: 'foobar'
       };
@@ -977,10 +992,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#createMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
@@ -991,7 +1002,7 @@ describe('Kuzzle methods', function () {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('createMyCredentials');
@@ -1010,7 +1021,7 @@ describe('Kuzzle methods', function () {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('createMyCredentials');
@@ -1021,10 +1032,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#deleteMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
@@ -1035,7 +1042,7 @@ describe('Kuzzle methods', function () {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('deleteMyCredentials');
@@ -1053,7 +1060,7 @@ describe('Kuzzle methods', function () {
         should(res.acknowledged).be.exactly(true);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('deleteMyCredentials');
@@ -1064,10 +1071,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#getMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
@@ -1078,7 +1081,7 @@ describe('Kuzzle methods', function () {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('getMyCredentials');
@@ -1097,7 +1100,7 @@ describe('Kuzzle methods', function () {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('getMyCredentials');
@@ -1108,10 +1111,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#updateMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
@@ -1122,7 +1121,7 @@ describe('Kuzzle methods', function () {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('updateMyCredentials');
@@ -1141,7 +1140,7 @@ describe('Kuzzle methods', function () {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('updateMyCredentials');
@@ -1152,10 +1151,6 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#validateMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
@@ -1166,7 +1161,7 @@ describe('Kuzzle methods', function () {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('validateMyCredentials');
@@ -1185,7 +1180,7 @@ describe('Kuzzle methods', function () {
         should(res).be.exactly(true);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('auth');
         should(args[0].action).be.exactly('validateMyCredentials');

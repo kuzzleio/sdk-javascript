@@ -69,7 +69,7 @@ describe('Collection constructor', function () {
   it('should set headers using setHeaders', function () {
     var
       kuzzle = new Kuzzle('foo', {connect: 'manual'}),
-      collection = kuzzle.collection('foo', 'bar');
+      collection = new Collection(kuzzle, 'foo', 'bar');
 
     collection.setHeaders({foo: 'bar'}, true);
     should(collection.headers).match({foo: 'bar'});
