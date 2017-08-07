@@ -188,6 +188,24 @@ function Kuzzle (host, options, cb) {
   });
 
   this.network = networkWrapper(this.protocol, host, options);
+
+  this.network.addListener('offlineQueuePush', function(data) {
+    self.emitEvent('offlineQueuePush', data);
+  });
+
+  this.network.addListener('offlineQueuePop', function(data) {
+    self.emitEvent('offlineQueuePop', data);
+  });
+
+  this.network.addListener('queryError', function(err, query) {
+    self.emitEvent('queryError', err, query);
+  });
+
+  this.network.addListener('tokenExpired', function() {
+    self.jwt = undefined;
+    self.emitEvent('tokenExpired');
+  });
+
   if ((options && options.connect || 'auto') === 'auto') {
     this.connect();
   }
