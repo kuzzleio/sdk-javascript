@@ -41,7 +41,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.flushQueue).be.a.Function();
     should(kuzzle.getAllStatistics).be.a.Function();
     should(kuzzle.getAutoRefresh).be.a.Function();
-    should(kuzzle.getJwtToken).be.a.Function();
+    should(kuzzle.getJwt).be.a.Function();
     should(kuzzle.getMyRights).be.a.Function();
     should(kuzzle.getServerInfo).be.a.Function();
     should(kuzzle.getStatistics).be.a.Function();
@@ -60,9 +60,9 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.setHeaders).be.a.Function();
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
-    should(kuzzle.setJwtToken).be.a.Function();
+    should(kuzzle.setJwt).be.a.Function();
     should(kuzzle.updateSelf).be.a.Function();
-    should(kuzzle.unsetJwtToken).be.a.Function();
+    should(kuzzle.unsetJwt).be.a.Function();
     should(kuzzle.whoAmI).be.a.Function();
   });
 
@@ -72,7 +72,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('protocol', { enumerable: true, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('jwtToken', { enumerable: true, writable: true, configurable: false });
+    should(kuzzle).have.propertyWithDescriptor('jwt', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('volatile', { enumerable: true, writable: true, configurable: false });
   });
@@ -85,7 +85,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.defaultIndex).be.undefined();
     should(kuzzle.protocol).be.exactly('websocket');
     should(kuzzle.headers).be.an.Object().and.be.empty();
-    should(kuzzle.jwtToken).be.undefined();
+    should(kuzzle.jwt).be.undefined();
     should(kuzzle.volatile).be.an.Object().and.be.empty();
     should(kuzzle.sdkVersion).be.exactly(sdkVersion);
   });
@@ -143,7 +143,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.flushQueuePromise).be.undefined();
     should(kuzzle.getAllStatisticsPromise).be.a.Function();
     should(kuzzle.getAutoRefreshPromise).be.a.Function();
-    should(kuzzle.getJwtTokenPromise).be.undefined();
+    should(kuzzle.getJwtPromise).be.undefined();
     should(kuzzle.getMyRightsPromise).be.a.Function();
     should(kuzzle.getServerInfoPromise).be.a.Function();
     should(kuzzle.getStatisticsPromise).be.a.Function();
@@ -162,9 +162,9 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.setHeadersPromise).be.undefined();
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();
-    should(kuzzle.setJwtTokenPromise).be.undefined();
+    should(kuzzle.setJwtPromise).be.undefined();
     should(kuzzle.updateSelfPromise).be.a.Function();
-    should(kuzzle.unsetJwtTokenPromise).be.undefined();
+    should(kuzzle.unsetJwtPromise).be.undefined();
     should(kuzzle.whoAmIPromise).be.a.Function();
   });
 

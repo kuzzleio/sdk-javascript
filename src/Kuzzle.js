@@ -111,7 +111,7 @@ function Kuzzle (host, options, cb) {
       enumerable: true,
       writable: true
     },
-    jwtToken: {
+    jwt: {
       value: undefined,
       enumerable: true,
       writable: true
@@ -288,11 +288,11 @@ Kuzzle.prototype.connect = function () {
       self.emitEvent('reconnected');
     };
 
-    if (self.jwtToken) {
-      self.checkToken(self.jwtToken, function (err, res) {
+    if (self.jwt) {
+      self.checkToken(self.jwt, function (err, res) {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
-          self.jwtToken = undefined;
+          self.jwt = undefined;
           self.emitEvent('tokenExpired');
         }
 
@@ -311,16 +311,16 @@ Kuzzle.prototype.connect = function () {
 };
 
 /**
- * Set the jwtToken used to query kuzzle
+ * Set the jwt used to query kuzzle
  * @param token
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.setJwtToken = function(token) {
+Kuzzle.prototype.setJwt = function(token) {
   if (typeof token === 'string') {
-    this.jwtToken = token;
+    this.jwt = token;
   } else if (typeof token === 'object') {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
-      this.jwtToken = token.result.jwt;
+      this.jwt = token.result.jwt;
     } else {
       this.emitEvent('loginAttempt', {
         success: false,
@@ -340,11 +340,11 @@ Kuzzle.prototype.setJwtToken = function(token) {
 };
 
 /**
- * Unset the jwtToken used to query kuzzle
+ * Unset the jwt used to query kuzzle
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.unsetJwtToken = function() {
-  this.jwtToken = undefined;
+Kuzzle.prototype.unsetJwt = function() {
+  this.jwt = undefined;
 
   removeAllSubscriptions.call(this);
 
@@ -352,16 +352,16 @@ Kuzzle.prototype.unsetJwtToken = function() {
 };
 
 /**
- * Get the jwtToken used by kuzzle
+ * Get the jwt used by kuzzle
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.getJwtToken = function() {
-  return this.jwtToken;
+Kuzzle.prototype.getJwt = function() {
+  return this.jwt;
 };
 
 /**
  * Send login request to kuzzle with credentials
- * If login success, store the jwtToken into kuzzle object
+ * If login success, store the jwt into kuzzle object
  *
  * @param strategy
  * @param credentials
@@ -405,7 +405,7 @@ Kuzzle.prototype.login = function (strategy) {
   this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, function(error, response) {
     if (!error) {
       if (response.result.jwt) {
-        self.setJwtToken(response.result.jwt);
+        self.setJwt(response.result.jwt);
       }
 
       cb && cb(null, response.result);
@@ -568,7 +568,7 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
 };
 
 /**
- * Send logout request to kuzzle with jwtToken.
+ * Send logout request to kuzzle with jwt.
  *
  * @param cb
  * @returns {Kuzzle}
@@ -587,7 +587,7 @@ Kuzzle.prototype.logout = function (cb) {
     cb(error, self);
   });
 
-  self.unsetJwtToken();
+  self.unsetJwt();
 
   return self;
 };
@@ -1169,8 +1169,8 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
-    object.jwt = self.jwtToken;
+  if (self.jwt !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
+    object.jwt = self.jwt;
   }
 
   if (queryArgs.collection) {

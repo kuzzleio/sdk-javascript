@@ -157,14 +157,14 @@ describe('Kuzzle query management', function () {
     });
 
     it('should set jwt except for auth/checkToken', function () {
-      kuzzle.jwtToken = 'fake-token';
+      kuzzle.jwt = 'fake-token';
 
       kuzzle.query({controller: 'foo', action: 'bar'}, {});
       kuzzle.query({controller: 'auth', action: 'checkToken'}, {});
 
       should(kuzzle.network.query).be.calledTwice();
-      should(kuzzle.network.query.firstCall.args[0].jwtToken).be.exactly('fake-token');
-      should(kuzzle.network.query.secondCall.args[0].jwtToken).be.undefined();
+      should(kuzzle.network.query.firstCall.args[0].jwt).be.exactly('fake-token');
+      should(kuzzle.network.query.secondCall.args[0].jwt).be.undefined();
     });
   });
 

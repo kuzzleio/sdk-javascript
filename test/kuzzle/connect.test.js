@@ -107,7 +107,7 @@ describe('Kuzzle connect', function () {
 
       kuzzle.checkToken = sinon.stub();
 
-      kuzzle.jwtToken = 'foobar';
+      kuzzle.jwt = 'foobar';
       kuzzle.addListener('tokenExpired', eventStub);
 
       kuzzle.connect();
@@ -117,7 +117,7 @@ describe('Kuzzle connect', function () {
       should(kuzzle.checkToken).be.calledWith('foobar');
       kuzzle.checkToken.yield(null, {valid: true});
 
-      should(kuzzle.jwtToken).be.eql('foobar');
+      should(kuzzle.jwt).be.eql('foobar');
       should(eventStub).not.be.called();
     });
 
@@ -128,7 +128,7 @@ describe('Kuzzle connect', function () {
 
       kuzzle.checkToken = sinon.stub();
 
-      kuzzle.jwtToken = 'foobar';
+      kuzzle.jwt = 'foobar';
       kuzzle.addListener('tokenExpired', eventStub);
 
       kuzzle.connect();
@@ -138,7 +138,7 @@ describe('Kuzzle connect', function () {
       should(kuzzle.checkToken).be.calledWith('foobar');
       kuzzle.checkToken.yield(null, {valid: false});
 
-      should(kuzzle.jwtToken).be.undefined();
+      should(kuzzle.jwt).be.undefined();
       should(eventStub).be.calledOnce();
     });
 

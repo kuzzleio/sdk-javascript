@@ -312,7 +312,7 @@ Room.prototype.setHeaders = function (content, replace) {
  */
 function notificationCallback (data) {
   if (data.type === 'TokenExpired') {
-    this.kuzzle.jwtToken = undefined;
+    this.kuzzle.jwt = undefined;
     return this.kuzzle.emitEvent('tokenExpired');
   }
 

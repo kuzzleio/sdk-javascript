@@ -630,24 +630,24 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#getJwtToken', function () {
+  describe('#getJwt', function () {
     it('should return the current jwt token', function () {
-      kuzzle.jwtToken = 'testToken';
-      should(kuzzle.getJwtToken()).be.exactly('testToken');
+      kuzzle.jwt = 'testToken';
+      should(kuzzle.getJwt()).be.exactly('testToken');
     });
   });
 
-  describe('#unsetJwtToken', function () {
+  describe('#unsetJwt', function () {
     var removeAllSubscriptionsStub = sinon.stub();
 
     it('should unset the token and call removeAllSubscriptions', function () {
       Kuzzle.__with__({
         'removeAllSubscriptions': removeAllSubscriptionsStub
       })(function() {
-        kuzzle.jwtToken = 'testToken';
-        kuzzle.unsetJwtToken();
+        kuzzle.jwt = 'testToken';
+        kuzzle.unsetJwt();
         should(removeAllSubscriptionsStub).be.calledOnce();
-        should(kuzzle.jwtToken).be.undefined();
+        should(kuzzle.jwt).be.undefined();
       }
       );
     });
@@ -660,13 +660,13 @@ describe('Kuzzle methods', function () {
 
       kuzzle.subscriptions.foo = { bar: stubKuzzleRoom };
 
-      kuzzle.unsetJwtToken();
+      kuzzle.unsetJwt();
 
       should(stubKuzzleRoom.unsubscribe).be.calledOnce();
     });
   });
 
-  describe('#setJwtToken', function () {
+  describe('#setJwt', function () {
     var
       revert,
       renewAllSubscriptionsStub = sinon.stub(),
@@ -687,36 +687,36 @@ describe('Kuzzle methods', function () {
     });
 
     it('should set the token when provided with a string argument', function () {
-      kuzzle.setJwtToken('foobar');
+      kuzzle.setJwt('foobar');
 
-      should(kuzzle.jwtToken).be.eql('foobar');
+      should(kuzzle.jwt).be.eql('foobar');
       should(renewAllSubscriptionsStub).be.calledOnce();
       should(loginAttemptStub).be.calledOnce();
       should(loginAttemptStub).be.calledWith({success: true});
     });
 
     it('should set the token when provided with a kuzzle response argument', function () {
-      kuzzle.setJwtToken({result:{jwt: 'foobar'}});
+      kuzzle.setJwt({result:{jwt: 'foobar'}});
 
-      should(kuzzle.jwtToken).be.eql('foobar');
+      should(kuzzle.jwt).be.eql('foobar');
       should(renewAllSubscriptionsStub).be.calledOnce();
       should(loginAttemptStub).be.calledOnce();
       should(loginAttemptStub).be.calledWith({success: true});
     });
 
     it('should send an "attempt failed" event if provided with an invalid argument type', function () {
-      kuzzle.setJwtToken();
+      kuzzle.setJwt();
 
-      should(kuzzle.jwtToken).be.undefined();
+      should(kuzzle.jwt).be.undefined();
       should(renewAllSubscriptionsStub).not.be.calledOnce();
       should(loginAttemptStub).be.calledOnce();
       should(loginAttemptStub).be.calledWith({ error: 'Invalid token argument: undefined', success: false });
     });
 
     it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
-      kuzzle.setJwtToken({foo: 'bar'});
+      kuzzle.setJwt({foo: 'bar'});
 
-      should(kuzzle.jwtToken).be.undefined();
+      should(kuzzle.jwt).be.undefined();
       should(renewAllSubscriptionsStub).not.be.calledOnce();
       should(loginAttemptStub).be.calledOnce();
       should(loginAttemptStub).be.calledWith({ error: 'Cannot find a valid JWT token in the following object: {"foo":"bar"}', success: false });

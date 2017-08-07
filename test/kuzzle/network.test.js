@@ -128,10 +128,10 @@ describe('Kuzzle network methods', function () {
     });
 
     it('should empty the jwt when a "tokenExpired" events is triggered', function () {
-      kuzzle.jwtToken = 'foobar';
+      kuzzle.jwt = 'foobar';
       kuzzle.network.emitEvent('tokenExpired');
 
-      should(kuzzle.jwtToken).be.undefined();
+      should(kuzzle.jwt).be.undefined();
     });
 
     it('should populate the request History when a "emitRequest" events is triggered', function () {
