@@ -1,39 +1,44 @@
-var
+const
   RTWrapper = require('./abstract/realtime');
 
-function WSNode(host, options) {
-  var self = this;
-  RTWrapper.call(this, host, options);
+let WebSocketClient;
 
-  this.WebSocket = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
-  this.client = null;
-  this.lasturl = null;
+class WSNode extends RTWrapper {
+
+  constructor(host, options) {
+    super(host, options);
+
+    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
+    this.client = null;
+    this.lasturl = null;
+  }
 
   /**
    * Connect to the websocket server
    */
-  this.connect = function () {
-    var
+  connect () {
+    const
       url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
       opts = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
 
-    RTWrapper.prototype.connect.call(this);
+    super.connect();
 
     if (url !== this.lasturl) {
-      self.wasConnected = false;
+      this.wasConnected = false;
       this.lasturl = url;
     }
 
-    this.client = new this.WebSocket(url, opts);
+    this.client = new WebSocketClient(url, opts);
 
-    this.client.onopen = function () {
-      self.clientConnected();
+    this.client.onopen = () => {
+      this.clientConnected();
     };
 
-    this.client.onclose = function (closeEvent, message) {
-      var error;
-      var status;
-      var reason = message;
+    this.client.onclose = (closeEvent, message) => {
+      let
+        error,
+        status,
+        reason = message;
 
       if (typeof closeEvent === 'number') {
         status = closeEvent;
@@ -47,51 +52,51 @@ function WSNode(host, options) {
       }
 
       if (status === 1000) {
-        self.clientDisconnected();
+        this.clientDisconnected();
       }
       else {
         error = new Error(reason);
         error.status = status;
 
-        self.clientNetworkError(error);
+        this.clientNetworkError(error);
       }
     };
 
-    this.client.onerror = function (error) {
+    this.client.onerror = error => {
       if (!(error instanceof Error)) {
         error = new Error(error);
       }
 
-      self.clientNetworkError(error);
+      this.clientNetworkError(error);
     };
 
-    this.client.onmessage = function (payload) {
-      var data = JSON.parse(payload.data || payload);
+    this.client.onmessage = payload => {
+      const data = JSON.parse(payload.data || payload);
 
       if (data.room) {
-        self.emitEvent(data.room, data);
+        this.emitEvent(data.room, data);
       }
       else {
-        self.emitEvent('discarded', data);
+        this.emitEvent('discarded', data);
       }
     };
-  };
+  }
 
   /**
    * Sends a payload to the connected server
    *
    * @param {Object} payload
    */
-  this.send = function (payload) {
+  send (payload) {
     if (this.client && this.client.readyState === this.client.OPEN) {
       this.client.send(JSON.stringify(payload));
     }
-  };
+  }
 
   /**
    * Closes the connection
    */
-  this.close = function () {
+  close () {
     this.state = 'disconnected';
     this.removeAllListeners();
     this.wasConnected = false;
@@ -99,9 +104,8 @@ function WSNode(host, options) {
       this.client.close();
     }
     this.client = null;
-    self.stopRetryingToConnect = true;
-  };
+    this.stopRetryingToConnect = true;
+  }
 }
-WSNode.prototype = Object.create(RTWrapper.prototype);
 
 module.exports = WSNode;

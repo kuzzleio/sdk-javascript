@@ -49,7 +49,7 @@ describe('Offline queue management', function () {
       network.queueTTL = 5000;
       network.addListener('offlineQueuePop', eventStub);
 
-      cleanQueue.call(network);
+      cleanQueue(network);
 
       // should keep only the latest requests, dating from a few ms ago
       should(network.offlineQueue.length).be.exactly(1);
@@ -61,7 +61,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueTTL = 0;
-      cleanQueue.call(network);
+      cleanQueue(network);
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
 
@@ -72,7 +72,7 @@ describe('Offline queue management', function () {
 
       network.queueMaxSize = 1;
       network.addListener('offlineQueuePop', eventStub);
-      cleanQueue.call(network);
+      cleanQueue(network);
 
       should(network.offlineQueue.length).be.exactly(1);
       should(network.offlineQueue[0]).match(lastRequest);
@@ -83,7 +83,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueMaxSize = 0;
-      cleanQueue.call(network);
+      cleanQueue(network);
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
   });
@@ -114,7 +114,7 @@ describe('Offline queue management', function () {
         eventStub = sinon.stub();
 
       network.addListener('offlineQueuePop', eventStub);
-      dequeue.call(network);
+      dequeue(network);
 
       clock.tick(numRequests * network.replayInterval + 50);
 
@@ -136,7 +136,7 @@ describe('Offline queue management', function () {
         ];
       };
       network.addListener('offlineQueuePop', eventStub);
-      dequeue.call(network);
+      dequeue(network);
 
       clock.tick((numRequests + 2) * network.replayInterval + 50);
 
@@ -159,7 +159,7 @@ describe('Offline queue management', function () {
         ];
       };
       network.addListener('offlineQueuePop', eventStub);
-      dequeue.call(network);
+      dequeue(network);
 
       clock.tick((numRequests + 1) * network.replayInterval + 50);
 
@@ -176,12 +176,12 @@ describe('Offline queue management', function () {
         ];
       };
 
-      should(function () {dequeue.call(network);}).throw();
+      should(function () {dequeue(network);}).throw();
     });
 
     it('should throw if the offlineQueueLoader property is not a function', function () {
       network.offlineQueueLoader = 'foobar';
-      should(function () {dequeue.call(network);}).throw();
+      should(function () {dequeue(network);}).throw();
     });
 
     it('should throw if the offlineQueueLoader function does not return an array', function () {
@@ -189,7 +189,7 @@ describe('Offline queue management', function () {
         return false;
       };
 
-      should(function () {dequeue.call(network);}).throw();
+      should(function () {dequeue(network);}).throw();
     });
   });
 

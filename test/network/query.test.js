@@ -22,7 +22,7 @@ describe('Network query management', function () {
     it('should emit the request when asked to', function () {
       var request = {requestId: 'bar'};
 
-      emitRequest.call(network, request);
+      emitRequest(network, request);
       should(sendSpy).be.calledWith(request);
     });
 
@@ -31,7 +31,7 @@ describe('Network query management', function () {
 
       network.addListener('emitRequest', eventStub);
 
-      emitRequest.call(network, {requestId: 'foo', response: 'bar'}, function() {
+      emitRequest(network, {requestId: 'foo', response: 'bar'}, function() {
         should(eventStub).be.calledOnce();
         done();
       });
@@ -48,7 +48,7 @@ describe('Network query management', function () {
 
       network.addListener('tokenExpired', eventStub);
 
-      emitRequest.call(network, {requestId: 'foobar', response: response}, function(error) {
+      emitRequest(network, {requestId: 'foobar', response: response}, function(error) {
         should(eventStub).be.calledOnce();
         should(error.message).be.exactly('Token expired');
         done();
@@ -66,7 +66,7 @@ describe('Network query management', function () {
 
       network.addListener('queryError', eventStub);
 
-      emitRequest.call(network, {requestId: 'bar', response: response}, function(error) {
+      emitRequest(network, {requestId: 'bar', response: response}, function(error) {
         should(eventStub).be.calledOnce();
         should(error.message).be.exactly('foo-bar');
         done();
@@ -87,7 +87,7 @@ describe('Network query management', function () {
           done();
         };
 
-      emitRequest.call(network, request, cb);
+      emitRequest(network, request, cb);
     });
   });
 

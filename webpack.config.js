@@ -27,6 +27,14 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
+        include: path.resolve(__dirname, './src/networkWrapper/wrappers/'),
+        loader: 'babel-loader',
+        query: {
+          presets: ['es2015']
+        }
+      },
+      {
+        test: /\.js$/,
         loader: 'eslint-loader',
         include: path.resolve(__dirname, './src/'),
         exclude: /node_modules/
