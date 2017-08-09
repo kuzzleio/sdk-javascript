@@ -597,7 +597,7 @@ describe('MemoryStorage methods', function () {
       'lindex',
       ['key', 3],
       {},
-      {_id: 'key', index: 3},
+      {_id: 'key', idx: 3},
       {},
       'foobar',
       'foobar'
