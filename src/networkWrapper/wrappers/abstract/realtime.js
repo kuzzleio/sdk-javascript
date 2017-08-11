@@ -207,6 +207,28 @@ class RTWrapper extends KuzzleEventEmitter {
     this.queuing = false;
   }
 
+  subscribe(object, options, notificationCB, cb) {
+    if (this.state !== 'connected') {
+      return cb(new Error('Not Connected'));
+    }
+    this.query(object, options, (error, response) => {
+      if (error) {
+        return cb(error);
+      }
+      this.on(response.result.channel, notificationCB);
+      cb(null, response.result);
+    });
+  }
+
+  unsubscribe(object, options, room, cb) {
+    this.off(room.channel, room.notifier);
+    this.query(object, options, (err, res) => {
+      if (cb) {
+        cb(err, err ? undefined : res.result);
+      }
+    });
+  }
+
   query(object, options, cb) {
     let queuable = options && (options.queuable !== false) || true;
 

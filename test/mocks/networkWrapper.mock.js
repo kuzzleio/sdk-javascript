@@ -51,6 +51,8 @@ function NetworkWrapperMock (host, options) {
   this.flushQueue = sinon.stub();
   this.startQueuing = sinon.stub();
   this.stopQueuing = sinon.stub();
+  this.subscribe = sinon.stub();
+  this.unsubscribe = sinon.stub();
 }
 
 NetworkWrapperMock.prototype = new (require('events'))();

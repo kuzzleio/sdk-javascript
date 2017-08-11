@@ -9,7 +9,6 @@ var
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  SubscribeResult = require('../../src/SubscribeResult'),
   Bluebird = require('bluebird');
 
 describe('Collection methods', function () {
@@ -23,6 +22,8 @@ describe('Collection methods', function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
     kuzzle.bluebird = Bluebird;
     kuzzle.query = sinon.stub();
+    kuzzle.subscribe = sinon.stub();
+    kuzzle.unsubscribe = sinon.stub();
     collection = new Collection(kuzzle, 'foo', 'bar');
   });
 
@@ -1300,18 +1301,17 @@ describe('Collection methods', function () {
       kuzzle.network = new NetworkWrapperMock();
       kuzzle.network.state = 'connected';
       result = { result: {roomId: 'foobar' }};
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'subscribe',
-        controller: 'realtime'
-      };
     });
 
     it('should instantiate a new Room object', function () {
-      should(collection.subscribe({}, {}, sinon.stub())).be.instanceof(SubscribeResult);
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery);
+      var
+        filters = {equals: {foo: 'bar'}},
+        room = collection.subscribe(filters, {}, sinon.stub());
+
+      should(room).be.instanceof(Room);
+      should(room.filters).be.exactly(filters);
+      should(kuzzle.subscribe).be.calledOnce();
+      should(kuzzle.subscribe).calledWith(room);
     });
 
     it('should handle the callback argument correctly', function () {
@@ -1322,7 +1322,7 @@ describe('Collection methods', function () {
       collection.subscribe({}, {}, cb1);
       collection.subscribe({}, cb2);
 
-      should(kuzzle.query).be.calledTwice();
+      should(kuzzle.subscribe).be.calledTwice();
     });
 
     it('should raise an error if no callback is provided', function () {
@@ -1603,10 +1603,6 @@ describe('Collection methods', function () {
   describe('#factories', function () {
     it('document should return a new Document object', function () {
       should(collection.document('foo', { foo: 'bar'})).be.instanceof(Document);
-    });
-
-    it('room should return a new Room object', function () {
-      should(collection.room()).be.instanceof(Room);
     });
 
     it('collectionMapping should return a CollectionMapping object', function () {

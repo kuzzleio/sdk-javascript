@@ -4,7 +4,7 @@ var
   Kuzzle = require('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
   Document = require('../../src/Document'),
-  SubscribeResult = require('../../src/SubscribeResult');
+  Room = require('../../src/Room');
 
 describe('Document methods', function () {
   var
@@ -429,7 +429,7 @@ describe('Document methods', function () {
 
   describe('#subscribe', function () {
     beforeEach(function () {
-      collection.subscribe = sinon.stub().returns(new SubscribeResult());
+      collection.subscribe = sinon.stub().returns(new Room(collection, {}));
     });
 
     it('should call collection.subscribe() method with the right arguments', function () {
@@ -439,8 +439,8 @@ describe('Document methods', function () {
         document = new Document(collection);
 
       document.id = 'foo';
-      should(document.subscribe(options, sinon.stub())).be.instanceof(SubscribeResult);
-      should(document.subscribe(sinon.stub())).be.instanceof(SubscribeResult);
+      should(document.subscribe(options, sinon.stub())).be.instanceof(Room);
+      should(document.subscribe(sinon.stub())).be.instanceof(Room);
       should(collection.subscribe).be.calledTwice();
       should(collection.subscribe.firstCall).be.calledWith(filters, options, sinon.match.func);
       should(collection.subscribe.secondCall).be.calledWith(filters, null, sinon.match.func);

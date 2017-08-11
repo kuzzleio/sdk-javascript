@@ -2,8 +2,7 @@ var
   KuzzleSearchResult = require('./SearchResult'),
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
-  Room = require('./Room'),
-  SubscribeResult = require('./SubscribeResult');
+  Room = require('./Room');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -382,7 +381,7 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
   });
 
   data = self.kuzzle.addHeaders(data, this.headers);
-  
+
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreate'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -863,27 +862,23 @@ Collection.prototype.searchSpecifications = function (filters, options, cb) {
  *
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {object} [options] - subscriptions options
- * @param {responseCallback} cb - called for each new notification
- * @returns {*} KuzzleSubscribeResult object
+ * @param {responseCallback} notificationCB - called for each new notification
+ * @returns {*} KuzzleRoom object
  */
-Collection.prototype.subscribe = function (filters, options, cb) {
+Collection.prototype.subscribe = function (filters, options, notificationCB) {
   var
-    room,
-    subscribeResult;
+    room;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
+  if (!notificationCB && typeof options === 'function') {
+    notificationCB = options;
     options = null;
   }
 
-  this.kuzzle.callbackRequired('Collection.subscribe', cb);
+  this.kuzzle.callbackRequired('Collection.subscribe', notificationCB);
 
-  subscribeResult = new SubscribeResult();
-  room = new Room(this, options);
+  room = new Room(this, filters, options);
 
-  room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
-
-  return subscribeResult;
+  return room.renew(notificationCB);
 };
 
 /**
@@ -1021,17 +1016,6 @@ Collection.prototype.validateSpecifications = function (specifications, options,
  */
 Collection.prototype.document = function (id, content) {
   return new Document(this, id, content);
-};
-
-/**
- * Instantiate a new Room object. Workaround to the module.exports limitation, preventing multiple
- * constructors to be exposed without having to use a factory or a composed object.
- *
- * @param {object} [options] - subscription configuration
- * @constructor
- */
-Collection.prototype.room = function (options) {
-  return new Room(this, options);
 };
 
 /**

@@ -2,6 +2,7 @@ var
   uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
+  Document = require('./Document.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
   User = require('./security/User'),
@@ -66,28 +67,6 @@ function Kuzzle (host, options, cb) {
     },
     requestHistory: {
       value: {},
-      writable: true
-    },
-    subscriptions: {
-      /*
-       Contains the centralized subscription list in the following format:
-          pending: {
-            subscriptionUid_1: kuzzleRoomInstance_1,
-            subscriptionUid_2: kuzzleRoomInstance_2,
-            subscriptionUid_...: kuzzleRoomInstance_...
-          },
-          'roomId': {
-            subscriptionUid_1: kuzzleRoomInstance_1,
-            subscriptionUid_2: kuzzleRoomInstance_2,
-            subscriptionUid_...: kuzzleRoomInstance_...
-          }
-
-       This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
-       This structure also allows renewing subscriptions after a connection loss
-       */
-      value: {
-        pending: {}
-      },
       writable: true
     },
     // configuration properties
@@ -202,8 +181,7 @@ function Kuzzle (host, options, cb) {
   });
 
   this.network.addListener('tokenExpired', function() {
-    self.jwt = undefined;
-    self.emitEvent('tokenExpired');
+    self.unsetJwt();
   });
 
   if ((options && options.connect || 'auto') === 'auto') {
@@ -270,7 +248,6 @@ Kuzzle.prototype.connect = function () {
   this.network.connect();
 
   this.network.addListener('connect', function () {
-    renewAllSubscriptions.call(self);
     self.emitEvent('connected');
 
     if (self.connectCB) {
@@ -284,8 +261,6 @@ Kuzzle.prototype.connect = function () {
     connectionError.internal = error;
     self.emitEvent('networkError', connectionError);
 
-    disableAllSubscriptions.call(self);
-
     if (self.connectCB) {
       self.connectCB(connectionError);
     }
@@ -298,20 +273,14 @@ Kuzzle.prototype.connect = function () {
 
   this.network.addListener('reconnect', function () {
     var reconnect = function () {
-      // renew subscriptions
-      if (self.network.autoResubscribe) {
-        renewAllSubscriptions.call(self);
-      }
-
-      self.emitEvent('reconnected');
+      self.emitEvent('reconnected', self.network.autoResubscribe);
     };
 
     if (self.jwt) {
       self.checkToken(self.jwt, function (err, res) {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
-          self.jwt = undefined;
-          self.emitEvent('tokenExpired');
+          self.unsetJwt();
         }
 
         reconnect();
@@ -352,7 +321,6 @@ Kuzzle.prototype.setJwt = function(token) {
     return this;
   }
 
-  renewAllSubscriptions.call(this);
   this.emitEvent('loginAttempt', {success: true});
   return this;
 };
@@ -363,8 +331,7 @@ Kuzzle.prototype.setJwt = function(token) {
  */
 Kuzzle.prototype.unsetJwt = function() {
   this.jwt = undefined;
-
-  removeAllSubscriptions.call(this);
+  this.emitEvent('tokenExpired');
 
   return this;
 };
@@ -713,35 +680,6 @@ function cleanHistory (requestHistory) {
   setTimeout(function () {
     cleanHistory(requestHistory);
   }, 1000);
-}
-
-/**
- * Renew all registered subscriptions. Triggered either by a successful connection/reconnection or by a
- * successful login attempt
- */
-function renewAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.renew(subscription.callback);
-    });
-  });
-}
-
-/**
- * Remove all registered subscriptions. Triggered either by a logout query or by un-setting the token
- */
-function removeAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.unsubscribe();
-    });
-  });
 }
 
 /**
@@ -1109,6 +1047,84 @@ Kuzzle.prototype.now = function (options, cb) {
   });
 };
 
+Kuzzle.prototype.subscribe = function(room, options, cb) {
+  var
+    self = this,
+    object = {
+      requestId: uuidv4(),
+      controller: 'realtime',
+      action: 'subscribe',
+      index: room.collection.index,
+      collection: room.collection.collection,
+      headers: room.headers,
+      volatile: this.volatile,
+      body: room.filters,
+      scope: room.scope,
+      state: room.state,
+      users: room.users
+    },
+    notificationCB = function(data) {
+      if (data.type === 'TokenExpired') {
+        return self.unsetJwt();
+      }
+      if (data.type === 'document') {
+        data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
+        delete data.result;
+      }
+      if (self.requestHistory[data.requestId]) {
+
+        if (room.subscribeToSelf) {
+          room.notifier(null, data);
+        }
+        delete self.requestHistory[data.requestId];
+      } else {
+        room.notifier(null, data);
+      }
+    };
+
+  if (this.jwt !== undefined) {
+    object.jwt = this.jwt;
+  }
+
+  if (room.volatile) {
+    Object.keys(room.volatile).forEach(function (meta) {
+      object.volatile[meta] = room.volatile[meta];
+    });
+  }
+  object.volatile.sdkVersion = this.sdkVersion;
+
+  object = this.addHeaders(object, this.headers);
+
+  this.network.subscribe(object, options, notificationCB, cb);
+};
+
+Kuzzle.prototype.unsubscribe = function(room, options, cb) {
+  var
+    object = {
+      requestId: uuidv4(),
+      controller: 'realtime',
+      action: 'unsubscribe',
+      volatile: this.volatile,
+      headers: room.headers,
+      body: {roomId: room.roomId}
+    };
+
+  if (this.jwt !== undefined) {
+    object.jwt = this.jwt;
+  }
+
+  if (room.volatile) {
+    Object.keys(room.volatile).forEach(function (meta) {
+      object.volatile[meta] = room.volatile[meta];
+    });
+  }
+  object.volatile.sdkVersion = this.sdkVersion;
+
+  object = this.addHeaders(object, this.headers);
+
+  this.network.unsubscribe(object, options, room, cb);
+};
+
 /**
  * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
  * Base method used to send read queries to Kuzzle
@@ -1129,8 +1145,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       action: queryArgs.action,
       controller: queryArgs.controller,
       volatile: this.volatile
-    },
-    self = this;
+    };
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -1181,14 +1196,14 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     }
   }
 
-  object = self.addHeaders(object, this.headers);
+  object = this.addHeaders(object, this.headers);
 
   /*
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwt !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
-    object.jwt = self.jwt;
+  if (this.jwt !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
+    object.jwt = this.jwt;
   }
 
   if (queryArgs.collection) {
@@ -1205,9 +1220,9 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
 
   object.volatile.sdkVersion = this.sdkVersion;
 
-  self.network.query(object, options, cb);
+  this.network.query(object, options, cb);
 
-  return self;
+  return this;
 };
 
 /**
@@ -1288,16 +1303,5 @@ Kuzzle.prototype.setHeaders = function (content, replace) {
 
   return self;
 };
-
-function disableAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.subscribing = false;
-    });
-  });
-}
 
 module.exports = Kuzzle;

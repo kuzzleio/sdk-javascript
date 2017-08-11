@@ -16,7 +16,7 @@ describe('Room constructor', function () {
   });
 
   it('should handle provided arguments correctly', function () {
-    var room = new Room(collection);
+    var room = new Room(collection, {equals: {foo: 'bar'}});
 
     should(room.volatile).be.an.Object().and.be.empty();
     should(room.subscribeToSelf).be.true();
@@ -24,11 +24,11 @@ describe('Room constructor', function () {
     should(room.state).be.exactly('done');
     should(room.users).be.exactly('none');
     should(room.collection).be.exactly(collection);
-    should(room.filters).be.null();
+    should(room.filters).match({equals: {foo: 'bar'}});
     should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();
 
-    room = new Room(collection, {
+    room = new Room(collection, {equals: {foo: 'bar'}}, {
       scope: 'in',
       state: 'pending',
       users: 'all',
@@ -44,10 +44,10 @@ describe('Room constructor', function () {
   });
 
   it('should expose documented properties with the right permissions', function () {
-    var room = new Room(collection);
+    var room = new Room(collection, {equals: {foo: 'bar'}});
 
     should(room).have.propertyWithDescriptor('collection', {enumerable: true, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: true, configurable: false});
+    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('headers', {enumerable: true, writable: true, configurable: false});
     should(room).have.propertyWithDescriptor('scope', {enumerable: false, writable: false, configurable: false});
     should(room).have.propertyWithDescriptor('state', {enumerable: false, writable: false, configurable: false});
@@ -65,11 +65,11 @@ describe('Room constructor', function () {
     var room;
 
     kuzzle.bluebird = bluebird;
-    room = new Room(collection);
+    room = new Room(collection, {equals: {foo: 'bar'}});
 
     should.exist(room.countPromise);
     should.not.exist(room.renewPromise);
     should.not.exist(room.setHeadersPromise);
-    should.not.exist(room.unsubscribePromise);
+    should.exist(room.unsubscribePromise);
   });
 });
