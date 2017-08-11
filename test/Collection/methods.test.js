@@ -125,6 +125,20 @@ describe('Collection methods', function () {
       should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.scroll('scrollId', cb1);
+      collection.scroll('scrollId', {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
     it('should parse the given parameters', function (done) {
       var
         scrollId = 'scrollId',
@@ -149,6 +163,17 @@ describe('Collection methods', function () {
       kuzzle.query.yield(null, result);
 
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.scroll({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
   });
 
   describe('#scrollSpecifications', function () {
@@ -169,6 +194,20 @@ describe('Collection methods', function () {
 
     it('should throw an error if no callback is given', function () {
       should(function () { collection.scrollSpecifications('1337'); }).throw('Collection.scrollSpecifications: a callback argument is required for read queries');
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.scrollSpecifications('scrollId', cb1);
+      collection.scrollSpecifications('scrollId', {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
     });
 
     it('should parse the given parameters', function (done) {
@@ -193,6 +232,17 @@ describe('Collection methods', function () {
       should(kuzzle.query).be.calledWith(expectedQuery, { scrollId: 'scrollId' }, {}, sinon.match.func);
 
       kuzzle.query.yield(null, result);
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.scrollSpecifications({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
     });
   });
 

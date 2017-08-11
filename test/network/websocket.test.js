@@ -233,6 +233,15 @@ describe('WebSocket networking module', function () {
     should(cb).be.calledOnce();
     should(cb.calledWith('foobar'));
     should(websocket.listeners('networkError').length).be.eql(1);
+
+    cb.reset();
+    websocket.connect();
+    clientStub.onclose(4666, {reason: 'foobar'});
+
+    clock.tick(10);
+    should(cb).be.calledOnce();
+    should(cb.calledWith('foobar'));
+    should(websocket.listeners('networkError').length).be.eql(1);
   });
 
   it('should start queuing when the client is disconnected with an error, if autoQueue option is set', function () {

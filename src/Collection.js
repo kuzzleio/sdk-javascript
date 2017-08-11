@@ -757,10 +757,6 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
 
   request.scrollId = scrollId;
 
-  if (options && options.scroll) {
-    request.scroll = options.scroll;
-  }
-
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
 
@@ -815,10 +811,6 @@ Collection.prototype.scrollSpecifications = function (scrollId, options, cb) {
   }
 
   this.kuzzle.callbackRequired('Collection.scrollSpecifications', cb);
-
-  if (options && options.scroll) {
-    data.scroll = options.scroll;
-  }
 
   this.kuzzle.query(
     { controller: 'collection', action: 'scrollSpecifications'},
