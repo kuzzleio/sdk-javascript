@@ -129,7 +129,7 @@ if (typeof window === 'undefined') {
     listeners = this._events && this._events[eventName];
 
     if (!listeners || !listeners.length) {
-      return;
+      return false;
     }
 
     args = Array.prototype.slice.call(arguments, 1);
@@ -160,7 +160,7 @@ if (typeof window === 'undefined') {
       }
     }
 
-    return this;
+    return true;
   };
 
   KuzzleEventEmitter.prototype.eventNames = function () {
