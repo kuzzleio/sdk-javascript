@@ -24,7 +24,7 @@ describe('Kuzzle subscription management', function () {
 
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
     room = new KuzzleRoom(kuzzle.collection('foo', 'bar'), {equals: {foo: 'bar'}}, {});
-    room.notifier = sinon.stub();
+    room.notify = sinon.stub();
   });
 
   afterEach(function() {
@@ -146,9 +146,9 @@ describe('Kuzzle subscription management', function () {
         }
       });
 
-      should(room.notifier)
+      should(room.notify)
         .be.calledOnce()
-        .be.calledWithMatch(null, {
+        .be.calledWithMatch({
           controller: 'document',
           type: 'document',
           document: {
@@ -158,7 +158,7 @@ describe('Kuzzle subscription management', function () {
             }
           }
         });
-      should(room.notifier.firstCall.args[1].document)
+      should(room.notify.firstCall.args[0].document)
         .be.an.instanceOf(KuzzleDocument);
     });
 
@@ -174,9 +174,9 @@ describe('Kuzzle subscription management', function () {
         }
       });
 
-      should(room.notifier)
+      should(room.notify)
         .be.calledOnce()
-        .be.calledWithMatch(null, {
+        .be.calledWithMatch({
           controller: 'realtime',
           action: 'publish',
           type: 'document',
@@ -187,7 +187,7 @@ describe('Kuzzle subscription management', function () {
             }
           }
         });
-      should(room.notifier.firstCall.args[1].document)
+      should(room.notify.firstCall.args[0].document)
         .be.an.instanceOf(KuzzleDocument);
     });
 
@@ -199,33 +199,30 @@ describe('Kuzzle subscription management', function () {
         user: 'in'
       });
 
-      should(room.notifier)
+      should(room.notify)
         .be.calledOnce()
-        .be.calledWithMatch(null, {
+        .be.calledWithMatch({
           result: { count: 3 },
           type: 'user',
           user: 'in',
         });
     });
 
-    it('should delete the result from history if emitted by this instance', function () {
-      room.subscribeToSelf = true;
+    it('should add "fromSelf" property to the result from history if emitted by this instance', function () {
       kuzzle.requestHistory.bar = {};
 
       notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'bar'});
 
-      should(room.notifier).be.calledOnce();
-      should(kuzzle.requestHistory).be.empty();
-    });
+      should(room.notify)
+        .be.calledOnce()
+        .be.calledWithMatch({fromSelf: true});
 
-    it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
-      room.subscribeToSelf = false;
-      kuzzle.requestHistory.bar = {};
+      room.notify.reset();
+      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'foo'});
 
-      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'bar'});
-
-      should(room.notifier).not.be.called();
-      should(kuzzle.requestHistory).be.empty();
+      should(room.notify)
+        .be.calledOnce()
+        .not.be.calledWithMatch({fromSelf: true});
     });
 
     it('should fire a "tokenExpired" event when receiving a TokenExpired notification', function () {
@@ -235,27 +232,5 @@ describe('Kuzzle subscription management', function () {
       should(kuzzle.emitEvent).be.calledOnce();
       should(kuzzle.emitEvent).be.calledWith('tokenExpired');
     });
-
-
-    it('should delete the result from history if emitted by this instance', function () {
-      room.subscribeToSelf = true;
-      kuzzle.requestHistory.bar = {};
-
-      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'bar'});
-
-      should(room.notifier).be.calledOnce();
-      should(kuzzle.requestHistory).be.empty();
-    });
-
-    it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
-      room.subscribeToSelf = false;
-      kuzzle.requestHistory.bar = {};
-
-      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'bar'});
-
-      should(room.notifier).not.be.called();
-      should(kuzzle.requestHistory).be.empty();
-    });
-
   });
 });

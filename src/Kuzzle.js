@@ -43,49 +43,34 @@ function Kuzzle (host, options, cb) {
 
   Object.defineProperties(this, {
     // 'private' properties
-    collections: {
-      value: {},
-      writable: true
-    },
     connectCB: {
       value: cb
     },
     eventActions: {
       value: [
         'connected',
-        'networkError',
+        'discarded',
         'disconnected',
-        'reconnected',
-        'tokenExpired',
         'loginAttempt',
+        'networkError',
         'offlineQueuePush',
         'offlineQueuePop',
         'queryError',
-        'discarded'
-      ],
-      writable: false
-    },
-    requestHistory: {
-      value: {},
-      writable: true
+        'reconnected',
+        'tokenExpired'
+      ]
     },
     // configuration properties
+    autoResubscribe: {
+      value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true,
+      enumerable: true
+    },
     defaultIndex: {
       value: (options && typeof options.defaultIndex === 'string') ? options.defaultIndex : undefined,
       writable: true,
       enumerable: true
     },
-    protocol: {
-      value: (options && typeof options.protocol === 'string') ? options.protocol : 'websocket',
-      enumerable: true,
-      writable: false
-    },
     headers: {
-      value: {},
-      enumerable: true,
-      writable: true
-    },
-    volatile: {
       value: {},
       enumerable: true,
       writable: true
@@ -95,9 +80,17 @@ function Kuzzle (host, options, cb) {
       enumerable: true,
       writable: true
     },
+    protocol: {
+      value: (options && typeof options.protocol === 'string') ? options.protocol : 'websocket',
+      enumerable: true
+    },
     sdkVersion: {
-      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION,
-      writable: false
+      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION
+    },
+    volatile: {
+      value: {},
+      enumerable: true,
+      writable: true
     }
   });
 
@@ -119,6 +112,82 @@ function Kuzzle (host, options, cb) {
       });
 
       return query;
+    }
+  });
+
+  // Forward the subscribe query to the network wrapper
+  Object.defineProperty(this, 'subscribe', {
+    value: function(room, opts, subscribeCB) {
+      var
+        object = {
+          requestId: uuidv4(),
+          controller: 'realtime',
+          action: 'subscribe',
+          index: room.collection.index,
+          collection: room.collection.collection,
+          headers: room.headers,
+          volatile: this.volatile,
+          body: room.filters,
+          scope: room.scope,
+          state: room.state,
+          users: room.users
+        },
+        notificationCB = function(data) {
+          if (data.type === 'TokenExpired') {
+            return self.unsetJwt();
+          }
+          if (data.type === 'document') {
+            data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
+            delete data.result;
+          }
+          data.fromSelf = self.requestHistory[data.requestId] !== undefined;
+          room.notify(data);
+        };
+
+      if (this.jwt !== undefined) {
+        object.jwt = this.jwt;
+      }
+
+      if (room.volatile) {
+        Object.keys(room.volatile).forEach(function (meta) {
+          object.volatile[meta] = room.volatile[meta];
+        });
+      }
+      object.volatile.sdkVersion = this.sdkVersion;
+
+      object = this.addHeaders(object, this.headers);
+
+      this.network.subscribe(object, opts, notificationCB, subscribeCB);
+    }
+  });
+
+  // Forward the unsubscribe query to the network wrapper
+  Object.defineProperty(this, 'unsubscribe', {
+    value: function(room, opts, unsubscribeCB) {
+      var
+        object = {
+          requestId: uuidv4(),
+          controller: 'realtime',
+          action: 'unsubscribe',
+          volatile: this.volatile,
+          headers: room.headers,
+          body: {roomId: room.roomId}
+        };
+
+      if (this.jwt !== undefined) {
+        object.jwt = this.jwt;
+      }
+
+      if (room.volatile) {
+        Object.keys(room.volatile).forEach(function (meta) {
+          object.volatile[meta] = room.volatile[meta];
+        });
+      }
+      object.volatile.sdkVersion = this.sdkVersion;
+
+      object = this.addHeaders(object, this.headers);
+
+      this.network.unsubscribe(object, opts, room, unsubscribeCB);
     }
   });
 
@@ -147,11 +216,13 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
-  Object.defineProperties(this, {
-    eventTimeout: {
-      value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200,
-      writeable: false
-    }
+  Object.defineProperty(this, 'collections',{
+    value: {},
+    writable: true
+  });
+
+  Object.defineProperty(this, 'eventTimeout',{
+    value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200
   });
 
   Object.defineProperty(this, 'protectedEvents', {
@@ -162,8 +233,12 @@ function Kuzzle (host, options, cb) {
       reconnected: {timeout: this.eventTimeout},
       tokenExpired: {timeout: this.eventTimeout},
       loginAttempt: {timeout: this.eventTimeout}
-    },
-    writeable: false
+    }
+  });
+
+  Object.defineProperty(this, 'requestHistory', {
+    value: {},
+    writable: true
   });
 
   this.network = networkWrapper(this.protocol, host, options);
@@ -200,8 +275,9 @@ function Kuzzle (host, options, cb) {
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
           'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights',
-          'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
+          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
+          'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
+          'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
         ];
 
         return passes && whitelist.indexOf(name) !== -1;
@@ -272,10 +348,6 @@ Kuzzle.prototype.connect = function () {
   });
 
   this.network.addListener('reconnect', function () {
-    var reconnect = function () {
-      self.emitEvent('reconnected', self.network.autoResubscribe);
-    };
-
     if (self.jwt) {
       self.checkToken(self.jwt, function (err, res) {
         // shouldn't obtain an error but let's invalidate the token anyway
@@ -283,10 +355,10 @@ Kuzzle.prototype.connect = function () {
           self.unsetJwt();
         }
 
-        reconnect();
+        self.emitEvent('reconnected');
       });
     } else {
-      reconnect();
+      self.emitEvent('reconnected');
     }
   });
 
@@ -1045,84 +1117,6 @@ Kuzzle.prototype.now = function (options, cb) {
   this.query({controller: 'server', action: 'now'}, {}, options, function (err, res) {
     cb(err, err ? undefined : res.result.now);
   });
-};
-
-Kuzzle.prototype.subscribe = function(room, options, cb) {
-  var
-    self = this,
-    object = {
-      requestId: uuidv4(),
-      controller: 'realtime',
-      action: 'subscribe',
-      index: room.collection.index,
-      collection: room.collection.collection,
-      headers: room.headers,
-      volatile: this.volatile,
-      body: room.filters,
-      scope: room.scope,
-      state: room.state,
-      users: room.users
-    },
-    notificationCB = function(data) {
-      if (data.type === 'TokenExpired') {
-        return self.unsetJwt();
-      }
-      if (data.type === 'document') {
-        data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
-        delete data.result;
-      }
-      if (self.requestHistory[data.requestId]) {
-
-        if (room.subscribeToSelf) {
-          room.notifier(null, data);
-        }
-        delete self.requestHistory[data.requestId];
-      } else {
-        room.notifier(null, data);
-      }
-    };
-
-  if (this.jwt !== undefined) {
-    object.jwt = this.jwt;
-  }
-
-  if (room.volatile) {
-    Object.keys(room.volatile).forEach(function (meta) {
-      object.volatile[meta] = room.volatile[meta];
-    });
-  }
-  object.volatile.sdkVersion = this.sdkVersion;
-
-  object = this.addHeaders(object, this.headers);
-
-  this.network.subscribe(object, options, notificationCB, cb);
-};
-
-Kuzzle.prototype.unsubscribe = function(room, options, cb) {
-  var
-    object = {
-      requestId: uuidv4(),
-      controller: 'realtime',
-      action: 'unsubscribe',
-      volatile: this.volatile,
-      headers: room.headers,
-      body: {roomId: room.roomId}
-    };
-
-  if (this.jwt !== undefined) {
-    object.jwt = this.jwt;
-  }
-
-  if (room.volatile) {
-    Object.keys(room.volatile).forEach(function (meta) {
-      object.volatile[meta] = room.volatile[meta];
-    });
-  }
-  object.volatile.sdkVersion = this.sdkVersion;
-
-  object = this.addHeaders(object, this.headers);
-
-  this.network.unsubscribe(object, options, room, cb);
 };
 
 /**

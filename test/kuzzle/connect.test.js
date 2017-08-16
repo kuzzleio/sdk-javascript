@@ -142,12 +142,12 @@ describe('Kuzzle connect', function () {
       should(eventStub).be.calledOnce();
     });
 
-    it('should registered listeners upon receiving a "disconnect" event', function () {
+    it('should register listeners upon receiving a "disconnect" event', function () {
       var
+        eventStub = sinon.stub(),
         kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
           kuzzle.network.disconnect();
-        }),
-        eventStub = sinon.stub();
+        });
 
       kuzzle.addListener('disconnected', eventStub);
 
@@ -156,12 +156,12 @@ describe('Kuzzle connect', function () {
       should(eventStub).be.calledOnce();
     });
 
-    it('should registered listeners upon receiving a "discarded" event', function () {
+    it('should register listeners upon receiving a "discarded" event', function () {
       var
+        eventStub = sinon.stub(),
         kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
           kuzzle.network.emitEvent('discarded');
-        }),
-        eventStub = sinon.stub();
+        });
 
       kuzzle.addListener('discarded', eventStub);
 
