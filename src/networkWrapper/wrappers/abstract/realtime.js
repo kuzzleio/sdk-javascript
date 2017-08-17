@@ -231,7 +231,7 @@ class RTWrapper extends KuzzleEventEmitter {
   }
 
   unsubscribe(object, options, room, cb) {
-    this.off(room.channel, room.notifier);
+    this.removeAllListeners(room.channel);
     this.query(object, options, (err, res) => {
       if (cb) {
         cb(err, err ? undefined : res.result);
