@@ -26,13 +26,14 @@ describe('Network query management', function () {
       should(sendSpy).be.calledWith(request);
     });
 
-    it('should trigger an "emitRequest" event if the request has been emitted', function (done) {
-      var eventStub = sinon.stub();
+    it('should populate the request History when the request has been emitted', function (done) {
+      var
+        now = Date.now();
 
-      network.addListener('emitRequest', eventStub);
+      network.requestHistory = {};
 
       emitRequest(network, {requestId: 'foo', response: 'bar'}, function() {
-        should(eventStub).be.calledOnce();
+        should(network.requestHistory.foo).not.be.undefined().and.be.approximately(now, 10);
         done();
       });
     });
@@ -209,7 +210,7 @@ describe('Network query management', function () {
 
     it('should queue the request if a queue filter has been defined and if it allows queuing', function () {
       var
-        now = Date.now(),
+        now,
         queueStub = sinon.stub(),
         cb = sinon.stub();
 
@@ -218,6 +219,7 @@ describe('Network query management', function () {
       network.queuing = true;
       network.queueFilter = function () { return true; };
 
+      now = Date.now();
       network.query(queryBody, {}, cb);
 
       should(emitRequestStub).not.be.called();
@@ -246,6 +248,41 @@ describe('Network query management', function () {
       should(cb).be.calledOnce();
       should(cb.firstCall.args[0]).be.instanceof(Error);
       should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request');
+    });
+  });
+  describe('#cleanHistory', function () {
+    it('should be started by network wrapper constructor', function () {
+      var
+        network, // eslint-disable-line
+        cleanStub = sinon.stub();
+
+      RTWrapper.__set__('cleanHistory', cleanStub);
+      network = new RTWrapper('somewhere', {connect: 'manual'});
+
+      should(cleanStub).be.calledOnce();
+    });
+
+    it('should clean oldest entries every 1s', function () {
+      var
+        i,
+        clock = sinon.useFakeTimers(),
+        network = new RTWrapper('somewhere', {connect: 'manual'});
+
+      for (i = 100000; i >= 0; i -= 10000) {
+        network.requestHistory[i] = -i;
+      }
+
+      clock.tick(1000);
+
+      // should only contains i == 0 entry
+      should(Object.keys(network.requestHistory)).match(['0']);
+
+      network.requestHistory.foobar = -100000;
+
+      clock.tick(1000);
+      should(Object.keys(network.requestHistory)).match(['0']);
+
+      clock.restore();
     });
   });
 });

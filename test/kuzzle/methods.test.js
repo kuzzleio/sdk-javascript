@@ -8,7 +8,11 @@ var
   User = require('../../src/security/User');
 
 describe('Kuzzle methods', function () {
-  var queryStub = function(queryArgs, query, options, cb) {
+  var
+    error,
+    result,
+    kuzzle,
+    queryStub = function(queryArgs, query, options, cb) {
       if (!cb && typeof options === 'function') {
         cb = options;
         options = null;
@@ -16,10 +20,7 @@ describe('Kuzzle methods', function () {
       if (cb && typeof cb === 'function') {
         cb(error, result);
       }
-    },
-    error,
-    result,
-    kuzzle;
+    };
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});

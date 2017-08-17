@@ -140,7 +140,6 @@ function Kuzzle (host, options, cb) {
             data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
             delete data.result;
           }
-          data.fromSelf = self.requestHistory[data.requestId] !== undefined;
           room.notify(data);
         };
 
@@ -236,11 +235,6 @@ function Kuzzle (host, options, cb) {
     }
   });
 
-  Object.defineProperty(this, 'requestHistory', {
-    value: {},
-    writable: true
-  });
-
   this.network = networkWrapper(this.protocol, host, options);
 
   this.network.addListener('offlineQueuePush', function(data) {
@@ -262,12 +256,6 @@ function Kuzzle (host, options, cb) {
   if ((options && options.connect || 'auto') === 'auto') {
     this.connect();
   }
-
-  this.network.addListener('emitRequest', function(request) {
-    self.requestHistory[request.requestId] = Date.now();
-  });
-
-  cleanHistory(this.requestHistory);
 
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
@@ -735,24 +723,6 @@ Kuzzle.prototype.updateSelf = function (content, options, cb) {
 
   return this;
 };
-
-/**
- * Clean history from requests made more than 10s ago
- */
-function cleanHistory (requestHistory) {
-  var
-    now = Date.now();
-
-  Object.keys(requestHistory).forEach(function (key) {
-    if (requestHistory[key] < now - 10000) {
-      delete requestHistory[key];
-    }
-  });
-
-  setTimeout(function () {
-    cleanHistory(requestHistory);
-  }, 1000);
-}
 
 /**
  * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their

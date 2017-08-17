@@ -32,15 +32,15 @@ describe('Kuzzle listeners management', function () {
       i,
       knownEvents = [
         'connected',
-        'networkError',
+        'discarded',
         'disconnected',
-        'reconnected',
-        'tokenExpired',
         'loginAttempt',
+        'networkError',
         'offlineQueuePush',
         'offlineQueuePop',
         'queryError',
-        'discarded'
+        'reconnected',
+        'tokenExpired'
       ];
 
     should(function() {kuzzle.addListener('foo', sinon.stub());}).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());

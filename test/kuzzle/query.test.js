@@ -167,38 +167,4 @@ describe('Kuzzle query management', function () {
       should(kuzzle.network.query.secondCall.args[0].jwt).be.undefined();
     });
   });
-
-  describe('#cleanHistory', function () {
-    it('should be started by kuzzle constructor', function () {
-      var cleanStub = sinon.stub();
-
-      Kuzzle.__set__('cleanHistory', cleanStub);
-      new Kuzzle('foo', {connect: 'manual'});
-
-      should(cleanStub).be.calledOnce();
-    });
-
-    it('should clean oldest entries every 1s', function () {
-      var
-        i,
-        clock = sinon.useFakeTimers(),
-        kuzzle = new Kuzzle('foo', {connect: 'manual'});
-
-      for (i = 100000; i >= 0; i -= 10000) {
-        kuzzle.requestHistory[i] = -i;
-      }
-
-      clock.tick(1000);
-
-      // should only contains i == 0 entry
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
-
-      kuzzle.requestHistory.foobar = -100000;
-
-      clock.tick(1000);
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
-
-      clock.restore();
-    });
-  });
 });

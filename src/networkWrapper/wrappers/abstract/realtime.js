@@ -111,6 +111,13 @@ class RTWrapper extends KuzzleEventEmitter {
       }
     }
 
+    Object.defineProperty(this, 'requestHistory', {
+      value: {},
+      writable: true
+    });
+
+    cleanHistory(this.requestHistory);
+
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
@@ -215,7 +222,10 @@ class RTWrapper extends KuzzleEventEmitter {
       if (error) {
         return cb(error);
       }
-      this.on(response.result.channel, notificationCB);
+      this.on(response.result.channel, data => {
+        data.fromSelf = this.requestHistory[data.requestId] !== undefined;
+        notificationCB(data);
+      });
       cb(null, response.result);
     });
   }
@@ -278,7 +288,7 @@ function emitRequest (network, request, cb) {
     });
   }
   // Track requests made to allow Room.subscribeToSelf to work
-  network.emitEvent('emitRequest', request);
+  network.requestHistory[request.requestId] = Date.now();
   network.send(request);
 }
 
@@ -361,6 +371,24 @@ function dequeue (network) {
   }
 
   dequeuingProcess();
+}
+
+/**
+ * Clean history from requests made more than 10s ago
+ */
+function cleanHistory (requestHistory) {
+  var
+    now = Date.now();
+
+  Object.keys(requestHistory).forEach(function (key) {
+    if (requestHistory[key] < now - 10000) {
+      delete requestHistory[key];
+    }
+  });
+
+  setTimeout(function () {
+    cleanHistory(requestHistory);
+  }, 1000);
 }
 
 module.exports = RTWrapper;

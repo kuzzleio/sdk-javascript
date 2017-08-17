@@ -98,7 +98,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle).have.propertyWithDescriptor('eventActions', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('eventTimeout', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('protectedEvents', { enumerable: false, writable: false, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('requestHistory', { enumerable: false, writable: true, configurable: false });
   });
 
   it('should have properties with the documented and internal default values', function () {
@@ -135,7 +134,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.protectedEvents.reconnected).be.eql({timeout: 200});
     should(kuzzle.protectedEvents.tokenExpired).be.eql({timeout: 200});
     should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 200});
-    should(kuzzle.requestHistory).be.an.Object().and.be.empty();
   });
 
   it('should expose the right singletons', function () {
@@ -193,7 +191,6 @@ describe('Kuzzle constructor', function () {
       should(kuzzle.protectedEvents.reconnected).be.eql({timeout: 1000});
       should(kuzzle.protectedEvents.tokenExpired).be.eql({timeout: 1000});
       should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 1000});
-      should(kuzzle.requestHistory).be.an.Object().and.be.empty();
     });
   });
 

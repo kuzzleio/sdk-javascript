@@ -208,23 +208,6 @@ describe('Kuzzle subscription management', function () {
         });
     });
 
-    it('should add "fromSelf" property to the result from history if emitted by this instance', function () {
-      kuzzle.requestHistory.bar = {};
-
-      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'bar'});
-
-      should(room.notify)
-        .be.calledOnce()
-        .be.calledWithMatch({fromSelf: true});
-
-      room.notify.reset();
-      notificationCB({type: 'document', result: {}, action: 'foo', requestId: 'foo'});
-
-      should(room.notify)
-        .be.calledOnce()
-        .not.be.calledWithMatch({fromSelf: true});
-    });
-
     it('should fire a "tokenExpired" event when receiving a TokenExpired notification', function () {
       kuzzle.emitEvent = sinon.stub();
 

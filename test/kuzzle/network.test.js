@@ -133,16 +133,5 @@ describe('Kuzzle network methods', function () {
 
       should(kuzzle.jwt).be.undefined();
     });
-
-    it('should populate the request History when a "emitRequest" events is triggered', function () {
-      var
-        now = Date.now(),
-        request = {requestId: 'foobar', query: {foo: 'bar'}};
-
-      kuzzle.requestHistory = {};
-
-      kuzzle.network.emitEvent('emitRequest', request);
-      should(kuzzle.requestHistory.foobar).not.be.undefined().and.be.approximately(now, 10);
-    });
   });
 });
