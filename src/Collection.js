@@ -849,6 +849,18 @@ Collection.prototype.searchSpecifications = function (filters, options, cb) {
 };
 
 /**
+ * Create a subscription room to this data collection with a set of filters.
+ * To subscribe to the entire data collection, simply provide an empty filter.
+ *
+ * @param {object} filters - Filters in Kuzzle DSL format
+ * @param {object} [options] - subscriptions options
+ * @returns {*} KuzzleRoom object
+ */
+Collection.prototype.room = function (filters, options) {
+  return new Room(this, filters, options);
+};
+
+/**
  * Subscribes to this data collection with a set of filters.
  * To subscribe to the entire data collection, simply provide an empty filter.
  *
@@ -859,6 +871,7 @@ Collection.prototype.searchSpecifications = function (filters, options, cb) {
  */
 Collection.prototype.subscribe = function (filters, options, notificationCB) {
   var
+    evtName,
     room;
 
   if (!notificationCB && typeof options === 'function') {
@@ -868,9 +881,11 @@ Collection.prototype.subscribe = function (filters, options, notificationCB) {
 
   this.kuzzle.callbackRequired('Collection.subscribe', notificationCB);
 
+  evtName = (options && options.users && options.users !== 'none') ? 'user' : 'document';
   room = new Room(this, filters, options);
 
-  return room.renew(notificationCB);
+  room.subscribe().on(evtName, notificationCB);
+  return room;
 };
 
 /**
