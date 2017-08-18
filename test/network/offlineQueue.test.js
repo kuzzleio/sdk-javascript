@@ -88,7 +88,7 @@ describe('Offline queue management', function () {
     });
   });
 
-  describe('#dequeuing', function () {
+  describe('#dequeue', function () {
     var
       emitRequestRevert,
       emitRequestStub,
@@ -193,7 +193,7 @@ describe('Offline queue management', function () {
     });
   });
 
-  describe('#flushing the queue', function () {
+  describe('#flushQueue', function () {
     it('should empty the queue when asked to', function () {
       network.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
       network.offlineQueue.push({ts: 'foo', query: {}, cb: function () {}});
