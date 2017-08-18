@@ -1,10 +1,5 @@
-/**
- * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
- *
- * @callback responseCallback
- * @param {Object} err - Error object, NULL if the query is successful
- * @param {Object} [data] - The content of the query response
- */
+const
+  KuzzleEventEmitter = require('./eventEmitter');
 
 /**
  * This object is the result of a subscription request, allowing to manipulate the subscription itself.
@@ -16,7 +11,7 @@
  * document change (because it is created, updated or deleted), then you’ll receive a notification about it.
  *
  */
-class Room {
+class Room extends KuzzleEventEmitter {
   /*
    * @constructor
    * @param {object} collection - an instantiated and valid kuzzle object
@@ -24,6 +19,8 @@ class Room {
    * @param {object} [options] - subscription optional configuration
    */
   constructor(collection, filters, options) {
+    super();
+
     // Define properties
     Object.defineProperties(this, {
       // private properties
@@ -31,18 +28,11 @@ class Room {
         value: null,
         writable: true
       },
-      doneCallbacks: {
-        value: []
-      },
       kuzzle: {
         value: collection.kuzzle,
         enumerable: true
       },
       lastRenewal: {
-        value: null,
-        writable: true
-      },
-      notifier: {
         value: null,
         writable: true
       },
@@ -96,26 +86,19 @@ class Room {
         value: options && typeof options.subscribeToSelf === 'boolean' ? options.subscribeToSelf : true,
         enumerable: true,
         writable: true
-      }
-    });
-
-    // method handled when the subscription request is done:
-    Object.defineProperty(this, 'done', {
-      value: error => {
-        this.error = error;
-        this.doneCallbacks.forEach(cb => {
-          cb(error, this);
-        });
-        return this;
       },
-      enumerable: false
+      autoResubscribe: {
+        value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : collection.kuzzle.autoResubscribe,
+        enumerable: true,
+        writable: true
+      }
     });
 
     if (this.kuzzle.bluebird) {
       return this.kuzzle.bluebird.promisifyAll(this, {
         suffix: 'Promise',
         filter: function (name, func, target, passes) {
-          var whitelist = ['count', 'unsubscribe'];
+          var whitelist = ['count', 'renew', 'subscribe', 'unsubscribe', 'onDone'];
 
           return passes && whitelist.indexOf(name) !== -1;
         }
@@ -152,10 +135,10 @@ class Room {
   /**
    * Renew the subscription
    *
-   * @param {responseCallback} notificationCB - called for each new notification
+   * @param {responseCallback} cb - called when the subscription is ready.
    * @return {*} this
    */
-  renew(notificationCB) {
+  renew(cb) {
     var
       now = Date.now();
 
@@ -163,41 +146,68 @@ class Room {
       Skip subscription renewal if another one was performed a moment before
      */
     if (this.lastRenewal && (now - this.lastRenewal) <= this.renewalDelay) {
-      return this.done(new Error('Subscription already renewed less than ' + this.renewalDelay + 'ms ago'));
-    }
-
-    if (this.subscribing) {
-      this.queue.push({action: 'renew', args: [notificationCB]});
+      this.error = new Error('Subscription already renewed less than ' + this.renewalDelay + 'ms ago');
+      if (cb) {
+        cb(this.error);
+      }
+      this.emit('done', this.error);
       return this;
     }
 
-    if (this.notifier) {
-      this.unsubscribe();
-    } else if (notificationCB && typeof notificationCB === 'function') {
-      this.notifier = notificationCB;
-    } else {
-      throw new Error('Room.renew : a notification callback argument is required');
+    if (this.subscribing) {
+      this.queue.push({action: 'renew', args: []});
+      return this;
     }
 
-    this.roomId = null;
+    this.unsubscribe();
+    return this.subscribe(cb);
+  }
+
+  /**
+   * Subscribes to Kuzzle.
+   *
+   * (Do not renew the subscription if the room is already subscribing).
+   * @param {responseCallback} cb - called when the subscription is ready.
+   * @return {*} this
+   */
+  subscribe(cb) {
+    if (cb) {
+      this.onDone(cb);
+    }
+
+    // If the room subscription is active, just call the callback.
+    if (this.roomId) {
+      this.emit('done', null, this);
+      return this;
+    }
+
+    // If the room is already subscribing, wait for its activation.
+    if (this.subscribing) {
+      return this;
+    }
+
+
+    // If the room is still inactive, start the subscription.
     this.error = null;
     this.subscribing = true;
     this.kuzzle.subscribe(this, (error, result) => {
       if (error) {
         if (error.message === 'Not Connected') {
           return this.kuzzle.addListener('connected', () => {
-            this.renew();
+            this.subscribing = false;
+            this.subscribe();
           });
         }
 
         this.subscribing = false;
         this.queue = [];
         this.error = new Error('Error during Kuzzle subscription: ' + error.message);
-        return this.done(this.error);
+        this.emit('done', this.error);
+        return this;
       }
 
       this.subscribing = false;
-      this.lastRenewal = now;
+      this.lastRenewal = Date.now();
       this.roomId = result.roomId;
       this.channel = result.channel;
 
@@ -215,14 +225,14 @@ class Room {
         }
       });
 
-      this.kuzzle.addListener('reconnected', autoResubscribe => {
-        if (autoResubscribe) {
+      this.kuzzle.addListener('reconnected', () => {
+        if (this.autoResubscribe) {
           this.renew();
         }
       });
 
       dequeue(this);
-      this.done(null, this);
+      this.emit('done', null, this);
     });
 
     return this;
@@ -250,6 +260,22 @@ class Room {
   }
 
   /**
+   * Notify listeners
+   *
+   * @param {Object} data - data to send. Must contain `data.type` as eventName.
+   * @return {*} this
+   */
+  notify(data) {
+    if (data.type === undefined) {
+      throw new Error('Room.notify: argument must match {type: <document|user>}');
+    }
+    if (!data.fromSelf || this.subscribeToSelf) {
+      this.emit(data.type, data);
+    }
+    return this;
+  }
+
+  /**
    * Helper function allowing to set headers while chaining calls.
    *
    * If the replace argument is set to true, replace the current headers with the provided content.
@@ -268,11 +294,18 @@ class Room {
    * @param {Function} cb
    */
   onDone(cb) {
-    if (this.error || this.roomId) {
-      cb(this.error, this);
+    if (!cb || typeof cb !== 'function') {
+      throw new Error('Room.onDone: as callback argument is required.');
+    }
+
+    if (this.error) {
+      cb(this.error);
+    }
+    else if (this.roomId) {
+      cb(null, this);
     }
     else {
-      this.doneCallbacks.push(cb);
+      this.once('done', cb);
     }
 
     return this;

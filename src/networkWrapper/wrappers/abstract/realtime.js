@@ -47,11 +47,6 @@ class RTWrapper extends KuzzleEventEmitter {
         enumerable: true,
         writable: true
       },
-      autoResubscribe: {
-        value: true,
-        enumerable: true,
-        writable: true
-      },
       state: {
         value: 'offline',
         enumerable: true,
@@ -107,7 +102,7 @@ class RTWrapper extends KuzzleEventEmitter {
       });
 
       if (options.offlineMode === 'auto' && this.autoReconnect) {
-        this.autoQueue = this.autoReplay = this.autoResubscribe = true;
+        this.autoQueue = this.autoReplay = true;
       }
     }
 

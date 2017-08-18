@@ -1,7 +1,8 @@
 var
   should = require('should'),
   bluebird = require('bluebird'),
-  Kuzzle = require('../../src/Kuzzle'),
+  CollectionMock = require('../mocks/collection.mock'),
+  KuzzleMock = require('../mocks/kuzzle.mock'),
   Room = require('../../src/Room');
 
 describe('Room constructor', function () {
@@ -10,9 +11,10 @@ describe('Room constructor', function () {
     collection;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
+    kuzzle = new KuzzleMock();
     kuzzle.headers = {foo: 'bar'};
-    collection = kuzzle.collection('foo');
+    kuzzle.autoResubscribe = true;
+    collection = new CollectionMock(kuzzle);
   });
 
   it('should handle provided arguments correctly', function () {
@@ -20,6 +22,7 @@ describe('Room constructor', function () {
 
     should(room.volatile).be.an.Object().and.be.empty();
     should(room.subscribeToSelf).be.true();
+    should(room.autoResubscribe).be.true();
     should(room.scope).be.exactly('all');
     should(room.state).be.exactly('done');
     should(room.users).be.exactly('none');
@@ -28,19 +31,27 @@ describe('Room constructor', function () {
     should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();
 
+
     room = new Room(collection, {equals: {foo: 'bar'}}, {
       scope: 'in',
       state: 'pending',
       users: 'all',
       volatile: {some: 'metadata'},
-      subscribeToSelf: false
+      subscribeToSelf: false,
+      autoResubscribe: false
     });
 
     should(room.volatile).match({some: 'metadata'});
     should(room.subscribeToSelf).be.false();
+    should(room.autoResubscribe).be.false();
     should(room.scope).be.exactly('in');
     should(room.state).be.exactly('pending');
     should(room.users).be.exactly('all');
+
+
+    kuzzle.autoResubscribe = false;
+    room = new Room(collection, {equals: {foo: 'bar'}});
+    should(room.autoResubscribe).be.false();
   });
 
   it('should expose documented properties with the right permissions', function () {
@@ -68,8 +79,11 @@ describe('Room constructor', function () {
     room = new Room(collection, {equals: {foo: 'bar'}});
 
     should.exist(room.countPromise);
-    should.not.exist(room.renewPromise);
+    should.exist(room.onDonePromise);
+    should.not.exist(room.notifyPromise);
+    should.exist(room.renewPromise);
     should.not.exist(room.setHeadersPromise);
+    should.exist(room.subscribePromise);
     should.exist(room.unsubscribePromise);
   });
 });
