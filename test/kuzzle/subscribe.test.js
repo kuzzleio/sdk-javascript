@@ -82,18 +82,22 @@ describe('Kuzzle subscription management', function () {
   describe('#unsubscribe', function () {
     beforeEach(function () {
       room.roomId = 'roomId';
+      room.channel = 'channel';
     });
 
     it('should generate a valid request object', function () {
-      kuzzle.unsubscribe(room, {}, cb);
+      kuzzle.unsubscribe(room, {foo: 'bar'}, cb);
 
       should(kuzzle.network.unsubscribe).be.calledOnce();
-      should(kuzzle.network.unsubscribe).be.calledWithMatch({
+      should(kuzzle.network.unsubscribe).be.calledWith(sinon.match({
         action: 'unsubscribe',
         body: {roomId: 'roomId'},
         volatile: { sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      });
+      }),
+      {foo: 'bar'},
+      'channel',
+      cb);
     });
 
     it('should handle options "volatile" properly', function () {

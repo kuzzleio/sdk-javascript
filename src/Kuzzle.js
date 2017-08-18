@@ -186,7 +186,7 @@ function Kuzzle (host, options, cb) {
 
       object = this.addHeaders(object, this.headers);
 
-      this.network.unsubscribe(object, opts, room, unsubscribeCB);
+      this.network.unsubscribe(object, opts, room.channel, unsubscribeCB);
     }
   });
 

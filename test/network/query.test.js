@@ -250,6 +250,188 @@ describe('Network query management', function () {
       should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request');
     });
   });
+
+  describe('#subscribe', function() {
+    var
+      error,
+      response,
+      queryStub = function(queryArgs, query, options, cb) {
+        if (!cb && typeof options === 'function') {
+          cb = options;
+          options = null;
+        }
+        if (cb && typeof cb === 'function') {
+          cb(error, response);
+        }
+      };
+
+    beforeEach(function () {
+      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network.state = 'connected';
+      network.query = sinon.stub().callsFake(queryStub);
+      error = null;
+      response = {result: {channel: 'foobar', roomId: 'barfoo'}};
+    });
+
+    it('should throw an error if not connected', function() {
+      var cb = sinon.stub();
+
+      network.state = 'offline';
+      network.subscribe({}, {}, sinon.stub(), cb);
+      should(cb).be.calledOnce();
+      should(cb.firstCall.args[0]).be.an.instanceOf(Error);
+      should(cb.firstCall.args[0].message).be.eql('Not Connected');
+      should(network.query).not.be.called();
+    });
+
+    it('should call query method with good arguments', function() {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
+      should(network.query)
+        .be.calledOnce()
+        .be.calledWith({foo: 'bar'}, {bar: 'foo'});
+    });
+
+    it('should launch the callback with an error in case of error', function() {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      error = new Error('foobar');
+      network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
+
+      should(cb)
+        .be.calledOnce()
+        .be.calledWith(error);
+    });
+
+    it('should launch the callback with the query result if OK', function() {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
+
+      should(cb)
+        .be.calledOnce()
+        .be.calledWith(null, {channel: 'foobar', roomId: 'barfoo'});
+    });
+
+    it('should listen to the channel when the subscription is sucessully created', function() {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
+
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo'});
+
+      should(notificationCB)
+        .be.calledOnce()
+        .be.calledWithMatch({type: 'document', result: {}, action: 'foo'});
+    });
+
+    it('should add "fromSelf" property to the result from history if emitted by this instance', function () {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      network.requestHistory.bar = {};
+      network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo', requestId: 'bar'});
+
+      should(notificationCB)
+        .be.calledOnce()
+        .be.calledWithMatch({fromSelf: true});
+
+      notificationCB.reset();
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo', requestId: 'foo'});
+
+      should(notificationCB)
+        .be.calledOnce()
+        .not.be.calledWithMatch({fromSelf: true});
+    });
+  });
+
+  describe('#unsubscribe', function() {
+    var
+      error,
+      response,
+      queryStub = function(queryArgs, query, options, cb) {
+        if (!cb && typeof options === 'function') {
+          cb = options;
+          options = null;
+        }
+        if (cb && typeof cb === 'function') {
+          cb(error, response);
+        }
+      };
+
+    beforeEach(function () {
+      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network.state = 'connected';
+      network.query = sinon.stub().callsFake(queryStub);
+      error = null;
+      response = {result: {roomId: 'foobar'}};
+    });
+
+    it('should call query method with good arguments', function() {
+      var
+        cb = sinon.stub();
+
+      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      should(network.query)
+        .be.calledOnce()
+        .be.calledWith({foo: 'bar'}, {bar: 'foo'});
+    });
+
+    it('should launch the callback with an error in case of error', function() {
+      var
+        cb = sinon.stub();
+
+      error = new Error('foobar');
+      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+
+      should(cb)
+        .be.calledOnce()
+        .be.calledWith(error);
+    });
+
+    it('should launch the callback with the query result if OK', function() {
+      var
+        cb = sinon.stub();
+
+      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+
+      should(cb)
+        .be.calledOnce()
+        .be.calledWith(null, {roomId: 'foobar'});
+    });
+
+    it('should stop listening to the channel', function() {
+      var
+        notificationCB = sinon.stub(),
+        cb = sinon.stub();
+
+      network.on('channel', notificationCB);
+      network.on('channel', sinon.stub());
+      should(network.listeners('channel').length).be.eql(2);
+
+      network.emit('channel', {type: 'document', result: {}, action: 'foo'});
+      should(notificationCB).be.calledOnce();
+
+      notificationCB.reset();
+      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      should(network.listeners('channel')).be.empty();
+
+      network.emit('channel', {type: 'document', result: {}, action: 'foo'});
+      should(notificationCB).not.be.called();
+    });
+  });
+
   describe('#cleanHistory', function () {
     it('should be started by network wrapper constructor', function () {
       var
