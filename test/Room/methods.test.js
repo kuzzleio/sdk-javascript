@@ -325,6 +325,52 @@ describe('Room methods', function () {
       should(room.lastRenewal).be.within(before, Date.now());
     });
 
+    it('should register the callback and delay if the room is still subscribing', function() {
+      var
+        spy = sinon.spy(room,'onDone'),
+        cb = sinon.stub();
+
+      room.subscribing = true;
+      room.subscribe(cb);
+      should(kuzzle.subscribe).not.be.called();
+      should(spy).be.calledOnce().be.calledWith(cb);
+      should(cb).not.be.called();
+    });
+
+    it('should not subscribe again and call directly the callback if the subscription is already active', function() {
+      var
+        spy = sinon.spy(room,'onDone'),
+        cb = sinon.stub();
+
+      room.roomId = 'roomId';
+      room.subscribe(cb);
+      should(kuzzle.subscribe).not.be.called();
+      should(spy).be.calledOnce().be.calledWith(cb);
+      should(cb).be.calledOnce().be.calledWith(null, room);
+    });
+
+    it('should delay and wait for the "connected" event if the network state is still offline', function() {
+      var cb = sinon.stub();
+
+      room.subscribe(cb);
+
+      kuzzle.subscribe.yield(new Error('Not Connected'));
+      should(room.subscribing).be.true();
+      should(room.roomId).be.null();
+      should(room.channel).be.null();
+      should(cb).not.be.called();
+
+      kuzzle.subscribe.reset();
+      kuzzle.emit('connected');
+      should(kuzzle.subscribe).be.calledOnce();
+      kuzzle.subscribe.yield(null, result);
+
+      should(room.subscribing).be.false();
+      should(room.roomId).be.exactly('foobar');
+      should(room.channel).be.exactly('barfoo');
+      should(cb).be.calledOnce();
+    });
+
     it('should call the callback if given', function (done) {
       room.subscribe(function(err, res) {
         should(err).be.null();
@@ -337,8 +383,8 @@ describe('Room methods', function () {
     it('should disable the subscription when network error occurs', function () {
       room.subscribe();
 
-      kuzzle.subscribe.yield(null, result);
       should(kuzzle.subscribe).be.calledOnce();
+      kuzzle.subscribe.yield(null, result);
 
       should(room.roomId).be.exactly('foobar');
       should(room.channel).be.exactly('barfoo');

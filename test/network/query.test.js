@@ -446,9 +446,16 @@ describe('Network query management', function () {
 
     it('should clean oldest entries every 1s', function () {
       var
+        clock,
         i,
-        clock = sinon.useFakeTimers(),
-        network = new RTWrapper('somewhere', {connect: 'manual'});
+        network;
+
+      delete(require.cache[require.resolve('../../src/networkWrapper/wrappers/abstract/realtime')]);
+      RTWrapper = require('../../src/networkWrapper/wrappers/abstract/realtime');
+
+      clock = sinon.useFakeTimers();
+
+      network = new RTWrapper('somewhere', {connect: 'manual'});
 
       for (i = 100000; i >= 0; i -= 10000) {
         network.requestHistory[i] = -i;
@@ -457,11 +464,13 @@ describe('Network query management', function () {
       clock.tick(1000);
 
       // should only contains i == 0 entry
+      should(Object.keys(network.requestHistory).length).be.eql(1);
       should(Object.keys(network.requestHistory)).match(['0']);
 
       network.requestHistory.foobar = -100000;
 
       clock.tick(1000);
+      should(Object.keys(network.requestHistory).length).be.eql(1);
       should(Object.keys(network.requestHistory)).match(['0']);
 
       clock.restore();

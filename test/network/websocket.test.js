@@ -236,7 +236,7 @@ describe('WebSocket networking module', function () {
 
     cb.reset();
     websocket.connect();
-    clientStub.onclose(4666, {reason: 'foobar'});
+    clientStub.onclose({code: 4666, reason: 'foobar'});
 
     clock.tick(10);
     should(cb).be.calledOnce();
