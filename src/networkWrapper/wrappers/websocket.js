@@ -1,3 +1,5 @@
+'use strict';
+
 const
   RTWrapper = require('./abstract/realtime');
 
@@ -36,7 +38,6 @@ class WSNode extends RTWrapper {
 
     this.client.onclose = (closeEvent, message) => {
       let
-        error,
         status,
         reason = message;
 
@@ -55,7 +56,7 @@ class WSNode extends RTWrapper {
         this.clientDisconnected();
       }
       else {
-        error = new Error(reason);
+        const error = new Error(reason);
         error.status = status;
 
         this.clientNetworkError(error);
@@ -63,11 +64,9 @@ class WSNode extends RTWrapper {
     };
 
     this.client.onerror = error => {
-      if (!(error instanceof Error)) {
-        error = new Error(error);
-      }
+      const err = (error instanceof Error) && error || new Error(error);
 
-      this.clientNetworkError(error);
+      this.clientNetworkError(err);
     };
 
     this.client.onmessage = payload => {

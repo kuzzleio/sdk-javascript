@@ -147,12 +147,7 @@ function Kuzzle (host, options, cb) {
         object.jwt = this.jwt;
       }
 
-      if (room.volatile) {
-        Object.keys(room.volatile).forEach(function (meta) {
-          object.volatile[meta] = room.volatile[meta];
-        });
-      }
-      object.volatile.sdkVersion = this.sdkVersion;
+      Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
 
       object = this.addHeaders(object, this.headers);
 
@@ -177,6 +172,7 @@ function Kuzzle (host, options, cb) {
         object.jwt = this.jwt;
       }
 
+      Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
       if (room.volatile) {
         Object.keys(room.volatile).forEach(function (meta) {
           object.volatile[meta] = room.volatile[meta];
@@ -320,7 +316,7 @@ Kuzzle.prototype.connect = function () {
   });
 
   this.network.addListener('networkError', function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.network.host + ':' + self.network.port + '"');
+    const connectionError = new Error(`Unable to connect to kuzzle proxy server at ${self.network.host}:${self.network.port}`);
 
     connectionError.internal = error;
     self.emitEvent('networkError', connectionError);
@@ -1148,11 +1144,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     throw new Error('Invalid query parameter: ' + query);
   }
 
-  if (query.volatile) {
-    Object.keys(query.volatile).forEach(function (meta) {
-      object.volatile[meta] = query.volatile[meta];
-    });
-  }
+  Object.assign(object.volatile, query.volatile, {sdkVersion: this.sdkVersion});
 
   for (attr in query) {
     if (attr !== 'volatile' && query.hasOwnProperty(attr)) {
@@ -1181,8 +1173,6 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   if (!object.requestId) {
     object.requestId = uuidv4();
   }
-
-  object.volatile.sdkVersion = this.sdkVersion;
 
   this.network.query(object, options, cb);
 

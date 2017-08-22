@@ -1,3 +1,5 @@
+'use strict';
+
 const
   KuzzleEventEmitter = require('./eventEmitter');
 
@@ -98,7 +100,7 @@ class Room extends KuzzleEventEmitter {
       return this.kuzzle.bluebird.promisifyAll(this, {
         suffix: 'Promise',
         filter: function (name, func, target, passes) {
-          var whitelist = ['count', 'renew', 'subscribe', 'unsubscribe', 'onDone'];
+          const whitelist = ['count', 'renew', 'subscribe', 'unsubscribe', 'onDone'];
 
           return passes && whitelist.indexOf(name) !== -1;
         }
@@ -112,11 +114,9 @@ class Room extends KuzzleEventEmitter {
    * @param {responseCallback} cb - Handles the query response
    */
   count(cb) {
-    var data;
-
     this.kuzzle.callbackRequired('Room.count', cb);
 
-    data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
+    const data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
 
     if (this.subscribing) {
       this.queue.push({action: 'count', args: [cb]});
@@ -139,12 +139,10 @@ class Room extends KuzzleEventEmitter {
    * @return {*} this
    */
   renew(cb) {
-    var
-      now = Date.now();
-
     /*
       Skip subscription renewal if another one was performed a moment before
      */
+    const now = Date.now();
     if (this.lastRenewal && (now - this.lastRenewal) <= this.renewalDelay) {
       this.error = new Error('Subscription already renewed less than ' + this.renewalDelay + 'ms ago');
       if (cb) {

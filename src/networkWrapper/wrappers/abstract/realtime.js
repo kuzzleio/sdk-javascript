@@ -1,3 +1,5 @@
+'use strict';
+
 const
   KuzzleEventEmitter = require('../../../eventEmitter');
 
@@ -372,14 +374,13 @@ function dequeue (network) {
  * Clean history from requests made more than 10s ago
  */
 function cleanHistory (requestHistory) {
-  var
-    now = Date.now();
+  const now = Date.now();
 
-  Object.keys(requestHistory).forEach(function (key) {
+  for (const key in requestHistory) {
     if (requestHistory[key] < now - 10000) {
       delete requestHistory[key];
     }
-  });
+  }
 
   setTimeout(function () {
     cleanHistory(requestHistory);
