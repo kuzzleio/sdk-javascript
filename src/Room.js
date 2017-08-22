@@ -167,10 +167,16 @@ class Room extends KuzzleEventEmitter {
    * Subscribes to Kuzzle.
    *
    * (Do not renew the subscription if the room is already subscribing).
+   * @param options
    * @param {responseCallback} cb - called when the subscription is ready.
    * @return {*} this
    */
-  subscribe(cb) {
+  subscribe(options, cb) {
+    if (!cb && typeof options === 'function') {
+      cb = options;
+      options = null;
+    }
+
     if (cb) {
       this.onDone(cb);
     }
@@ -190,7 +196,7 @@ class Room extends KuzzleEventEmitter {
     // If the room is still inactive, start the subscription.
     this.error = null;
     this.subscribing = true;
-    this.kuzzle.subscribe(this, (error, result) => {
+    this.kuzzle.subscribe(this, options, (error, result) => {
       if (error) {
         if (error.message === 'Not Connected') {
           return this.kuzzle.addListener('connected', () => {

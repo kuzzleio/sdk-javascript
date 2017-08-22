@@ -314,15 +314,38 @@ describe('Room methods', function () {
     });
 
     it('should send the right query to Kuzzle', function () {
-      var before = Date.now();
+      var
+        opts = {foo: 'bar'},
+        cb = sinon.stub(),
+        before = Date.now();
 
       room.subscribe();
       should(kuzzle.subscribe).be.calledOnce();
-      should(kuzzle.subscribe).calledWith(room);
+      should(kuzzle.subscribe).calledWith(room, undefined);
       kuzzle.subscribe.yield(null, result);
       should(room.roomId).be.exactly('foobar');
       should(room.channel).be.exactly('barfoo');
       should(room.lastRenewal).be.within(before, Date.now());
+
+      kuzzle.subscribe.reset();
+      room.roomId = null;
+      room.subscribe(cb);
+      should(kuzzle.subscribe).be.calledOnce();
+      should(kuzzle.subscribe).calledWith(room, null);
+
+      kuzzle.subscribe.reset();
+      room.subscribing = false;
+      room.roomId = null;
+      room.subscribe(opts);
+      should(kuzzle.subscribe).be.calledOnce();
+      should(kuzzle.subscribe).calledWith(room, opts);
+
+      kuzzle.subscribe.reset();
+      room.subscribing = false;
+      room.roomId = null;
+      room.subscribe(opts, cb);
+      should(kuzzle.subscribe).be.calledOnce();
+      should(kuzzle.subscribe).calledWith(room, opts);
     });
 
     it('should register the callback and delay if the room is still subscribing', function() {
