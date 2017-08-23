@@ -67,7 +67,7 @@ function Collection(kuzzle, collection, index) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['publishMessage', 'setHeaders', 'subscribe'];
+        var blacklist = ['setHeaders', 'subscribe'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
