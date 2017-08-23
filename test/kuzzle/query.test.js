@@ -76,6 +76,21 @@ describe('Kuzzle query management', function () {
       }, null, sinon.match(function(f) {return f === cb;}));
     });
 
+    it('should manage arguments properly if empty query and no options are provided', function () {
+      var cb = sinon.stub();
+
+      kuzzle.query(queryArgs, cb);
+      should(kuzzle.network.query).be.calledOnce();
+      should(kuzzle.network.query).be.calledWith({
+        action: 'action',
+        collection: 'collection',
+        controller: 'controller',
+        index: 'index',
+        volatile: { sdkVersion: kuzzle.sdkVersion },
+        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+      }, null, sinon.match(function(f) {return f === cb;}));
+    });
+
     it('should not define optional members if none was provided', function () {
       kuzzle.query({controller: 'foo', action: 'bar'}, queryBody);
       should(kuzzle.network.query).be.calledWithMatch({collection: undefined});
@@ -83,7 +98,6 @@ describe('Kuzzle query management', function () {
     });
 
     it('should invoke the callback with an error if no query is provided', function () {
-      should(function () { kuzzle.query(queryArgs, sinon.stub()); }).throw(Error);
       should(function () { kuzzle.query(queryArgs, ['foo', 'bar']); }).throw(Error);
       should(function () { kuzzle.query(queryArgs); }).throw(Error);
       should(function () { kuzzle.query(queryArgs, 'foobar'); }).throw(Error);

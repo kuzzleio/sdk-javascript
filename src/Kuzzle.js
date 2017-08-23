@@ -1110,6 +1110,10 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  } else if (!cb && !options && typeof query === 'function') {
+    cb = query;
+    query = {};
+    options = null;
   }
 
   if (options) {
