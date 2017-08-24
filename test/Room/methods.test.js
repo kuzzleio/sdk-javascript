@@ -313,7 +313,7 @@ describe('Room methods', function () {
       revert();
     });
 
-    it('should send the right query to Kuzzle', function () {
+    it('should send the right subscribe query to Kuzzle', function () {
       var
         opts = {foo: 'bar'},
         cb = sinon.stub(),
@@ -494,15 +494,53 @@ describe('Room methods', function () {
     });
 
     it('should forward the unsubscribe request to Kuzzle', function () {
+      var
+        opts = {foo: 'bar'},
+        cb = sinon.stub();
+
       should(room.unsubscribe()).be.exactly(room);
       should(kuzzle.unsubscribe).be.calledOnce();
-      should(kuzzle.unsubscribe).calledWith(room);
+      should(kuzzle.unsubscribe).calledWith(room, undefined, undefined);
+
+      room.roomId = 'foobar';
+      kuzzle.unsubscribe.reset();
+      room.unsubscribe(cb);
+      should(kuzzle.unsubscribe).be.calledOnce();
+      should(kuzzle.unsubscribe).calledWith(room, null, cb);
+
+      room.roomId = 'foobar';
+      kuzzle.unsubscribe.reset();
+      room.unsubscribe(opts);
+      should(kuzzle.unsubscribe).be.calledOnce();
+      should(kuzzle.unsubscribe).calledWith(room, opts, undefined);
+
+      room.roomId = 'foobar';
+      kuzzle.unsubscribe.reset();
+      room.unsubscribe(opts, cb);
+      should(kuzzle.unsubscribe).be.calledOnce();
+      should(kuzzle.unsubscribe).calledWith(room, opts, cb);
     });
 
     it('should delay the unsubscription until after the current subscription is done', function () {
+      var
+        opts = {foo: 'bar'},
+        cb = sinon.stub();
+
       room.subscribing = true;
       should(room.unsubscribe()).be.exactly(room);
       should(room.queue).match([{action: 'unsubscribe', args: []}]);
+
+      room.queue = [];
+      room.unsubscribe(cb);
+      should(room.queue).match([{action: 'unsubscribe', args: [cb]}]);
+
+      room.queue = [];
+      room.unsubscribe(opts);
+      should(room.queue).match([{action: 'unsubscribe', args: [opts]}]);
+
+      room.queue = [];
+      room.unsubscribe(opts, cb);
+      should(room.queue).match([{action: 'unsubscribe', args: [opts, cb]}]);
     });
 
     it('should not send the unsubscribe request if the room is already inactive', function () {
