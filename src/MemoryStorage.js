@@ -86,7 +86,7 @@ var
     incrby: setIdValue,
     incrbyfloat: {required: ['_id', 'value'], mapResults: parseFloat},
     keys: {getter: true, required: ['pattern']},
-    lindex: {getter: true, required: ['_id', 'index']},
+    lindex: {getter: true, required: ['_id', 'idx']},
     linsert: {required: ['_id', 'position', 'pivot', 'value']},
     llen: getId,
     lpop: setId,
