@@ -100,7 +100,7 @@ describe('Kuzzle connect', function () {
       should(eventStub).be.calledOnce();
     });
 
-    it('should keep a valid JWT Token at reconnection', function () {
+    it('should keep a valid JWT at reconnection', function () {
       var
         kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
         eventStub = sinon.stub();
@@ -121,7 +121,7 @@ describe('Kuzzle connect', function () {
       should(eventStub).not.be.called();
     });
 
-    it('should empty the JWT Token at reconnection if it has expired', function () {
+    it('should empty the JWT at reconnection if it has expired', function () {
       var
         kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
         eventStub = sinon.stub();

@@ -384,7 +384,7 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#getJwt', function () {
-    it('should return the current jwt token', function () {
+    it('should return the current token', function () {
       kuzzle.jwt = 'testToken';
       should(kuzzle.getJwt()).be.exactly('testToken');
     });
@@ -1001,7 +1001,7 @@ describe('Kuzzle methods', function () {
 
       should(kuzzle.jwt).be.undefined();
       should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({ error: 'Cannot find a valid JWT token in the following object: {"foo":"bar"}', success: false });
+      should(loginAttemptStub).be.calledWith({ error: 'Cannot find a valid JWT in the following object: {"foo":"bar"}', success: false });
     });
   });
 

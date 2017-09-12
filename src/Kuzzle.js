@@ -367,7 +367,7 @@ Kuzzle.prototype.setJwt = function(token) {
     } else {
       this.emitEvent('loginAttempt', {
         success: false,
-        error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
+        error: 'Cannot find a valid JWT in the following object: ' + JSON.stringify(token)
       });
 
       return this;
