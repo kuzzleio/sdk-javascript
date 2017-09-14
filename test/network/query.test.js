@@ -2,7 +2,7 @@ var
   should = require('should'),
   sinon = require('sinon'),
   rewire = require('rewire'),
-  RTWrapper = rewire('../../src/networkWrapper/wrappers/abstract/realtime');
+  RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
 
 describe('Network query management', function () {
   describe('#emitRequest', function () {
@@ -450,8 +450,8 @@ describe('Network query management', function () {
         i,
         network;
 
-      delete(require.cache[require.resolve('../../src/networkWrapper/wrappers/abstract/realtime')]);
-      RTWrapper = require('../../src/networkWrapper/wrappers/abstract/realtime');
+      delete(require.cache[require.resolve('../../src/networkWrapper/protocols/abstract/realtime')]);
+      RTWrapper = require('../../src/networkWrapper/protocols/abstract/realtime');
 
       clock = sinon.useFakeTimers();
 

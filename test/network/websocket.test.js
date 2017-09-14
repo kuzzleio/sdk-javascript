@@ -1,7 +1,7 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  WS = require('../../src/networkWrapper/wrappers/websocket');
+  WS = require('../../src/networkWrapper/protocols/websocket');
 
 describe('WebSocket networking module', function () {
   var

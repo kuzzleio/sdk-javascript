@@ -12,12 +12,12 @@ function network(protocol, host, options) {
       if (typeof window !== 'undefined' && typeof WebSocket === 'undefined') {
         throw new Error('Aborting: no websocket support detected.');
       }
-      return new (require('./wrappers/websocket'))(host, options);
+      return new (require('./protocols/websocket'))(host, options);
     case 'socketio':
       if (!window.io) {
         throw new Error('Aborting: no socket.io library loaded.');
       }
-      return new (require('./wrappers/socketio'))(host, options);
+      return new (require('./protocols/socketio'))(host, options);
     default:
       throw new Error('Aborting: unknown protocol "' + protocol + '" (only "websocket" and "socketio" are available).');
   }

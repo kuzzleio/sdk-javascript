@@ -28,7 +28,7 @@ module.exports = {
       {
         test: /\.js$/,
         include: [
-          path.resolve(__dirname, './src/networkWrapper/wrappers/'),
+          path.resolve(__dirname, './src/networkWrapper/protocols/'),
           path.resolve(__dirname, './src/Kuzzle.js'),
           path.resolve(__dirname, './src/Room.js')
         ],

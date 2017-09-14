@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  RTWrapper = rewire('../../src/networkWrapper/wrappers/abstract/realtime');
+  RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
 
 describe('Offline queue management', function () {
   var

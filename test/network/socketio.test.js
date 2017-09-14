@@ -1,7 +1,7 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  SocketIO = require('../../src/networkWrapper/wrappers/socketio');
+  SocketIO = require('../../src/networkWrapper/protocols/socketio');
 
 /**
  * @global window

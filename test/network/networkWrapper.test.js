@@ -1,7 +1,7 @@
 var
   should = require('should'),
-  WS = require('../../src/networkWrapper/wrappers/websocket'),
-  SocketIO = require('../../src/networkWrapper/wrappers/socketio'),
+  WS = require('../../src/networkWrapper/protocols/websocket'),
+  SocketIO = require('../../src/networkWrapper/protocols/socketio'),
   Wrapper = require('../../src/networkWrapper');
 
 /**
