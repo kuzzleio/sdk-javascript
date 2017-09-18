@@ -296,8 +296,8 @@ function Kuzzle (host, options, cb) {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
-          'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights',
+          'listCollections', 'createIndex', 'listIndexes', 'login', 'logout',
+          'now', 'query', 'checkToken', 'whoAmI', 'updateSelf', 'getMyRights',
           'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
         ];
 

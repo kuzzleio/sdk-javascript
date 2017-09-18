@@ -117,7 +117,8 @@ Collection.prototype.count = function (filters, options, cb) {
  * @returns {*} this
  */
 Collection.prototype.create = function (options, cb) {
-  var data = {};
+  var data = {},
+    self = this;
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -125,7 +126,9 @@ Collection.prototype.create = function (options, cb) {
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
-  this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, cb);
+  this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, function(err) {
+    cb(err, err ? undefined : self);
+  });
 
   return this;
 };
@@ -382,7 +385,7 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
   });
 
   data = self.kuzzle.addHeaders(data, this.headers);
-  
+
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreate'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
