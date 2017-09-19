@@ -10,9 +10,9 @@ var
 
 describe('Network Wrapper', function () {
   afterEach(function () {
+    // eslint-disable-next-line no-native-reassign, no-global-assign
     window = undefined;
-    /*eslint no-native-reassign: "off"*/
-    /*eslint no-global-assign: "off"*/
+    // eslint-disable-next-line no-native-reassign, no-global-assign
     WebSocket = undefined;
   });
 
