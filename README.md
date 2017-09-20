@@ -61,8 +61,7 @@ npm install kuzzle-sdk --save
 
 ### Browser
 
-To run the SDK in the browser, you need to pick the built version.
-Clone this github repository and run `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
+To run the SDK in the browser, you need to pick the [built version available here](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/master/dist/kuzzle.js). You can also build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
 
 ```html
 <script type="text/javascript" src="dist/kuzzle.js"></script>
