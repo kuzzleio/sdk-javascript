@@ -381,19 +381,32 @@ describe('Query management', function () {
 
   describe('#cleanHistory', function () {
     it('should be started by kuzzle constructor', function () {
-      var cleanStub = sinon.stub();
+      var 
+        cleanStub = sinon.stub(),
+        clock = sinon.useFakeTimers(),
+        kuzzle;
 
+      // we need to re-import so that fake timers can take effect
+      Kuzzle = rewire('../../src/Kuzzle');
       Kuzzle.__set__('cleanHistory', cleanStub);
-      new Kuzzle('foo', {connect: 'manual'});
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
+      clock.tick(1000);
+
+      should(kuzzle.cleanHistoryTimer).be.not.null();
       should(cleanStub.calledOnce).be.true();
+
+      clock.restore();
     });
 
     it('should clean oldest entries every 1s', function () {
       var
         i,
         clock = sinon.useFakeTimers(),
-        kuzzle = new Kuzzle('foo', {connect: 'manual'});
+        kuzzle;
+
+      Kuzzle = rewire('../../src/Kuzzle');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
       for (i = 100000; i >= 0; i -= 10000) {
         kuzzle.requestHistory[i] = -i;
