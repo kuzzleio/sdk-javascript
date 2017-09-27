@@ -7,9 +7,8 @@ var
  * @param {Object} content
  * @constructor
  */
-function User(Security, id, content) {
-
-  KuzzleSecurityDocument.call(this, Security, id, content);
+function User(Security, id, content, meta) {
+  KuzzleSecurityDocument.call(this, Security, id, content, meta);
 
   // Define properties
   Object.defineProperties(this, {
@@ -19,6 +18,11 @@ function User(Security, id, content) {
     },
     updateActionName: {
       value: 'updateUser'
+    },
+    credentials: {
+      value: {},
+      writable: true,
+      enumerable: true
     }
   });
 
@@ -27,7 +31,7 @@ function User(Security, id, content) {
     return Security.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['save', 'saveRestricted'];
+        var whitelist = ['create', 'replace', 'saveRestricted', 'update', 'getProfiles'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -58,6 +62,19 @@ User.prototype.setProfiles = function (profileIds) {
 };
 
 /**
+ * @param {object} credentials
+ */
+User.prototype.setCredentials = function (credentials) {
+  if (typeof credentials !== 'object') {
+    throw new Error('Parameter "credentials" must be a object');
+  }
+
+  this.credentials = credentials;
+
+  return this;
+};
+
+/**
  * Add a profile
  * @param {string} profileId - a profile ids string
  *
@@ -80,31 +97,61 @@ User.prototype.addProfile = function (profileId) {
 };
 
 /**
- * Saves this user into Kuzzle.
- *
- * If this is a new user, this function will create it in Kuzzle.
- * Otherwise, this method will replace the latest version of this user in Kuzzle by the current content
- * of this object.
+ * Creates this user into Kuzzle
  *
  * @param {object|responseCallback} [options] - Optional parameters
  * @param {responseCallback} [cb] - Handles the query response
  * @returns {User} this
  */
-User.prototype.save = function (options, cb) {
+User.prototype.create = function (options, cb) {
   var
-    data = this.serialize(),
+    data = this.creationSerialize(),
     self = this;
+
+  if (!this.content.profileIds) {
+    throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
+  }
 
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;
   }
 
-  self.kuzzle.query(this.Security.buildQueryArgs('createOrReplaceUser'), data, options, cb && function (error) {
-    cb(error, error ? undefined : self);
+  this.kuzzle.query(this.Security.buildQueryArgs('createUser'), data, null, cb && function (err) {
+    cb(err, err ? undefined : self);
   });
 
-  return self;
+  return this;
+};
+
+
+/**
+ * Replaces the latest version of this user in Kuzzle by the current content of this object.
+ *
+ * @param {object|responseCallback} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {User} this
+ */
+User.prototype.replace = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (!this.content.profileIds) {
+    throw new Error('Argument "profileIds" is mandatory in a user. This argument contains an array of profile identifiers.');
+  }
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+
+  this.kuzzle.query(this.Security.buildQueryArgs('replaceUser'), data, null, cb && function (err) {
+    cb(err, err ? undefined : self);
+  });
+
+  return this;
 };
 
 /**
@@ -141,16 +188,68 @@ User.prototype.saveRestricted = function (options, cb) {
  * @return {object} JSON object representing this User
  */
 User.prototype.serialize = function () {
-  return {_id: this.id, body: this.content};
+  return {_id: this.id, body: this.content, meta: this.meta};
+};
+
+/**
+ * Serialize this object into a JSON object
+ *
+ * @return {object} JSON object representing this User
+ */
+User.prototype.creationSerialize = function () {
+  return {_id: this.id, body: {content: this.content, credentials: this.credentials, meta: this.meta}};
 };
 
 /**
  * Return the associated profiles IDs
  *
- * @return {array} the associated profiles IDs
+ * @return {array.<string>} the associated profiles IDs
  */
-User.prototype.getProfiles = function () {
-  return this.content.profileIds;
+User.prototype.getProfileIds = function () {
+  return this.content.profileIds || [];
+};
+
+/**
+ * Return the associated Profile objects
+ *
+ * @param {object|responseCallback} [options] - Optional parameters
+ * @param {responseCallback} cb - Handles the query response
+ */
+User.prototype.getProfiles = function (options, cb) {
+  var 
+    self = this,
+    fetchedProfiles = [],
+    errored = false;
+
+  if (options && !cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.Security.kuzzle.callbackRequired('User.getProfiles', cb);
+
+  if (!self.content.profileIds) {
+    return cb(null, fetchedProfiles);
+  }
+
+  self.content.profileIds.forEach(function (profileId) {
+    self.Security.fetchProfile(profileId, options, function (error, profile) {
+      if (error) {
+        if (errored) {
+          return;
+        }
+
+        errored = true; // prevents multiple callback resolutions
+        return cb(error);
+      }
+
+      fetchedProfiles.push(profile);
+
+      if (fetchedProfiles.length === self.content.profileIds.length) {
+        cb(null, fetchedProfiles);
+      }
+    });
+  });
 };
 
 module.exports = User;

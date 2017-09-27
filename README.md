@@ -4,11 +4,9 @@
 Official Kuzzle Javascript SDK
 ======
 
-This SDK version is compatible with Kuzzle 1.0.0-RC9.5 and higher
-
 ## About Kuzzle
 
-For UI and linked objects developers, Kuzzle is an open-source solution that handles all the data management (CRUD, real-time storage, search, high-level features, etc).
+A backend software, self-hostable and ready to use to power modern apps.
 
 You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
@@ -24,11 +22,11 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 ## Basic usage
 
-Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/#sdk-play-time)
+Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/getting-started/#sdk-play-time)
 
 ## SDK Documentation
 
-The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/?javascript#kuzzle)
+The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/)
 
 ## Report an issue
 
@@ -38,10 +36,10 @@ https://github.com/kuzzleio/kuzzle-sdk/issues
 
 ## Protocols used
 
-The SDK Javascript implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
+The Javascript SDK implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
 The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
 
-What protocol is used when you connect to Kuzzle depends on multiple factors:
+Which protocol is used when you connect to Kuzzle depends on multiple factors:
 
 #### NodeJS
 
@@ -79,8 +77,8 @@ The browser version is also available from CDN:
 If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
 
 ```html
-<!-- Don't forget to include socketio before kuzzle SDK -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.6.0/socket.io.min.js"></script>
+<!-- Don't forget to include socketio before Kuzzle SDK -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
 ```
 
 ## License

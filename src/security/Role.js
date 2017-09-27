@@ -1,8 +1,8 @@
 var SecurityDocument = require('./SecurityDocument');
 
-function Role(Security, id, content) {
+function Role(Security, id, content, meta) {
 
-  SecurityDocument.call(this, Security, id, content);
+  SecurityDocument.call(this, Security, id, content, meta);
 
   // Define properties
   Object.defineProperties(this, {

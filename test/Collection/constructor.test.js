@@ -1,14 +1,13 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  Collection = rewire('../../src/Collection.js');
+  Kuzzle = require('../../src/Kuzzle'),
+  Collection = require('../../src/Collection.js');
 
 describe('Collection constructor', function () {
   it('should initialize properties and return a valid Collection object', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       index = 'barfoo',
       collectionName = 'foobar',
       c;
@@ -37,27 +36,39 @@ describe('Collection constructor', function () {
       collection;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
     collection = new Collection(kuzzle, 'bar', 'foo');
 
     should.exist(collection.countPromise);
     should.exist(collection.createPromise);
     should.exist(collection.createDocumentPromise);
     should.exist(collection.deleteDocumentPromise);
+    should.exist(collection.deleteSpecificationsPromise);
+    should.exist(collection.documentExistsPromise);
     should.exist(collection.fetchDocumentPromise);
-    should.exist(collection.fetchAllDocumentsPromise);
     should.exist(collection.getMappingPromise);
+    should.exist(collection.getSpecificationsPromise);
+    should.exist(collection.mCreateDocumentPromise);
+    should.exist(collection.mCreateOrReplaceDocumentPromise);
+    should.exist(collection.mDeleteDocumentPromise);
+    should.exist(collection.mGetDocumentPromise);
+    should.exist(collection.mReplaceDocumentPromise);
+    should.exist(collection.mUpdateDocumentPromise);
     should.not.exist(collection.publishPromise);
     should.exist(collection.replaceDocumentPromise);
+    should.exist(collection.scrollSpecificationsPromise);
+    should.exist(collection.searchSpecificationsPromise);
     should.not.exist(collection.setHeadersPromise);
     should.not.exist(collection.subscribePromise);
     should.exist(collection.truncatePromise);
     should.exist(collection.updateDocumentPromise);
+    should.exist(collection.updateSpecificationsPromise);
+    should.exist(collection.validateSpecificationsPromise);
   });
 
   it('should set headers using setHeaders', function () {
     var
-      kuzzle = new Kuzzle('foo'),
+      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       collection = kuzzle.collection('foo', 'bar');
 
     collection.setHeaders({foo: 'bar'}, true);
@@ -68,7 +79,7 @@ describe('Collection constructor', function () {
   });
 
   it('should throw an error if no collection or no index is provided', function () {
-    var kuzzle = new Kuzzle('foo');
+    var kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
     should((function () { new Collection(kuzzle);})).throw();
     should((function () { new Collection(kuzzle, 'foo');})).throw();

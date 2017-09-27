@@ -113,9 +113,12 @@ Document.prototype.serialize = function () {
     data._id = this.id;
   }
 
+  if (this.version) {
+    data._version = this.version;
+  }
+
   data.body = this.content;
   data.meta = this.meta;
-  data._version = this.version;
   data = this.kuzzle.addHeaders(data, this.headers);
 
   return data;
@@ -155,6 +158,30 @@ Document.prototype.delete = function (options, cb) {
 
   this.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'delete'), this.serialize(), options, cb && function (err) {
     cb(err, err ? undefined : self.id);
+  });
+};
+
+/**
+ * Checks if this document exists in Kuzzle.
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {*} this
+ */
+Document.prototype.exists = function (options, cb) {
+  var self = this;
+
+  if (!cb && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (!self.id) {
+    throw new Error('Document.exists: cannot check if the document exists if no id has been provided');
+  }
+
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'exists'), this.serialize(), options, cb && function (err, res) {
+    cb(err, err ? undefined : res.result);
   });
 };
 

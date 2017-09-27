@@ -1,21 +1,16 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
-  CollectionMapping = rewire('../../src/CollectionMapping');
+  Kuzzle = require('../../src/Kuzzle'),
+  CollectionMapping = require('../../src/CollectionMapping');
 
 describe('CollectionMapping constructor', function () {
   var
     kuzzle,
     collection;
 
-  before(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
-
-  });
-
   beforeEach(function () {
+    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
     collection = kuzzle.collection('foo');
   });
 
@@ -53,8 +48,7 @@ describe('CollectionMapping constructor', function () {
     var
       mapping;
 
-    Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+    kuzzle.bluebird = bluebird;
     mapping = new CollectionMapping(kuzzle.collection('foo'));
 
     should.exist(mapping.applyPromise);

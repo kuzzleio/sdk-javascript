@@ -1,8 +1,8 @@
 var SecurityDocument = require('./SecurityDocument');
 
-function Profile(Security, id, content) {
+function Profile(Security, id, content, meta) {
 
-  SecurityDocument.call(this, Security, id, content);
+  SecurityDocument.call(this, Security, id, content, meta);
 
   // Define properties
   Object.defineProperties(this, {
@@ -124,6 +124,7 @@ Profile.prototype.serialize = function () {
   }
 
   data.body = this.content;
+  data.meta = this.meta;
 
   return data;
 };
