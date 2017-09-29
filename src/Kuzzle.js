@@ -2,6 +2,7 @@ var
   uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
+  Document = require('./Document.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
   User = require('./security/User'),
@@ -42,66 +43,26 @@ function Kuzzle (host, options, cb) {
 
   Object.defineProperties(this, {
     // 'private' properties
-    collections: {
-      value: {},
-      writable: true
-    },
     connectCB: {
       value: cb
     },
     eventActions: {
       value: [
         'connected',
-        'networkError',
+        'discarded',
         'disconnected',
-        'reconnected',
-        'tokenExpired',
         'loginAttempt',
+        'networkError',
         'offlineQueuePush',
         'offlineQueuePop',
         'queryError',
-        'discarded'
-      ],
-      writable: false
-    },
-    queuing: {
-      value: false,
-      writable: true
-    },
-    requestHistory: {
-      value: {},
-      writable: true
-    },
-    state: {
-      value: 'initializing',
-      writable: true
-    },
-    subscriptions: {
-      /*
-       Contains the centralized subscription list in the following format:
-          pending: {
-            subscriptionUid_1: kuzzleRoomInstance_1,
-            subscriptionUid_2: kuzzleRoomInstance_2,
-            subscriptionUid_...: kuzzleRoomInstance_...
-          },
-          'roomId': {
-            subscriptionUid_1: kuzzleRoomInstance_1,
-            subscriptionUid_2: kuzzleRoomInstance_2,
-            subscriptionUid_...: kuzzleRoomInstance_...
-          }
-
-       This was made to allow multiple subscriptions on the same set of filters, something that Kuzzle does not permit.
-       This structure also allows renewing subscriptions after a connection loss
-       */
-      value: {
-        pending: {}
-      },
-      writable: true
+        'reconnected',
+        'tokenExpired'
+      ]
     },
     // configuration properties
-    autoReconnect: {
-      value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
-      writable: true,
+    autoResubscribe: {
+      value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true,
       enumerable: true
     },
     defaultIndex: {
@@ -109,99 +70,27 @@ function Kuzzle (host, options, cb) {
       writable: true,
       enumerable: true
     },
-    reconnectionDelay: {
-      value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
-      writable: true,
-      enumerable: true
-    },
-    host: {
-      value: host,
-      writable: true,
-      enumerable: true
-    },
-    port: {
-      value: (options && typeof options.port === 'number') ? options.port : 7512,
-      enumerable: true,
-      writable: true
-    },
-    sslConnection: {
-      value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
-      writable: true,
-      enumerable: true
-    },
-    autoQueue: {
-      value: false,
-      enumerable: true,
-      writable: true
-    },
-    autoReplay: {
-      value: false,
-      enumerable: true,
-      writable: true
-    },
-    autoResubscribe: {
-      value: true,
-      enumerable: true,
-      writable: true
-    },
     headers: {
       value: {},
       enumerable: true,
       writable: true
     },
+    jwt: {
+      value: undefined,
+      enumerable: true,
+      writable: true
+    },
+    protocol: {
+      value: (options && typeof options.protocol === 'string') ? options.protocol : 'websocket',
+      enumerable: true
+    },
+    sdkVersion: {
+      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION
+    },
     volatile: {
       value: {},
       enumerable: true,
       writable: true
-    },
-    /*
-      Offline queue use the following format:
-            [
-              {
-                ts: <query timestamp>,
-                query: 'query',
-                cb: callbackFunction
-              }
-            ]
-     */
-    offlineQueue: {
-      value: [],
-      enumerable: true,
-      writable: true
-    },
-    queueFilter: {
-      value: null,
-      enumerable: true,
-      writable: true
-    },
-    queueMaxSize: {
-      value: 500,
-      enumerable: true,
-      writable: true
-    },
-    queueTTL: {
-      value: 120000,
-      enumerable: true,
-      writable: true
-    },
-    replayInterval: {
-      value: 10,
-      enumerable: true,
-      writable: true
-    },
-    jwtToken: {
-      value: undefined,
-      enumerable: true,
-      writable: true
-    },
-    offlineQueueLoader: {
-      value: undefined,
-      enumerable: true,
-      writable: true
-    },
-    sdkVersion: {
-      value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION,
-      writable: false
     }
   });
 
@@ -211,20 +100,7 @@ function Kuzzle (host, options, cb) {
         self[opt] = options[opt];
       }
     });
-
-    if (options.offlineMode === 'auto' && this.autoReconnect) {
-      this.autoQueue = this.autoReplay = this.autoResubscribe = true;
-    }
   }
-
-  // Helper function ensuring that this Kuzzle object is still valid before performing a query
-  Object.defineProperty(this, 'isValid', {
-    value: function () {
-      if (self.state === 'disconnected') {
-        throw new Error('This Kuzzle object has been invalidated. Did you try to access it after a disconnect call?');
-      }
-    }
-  });
 
   // Helper function copying headers to the query data
   Object.defineProperty(this, 'addHeaders', {
@@ -236,6 +112,77 @@ function Kuzzle (host, options, cb) {
       });
 
       return query;
+    }
+  });
+
+  // Forward the subscribe query to the network wrapper
+  Object.defineProperty(this, 'subscribe', {
+    value: function(room, opts, subscribeCB) {
+      var
+        object = {
+          requestId: uuidv4(),
+          controller: 'realtime',
+          action: 'subscribe',
+          index: room.collection.index,
+          collection: room.collection.collection,
+          headers: room.headers,
+          volatile: this.volatile,
+          body: room.filters,
+          scope: room.scope,
+          state: room.state,
+          users: room.users
+        },
+        notificationCB = function(data) {
+          if (data.type === 'TokenExpired') {
+            return self.unsetJwt();
+          }
+          if (data.type === 'document') {
+            data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
+            delete data.result;
+          }
+          room.notify(data);
+        };
+
+      if (this.jwt !== undefined) {
+        object.jwt = this.jwt;
+      }
+
+      Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
+
+      object = this.addHeaders(object, this.headers);
+
+      this.network.subscribe(object, opts, notificationCB, subscribeCB);
+    }
+  });
+
+  // Forward the unsubscribe query to the network wrapper
+  Object.defineProperty(this, 'unsubscribe', {
+    value: function(room, opts, unsubscribeCB) {
+      var
+        object = {
+          requestId: uuidv4(),
+          controller: 'realtime',
+          action: 'unsubscribe',
+          volatile: this.volatile,
+          headers: room.headers,
+          body: {roomId: room.roomId}
+        };
+
+      if (this.jwt !== undefined) {
+        object.jwt = this.jwt;
+      }
+
+      Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
+      if (room.volatile) {
+        Object.keys(room.volatile).forEach(function (meta) {
+          object.volatile[meta] = room.volatile[meta];
+        });
+      }
+      object.volatile.sdkVersion = this.sdkVersion;
+
+      object = this.addHeaders(object, this.headers);
+
+      this.network.unsubscribe(object, opts, room.channel, unsubscribeCB);
     }
   });
 
@@ -264,11 +211,13 @@ function Kuzzle (host, options, cb) {
     enumerable: true
   });
 
-  Object.defineProperties(this, {
-    eventTimeout: {
-      value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200,
-      writeable: false
-    }
+  Object.defineProperty(this, 'collections',{
+    value: {},
+    writable: true
+  });
+
+  Object.defineProperty(this, 'eventTimeout',{
+    value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200
   });
 
   Object.defineProperty(this, 'protectedEvents', {
@@ -279,26 +228,40 @@ function Kuzzle (host, options, cb) {
       reconnected: {timeout: this.eventTimeout},
       tokenExpired: {timeout: this.eventTimeout},
       loginAttempt: {timeout: this.eventTimeout}
-    },
-    writeable: false
+    }
   });
 
-  if (!options || !options.connect || options.connect === 'auto') {
-    this.connect();
-  } else {
-    this.state = 'ready';
-  }
+  this.network = networkWrapper(this.protocol, host, options);
 
-  cleanHistory(this.requestHistory);
+  this.network.addListener('offlineQueuePush', function(data) {
+    self.emitEvent('offlineQueuePush', data);
+  });
+
+  this.network.addListener('offlineQueuePop', function(data) {
+    self.emitEvent('offlineQueuePop', data);
+  });
+
+  this.network.addListener('queryError', function(err, query) {
+    self.emitEvent('queryError', err, query);
+  });
+
+  this.network.addListener('tokenExpired', function() {
+    self.unsetJwt();
+  });
+
+  if ((options && options.connect || 'auto') === 'auto') {
+    this.connect();
+  }
 
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
         var whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
-          'listCollections', 'createIndex', 'listIndexes', 'login', 'logout',
-          'now', 'query', 'checkToken', 'whoAmI', 'updateSelf', 'getMyRights',
-          'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
+          'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
+          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
+          'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
+          'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
         ];
 
         return passes && whitelist.indexOf(name) !== -1;
@@ -335,26 +298,16 @@ Kuzzle.prototype.emitEvent = Kuzzle.prototype.emit;
 Kuzzle.prototype.connect = function () {
   var self = this;
 
-  if (self.network) {
-    self.disconnect();
-  }
-
-  self.network = networkWrapper(self.host, self.port, self.sslConnection);
-
-  if (['initializing', 'ready', 'disconnected', 'error', 'offline'].indexOf(this.state) === -1) {
-    if (self.connectCB) {
-      self.connectCB(null, self);
+  if (this.network.state !== 'offline') {
+    if (this.connectCB) {
+      this.connectCB(null, self);
     }
     return self;
   }
 
-  self.state = 'connecting';
-  self.network.connect(self.autoReconnect, self.reconnectionDelay);
+  this.network.connect();
 
-  self.network.onConnect(function () {
-    self.state = 'connected';
-    renewAllSubscriptions.call(self);
-    dequeue.call(self);
+  this.network.addListener('connect', function () {
     self.emitEvent('connected');
 
     if (self.connectCB) {
@@ -362,90 +315,59 @@ Kuzzle.prototype.connect = function () {
     }
   });
 
-  self.network.on('discarded', function (data) {
-    self.emitEvent('discarded', data);
-  });
-
-  self.network.onConnectError(function (error) {
-    var connectionError = new Error('Unable to connect to kuzzle proxy server at "' + self.host + ':' + self.port + '"');
+  this.network.addListener('networkError', function (error) {
+    const connectionError = new Error(`Unable to connect to kuzzle proxy server at ${self.network.host}:${self.network.port}`);
 
     connectionError.internal = error;
-    self.state = 'error';
     self.emitEvent('networkError', connectionError);
-
-    disableAllSubscriptions.call(self);
 
     if (self.connectCB) {
       self.connectCB(connectionError);
     }
   });
 
-  self.network.onDisconnect(function () {
-    self.state = 'offline';
-
-    if (!self.autoReconnect) {
-      self.disconnect();
-    }
-
-    if (self.autoQueue) {
-      self.queuing = true;
-    }
-
+  this.network.addListener('disconnect', function () {
+    self.disconnect();
     self.emitEvent('disconnected');
   });
 
-  self.network.onReconnect(function () {
-    var reconnect = function () {
-      // renew subscriptions
-      if (self.autoResubscribe) {
-        renewAllSubscriptions.call(self);
-      }
-
-      // replay queued requests
-      if (self.autoReplay) {
-        cleanQueue.call(self);
-        dequeue.call(self);
-      }
-
-      // alert listeners
-      self.emitEvent('reconnected');
-    };
-
-    self.state = 'connected';
-
-    if (self.jwtToken) {
-      self.checkToken(self.jwtToken, function (err, res) {
+  this.network.addListener('reconnect', function () {
+    if (self.jwt) {
+      self.checkToken(self.jwt, function (err, res) {
         // shouldn't obtain an error but let's invalidate the token anyway
         if (err || !res.valid) {
-          self.jwtToken = undefined;
-          self.emitEvent('tokenExpired');
+          self.unsetJwt();
         }
 
-        reconnect();
+        self.emitEvent('reconnected');
       });
     } else {
-      reconnect();
+      self.emitEvent('reconnected');
     }
+  });
+
+  this.network.on('discarded', function (data) {
+    self.emitEvent('discarded', data);
   });
 
   return this;
 };
 
 /**
- * Set the jwtToken used to query kuzzle
+ * Set the jwt used to query kuzzle
  * @param token
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.setJwtToken = function(token) {
+Kuzzle.prototype.setJwt = function(token) {
   if (typeof token === 'string') {
-    this.jwtToken = token;
+    this.jwt = token;
   } else if (typeof token === 'object') {
     if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
-      this.jwtToken = token.result.jwt;
+      this.jwt = token.result.jwt;
     } else {
       this.emitEvent('loginAttempt', {
         success: false,
-        error: 'Cannot find a valid JWT token in the following object: ' + JSON.stringify(token)
+        error: 'Cannot find a valid JWT in the following object: ' + JSON.stringify(token)
       });
 
       return this;
@@ -455,34 +377,32 @@ Kuzzle.prototype.setJwtToken = function(token) {
     return this;
   }
 
-  renewAllSubscriptions.call(this);
   this.emitEvent('loginAttempt', {success: true});
   return this;
 };
 
 /**
- * Unset the jwtToken used to query kuzzle
+ * Unset the jwt used to query kuzzle
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.unsetJwtToken = function() {
-  this.jwtToken = undefined;
-
-  removeAllSubscriptions.call(this);
+Kuzzle.prototype.unsetJwt = function() {
+  this.jwt = undefined;
+  this.emitEvent('tokenExpired');
 
   return this;
 };
 
 /**
- * Get the jwtToken used by kuzzle
+ * Get the jwt used by kuzzle
  * @returns {Kuzzle}
  */
-Kuzzle.prototype.getJwtToken = function() {
-  return this.jwtToken;
+Kuzzle.prototype.getJwt = function() {
+  return this.jwt;
 };
 
 /**
  * Send login request to kuzzle with credentials
- * If login success, store the jwtToken into kuzzle object
+ * If login success, store the jwt into kuzzle object
  *
  * @param strategy
  * @param credentials
@@ -526,7 +446,7 @@ Kuzzle.prototype.login = function (strategy) {
   this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, function(error, response) {
     if (!error) {
       if (response.result.jwt) {
-        self.setJwtToken(response.result.jwt);
+        self.setJwt(response.result.jwt);
       }
 
       cb && cb(null, response.result);
@@ -689,7 +609,7 @@ Kuzzle.prototype.createIndex = function (index, options, cb) {
 };
 
 /**
- * Send logout request to kuzzle with jwtToken.
+ * Send logout request to kuzzle with jwt.
  *
  * @param cb
  * @returns {Kuzzle}
@@ -708,7 +628,7 @@ Kuzzle.prototype.logout = function (cb) {
     cb(error, self);
   });
 
-  self.unsetJwtToken();
+  self.unsetJwt();
 
   return self;
 };
@@ -801,172 +721,6 @@ Kuzzle.prototype.updateSelf = function (content, options, cb) {
 };
 
 /**
- * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
- */
-function cleanQueue () {
-  var
-    self = this,
-    now = Date.now(),
-    lastDocumentIndex = -1;
-
-  if (self.queueTTL > 0) {
-    self.offlineQueue.forEach(function (query, index) {
-      if (query.ts < now - self.queueTTL) {
-        lastDocumentIndex = index;
-      }
-    });
-
-    if (lastDocumentIndex !== -1) {
-      self.offlineQueue
-        .splice(0, lastDocumentIndex + 1)
-        .forEach(function (droppedRequest) {
-          self.emitEvent('offlineQueuePop', droppedRequest.query);
-        });
-    }
-  }
-
-  if (self.queueMaxSize > 0 && self.offlineQueue.length > self.queueMaxSize) {
-    self.offlineQueue
-      .splice(0, self.offlineQueue.length - self.queueMaxSize)
-      .forEach(function (droppedRequest) {
-        self.emitEvent('offlineQueuePop', droppedRequest.query);
-      });
-  }
-}
-
-
-/**
- * Clean history from requests made more than 10s ago
- */
-function cleanHistory (requestHistory) {
-  var
-    now = Date.now();
-
-  Object.keys(requestHistory).forEach(function (key) {
-    if (requestHistory[key] < now - 10000) {
-      delete requestHistory[key];
-    }
-  });
-
-  setTimeout(function () {
-    cleanHistory(requestHistory);
-  }, 1000);
-}
-
-/**
- * Emit a request to Kuzzle
- *
- * @param {object} request
- * @param {responseCallback} [cb]
- */
-function emitRequest (request, cb) {
-  var
-    self = this;
-
-  if (self.jwtToken !== undefined || cb) {
-    self.network.once(request.requestId, function (response) {
-      var error = null;
-
-      if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
-        self.jwtToken = undefined;
-        self.emitEvent('tokenExpired', request, cb);
-      }
-
-      if (response.error) {
-        error = new Error(response.error.message);
-        Object.assign(error, response.error);
-        error.status = response.status;
-        self.emitEvent('queryError', error, request, cb);
-      }
-
-      if (cb) {
-        cb(error, response);
-      }
-    });
-  }
-
-  this.network.send(request);
-
-  // Track requests made to allow Room.subscribeToSelf to work
-  self.requestHistory[request.requestId] = Date.now();
-}
-
-/**
- * Play all queued requests, in order.
- */
-function dequeue () {
-  var
-    self = this,
-    additionalQueue,
-    uniqueQueue = {},
-    dequeuingProcess = function () {
-      if (self.offlineQueue.length > 0) {
-        emitRequest.call(self, self.offlineQueue[0].query, self.offlineQueue[0].cb);
-        self.emitEvent('offlineQueuePop', self.offlineQueue.shift());
-
-        setTimeout(function () {
-          dequeuingProcess();
-        }, Math.max(0, self.replayInterval));
-      } else {
-        self.queuing = false;
-      }
-    };
-
-  if (self.offlineQueueLoader) {
-    if (typeof self.offlineQueueLoader !== 'function') {
-      throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof self.offlineQueueLoader);
-    }
-
-    additionalQueue = self.offlineQueueLoader();
-    if (Array.isArray(additionalQueue)) {
-      self.offlineQueue = additionalQueue
-        .concat(self.offlineQueue)
-        .filter(function (request) {
-          // throws if the query object does not contain required attributes
-          if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
-            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
-          }
-
-          return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
-        });
-    } else {
-      throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
-    }
-  }
-
-  dequeuingProcess();
-}
-
-/**
- * Renew all registered subscriptions. Triggered either by a successful connection/reconnection or by a
- * successful login attempt
- */
-function renewAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.renew(subscription.callback);
-    });
-  });
-}
-
-/**
- * Remove all registered subscriptions. Triggered either by a logout query or by un-setting the token
- */
-function removeAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.unsubscribe();
-    });
-  });
-}
-
-/**
  * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
  * insertion.
  *
@@ -974,8 +728,6 @@ function removeAllSubscriptions() {
  * @param {function} listener - callback to invoke each time an event is fired
  */
 Kuzzle.prototype.addListener = function(event, listener) {
-  this.isValid();
-
   if (this.eventActions.indexOf(event) === -1) {
     throw new Error('[' + event + '] is not a known event. Known events: ' + this.eventActions.toString());
   }
@@ -1056,8 +808,6 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
  * @returns {Collection} A Collection instance
  */
 Kuzzle.prototype.collection = function(collection, index) {
-  this.isValid();
-
   if (!index) {
     if (!this.defaultIndex) {
       throw new Error('Unable to create a new data collection object: no index specified');
@@ -1087,7 +837,7 @@ Kuzzle.prototype.collection = function(collection, index) {
  * @returns {Kuzzle}
  */
 Kuzzle.prototype.flushQueue = function () {
-  this.offlineQueue = [];
+  this.network.flushQueue();
   return this;
 };
 
@@ -1162,9 +912,7 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
 Kuzzle.prototype.disconnect = function () {
   var collection;
 
-  this.state = 'disconnected';
   this.network.close();
-  this.network = null;
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
@@ -1357,21 +1105,18 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
       action: queryArgs.action,
       controller: queryArgs.controller,
       volatile: this.volatile
-    },
-    self = this;
-
-  this.isValid();
+    };
 
   if (!cb && typeof options === 'function') {
     cb = options;
     options = null;
+  } else if (!cb && !options && typeof query === 'function') {
+    cb = query;
+    query = {};
+    options = null;
   }
 
   if (options) {
-    if (options.queuable === false && self.state === 'offline') {
-      return self;
-    }
-
     if (options.refresh) {
       object.refresh = options.refresh;
     }
@@ -1403,11 +1148,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     throw new Error('Invalid query parameter: ' + query);
   }
 
-  if (query.volatile) {
-    Object.keys(query.volatile).forEach(function (meta) {
-      object.volatile[meta] = query.volatile[meta];
-    });
-  }
+  Object.assign(object.volatile, query.volatile, {sdkVersion: this.sdkVersion});
 
   for (attr in query) {
     if (attr !== 'volatile' && query.hasOwnProperty(attr)) {
@@ -1415,14 +1156,14 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     }
   }
 
-  object = self.addHeaders(object, this.headers);
+  object = this.addHeaders(object, this.headers);
 
   /*
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
    */
-  if (self.jwtToken !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
-    object.jwt = self.jwtToken;
+  if (this.jwt !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
+    object.jwt = this.jwt;
   }
 
   if (queryArgs.collection) {
@@ -1437,40 +1178,40 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     object.requestId = uuidv4();
   }
 
-  object.volatile.sdkVersion = this.sdkVersion;
+  this.network.query(object, options, cb);
 
-  if (self.state === 'connected' || (options && options.queuable === false)) {
-    if (self.state === 'connected') {
-      emitRequest.call(this, object, cb);
-    } else {
-      discardRequest(object, cb);
-    }
-  } else if (self.queuing || (options && options.queuable === true) || ['initializing', 'connecting'].indexOf(self.state) !== -1) {
-    cleanQueue.call(this, object, cb);
-    if (!self.queueFilter || self.queueFilter(object)) {
-      self.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
-      self.emitEvent('offlineQueuePush', {query: object, cb: cb});
-    } else {
-      discardRequest(object, cb);
-    }
-  }
-  else {
-    discardRequest(object, cb);
-  }
-
-  return self;
+  return this;
 };
 
 /**
- * Replays the requests queued during offline mode.
- * Works only if the SDK is not in a disconnected state, and if the autoReplay option is set to false.
+ * Starts the requests queuing.
+ */
+Kuzzle.prototype.startQueuing = function () {
+  this.network.startQueuing();
+  return this;
+};
+
+/**
+ * Stops the requests queuing.
+ */
+Kuzzle.prototype.stopQueuing = function () {
+  this.network.stopQueuing();
+  return this;
+};
+
+/**
+ * @DEPRECATED
+ * See Kuzzle.prototype.playQueue();
  */
 Kuzzle.prototype.replayQueue = function () {
-  if (this.state !== 'offline' && !this.autoReplay) {
-    cleanQueue.call(this);
-    dequeue.call(this);
-  }
+  return this.playQueue();
+};
 
+/**
+ * Plays the requests queued during offline mode.
+ */
+Kuzzle.prototype.playQueue = function () {
+  this.network.playQueue();
   return this;
 };
 
@@ -1520,43 +1261,5 @@ Kuzzle.prototype.setHeaders = function (content, replace) {
 
   return self;
 };
-
-/**
- * Starts the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
- */
-Kuzzle.prototype.startQueuing = function () {
-  if (this.state === 'offline' && !this.autoQueue) {
-    this.queuing = true;
-  }
-  return this;
-};
-
-/**
- * Stops the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
- */
-Kuzzle.prototype.stopQueuing = function () {
-  if (this.state === 'offline' && !this.autoQueue) {
-    this.queuing = false;
-  }
-
-  return this;
-};
-
-function discardRequest(object, cb) {
-  if (cb) {
-    cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
-  }
-}
-
-function disableAllSubscriptions() {
-  var self = this;
-
-  Object.keys(self.subscriptions).forEach(function (roomId) {
-    Object.keys(self.subscriptions[roomId]).forEach(function (subscriptionId) {
-      var subscription = self.subscriptions[roomId][subscriptionId];
-      subscription.subscribing = false;
-    });
-  });
-}
 
 module.exports = Kuzzle;

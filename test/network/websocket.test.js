@@ -1,15 +1,17 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  WS = require('../../src/networkWrapper/wrappers/websocket');
+  WS = require('../../src/networkWrapper/protocols/websocket');
 
 describe('WebSocket networking module', function () {
   var
+    clock,
     websocket,
     wsargs,
     clientStub;
 
   beforeEach(function () {
+    clock = sinon.useFakeTimers();
     clientStub = {
       send: sinon.stub(),
       close: sinon.stub()
@@ -21,18 +23,35 @@ describe('WebSocket networking module', function () {
       return clientStub;
     };
 
-    websocket = new WS('address', 'port', false);
+    websocket = new WS('address', {
+      port: 1234,
+      autoReconnect: 'autoReconnectValue',
+      reconnectionDelay: 'reconnectionDelayValue'
+    });
   });
 
   afterEach(function () {
+    clock.restore();
     WebSocket = undefined; // eslint-disable-line
     window = undefined; // eslint-disable-line
   });
 
+  it('should initialize network status when connecting', function () {
+    websocket.connect();
+    should(websocket.state).be.eql('connecting');
+    should(websocket.queuing).be.false();
+  });
+
+  it('should start queuing if autoQueue option is set', function () {
+    websocket.autoQueue = true;
+    websocket.connect();
+    should(websocket.queuing).be.true();
+  });
+
   it('should initialize a WS connection properly', function () {
     clientStub.on = sinon.stub();
-    websocket.connect('autoReconnect', 'reconnectionDelay');
-    should(wsargs).match(['ws://address:port']);
+    websocket.connect();
+    should(wsargs).match(['ws://address:1234']);
     should(clientStub.onopen).not.be.undefined();
     should(clientStub.onclose).not.be.undefined();
     should(clientStub.onerror).not.be.undefined();
@@ -42,53 +61,95 @@ describe('WebSocket networking module', function () {
   it('should initialize a WS secure connection', function () {
     clientStub.on = sinon.stub();
     websocket.ssl = true;
-    websocket.connect('autoReconnect', 'reconnectionDelay');
-    should(wsargs).match(['wss://address:port']);
+    websocket.connect();
+    should(wsargs).match(['wss://address:1234']);
   });
 
-  it('should call listeners on a "open" event', function (done) {
+  it('should call listeners on a "open" event', function () {
     var cb = sinon.stub();
 
+    should(websocket.listeners('connect').length).be.eql(0);
+    should(websocket.listeners('reconnect').length).be.eql(0);
+
     websocket.retrying = false;
-    websocket.onConnect(cb);
+    websocket.addListener('connect', cb);
     should(websocket.listeners('connect').length).be.eql(1);
     should(websocket.listeners('reconnect').length).be.exactly(0);
 
     websocket.connect();
     clientStub.onopen();
-    setTimeout(function () {
-      should(cb.calledOnce).be.true();
-      should(websocket.listeners('connect').length).be.eql(1);
-      done();
-    }, 0);
+    should(cb).be.calledOnce();
   });
 
-  it('should call listeners on a "reconnect" event', function (done) {
+  it('should change the state when the client connection is established', function () {
+    websocket.state = 'connecting';
+
+    websocket.connect();
+    clientStub.onopen();
+    should(websocket.state).be.eql('connected');
+    should(websocket.wasConnected).be.true();
+    should(websocket.stopRetryingToConnect).be.false();
+  });
+
+  it('should stop queuing when the client connection is established if autoQueue option is set', function () {
+    websocket.queuing = true;
+    websocket.autoQueue = true;
+
+    websocket.connect();
+    clientStub.onopen();
+    should(websocket.queuing).be.false();
+  });
+
+  it('should not stop queuing when the client connection is established if autoQueue option is not set', function () {
+    websocket.queuing = true;
+    websocket.autoQueue = false;
+
+    websocket.connect();
+    clientStub.onopen();
+    should(websocket.queuing).be.true();
+  });
+
+  it('should play the queue when the client connection is established if autoReplay option is set', function () {
+    websocket.playQueue = sinon.stub();
+    websocket.autoReplay = true;
+
+    websocket.connect();
+    clientStub.onopen();
+    should(websocket.playQueue).be.calledOnce();
+  });
+
+  it('should not play the queue when the client connection is established if autoReplay option is not set', function () {
+    websocket.playQueue = sinon.stub();
+    websocket.autoReplay = false;
+
+    websocket.connect();
+    clientStub.onopen();
+    should(websocket.playQueue).not.be.called();
+  });
+
+  it('should call listeners on a "reconnect" event', function () {
     var cb = sinon.stub();
 
+    should(websocket.listeners('connect').length).be.eql(0);
+    should(websocket.listeners('reconnect').length).be.eql(0);
+
     websocket.wasConnected = true;
-    websocket.lasturl = 'ws://address:port';
-    websocket.onReconnect(cb);
+    websocket.lasturl = 'ws://address:1234';
+    websocket.addListener('reconnect', cb);
     should(websocket.listeners('connect').length).be.exactly(0);
     should(websocket.listeners('reconnect').length).be.eql(1);
 
     websocket.connect();
     clientStub.onopen();
 
-    setTimeout(function () {
-      should(cb.calledOnce).be.true();
-      should(websocket.listeners('reconnect').length).be.eql(1);
-      done();
-    }, 0);
+    should(cb).be.calledOnce();
   });
 
   it('should try to reconnect on a connection error with autoReconnect = true', function () {
-    var
-      cb = sinon.stub(),
-      clock = sinon.useFakeTimers();
+    var cb = sinon.stub();
 
     websocket.retrying = false;
-    websocket.onConnectError(cb);
+    websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect(true, 10);
@@ -97,70 +158,115 @@ describe('WebSocket networking module', function () {
     should(websocket.retrying).be.true();
     clock.tick(10);
 
-    should(cb.calledOnce).be.true();
-    should(websocket.listeners('networkError').length).be.eql(1);
+    should(cb).be.calledOnce();
     should(websocket.retrying).be.false();
-    should(websocket.connect.calledOnce).be.true();
-    clock.restore();
+    should(websocket.connect).be.calledOnce();
   });
 
   it('should not try to reconnect on a connection error with autoReconnect = false', function () {
-    var
-      cb = sinon.stub(),
-      clock = sinon.useFakeTimers();
+    var cb = sinon.stub();
 
+    websocket.autoReconnect = false;
+    websocket.reconnectionDelay = 10;
     websocket.retrying = false;
-    websocket.onConnectError(cb);
+    websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
-    websocket.connect(false, 10);
+    websocket.connect();
     websocket.connect = sinon.stub();
     clientStub.onerror();
     clock.tick(10);
 
-    should(cb.calledOnce).be.true();
-    should(websocket.listeners('networkError').length).be.eql(1);
+    should(cb).be.calledOnce();
     should(websocket.retrying).be.false();
-    should(websocket.connect.calledOnce).be.false();
-    clock.restore();
+    should(websocket.connect).not.be.called();
   });
 
-  it('should call listeners on a "disconnect" event', function (done) {
+  it('should call listeners on a "disconnect" event', function () {
     var cb = sinon.stub();
 
     websocket.retrying = false;
-    websocket.onDisconnect(cb);
+    websocket.addListener('disconnect', cb);
     should(websocket.listeners('disconnect').length).be.eql(1);
 
     websocket.connect();
     clientStub.onclose(1000);
 
-    setTimeout(function () {
-      should(cb.calledOnce).be.true();
-      should(websocket.listeners('disconnect').length).be.eql(1);
-      done();
-    }, 0);
+    clock.tick(10);
+    should(cb).be.calledOnce();
+    should(websocket.listeners('disconnect').length).be.eql(1);
   });
 
-  it('should call error listeners on a disconnect event with an abnormal websocket code', function (done) {
+  it('should start queuing when the client is disconnected if autoQueue option is set', function () {
+    websocket.queuing = false;
+    websocket.autoQueue = true;
+
+    websocket.connect();
+    clientStub.onclose(1000);
+
+    clock.tick(10);
+    should(websocket.queuing).be.true();
+  });
+
+  it('should not start queuing when the client is disconnected if autoQueue option is not set', function () {
+    websocket.queuing = false;
+    websocket.autoQueue = false;
+
+    websocket.connect();
+    clientStub.onclose(1000);
+
+    clock.tick(10);
+    should(websocket.queuing).be.false();
+  });
+
+  it('should call error listeners on a "disconnect" event with an abnormal websocket code', function () {
     var cb = sinon.stub();
 
     websocket.retrying = false;
-    websocket.onConnectError(cb);
+    websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
     clientStub.onclose(4666, 'foobar');
 
-    setTimeout(function () {
-      should(cb.calledOnce).be.true();
-      should(cb.calledWith('foobar'));
-      should(websocket.listeners('networkError').length).be.eql(1);
-      done();
-    }, 0);
+    clock.tick(10);
+    should(cb).be.calledOnce();
+    should(cb.calledWith('foobar'));
+    should(websocket.listeners('networkError').length).be.eql(1);
+
+    cb.reset();
+    websocket.connect();
+    clientStub.onclose({code: 4666, reason: 'foobar'});
+
+    clock.tick(10);
+    should(cb).be.calledOnce();
+    should(cb.calledWith('foobar'));
+    should(websocket.listeners('networkError').length).be.eql(1);
   });
 
-  it('should be able to register ephemeral callbacks on an event', function (done) {
+  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', function () {
+    websocket.queuing = false;
+    websocket.autoQueue = true;
+
+    websocket.connect();
+    clientStub.onclose(4666, 'foobar');
+
+    clock.tick(10);
+    should(websocket.queuing).be.true();
+  });
+
+  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', function () {
+    websocket.queuing = false;
+    websocket.autoQueue = false;
+
+    websocket.connect();
+    clientStub.onclose(4666, 'foobar');
+
+    clock.tick(10);
+    should(websocket.queuing).be.false();
+  });
+
+  it('should be able to register ephemeral callbacks on an event', function () {
     var
       cb1,
       cb2,
@@ -177,17 +283,15 @@ describe('WebSocket networking module', function () {
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    setTimeout(function () {
-      should(websocket.listeners('foobar').length).be.exactly(0);
-      should(websocket.listeners('barfoo').length).be.equal(1);
-      should(cb1).match(payload);
-      should(cb2).match(payload);
-      should(cb3).be.undefined();
-      done();
-    }, 0);
+    clock.tick(10);
+    should(websocket.listeners('foobar').length).be.exactly(0);
+    should(websocket.listeners('barfoo').length).be.equal(1);
+    should(cb1).match(payload);
+    should(cb2).match(payload);
+    should(cb3).be.undefined();
   });
 
-  it('should be able to register persistent callbacks on an event', function (done) {
+  it('should be able to register persistent callbacks on an event', function () {
     var
       cb1,
       cb2,
@@ -201,15 +305,13 @@ describe('WebSocket networking module', function () {
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    setTimeout(function () {
-      should(websocket.listeners('foobar').length).be.equal(2);
-      should(cb1).match(payload);
-      should(cb2).match(payload);
-      done();
-    }, 0);
+    clock.tick(10);
+    should(websocket.listeners('foobar').length).be.equal(2);
+    should(cb1).match(payload);
+    should(cb2).match(payload);
   });
 
-  it('should send the message on room "discarded" if no room specified', function (done) {
+  it('should send the message on room "discarded" if no room specified', function () {
     var
       cb = sinon.stub(),
       payload = {};
@@ -219,11 +321,9 @@ describe('WebSocket networking module', function () {
 
     clientStub.onmessage({data: JSON.stringify(payload)});
 
-    setTimeout(function () {
-      should(cb.calledOnce).be.true();
-      should(cb.alwaysCalledWithMatch(payload)).be.true();
-      done();
-    }, 0);
+    clock.tick(10);
+    should(cb).be.calledOnce();
+    should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
   it('should be able to unregister a callback on an event', function () {
@@ -269,7 +369,7 @@ describe('WebSocket networking module', function () {
     websocket.connect();
     websocket.send(data);
 
-    should(clientStub.send.calledOnce).be.true();
+    should(clientStub.send).be.calledOnce();
     should(clientStub.send.calledWith(JSON.stringify(data))).be.true();
   });
 
@@ -281,7 +381,7 @@ describe('WebSocket networking module', function () {
     websocket.connect();
     websocket.send(data);
 
-    should(clientStub.send.called).be.false();
+    should(clientStub.send).not.be.called();
   });
 
   it('should properly close a connection when asked', function () {
@@ -289,10 +389,10 @@ describe('WebSocket networking module', function () {
       cb = sinon.stub();
 
     websocket.on('foobar', cb);
-    websocket.onConnect(cb);
-    websocket.onDisconnect(cb);
-    websocket.onConnectError(cb);
-    websocket.onReconnect(cb);
+    websocket.addListener('connect', cb);
+    websocket.addListener('disconnect', cb);
+    websocket.addListener('networkError', cb);
+    websocket.addListener('reconnect', cb);
     websocket.retrying = true;
 
     websocket.connect();

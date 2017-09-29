@@ -64,7 +64,7 @@ describe('Kuzzle Login', function () {
 
     it('should have the token in login callback', function (done) {
       kuzzle.login('local', loginCredentials, '1h', function() {
-        should(kuzzle.jwtToken).be.exactly('test-toto');
+        should(kuzzle.jwt).be.exactly('test-toto');
         should(queryStub.firstCall).be.calledWith(
           {controller: 'auth', action: 'login'},
           {body: {username: 'foo', password: 'bar'}, strategy: 'local', expiresIn: '1h'},
@@ -159,7 +159,7 @@ describe('Kuzzle Login', function () {
 
       kuzzle.login('local', {});
 
-      process.nextTick(function () {
+      setTimeout(function () {
         should(loginAttemptStub).not.be.called();
         done();
       });
@@ -179,10 +179,10 @@ describe('Kuzzle Login', function () {
 
   describe('#Logout', function () {
     it('should have a empty token in logout callback', function () {
-      var unsetJwtToken = sinon.spy(kuzzle, 'unsetJwtToken');
+      var unsetJwt = sinon.spy(kuzzle, 'unsetJwt');
 
       kuzzle.logout();
-      should(unsetJwtToken).be.calledOnce();
+      should(unsetJwt).be.calledOnce();
     });
 
     it('should give an error if logout query fail to the logout callback if is set', function (done) {

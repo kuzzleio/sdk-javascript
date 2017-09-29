@@ -54,7 +54,7 @@ describe('Collection constructor', function () {
     should.exist(collection.mGetDocumentPromise);
     should.exist(collection.mReplaceDocumentPromise);
     should.exist(collection.mUpdateDocumentPromise);
-    should.not.exist(collection.publishPromise);
+    should.exist(collection.publishMessagePromise);
     should.exist(collection.replaceDocumentPromise);
     should.exist(collection.scrollSpecificationsPromise);
     should.exist(collection.searchSpecificationsPromise);
@@ -69,7 +69,7 @@ describe('Collection constructor', function () {
   it('should set headers using setHeaders', function () {
     var
       kuzzle = new Kuzzle('foo', {connect: 'manual'}),
-      collection = kuzzle.collection('foo', 'bar');
+      collection = new Collection(kuzzle, 'foo', 'bar');
 
     collection.setHeaders({foo: 'bar'}, true);
     should(collection.headers).match({foo: 'bar'});

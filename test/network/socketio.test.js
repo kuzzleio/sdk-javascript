@@ -1,7 +1,7 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  SocketIO = require('../../src/networkWrapper/wrappers/socketio');
+  SocketIO = require('../../src/networkWrapper/protocols/socketio');
 
 /**
  * @global window
@@ -9,11 +9,13 @@ var
 
 describe('SocketIO network wrapper', function () {
   var
+    clock,
     socketIO,
     socketStub;
 
   describe('SocketIO networking module', function() {
     beforeEach(function () {
+      clock = sinon.useFakeTimers();
       socketStub = {
         events: {},
         eventOnce: {},
@@ -66,140 +68,228 @@ describe('SocketIO network wrapper', function () {
         close: sinon.spy()
       };
 
-      socketIO = new SocketIO('address', 'port', false);
+      socketIO = new SocketIO('address', {
+        port: 1234,
+        autoReconnect: 'autoReconnectValue',
+        reconnectionDelay: 'reconnectionDelayValue'
+      });
       socketIO.socket = socketStub;
 
       window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
     });
 
+    afterEach(function () {
+      clock.restore();
+    });
+
+    it('should initialize network status when connecting', function () {
+      socketIO.connect();
+      should(socketIO.state).be.eql('connecting');
+      should(socketIO.queuing).be.false();
+    });
+
+    it('should start queuing if autoQueue option is set', function () {
+      socketIO.autoQueue = true;
+      socketIO.connect();
+      should(socketIO.queuing).be.true();
+    });
+
     it('should connect with the right parameters', function () {
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
-      should(window.io.calledOnce).be.true();
-      should(window.io.calledWithMatch('http://address:port', {
+      socketIO.connect();
+      should(window.io).be.calledOnce();
+      should(window.io).be.calledWithMatch('http://address:1234', {
         reconnection: 'autoReconnectValue',
         reconnectionDelay: 'reconnectionDelayValue',
         forceNew: true
-      })).be.true();
+      });
     });
 
     it('should connect with the secure connection', function () {
       socketIO.ssl = true;
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
-      should(window.io.calledWithMatch('https://address:port', {
+      socketIO.connect();
+      should(window.io.calledWithMatch('https://address:1234', {
         reconnection: 'autoReconnectValue',
         reconnectionDelay: 'reconnectionDelayValue',
         forceNew: true
       })).be.true();
     });
 
-    it('should register onConnect callbacks to the right event', function () {
-      var cb = sinon.spy();
+    it('should call listeners on connect event', function () {
+      var cb = sinon.stub();
 
-      should(socketIO.handlers.connect.length).be.eql(0);
+      should(socketIO.listeners('connect').length).be.eql(0);
+      should(socketIO.listeners('reconnect').length).be.eql(0);
 
-      socketIO.onConnect(cb);
+      socketIO.retrying = false;
+      socketIO.addListener('connect', cb);
+      should(socketIO.listeners('connect').length).be.eql(1);
+      should(socketIO.listeners('reconnect').length).be.eql(0);
 
-      should(socketIO.handlers.connect.length).be.eql(1);
-      should(socketIO.handlers.connect).containEql(cb);
-    });
-
-    it('should call connect handler on connect event', function () {
-      var cb = sinon.spy();
-
-      socketIO.wasConnected = false;
-      socketIO.onConnect(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
-
+      socketIO.connect();
       socketIO.socket.emit('connect');
 
-      should(cb.calledOnce).be.true();
+      should(cb).be.calledOnce();
     });
 
-    it('should register onReconnect callbacks to the right event', function () {
-      var cb = sinon.spy();
 
-      should(socketIO.handlers.reconnect.length).be.eql(0);
+    it('should change the state when the client connection is established', function () {
+      socketIO.state = 'connecting';
+      socketIO.queuing = true;
 
-      socketIO.onReconnect(cb);
-
-      should(socketIO.handlers.reconnect.length).be.eql(1);
-      should(socketIO.handlers.reconnect).containEql(cb);
+      socketIO.connect();
+      socketIO.socket.emit('connect');
+      should(socketIO.state).be.eql('connected');
+      should(socketIO.wasConnected).be.true();
+      should(socketIO.stopRetryingToConnect).be.false();
     });
 
-    it('should call reconnect handler on connect event when was already connected before', function () {
-      var cb = sinon.spy();
+    it('should stop queuing when the client connection is established if autoQueue option is set', function () {
+      socketIO.queuing = true;
+      socketIO.autoQueue = true;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect');
+      should(socketIO.queuing).be.false();
+    });
+
+    it('should not stop queuing when the client connection is established if autoQueue option is not set', function () {
+      socketIO.queuing = true;
+      socketIO.autoQueue = false;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect');
+      should(socketIO.queuing).be.true();
+    });
+
+    it('should play the queue when the client connection is established if autoReplay option is set', function () {
+      socketIO.playQueue = sinon.stub();
+      socketIO.autoReplay = true;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect');
+      should(socketIO.playQueue).be.calledOnce();
+    });
+
+    it('should not play the queue when the client connection is established if autoReplay option is not set', function () {
+      socketIO.playQueue = sinon.stub();
+      socketIO.autoReplay = false;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect');
+      should(socketIO.playQueue).not.be.called();
+    });
+
+    it('should call listeners on a "reconnect" event', function () {
+      var cb = sinon.stub();
+
+      should(socketIO.listeners('connect').length).be.eql(0);
+      should(socketIO.listeners('reconnect').length).be.eql(0);
 
       socketIO.wasConnected = true;
-      socketIO.onReconnect(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
+      socketIO.retrying = false;
+      socketIO.addListener('reconnect', cb);
+      should(socketIO.listeners('connect').length).be.eql(0);
+      should(socketIO.listeners('reconnect').length).be.eql(1);
 
+      socketIO.connect();
       socketIO.socket.emit('connect');
 
-      should(cb.calledOnce).be.true();
+      should(cb).be.calledOnce();
     });
 
-    it('should register onDisconnect callbacks to the right event', function () {
-      var cb = sinon.spy();
+    it('should call listeners on a "disconnect" event', function () {
+      var cb = sinon.stub();
 
-      should(socketIO.handlers.disconnect.length).be.eql(0);
+      should(socketIO.listeners('disconnect').length).be.eql(0);
 
-      socketIO.onDisconnect(cb);
-
-      should(socketIO.handlers.disconnect.length).be.eql(1);
-      should(socketIO.handlers.disconnect).containEql(cb);
-    });
-
-    it('should call disconnect handler on attended disconnect event', function () {
-      var cb = sinon.spy();
-
-      socketIO.wasConnected = false;
       socketIO.forceDisconnect = true;
-      socketIO.onDisconnect(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
+      socketIO.addListener('disconnect', cb);
+      should(socketIO.listeners('disconnect').length).be.eql(1);
 
+      socketIO.connect();
       socketIO.socket.emit('disconnect');
 
-      should(cb.calledOnce).be.true();
+      should(cb).be.calledOnce();
     });
 
-    it('should register onConnectError callbacks to the right event', function () {
-      var cb = sinon.spy();
+    it('should start queuing when the client is disconnected if autoQueue option is set', function () {
+      socketIO.queuing = false;
+      socketIO.autoQueue = true;
 
-      should(socketIO.handlers.connectError.length).be.eql(0);
+      socketIO.connect();
+      socketIO.socket.emit('disconnect');
 
-      socketIO.onConnectError(cb);
-
-      should(socketIO.handlers.connectError.length).be.eql(1);
-      should(socketIO.handlers.connectError).containEql(cb);
+      clock.tick(10);
+      should(socketIO.queuing).be.true();
     });
 
-    it('should call connectError handler on connect error event', function () {
-      var cb = sinon.spy();
-      var err = new Error('foobar');
+    it('should not start queuing when the client is disconnected if autoQueue option is not set', function () {
+      socketIO.queuing = false;
+      socketIO.autoQueue = false;
 
-      socketIO.onConnectError(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
+      socketIO.connect();
+      socketIO.socket.emit('disconnect');
 
+      clock.tick(10);
+      should(socketIO.queuing).be.false();
+    });
+
+    it('should call listeners on a connect error event', function () {
+      var
+        cb = sinon.stub(),
+        err = new Error('foobar');
+
+      should(socketIO.listeners('networkError').length).be.eql(0);
+
+      socketIO.forceDisconnect = true;
+      socketIO.addListener('networkError', cb);
+      should(socketIO.listeners('networkError').length).be.eql(1);
+
+      socketIO.connect();
       socketIO.socket.emit('connect_error', err);
 
-      should(cb)
-        .be.calledOnce();
+      should(cb).be.calledOnce();
+      should(cb).be.calledWith(err);
+    });
 
-      should(cb)
-        .be.calledWith(err);
+    it('should start queuing when the client is disconnected with an error, if autoQueue option is set', function () {
+      var err = new Error('foobar');
+
+      socketIO.queuing = false;
+      socketIO.autoQueue = true;
+      socketIO.forceDisconnect = true;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect_error', err);
+
+      clock.tick(10);
+      should(socketIO.queuing).be.true();
+    });
+
+    it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', function () {
+      var err = new Error('foobar');
+
+      socketIO.queuing = false;
+      socketIO.autoQueue = false;
+      socketIO.forceDisconnect = true;
+
+      socketIO.connect();
+      socketIO.socket.emit('connect_error', err);
+
+      clock.tick(10);
+      should(socketIO.queuing).be.false();
     });
 
     it('should call connectError handler on unattended disconnect event', function () {
       var cb = sinon.spy();
 
       socketIO.forceDisconnect = false;
-      socketIO.onConnectError(cb);
-      socketIO.connect('autoReconnectValue', 'reconnectionDelayValue');
+      socketIO.addListener('networkError', cb);
+      socketIO.connect();
 
       socketIO.socket.emit('disconnect');
 
-      should(cb)
-        .be.calledOnce();
+      should(cb).be.calledOnce();
     });
   });
 
@@ -213,7 +303,7 @@ describe('SocketIO network wrapper', function () {
         close: sinon.spy()
       };
 
-      socketIO = new SocketIO('address', 'port', false);
+      socketIO = new SocketIO('address');
       socketIO.socket = socketStub;
 
       window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
@@ -223,35 +313,35 @@ describe('SocketIO network wrapper', function () {
       var cb = function () {};
 
       socketIO.once('event', cb);
-      should(socketStub.once.calledOnce).be.true();
-      should(socketStub.once.calledWith('event', cb)).be.true();
+      should(socketStub.once).be.calledOnce();
+      should(socketStub.once).be.calledWith('event', cb);
     });
 
     it('should be able to listen to an event', function () {
       var cb = function () {};
 
       socketIO.on('event', cb);
-      should(socketStub.on.calledOnce).be.true();
-      should(socketStub.on.calledWith('event', cb)).be.true();
+      should(socketStub.on).be.calledOnce();
+      should(socketStub.on).be.calledWith('event', cb);
     });
 
     it('should be able to remove an event listener', function () {
       var cb = function () {};
 
       socketIO.off('event', cb);
-      should(socketStub.off.calledOnce).be.true();
-      should(socketStub.off.calledWith('event', cb)).be.true();
+      should(socketStub.off).be.calledOnce();
+      should(socketStub.off).be.calledWith('event', cb);
     });
 
     it('should be able to send a payload', function () {
       socketIO.send('some data');
-      should(socketStub.emit.calledOnce).be.true();
-      should(socketStub.emit.calledWith('kuzzle', 'some data')).be.true();
+      should(socketStub.emit).be.calledOnce();
+      should(socketStub.emit).be.calledWith('kuzzle', 'some data');
     });
 
     it('should be able to be closed', function () {
       socketIO.close();
-      should(socketStub.close.calledOnce).be.true();
+      should(socketStub.close).be.calledOnce();
       should(socketIO.socket).be.null();
     });
   });

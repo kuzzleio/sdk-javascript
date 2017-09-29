@@ -22,7 +22,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('createCredentials');
         should(args[2]).be.exactly(null);
@@ -41,7 +41,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('createCredentials');
@@ -66,7 +66,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('deleteCredentials');
         should(args[2]).be.exactly(null);
@@ -84,7 +84,7 @@ describe('Credentials methods', function() {
         should(res.acknowledged).be.exactly(true);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('deleteCredentials');
@@ -109,7 +109,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getAllCredentialFields');
@@ -127,7 +127,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getAllCredentialFields');
@@ -151,7 +151,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getCredentialFields');
@@ -169,7 +169,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getCredentialFields');
@@ -193,7 +193,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getCredentials');
@@ -212,7 +212,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('getCredentials');
@@ -237,7 +237,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('hasCredentials');
@@ -255,7 +255,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(true);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('hasCredentials');
@@ -280,7 +280,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('updateCredentials');
@@ -299,7 +299,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(doc);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('updateCredentials');
@@ -324,7 +324,7 @@ describe('Credentials methods', function() {
         should(err).be.exactly(cberror);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('validateCredentials');
@@ -343,7 +343,7 @@ describe('Credentials methods', function() {
         should(res).be.exactly(true);
         args = spy.firstCall.args;
 
-        should(spy.calledOnce).be.true();
+        should(spy).be.calledOnce();
 
         should(args[0].controller).be.exactly('security');
         should(args[0].action).be.exactly('validateCredentials');

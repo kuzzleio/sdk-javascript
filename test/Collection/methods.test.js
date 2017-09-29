@@ -3,13 +3,11 @@ var
   rewire = require('rewire'),
   sinon = require('sinon'),
   Kuzzle = require('../../src/Kuzzle'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
   SearchResult = require('../../src/SearchResult'),
   Collection = rewire('../../src/Collection.js'),
   Document = require('../../src/Document'),
   CollectionMapping = require('../../src/CollectionMapping'),
   Room = require('../../src/Room'),
-  SubscribeResult = require('../../src/SubscribeResult'),
   Bluebird = require('bluebird');
 
 describe('Collection methods', function () {
@@ -23,6 +21,8 @@ describe('Collection methods', function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
     kuzzle.bluebird = Bluebird;
     kuzzle.query = sinon.stub();
+    kuzzle.subscribe = sinon.stub();
+    kuzzle.unsubscribe = sinon.stub();
     collection = new Collection(kuzzle, 'foo', 'bar');
   });
 
@@ -124,6 +124,20 @@ describe('Collection methods', function () {
       should(function () { collection.scroll('scrollId'); }).throw('Collection.scroll: a callback argument is required for read queries');
     });
 
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.scroll('scrollId', cb1);
+      collection.scroll('scrollId', {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+    });
+
     it('should parse the given parameters', function (done) {
       var
         scrollId = 'scrollId',
@@ -148,6 +162,17 @@ describe('Collection methods', function () {
       kuzzle.query.yield(null, result);
 
     });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.scroll({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
   });
 
   describe('#scrollSpecifications', function () {
@@ -168,6 +193,20 @@ describe('Collection methods', function () {
 
     it('should throw an error if no callback is given', function () {
       should(function () { collection.scrollSpecifications('1337'); }).throw('Collection.scrollSpecifications: a callback argument is required for read queries');
+    });
+
+    it('should handle the callback argument correctly', function () {
+      var
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      collection.scrollSpecifications('scrollId', cb1);
+      collection.scrollSpecifications('scrollId', {}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
     });
 
     it('should parse the given parameters', function (done) {
@@ -192,6 +231,17 @@ describe('Collection methods', function () {
       should(kuzzle.query).be.calledWith(expectedQuery, { scrollId: 'scrollId' }, {}, sinon.match.func);
 
       kuzzle.query.yield(null, result);
+    });
+
+    it('should call the callback with an error if one occurs', function (done) {
+      this.timeout(50);
+
+      collection.scrollSpecifications({}, function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
     });
   });
 
@@ -1295,39 +1345,160 @@ describe('Collection methods', function () {
     });
   });
 
-  describe('#subscribe', function () {
-    beforeEach(function () {
-      kuzzle.state = 'connected';
-      kuzzle.network = new NetworkWrapperMock();
-      result = { result: {roomId: 'foobar' }};
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'subscribe',
-        controller: 'realtime'
-      };
+  describe('#room', function() {
+    it('should instantiate a new Room object with default properties', function () {
+      var
+        filters = {equals: {foo: 'bar'}},
+        room = collection.room(filters, {}, sinon.stub());
+
+      should(room).be.instanceof(Room);
+      should(room.filters).be.exactly(filters);
+      should(room.scope).be.exactly('all');
+      should(room.state).be.exactly('done');
+      should(room.users).be.exactly('none');
+      should(room.volatile).be.empty();
+      should(room.subscribeToSelf).be.true();
+      should(room.autoResubscribe).be.true();
     });
 
-    it('should instantiate a new Room object', function () {
-      should(collection.subscribe({}, {}, sinon.stub())).be.instanceof(SubscribeResult);
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery);
+    it('should instantiate a new Room object with custom properties', function () {
+      var
+        filters = {equals: {foo: 'bar'}},
+        options = {
+          scope: 'optscope',
+          state: 'optstate',
+          users: 'optusers',
+          volatile: {foo: 'bar'},
+          subscribeToSelf: false,
+          autoResubscribe: false
+        },
+        room = collection.room(filters, options, sinon.stub());
+
+      should(room).be.instanceof(Room);
+      should(room.filters).be.exactly(filters);
+      should(room.scope).be.exactly('optscope');
+      should(room.state).be.exactly('optstate');
+      should(room.users).be.exactly('optusers');
+      should(room.volatile).match({foo: 'bar'});
+      should(room.subscribeToSelf).be.false();
+      should(room.autoResubscribe).be.false();
+    });
+  });
+
+  describe('#subscribe', function () {
+    var revert;
+
+    beforeEach(function () {
+      revert = Collection.__set__('Room', function (col, filters, options) {
+        var room = new Room(col, filters, options);
+        room.subscribe = sinon.stub().returns(room);
+        room.on = sinon.stub();
+        return room;
+      });
+    });
+
+    afterEach(function() {
+      revert();
+    });
+
+    it('should instantiate a new Room object with default properties', function () {
+      var
+        filters = {equals: {foo: 'bar'}},
+        room = collection.subscribe(filters, {}, sinon.stub());
+
+      should(room).be.instanceof(Room);
+      should(room.filters).be.exactly(filters);
+      should(room.scope).be.exactly('all');
+      should(room.state).be.exactly('done');
+      should(room.users).be.exactly('none');
+      should(room.volatile).be.empty();
+      should(room.subscribeToSelf).be.true();
+    });
+
+    it('should instantiate a new Room object with custom properties', function () {
+      var
+        filters = {equals: {foo: 'bar'}},
+        options = {
+          scope: 'optscope',
+          state: 'optstate',
+          users: 'optusers',
+          volatile: {foo: 'bar'},
+          subscribeToSelf: false
+        },
+        room = collection.subscribe(filters, options, sinon.stub());
+
+      should(room).be.instanceof(Room);
+      should(room.filters).be.exactly(filters);
+      should(room.scope).be.exactly('optscope');
+      should(room.state).be.exactly('optstate');
+      should(room.users).be.exactly('optusers');
+      should(room.volatile).match({foo: 'bar'});
+      should(room.subscribeToSelf).be.false();
     });
 
     it('should handle the callback argument correctly', function () {
       var
         cb1 = sinon.stub(),
-        cb2 = sinon.stub();
+        cb2 = sinon.stub(),
+        room1 = collection.subscribe({}, {}, cb1),
+        room2 = collection.subscribe({}, cb2);
 
-      collection.subscribe({}, {}, cb1);
-      collection.subscribe({}, cb2);
+      should(room1.subscribe).be.calledOnce();
+      should(room1.on).be.calledOnce();
+      should(room1.on).be.calledWith('document', cb1);
 
-      should(kuzzle.query).be.calledTwice();
+      should(room2.subscribe).be.calledOnce();
+      should(room2.on).be.calledOnce();
+      should(room2.on).be.calledWith('document', cb2);
+    });
+
+    it('should handle the option arguments correctly', function () {
+      var
+        cb = sinon.stub(),
+        opts1 = {
+          scope: 'optscope',
+          state: 'optstate',
+          subscribeToSelf: 'fake'
+        },
+        opts2 = {
+          scope: 'optscope',
+          state: 'optstate',
+          subscribeToSelf: false
+        },
+        opts3 = {
+          users: 'in'
+        },
+        room1 = collection.subscribe({}, opts1, cb),
+        room2 = collection.subscribe({}, opts2, cb),
+        room3 = collection.subscribe({}, opts3, cb);
+
+      should(room1.subscribe).be.calledOnce();
+      should(room1.scope).be.equal('optscope');
+      should(room1.state).be.equal('optstate');
+      should(room1.users).be.equal('none');
+      should(room1.subscribeToSelf).be.true();
+      should(room1.on).be.calledOnce();
+      should(room1.on).be.calledWith('document', cb);
+
+      should(room2.subscribe).be.calledOnce();
+      should(room2.scope).be.equal('optscope');
+      should(room2.state).be.equal('optstate');
+      should(room2.users).be.equal('none');
+      should(room2.subscribeToSelf).be.false();
+      should(room2.on).be.calledOnce();
+      should(room2.on).be.calledWith('document', cb);
+
+      should(room3.subscribe).be.calledOnce();
+      should(room3.scope).be.equal('all');
+      should(room3.state).be.equal('done');
+      should(room3.users).be.equal('in');
+      should(room3.subscribeToSelf).be.true();
+      should(room3.on).be.calledOnce();
+      should(room3.on).be.calledWith('user', cb);
     });
 
     it('should raise an error if no callback is provided', function () {
       should(function () { collection.subscribe({}); }).throw(Error);
-      should(kuzzle.query).not.be.called();
     });
   });
 

@@ -2,8 +2,7 @@ var
   KuzzleSearchResult = require('./SearchResult'),
   Document = require('./Document'),
   CollectionMapping = require('./CollectionMapping'),
-  Room = require('./Room'),
-  SubscribeResult = require('./SubscribeResult');
+  Room = require('./Room');
 
 /**
  * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
@@ -68,7 +67,7 @@ function Collection(kuzzle, collection, index) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['publishMessage', 'setHeaders', 'subscribe'];
+        var blacklist = ['setHeaders', 'subscribe'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -761,10 +760,6 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
 
   request.scrollId = scrollId;
 
-  if (options && options.scroll) {
-    request.scroll = options.scroll;
-  }
-
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
     var documents = [];
 
@@ -820,10 +815,6 @@ Collection.prototype.scrollSpecifications = function (scrollId, options, cb) {
 
   this.kuzzle.callbackRequired('Collection.scrollSpecifications', cb);
 
-  if (options && options.scroll) {
-    data.scroll = options.scroll;
-  }
-
   this.kuzzle.query(
     { controller: 'collection', action: 'scrollSpecifications'},
     this.kuzzle.addHeaders(data, this.headers),
@@ -861,32 +852,43 @@ Collection.prototype.searchSpecifications = function (filters, options, cb) {
 };
 
 /**
+ * Create a subscription room to this data collection with a set of filters.
+ * To subscribe to the entire data collection, simply provide an empty filter.
+ *
+ * @param {object} filters - Filters in Kuzzle DSL format
+ * @param {object} [options] - subscriptions options
+ * @returns {*} KuzzleRoom object
+ */
+Collection.prototype.room = function (filters, options) {
+  return new Room(this, filters, options);
+};
+
+/**
  * Subscribes to this data collection with a set of filters.
  * To subscribe to the entire data collection, simply provide an empty filter.
  *
  * @param {object} filters - Filters in Kuzzle DSL format
  * @param {object} [options] - subscriptions options
- * @param {responseCallback} cb - called for each new notification
- * @returns {*} KuzzleSubscribeResult object
+ * @param {responseCallback} notificationCB - called for each new notification
+ * @returns {*} KuzzleRoom object
  */
-Collection.prototype.subscribe = function (filters, options, cb) {
+Collection.prototype.subscribe = function (filters, options, notificationCB) {
   var
-    room,
-    subscribeResult;
+    evtName,
+    room;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
+  if (!notificationCB && typeof options === 'function') {
+    notificationCB = options;
     options = null;
   }
 
-  this.kuzzle.callbackRequired('Collection.subscribe', cb);
+  this.kuzzle.callbackRequired('Collection.subscribe', notificationCB);
 
-  subscribeResult = new SubscribeResult();
-  room = new Room(this, options);
+  evtName = (options && options.users && options.users !== 'none') ? 'user' : 'document';
+  room = new Room(this, filters, options);
 
-  room.renew(filters, cb, subscribeResult.done.bind(subscribeResult));
-
-  return subscribeResult;
+  room.subscribe().on(evtName, notificationCB);
+  return room;
 };
 
 /**
@@ -1024,17 +1026,6 @@ Collection.prototype.validateSpecifications = function (specifications, options,
  */
 Collection.prototype.document = function (id, content) {
   return new Document(this, id, content);
-};
-
-/**
- * Instantiate a new Room object. Workaround to the module.exports limitation, preventing multiple
- * constructors to be exposed without having to use a factory or a composed object.
- *
- * @param {object} [options] - subscription configuration
- * @constructor
- */
-Collection.prototype.room = function (options) {
-  return new Room(this, options);
 };
 
 /**

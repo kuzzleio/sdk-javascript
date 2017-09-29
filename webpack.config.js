@@ -27,6 +27,18 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
+        include: [
+          path.resolve(__dirname, './src/networkWrapper/protocols/'),
+          path.resolve(__dirname, './src/Kuzzle.js'),
+          path.resolve(__dirname, './src/Room.js')
+        ],
+        loader: 'babel-loader',
+        query: {
+          presets: ['es2015']
+        }
+      },
+      {
+        test: /\.js$/,
         loader: 'eslint-loader',
         include: path.resolve(__dirname, './src/'),
         exclude: /node_modules/
