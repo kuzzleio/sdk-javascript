@@ -10,9 +10,11 @@ var
  */
 
 describe('Network Wrapper', function () {
-  beforeEach(function () {
-    window = undefined; // eslint-disable-line
-    WebSocket = undefined; // eslint-disable-line
+  afterEach(function () {
+    // eslint-disable-next-line no-native-reassign, no-global-assign
+    window = undefined;
+    // eslint-disable-next-line no-native-reassign, no-global-assign
+    WebSocket = undefined;
   });
 
   it('should instantiate a WS object in NodeJS environment', function() {
