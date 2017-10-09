@@ -42,6 +42,10 @@ function Kuzzle (host, options, cb) {
 
   Object.defineProperties(this, {
     // 'private' properties
+    cleanHistoryTimer: {
+      value: null,
+      writable: true
+    },
     collections: {
       value: {},
       writable: true
@@ -289,7 +293,7 @@ function Kuzzle (host, options, cb) {
     this.state = 'ready';
   }
 
-  cleanHistory(this.requestHistory);
+  this.cleanHistoryTimer = setInterval(function () { cleanHistory(self.requestHistory); }, 1000);
 
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
@@ -847,10 +851,6 @@ function cleanHistory (requestHistory) {
       delete requestHistory[key];
     }
   });
-
-  setTimeout(function () {
-    cleanHistory(requestHistory);
-  }, 1000);
 }
 
 /**
@@ -1162,6 +1162,7 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
 Kuzzle.prototype.disconnect = function () {
   var collection;
 
+  clearInterval(this.cleanHistoryTimer);
   this.state = 'disconnected';
   this.network.close();
   this.network = null;
