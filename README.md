@@ -66,8 +66,13 @@ To run the SDK in the browser, you need to pick the [built version available her
 ```html
 <script type="text/javascript" src="dist/kuzzle.js"></script>
 ```
+The browser version is also available from CDN:
 
-If you want to support older browser versions, you may want to load Socket.io before Kuzzle, making the SDK compatible with browsers without websocket support:
+```html
+<script type="text/javascript" src="https://cdn.rawgit.com/kuzzleio/sdk-javascript/master/dist/kuzzle.js"></script>
+```
+
+If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
 
 ```html
 <!-- Don't forget to include socketio before Kuzzle SDK -->
