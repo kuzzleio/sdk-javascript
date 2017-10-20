@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "5.0.9",
+  "version": "5.0.10",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "codecov": "^2.2.0",
-    "eslint": "^4.0.0",
+    "eslint": "^4.7.0",
     "eslint-friendly-formatter": "^3.0.0",
     "istanbul": "0.4.5",
     "istanbul-middleware": "0.2.2",
