@@ -59,15 +59,13 @@ This SDK can be used either in NodeJS or in a browser.
 npm install kuzzle-sdk --save
 ```
 
-### Javascript
+### Browser
 
-Clone this github repository and run ``npm run build``. A ``dist`` directory will be created, containing a browser version of this SDK.
-
+To run the SDK in the browser, you need to pick the [built version available here](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/master/dist/kuzzle.js). You can also build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
 
 ```html
 <script type="text/javascript" src="dist/kuzzle.js"></script>
 ```
-
 The browser version is also available from CDN:
 
 ```html
@@ -79,6 +77,23 @@ If you want to support older browser versions, you may load `socket.io` before K
 ```html
 <!-- Don't forget to include socketio before Kuzzle SDK -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
+```
+
+#### Browser with Webpack
+
+If you use Webpack, you'll likely use the NPM-packaged version of the SDK (like in Node)
+
+```
+npm install kuzzle-sdk --save
+```
+
+But you'll still need to pick the built version (which ships with the package).
+
+```javascript
+// with the classic require...
+let Kuzzle = require('kuzzle-sdk/dist/kuzzle.js')
+// ... or with the new import directive.
+import Kuzzle from 'kuzzle-sdk/dist/kuzzle.js'
 ```
 
 ## License

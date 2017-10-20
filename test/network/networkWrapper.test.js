@@ -10,8 +10,10 @@ var
 
 describe('Network Wrapper', function () {
   afterEach(function () {
-    window = undefined; // eslint-disable-line
-    WebSocket = undefined; // eslint-disable-line
+    // eslint-disable-next-line no-native-reassign, no-global-assign
+    window = undefined;
+    // eslint-disable-next-line no-native-reassign, no-global-assign
+    WebSocket = undefined;
   });
 
   it('should instantiate a WebSocket object if not in a Web Browser', function () {

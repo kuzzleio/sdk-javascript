@@ -274,9 +274,9 @@ describe('Collection methods', function () {
 
       this.timeout(50);
 
-      should(collection.create(options, function (err, res) {
+      should(collection.create(options, function (err, coll) {
         should(err).be.null();
-        should(res).be.an.Object().and.be.exactly(result);
+        should(coll).be.an.Object().and.be.exactly(collection);
         done();
       })).be.exactly(collection);
 
