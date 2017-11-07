@@ -14,7 +14,7 @@ function NetworkWrapperMock (host, port, sslConnection) {
 
   this.connect = function() {
     this.connectCalled = true;
-    process.nextTick(function () {
+    setTimeout(function () {
       switch (self.host) {
         case 'nowhere':
           self.emit('networkError', new Error('Mock Error'));
@@ -25,7 +25,7 @@ function NetworkWrapperMock (host, port, sslConnection) {
         default:
           self.emit('connect');
       }
-    });
+    }, 0);
   };
 
   this.disconnect = function() {

@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "test": "npm run --silent lint && npm run unit-testing",
-    "unit-testing": "istanbul cover _mocha  -- --recursive",
+    "unit-testing": "istanbul cover _mocha",
     "lint": "eslint --max-warnings=0 ./src ./test",
     "build": "node build.js"
   },

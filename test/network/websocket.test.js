@@ -150,12 +150,30 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
+    websocket.wasConnected = true;
     clientStub.onclose(4666, 'foobar');
 
     setTimeout(function () {
       should(cb.calledOnce).be.true();
       should(cb.calledWith('foobar'));
       should(websocket.listeners('networkError').length).be.eql(1);
+      done();
+    }, 0);
+  });
+
+  it('should not raise an error on a "disconnect" event if the socket has not been opened', function (done) {
+    var cb = sinon.stub();
+
+    websocket.retrying = false;
+    websocket.onConnectError(cb);
+    should(websocket.listeners('networkError').length).be.eql(1);
+
+    websocket.connect();
+    websocket.wasConnected = false;
+    clientStub.onclose(4666, 'foobar');
+
+    setTimeout(function () {
+      should(cb.calledOnce).be.false();
       done();
     }, 0);
   });

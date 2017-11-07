@@ -978,7 +978,7 @@ describe('Kuzzle methods', function () {
 
   describe('#createMyCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
@@ -1022,7 +1022,7 @@ describe('Kuzzle methods', function () {
 
   describe('#deleteMyCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
@@ -1065,7 +1065,7 @@ describe('Kuzzle methods', function () {
 
   describe('#getMyCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
@@ -1109,7 +1109,7 @@ describe('Kuzzle methods', function () {
 
   describe('#updateMyCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
@@ -1153,7 +1153,7 @@ describe('Kuzzle methods', function () {
 
   describe('#validateMyCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {

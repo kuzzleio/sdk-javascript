@@ -65,7 +65,7 @@ function WSNode(host, port, ssl) {
       if (status === 1000) {
         self.emitEvent('disconnect');
       }
-      else {
+      else if (self.wasConnected) {
         error = new Error(reason);
         error.status = status;
 

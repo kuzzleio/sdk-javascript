@@ -380,7 +380,7 @@ describe('Query management', function () {
   });
 
   describe('#cleanHistory', function () {
-    it('should be started by kuzzle constructor', function () {
+    it('should be started once connected to a network', function () {
       var 
         cleanStub = sinon.stub(),
         clock = sinon.useFakeTimers(),
@@ -388,13 +388,21 @@ describe('Query management', function () {
 
       // we need to re-import so that fake timers can take effect
       Kuzzle = rewire('../../src/Kuzzle');
-      Kuzzle.__set__('cleanHistory', cleanStub);
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
+      Kuzzle.__set__({
+        networkWrapper: function(host, port, sslConnection) {
+          return new NetworkWrapperMock(host, port, sslConnection);
+        },
+        cleanHistory: cleanStub
+      });
+      kuzzle = new Kuzzle('foo');
+
+      should(kuzzle.cleanHistoryTimer).be.null();
 
       clock.tick(1000);
 
       should(kuzzle.cleanHistoryTimer).be.not.null();
       should(cleanStub.calledOnce).be.true();
+      should(kuzzle.state).be.eql('connected');
 
       clock.restore();
     });
@@ -406,6 +414,11 @@ describe('Query management', function () {
         kuzzle;
 
       Kuzzle = rewire('../../src/Kuzzle');
+      Kuzzle.__set__({
+        networkWrapper: function(host, port, sslConnection) {
+          return new NetworkWrapperMock(host, port, sslConnection);
+        }
+      });
       kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
       for (i = 100000; i >= 0; i -= 10000) {

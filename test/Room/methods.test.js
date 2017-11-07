@@ -152,6 +152,7 @@ describe('Room methods', function () {
 
       should(room.subscribing).be.false();
       should(kuzzle.query).be.called();
+      kuzzle.disconnect();
     });
 
     it('should register itself in the global subscription list', function () {

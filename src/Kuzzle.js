@@ -293,8 +293,6 @@ function Kuzzle (host, options, cb) {
     this.state = 'ready';
   }
 
-  this.cleanHistoryTimer = setInterval(function () { cleanHistory(self.requestHistory); }, 1000);
-
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
       suffix: 'Promise',
@@ -357,6 +355,11 @@ Kuzzle.prototype.connect = function () {
 
   self.network.onConnect(function () {
     self.state = 'connected';
+
+    if (!self.cleanHistoryTimer) {
+      self.cleanHistoryTimer = setInterval(function () { cleanHistory(self.requestHistory); }, 1000);
+    }
+
     renewAllSubscriptions.call(self);
     dequeue.call(self);
     self.emitEvent('connected');
@@ -1164,8 +1167,11 @@ Kuzzle.prototype.disconnect = function () {
 
   clearInterval(this.cleanHistoryTimer);
   this.state = 'disconnected';
-  this.network.close();
-  this.network = null;
+
+  if (this.network) {
+    this.network.close();
+    this.network = null;
+  }
 
   for (collection in this.collections) {
     if (this.collections.hasOwnProperty(collection)) {
