@@ -419,23 +419,28 @@ describe('Query management', function () {
           return new NetworkWrapperMock(host, port, sslConnection);
         }
       });
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
+      kuzzle = new Kuzzle('foo');
 
       for (i = 100000; i >= 0; i -= 10000) {
         kuzzle.requestHistory[i] = -i;
       }
 
+      should(Object.keys(kuzzle.requestHistory).length).be.eql(11);
       clock.tick(1000);
 
       // should only contains i == 0 entry
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+      should(Object.keys(kuzzle.requestHistory).length).be.eql(1);
+      should(Object.keys(kuzzle.requestHistory)).eql(['0']);
 
       kuzzle.requestHistory.foobar = -100000;
+      should(Object.keys(kuzzle.requestHistory).length).be.eql(2);
 
       clock.tick(1000);
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
+      should(Object.keys(kuzzle.requestHistory).length).be.eql(1);
+      should(Object.keys(kuzzle.requestHistory)).eql(['0']);
 
       clock.restore();
+      kuzzle.disconnect();
     });
   });
 });
