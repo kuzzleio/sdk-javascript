@@ -315,7 +315,7 @@ describe('Security profiles methods', function () {
 
   describe('#scrollProfiles', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
       result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ] } };
     });
 

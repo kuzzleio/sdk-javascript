@@ -435,45 +435,63 @@ describe('Network query management', function () {
   describe('#cleanHistory', function () {
     it('should be started by network wrapper constructor', function () {
       var
-        network, // eslint-disable-line
-        cleanStub = sinon.stub();
+        clock = sinon.useFakeTimers(),
+        cleanStub = sinon.stub(),
+        network;
 
+      RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
       RTWrapper.__set__('cleanHistory', cleanStub);
       network = new RTWrapper('somewhere', {connect: 'manual'});
 
-      should(cleanStub).be.calledOnce();
-    });
+      should(network.cleanHistoryTimer).be.null();
+      should(cleanStub).not.be.called();
 
+      network.clientConnected();
+      
+      should(network.cleanHistoryTimer).be.not.null();
+      should(cleanStub).not.be.called();
+
+      clock.tick(1000);
+
+      should(network.cleanHistoryTimer).be.not.null();
+      should(cleanStub).be.calledOnce();
+
+      network.clearHistoryTimer();
+      should(network.cleanHistoryTimer).be.null();
+
+      clock.restore();
+    });
+    
     it('should clean oldest entries every 1s', function () {
       var
-        clock,
         i,
+        clock = sinon.useFakeTimers(),
         network;
 
-      delete(require.cache[require.resolve('../../src/networkWrapper/protocols/abstract/realtime')]);
-      RTWrapper = require('../../src/networkWrapper/protocols/abstract/realtime');
-
-      clock = sinon.useFakeTimers();
-
+      RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
       network = new RTWrapper('somewhere', {connect: 'manual'});
+      network.clientConnected();
 
       for (i = 100000; i >= 0; i -= 10000) {
         network.requestHistory[i] = -i;
       }
 
+      should(Object.keys(network.requestHistory).length).be.eql(11);
       clock.tick(1000);
 
       // should only contains i == 0 entry
       should(Object.keys(network.requestHistory).length).be.eql(1);
-      should(Object.keys(network.requestHistory)).match(['0']);
+      should(Object.keys(network.requestHistory)).eql(['0']);
 
       network.requestHistory.foobar = -100000;
+      should(Object.keys(network.requestHistory).length).be.eql(2);
 
       clock.tick(1000);
       should(Object.keys(network.requestHistory).length).be.eql(1);
-      should(Object.keys(network.requestHistory)).match(['0']);
+      should(Object.keys(network.requestHistory)).eql(['0']);
 
       clock.restore();
+      network.clearHistoryTimer();
     });
   });
 });
