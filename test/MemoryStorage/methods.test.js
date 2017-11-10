@@ -177,8 +177,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', body: {seconds: 42}},
       {},
-      1,
-      1
+      0,
+      false
     );
   });
 
@@ -190,12 +190,12 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {timestamp: 123456789}},
       {},
       1,
-      1
+      true
     );
   });
 
   it('#flushdb', function () {
-    return testWriteCommand('flushdb', [], {}, {}, {}, 'OK', 'OK');
+    return testWriteCommand('flushdb', [], {}, {}, {}, 'OK', undefined);
   });
 
   it('#geoadd', function () {
@@ -378,8 +378,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', field: 'field'},
       {},
-      1,
-      1
+      0,
+      false
     );
   });
 
@@ -480,7 +480,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {entries: entries}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -504,7 +504,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {field: 'field', value: 'value'}},
       {},
       1,
-      1
+      true
     );
   });
 
@@ -515,8 +515,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', body: {field: 'field', value: 'value'}},
       {},
-      1,
-      1
+      0,
+      false
     );
   });
 
@@ -696,7 +696,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {index: 1, value: 'foo'}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -708,7 +708,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {start: 1, stop: 2}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -737,7 +737,7 @@ describe('MemoryStorage methods', function () {
       {body: {entries: entries}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -748,13 +748,13 @@ describe('MemoryStorage methods', function () {
     ];
 
     return testWriteCommand(
-      'mset',
+      'msetnx',
       [entries],
       {},
       {body: {entries: entries}},
       {},
       1,
-      1
+      true
     );
   });
 
@@ -778,7 +778,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key'},
       {},
       1,
-      1
+      true
     );
   });
 
@@ -789,8 +789,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', body: {milliseconds: 42000}},
       {},
-      1,
-      1
+      0,
+      false
     );
   });
 
@@ -802,7 +802,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {timestamp: 123456789}},
       {},
       1,
-      1
+      true
     );
   });
 
@@ -813,8 +813,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', body: {elements: ['foo', 'bar', 'baz']}},
       {},
-      1,
-      1
+      0,
+      false
     );
   });
 
@@ -838,7 +838,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {sources: ['key1', 'key2', 'key3']}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -854,7 +854,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {value: 'value', milliseconds: 42000}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -882,7 +882,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {newkey: 'newId'}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -893,8 +893,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', body: {newkey: 'newId'}},
       {},
-      'OK',
-      'OK'
+      1,
+      true
     );
   });
 
@@ -1014,7 +1014,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {value: 'foo'}},
       {ex: 0, nx: true, px: 42, xx: true},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -1026,7 +1026,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {value: 'foo', seconds: 42}},
       {},
       'OK',
-      'OK'
+      undefined
     );
   });
 
@@ -1038,7 +1038,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {value: 'foo'}},
       {},
       1,
-      1
+      true
     );
   });
 
@@ -1073,8 +1073,8 @@ describe('MemoryStorage methods', function () {
       {},
       {_id: 'key', member: 'foobar'},
       {},
-      123,
-      123
+      0,
+      false
     );
   });
 
@@ -1098,7 +1098,7 @@ describe('MemoryStorage methods', function () {
       {_id: 'key', body: {destination: 'dest', member: 'member'}},
       {},
       1,
-      1
+      true
     );
   });
 
