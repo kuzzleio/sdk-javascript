@@ -68,7 +68,7 @@ describe('User methods', function () {
   describe('#replace', function () {
     beforeEach(function () {
       sandbox.reset();
-      kuzzle = new Kuzzle('http://localhost:7512');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
       result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });

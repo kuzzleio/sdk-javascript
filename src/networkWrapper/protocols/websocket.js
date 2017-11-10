@@ -55,7 +55,9 @@ class WSNode extends RTWrapper {
       if (status === 1000) {
         this.clientDisconnected();
       }
-      else {
+      // do not forward a connection close error if no 
+      // connection has been previously established
+      else if (this.wasConnected) {
         const error = new Error(reason);
         error.status = status;
 

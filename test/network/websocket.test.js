@@ -227,6 +227,7 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
+    websocket.wasConnected = true;
     clientStub.onclose(4666, 'foobar');
 
     clock.tick(10);

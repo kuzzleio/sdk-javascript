@@ -9,6 +9,10 @@ class RTWrapper extends KuzzleEventEmitter {
     super();
 
     Object.defineProperties(this, {
+      cleanHistoryTimer: {
+        value: null,
+        writable: true
+      },
       host: {
         value: host,
         writable: false,
@@ -113,8 +117,6 @@ class RTWrapper extends KuzzleEventEmitter {
       writable: true
     });
 
-    cleanHistory(this.requestHistory);
-
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
@@ -143,6 +145,12 @@ class RTWrapper extends KuzzleEventEmitter {
     if (this.autoReplay) {
       this.playQueue();
     }
+
+    if (!this.cleanHistoryTimer) {
+      this.cleanHistoryTimer = setInterval(() => { 
+        cleanHistory(this.requestHistory); 
+      }, 1000);
+    }
   }
 
   /**
@@ -154,6 +162,7 @@ class RTWrapper extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
+    this.clearHistoryTimer();
     this.emitEvent('disconnect');
   }
 
@@ -167,6 +176,8 @@ class RTWrapper extends KuzzleEventEmitter {
     if (this.autoQueue) {
       this.startQueuing();
     }
+
+    this.clearHistoryTimer();
 
     this.emitEvent('networkError', error);
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
@@ -254,6 +265,13 @@ class RTWrapper extends KuzzleEventEmitter {
     }
 
     return discardRequest(object, cb);
+  }
+
+  clearHistoryTimer() {
+    if (this.cleanHistoryTimer) {
+      clearInterval(this.cleanHistoryTimer);
+      this.cleanHistoryTimer = null;
+    }
   }
 }
 /**
@@ -374,17 +392,14 @@ function dequeue (network) {
  * Clean history from requests made more than 10s ago
  */
 function cleanHistory (requestHistory) {
-  const now = Date.now();
+  var
+    now = Date.now();
 
-  for (const key in requestHistory) {
+  Object.keys(requestHistory).forEach(function (key) {
     if (requestHistory[key] < now - 10000) {
       delete requestHistory[key];
     }
-  }
-
-  setTimeout(function () {
-    cleanHistory(requestHistory);
-  }, 1000);
+  });
 }
 
 module.exports = RTWrapper;
