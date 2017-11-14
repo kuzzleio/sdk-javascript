@@ -2,7 +2,7 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
+  AbstractWrapper = rewire('../../src/networkWrapper/protocols/abstract/common');
 
 describe('Offline queue management', function () {
   var
@@ -14,13 +14,13 @@ describe('Offline queue management', function () {
   beforeEach(function () {
     var pastTime = 60050;
 
-    network = new RTWrapper('somewhere');
+    network = new AbstractWrapper('somewhere');
 
     // queuing a bunch of 7 requests from 1min ago to right now, 10s apart
     now = Date.now();
     clock = sinon.useFakeTimers(now);
 
-    reset = RTWrapper.__set__({
+    reset = AbstractWrapper.__set__({
       setTimeout: clock.setTimeout,
       setInterval: clock.setInterval,
       clearTimeout: clock.clearTimeout,
@@ -40,7 +40,7 @@ describe('Offline queue management', function () {
 
   describe('#cleanQueue', function () {
     var
-      cleanQueue = RTWrapper.__get__('cleanQueue');
+      cleanQueue = AbstractWrapper.__get__('cleanQueue');
 
     it('should remove outdated queued requests', function () {
       var eventStub = sinon.stub();
@@ -92,11 +92,11 @@ describe('Offline queue management', function () {
     var
       emitRequestRevert,
       emitRequestStub,
-      dequeue = RTWrapper.__get__('dequeue');
+      dequeue = AbstractWrapper.__get__('dequeue');
 
     before(function () {
       emitRequestStub = sinon.stub();
-      emitRequestRevert = RTWrapper.__set__('emitRequest', emitRequestStub);
+      emitRequestRevert = AbstractWrapper.__set__('emitRequest', emitRequestStub);
     });
 
     after(function () {
@@ -212,7 +212,7 @@ describe('Offline queue management', function () {
 
     before(function () {
       dequeueStub = sinon.stub();
-      dequeueRevert = RTWrapper.__set__('dequeue', dequeueStub);
+      dequeueRevert = AbstractWrapper.__set__('dequeue', dequeueStub);
     });
 
     after(function () {
