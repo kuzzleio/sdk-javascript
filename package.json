@@ -28,6 +28,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "3.5.0",
+    "xmlhttprequest": "1.8.0",
     "uuid": "3.1.0",
     "ws": "3.0.0"
   },
