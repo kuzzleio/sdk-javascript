@@ -68,6 +68,13 @@ class RTWrapper extends AbtractWrapper {
   }
 
   /**
+   * Called when the client's connection is closed
+   */
+  clientDisconnected() {
+    this.emit('disconnect');
+  }
+
+  /**
    * Called when the client's connection is closed with an error state
    *
    * @param {Error} error

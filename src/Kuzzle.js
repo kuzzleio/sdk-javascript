@@ -365,7 +365,10 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.addListener('disconnect', () => {
-      this.disconnect();
+      for (const collection of Object.keys(this.collections)) {
+        delete this.collections[collection];
+      }
+
       this.emit('disconnected');
     });
 
@@ -941,10 +944,6 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   disconnect () {
     this.network.close();
-
-    for (const collection of Object.keys(this.collections)) {
-      delete this.collections[collection];
-    }
   }
 
   /**

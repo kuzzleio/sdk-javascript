@@ -122,13 +122,11 @@ class AbtractWrapper extends KuzzleEventEmitter {
   /**
    * Called when the client's connection is closed
    */
-  clientDisconnected() {
+  disconnect() {
     this.state = 'offline';
     if (this.autoQueue) {
       this.startQueuing();
     }
-
-    this.emit('disconnect');
   }
 
   /**
