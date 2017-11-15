@@ -1,7 +1,6 @@
 'use strict';
 
 const
-  XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest,
   AbtractWrapper = require('./abstract/common');
 
 class HttpWrapper extends AbtractWrapper {
@@ -9,8 +8,8 @@ class HttpWrapper extends AbtractWrapper {
   constructor(host, options) {
     super(host, options);
     Object.defineProperties(this, {
-      urlPrefix: {
-        value: (this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port,
+      protocol: {
+        value: (this.ssl ? 'https:' : 'http:'),
         writeable: false,
         enumerable: false
       },
@@ -26,20 +25,14 @@ class HttpWrapper extends AbtractWrapper {
    * Connect to the websocket server
    */
   connect () {
-    const
-      url = this.urlPrefix,
-      xhr = new XMLHttpRequest(),
-      method = 'GET';
+    sendHttpRequest(this, 'GET', '/', (err, res) => {
+      if (err) {
+        return this.emitEvent('networkError', err);
+      }
 
-    xhr.open(method, url);
-
-    xhr.onload = () => {
-      const response = JSON.parse(xhr.responseText);
-      this.httpRoutes = response.result.serverInfo.kuzzle.api.routes;
+      this.httpRoutes = res.result.serverInfo.kuzzle.api.routes;
       this.clientConnected();
-    };
-
-    xhr.send();
+    });
   }
 
   /**
@@ -55,27 +48,24 @@ class HttpWrapper extends AbtractWrapper {
     }
 
     const
-      xhr = new XMLHttpRequest(),
       method = route.http.verb,
-      regex = /\/\:([^\/]*)/;
+      regex = /\/\:([^\/]*)/; //eslint-disable-line
 
     let
-      matches,
-      url = route.http.url;
+      url = route.http.url,
+      matches = regex.exec(url);
 
-    while (matches = regex.exec(url)) {
+    while (matches) {
       url = url.replace(regex, '/' + payload[ matches[1] ]);
+      matches = regex.exec(url);
     }
 
-    xhr.open(method, this.urlPrefix + url);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.onload = () => {
-      const response = JSON.parse(xhr.responseText);
-      this.emitEvent(payload.requestId, response);
-    };
-
-    xhr.send(JSON.stringify(payload.body));
+    sendHttpRequest(this, method, url, payload.body, (error, response) => {
+      if (error && response) {
+        response.error = error;
+      }
+      this.emitEvent(payload.requestId, response || {error});
+    });
   }
 
   /**
@@ -86,5 +76,68 @@ class HttpWrapper extends AbtractWrapper {
   }
 
 }
+
+/**
+ * Handles HTTP Request
+ *
+ */
+function sendHttpRequest (network, method, path, body, cb) {
+  if (!cb && typeof body === 'function') {
+    cb = body;
+    body = null;
+  }
+
+  if (typeof XMLHttpRequest === 'undefined') { // NodeJS implementation, using http.request:
+    const
+      http = network.ssl && require('https') || require('http'),
+      reqBody = body && JSON.stringify(body) || '',
+      options = {
+        protocol: network.protocol,
+        host: network.host,
+        port: network.port,
+        method,
+        path,
+        headers: {
+          'Content-Length': Buffer.byteLength(reqBody),
+          'Content-Type': 'application/json'
+        }
+      },
+      req = http.request(options, res => {
+        let response = '';
+
+        res.on('data', chunk => {
+          response += chunk;
+        });
+
+        res.on('end', () => {
+          cb(null, JSON.parse(response));
+        });
+      });
+
+    req.write(reqBody);
+
+    req.on('error', err => {
+      cb(err);
+    });
+
+    req.end();
+
+  } else { // Browser implementation, using XMLHttpRequest:
+    const
+      xhr = new XMLHttpRequest(),
+      url = network.protocol + '//' + network.host + ':' + network.port + path;
+
+    xhr.open(method, url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.onload = () => {
+      const response = JSON.parse(xhr.responseText);
+      cb(null, response);
+    };
+
+    xhr.send(body && JSON.stringify(body));
+  }
+}
+
 
 module.exports = HttpWrapper;
