@@ -30,7 +30,9 @@ describe('Room methods', function () {
         action: 'count',
         controller: 'realtime'
       };
+
       room.roomId = 'foobar';
+      room.active = true;
     });
 
     it('should send the right query to Kuzzle', function () {
@@ -76,7 +78,7 @@ describe('Room methods', function () {
     });
 
     it('should fail if the room has no room ID', function () {
-      room.roomId = undefined;
+      room = new Room(collection, {equals: {foo: 'bar'}});
       should(function () {room.count(sinon.stub());}).throw('Room.count: cannot count subscriptions on an inactive room');
     });
   });
@@ -212,7 +214,7 @@ describe('Room methods', function () {
     it('should call immediatly the callback if the room subscription is already active', function() {
       var cb = sinon.stub();
 
-      room.roomId = 'foobar';
+      room.active = true;
       room.onDone(cb);
 
       should(room.listeners('done')).be.empty();
@@ -328,7 +330,7 @@ describe('Room methods', function () {
       should(room.lastRenewal).be.within(before, Date.now());
 
       kuzzle.subscribe.reset();
-      room.roomId = null;
+      room.active = false;
       room.subscribe(cb);
       should(kuzzle.subscribe).be.calledOnce();
       should(kuzzle.subscribe).calledWith(room, null);
@@ -365,7 +367,7 @@ describe('Room methods', function () {
         spy = sinon.spy(room,'onDone'),
         cb = sinon.stub();
 
-      room.roomId = 'roomId';
+      room.active = true;
       room.subscribe(cb);
       should(kuzzle.subscribe).not.be.called();
       should(spy).be.calledOnce().be.calledWith(cb);
@@ -413,7 +415,7 @@ describe('Room methods', function () {
       should(room.channel).be.exactly('barfoo');
       kuzzle.emit('networkError', new Error('foobar'));
 
-      should(room.roomId).be.null();
+      should(room.active).be.false();
     });
 
     it('should renew the subscription when the JWT is expired', function () {
@@ -444,9 +446,8 @@ describe('Room methods', function () {
     });
 
     it('should renew the subscription when the user is reconnected and the "autoResubscribe" option is set', function () {
-      room.renew = sinon.stub();
-      room.autoResubscribe = true;
-
+      room = new Room(collection, {equals: {foo: 'bar'}}, {autoResubscribe: true});
+      sinon.stub(room, 'renew');
       room.subscribe();
       should(room.renew).not.be.called();
 
@@ -454,8 +455,8 @@ describe('Room methods', function () {
       kuzzle.emit('reconnected', {success: true});
       should(room.renew).be.calledOnce();
 
-      room.autoResubscribe = false;
-      room.renew.reset();
+      room = new Room(collection, {equals: {foo: 'bar'}}, {autoResubscribe: false});
+      sinon.stub(room, 'renew');
       kuzzle.subscribe.yield(null, result);
       kuzzle.emit('reconnected', {success: true});
       should(room.renew).not.be.called();
@@ -490,6 +491,7 @@ describe('Room methods', function () {
 
       room.roomId = 'foobar';
       room.channel = 'barfoo';
+      room.active = true;
       room.notify = sinon.stub();
     });
 
@@ -502,19 +504,19 @@ describe('Room methods', function () {
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, undefined, undefined);
 
-      room.roomId = 'foobar';
+      room.active = true;
       kuzzle.unsubscribe.reset();
       room.unsubscribe(cb);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, null, cb);
 
-      room.roomId = 'foobar';
+      room.active = true;
       kuzzle.unsubscribe.reset();
       room.unsubscribe(opts);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, opts, undefined);
 
-      room.roomId = 'foobar';
+      room.active = true;
       kuzzle.unsubscribe.reset();
       room.unsubscribe(opts, cb);
       should(kuzzle.unsubscribe).be.calledOnce();
@@ -544,7 +546,7 @@ describe('Room methods', function () {
     });
 
     it('should not send the unsubscribe request if the room is already inactive', function () {
-      room.roomId = null;
+      room.active = false;
 
       should(room.unsubscribe()).be.exactly(room);
       should(kuzzle.unsubscribe).not.be.called();

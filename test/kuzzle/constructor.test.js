@@ -73,16 +73,101 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.whoAmI).be.a.Function();
   });
 
-  it('should expose the documented properties', function () {
-    var kuzzle = new Kuzzle('somewhere');
+  it('should expose the documented writable properties', function () {
+    var 
+      kuzzle = new Kuzzle('somewhere'),
+      fn = function() {};
 
-    should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true, writable: false, configurable: false });
+    // there is no way to simply test the presence of a getter or a setter
+    // we have to manually make sure that the value can be changed
+    should(kuzzle).have.propertyWithDescriptor('autoQueue', { enumerable: true});
+    should(kuzzle.autoQueue).be.eql(false);
+    kuzzle.autoQueue = true;
+    should(kuzzle.autoQueue).be.true();
+    should(function() {kuzzle.autoQueue = 123;}).throw();
+
+    should(kuzzle).have.propertyWithDescriptor('autoReplay', { enumerable: true});
+    should(kuzzle.autoReplay).be.eql(false);
+    kuzzle.autoReplay = true;
+    should(kuzzle.autoReplay).be.true();
+    should(function() {kuzzle.autoReplay = 123;}).throw();
+
     should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('jwt', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('protocol', { enumerable: true, writable: false, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
+
+    should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true});
+    should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
+    kuzzle.offlineQueue = ['foo', 'bar'];
+    should(kuzzle.offlineQueue).be.eql(['foo', 'bar']);
+    should(function() {kuzzle.offlineQueue = {};}).throw();
+
+    should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true});
+    should(kuzzle.offlineQueueLoader).be.null();
+    kuzzle.offlineQueueLoader = fn;
+    should(kuzzle.offlineQueueLoader).be.eql(fn);
+    // special case: should be able to unset this property by providing a null value
+    kuzzle.offlineQueueLoader = null;
+    should(kuzzle.offlineQueueLoader).be.null();
+    should(function() {kuzzle.offlineQueueLoader = 123;}).throw();
+
+    should(kuzzle).have.propertyWithDescriptor('queueMaxSize', { enumerable: true });
+    should(kuzzle.queueMaxSize).be.eql(500);
+    kuzzle.queueMaxSize = 123;
+    should(kuzzle.queueMaxSize).be.eql(123);
+    should(function() {kuzzle.queueMaxSize = 'foobar';}).throw();
+
+    should(kuzzle).have.propertyWithDescriptor('queueTTL', { enumerable: true });
+    should(kuzzle.queueTTL).be.eql(120000);
+    kuzzle.queueTTL = 123;
+    should(kuzzle.queueTTL).be.eql(123);
+    should(function() {kuzzle.queueTTL = 'foobar';}).throw();
+    
+    should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true });
+    should(kuzzle.replayInterval).be.eql(10);
+    kuzzle.replayInterval = 123;
+    should(kuzzle.replayInterval).be.eql(123);
+    should(function() {kuzzle.replayInterval = 'foobar';}).throw();
+
     should(kuzzle).have.propertyWithDescriptor('volatile', { enumerable: true, writable: true, configurable: false });
+  });
+
+  it('should expose the documented read-only properties', function () {
+    var kuzzle = new Kuzzle('somewhere');
+
+    // there is no way to simply test the presence of a getter or a setter
+    // we have to manually make sure that the value cannot be changed
+    should(kuzzle).have.propertyWithDescriptor('autoReconnect', { enumerable: true });
+    should(kuzzle.autoReconnect).be.true();
+    kuzzle.autoReconnect = false;
+    should(kuzzle.autoReconnect).be.true();
+
+    should(kuzzle).have.propertyWithDescriptor('autoResubscribe', { enumerable: true });
+    should(kuzzle.autoResubscribe).be.true();
+    kuzzle.autoResubscribe = false;
+    should(kuzzle.autoResubscribe).be.true();
+
+    should(kuzzle).have.propertyWithDescriptor('host', { enumerable: true });
+    should(kuzzle.host).be.eql('somewhere');
+    kuzzle.host = 'foobar';
+    should(kuzzle.host).be.eql('somewhere');
+
+    should(kuzzle).have.propertyWithDescriptor('port', { enumerable: true });
+    should(kuzzle.port).be.eql(7512);
+    kuzzle.port = 123;
+    should(kuzzle.port).be.eql(7512);
+
+    should(kuzzle).have.propertyWithDescriptor('protocol', { enumerable: true });
+    should(kuzzle.protocol).be.eql('websocket');
+    kuzzle.protocol = 'foobar';
+    should(kuzzle.protocol).be.eql('websocket');
+
+    should(kuzzle).have.propertyWithDescriptor('reconnectionDelay', { enumerable: true });
+    should(kuzzle.reconnectionDelay).be.eql(1000);
+    kuzzle.reconnectionDelay = 123;
+    should(kuzzle.reconnectionDelay).be.eql(1000);
+
+    should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
   });
 
   it('should have right internal properties and methods', function () {

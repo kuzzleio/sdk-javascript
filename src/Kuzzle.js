@@ -233,6 +233,129 @@ function Kuzzle (host, options, cb) {
 
   this.network = networkWrapper(this.protocol, host, options);
 
+  // Properties related to the network layer
+  // Accessing a property irrelevant for a given protocol
+  // (e.g. "autoReconnect" for the HTTP layer) should
+  // throw an exception
+  Object.defineProperties(this, {
+    autoQueue: {
+      enumerable: true,
+      get: function() {
+        return self.network.autoQueue;
+      },
+      set: function(value) {
+        checkPropertyType('autoQueue', 'boolean', value);
+        self.network.autoQueue = value;
+      }
+    },
+    autoReconnect: {
+      enumerable: true,
+      get: function() {
+        return self.network.autoReconnect;
+      }
+    },
+    autoReplay: {
+      enumerable: true,
+      get: function() {
+        return self.network.autoReplay;
+      },
+      set: function(value) {
+        checkPropertyType('autoReplay', 'boolean', value);
+        self.network.autoReplay = value;
+      }
+    },
+    host: {
+      enumerable: true,
+      get: function() {
+        return self.network.host;
+      }
+    },
+    offlineQueue: {
+      enumerable: true,
+      get: function() {
+        return self.network.offlineQueue;
+      },
+      set: function(value) {
+        checkPropertyType('offlineQueue', 'array', value);
+        self.network.offlineQueue = value;
+      }
+    },
+    offlineQueueLoader: {
+      enumerable: true,
+      get: function() {
+        return self.network.offlineQueueLoader;
+      },
+      set: function(value) {
+        if (value !== null) {
+          checkPropertyType('offlineQueueLoader', 'function', value);
+        }
+        self.network.offlineQueueLoader = value;
+      }
+    },
+    port: {
+      enumerable: true,
+      get: function() {
+        return self.network.port;
+      }
+    },
+    queueFilter: {
+      enumerable: true,
+      get: function() {
+        return self.network.queueFilter;
+      },
+      set: function(value) {
+        if (typeof value !== 'function') {
+          throw new Error('Can only assign a function to the "queueFilter" property');
+        }
+        self.network.queueFilter = value;
+      }
+    },
+    queueMaxSize: {
+      enumerable: true,
+      get: function() {
+        return self.network.queueMaxSize;
+      },
+      set: function(value) {
+        checkPropertyType('queueMaxSize', 'number', value);
+        self.network.queueMaxSize = value;
+      }
+    },
+    queueTTL: {
+      enumerable: true,
+      get: function() {
+        return self.network.queueTTL;
+      },
+      set: function(value) {
+        checkPropertyType('queueTTL', 'number', value);
+        self.network.queueTTL = value;
+      }
+    },
+    replayInterval: {
+      enumerable: true,
+      get: function() {
+        return self.network.replayInterval;
+      },
+      set: function(value) {
+        if (!Number.isInteger(value)) {
+          throw new Error('Invalid value "' + value + '" assigned to the "replayInterval" property');
+        }
+        self.network.replayInterval = value;
+      }
+    },
+    reconnectionDelay: {
+      enumerable: true,
+      get: function() {
+        return self.network.reconnectionDelay;
+      }
+    },
+    sslConnection: {
+      eumerable: true,
+      get: function() {
+        return self.network.ssl;
+      }
+    }
+  });
+
   this.network.addListener('offlineQueuePush', function(data) {
     self.emitEvent('offlineQueuePush', data);
   });
@@ -1261,5 +1384,13 @@ Kuzzle.prototype.setHeaders = function (content, replace) {
 
   return self;
 };
+
+function checkPropertyType(prop, typestr, value) {
+  var wrongType = typestr === 'array' ? !Array.isArray(value) : typeof value !== typestr;
+
+  if (wrongType) {
+    throw new Error('Can only assign a ' + typestr + ' value to property "' + prop + '"');
+  }
+}
 
 module.exports = Kuzzle;

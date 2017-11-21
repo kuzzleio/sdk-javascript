@@ -23,9 +23,15 @@ class Room extends KuzzleEventEmitter {
   constructor(collection, filters, options) {
     super();
 
+    let _roomId = null;
+
     // Define properties
     Object.defineProperties(this, {
       // private properties
+      active: {
+        value: false,
+        writable: true
+      },
       channel: {
         value: null,
         writable: true
@@ -47,17 +53,20 @@ class Room extends KuzzleEventEmitter {
         value: 500
       },
       scope: {
-        value: options && options.scope ? options.scope : 'all'
+        value: options && options.scope ? options.scope : 'all',
+        enumerable: true
       },
       state: {
-        value: options && options.state ? options.state : 'done'
+        value: options && options.state ? options.state : 'done',
+        enumerable: true
       },
       subscribing: {
         value: false,
         writable: true
       },
       users: {
-        value: options && options.users ? options.users : 'none'
+        value: options && options.users ? options.users : 'none',
+        enumerable: true
       },
       // read-only properties
       collection: {
@@ -75,9 +84,13 @@ class Room extends KuzzleEventEmitter {
         writable: true
       },
       roomId: {
-        value: null,
         enumerable: true,
-        writable: true
+        get: () => _roomId,
+        set: value => {
+          if (!_roomId) {
+            _roomId = value;
+          }
+        }
       },
       volatile: {
         value: (options && options.volatile) ? options.volatile : {},
@@ -91,8 +104,7 @@ class Room extends KuzzleEventEmitter {
       },
       autoResubscribe: {
         value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : collection.kuzzle.autoResubscribe,
-        enumerable: true,
-        writable: true
+        enumerable: true
       }
     });
 
@@ -123,7 +135,7 @@ class Room extends KuzzleEventEmitter {
       return;
     }
 
-    if (!this.roomId) {
+    if (!this.active) {
       throw new Error('Room.count: cannot count subscriptions on an inactive room');
     }
 
@@ -180,7 +192,7 @@ class Room extends KuzzleEventEmitter {
     }
 
     // If the room subscription is active, just call the callback.
-    if (this.roomId) {
+    if (this.active) {
       this.emit('done', null, this);
       return this;
     }
@@ -214,9 +226,10 @@ class Room extends KuzzleEventEmitter {
       this.lastRenewal = Date.now();
       this.roomId = result.roomId;
       this.channel = result.channel;
+      this.active = true;
 
       this.kuzzle.addListener('networkError', () => {
-        this.roomId = null;
+        this.active = false;
       });
 
       this.kuzzle.addListener('tokenExpired', () => {
@@ -261,9 +274,9 @@ class Room extends KuzzleEventEmitter {
       return this;
     }
 
-    if (this.roomId) {
+    if (this.active) {
       this.kuzzle.unsubscribe(this, options, cb);
-      this.roomId = null;
+      this.active = false;
     }
 
     return this;
@@ -311,7 +324,7 @@ class Room extends KuzzleEventEmitter {
     if (this.error) {
       cb(this.error);
     }
-    else if (this.roomId) {
+    else if (this.active) {
       cb(null, this);
     }
     else {

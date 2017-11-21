@@ -57,19 +57,16 @@ describe('Room constructor', function () {
   it('should expose documented properties with the right permissions', function () {
     var room = new Room(collection, {equals: {foo: 'bar'}});
 
-    should(room).have.propertyWithDescriptor('collection', {enumerable: true, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('headers', {enumerable: true, writable: true, configurable: false});
-    should(room).have.propertyWithDescriptor('scope', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('state', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('users', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true, configurable: false});
-    should(room).have.propertyWithDescriptor('subscribeToSelf', {
-      enumerable: true,
-      writable: true,
-      configurable: false
-    });
-    should(room).have.propertyWithDescriptor('roomId', {enumerable: true, writable: true, configurable: false});
+    should(room).have.propertyWithDescriptor('autoResubscribe', {enumerable: true});
+    should(room).have.propertyWithDescriptor('collection', {enumerable: true});
+    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: false});
+    should(room).have.propertyWithDescriptor('headers', {enumerable: true, writable: true});
+    should(room).have.propertyWithDescriptor('scope', {enumerable: true});
+    should(room).have.propertyWithDescriptor('state', {enumerable: true});
+    should(room).have.propertyWithDescriptor('users', {enumerable: true});
+    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true});
+    should(room).have.propertyWithDescriptor('subscribeToSelf', {enumerable: true, writable: true});
+    should(room).have.propertyWithDescriptor('roomId', {enumerable: true});
   });
 
   it('should promisify the right functions', function () {

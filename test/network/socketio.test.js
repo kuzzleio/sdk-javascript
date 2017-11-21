@@ -70,8 +70,8 @@ describe('SocketIO network wrapper', function () {
 
       socketIO = new SocketIO('address', {
         port: 1234,
-        autoReconnect: 'autoReconnectValue',
-        reconnectionDelay: 'reconnectionDelayValue'
+        autoReconnect: false,
+        reconnectionDelay: 1234
       });
       socketIO.socket = socketStub;
 
@@ -98,20 +98,27 @@ describe('SocketIO network wrapper', function () {
       socketIO.connect();
       should(window.io).be.calledOnce();
       should(window.io).be.calledWithMatch('http://address:1234', {
-        reconnection: 'autoReconnectValue',
-        reconnectionDelay: 'reconnectionDelayValue',
+        reconnection: false,
+        reconnectionDelay: 1234,
         forceNew: true
       });
     });
 
     it('should connect with the secure connection', function () {
-      socketIO.ssl = true;
+      socketIO = new SocketIO('address', {
+        port: 1234,
+        autoReconnect: false,
+        reconnectionDelay: 1234,
+        sslConnection: true
+      });
+      socketIO.socket = socketStub;
+
       socketIO.connect();
-      should(window.io.calledWithMatch('https://address:1234', {
-        reconnection: 'autoReconnectValue',
-        reconnectionDelay: 'reconnectionDelayValue',
+      should(window.io).be.calledWithMatch('https://address:1234', {
+        reconnection: false,
+        reconnectionDelay: 1234,
         forceNew: true
-      })).be.true();
+      });
     });
 
     it('should call listeners on connect event', function () {
