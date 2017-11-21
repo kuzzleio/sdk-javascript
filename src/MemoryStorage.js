@@ -23,9 +23,7 @@ var
     mapResults: mapZrangeResults
   },
   setId = {required: ['_id']},
-  setIdValue = {required: ['_id', 'value']},
-  setIdFieldValue = {required: ['_id', 'field', 'value']},
-  setEntries = {required: ['entries']};
+  setIdValue = {required: ['_id', 'value']};
 
 // Redis commands
 var
@@ -39,9 +37,9 @@ var
     decrby: setIdValue,
     del: {required: ['keys']},
     exists: getKeys,
-    expire: {required: ['_id', 'seconds']},
-    expireat: {required: ['_id', 'timestamp']},
-    flushdb: {},
+    expire: {required: ['_id', 'seconds'], mapResults: Boolean},
+    expireat: {required: ['_id', 'timestamp'], mapResults: Boolean},
+    flushdb: {mapResults: mapNoResult},
     geoadd: {required: ['_id', 'points']},
     geodist: {
       getter: true,
@@ -68,18 +66,18 @@ var
     getrange: {getter: true, required: ['_id', 'start', 'end']},
     getset: setIdValue,
     hdel: {required: ['_id', 'fields']},
-    hexists: getIdField,
+    hexists: {getter: true, required: ['_id', 'field'], mapResults: Boolean},
     hget: getIdField,
     hgetall: {getter: true, required: ['_id']},
-    hincrby: setIdFieldValue,
+    hincrby: {required: ['_id', 'field', 'value']},
     hincrbyfloat: {required: ['_id', 'field', 'value'], mapResults: parseFloat},
     hkeys: getId,
     hlen: getId,
     hmget: {getter: true, required: ['_id', 'fields']},
-    hmset: {required: ['_id', 'entries']},
+    hmset: {required: ['_id', 'entries'], mapResults: mapNoResult},
     hscan: getxScan,
-    hset: setIdFieldValue,
-    hsetnx: setIdFieldValue,
+    hset: {required: ['_id', 'field', 'value'], mapResults: Boolean},
+    hsetnx: {required: ['_id', 'field', 'value'], mapResults: Boolean},
     hstrlen: getIdField,
     hvals: getId,
     incr: setId,
@@ -94,24 +92,24 @@ var
     lpushx: setIdValue,
     lrange: {getter: true, required: ['_id', 'start', 'stop']},
     lrem: {required: ['_id', 'count', 'value']},
-    lset: {required: ['_id', 'index', 'value']},
-    ltrim: {required: ['_id', 'start', 'stop']},
+    lset: {required: ['_id', 'index', 'value'], mapResults: mapNoResult},
+    ltrim: {required: ['_id', 'start', 'stop'], mapResults: mapNoResult},
     mget: getKeys,
-    mset: setEntries,
-    msetnx: setEntries,
+    mset: {required: ['entries'], mapResults: mapNoResult},
+    msetnx: {required: ['entries'], mapResults: Boolean},
     object: {getter: true, required: ['_id', 'subcommand']},
-    persist: setId,
-    pexpire: {required: ['_id', 'milliseconds']},
-    pexpireat: {required: ['_id', 'timestamp']},
-    pfadd: {required: ['_id', 'elements']},
+    persist: {required: ['_id'], mapResults: Boolean},
+    pexpire: {required: ['_id', 'milliseconds'], mapResults: Boolean},
+    pexpireat: {required: ['_id', 'timestamp'], mapResults: Boolean},
+    pfadd: {required: ['_id', 'elements'], mapResults: Boolean},
     pfcount: getKeys,
-    pfmerge: {required: ['_id', 'sources']},
+    pfmerge: {required: ['_id', 'sources'], mapResults: mapNoResult},
     ping: {getter: true},
-    psetex: {required: ['_id', 'value', 'milliseconds']},
+    psetex: {required: ['_id', 'value', 'milliseconds'], mapResults: mapNoResult},
     pttl: getId,
     randomkey: {getter: true},
-    rename: {required: ['_id', 'newkey']},
-    renamenx: {required: ['_id', 'newkey']},
+    rename: {required: ['_id', 'newkey'], mapResults: mapNoResult},
+    renamenx: {required: ['_id', 'newkey'], mapResults: Boolean},
     rpop: setId,
     rpoplpush: {required: ['source', 'destination']},
     rpush: {required: ['_id', 'values']},
@@ -121,14 +119,14 @@ var
     scard: getId,
     sdiff: {getter: true, required: ['_id', 'keys']},
     sdiffstore: {required: ['_id', 'keys', 'destination']},
-    set: {required: ['_id', 'value'], opts: ['ex', 'px', 'nx', 'xx']},
-    setex: {required: ['_id', 'value', 'seconds']},
-    setnx: setIdValue,
+    set: {required: ['_id', 'value'], opts: ['ex', 'px', 'nx', 'xx'], mapResults: mapNoResult},
+    setex: {required: ['_id', 'value', 'seconds'], mapResults: mapNoResult},
+    setnx: {required: ['_id', 'value'], mapResults: Boolean},
     sinter: getKeys,
     sinterstore: {required: ['destination', 'keys']},
-    sismember: getMember,
+    sismember: {getter: true, required: ['_id', 'member'], mapResults: Boolean},
     smembers: getId,
-    smove: {required: ['_id', 'destination', 'member']},
+    smove: {required: ['_id', 'destination', 'member'], mapResults: Boolean},
     sort: {getter: true, required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
     spop: {required: ['_id'], opts: ['count'], mapResults: mapStringToArray },
     srandmember: {getter: true, required: ['_id'], opts: ['count'], mapResults: mapStringToArray},
@@ -441,7 +439,7 @@ function mapGeoRadiusResults(results) {
  * @param {Array|string} results
  * @return {Array.<string>}
  */
-function mapStringToArray (results) {
+function mapStringToArray(results) {
   return Array.isArray(results) ? results : [results];
 }
 
@@ -455,6 +453,14 @@ function mapArrayStringToArrayInt(results) {
   return results.map(function (value) {
     return parseInt(value);
   });
+}
+
+/**
+ * Disable results for routes like flushdb
+ * @return {undefined}
+ */
+function mapNoResult() {
+  return undefined;
 }
 
 /**
