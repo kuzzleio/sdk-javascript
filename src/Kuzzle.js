@@ -70,11 +70,6 @@ function Kuzzle (host, options, cb) {
       writable: true,
       enumerable: true
     },
-    headers: {
-      value: {},
-      enumerable: true,
-      writable: true
-    },
     jwt: {
       value: undefined,
       enumerable: true,
@@ -102,19 +97,6 @@ function Kuzzle (host, options, cb) {
     });
   }
 
-  // Helper function copying headers to the query data
-  Object.defineProperty(this, 'addHeaders', {
-    value: function (query, headers) {
-      Object.keys(headers).forEach(function (header) {
-        if (!query[header]) {
-          query[header] = headers[header];
-        }
-      });
-
-      return query;
-    }
-  });
-
   // Forward the subscribe query to the network wrapper
   Object.defineProperty(this, 'subscribe', {
     value: function(room, opts, subscribeCB) {
@@ -125,7 +107,6 @@ function Kuzzle (host, options, cb) {
           action: 'subscribe',
           index: room.collection.index,
           collection: room.collection.collection,
-          headers: room.headers,
           volatile: this.volatile,
           body: room.filters,
           scope: room.scope,
@@ -149,8 +130,6 @@ function Kuzzle (host, options, cb) {
 
       Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
 
-      object = this.addHeaders(object, this.headers);
-
       this.network.subscribe(object, opts, notificationCB, subscribeCB);
     }
   });
@@ -164,7 +143,6 @@ function Kuzzle (host, options, cb) {
           controller: 'realtime',
           action: 'unsubscribe',
           volatile: this.volatile,
-          headers: room.headers,
           body: {roomId: room.roomId}
         };
 
@@ -179,8 +157,6 @@ function Kuzzle (host, options, cb) {
         });
       }
       object.volatile.sdkVersion = this.sdkVersion;
-
-      object = this.addHeaders(object, this.headers);
 
       this.network.unsubscribe(object, opts, room.channel, unsubscribeCB);
     }
@@ -1279,8 +1255,6 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
     }
   }
 
-  object = this.addHeaders(object, this.headers);
-
   /*
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
@@ -1356,33 +1330,6 @@ Kuzzle.prototype.setDefaultIndex = function (index) {
   this.defaultIndex = index;
 
   return this;
-};
-
-/**
- * Helper function allowing to set headers while chaining calls.
- *
- * If the replace argument is set to true, replace the current headers with the provided content.
- * Otherwise, it appends the content to the current headers, only replacing already existing values
- *
- * @param content - new headers content
- * @param [replace] - default: false = append the content. If true: replace the current headers with tj
- */
-Kuzzle.prototype.setHeaders = function (content, replace) {
-  var self = this;
-
-  if (typeof content !== 'object' || Array.isArray(content)) {
-    throw new Error('Expected a content object, received a ' + typeof content);
-  }
-
-  if (replace) {
-    self.headers = content;
-  } else {
-    Object.keys(content).forEach(function (key) {
-      self.headers[key] = content[key];
-    });
-  }
-
-  return self;
 };
 
 function checkPropertyType(prop, typestr, value) {

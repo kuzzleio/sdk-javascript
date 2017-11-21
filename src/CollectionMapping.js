@@ -31,11 +31,6 @@ function CollectionMapping(collection, mapping) {
       enumerable: true
     },
     // writable properties
-    headers: {
-      value: JSON.parse(JSON.stringify(collection.headers)),
-      enumerable: true,
-      writable: true
-    },
     mapping: {
       value: mapping || {},
       enumerable: true,
@@ -47,7 +42,7 @@ function CollectionMapping(collection, mapping) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['set', 'setHeaders'];
+        var blacklist = ['set'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -66,7 +61,11 @@ function CollectionMapping(collection, mapping) {
 CollectionMapping.prototype.apply = function (options, cb) {
   var
     self = this,
-    data = this.kuzzle.addHeaders({body: {properties: this.mapping}}, this.headers);
+    data = {
+      body: {
+        properties: this.mapping
+      }
+    };
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -96,7 +95,7 @@ CollectionMapping.prototype.apply = function (options, cb) {
 CollectionMapping.prototype.refresh = function (options, cb) {
   var
     self = this,
-    data = this.kuzzle.addHeaders({}, this.headers);
+    data = {};
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -144,20 +143,6 @@ CollectionMapping.prototype.refresh = function (options, cb) {
 CollectionMapping.prototype.set = function (field, mapping) {
   this.mapping[field] = mapping;
 
-  return this;
-};
-
-/**
- * Helper function allowing to set headers while chaining calls.
- *
- * If the replace argument is set to true, replace the current headers with the provided content.
- * Otherwise, it appends the content to the current headers, only replacing already existing values
- *
- * @param content - new headers content
- * @param [replace] - default: false = append the content. If true: replace the current headers with tj
- */
-CollectionMapping.prototype.setHeaders = function (content, replace) {
-  this.kuzzle.setHeaders.call(this, content, replace);
   return this;
 };
 

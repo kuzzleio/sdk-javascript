@@ -157,13 +157,6 @@ describe('Kuzzle query management', function () {
       should(kuzzle.network.query).be.calledWithMatch({scrollId: 'foo'});
     });
 
-    it('should add global headers without overwriting any existing query headers', function () {
-      kuzzle.headers = { foo: 'bar', bar: 'foo' };
-      kuzzle.query(queryArgs, { foo: 'foo', body: {some: 'query'}});
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({foo: 'foo', bar: 'foo'});
-    });
-
     it('should not generate a new request ID if one is already defined', function () {
       kuzzle.query(queryArgs, { body: { some: 'query'}, requestId: 'foobar'});
       should(kuzzle.network.query).be.calledOnce();

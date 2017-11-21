@@ -10,17 +10,10 @@ describe('MemoryStorage constructor', function () {
       kuzzle = new Kuzzle('foo', {connect: 'manual'}),
       ms;
 
-    kuzzle.headers.some = 'headers';
     ms = new MemoryStorage(kuzzle);
-
-    // the collection "headers" should be a hard copy of the kuzzle ones
-    kuzzle.headers = { someother: 'headers' };
 
     should(ms).be.an.instanceOf(MemoryStorage);
     should(ms).have.propertyWithDescriptor('kuzzle', {enumerable: true, writable: false, configurable: false});
-    should(ms).have.propertyWithDescriptor('headers', {enumerable: true, writable: true, configurable: false});
-    should(ms.headers.some).be.exactly('headers');
-    should(ms.headers.someother).be.undefined();
   });
 
   it('should promisify all methods', function () {
@@ -35,7 +28,7 @@ describe('MemoryStorage constructor', function () {
     ms = new MemoryStorage(kuzzle);
 
     functions = Object.getOwnPropertyNames(Object.getPrototypeOf(ms)).filter(function (p) {
-      return (typeof ms[p] === 'function' && ['constructor', 'setHeaders'].indexOf(p) === -1);
+      return typeof ms[p] === 'function' && p !== 'constructor';
     });
 
     should(functions.length).be.eql(117);
@@ -45,18 +38,6 @@ describe('MemoryStorage constructor', function () {
     });
 
     delete Kuzzle.prototype.bluebird;
-  });
-
-  it('should set headers using setHeaders', function () {
-    var
-      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
-      ms = new MemoryStorage(kuzzle);
-
-    ms.setHeaders({foo: 'bar'}, true);
-    should(ms.headers).match({foo: 'bar'});
-
-    ms.setHeaders({bar: 'foobar'}, false);
-    should(ms.headers).match({foo: 'bar', bar: 'foobar'});
   });
 
   it('auto-generated functions should throw if the wrong number of parameters is provided', function () {

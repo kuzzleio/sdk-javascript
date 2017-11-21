@@ -43,12 +43,6 @@ function Collection(kuzzle, collection, index) {
     kuzzle: {
       value: kuzzle,
       enumerable: true
-    },
-    // writable properties
-    headers: {
-      value: JSON.parse(JSON.stringify(kuzzle.headers)),
-      enumerable: true,
-      writable: true
     }
   });
 
@@ -67,7 +61,7 @@ function Collection(kuzzle, collection, index) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['setHeaders', 'subscribe'];
+        var blacklist = ['subscribe'];
 
         return passes && blacklist.indexOf(name) === -1;
       }
@@ -89,8 +83,7 @@ function Collection(kuzzle, collection, index) {
  * @param {responseCallback} cb - Handles the query response
  */
 Collection.prototype.count = function (filters, options, cb) {
-  var
-    query;
+  var query = {body: filters};
 
   if (!cb && typeof options === 'function') {
     cb = options;
@@ -98,8 +91,6 @@ Collection.prototype.count = function (filters, options, cb) {
   }
 
   this.kuzzle.callbackRequired('Collection.count', cb);
-
-  query = this.kuzzle.addHeaders({body: filters}, this.headers);
 
   this.kuzzle.query(this.buildQueryArgs('document', 'count'), query, options, function (err, res) {
     cb(err, err ? undefined : res.result.count);
@@ -124,7 +115,6 @@ Collection.prototype.create = function (options, cb) {
     options = null;
   }
 
-  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, function(err) {
     cb(err, err ? undefined : self);
   });
@@ -186,8 +176,6 @@ Collection.prototype.createDocument = function (id, document, options, cb) {
     data._id = id;
   }
 
-  data = self.kuzzle.addHeaders(data, self.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     var doc;
 
@@ -237,8 +225,6 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
     options = null;
   }
 
-  data = this.kuzzle.addHeaders(data, this.headers);
-
   this.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
     if (err) {
       cb(err);
@@ -267,8 +253,6 @@ Collection.prototype.deleteSpecifications = function (options, cb) {
     cb = options;
     options = null;
   }
-
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('collection', 'deleteSpecifications'), data, options, function (err, res) {
     cb(err, err ? undefined : res.result);
@@ -319,7 +303,6 @@ Collection.prototype.fetchDocument = function (documentId, options, cb) {
   }
 
   self.kuzzle.callbackRequired('Collection.fetch', cb);
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'get'), data, options, function (err, res) {
     var document;
@@ -383,8 +366,6 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
     return (doc instanceof Document) ? doc.serialize() : doc;
   });
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreate'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -421,8 +402,6 @@ Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb
     return (doc instanceof Document) ? doc.serialize() : doc;
   });
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreateOrReplace'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -457,8 +436,6 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
 
   self.kuzzle.callbackRequired('Collection.mDelete', cb);
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'mDelete'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -491,8 +468,6 @@ Collection.prototype.mGetDocument = function (documentIds, options, cb) {
   }
 
   self.kuzzle.callbackRequired('Collection.mGet', cb);
-
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mGet'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
@@ -527,8 +502,6 @@ Collection.prototype.mReplaceDocument = function (documents, options, cb) {
   data.body.documents = documents.map(function (doc) {
     return (doc instanceof Document) ? doc.serialize() : doc;
   });
-
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mReplace'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
@@ -566,8 +539,6 @@ Collection.prototype.mUpdateDocument = function (documents, options, cb) {
     return (doc instanceof Document) ? doc.serialize() : doc;
   });
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'mUpdate'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -592,7 +563,6 @@ Collection.prototype.getSpecifications = function (options, cb) {
   }
 
   self.kuzzle.callbackRequired('Collection.getSpecifications', cb);
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('collection', 'getSpecifications'), data, options, function (err, res) {
     cb(err, err ? undefined : res.result);
@@ -620,7 +590,6 @@ Collection.prototype.publishMessage = function (document, options, cb) {
     data.body = document;
   }
 
-  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.buildQueryArgs('realtime', 'publish'), data, options, cb);
 
   return this;
@@ -652,8 +621,6 @@ Collection.prototype.replaceDocument = function (documentId, content, options, c
     options = null;
   }
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'createOrReplace'), data, options, cb && function (err, res) {
     var document;
 
@@ -683,7 +650,7 @@ Collection.prototype.replaceDocument = function (documentId, content, options, c
 
 Collection.prototype.search = function (filters, options, cb) {
   var
-    query,
+    query = {body: filters},
     self = this;
 
   if (!cb && typeof options === 'function') {
@@ -692,8 +659,6 @@ Collection.prototype.search = function (filters, options, cb) {
   }
 
   self.kuzzle.callbackRequired('Collection.search', cb);
-
-  query = self.kuzzle.addHeaders({body: filters}, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
     var documents = [];
@@ -817,7 +782,7 @@ Collection.prototype.scrollSpecifications = function (scrollId, options, cb) {
 
   this.kuzzle.query(
     { controller: 'collection', action: 'scrollSpecifications'},
-    this.kuzzle.addHeaders(data, this.headers),
+    data,
     options,
     function (err, res) {
       cb (err, err ? undefined : res.result);
@@ -843,8 +808,6 @@ Collection.prototype.searchSpecifications = function (filters, options, cb) {
   }
 
   self.kuzzle.callbackRequired('Collection.searchSpecifications', cb);
-
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query({ controller: 'collection', action: 'searchSpecifications' }, data, options, function (err, res) {
     cb(err, err ? undefined : res.result);
@@ -907,7 +870,6 @@ Collection.prototype.truncate = function (options, cb) {
     options = null;
   }
 
-  data = this.kuzzle.addHeaders(data, this.headers);
   this.kuzzle.query(this.buildQueryArgs('collection', 'truncate'), data, options, cb);
 
   return this;
@@ -943,8 +905,6 @@ Collection.prototype.updateDocument = function (documentId, content, options, cb
     data.retryOnConflict = options.retryOnConflict;
   }
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('document', 'update'), data, options, cb && function (err, res) {
     if (err) {
       return cb(err);
@@ -978,8 +938,6 @@ Collection.prototype.updateSpecifications = function (specifications, options, c
     options = null;
   }
 
-  data = self.kuzzle.addHeaders(data, this.headers);
-
   self.kuzzle.query(this.buildQueryArgs('collection', 'updateSpecifications'), data, options, cb && function (err, res) {
     cb(err, err ? undefined : res.result);
   });
@@ -1009,7 +967,6 @@ Collection.prototype.validateSpecifications = function (specifications, options,
   }
 
   self.kuzzle.callbackRequired('Collection.validateSpecifications', cb);
-  data = self.kuzzle.addHeaders(data, this.headers);
 
   self.kuzzle.query(this.buildQueryArgs('collection', 'validateSpecifications'), data, options, function (err, res) {
     cb(err, err ? undefined : res.result.valid);
@@ -1037,20 +994,6 @@ Collection.prototype.document = function (id, content) {
  */
 Collection.prototype.collectionMapping = function (mapping) {
   return new CollectionMapping(this, mapping);
-};
-
-/**
- * Helper function allowing to set headers while chaining calls.
- *
- * If the replace argument is set to true, replace the current headers with the provided content.
- * Otherwise, it appends the content to the current headers, only replacing already existing values
- *
- * @param content - new headers content
- * @param [replace] - default: false = append the content. If true: replace the current headers with tj
- */
-Collection.prototype.setHeaders = function (content, replace) {
-  this.kuzzle.setHeaders.call(this, content, replace);
-  return this;
 };
 
 module.exports = Collection;

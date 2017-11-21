@@ -62,14 +62,6 @@ describe('Kuzzle subscription management', function () {
       should(kuzzle.network.subscribe).be.calledWithMatch({volatile: room.volatile});
     });
 
-    it('should add global headers without overwriting any existing query headers', function () {
-      kuzzle.headers = {scope: 'none', foo: 'bar'};
-      kuzzle.subscribe(room, {}, cb);
-
-      should(kuzzle.network.subscribe).be.calledOnce();
-      should(kuzzle.network.subscribe).be.calledWithMatch({scope: 'all', foo: 'bar'});
-    });
-
     it('should set jwt if present', function () {
       kuzzle.jwt = 'fake-token';
       kuzzle.subscribe(room, {}, cb);
@@ -110,14 +102,6 @@ describe('Kuzzle subscription management', function () {
 
       should(kuzzle.network.unsubscribe).be.calledOnce();
       should(kuzzle.network.unsubscribe).be.calledWithMatch({volatile: room.volatile});
-    });
-
-    it('should add global headers without overwriting any existing query headers', function () {
-      kuzzle.headers = {body: {roomId: 'none'}, foo: 'bar'};
-      kuzzle.unsubscribe(room, {}, cb);
-
-      should(kuzzle.network.unsubscribe).be.calledOnce();
-      should(kuzzle.network.unsubscribe).be.calledWithMatch({body: {roomId: 'roomId'}, foo: 'bar'});
     });
 
     it('should set jwt if present', function () {

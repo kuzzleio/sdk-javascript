@@ -196,22 +196,14 @@ function MemoryStorage(kuzzle) {
     kuzzle: {
       value: kuzzle,
       enumerable: true
-    },
-    // writable properties
-    headers: {
-      value: JSON.parse(JSON.stringify(kuzzle.headers)),
-      enumerable: true,
-      writable: true
     }
   });
-
-  this.setHeaders = kuzzle.setHeaders.bind(this);
 
   if (this.kuzzle.bluebird) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var blacklist = ['setHeaders'];
+        var blacklist = [];
 
         return passes && blacklist.indexOf(name) === -1;
       }

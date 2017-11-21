@@ -60,7 +60,6 @@ describe('Document constructor', function () {
 
     should(document).have.propertyWithDescriptor('collection', { enumerable: true, writable: false, configurable: false });
     should(document).have.propertyWithDescriptor('content', { enumerable: true, writable: true, configurable: false });
-    should(document).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(document).have.propertyWithDescriptor('id', { enumerable: true, writable: true, configurable: false });
     should(document).have.propertyWithDescriptor('version', { enumerable: true, writable: true, configurable: false });
     should(document).have.propertyWithDescriptor('meta', { enumerable: true, writable: false, configurable: false });
@@ -75,7 +74,6 @@ describe('Document constructor', function () {
     should.exist(document.refreshPromise);
     should.exist(document.savePromise);
     should.not.exist(document.setContentPromise);
-    should.not.exist(document.setHeadersPromise);
     should.not.exist(document.subscribePromise);
   });
 });

@@ -43,13 +43,6 @@ describe('CollectionMapping methods', function () {
 
       should(kuzzle.query).be.calledOnce();
       should(kuzzle.query).calledWith(expectedQuery, {body: content}, options, sinon.match.func);
-
-      kuzzle.query.reset();
-      mapping.headers = {foohead: 'barhead'};
-      mapping.apply(options, sinon.stub());
-
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {body: content, foohead: 'barhead'}, options, sinon.match.func);
     });
 
     it('should call refresh() method when invoked', function (done) {
@@ -222,17 +215,6 @@ describe('CollectionMapping methods', function () {
 
       mapping.set('foo', {type: 'string'});
       should(mapping.mapping.bar).match({type: 'string'});
-    });
-  });
-
-  describe('#setHeaders', function () {
-    it('should allow setting headers', function () {
-      var
-        mapping = new CollectionMapping(collection),
-        header = {foohead: 'barhead'};
-
-      should(mapping.setHeaders(header)).be.exactly(mapping);
-      should(mapping.headers).match(header);
     });
   });
 });

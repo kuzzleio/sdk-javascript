@@ -936,34 +936,6 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#setHeaders', function () {
-    it('should throw an error if an invalid content object is provided', function () {
-      should(function () { kuzzle.setHeaders(); }).throw(Error);
-      should(function () { kuzzle.setHeaders(123); }).throw(Error);
-      should(function () { kuzzle.setHeaders('foo'); }).throw(Error);
-      should(function () { kuzzle.setHeaders(['mama', 'mia']); }).throw(Error);
-    });
-
-    it('should set headers properly', function () {
-      should(kuzzle.setHeaders({foo: 'bar'})).be.exactly(kuzzle);
-      kuzzle.setHeaders({bar: 'baz', baz: ['bar, baz, qux', 'foo']});
-      kuzzle.setHeaders({foo: { bar: 'baz'}});
-
-      should(kuzzle.headers).match({bar: 'baz', baz: ['bar, baz, qux', 'foo'], foo: { bar: 'baz'}});
-    });
-
-    it('should replace existing headers if asked to', function () {
-      kuzzle.setHeaders({foo: 'bar'});
-
-      kuzzle.setHeaders({bar: 'foo'}, true);
-      should(kuzzle.headers).match({bar: 'foo'});
-      should(kuzzle.headers).not.match({foo: 'bar'});
-
-      kuzzle.setHeaders({}, true);
-      should(kuzzle.headers).be.empty();
-    });
-  });
-
   describe('#setJwt', function () {
     var loginAttemptStub = sinon.stub();
 

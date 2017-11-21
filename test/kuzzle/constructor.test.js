@@ -62,7 +62,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.removeListener).be.a.Function();
     should(kuzzle.setAutoRefresh).be.a.Function();
     should(kuzzle.setDefaultIndex).be.a.Function();
-    should(kuzzle.setHeaders).be.a.Function();
     should(kuzzle.setJwt).be.a.Function();
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
@@ -93,7 +92,6 @@ describe('Kuzzle constructor', function () {
     should(function() {kuzzle.autoReplay = 123;}).throw();
 
     should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('jwt', { enumerable: true, writable: true, configurable: false });
 
     should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true});
@@ -173,7 +171,6 @@ describe('Kuzzle constructor', function () {
   it('should have right internal properties and methods', function () {
     var kuzzle = new Kuzzle('somewhere');
 
-    should(kuzzle.addHeaders).be.a.Function();
     should(kuzzle.callbackRequired).be.a.Function();
     should(kuzzle.subscribe).be.a.Function();
     should(kuzzle.unsubscribe).be.a.Function();
@@ -192,7 +189,6 @@ describe('Kuzzle constructor', function () {
 
     should(kuzzle.autoResubscribe).be.true();
     should(kuzzle.defaultIndex).be.undefined();
-    should(kuzzle.headers).be.an.Object().and.be.empty();
     should(kuzzle.jwt).be.undefined();
     should(kuzzle.protocol).be.exactly('websocket');
     should(kuzzle.sdkVersion).be.exactly(sdkVersion);
@@ -239,7 +235,6 @@ describe('Kuzzle constructor', function () {
         options = {
           autoResubscribe: false,
           protocol: 'fakeproto',
-          headers: {foo: 'bar'},
           volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
           defaultIndex: 'foobar',
           jwt: 'fakejwt',
@@ -249,7 +244,6 @@ describe('Kuzzle constructor', function () {
 
       should(kuzzle.autoResubscribe).be.false();
       should(kuzzle.defaultIndex).be.exactly('foobar');
-      should(kuzzle.headers).be.an.Object().and.match(options.headers);
       should(kuzzle.jwt).be.exactly('fakejwt');
       should(kuzzle.protocol).be.exactly('fakeproto');
       should(kuzzle.sdkVersion).be.exactly(sdkVersion);
@@ -326,7 +320,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.removeListenerPromise).be.undefined();
     should(kuzzle.setAutoRefreshPromise).be.a.Function();
     should(kuzzle.setDefaultIndexPromise).be.undefined();
-    should(kuzzle.setHeadersPromise).be.undefined();
     should(kuzzle.setJwtPromise).be.undefined();
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();

@@ -293,13 +293,6 @@ describe('Room methods', function () {
     });
   });
 
-  describe('#setHeaders', function () {
-    it('should set headers properly', function () {
-      should(room.setHeaders({foo: 'bar'})).be.exactly(room);
-      should(room.headers).match({foo: 'bar'});
-    });
-  });
-
   describe('#subscribe', function() {
     var
       revert,

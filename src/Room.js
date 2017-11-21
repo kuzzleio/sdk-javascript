@@ -77,12 +77,6 @@ class Room extends KuzzleEventEmitter {
         value: filters ? filters : {},
         enumerable: true,
       },
-      // writable properties
-      headers: {
-        value: JSON.parse(JSON.stringify(collection.headers)),
-        enumerable: true,
-        writable: true
-      },
       roomId: {
         enumerable: true,
         get: () => _roomId,
@@ -92,6 +86,7 @@ class Room extends KuzzleEventEmitter {
           }
         }
       },
+      // writable properties
       volatile: {
         value: (options && options.volatile) ? options.volatile : {},
         enumerable: true,
@@ -128,7 +123,7 @@ class Room extends KuzzleEventEmitter {
   count(cb) {
     this.kuzzle.callbackRequired('Room.count', cb);
 
-    const data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
+    const data = {body: {roomId: this.roomId}};
 
     if (this.subscribing) {
       this.queue.push({action: 'count', args: [cb]});
@@ -295,20 +290,6 @@ class Room extends KuzzleEventEmitter {
     if (!data.fromSelf || this.subscribeToSelf) {
       this.emit(data.type, data);
     }
-    return this;
-  }
-
-  /**
-   * Helper function allowing to set headers while chaining calls.
-   *
-   * If the replace argument is set to true, replace the current headers with the provided content.
-   * Otherwise, it appends the content to the current headers, only replacing already existing values
-   *
-   * @param content - new headers content
-   * @param [replace] - default: false = append the content. If true: replace the current headers with tj
-   */
-  setHeaders(content, replace) {
-    this.kuzzle.setHeaders.call(this, content, replace);
     return this;
   }
 
