@@ -94,12 +94,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('jwt', { enumerable: true, writable: true, configurable: false });
 
-    should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true});
-    should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
-    kuzzle.offlineQueue = ['foo', 'bar'];
-    should(kuzzle.offlineQueue).be.eql(['foo', 'bar']);
-    should(function() {kuzzle.offlineQueue = {};}).throw();
-
     should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true});
     should(kuzzle.offlineQueueLoader).be.null();
     kuzzle.offlineQueueLoader = fn;
@@ -165,6 +159,12 @@ describe('Kuzzle constructor', function () {
     kuzzle.reconnectionDelay = 123;
     should(kuzzle.reconnectionDelay).be.eql(1000);
 
+
+    should(kuzzle).have.propertyWithDescriptor('offlineQueue', { enumerable: true});
+    should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
+    kuzzle.offlineQueue = ['foo', 'bar'];
+    should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
+    
     should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
   });
 

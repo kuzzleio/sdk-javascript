@@ -250,10 +250,6 @@ function Kuzzle (host, options, cb) {
       enumerable: true,
       get: function() {
         return self.network.offlineQueue;
-      },
-      set: function(value) {
-        checkPropertyType('offlineQueue', 'array', value);
-        self.network.offlineQueue = value;
       }
     },
     offlineQueueLoader: {
@@ -312,9 +308,7 @@ function Kuzzle (host, options, cb) {
         return self.network.replayInterval;
       },
       set: function(value) {
-        if (!Number.isInteger(value)) {
-          throw new Error('Invalid value "' + value + '" assigned to the "replayInterval" property');
-        }
+        checkPropertyType('replayInterval', 'number', value);
         self.network.replayInterval = value;
       }
     },
