@@ -363,34 +363,18 @@ describe('Room methods', function () {
     });
 
     it('should forward the unsubscribe request to Kuzzle', function () {
-      var
-        opts = {foo: 'bar'},
-        cb = sinon.stub();
+      var cb = sinon.stub();
 
       should(room.unsubscribe()).be.exactly(room);
       should(kuzzle.unsubscribe).be.calledOnce();
-      should(kuzzle.unsubscribe).calledWith(room, undefined, undefined);
+      should(kuzzle.unsubscribe).calledWith(room, undefined);
       should(room.roomstate).be.eql('inactive');
 
       room.roomstate = 'active';
       kuzzle.unsubscribe.reset();
       room.unsubscribe(cb);
       should(kuzzle.unsubscribe).be.calledOnce();
-      should(kuzzle.unsubscribe).calledWith(room, null, cb);
-      should(room.roomstate).be.eql('inactive');
-
-      room.roomstate = 'active';
-      kuzzle.unsubscribe.reset();
-      room.unsubscribe(opts);
-      should(kuzzle.unsubscribe).be.calledOnce();
-      should(kuzzle.unsubscribe).calledWith(room, opts, undefined);
-      should(room.roomstate).be.eql('inactive');
-
-      room.roomstate = 'active';
-      kuzzle.unsubscribe.reset();
-      room.unsubscribe(opts, cb);
-      should(kuzzle.unsubscribe).be.calledOnce();
-      should(kuzzle.unsubscribe).calledWith(room, opts, cb);
+      should(kuzzle.unsubscribe).calledWith(room, cb);
       should(room.roomstate).be.eql('inactive');
     });
 

@@ -212,16 +212,10 @@ class Room extends KuzzleEventEmitter {
    * Unsubscribes from Kuzzle.
    *
    * Stop listening immediately.
-   * @param options
    * @param {responseCallback} cb - Handles the query response
    * @return {*} this
    */
-  unsubscribe(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
+  unsubscribe(cb) {
     if (this.roomstate === 'subscribing') {
       if (cb) {
         cb(new Error('Cannot unsubscribe a room while a subscription attempt is underway'));
@@ -238,7 +232,7 @@ class Room extends KuzzleEventEmitter {
     }
 
     if (this.roomstate === 'active') {
-      this.kuzzle.unsubscribe(this, options, cb);
+      this.kuzzle.unsubscribe(this, cb);
     }
     else if (cb) {
       cb(null, this.roomId);

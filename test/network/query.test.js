@@ -382,10 +382,10 @@ describe('Network query management', function () {
       var
         cb = sinon.stub();
 
-      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      network.unsubscribe({foo: 'bar'}, 'channel', cb);
       should(network.query)
         .be.calledOnce()
-        .be.calledWith({foo: 'bar'}, {bar: 'foo'});
+        .be.calledWith({foo: 'bar'}, null);
     });
 
     it('should launch the callback with an error in case of error', function() {
@@ -393,7 +393,7 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       error = new Error('foobar');
-      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      network.unsubscribe({foo: 'bar'}, 'channel', cb);
 
       should(cb)
         .be.calledOnce()
@@ -404,7 +404,7 @@ describe('Network query management', function () {
       var
         cb = sinon.stub();
 
-      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      network.unsubscribe({foo: 'bar'}, 'channel', cb);
 
       should(cb)
         .be.calledOnce()
@@ -424,7 +424,7 @@ describe('Network query management', function () {
       should(notificationCB).be.calledOnce();
 
       notificationCB.reset();
-      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
+      network.unsubscribe({foo: 'bar'}, 'channel', cb);
       should(network.listeners('channel')).be.empty();
 
       network.emit('channel', {type: 'document', result: {}, action: 'foo'});
