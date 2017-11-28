@@ -75,7 +75,6 @@ describe('Room constructor', function () {
     should.exist(room.countPromise);
     should.exist(room.onDonePromise);
     should.not.exist(room.notifyPromise);
-    should.exist(room.renewPromise);
     should.exist(room.subscribePromise);
     should.exist(room.unsubscribePromise);
   });

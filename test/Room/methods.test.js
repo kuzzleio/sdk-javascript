@@ -32,7 +32,7 @@ describe('Room methods', function () {
       };
 
       room.roomId = 'foobar';
-      room.active = true;
+      room.roomstate = 'active';
     });
 
     it('should send the right query to Kuzzle', function () {
@@ -46,13 +46,16 @@ describe('Room methods', function () {
       should(kuzzle.query).not.be.called();
     });
 
-    it('should delay the request until after subscribing', function () {
+    it('should force-fail if the room is not active', function () {
       var cb = sinon.stub();
 
-      room.subscribing = true;
+      room.roomstate = 'inactive';
       room.count(cb);
-      should(kuzzle.query).not.be.called();
-      should(room.queue).match([{action: 'count', args: [cb]}]);
+
+      should(cb).calledOnce();
+      should(cb.firstCall.args[0])
+        .be.instanceof(Error)
+        .and.match({message: 'Cannot count subscriptions on an non-active room'});
     });
 
     it('should answer with the number of subscribers', function (done) {
@@ -75,42 +78,6 @@ describe('Room methods', function () {
         done();
       });
       kuzzle.query.yield('foobar');
-    });
-
-    it('should fail if the room has no room ID', function () {
-      room = new Room(collection, {equals: {foo: 'bar'}});
-      should(function () {room.count(sinon.stub());}).throw('Room.count: cannot count subscriptions on an inactive room');
-    });
-  });
-
-  describe('#dequeue', function () {
-    var dequeue = Room.__get__('dequeue');
-
-    beforeEach(function () {
-      room.count = sinon.stub();
-      room.renew = sinon.stub();
-      room.unsubscribe = sinon.stub();
-    });
-
-    it('should replay requests queued while refreshing', function () {
-      dequeue(room);
-      should(room.count).not.be.called();
-      should(room.renew).not.be.called();
-      should(room.unsubscribe).not.be.called();
-
-      room.queue.push({action: 'count', args: ['foo']});
-      room.queue.push({action: 'renew', args: ['bar']});
-      room.queue.push({action: 'unsubscribe', args: ['baz']});
-      dequeue(room);
-      should(room.count)
-        .be.calledOnce()
-        .be.calledWith('foo');
-      should(room.renew)
-        .be.calledOnce()
-        .be.calledWith('bar');
-      should(room.unsubscribe)
-        .be.calledOnce()
-        .be.calledWith('baz');
     });
   });
 
@@ -191,12 +158,12 @@ describe('Room methods', function () {
   });
 
   describe('#onDone', function() {
-    it('should thow an error if the callback argument is missing', function() {
-      should(function() {room.onDone();}).throw('Room.onDone: as callback argument is required.');
+    it('should throw an error if the callback argument is missing', function() {
+      should(function() {room.onDone();}).throw('Room.onDone: a callback argument is required.');
     });
 
-    it('should thow an error if the callback argument is not a function', function() {
-      should(function() {room.onDone('foobar');}).throw('Room.onDone: as callback argument is required.');
+    it('should throw an error if the callback argument is not a function', function() {
+      should(function() {room.onDone('foobar');}).throw('Room.onDone: a callback argument is required.');
     });
 
     it('should call immediatly the callback if the room has an error', function() {
@@ -214,7 +181,7 @@ describe('Room methods', function () {
     it('should call immediatly the callback if the room subscription is already active', function() {
       var cb = sinon.stub();
 
-      room.active = true;
+      room.roomstate = 'active';
       room.onDone(cb);
 
       should(room.listeners('done')).be.empty();
@@ -239,105 +206,38 @@ describe('Room methods', function () {
     });
   });
 
-  describe('#renew', function () {
-    beforeEach(function () {
-      room.subscribe = sinon.stub();
-      room.unsubscribe = sinon.stub();
-    });
-
-    it('should force room resubscribe if not already subscribing', function () {
-      var cb = sinon.stub();
-
-      room.renew(cb);
-      should(room.unsubscribe).be.calledOnce();
-      should(room.unsubscribe.firstCall.args).be.empty();
-      should(room.subscribe).be.calledOnce();
-      should(room.subscribe).calledWith(cb);
-    });
-
-    it('should delay the request until after subscribing', function () {
-      room.subscribing = true;
-      room.renew();
-      should(room.subscribe).not.be.called();
-      should(room.queue).match([{action: 'renew', args: []}]);
-    });
-
-    it('should not renew subscription if another renewal was performed before the allowed delay', function () {
-      var
-        listener = sinon.stub(),
-        cb = sinon.stub();
-
-      room.on('done', listener);
-      room.renew(cb);
-      room.lastRenewal = Date.now();
-      room.renew(cb);
-      room.renew(cb);
-
-      should(room.subscribe)
-        .be.calledOnce()
-        .be.calledWith(cb);
-
-      should(cb)
-        .be.calledTwice()
-        .be.alwaysCalledWith(sinon.match(function(arg) {
-          return arg instanceof Error
-            && arg.message === 'Subscription already renewed less than ' + room.renewalDelay + 'ms ago';
-        }));
-
-      should(listener)
-        .be.calledTwice()
-        .be.alwaysCalledWith(sinon.match(function(arg) {
-          return arg instanceof Error
-            && arg.message === 'Subscription already renewed less than ' + room.renewalDelay + 'ms ago';
-        }));
-    });
-  });
-
   describe('#subscribe', function() {
-    var
-      revert,
-      dequeue;
-
     beforeEach(function () {
-      dequeue = sinon.stub();
-      revert = Room.__set__('dequeue', dequeue);
       result = {roomId: 'foobar', channel: 'barfoo' };
-    });
-
-    afterEach(function () {
-      revert();
     });
 
     it('should send the right subscribe query to Kuzzle', function () {
       var
         opts = {foo: 'bar'},
-        cb = sinon.stub(),
-        before = Date.now();
+        cb = sinon.stub();
 
       room.subscribe();
-      should(kuzzle.subscribe).be.calledOnce();
-      should(kuzzle.subscribe).calledWith(room, undefined);
+      should(kuzzle.subscribe)
+        .be.calledOnce()
+        .be.calledWith(room, undefined);
       kuzzle.subscribe.yield(null, result);
       should(room.roomId).be.exactly('foobar');
       should(room.channel).be.exactly('barfoo');
-      should(room.lastRenewal).be.within(before, Date.now());
 
       kuzzle.subscribe.reset();
-      room.active = false;
+      room.roomstate = 'inactive';
       room.subscribe(cb);
       should(kuzzle.subscribe).be.calledOnce();
       should(kuzzle.subscribe).calledWith(room, null);
 
       kuzzle.subscribe.reset();
-      room.subscribing = false;
-      room.roomId = null;
+      room.roomstate = 'inactive';
       room.subscribe(opts);
       should(kuzzle.subscribe).be.calledOnce();
       should(kuzzle.subscribe).calledWith(room, opts);
 
       kuzzle.subscribe.reset();
-      room.subscribing = false;
-      room.roomId = null;
+      room.roomstate = 'inactive';
       room.subscribe(opts, cb);
       should(kuzzle.subscribe).be.calledOnce();
       should(kuzzle.subscribe).calledWith(room, opts);
@@ -348,7 +248,7 @@ describe('Room methods', function () {
         spy = sinon.spy(room,'onDone'),
         cb = sinon.stub();
 
-      room.subscribing = true;
+      room.roomstate = 'subscribing';
       room.subscribe(cb);
       should(kuzzle.subscribe).not.be.called();
       should(spy).be.calledOnce().be.calledWith(cb);
@@ -360,7 +260,7 @@ describe('Room methods', function () {
         spy = sinon.spy(room,'onDone'),
         cb = sinon.stub();
 
-      room.active = true;
+      room.roomstate = 'active';
       room.subscribe(cb);
       should(kuzzle.subscribe).not.be.called();
       should(spy).be.calledOnce().be.calledWith(cb);
@@ -373,7 +273,7 @@ describe('Room methods', function () {
       room.subscribe(cb);
 
       kuzzle.subscribe.yield(new Error('Not Connected'));
-      should(room.subscribing).be.true();
+      should(room.roomstate).be.eql('subscribing');
       should(room.roomId).be.null();
       should(room.channel).be.null();
       should(cb).not.be.called();
@@ -383,7 +283,7 @@ describe('Room methods', function () {
       should(kuzzle.subscribe).be.calledOnce();
       kuzzle.subscribe.yield(null, result);
 
-      should(room.subscribing).be.false();
+      should(room.roomstate).be.eql('active');
       should(room.roomId).be.exactly('foobar');
       should(room.channel).be.exactly('barfoo');
       should(cb).be.calledOnce();
@@ -398,7 +298,7 @@ describe('Room methods', function () {
       kuzzle.subscribe.yield(null, result);
     });
 
-    it('should disable the subscription when network error occurs', function () {
+    it('should disable the subscription when a network disconnection occurs', function () {
       room.subscribe();
 
       should(kuzzle.subscribe).be.calledOnce();
@@ -406,70 +306,44 @@ describe('Room methods', function () {
 
       should(room.roomId).be.exactly('foobar');
       should(room.channel).be.exactly('barfoo');
-      kuzzle.emit('networkError', new Error('foobar'));
+      kuzzle.emit('disconnected', new Error('foobar'));
 
-      should(room.active).be.false();
+      should(room.roomstate).be.eql('inactive');
     });
 
-    it('should renew the subscription when the JWT is expired', function () {
-      room.renew = sinon.stub();
-
+    it('should set the room in a deactivated state when the JWT expires', function () {
       room.subscribe();
-      should(room.renew).not.be.called();
-
       kuzzle.subscribe.yield(null, result);
+      should(room.roomstate).be.eql('active');
       kuzzle.emit('tokenExpired');
-      should(room.renew).be.calledOnce();
-    });
-
-    it('should renew the subscription when the user is successfully logged-in', function () {
-      room.renew = sinon.stub();
-
-      room.subscribe();
-      should(room.renew).not.be.called();
-
-      kuzzle.subscribe.yield(null, result);
-      kuzzle.emit('loginAttempt', {success: true});
-      should(room.renew).be.calledOnce();
-
-      room.renew.reset();
-      kuzzle.subscribe.yield(null, result);
-      kuzzle.emit('loginAttempt', {success: false});
-      should(room.renew).not.be.called();
+      should(room.roomstate).be.eql('inactive');
     });
 
     it('should renew the subscription when the user is reconnected and the "autoResubscribe" option is set', function () {
-      room = new Room(collection, {equals: {foo: 'bar'}}, {autoResubscribe: true});
-      sinon.stub(room, 'renew');
-      room.subscribe();
-      should(room.renew).not.be.called();
+      var subscribeSpy;
 
+      room = new Room(collection, {equals: {foo: 'bar'}}, {autoResubscribe: true});
+      subscribeSpy = sinon.spy(room, 'subscribe');
+
+      room.subscribe();
+      subscribeSpy.reset();
       kuzzle.subscribe.yield(null, result);
+      should(room.roomstate).be.eql('active');
+
       kuzzle.emit('reconnected', {success: true});
-      should(room.renew).be.calledOnce();
+      should(subscribeSpy).be.calledOnce();
 
       room = new Room(collection, {equals: {foo: 'bar'}}, {autoResubscribe: false});
-      sinon.stub(room, 'renew');
+      subscribeSpy = sinon.spy(room, 'subscribe');
       kuzzle.subscribe.yield(null, result);
       kuzzle.emit('reconnected', {success: true});
-      should(room.renew).not.be.called();
+      should(subscribeSpy).not.be.called();
     });
 
-    it('should start dequeuing if subscribed successfully', function () {
-      room.subscribe();
-      kuzzle.subscribe.yield(null, result);
-      should(dequeue).be.calledOnce();
-    });
-
-    it('should rejects the callback and empty the queue if the subscription fails', function (done) {
-      room.queue.push({foo: 'bar'});
-
+    it('should reject the callback if the subscription fails', function (done) {
       room.onDone(function (err, res) {
         should(err).not.be.null();
         should(res).be.undefined();
-        should(dequeue).not.be.called();
-        should(room.lastRenewal).be.null();
-        should(room.queue).be.empty();
         done();
       });
       room.subscribe();
@@ -484,7 +358,7 @@ describe('Room methods', function () {
 
       room.roomId = 'foobar';
       room.channel = 'barfoo';
-      room.active = true;
+      room.roomstate = 'active';
       room.notify = sinon.stub();
     });
 
@@ -496,53 +370,75 @@ describe('Room methods', function () {
       should(room.unsubscribe()).be.exactly(room);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, undefined, undefined);
+      should(room.roomstate).be.eql('inactive');
 
-      room.active = true;
+      room.roomstate = 'active';
       kuzzle.unsubscribe.reset();
       room.unsubscribe(cb);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, null, cb);
+      should(room.roomstate).be.eql('inactive');
 
-      room.active = true;
+      room.roomstate = 'active';
       kuzzle.unsubscribe.reset();
       room.unsubscribe(opts);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, opts, undefined);
+      should(room.roomstate).be.eql('inactive');
 
-      room.active = true;
+      room.roomstate = 'active';
       kuzzle.unsubscribe.reset();
       room.unsubscribe(opts, cb);
       should(kuzzle.unsubscribe).be.calledOnce();
       should(kuzzle.unsubscribe).calledWith(room, opts, cb);
+      should(room.roomstate).be.eql('inactive');
     });
 
-    it('should delay the unsubscription until after the current subscription is done', function () {
-      var
-        opts = {foo: 'bar'},
-        cb = sinon.stub();
+    it('should force-fail if the room is still subscribing', function () {
+      var cb = sinon.stub();
 
-      room.subscribing = true;
+      room.roomstate = 'subscribing';
       should(room.unsubscribe()).be.exactly(room);
-      should(room.queue).match([{action: 'unsubscribe', args: []}]);
+      should(room.roomstate).be.eql('subscribing');
+      should(kuzzle.unsubscribe).not.called();
 
-      room.queue = [];
       room.unsubscribe(cb);
-      should(room.queue).match([{action: 'unsubscribe', args: [cb]}]);
-
-      room.queue = [];
-      room.unsubscribe(opts);
-      should(room.queue).match([{action: 'unsubscribe', args: [opts]}]);
-
-      room.queue = [];
-      room.unsubscribe(opts, cb);
-      should(room.queue).match([{action: 'unsubscribe', args: [opts, cb]}]);
+      should(room.unsubscribe()).be.exactly(room);
+      should(room.roomstate).be.eql('subscribing');
+      should(kuzzle.unsubscribe).not.called();
+      should(cb).calledOnce();
+      should(cb.firstCall.args[0])
+        .be.instanceof(Error)
+        .and.match({message: 'Cannot unsubscribe a room while a subscription attempt is underway'});
     });
 
     it('should not send the unsubscribe request if the room is already inactive', function () {
-      room.active = false;
+      var cb = sinon.stub();
 
-      should(room.unsubscribe()).be.exactly(room);
+      room.roomstate = 'inactive';
+      should(room.unsubscribe(cb)).be.exactly(room);
       should(kuzzle.unsubscribe).not.be.called();
+      should(cb)
+        .be.calledOnce()
+        .and.calledWithMatch(null, room.roomId);
+    });
+
+    it('should remove active listeners, if any', function () {
+      sinon.stub(kuzzle, 'removeListener');
+
+      room.roomstate = 'active';
+      room.isListening = false;
+      room.unsubscribe();
+      should(kuzzle.removeListener).not.be.called();
+
+      room.roomstate = 'active';
+      room.isListening = true;
+      room.unsubscribe();
+      should(kuzzle.removeListener).be.calledThrice();
+      should(kuzzle.removeListener.firstCall.args).match(['disconnected', room.deactivate]);
+      should(kuzzle.removeListener.secondCall.args).match(['tokenExpired', room.deactivate]);
+      should(kuzzle.removeListener.thirdCall.args).match(['reconnected', room.resubscribeConditional]);
+      should(room.isListening).be.false();
     });
   });
 });
