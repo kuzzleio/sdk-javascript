@@ -101,14 +101,11 @@ describe('Kuzzle connect', function () {
     });
 
     it('should keep a valid JWT at reconnection', function () {
-      var
-        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
-        eventStub = sinon.stub();
+      var kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'});
 
       kuzzle.checkToken = sinon.stub();
 
       kuzzle.jwt = 'foobar';
-      kuzzle.addListener('tokenExpired', eventStub);
 
       kuzzle.connect();
       clock.tick();
@@ -118,18 +115,15 @@ describe('Kuzzle connect', function () {
       kuzzle.checkToken.yield(null, {valid: true});
 
       should(kuzzle.jwt).be.eql('foobar');
-      should(eventStub).not.be.called();
     });
 
     it('should empty the JWT at reconnection if it has expired', function () {
       var
-        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
-        eventStub = sinon.stub();
+        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'});
 
       kuzzle.checkToken = sinon.stub();
 
       kuzzle.jwt = 'foobar';
-      kuzzle.addListener('tokenExpired', eventStub);
 
       kuzzle.connect();
       clock.tick();
@@ -139,7 +133,6 @@ describe('Kuzzle connect', function () {
       kuzzle.checkToken.yield(null, {valid: false});
 
       should(kuzzle.jwt).be.undefined();
-      should(eventStub).be.calledOnce();
     });
 
     it('should register listeners upon receiving a "disconnect" event', function () {
