@@ -30,18 +30,7 @@ describe('CollectionMapping constructor', function () {
   it('should expose documented properties with the right permissions', function () {
     var mapping = new CollectionMapping(collection);
 
-    should(mapping).have.propertyWithDescriptor('headers', { enumerable: true, writable: true, configurable: false });
     should(mapping).have.propertyWithDescriptor('mapping', { enumerable: true, writable: true, configurable: false });
-  });
-
-  it('should initialize headers coming from the provided data collection object', function () {
-    var
-      headers = {foo: 'bar'},
-      mapping;
-
-    collection.headers = headers;
-    mapping = new CollectionMapping(collection);
-    should(mapping.headers).match(headers);
   });
 
   it('should promisify the right functions', function () {
@@ -54,6 +43,5 @@ describe('CollectionMapping constructor', function () {
     should.exist(mapping.applyPromise);
     should.exist(mapping.refreshPromise);
     should.not.exist(mapping.setPromise);
-    should.not.exist(mapping.setHeadersPromise);
   });
 });

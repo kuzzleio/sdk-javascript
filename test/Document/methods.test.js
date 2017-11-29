@@ -453,15 +453,4 @@ describe('Document methods', function () {
       should(collection.subscribe).not.be.called();
     });
   });
-
-  describe('#setHeaders', function () {
-    it('should properly set headers', function () {
-      var
-        document = new Document(collection),
-        header = {_id: 'foobar'};
-
-      should(document.setHeaders(header)).be.exactly(document);
-      should(document.headers).match(header);
-    });
-  });
 });

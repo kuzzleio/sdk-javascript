@@ -23,9 +23,15 @@ class Room extends KuzzleEventEmitter {
   constructor(collection, filters, options) {
     super();
 
+    let _roomId = null;
+
     // Define properties
     Object.defineProperties(this, {
       // private properties
+      active: {
+        value: false,
+        writable: true
+      },
       channel: {
         value: null,
         writable: true
@@ -47,17 +53,20 @@ class Room extends KuzzleEventEmitter {
         value: 500
       },
       scope: {
-        value: options && options.scope ? options.scope : 'all'
+        value: options && options.scope ? options.scope : 'all',
+        enumerable: true
       },
       state: {
-        value: options && options.state ? options.state : 'done'
+        value: options && options.state ? options.state : 'done',
+        enumerable: true
       },
       subscribing: {
         value: false,
         writable: true
       },
       users: {
-        value: options && options.users ? options.users : 'none'
+        value: options && options.users ? options.users : 'none',
+        enumerable: true
       },
       // read-only properties
       collection: {
@@ -68,17 +77,16 @@ class Room extends KuzzleEventEmitter {
         value: filters ? filters : {},
         enumerable: true,
       },
-      // writable properties
-      headers: {
-        value: JSON.parse(JSON.stringify(collection.headers)),
-        enumerable: true,
-        writable: true
-      },
       roomId: {
-        value: null,
         enumerable: true,
-        writable: true
+        get: () => _roomId,
+        set: value => {
+          if (!_roomId) {
+            _roomId = value;
+          }
+        }
       },
+      // writable properties
       volatile: {
         value: (options && options.volatile) ? options.volatile : {},
         enumerable: true,
@@ -91,8 +99,7 @@ class Room extends KuzzleEventEmitter {
       },
       autoResubscribe: {
         value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : collection.kuzzle.autoResubscribe,
-        enumerable: true,
-        writable: true
+        enumerable: true
       }
     });
 
@@ -116,14 +123,14 @@ class Room extends KuzzleEventEmitter {
   count(cb) {
     this.kuzzle.callbackRequired('Room.count', cb);
 
-    const data = this.kuzzle.addHeaders({body: {roomId: this.roomId}}, this.headers);
+    const data = {body: {roomId: this.roomId}};
 
     if (this.subscribing) {
       this.queue.push({action: 'count', args: [cb]});
       return;
     }
 
-    if (!this.roomId) {
+    if (!this.active) {
       throw new Error('Room.count: cannot count subscriptions on an inactive room');
     }
 
@@ -180,7 +187,7 @@ class Room extends KuzzleEventEmitter {
     }
 
     // If the room subscription is active, just call the callback.
-    if (this.roomId) {
+    if (this.active) {
       this.emit('done', null, this);
       return this;
     }
@@ -214,9 +221,10 @@ class Room extends KuzzleEventEmitter {
       this.lastRenewal = Date.now();
       this.roomId = result.roomId;
       this.channel = result.channel;
+      this.active = true;
 
       this.kuzzle.addListener('networkError', () => {
-        this.roomId = null;
+        this.active = false;
       });
 
       this.kuzzle.addListener('tokenExpired', () => {
@@ -261,9 +269,9 @@ class Room extends KuzzleEventEmitter {
       return this;
     }
 
-    if (this.roomId) {
+    if (this.active) {
       this.kuzzle.unsubscribe(this, options, cb);
-      this.roomId = null;
+      this.active = false;
     }
 
     return this;
@@ -286,20 +294,6 @@ class Room extends KuzzleEventEmitter {
   }
 
   /**
-   * Helper function allowing to set headers while chaining calls.
-   *
-   * If the replace argument is set to true, replace the current headers with the provided content.
-   * Otherwise, it appends the content to the current headers, only replacing already existing values
-   *
-   * @param content - new headers content
-   * @param [replace] - default: false = append the content. If true: replace the current headers with tj
-   */
-  setHeaders(content, replace) {
-    this.kuzzle.setHeaders.call(this, content, replace);
-    return this;
-  }
-
-  /**
    * Registers a callback to be called with a subscription result
    * @param {Function} cb
    */
@@ -311,7 +305,7 @@ class Room extends KuzzleEventEmitter {
     if (this.error) {
       cb(this.error);
     }
-    else if (this.roomId) {
+    else if (this.active) {
       cb(null, this);
     }
     else {

@@ -6,7 +6,6 @@ function CollectionMock (kuzzle) {
   this.kuzzle = kuzzle;
   this.collection = 'foo';
   this.index = 'bar';
-  this.headers = kuzzle.headers || {};
 
   Object.defineProperty(this, 'buildQueryArgs', {
     value: function (controller, action) {

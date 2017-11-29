@@ -25,8 +25,8 @@ describe('WebSocket networking module', function () {
 
     websocket = new WS('address', {
       port: 1234,
-      autoReconnect: 'autoReconnectValue',
-      reconnectionDelay: 'reconnectionDelayValue'
+      autoReconnect: true,
+      reconnectionDelay: 10
     });
   });
 
@@ -60,7 +60,12 @@ describe('WebSocket networking module', function () {
 
   it('should initialize a WS secure connection', function () {
     clientStub.on = sinon.stub();
-    websocket.ssl = true;
+    websocket = new WS('address', {
+      port: 1234,
+      autoReconnect: false,
+      reconnectionDelay: 1234,
+      sslConnection: true
+    });
     websocket.connect();
     should(wsargs).match(['wss://address:1234']);
   });
@@ -152,7 +157,7 @@ describe('WebSocket networking module', function () {
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
-    websocket.connect(true, 10);
+    websocket.connect();
     websocket.connect = sinon.stub();
     clientStub.onerror();
     should(websocket.retrying).be.true();
@@ -166,8 +171,12 @@ describe('WebSocket networking module', function () {
   it('should not try to reconnect on a connection error with autoReconnect = false', function () {
     var cb = sinon.stub();
 
-    websocket.autoReconnect = false;
-    websocket.reconnectionDelay = 10;
+    websocket = new WS('address', {
+      port: 1234,
+      autoReconnect: false,
+      reconnectionDelay: 10
+    });
+
     websocket.retrying = false;
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);

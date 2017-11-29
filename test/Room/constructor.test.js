@@ -12,7 +12,6 @@ describe('Room constructor', function () {
 
   beforeEach(function () {
     kuzzle = new KuzzleMock();
-    kuzzle.headers = {foo: 'bar'};
     kuzzle.autoResubscribe = true;
     collection = new CollectionMock(kuzzle);
   });
@@ -28,7 +27,6 @@ describe('Room constructor', function () {
     should(room.users).be.exactly('none');
     should(room.collection).be.exactly(collection);
     should(room.filters).match({equals: {foo: 'bar'}});
-    should(room.headers).match({foo: 'bar'});
     should(room.roomId).be.null();
 
 
@@ -57,19 +55,15 @@ describe('Room constructor', function () {
   it('should expose documented properties with the right permissions', function () {
     var room = new Room(collection, {equals: {foo: 'bar'}});
 
-    should(room).have.propertyWithDescriptor('collection', {enumerable: true, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('headers', {enumerable: true, writable: true, configurable: false});
-    should(room).have.propertyWithDescriptor('scope', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('state', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('users', {enumerable: false, writable: false, configurable: false});
-    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true, configurable: false});
-    should(room).have.propertyWithDescriptor('subscribeToSelf', {
-      enumerable: true,
-      writable: true,
-      configurable: false
-    });
-    should(room).have.propertyWithDescriptor('roomId', {enumerable: true, writable: true, configurable: false});
+    should(room).have.propertyWithDescriptor('autoResubscribe', {enumerable: true});
+    should(room).have.propertyWithDescriptor('collection', {enumerable: true});
+    should(room).have.propertyWithDescriptor('filters', {enumerable: true, writable: false});
+    should(room).have.propertyWithDescriptor('scope', {enumerable: true});
+    should(room).have.propertyWithDescriptor('state', {enumerable: true});
+    should(room).have.propertyWithDescriptor('users', {enumerable: true});
+    should(room).have.propertyWithDescriptor('volatile', {enumerable: true, writable: true});
+    should(room).have.propertyWithDescriptor('subscribeToSelf', {enumerable: true, writable: true});
+    should(room).have.propertyWithDescriptor('roomId', {enumerable: true});
   });
 
   it('should promisify the right functions', function () {
@@ -82,7 +76,6 @@ describe('Room constructor', function () {
     should.exist(room.onDonePromise);
     should.not.exist(room.notifyPromise);
     should.exist(room.renewPromise);
-    should.not.exist(room.setHeadersPromise);
     should.exist(room.subscribePromise);
     should.exist(room.unsubscribePromise);
   });
