@@ -28,29 +28,45 @@ class Room extends KuzzleEventEmitter {
     // Define properties
     Object.defineProperties(this, {
       // private properties
-      active: {
-        value: false,
-        writable: true
-      },
-      channel: {
-        value: null,
+      roomstate: {
+        // Values can be: inactive, subscribing, active
+        value: 'inactive',
         writable: true
       },
       kuzzle: {
-        value: collection.kuzzle,
-        enumerable: true
+        value: collection.kuzzle
       },
-      lastRenewal: {
+      isListening: {
+        value: false,
+        writable: true
+      },
+      //listeners
+      resubscribe: {
+        value: () => {
+          this.roomstate = 'inactive';
+          this.error = null;
+          this.subscribe();
+        }
+      },
+      deactivate: {
+        value: () => {
+          this.roomstate = 'inactive';
+        }
+      },
+      resubscribeConditional: {
+        value: () => {
+          this.roomstate = 'inactive';
+          
+          if (this.autoResubscribe) {
+            this.subscribe();
+          }
+        }
+      },
+      //enumerables
+      channel: {
         value: null,
-        writable: true
-      },
-      queue: {
-        value: [],
-        writable: true
-      },
-      // Delay before allowing a subscription renewal
-      renewalDelay: {
-        value: 500
+        writable: true,
+        enumerable: true
       },
       scope: {
         value: options && options.scope ? options.scope : 'all',
@@ -59,10 +75,6 @@ class Room extends KuzzleEventEmitter {
       state: {
         value: options && options.state ? options.state : 'done',
         enumerable: true
-      },
-      subscribing: {
-        value: false,
-        writable: true
       },
       users: {
         value: options && options.users ? options.users : 'none',
@@ -107,7 +119,7 @@ class Room extends KuzzleEventEmitter {
       return this.kuzzle.bluebird.promisifyAll(this, {
         suffix: 'Promise',
         filter: function (name, func, target, passes) {
-          const whitelist = ['count', 'renew', 'subscribe', 'unsubscribe', 'onDone'];
+          const whitelist = ['count', 'subscribe', 'unsubscribe', 'onDone'];
 
           return passes && whitelist.indexOf(name) !== -1;
         }
@@ -125,13 +137,8 @@ class Room extends KuzzleEventEmitter {
 
     const data = {body: {roomId: this.roomId}};
 
-    if (this.subscribing) {
-      this.queue.push({action: 'count', args: [cb]});
-      return;
-    }
-
-    if (!this.active) {
-      throw new Error('Room.count: cannot count subscriptions on an inactive room');
+    if (this.roomstate !== 'active') {
+      return cb(new Error('Cannot count subscriptions on an non-active room'));
     }
 
     this.kuzzle.query(this.collection.buildQueryArgs('realtime', 'count'), data, function (err, res) {
@@ -140,38 +147,9 @@ class Room extends KuzzleEventEmitter {
   }
 
   /**
-   * Renew the subscription
-   *
-   * @param {responseCallback} cb - called when the subscription is ready.
-   * @return {*} this
-   */
-  renew(cb) {
-    /*
-      Skip subscription renewal if another one was performed a moment before
-     */
-    const now = Date.now();
-    if (this.lastRenewal && (now - this.lastRenewal) <= this.renewalDelay) {
-      this.error = new Error('Subscription already renewed less than ' + this.renewalDelay + 'ms ago');
-      if (cb) {
-        cb(this.error);
-      }
-      this.emit('done', this.error);
-      return this;
-    }
-
-    if (this.subscribing) {
-      this.queue.push({action: 'renew', args: []});
-      return this;
-    }
-
-    this.unsubscribe();
-    return this.subscribe(cb);
-  }
-
-  /**
-   * Subscribes to Kuzzle.
-   *
-   * (Do not renew the subscription if the room is already subscribing).
+   * Subscribes to Kuzzle 
+   * (do nothing if a subscription is active or underway)
+   * 
    * @param options
    * @param {responseCallback} cb - called when the subscription is ready.
    * @return {*} this
@@ -187,63 +165,43 @@ class Room extends KuzzleEventEmitter {
     }
 
     // If the room subscription is active, just call the callback.
-    if (this.active) {
+    if (this.roomstate === 'active') {
       this.emit('done', null, this);
       return this;
     }
 
     // If the room is already subscribing, wait for its activation.
-    if (this.subscribing) {
+    if (this.roomstate === 'subscribing') {
       return this;
     }
 
-
     // If the room is still inactive, start the subscription.
     this.error = null;
-    this.subscribing = true;
+    this.roomstate = 'subscribing';
+
     this.kuzzle.subscribe(this, options, (error, result) => {
       if (error) {
         if (error.message === 'Not Connected') {
-          return this.kuzzle.addListener('connected', () => {
-            this.subscribing = false;
-            this.subscribe();
-          });
+          return this.kuzzle.once('connected', this.resubscribe);
         }
 
-        this.subscribing = false;
-        this.queue = [];
+        this.roomstate = 'inactive';
         this.error = new Error('Error during Kuzzle subscription: ' + error.message);
         this.emit('done', this.error);
-        return this;
+        return null;
       }
 
-      this.subscribing = false;
-      this.lastRenewal = Date.now();
       this.roomId = result.roomId;
       this.channel = result.channel;
-      this.active = true;
+      this.roomstate = 'active';
 
-      this.kuzzle.addListener('networkError', () => {
-        this.active = false;
-      });
+      if (!this.isListening) {
+        this.kuzzle.addListener('disconnected', this.deactivate);
+        this.kuzzle.addListener('tokenExpired', this.deactivate);
+        this.kuzzle.addListener('reconnected', this.resubscribeConditional);
+        this.isListening = true;
+      }
 
-      this.kuzzle.addListener('tokenExpired', () => {
-        this.renew();
-      });
-
-      this.kuzzle.addListener('loginAttempt', data => {
-        if (data.success) {
-          this.renew();
-        }
-      });
-
-      this.kuzzle.addListener('reconnected', () => {
-        if (this.autoResubscribe) {
-          this.renew();
-        }
-      });
-
-      dequeue(this);
       this.emit('done', null, this);
     });
 
@@ -254,25 +212,33 @@ class Room extends KuzzleEventEmitter {
    * Unsubscribes from Kuzzle.
    *
    * Stop listening immediately.
-   * @param options
    * @param {responseCallback} cb - Handles the query response
    * @return {*} this
    */
-  unsubscribe(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
+  unsubscribe(cb) {
+    if (this.roomstate === 'subscribing') {
+      if (cb) {
+        cb(new Error('Cannot unsubscribe a room while a subscription attempt is underway'));
+      }
 
-    if (this.subscribing) {
-      this.queue.push({action: 'unsubscribe', args: [options, cb]});
       return this;
     }
 
-    if (this.active) {
-      this.kuzzle.unsubscribe(this, options, cb);
-      this.active = false;
+    if (this.isListening) {
+      this.kuzzle.removeListener('disconnected', this.deactivate);
+      this.kuzzle.removeListener('tokenExpired', this.deactivate);
+      this.kuzzle.removeListener('reconnected', this.resubscribeConditional);
+      this.isListening = false;
     }
+
+    if (this.roomstate === 'active') {
+      this.kuzzle.unsubscribe(this, cb);
+    }
+    else if (cb) {
+      cb(null, this.roomId);
+    }
+
+    this.roomstate = 'inactive';
 
     return this;
   }
@@ -299,13 +265,13 @@ class Room extends KuzzleEventEmitter {
    */
   onDone(cb) {
     if (!cb || typeof cb !== 'function') {
-      throw new Error('Room.onDone: as callback argument is required.');
+      throw new Error('Room.onDone: a callback argument is required.');
     }
 
     if (this.error) {
       cb(this.error);
     }
-    else if (this.active) {
+    else if (this.roomstate === 'active') {
       cb(null, this);
     }
     else {
@@ -313,19 +279,6 @@ class Room extends KuzzleEventEmitter {
     }
 
     return this;
-  }
-}
-
-/**
- * Dequeue actions performed while subscription was being renewed
- */
-function dequeue(room) {
-  var element;
-
-  while (room.queue.length > 0) {
-    element = room.queue.shift();
-
-    room[element.action].apply(room, element.args);
   }
 }
 

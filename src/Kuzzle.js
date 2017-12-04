@@ -114,13 +114,19 @@ function Kuzzle (host, options, cb) {
           users: room.users
         },
         notificationCB = function(data) {
+          var copy;
+
           if (data.type === 'TokenExpired') {
             return self.unsetJwt();
           }
+
           if (data.type === 'document') {
-            data.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
-            delete data.result;
+            copy = Object.assign({}, data);
+            copy.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
+            delete copy.result;
+            return room.notify(copy);
           }
+
           room.notify(data);
         };
 
@@ -136,7 +142,7 @@ function Kuzzle (host, options, cb) {
 
   // Forward the unsubscribe query to the network wrapper
   Object.defineProperty(this, 'unsubscribe', {
-    value: function(room, opts, unsubscribeCB) {
+    value: function(room, unsubscribeCB) {
       var
         object = {
           requestId: uuidv4(),
@@ -158,7 +164,7 @@ function Kuzzle (host, options, cb) {
       }
       object.volatile.sdkVersion = this.sdkVersion;
 
-      this.network.unsubscribe(object, opts, room.channel, unsubscribeCB);
+      this.network.unsubscribe(object, room.channel, unsubscribeCB);
     }
   });
 
