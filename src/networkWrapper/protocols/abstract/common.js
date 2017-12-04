@@ -1,7 +1,6 @@
 'use strict';
 
 const
-  uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('../../../eventEmitter');
 
 class AbtractWrapper extends KuzzleEventEmitter {
@@ -10,22 +9,17 @@ class AbtractWrapper extends KuzzleEventEmitter {
     super();
 
     Object.defineProperties(this, {
-      id: {
-        value: uuidv4()
-      },
       host: {
         value: host,
         enumerable: true
       },
       port: {
         value: (options && typeof options.port === 'number') ? options.port : 7512,
-        enumerable: true,
-        writable: false
+        enumerable: true
       },
       ssl: {
         value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
-        writable: true,
-        enumerable: false
+        enumerable: true
       },
       queuing: {
         value: false,

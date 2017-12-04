@@ -13,29 +13,12 @@ class RTWrapper extends AbtractWrapper {
       id: {
         value: uuidv4()
       },
-      host: {
-        value: host,
+      autoReconnect: {
+        value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
         enumerable: true
-      },
-      port: {
-        value: (options && typeof options.port === 'number') ? options.port : 7512,
-        enumerable: true
-      },
-      ssl: {
-        value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
-        enumerable: true
-      },
-      queuing: {
-        value: false,
-        writable: true
       },
       reconnectionDelay: {
         value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
-        enumerable: true
-      },
-      // configuration properties
-      autoReconnect: {
-        value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
         enumerable: true
       }
     });
