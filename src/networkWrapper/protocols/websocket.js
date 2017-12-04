@@ -98,7 +98,7 @@ class WSNode extends RTWrapper {
    * Closes the connection
    */
   close () {
-    this.state = 'disconnected';
+    this.state = 'offline';
     this.removeAllListeners();
     this.wasConnected = false;
     if (this.client) {

@@ -983,14 +983,6 @@ describe('Kuzzle methods', function () {
       kuzzle.unsetJwt();
       should(kuzzle.jwt).be.undefined();
     });
-
-    it('should emit a "tokenExpired" event', function () {
-      var cb = sinon.stub();
-
-      kuzzle.addListener('tokenExpired', cb);
-      kuzzle.unsetJwt();
-      should(cb).be.calledOnce();
-    });
   });
 
   describe('#updateMyCredentials', function() {

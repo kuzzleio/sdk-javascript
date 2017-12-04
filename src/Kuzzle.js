@@ -117,7 +117,8 @@ function Kuzzle (host, options, cb) {
           var copy;
 
           if (data.type === 'TokenExpired') {
-            return self.unsetJwt();
+            self.unsetJwt();
+            return self.emitEvent('tokenExpired');
           }
 
           if (data.type === 'document') {
@@ -346,6 +347,7 @@ function Kuzzle (host, options, cb) {
 
   this.network.addListener('tokenExpired', function() {
     self.unsetJwt();
+    self.emitEvent('tokenExpired');
   });
 
   if ((options && options.connect || 'auto') === 'auto') {
@@ -486,8 +488,6 @@ Kuzzle.prototype.setJwt = function(token) {
  */
 Kuzzle.prototype.unsetJwt = function() {
   this.jwt = undefined;
-  this.emitEvent('tokenExpired');
-
   return this;
 };
 
