@@ -94,7 +94,7 @@ class SocketIO extends RTWrapper {
    */
   close() {
     this.forceDisconnect = true;
-    this.state = 'disconnected';
+    this.state = 'offline';
     this.socket.close();
     this.socket = null;
   }
