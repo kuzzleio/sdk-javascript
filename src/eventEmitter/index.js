@@ -55,7 +55,7 @@ if (typeof window === 'undefined') {
     return this;
   };
 
-  KuzzleEventEmitter.prototype.once = function(eventName, listener) {
+  KuzzleEventEmitter.prototype.addOnceListener = function(eventName, listener) {
     var onceListeners;
 
     if (!eventName || !listener) {
@@ -69,6 +69,7 @@ if (typeof window === 'undefined') {
 
     return this;
   };
+  KuzzleEventEmitter.prototype.once = KuzzleEventEmitter.prototype.addOnceListener;
 
   KuzzleEventEmitter.prototype.prependOnceListener = function(eventName, listener) {
     var onceListeners;
