@@ -1,14 +1,13 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  rewire = require('rewire'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
-  Kuzzle = rewire('../../src/Kuzzle');
+  proxyquire = require('proxyquire'),
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 describe('Kuzzle query management', function () {
   describe('#query', function () {
     var
-      networkWrapperRevert,
+      Kuzzle,
       queryBody = {body: {some: 'query'}},
       queryArgs = {
         controller: 'controller',
@@ -19,17 +18,13 @@ describe('Kuzzle query management', function () {
       kuzzle;
 
     beforeEach(function () {
-      networkWrapperRevert = Kuzzle.__set__({
-        networkWrapper: function(protocol, host, options) {
+      Kuzzle = proxyquire('../../src/Kuzzle', {
+        './networkWrapper': function(protocol, host, options) {
           return new NetworkWrapperMock(host, options);
         }
       });
 
       kuzzle = new Kuzzle('foo', {connect: 'manual'});
-    });
-
-    afterEach(function() {
-      networkWrapperRevert();
     });
 
     it('should generate a valid request object with no "options" argument and no callback', function () {

@@ -10,11 +10,11 @@ class SocketIO extends RTWrapper {
 
     this.socket = null;
     this.forceDisconnect = false;
+    this.eventsWrapper = {};
   }
 
   /**
    * Connect to the SocketIO server
-   *
    */
   connect() {
     super.connect();
@@ -25,20 +25,14 @@ class SocketIO extends RTWrapper {
       forceNew: true
     });
 
-    this.socket.on('connect', () => {
-      this.clientConnected();
-    });
-
-    this.socket.on('connect_error', error => {
-      this.clientNetworkError(error);
-    });
+    this.socket.on('connect', () => this.clientConnected());
+    this.socket.on('connect_error', error => this.clientNetworkError(error));
 
     this.socket.on('disconnect', () => {
       if (this.forceDisconnect) {
         this.clientDisconnected();
-      }
-      else {
-        const error = new Error('An error occurred, this may due that kuzzle was not ready yet');
+      } else {
+        const error = new Error('An error occurred, kuzzle may not be ready yet');
         error.status = 500;
 
         this.clientNetworkError(error);
@@ -49,36 +43,85 @@ class SocketIO extends RTWrapper {
   }
 
   /**
-   * Registers a callback on a room. Once 1 message is received, fires the
+   * Registers a callback on an event. Once 1 message is received, fires the
    * callback and unregister it afterward.
    *
-   * @param {string} roomId
+   * @param {string} event
    * @param {function} callback
    */
-  once(roomId, callback) {
-    this.socket.once(roomId, callback);
+  addOnceListener(event, callback) {
+    return this.addListener(event, callback, true);
+  }
+
+  once(event, callback) {
+    return this.addOnceListener(event, callback);
+  }
+
+  prependOnceListener(event, callback) {
+    return this.prependListener(event, callback, true);
   }
 
   /**
-   * Registers a callback on a room.
+   * Registers a callback on an event.
    *
-   * @param {string} roomId
+   * @param {string} event
    * @param {function} callback
    */
-  on(roomId, callback) {
-    this.socket.on(roomId, callback);
+  addListener(event, callback, once = false) {
+    this._addEventWrapper(event, callback, once);
+    super.addListener(event, callback, once);
+
+    return this;
+  }
+
+  on(event, callback) {
+    return this.addListener(event, callback);
+  }
+
+  prependListener(event, callback, once = false) {
+    this._addEventWrapper(event, callback, once);
+    return this.prependListener(event, callback, once);
   }
 
   /**
-   * Unregisters a callback from a room.
+   * Unregisters a callback from an event.
    *
-   * @param {string} roomId
+   * @param {string} event
    * @param {function} callback
    */
-  off(roomId, callback) {
-    this.socket.off(roomId, callback);
+  removeListener(event, callback) {
+    if (this.eventsWrapper[event]) {
+      this.eventsWrapper[event].listeners.delete(callback);
+
+      if (this.eventsWrapper[event].listeners.size === 0) {
+        this.socket.off(event, this.eventsWrapper[event].wrapper);
+        delete this.eventsWrapper[event];
+      }
+
+      super.removeListener(event, callback);
+    }
+
+    return this;
   }
 
+  /**
+   * Unregisters all listeners either from an event, or from all events
+   *
+   * @param {string} [event]
+   */
+  removeAllListeners(event) {
+    if (event !== undefined && this.eventsWrapper[event] !== undefined) {
+      for (const listener of this.eventsWrapper[event].listeners) {
+        this.removeListener(event, listener);
+      }
+    } else {
+      for (const _event of Object.keys(this.eventsWrapper)) {
+        this.removeAllListeners(_event);
+      }
+    }
+
+    return this;
+  }
 
   /**
    * Sends a payload to the connected server
@@ -97,6 +140,27 @@ class SocketIO extends RTWrapper {
     this.state = 'offline';
     this.socket.close();
     this.socket = null;
+  }
+
+  _addEventWrapper(event, callback, once = false) {
+    if (!this.eventsWrapper[event]) {
+      const wrapper = (...args) => this.emit(event, ...args);
+
+      this.eventsWrapper[event] = {
+        wrapper,
+        listeners: new Set()
+      };
+
+      if (['connect', 'connect_error', 'disconnect'].indexOf(event) === -1) {
+        if (once) {
+          this.socket.once(event, wrapper);
+        } else {
+          this.socket.on(event, wrapper);
+        }
+      }
+    }
+
+    this.eventsWrapper[event].listeners.add(callback);
   }
 }
 

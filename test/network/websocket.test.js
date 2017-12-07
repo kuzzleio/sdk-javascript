@@ -347,10 +347,10 @@ describe('WebSocket networking module', function () {
 
     should(websocket.listeners('foobar').length).be.equal(2);
 
-    websocket.off('foobar', cb1);
+    websocket.removeListener('foobar', cb1);
     should(websocket.listeners('foobar').length).be.equal(1);
 
-    websocket.off('foobar', cb2);
+    websocket.removeListener('foobar', cb2);
     should(websocket.listeners('foobar').length).be.exactly(0);
   });
 
@@ -365,10 +365,10 @@ describe('WebSocket networking module', function () {
 
     should(websocket.listeners('foobar').length).be.equal(2);
 
-    websocket.off('foo', cb1);
+    websocket.removeListener('foo', cb1);
     should(websocket.listeners('foobar').length).be.equal(2);
 
-    websocket.off('foobar', sinon.stub());
+    websocket.removeListener('foobar', sinon.stub());
     should(websocket.listeners('foobar').length).be.equal(2);
   });
 

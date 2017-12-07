@@ -1,9 +1,9 @@
 var
-  rewire = require('rewire'),
   should = require('should'),
   sinon = require('sinon'),
   bluebird = require('bluebird'),
-  Kuzzle = rewire('../../src/Kuzzle'),
+  proxyquire = require('proxyquire'),
+  Kuzzle = require('../../src/Kuzzle'),
   MemoryStorage = require('../../src/MemoryStorage'),
   NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
   Security = require('../../src/security/Security');
@@ -17,12 +17,6 @@ describe('Kuzzle constructor', function () {
 
   afterEach(function() {
     connectStub.restore();
-  });
-
-  it('should return a new instance even if not called with "new"', function () {
-    var kuzzle = Kuzzle('somewhere');
-
-    kuzzle.should.be.instanceof(Kuzzle);
   });
 
   it('should throw an error if no URL is provided', function () {
@@ -225,52 +219,52 @@ describe('Kuzzle constructor', function () {
   });
 
   it('should initialize correctly properties using the "options" argument', function () {
-    Kuzzle.__with__({
-      networkWrapper: function(protocol, host, options) {
+    var MockedKuzzle = proxyquire('../../src/Kuzzle', {
+      './networkWrapper': function(protocol, host, options) {
         return new NetworkWrapperMock(host, options);
       }
-    })(function() {
-      var
-        sdkVersion = require('../../package.json').version,
-        options = {
-          autoResubscribe: false,
-          protocol: 'fakeproto',
-          volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
-          defaultIndex: 'foobar',
-          jwt: 'fakejwt',
-          eventTimeout: 1000
-        },
-        kuzzle = new Kuzzle('somewhere', options);
-
-      should(kuzzle.autoResubscribe).be.false();
-      should(kuzzle.defaultIndex).be.exactly('foobar');
-      should(kuzzle.jwt).be.exactly('fakejwt');
-      should(kuzzle.protocol).be.exactly('fakeproto');
-      should(kuzzle.sdkVersion).be.exactly(sdkVersion);
-      should(kuzzle.volatile).be.an.Object().and.match(options.volatile);
-
-      should(kuzzle.collections).be.an.Object().and.be.empty();
-      should(kuzzle.connectCB).be.undefined();
-      should(kuzzle.eventActions).be.an.Array()
-        .and.containEql('connected')
-        .and.containEql('discarded')
-        .and.containEql('disconnected')
-        .and.containEql('loginAttempt')
-        .and.containEql('networkError')
-        .and.containEql('offlineQueuePush')
-        .and.containEql('offlineQueuePop')
-        .and.containEql('queryError')
-        .and.containEql('reconnected')
-        .and.containEql('tokenExpired');
-      should(kuzzle.eventTimeout).be.exactly(1000);
-      should(kuzzle.protectedEvents).be.an.Object();
-      should(kuzzle.protectedEvents.connected).be.eql({timeout: 1000});
-      should(kuzzle.protectedEvents.error).be.eql({timeout: 1000});
-      should(kuzzle.protectedEvents.disconnected).be.eql({timeout: 1000});
-      should(kuzzle.protectedEvents.reconnected).be.eql({timeout: 1000});
-      should(kuzzle.protectedEvents.tokenExpired).be.eql({timeout: 1000});
-      should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 1000});
     });
+    
+    var
+      sdkVersion = require('../../package.json').version,
+      options = {
+        autoResubscribe: false,
+        protocol: 'fakeproto',
+        volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
+        defaultIndex: 'foobar',
+        jwt: 'fakejwt',
+        eventTimeout: 1000
+      },
+      kuzzle = new MockedKuzzle('somewhere', options);
+
+    should(kuzzle.autoResubscribe).be.false();
+    should(kuzzle.defaultIndex).be.exactly('foobar');
+    should(kuzzle.jwt).be.exactly('fakejwt');
+    should(kuzzle.protocol).be.exactly('fakeproto');
+    should(kuzzle.sdkVersion).be.exactly(sdkVersion);
+    should(kuzzle.volatile).be.an.Object().and.match(options.volatile);
+
+    should(kuzzle.collections).be.an.Object().and.be.empty();
+    should(kuzzle.connectCB).be.undefined();
+    should(kuzzle.eventActions).be.an.Array()
+      .and.containEql('connected')
+      .and.containEql('discarded')
+      .and.containEql('disconnected')
+      .and.containEql('loginAttempt')
+      .and.containEql('networkError')
+      .and.containEql('offlineQueuePush')
+      .and.containEql('offlineQueuePop')
+      .and.containEql('queryError')
+      .and.containEql('reconnected')
+      .and.containEql('tokenExpired');
+    should(kuzzle.eventTimeout).be.exactly(1000);
+    should(kuzzle.protectedEvents).be.an.Object();
+    should(kuzzle.protectedEvents.connected).be.eql({timeout: 1000});
+    should(kuzzle.protectedEvents.error).be.eql({timeout: 1000});
+    should(kuzzle.protectedEvents.disconnected).be.eql({timeout: 1000});
+    should(kuzzle.protectedEvents.reconnected).be.eql({timeout: 1000});
+    should(kuzzle.protectedEvents.tokenExpired).be.eql({timeout: 1000});
+    should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 1000});
   });
 
   it('should handle the connect option properly', function () {

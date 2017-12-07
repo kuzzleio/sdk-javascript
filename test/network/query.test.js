@@ -14,7 +14,7 @@ describe('Network query management', function () {
     beforeEach(function () {
       network = new RTWrapper('somewhere', {connect: 'manual'});
       network.send = function(request) {
-        network.emitEvent(request.requestId, request.response);
+        network.emit(request.requestId, request.response);
       };
       sendSpy = sinon.spy(network, 'send');
     });

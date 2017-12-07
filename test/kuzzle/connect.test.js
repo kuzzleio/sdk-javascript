@@ -1,26 +1,25 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
-  Kuzzle = rewire('../../src/Kuzzle');
+  proxyquire = require('proxyquire'),
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 describe('Kuzzle connect', function () {
   var
-    clock,
-    networkWrapperRevert;
+    Kuzzle,
+    clock;
 
   beforeEach(function () {
-    networkWrapperRevert = Kuzzle.__set__({
-      networkWrapper: function(protocol, host, options) {
+    Kuzzle = proxyquire('../../src/Kuzzle', {
+      './networkWrapper': function(protocol, host, options) {
         return new NetworkWrapperMock(host, options);
       }
     });
+
     clock = sinon.useFakeTimers();
   });
 
   afterEach(function() {
-    networkWrapperRevert();
     clock.restore();
   });
 
@@ -34,7 +33,7 @@ describe('Kuzzle connect', function () {
 
   it('should return immediately if already connected', function () {
     var promises = [];
-    ['connecting', 'ready', 'connected'].forEach(function (state) {
+    ['connecting', 'connected'].forEach(function (state) {
       promises.push(new Promise(function(resolve) {
         var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
           should(err).be.null();
@@ -48,7 +47,7 @@ describe('Kuzzle connect', function () {
       }));
     });
     clock.tick();
-    Promise.all(promises);
+    return Promise.all(promises);
   });
 
   it('should call network wrapper connect() method when the instance is offline', function () {
@@ -153,7 +152,7 @@ describe('Kuzzle connect', function () {
       var
         eventStub = sinon.stub(),
         kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
-          kuzzle.network.emitEvent('discarded');
+          kuzzle.network.emit('discarded');
         });
 
       kuzzle.addListener('discarded', eventStub);
