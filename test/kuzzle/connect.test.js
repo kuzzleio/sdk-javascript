@@ -22,15 +22,6 @@ describe('Kuzzle connect', function () {
   afterEach(function() {
     clock.restore();
   });
-
-  it('should return the current Kuzzle instance', function () {
-    var
-      kuzzle = new Kuzzle('somewhere'),
-      connectedKuzzle = kuzzle.connect();
-
-    should(connectedKuzzle).be.exactly(kuzzle);
-  });
-
   it('should return immediately if already connected', function () {
     var promises = [];
     ['connecting', 'connected'].forEach(function (state) {
