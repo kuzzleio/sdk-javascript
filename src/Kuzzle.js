@@ -334,14 +334,13 @@ class Kuzzle extends KuzzleEventEmitter {
   /**
    * Connects to a Kuzzle instance using the provided host name
    * @param {function} [cb] Connection callback
-   * @returns {Object} this
    */
   connect (cb) {
     if (this.network.state !== 'offline') {
       if (cb) {
         cb(null, this);
       }
-      return this;
+      return;
     }
 
     this.network.connect();
@@ -386,8 +385,6 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.on('discarded', data => this.emit('discarded', data));
-
-    return this;
   }
 
   /**
