@@ -21,7 +21,7 @@ describe('Kuzzle subscription management', function () {
       }
     });
 
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     room = new KuzzleRoom(kuzzle.collection('foo', 'bar'), {equals: {foo: 'bar'}}, {});
     room.notify = sinon.stub();
   });

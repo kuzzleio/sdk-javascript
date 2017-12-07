@@ -23,7 +23,7 @@ describe('Kuzzle methods', function () {
     };
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     result = null;
     error = null;
   });

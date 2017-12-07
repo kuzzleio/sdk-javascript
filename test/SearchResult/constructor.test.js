@@ -15,7 +15,7 @@ describe('SearchResult constructor', function () {
     collection;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar', connect: 'manual'});
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     searchOptions = {from:0, size: 1};
     searchFilters = {};
     collection = kuzzle.collection('foo');

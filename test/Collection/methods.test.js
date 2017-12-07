@@ -18,7 +18,7 @@ describe('Collection methods', function () {
     kuzzle;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.bluebird = Bluebird;
     kuzzle.query = sinon.stub();
     kuzzle.subscribe = sinon.stub();

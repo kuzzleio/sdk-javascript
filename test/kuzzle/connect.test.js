@@ -25,7 +25,7 @@ describe('Kuzzle connect', function () {
 
   it('should return the current Kuzzle instance', function () {
     var
-      kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
+      kuzzle = new Kuzzle('somewhere'),
       connectedKuzzle = kuzzle.connect();
 
     should(connectedKuzzle).be.exactly(kuzzle);
@@ -35,37 +35,38 @@ describe('Kuzzle connect', function () {
     var promises = [];
     ['connecting', 'connected'].forEach(function (state) {
       promises.push(new Promise(function(resolve) {
-        var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+        var kuzzle = new Kuzzle('somewhere');
+        kuzzle.network.state = state;
+        kuzzle.connect(function (err, res) {
           should(err).be.null();
           should(res).be.exactly(kuzzle);
           should(res.network.connectCalled).be.false();
           should(res.network.state).be.exactly(state);
           resolve();
         });
-        kuzzle.network.state = state;
-        kuzzle.connect();
       }));
     });
     clock.tick();
     return Promise.all(promises);
   });
 
-  it('should call network wrapper connect() method when the instance is offline', function () {
-    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+  it('should call network wrapper connect() method when the instance is offline', function (done) {
+    var kuzzle = new Kuzzle('somewhere');
+    kuzzle.network.state = 'offline';
+    kuzzle.connect(function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
       should(res.network.state).be.exactly('connected');
       should(res.network.connectCalled).be.true();
+      done();
     });
-    kuzzle.network.state = 'offline';
-    kuzzle.connect();
     clock.tick();
   });
 
   describe('=> Connection Events', function () {
     it('should registered listeners upon receiving a "error" event', function () {
       var
-        kuzzle = new Kuzzle('nowhere', {connect: 'manual'}),
+        kuzzle = new Kuzzle('nowhere'),
         eventStub = sinon.stub();
 
       kuzzle.addListener('networkError', eventStub);
@@ -77,7 +78,7 @@ describe('Kuzzle connect', function () {
 
     it('should registered listeners upon receiving a "connect" event', function () {
       var
-        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
+        kuzzle = new Kuzzle('somewhere'),
         eventStub = sinon.stub();
 
       kuzzle.addListener('connected', eventStub);
@@ -89,7 +90,7 @@ describe('Kuzzle connect', function () {
 
     it('should registered listeners upon receiving a "reconnect" event', function () {
       var
-        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
+        kuzzle = new Kuzzle('somewhereagain'),
         eventStub = sinon.stub();
 
       kuzzle.addListener('reconnected', eventStub);
@@ -100,7 +101,7 @@ describe('Kuzzle connect', function () {
     });
 
     it('should keep a valid JWT at reconnection', function () {
-      var kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'});
+      var kuzzle = new Kuzzle('somewhereagain');
 
       kuzzle.checkToken = sinon.stub();
 
@@ -118,7 +119,7 @@ describe('Kuzzle connect', function () {
 
     it('should empty the JWT at reconnection if it has expired', function () {
       var
-        kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'});
+        kuzzle = new Kuzzle('somewhereagain');
 
       kuzzle.checkToken = sinon.stub();
 
@@ -137,13 +138,13 @@ describe('Kuzzle connect', function () {
     it('should register listeners upon receiving a "disconnect" event', function () {
       var
         eventStub = sinon.stub(),
-        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
-          kuzzle.network.disconnect();
-        });
+        kuzzle = new Kuzzle('somewhere');
 
       kuzzle.addListener('disconnected', eventStub);
 
-      kuzzle.connect();
+      kuzzle.connect(function () {
+        kuzzle.network.disconnect();
+      });
       clock.tick();
       should(eventStub).be.calledOnce();
     });
@@ -151,13 +152,13 @@ describe('Kuzzle connect', function () {
     it('should register listeners upon receiving a "discarded" event', function () {
       var
         eventStub = sinon.stub(),
-        kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
-          kuzzle.network.emit('discarded');
-        });
+        kuzzle = new Kuzzle('somewhere');
 
       kuzzle.addListener('discarded', eventStub);
 
-      kuzzle.connect();
+      kuzzle.connect(function() {
+        kuzzle.network.emit('discarded');
+      });
       clock.tick();
       should(eventStub).be.calledOnce();
     });

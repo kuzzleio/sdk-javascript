@@ -15,7 +15,7 @@ describe('User methods', function () {
     expectedQuery;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
   });
 
@@ -68,7 +68,7 @@ describe('User methods', function () {
   describe('#replace', function () {
     beforeEach(function () {
       sandbox.reset();
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
+      kuzzle = new Kuzzle('foo');
       result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });

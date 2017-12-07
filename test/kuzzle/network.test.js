@@ -16,7 +16,7 @@ describe('Kuzzle network methods', function () {
       }
     });
 
-    kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+    kuzzle = new Kuzzle('somewhere');
     kuzzle.network.close = sinon.stub();
   });
 

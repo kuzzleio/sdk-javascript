@@ -12,7 +12,7 @@ describe('Network query management', function () {
       network;
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
       network.send = function(request) {
         network.emit(request.requestId, request.response);
       };
@@ -114,7 +114,7 @@ describe('Network query management', function () {
     });
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
       network.state = 'connected';
       emitRequestStub.reset();
     });
@@ -266,7 +266,7 @@ describe('Network query management', function () {
       };
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
       network.state = 'connected';
       network.query = sinon.stub().callsFake(queryStub);
       error = null;
@@ -371,7 +371,7 @@ describe('Network query management', function () {
       };
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
       network.state = 'connected';
       network.query = sinon.stub().callsFake(queryStub);
       error = null;
@@ -441,7 +441,7 @@ describe('Network query management', function () {
 
       RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
       RTWrapper.__set__('cleanHistory', cleanStub);
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
 
       should(network.cleanHistoryTimer).be.null();
       should(cleanStub).not.be.called();
@@ -469,7 +469,7 @@ describe('Network query management', function () {
         network;
 
       RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
-      network = new RTWrapper('somewhere', {connect: 'manual'});
+      network = new RTWrapper('somewhere');
       network.clientConnected();
 
       for (i = 100000; i >= 0; i -= 10000) {

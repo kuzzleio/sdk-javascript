@@ -15,7 +15,7 @@ describe('SearchResult methods', function () {
     searchFilters;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
     searchOptions = {from:0, size: 1};
     searchFilters = {};

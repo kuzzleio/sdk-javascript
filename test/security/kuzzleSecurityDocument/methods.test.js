@@ -6,7 +6,7 @@ var
 describe('KuzzleSecurityDocument methods', function () {
   var
     securityDocument,
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
 
   describe('#toJSON', function () {
     before(function () {

@@ -14,7 +14,7 @@ describe('Document methods', function () {
     collection;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
     collection = new Collection(kuzzle, 'foo', 'bar');
   });
