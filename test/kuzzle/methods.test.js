@@ -598,7 +598,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {body: {startTime: 123 }}, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123 }, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });
@@ -620,7 +620,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, 456, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {body: {startTime: 123, stopTime: 456 }}, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456 }, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });

@@ -866,7 +866,7 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
 Kuzzle.prototype.getStatistics = function (startTime, stopTime, options, cb) {
   var
     queryCB,
-    body;
+    query = {};
 
   if (!cb) {
     switch (arguments.length) {
@@ -908,10 +908,10 @@ Kuzzle.prototype.getStatistics = function (startTime, stopTime, options, cb) {
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
   if (startTime) {
-    body = stopTime ? {startTime, stopTime} : {startTime};
+    query = stopTime ? {startTime, stopTime} : {startTime};
   }
 
-  this.query({controller: 'server', action: startTime ? 'getStats' : 'getLastStats'}, body, options, queryCB);
+  this.query({controller: 'server', action: startTime ? 'getStats' : 'getLastStats'}, query, options, queryCB);
 };
 
 /**
