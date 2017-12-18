@@ -75,10 +75,10 @@ class WSNode extends RTWrapper {
       const data = JSON.parse(payload.data || payload);
 
       if (data.room) {
-        this.emitEvent(data.room, data);
+        this.emit(data.room, data);
       }
       else {
-        this.emitEvent('discarded', data);
+        this.emit('discarded', data);
       }
     };
   }
