@@ -660,7 +660,7 @@ Collection.prototype.search = function (filters, options, cb) {
 
   self.kuzzle.callbackRequired('Collection.search', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
+  self.kuzzle.query(self.buildQueryArgs('document', 'search'), query, options, function (error, result) {
     if (error) {
       return cb(error);
     }

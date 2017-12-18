@@ -1,3 +1,5 @@
+var Document = require('./Document');
+
 /**
  * @param {Collection} collection
  * @param {object} filters
@@ -13,8 +15,6 @@
  * @constructor
  */
 function SearchResult (collection, filters, options, raw) {
-  var self = this;
-
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -27,21 +27,21 @@ function SearchResult (collection, filters, options, raw) {
     },
     documents: {
       value: raw.result.hits.map(function (doc) {
-        var d = new Document(self, doc._id, doc._source, doc._meta);
+        var d = new Document(collection, doc._id, doc._source, doc._meta);
         d.version = doc._version;
         return d;
       }),
       enumerable: true
     },
     aggregations: {
-      value: aggregations || {},
+      value: raw.result.aggregations || {},
       enumerable: true
     },
     options: {
       value: {
         from: options.from,
         size: options.size,
-        scrollId: options.scrollId
+        scrollId: raw.result._scroll_id
       },
       enumerable: true
     },
@@ -57,8 +57,8 @@ function SearchResult (collection, filters, options, raw) {
     }
   });
 
-  Object.freeze(this.options);
   Object.freeze(this.filters);
+  Object.freeze(this.options);
   Object.freeze(this.aggregations);
 
   // promisifying
