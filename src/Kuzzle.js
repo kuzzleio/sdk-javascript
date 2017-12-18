@@ -787,40 +787,62 @@ class Kuzzle extends KuzzleEventEmitter {
    * Kuzzle monitors active connections, and ongoing/completed/failed requests.
    * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
    *
-   * @param {number} [timestamp] -  Epoch time. Starting time from which the frames are to be retrieved
+   * @param {number} startTime -  Epoch time. Starting time from which the frames are to be retrieved
+   * @param {number} stopTime -  Epoch time. End time from which the frames are to be retrieved
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  getStatistics (timestamp, options, cb) {
-    if (!cb) {
-      if (!options) {
-        cb = timestamp;
+  getStatistics (...args) {
+    let
+      startTime,
+      stopTime,
+      options,
+      cb;
+
+    switch (args.length) {
+      case 1:
+        cb = args[0];
+        startTime = null;
+        stopTime = null;
         options = null;
-        timestamp = null;
-      } else {
-        cb = options;
-        if (typeof timestamp === 'object') {
-          options = timestamp;
-          timestamp = null;
+        break;
+      case 2:
+        if (typeof args[0] === 'object') {
+          [options, cb] = args;
         } else {
-          options = null;
+          [startTime, cb] = args;
         }
-      }
+        break;
+      case 3:
+        if (typeof args[1] === 'object') {
+          [startTime, options, cb] = args;
+        } else {
+          [startTime, stopTime, cb] = args;
+        }
+        break;
+      case 4:
+        [startTime, stopTime, options, cb] = args;
+        break;
+      default:
+        throw new Error('Bad arguments list. Usage: kuzzle.getStatistics([startTime,] [stopTime,] [options,] callback)');
     }
 
     this.callbackRequired('Kuzzle.getStatistics', cb);
 
-    const 
-      queryCB = (err, res) => {
-        if (err) {
-          return cb(err);
-        }
+    const queryCB = (err, res) => {
+      if (err) {
+        return cb(err);
+      }
 
-        cb(null, timestamp ? res.result.hits : [res.result]);
-      },
-      body = timestamp ? {body: {startTime: timestamp}} : {};
+      cb(null, startTime ? res.result.hits : [res.result]);
+    };
 
-    this.query({controller: 'server', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
+    let query = {};
+    if (startTime) {
+      query = stopTime ? {startTime, stopTime} : {startTime};
+    }
+
+    this.query({controller: 'server', action: startTime ? 'getStats' : 'getLastStats'}, query, options, queryCB);
   }
 
   /**
