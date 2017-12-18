@@ -14,7 +14,7 @@ describe('Offline queue management', function () {
   beforeEach(function () {
     var pastTime = 60050;
 
-    network = new RTWrapper('somewhere', {connect: 'manual'});
+    network = new RTWrapper('somewhere');
 
     // queuing a bunch of 7 requests from 1min ago to right now, 10s apart
     now = Date.now();

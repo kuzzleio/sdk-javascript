@@ -12,7 +12,7 @@ describe('Profile methods', function () {
     expectedQuery;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
   });
 

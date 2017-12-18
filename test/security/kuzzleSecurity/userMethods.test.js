@@ -11,7 +11,7 @@ describe('Security user methods', function () {
     result;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
   });
 
@@ -353,7 +353,7 @@ describe('Security user methods', function () {
 
   describe('#scrollUsers', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar', connect: 'manual'});
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
       result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ] } };
     });
 

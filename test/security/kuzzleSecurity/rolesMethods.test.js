@@ -11,7 +11,7 @@ describe('Security roles methods', function () {
     result;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
   });
 

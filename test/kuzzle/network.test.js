@@ -1,26 +1,23 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
+  proxyquire = require('proxyquire'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
-  Kuzzle = rewire('../../src/Kuzzle');
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 describe('Kuzzle network methods', function () {
-  var kuzzle;
+  var 
+    Kuzzle,
+    kuzzle;
 
   beforeEach(function () {
-    networkWrapperRevert = Kuzzle.__set__({
-      networkWrapper: function(protocol, host, options) {
+    Kuzzle = proxyquire('../../src/Kuzzle', {
+      './networkWrapper': function(protocol, host, options) {
         return new NetworkWrapperMock(host, options);
       }
     });
 
-    kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+    kuzzle = new Kuzzle('somewhere');
     kuzzle.network.close = sinon.stub();
-  });
-
-  afterEach(function() {
-    networkWrapperRevert();
   });
 
   describe('#flushQueue', function() {
@@ -92,7 +89,7 @@ describe('Kuzzle network methods', function () {
         query = {foo: 'bar'};
 
       kuzzle.addListener('queryError', eventStub);
-      kuzzle.network.emitEvent('queryError', error, query);
+      kuzzle.network.emit('queryError', error, query);
 
       should(eventStub).be.calledOnce();
       should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
@@ -102,7 +99,7 @@ describe('Kuzzle network methods', function () {
       var eventStub = sinon.stub();
 
       kuzzle.addListener('offlineQueuePush', eventStub);
-      kuzzle.network.emitEvent('offlineQueuePush', {query: {foo: 'bar'}, cb: 'callback'});
+      kuzzle.network.emit('offlineQueuePush', {query: {foo: 'bar'}, cb: 'callback'});
 
       should(eventStub).be.calledOnce();
       should(eventStub).be.calledWithMatch({query: {foo: 'bar'}, cb: 'callback'});
@@ -112,7 +109,7 @@ describe('Kuzzle network methods', function () {
       var eventStub = sinon.stub();
 
       kuzzle.addListener('offlineQueuePop', eventStub);
-      kuzzle.network.emitEvent('offlineQueuePop', {foo: 'bar'});
+      kuzzle.network.emit('offlineQueuePop', {foo: 'bar'});
 
       should(eventStub).be.calledOnce();
       should(eventStub).be.calledWithMatch({foo: 'bar'});
@@ -122,14 +119,14 @@ describe('Kuzzle network methods', function () {
       var eventStub = sinon.stub();
 
       kuzzle.addListener('tokenExpired', eventStub);
-      kuzzle.network.emitEvent('tokenExpired');
+      kuzzle.network.emit('tokenExpired');
 
       should(eventStub).be.calledOnce();
     });
 
     it('should empty the jwt when a "tokenExpired" events is triggered', function () {
       kuzzle.jwt = 'foobar';
-      kuzzle.network.emitEvent('tokenExpired');
+      kuzzle.network.emit('tokenExpired');
 
       should(kuzzle.jwt).be.undefined();
     });

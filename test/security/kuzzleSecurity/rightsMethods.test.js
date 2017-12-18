@@ -61,7 +61,7 @@ describe('Security user rights methods', function () {
   ];
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.query = sinon.stub();
   });
 

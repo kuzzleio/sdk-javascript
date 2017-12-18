@@ -129,7 +129,7 @@ class RTWrapper extends KuzzleEventEmitter {
    */
   clientConnected() {
     this.state = 'connected';
-    this.emitEvent(this.wasConnected && 'reconnect' || 'connect');
+    this.emit(this.wasConnected && 'reconnect' || 'connect');
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
 
@@ -158,7 +158,7 @@ class RTWrapper extends KuzzleEventEmitter {
     }
 
     this.clearHistoryTimer();
-    this.emitEvent('disconnect');
+    this.emit('disconnect');
   }
 
   /**
@@ -174,7 +174,7 @@ class RTWrapper extends KuzzleEventEmitter {
 
     this.clearHistoryTimer();
 
-    this.emitEvent('networkError', error);
+    this.emit('networkError', error);
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
       this.retrying = true;
       setTimeout(() => {
@@ -182,7 +182,7 @@ class RTWrapper extends KuzzleEventEmitter {
         this.connect(this.host);
       }, this.reconnectionDelay);
     } else {
-      this.emitEvent('disconnect');
+      this.emit('disconnect');
     }
   }
 
@@ -251,7 +251,7 @@ class RTWrapper extends KuzzleEventEmitter {
 
     if (this.queuing && queuable) {
       cleanQueue(this, object, cb);
-      this.emitEvent('offlineQueuePush', {query: object, cb: cb});
+      this.emit('offlineQueuePush', {query: object, cb: cb});
       return this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
     }
 
@@ -282,14 +282,14 @@ function emitRequest (network, request, cb) {
       let error = null;
 
       if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
-        network.emitEvent('tokenExpired', request, cb);
+        network.emit('tokenExpired', request, cb);
       }
 
       if (response.error) {
         error = new Error(response.error.message);
         Object.assign(error, response.error);
         error.status = response.status;
-        network.emitEvent('queryError', error, request, cb);
+        network.emit('queryError', error, request, cb);
       }
 
       if (cb) {
@@ -327,7 +327,7 @@ function cleanQueue (network) {
       network.offlineQueue
         .splice(0, lastDocumentIndex + 1)
         .forEach(droppedRequest => {
-          network.emitEvent('offlineQueuePop', droppedRequest.query);
+          network.emit('offlineQueuePop', droppedRequest.query);
         });
     }
   }
@@ -336,7 +336,7 @@ function cleanQueue (network) {
     network.offlineQueue
       .splice(0, network.offlineQueue.length - network.queueMaxSize)
       .forEach(droppedRequest => {
-        network.emitEvent('offlineQueuePop', droppedRequest.query);
+        network.emit('offlineQueuePop', droppedRequest.query);
       });
   }
 }
@@ -350,7 +350,7 @@ function dequeue (network) {
     dequeuingProcess = () => {
       if (network.offlineQueue.length > 0) {
         emitRequest(network, network.offlineQueue[0].query, network.offlineQueue[0].cb);
-        network.emitEvent('offlineQueuePop', network.offlineQueue.shift());
+        network.emit('offlineQueuePop', network.offlineQueue.shift());
 
         setTimeout(() => {
           dequeuingProcess();

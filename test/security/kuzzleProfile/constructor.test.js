@@ -9,7 +9,7 @@ describe('Profile constructor', function () {
     kuzzle;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
   });
 
   it('should throw an error if no id is provided', function() {

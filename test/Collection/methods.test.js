@@ -18,7 +18,7 @@ describe('Collection methods', function () {
     kuzzle;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.bluebird = Bluebird;
     kuzzle.query = sinon.stub();
     kuzzle.subscribe = sinon.stub();
@@ -866,6 +866,33 @@ describe('Collection methods', function () {
 
       kuzzle.query.yield(null, { result: result });
     });
+
+    it('should handle partial errors', function (done) {
+      this.timeout(50);
+
+      collection.mCreateDocument(content.documents, function (err, res) {
+        should(res).be.instanceof(Object);
+        should(res).match(result);
+        should(err).be.instanceof(Object);
+        should(err).match({status: 206});
+        done();
+      });
+
+      kuzzle.query.yield({status: 206}, { result: result });
+    });
+
+    it('should handle global errors', function (done) {
+      this.timeout(50);
+
+      collection.mCreateDocument(content.documents, function (err, res) {
+        should(res).be.undefined();
+        should(err).be.instanceof(Object);
+        should(err).match({status: 503});
+        done();
+      });
+
+      kuzzle.query.yield({status: 503});
+    });
   });
 
   describe('#mCreateOrReplaceDocument', function () {
@@ -916,6 +943,33 @@ describe('Collection methods', function () {
 
       kuzzle.query.yield(null, { result: result });
     });
+
+    it('should handle partial errors', function (done) {
+      this.timeout(50);
+
+      collection.mCreateOrReplaceDocument(content.documents, function (err, res) {
+        should(res).be.instanceof(Object);
+        should(res).match(result);
+        should(err).be.instanceof(Object);
+        should(err).match({status: 206});
+        done();
+      });
+
+      kuzzle.query.yield({status: 206}, { result: result });
+    });
+
+    it('should handle global errors', function (done) {
+      this.timeout(50);
+
+      collection.mCreateOrReplaceDocument(content.documents, function (err, res) {
+        should(res).be.undefined();
+        should(err).be.instanceof(Object);
+        should(err).match({status: 503});
+        done();
+      });
+
+      kuzzle.query.yield({status: 503});
+    });
   });
 
   describe('#mDeleteDocument', function () {
@@ -959,6 +1013,33 @@ describe('Collection methods', function () {
       });
 
       kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should handle partial errors', function (done) {
+      this.timeout(50);
+
+      collection.mDeleteDocument(content.ids, function (err, res) {
+        should(res).be.instanceof(Object);
+        should(res).match(result);
+        should(err).be.instanceof(Object);
+        should(err).match({status: 206});
+        done();
+      });
+
+      kuzzle.query.yield({status: 206}, { result: result });
+    });
+
+    it('should handle global errors', function (done) {
+      this.timeout(50);
+
+      collection.mDeleteDocument(content.ids, function (err, res) {
+        should(res).be.undefined();
+        should(err).be.instanceof(Object);
+        should(err).match({status: 503});
+        done();
+      });
+
+      kuzzle.query.yield({status: 503});
     });
   });
 
@@ -1096,12 +1177,40 @@ describe('Collection methods', function () {
       this.timeout(50);
 
       collection.mUpdateDocument(content.documents, function (err, res) {
-        should(res).should.be.instanceof(Object);
+        should(res).be.instanceof(Object);
         should(res).match(result);
+        should(err).be.null();
         done();
       });
 
       kuzzle.query.yield(null, { result: result });
+    });
+
+    it('should handle partial errors', function (done) {
+      this.timeout(50);
+
+      collection.mUpdateDocument(content.documents, function (err, res) {
+        should(res).be.instanceof(Object);
+        should(res).match(result);
+        should(err).be.instanceof(Object);
+        should(err).match({status: 206});
+        done();
+      });
+
+      kuzzle.query.yield({status: 206}, { result: result });
+    });
+
+    it('should handle global errors', function (done) {
+      this.timeout(50);
+
+      collection.mUpdateDocument(content.documents, function (err, res) {
+        should(res).be.undefined();
+        should(err).be.instanceof(Object);
+        should(err).match({status: 503});
+        done();
+      });
+
+      kuzzle.query.yield({status: 503});
     });
   });
 

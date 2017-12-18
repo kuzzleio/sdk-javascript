@@ -367,7 +367,7 @@ Collection.prototype.mCreateDocument = function (documents, options, cb) {
   });
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreate'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : res.result);
+    cb(err, res && res.result);
   });
 
   return self;
@@ -403,7 +403,7 @@ Collection.prototype.mCreateOrReplaceDocument = function (documents, options, cb
   });
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mCreateOrReplace'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : res.result);
+    cb(err, res && res.result);
   });
 
   return self;
@@ -437,7 +437,7 @@ Collection.prototype.mDeleteDocument = function (documentIds, options, cb) {
   self.kuzzle.callbackRequired('Collection.mDelete', cb);
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mDelete'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : res.result);
+    cb(err, res && res.result);
   });
 
   return self;
@@ -540,7 +540,7 @@ Collection.prototype.mUpdateDocument = function (documents, options, cb) {
   });
 
   self.kuzzle.query(this.buildQueryArgs('document', 'mUpdate'), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : res.result);
+    cb(err, res && res.result);
   });
 
   return self;

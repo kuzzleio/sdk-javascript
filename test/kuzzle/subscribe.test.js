@@ -1,34 +1,29 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  rewire = require('rewire'),
+  proxyquire = require('proxyquire'),
   NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
-  Kuzzle = rewire('../../src/Kuzzle'),
   KuzzleDocument = require('../../src/Document'),
   KuzzleRoom = require('../../src/Room');
 
 describe('Kuzzle subscription management', function () {
   var
+    Kuzzle,
     cb,
-    networkWrapperRevert,
     kuzzle,
     room;
 
   beforeEach(function () {
     cb = sinon.stub();
-    networkWrapperRevert = Kuzzle.__set__({
-      networkWrapper: function(protocol, host, options) {
+    Kuzzle = proxyquire('../../src/Kuzzle', {
+      './networkWrapper': function(protocol, host, options) {
         return new NetworkWrapperMock(host, options);
       }
     });
 
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     room = new KuzzleRoom(kuzzle.collection('foo', 'bar'), {equals: {foo: 'bar'}}, {});
     room.notify = sinon.stub();
-  });
-
-  afterEach(function() {
-    networkWrapperRevert();
   });
 
   describe('#subscribe', function () {
@@ -196,11 +191,11 @@ describe('Kuzzle subscription management', function () {
     });
 
     it('should fire a "tokenExpired" event when receiving a TokenExpired notification', function () {
-      kuzzle.emitEvent = sinon.stub();
+      sinon.stub(kuzzle, 'emit');
 
       notificationCB({type: 'TokenExpired'});
-      should(kuzzle.emitEvent).be.calledOnce();
-      should(kuzzle.emitEvent).be.calledWith('tokenExpired');
+      should(kuzzle.emit).be.calledOnce();
+      should(kuzzle.emit).be.calledWith('tokenExpired');
     });
   });
 });

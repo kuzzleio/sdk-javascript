@@ -7,7 +7,7 @@ var
 describe('Collection constructor', function () {
   it('should initialize properties and return a valid Collection object', function () {
     var
-      kuzzle = new Kuzzle('foo', {connect: 'manual'}),
+      kuzzle = new Kuzzle('foo'),
       index = 'barfoo',
       collectionName = 'foobar',
       c;
@@ -29,7 +29,7 @@ describe('Collection constructor', function () {
       collection;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     collection = new Collection(kuzzle, 'bar', 'foo');
 
     should.exist(collection.countPromise);
@@ -59,7 +59,7 @@ describe('Collection constructor', function () {
   });
 
   it('should throw an error if no collection or no index is provided', function () {
-    var kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    var kuzzle = new Kuzzle('foo');
 
     should((function () { new Collection(kuzzle);})).throw();
     should((function () { new Collection(kuzzle, 'foo');})).throw();

@@ -33,7 +33,7 @@ function NetworkWrapperMock (host, options) {
           self.state = 'connected';
           self.emit('connect');
       }
-    });
+    }, 0);
   };
 
   this.disconnect = function() {

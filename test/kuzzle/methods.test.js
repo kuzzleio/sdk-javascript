@@ -23,7 +23,7 @@ describe('Kuzzle methods', function () {
     };
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     result = null;
     error = null;
   });
@@ -598,7 +598,29 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {body: {startTime: 123 }}, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123 }, options);
+      should(cb).be.calledOnce();
+      should(cb).be.calledWithExactly(null, hits);
+    });
+
+    it('should return statistics frames starting from the given start timestamp to the given stop timestamp', function () {
+      var hits = [
+          {123: {}},
+          {456: {}},
+          {789: {}}
+        ],
+        cb = sinon.stub(),
+        options = {queuable: true, volatile: {foo: 'bar'}},
+        expectedQuery = {
+          controller: 'server',
+          action: 'getStats'
+        };
+
+      result = {result: {hits: hits}};
+
+      kuzzle.getStatistics(123, 456, options, cb);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456 }, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });

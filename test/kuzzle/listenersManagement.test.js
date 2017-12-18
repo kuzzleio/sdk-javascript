@@ -1,11 +1,11 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   sinon = require('sinon'),
-  Kuzzle = rewire('../../src/Kuzzle');
+  proxyquire = require('proxyquire');
 
 describe('Kuzzle listeners management', function () {
   var
+    Kuzzle,
     addListenerStub = sinon.stub(),
     emitStub = sinon.stub(),
     kuzzle;
@@ -15,14 +15,15 @@ describe('Kuzzle listeners management', function () {
 
     KuzzleEventEmitterMock.prototype.addListener = addListenerStub;
     KuzzleEventEmitterMock.prototype.emit = emitStub;
-    Kuzzle.__set__({
-      KuzzleEventEmitter: KuzzleEventEmitterMock
+
+    Kuzzle = proxyquire('../../src/Kuzzle', {
+      './eventEmitter': KuzzleEventEmitterMock
     });
   });
 
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual', eventTimeout: 20});
+    kuzzle = new Kuzzle('foo', {eventTimeout: 20});
     addListenerStub.reset();
     emitStub.reset();
   });
