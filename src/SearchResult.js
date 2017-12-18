@@ -1,21 +1,20 @@
 /**
  * @param {Collection} collection
- * @param {int} total
- * @param {Document[]} documents
- * @param {object} aggregations
- * @param {object} options
  * @param {object} filters
- * @param {SearchResult} previous
+ * @param {object} options
+ * @param {object} raw 
  * @property {Collection} collection
  * @property {number} total
  * @property {Document[]} documents
  * @property {object} aggregations
  * @property {object} options
  * @property {object} filters
- * @property {number} fetchedDocument
+ * @property {number} fetched
  * @constructor
  */
-function SearchResult (collection, total, documents, aggregations, options, filters, previous) {
+function SearchResult (collection, filters, options, raw) {
+  var self = this;
+
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -23,11 +22,15 @@ function SearchResult (collection, total, documents, aggregations, options, filt
       enumerable: true
     },
     total: {
-      value: total,
+      value: raw.result.total,
       enumerable: true
     },
     documents: {
-      value: documents,
+      value: raw.result.hits.map(function (doc) {
+        var d = new Document(self, doc._id, doc._source, doc._meta);
+        d.version = doc._version;
+        return d;
+      }),
       enumerable: true
     },
     aggregations: {
@@ -35,7 +38,11 @@ function SearchResult (collection, total, documents, aggregations, options, filt
       enumerable: true
     },
     options: {
-      value: options || {},
+      value: {
+        from: options.from,
+        size: options.size,
+        scrollId: options.scrollId
+      },
       enumerable: true
     },
     filters: {
@@ -43,12 +50,16 @@ function SearchResult (collection, total, documents, aggregations, options, filt
       enumerable: true
     },
     // writable properties
-    fetchedDocument: {
-      value: previous instanceof SearchResult ? documents.length + previous.fetchedDocument : documents.length,
+    fetched: {
+      value: raw.result.hits.length,
       enumerable: true,
       writable: true
     }
   });
+
+  Object.freeze(this.options);
+  Object.freeze(this.filters);
+  Object.freeze(this.aggregations);
 
   // promisifying
   if (this.collection.kuzzle.bluebird) {
@@ -69,124 +80,61 @@ function SearchResult (collection, total, documents, aggregations, options, filt
  * @param {function} cb
  */
 SearchResult.prototype.fetchNext = function (cb) {
-  var
+  var 
+    self = this,
     filters,
-    options = Object.assign({}, this.options),
-    self = this;
+    opts,
+    updateAfterSearch = function (error, result) {
+      if (error) {
+        return cb(error);
+      }
+
+      result.fetched += self.fetched;
+      cb(null, result);
+    };
   
-  options.previous = this;
+  this.collection.kuzzle.callbackRequired('SearchResult.fetchNext', cb);
+
+  if (this.fetched >= this.total) {
+    return cb(null, null);
+  }
 
   // retrieve next results with scroll if original search use it
-  if (options.scrollId) {
-    if (this.fetchedDocument >= this.getTotal()) {
-      cb(null, null);
-      return;
-    }
-
-    // from and size parameters are not valid for a scroll action
-    if (typeof options.from !== 'undefined') {
-      delete options.from;
-    }
-
-    if (options.size) {
-      delete options.size;
-    }
-
-    this.collection.scroll(options.scrollId, options, this.filters || {}, cb);
-
+  if (this.options.scrollId) {
+    this.collection.scroll(this.options.scrollId, null, this.filters || {}, updateAfterSearch);
     return;
   }
 
   // retrieve next results using ES's search_after
-  if (options.size && this.filters.sort) {
-    if (this.fetchedDocument >= this.getTotal()) {
-      cb(null, null);
-      return;
-    }
-
-    if (options.from) {
-      delete options.from;
-    }
-
-    filters = Object.assign(this.filters, {search_after: []});
+  if (this.options.size !== undefined && this.filters.sort) {
+    filters = Object.assign({}, this.filters, {search_after: []});
+    opts = {size: this.options.size};
 
     filters.sort.forEach(function (sortRule) {
       filters.search_after.push(self.documents[self.documents.length - 1].content[Object.keys(sortRule)[0]]);
     });
 
-    this.collection.search(filters, options, cb);
-
+    this.collection.search(filters, opts, updateAfterSearch);
     return;
   }
 
   // retrieve next results with from/size if original search use it
-  if (options.from !== undefined && options.size !== undefined) {
-    filters = Object.assign({}, this.filters);
-
+  if (this.options.from !== undefined && this.options.size !== undefined) {
     // check if we need to do next request to fetch all matching documents
-    options.from += options.size;
+    opts = {
+      from: this.options.from + this.options.size,
+      size: this.options.size
+    };
 
-    if (options.from >= this.getTotal()) {
-      cb(null, null);
-
-      return;
+    if (opts.from >= this.total) {
+      return cb(null, null);
     }
 
-    this.collection.search(filters, options, cb);
-
+    this.collection.search(this.filters, opts, updateAfterSearch);
     return;
   }
 
   cb(new Error('Unable to retrieve next results from search: missing scrollId or from/size params'));
-};
-
-/**
- * @returns {Document[]}
- */
-SearchResult.prototype.getDocuments = function () {
-  return this.documents;
-};
-
-/**
- * @returns {number}
- */
-SearchResult.prototype.getTotal = function () {
-  return this.total;
-};
-
-/**
- * @returns {object}
- */
-SearchResult.prototype.getAggregations = function () {
-  return this.aggregations;
-};
-
-/**
- * @returns {Object}
- */
-SearchResult.prototype.getOptions = function() {
-  return this.options;
-};
-
-/**
- * @returns {object}
- */
-SearchResult.prototype.getFilters = function() {
-  return this.filters;
-};
-
-/**
- * @returns {object}
- */
-SearchResult.prototype.getCollection = function () {
-  return this.collection;
-};
-
-/**
- * @returns {number}
- */
-SearchResult.prototype.getFetchedDocument = function () {
-  return this.fetchedDocument;
 };
 
 module.exports = SearchResult;
