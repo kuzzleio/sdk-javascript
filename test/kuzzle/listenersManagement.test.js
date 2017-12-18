@@ -23,7 +23,7 @@ describe('Kuzzle listeners management', function () {
 
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual', eventTimeout: 20});
+    kuzzle = new Kuzzle('foo', {eventTimeout: 20});
     addListenerStub.reset();
     emitStub.reset();
   });

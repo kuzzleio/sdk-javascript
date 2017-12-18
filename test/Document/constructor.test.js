@@ -11,7 +11,7 @@ describe('Document constructor', function () {
 
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     kuzzle.bluebird = bluebird;
     collection = kuzzle.collection('foo');
   });

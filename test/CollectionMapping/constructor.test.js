@@ -10,7 +10,7 @@ describe('CollectionMapping constructor', function () {
     collection;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual', defaultIndex: 'bar'});
+    kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
     collection = kuzzle.collection('foo');
   });
 

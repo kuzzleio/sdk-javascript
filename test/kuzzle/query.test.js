@@ -24,7 +24,7 @@ describe('Kuzzle query management', function () {
         }
       });
 
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
+      kuzzle = new Kuzzle('foo');
     });
 
     it('should generate a valid request object with no "options" argument and no callback', function () {

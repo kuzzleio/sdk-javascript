@@ -25,13 +25,8 @@ const
  * @param {responseCallback} [cb] - Handles connection response
  */
 class Kuzzle extends KuzzleEventEmitter {
-  constructor(host, options, cb) {
+  constructor(host, options) {
     super();
-
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
 
     if (!host || host === '') {
       throw new Error('host argument missing');
@@ -39,9 +34,6 @@ class Kuzzle extends KuzzleEventEmitter {
 
     Object.defineProperties(this, {
       // 'private' properties
-      connectCB: {
-        value: cb
-      },
       eventActions: {
         value: [
           'connected',
@@ -302,10 +294,6 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('tokenExpired');
     });
 
-    if ((options && options.connect || 'auto') === 'auto') {
-      this.connect();
-    }
-
     if (this.bluebird) {
       return this.bluebird.promisifyAll(this, {
         suffix: 'Promise',
@@ -314,7 +302,7 @@ class Kuzzle extends KuzzleEventEmitter {
             'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
             'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
             'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
-            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh'
+            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
           ];
 
           return passes && whitelist.indexOf(name) !== -1;
@@ -344,15 +332,15 @@ class Kuzzle extends KuzzleEventEmitter {
 
 
   /**
-   * Connects to a Kuzzle instance using the provided host name.
-   * @returns {Object} this
+   * Connects to a Kuzzle instance using the provided host name
+   * @param {function} [cb] Connection callback
    */
-  connect () {
+  connect (cb) {
     if (this.network.state !== 'offline') {
-      if (this.connectCB) {
-        this.connectCB(null, this);
+      if (cb) {
+        cb(null, this);
       }
-      return this;
+      return;
     }
 
     this.network.connect();
@@ -360,8 +348,8 @@ class Kuzzle extends KuzzleEventEmitter {
     this.network.addListener('connect', () => {
       this.emit('connected');
 
-      if (this.connectCB) {
-        this.connectCB(null, this);
+      if (cb) {
+        cb(null, this);
       }
     });
 
@@ -371,8 +359,8 @@ class Kuzzle extends KuzzleEventEmitter {
       connectionError.internal = error;
       this.emit('networkError', connectionError);
 
-      if (this.connectCB) {
-        this.connectCB(connectionError);
+      if (cb) {
+        cb(connectionError);
       }
     });
 
@@ -397,8 +385,6 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.on('discarded', data => this.emit('discarded', data));
-
-    return this;
   }
 
   /**

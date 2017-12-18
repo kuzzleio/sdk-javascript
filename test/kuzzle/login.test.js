@@ -10,7 +10,7 @@ describe('Kuzzle Login', function () {
     kuzzle;
 
   beforeEach(function() {
-    kuzzle = new Kuzzle('somewhere', {connect: 'manual', eventTimeout: 0});
+    kuzzle = new Kuzzle('somewhere', {eventTimeout: 0});
   });
 
   afterEach(function() {

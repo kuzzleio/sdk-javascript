@@ -170,7 +170,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.unsubscribe).be.a.Function();
 
     should(kuzzle).have.propertyWithDescriptor('collections', { enumerable: false, writable: true, configurable: false });
-    should(kuzzle).have.propertyWithDescriptor('connectCB', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('eventActions', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('eventTimeout', { enumerable: false, writable: false, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('protectedEvents', { enumerable: false, writable: false, configurable: false });
@@ -189,7 +188,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.volatile).be.an.Object().and.be.empty();
 
     should(kuzzle.collections).be.an.Object().and.be.empty();
-    should(kuzzle.connectCB).be.undefined();
     should(kuzzle.eventActions).be.an.Array()
       .and.containEql('connected')
       .and.containEql('discarded')
@@ -245,7 +243,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.volatile).be.an.Object().and.match(options.volatile);
 
     should(kuzzle.collections).be.an.Object().and.be.empty();
-    should(kuzzle.connectCB).be.undefined();
     should(kuzzle.eventActions).be.an.Array()
       .and.containEql('connected')
       .and.containEql('discarded')
@@ -267,19 +264,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 1000});
   });
 
-  it('should handle the connect option properly', function () {
-    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}); // eslint-disable-line
-
-    should(connectStub).not.be.called();
-
-    kuzzle = new Kuzzle('somewhere', {connect: 'auto'});
-    should(connectStub).be.calledOnce();
-
-    connectStub.reset();
-    kuzzle = new Kuzzle('somewhere');
-    should(connectStub).be.calledOnce();
-  });
-
   it('should promisify the right functions', function () {
     var kuzzle;
 
@@ -289,7 +273,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.addListenerPromise).be.undefined();
     should(kuzzle.checkTokenPromise).be.a.Function();
     should(kuzzle.collectionPromise).be.undefined();
-    should(kuzzle.connectPromise).be.undefined();
+    should(kuzzle.connectPromise).be.a.Function();
     should(kuzzle.createIndexPromise).be.a.Function();
     should(kuzzle.createMyCredentialsPromise).be.a.Function();
     should(kuzzle.deleteMyCredentialsPromise).be.a.Function();

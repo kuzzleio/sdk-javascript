@@ -11,7 +11,7 @@ describe('MemoryStorage methods', function () {
     emptyFunc = function () {};
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', {connect: 'manual'});
+    kuzzle = new Kuzzle('foo');
     kuzzle.bluebird = require('bluebird');
     kuzzle.query = sinon.stub();
     ms = new MemoryStorage(kuzzle);
