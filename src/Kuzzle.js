@@ -858,29 +858,42 @@ Kuzzle.prototype.getAllStatistics = function (options, cb) {
  * Kuzzle monitors active connections, and ongoing/completed/failed requests.
  * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
  *
- * @param {number} timestamp -  Epoch time. Starting time from which the frames are to be retrieved
+ * @param {number} startTime -  Epoch time. Starting time from which the frames are to be retrieved
+ * @param {number} stopTime -  Epoch time. End time from which the frames are to be retrieved
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} cb - Handles the query response
  */
-Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
+Kuzzle.prototype.getStatistics = function (startTime, stopTime, options, cb) {
   var
     queryCB,
-    body;
+    query = {};
 
   if (!cb) {
-    if (arguments.length === 1) {
-      cb = arguments[0];
-      options = null;
-      timestamp = null;
-    } else {
-      cb = arguments[1];
-      if (typeof arguments[0] === 'object') {
-        options = arguments[0];
-        timestamp = null;
-      } else {
-        timestamp = arguments[0];
+    switch (arguments.length) {
+      case 1:
+        cb = arguments[0];
+        startTime = null;
+        stopTime = null;
         options = null;
-      }
+        break;
+      case 2:
+        cb = arguments[1];
+        stopTime = null;
+        if (typeof arguments[0] === 'object') {
+          options = arguments[0];
+          startTime = null;
+        }
+        break;
+      case 3:
+        cb = arguments[2];
+        options = null;
+        if (typeof arguments[1] === 'object') {
+          options = arguments[1];
+          stopTime = null;
+        }
+        break;
+      default:
+        throw new Error('Bad arguments list. Usage: kuzzle.getStatistics([startTime,] [stopTime,] [options,] callback)');
     }
   }
 
@@ -889,13 +902,16 @@ Kuzzle.prototype.getStatistics = function (timestamp, options, cb) {
       return cb(err);
     }
 
-    cb(null, timestamp ? res.result.hits : [res.result]);
+    cb(null, startTime ? res.result.hits : [res.result]);
   };
 
   this.callbackRequired('Kuzzle.getStatistics', cb);
 
-  body = timestamp ? {body: {startTime: timestamp}} : {};
-  this.query({controller: 'server', action: timestamp ? 'getStats' : 'getLastStats'}, body, options, queryCB);
+  if (startTime) {
+    query = stopTime ? {startTime, stopTime} : {startTime};
+  }
+
+  this.query({controller: 'server', action: startTime ? 'getStats' : 'getLastStats'}, query, options, queryCB);
 };
 
 /**
