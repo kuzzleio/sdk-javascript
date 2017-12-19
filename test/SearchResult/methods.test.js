@@ -22,7 +22,7 @@ describe('SearchResult methods', function () {
     firstResultSet = {
       result: {
         hits: [
-          {_id: 'banana', _source: {foo: 'bar'}}
+          {_id: 'banana', _source: {foo: 'bar', bar: 'bazinga'}}
         ],
         total: 2
       }
@@ -42,14 +42,15 @@ describe('SearchResult methods', function () {
       collection.scroll = sinon.stub();
     });
 
-    it('should be able to perform a search-after request', function (done) {
+    it.only('should be able to perform a search-after request', function (done) {
       var firstSearchResult;
 
-      searchFilters = {sort: [{foo: 'asc'}]};
+      searchFilters = {sort: [{foo: 'asc'}, 'bar']};
 
       this.timeout(50);
 
       collection.search = function(filters, options, cb) {
+        should(filters.search_after).match(['bar', 'bazinga']);
         cb(null, new SearchResult(collection, searchFilters, searchOptions, secondResultSet));
       };
 

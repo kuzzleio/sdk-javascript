@@ -102,10 +102,16 @@ class SearchResult {
 
     // retrieve next results using ES's search_after
     if (this.options.size !== undefined && this.filters.sort) {
-      const filters = Object.assign({}, this.filters, {search_after: []});
+      const 
+        filters = Object.assign({}, this.filters, {search_after: []}),
+        lastDocumentContent = this.documents[this.documents.length - 1].content;
 
       for (const sortRule of filters.sort) {
-        filters.search_after.push(this.documents[this.documents.length - 1].content[Object.keys(sortRule)[0]]);
+        if (typeof sortRule === 'string') {
+          filters.search_after.push(lastDocumentContent[sortRule]);
+        } else {
+          filters.search_after.push(lastDocumentContent[Object.keys(sortRule)[0]]);
+        }
       }
 
       this.collection.search(filters, {size: this.options.size}, updateAfterSearch);
