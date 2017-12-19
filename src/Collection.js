@@ -660,34 +660,12 @@ Collection.prototype.search = function (filters, options, cb) {
 
   self.kuzzle.callbackRequired('Collection.search', cb);
 
-  self.kuzzle.query(this.buildQueryArgs('document', 'search'), query, options, function (error, result) {
-    var documents = [];
-
+  self.kuzzle.query(self.buildQueryArgs('document', 'search'), query, options, function (error, result) {
     if (error) {
       return cb(error);
     }
 
-    result.result.hits.forEach(function (doc) {
-      var newDocument = new Document(self, doc._id, doc._source, doc._meta);
-
-      newDocument.version = doc._version;
-
-      documents.push(newDocument);
-    });
-
-    if (result.result._scroll_id) {
-      options.scrollId = result.result._scroll_id;
-    }
-
-    cb(null, new KuzzleSearchResult(
-      self,
-      result.result.total,
-      documents,
-      result.result.aggregations ? result.result.aggregations : {},
-      options,
-      filters,
-      options.previous || null
-    ));
+    cb(null, new KuzzleSearchResult(self, filters, options, result));
   });
 };
 
@@ -726,36 +704,12 @@ Collection.prototype.scroll = function (scrollId, options, filters, cb) {
   request.scrollId = scrollId;
 
   this.kuzzle.query({controller: 'document', action: 'scroll'}, request, options, function (error, result) {
-    var documents = [];
-
     if (error) {
       return cb(error);
     }
 
-    result.result.hits.forEach(function (doc) {
-      var newDocument = new Document(self, doc._id, doc._source, doc._meta);
-
-      newDocument.version = doc._version;
-
-      documents.push(newDocument);
-    });
-
-    if (result.result._scroll_id) {
-      options.scrollId = result.result._scroll_id;
-    }
-
-    cb(null, new KuzzleSearchResult(
-      self,
-      result.result.total,
-      documents,
-      {},
-      options,
-      filters,
-      options.previous || null
-    ));
+    cb(null, new KuzzleSearchResult(self, filters, options, result));
   });
-
-  return this;
 };
 
 /**

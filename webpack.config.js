@@ -31,7 +31,8 @@ module.exports = {
           path.resolve(__dirname, './src/networkWrapper/protocols/'),
           path.resolve(__dirname, './src/Kuzzle.js'),
           path.resolve(__dirname, './src/Room.js'),
-          path.resolve(__dirname, './src/eventEmitter/')
+          path.resolve(__dirname, './src/eventEmitter/'),
+          path.resolve(__dirname, './src/SearchResult.js')
         ],
         loader: 'babel-loader',
         query: {

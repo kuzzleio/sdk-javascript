@@ -2,15 +2,14 @@ var
   should = require('should'),
   sinon = require('sinon'),
   Kuzzle = require('../../src/Kuzzle'),
-  Document = require('../../src/Document'),
   SearchResult = require('../../src/SearchResult');
 
 describe('SearchResult methods', function () {
   var
     kuzzle,
     collection,
-    firstDocument,
-    secondDocument,
+    firstResultSet,
+    secondResultSet,
     searchOptions,
     searchFilters;
 
@@ -20,8 +19,22 @@ describe('SearchResult methods', function () {
     searchOptions = {from:0, size: 1};
     searchFilters = {};
     collection = kuzzle.collection('foo', 'bar');
-    firstDocument = new Document(collection, 'banana', {foo: 'bar'});
-    secondDocument = new Document(collection, 'papagayo', {foo: 'bar'});
+    firstResultSet = {
+      result: {
+        hits: [
+          {_id: 'banana', _source: {foo: 'bar', bar: 'bazinga'}}
+        ],
+        total: 2
+      }
+    };
+    secondResultSet = {
+      result: {
+        hits: [
+          {_id: 'papagayo', _source: {foo: 'bar'}}
+        ],
+        total: 2
+      }
+    };
   });
 
   describe('#fetchNext', function () {
@@ -29,28 +42,30 @@ describe('SearchResult methods', function () {
       collection.scroll = sinon.stub();
     });
 
-    it('should be able to perform a search-after request', function (done) {
-      var
-        firstSearchResult;
+    it.only('should be able to perform a search-after request', function (done) {
+      var firstSearchResult;
 
-      searchFilters = {sort: [{foo: 'asc'}]};
+      searchFilters = {sort: [{foo: 'asc'}, 'bar']};
 
       this.timeout(50);
 
       collection.search = function(filters, options, cb) {
-        cb(null, new SearchResult(collection, 2, [secondDocument], {}, {size: 1}, searchFilters));
+        should(filters.search_after).match(['bar', 'bazinga']);
+        cb(null, new SearchResult(collection, searchFilters, searchOptions, secondResultSet));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, {size: 1}, searchFilters);
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
+      should(firstSearchResult.fetched).be.eql(1);
+
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
-        should(result.getDocuments()).be.an.Array();
-        should(result.getDocuments().length).be.exactly(1);
+        should(result.documents).be.an.Array().and.have.length(1);
+        should(result.fetched).be.eql(2);
         done();
       });
     });
 
-    it('should transfer error if not-able to do a search-after request', function (done) {
+    it('should transfer error if not able to do a search-after request', function (done) {
       var
         firstSearchResult;
 
@@ -60,7 +75,7 @@ describe('SearchResult methods', function () {
         cb(new Error('foobar search'));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, {size: 1}, searchFilters);
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
 
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -75,33 +90,36 @@ describe('SearchResult methods', function () {
 
       this.timeout(50);
 
-      searchOptions.scrollId = 'banana';
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
+      firstResultSet.result._scroll_id = 'banana';
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
+      should(firstSearchResult.fetched).be.eql(1);
+
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
-        should(result.getDocuments()).be.an.Array();
-        should(result.getDocuments().length).be.exactly(1);
+        should(result.documents).be.an.Array().and.have.length(1);
+        should(result.fetched).be.eql(2);
         done();
       });
 
-      collection.scroll.yield(null, new SearchResult(
-        collection,
-        1,
-        [new Document(collection, 'papagayo', {foo: 'bar'})],
-        {},
-        {options: {scrollId: 'papagayo', scroll: '1m', from: 0, size: 1}}
-      ));
+      should(collection.scroll)
+        .calledOnce()
+        .and.calledWithMatch('banana', null, searchFilters, sinon.match.func);
+      
+      collection.scroll.yield(null, new SearchResult(collection, searchFilters, searchOptions, secondResultSet));
     });
 
-    it('should transfer error if not-able to do a scroll request', function (done) {
+    it('should transfer error if not able to do a scroll request', function (done) {
       var
         firstSearchResult;
 
       this.timeout(50);
 
-      searchOptions.scrollId = 'banana';
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
-      firstSearchResult.fetchNext(function(error) {
+      firstResultSet.result._scroll_id = 'banana';
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
+      should(firstSearchResult.fetched).be.eql(1);
+
+      firstSearchResult.fetchNext(function(error, result) {
+        should(result).be.undefined();
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('foobar scroll');
         done();
@@ -117,20 +135,22 @@ describe('SearchResult methods', function () {
       this.timeout(50);
 
       collection.search = function(filters, options, cb) {
-        cb(null, new SearchResult(collection, 2, [secondDocument], {}, options, filters));
+        cb(null, new SearchResult(collection, searchFilters, options, secondResultSet));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
+      should(firstSearchResult.fetched).be.eql(1);
+
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.an.instanceOf(SearchResult);
-        should(result.documents).be.an.Array();
-        should(result.documents.length).be.exactly(1);
+        should(result.documents).be.an.Array().and.have.length(1);
         should(result.options.from).be.exactly(1);
+        should(result.fetched).be.eql(2);
         done();
       });
     });
 
-    it('should transfer error if not-able to do a from / next search request', function (done) {
+    it('should transfer error if not able to do a from / next search request', function (done) {
       var
         firstSearchResult;
 
@@ -138,7 +158,7 @@ describe('SearchResult methods', function () {
         cb(new Error('foobar search'));
       };
 
-      firstSearchResult = new SearchResult(collection, 2, [firstDocument], {}, searchOptions, searchFilters);
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
 
       firstSearchResult.fetchNext(function(error) {
         should(error).be.an.instanceOf(Error);
@@ -147,27 +167,16 @@ describe('SearchResult methods', function () {
       });
     });
 
-    it('should be resolve null if all documents is fetched', function (done) {
-      var
-        firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
-
-      firstSearchResult.fetchNext(function(error, result) {
-        should(result).be.null();
-        done();
-      });
-    });
-
-    it('should be resolve null if all documents is fetched with scroll', function (done) {
+    it('should resolve to null if all documents have been fetched', function (done) {
       var
         firstSearchResult;
 
-      searchOptions.scrollId = 'banana';
-      searchOptions.scroll = '1m';
-
-      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
+      firstResultSet.result.total = 1;
+      firstSearchResult = new SearchResult(collection, searchFilters, searchOptions, firstResultSet);
 
       firstSearchResult.fetchNext(function(error, result) {
         should(result).be.null();
+        should(error).be.null();
         done();
       });
     });
@@ -176,11 +185,10 @@ describe('SearchResult methods', function () {
       var
         firstSearchResult;
 
-      searchOptions = {};
+      firstSearchResult = new SearchResult(collection, searchFilters, {}, firstResultSet);
 
-      firstSearchResult = new SearchResult(collection, 1, [firstDocument], {}, searchOptions, searchFilters);
-
-      firstSearchResult.fetchNext(function(error) {
+      firstSearchResult.fetchNext(function(error, result) {
+        should(result).be.undefined();
         should(error).be.an.instanceOf(Error);
         should(error.message).be.exactly('Unable to retrieve next results from search: missing scrollId or from/size params');
         done();
