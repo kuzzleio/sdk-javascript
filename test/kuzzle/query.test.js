@@ -18,13 +18,11 @@ describe('Query management', function () {
 
     it('should emit the request when asked to', function () {
       var
-        start = Date.now(),
         request = {requestId: 'bar'},
         spy = sinon.spy(kuzzle.network, 'send');
 
       emitRequest.call(kuzzle, request);
       should(spy).be.calledWithMatch(request);
-      should(kuzzle.requestHistory.bar).be.within(start, Date.now());
     });
 
     it('should trigger a tokenExpired event if the token has expired', function (done) {
@@ -123,7 +121,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -139,7 +137,7 @@ describe('Query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, sinon.match(function(f) {return f === cb;}));
     });
@@ -376,53 +374,6 @@ describe('Query management', function () {
         action: 'checkToken'
       });
       should(kuzzle.offlineQueue[1].query.jwt).be.undefined();
-    });
-  });
-
-  describe('#cleanHistory', function () {
-    it('should be started by kuzzle constructor', function () {
-      var 
-        cleanStub = sinon.stub(),
-        clock = sinon.useFakeTimers(),
-        kuzzle;
-
-      // we need to re-import so that fake timers can take effect
-      Kuzzle = rewire('../../src/Kuzzle');
-      Kuzzle.__set__('cleanHistory', cleanStub);
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
-
-      clock.tick(1000);
-
-      should(kuzzle.cleanHistoryTimer).be.not.null();
-      should(cleanStub.calledOnce).be.true();
-
-      clock.restore();
-    });
-
-    it('should clean oldest entries every 1s', function () {
-      var
-        i,
-        clock = sinon.useFakeTimers(),
-        kuzzle;
-
-      Kuzzle = rewire('../../src/Kuzzle');
-      kuzzle = new Kuzzle('foo', {connect: 'manual'});
-
-      for (i = 100000; i >= 0; i -= 10000) {
-        kuzzle.requestHistory[i] = -i;
-      }
-
-      clock.tick(1000);
-
-      // should only contains i == 0 entry
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
-
-      kuzzle.requestHistory.foobar = -100000;
-
-      clock.tick(1000);
-      should(Object.keys(kuzzle.requestHistory)).match(['0']);
-
-      clock.restore();
     });
   });
 });

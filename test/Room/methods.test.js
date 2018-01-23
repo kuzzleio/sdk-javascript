@@ -416,23 +416,23 @@ describe('Room methods', function () {
         });
     });
 
-    it('should delete the result from history if emitted by this instance', function () {
-      room.subscribeToSelf = true;
-      kuzzle.requestHistory.bar = {};
-      notifCB.call(room, {type: 'document', result: {}, action: 'foo', requestId: 'bar'});
-
-      should(room.callback)
-        .be.calledOnce();
-      should(kuzzle.requestHistory).be.empty();
-    });
-
     it('should not forward the message if subscribeToSelf is false and the response comes from a query emitted by this instance', function () {
       room.subscribeToSelf = false;
-      kuzzle.requestHistory.bar = {};
-      notifCB.call(room, {type: 'document', result: {}, requestId: 'bar', action: 'foo'});
 
+      notifCB.call(room, {type: 'document', result: {}, action: 'foo', volatile: {sdkInstanceId: kuzzle.id}});
       should(room.callback).not.be.called();
-      should(kuzzle.requestHistory).be.empty();
+
+      room.callback.resetHistory();
+      notifCB.call(room, {type: 'document', result: {}, action: 'foo', volatile: {sdkInstanceId: 'foobar'}});
+      should(room.callback).be.calledOnce();
+
+      room.callback.resetHistory();
+      notifCB.call(room, {type: 'document', result: {}, action: 'foo', volatile: {barfoo: 'foobar'}});
+      should(room.callback).be.calledOnce();
+
+      room.callback.resetHistory();
+      notifCB.call(room, {type: 'document', result: {}, action: 'foo'});
+      should(room.callback).be.calledOnce();
     });
 
     it('should fire a "tokenExpired" event when receiving a TokenExpired notification', function () {
