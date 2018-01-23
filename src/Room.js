@@ -321,12 +321,7 @@ function notificationCallback (data) {
     delete data.result;
   }
 
-  if (this.kuzzle.requestHistory[data.requestId]) {
-    if (this.subscribeToSelf) {
-      this.callback(null, data);
-    }
-    delete this.kuzzle.requestHistory[data.requestId];
-  } else {
+  if (this.subscribeToSelf || !data.volatile || data.volatile.sdkInstanceId !== this.kuzzle.id) {
     this.callback(null, data);
   }
 }

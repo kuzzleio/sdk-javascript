@@ -42,9 +42,8 @@ function Kuzzle (host, options, cb) {
 
   Object.defineProperties(this, {
     // 'private' properties
-    cleanHistoryTimer: {
-      value: null,
-      writable: true
+    id: {
+      value: uuidv4()
     },
     collections: {
       value: {},
@@ -70,10 +69,6 @@ function Kuzzle (host, options, cb) {
     },
     queuing: {
       value: false,
-      writable: true
-    },
-    requestHistory: {
-      value: {},
       writable: true
     },
     state: {
@@ -292,8 +287,6 @@ function Kuzzle (host, options, cb) {
   } else {
     this.state = 'ready';
   }
-
-  this.cleanHistoryTimer = setInterval(function () { cleanHistory(self.requestHistory); }, 1000);
 
   if (this.bluebird) {
     return this.bluebird.promisifyAll(this, {
@@ -838,21 +831,6 @@ function cleanQueue () {
   }
 }
 
-
-/**
- * Clean history from requests made more than 10s ago
- */
-function cleanHistory (requestHistory) {
-  var
-    now = Date.now();
-
-  Object.keys(requestHistory).forEach(function (key) {
-    if (requestHistory[key] < now - 10000) {
-      delete requestHistory[key];
-    }
-  });
-}
-
 /**
  * Emit a request to Kuzzle
  *
@@ -886,9 +864,6 @@ function emitRequest (request, cb) {
   }
 
   this.network.send(request);
-
-  // Track requests made to allow Room.subscribeToSelf to work
-  self.requestHistory[request.requestId] = Date.now();
 }
 
 /**
@@ -1162,7 +1137,6 @@ Kuzzle.prototype.listIndexes = function (options, cb) {
 Kuzzle.prototype.disconnect = function () {
   var collection;
 
-  clearInterval(this.cleanHistoryTimer);
   this.state = 'disconnected';
   this.network.close();
   this.network = null;
@@ -1439,6 +1413,7 @@ Kuzzle.prototype.query = function (queryArgs, query, options, cb) {
   }
 
   object.volatile.sdkVersion = this.sdkVersion;
+  object.volatile.sdkInstanceId = this.id;
 
   if (self.state === 'connected' || (options && options.queuable === false)) {
     if (self.state === 'connected') {
