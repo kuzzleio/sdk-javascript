@@ -121,7 +121,7 @@ class Kuzzle extends KuzzleEventEmitter {
           object.jwt = this.jwt;
         }
 
-        Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
+        Object.assign(object.volatile, room.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
 
         this.network.subscribe(object, opts, notificationCB, subscribeCB);
       }
@@ -143,7 +143,7 @@ class Kuzzle extends KuzzleEventEmitter {
           object.jwt = this.jwt;
         }
 
-        Object.assign(object.volatile, room.volatile, {sdkVersion: this.sdkVersion});
+        Object.assign(object.volatile, room.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
 
         this.network.unsubscribe(object, room.channel, unsubscribeCB);
       }
@@ -1157,7 +1157,7 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('Invalid query parameter: ' + query);
     }
 
-    Object.assign(object.volatile, query.volatile, {sdkVersion: this.sdkVersion});
+    Object.assign(object.volatile, query.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
 
     for (const attr of Object.keys(query)) {
       if (attr !== 'volatile') {

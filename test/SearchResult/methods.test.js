@@ -42,7 +42,7 @@ describe('SearchResult methods', function () {
       collection.scroll = sinon.stub();
     });
 
-    it.only('should be able to perform a search-after request', function (done) {
+    it('should be able to perform a search-after request', function (done) {
       var firstSearchResult;
 
       searchFilters = {sort: [{foo: 'asc'}, 'bar']};
