@@ -72,8 +72,21 @@ describe('Document constructor', function () {
     should.not.exist(document.existsPromise);
     should.not.exist(document.publishPromise);
     should.exist(document.refreshPromise);
-    should.exist(document.savePromise);
+    should.exist(document.createPromise);
+    should.exist(document.updatePromise);
+    should.exist(document.replacePromise);
     should.not.exist(document.setContentPromise);
     should.not.exist(document.subscribePromise);
+  });
+
+  it('should instanciate a copy of a document', function () {
+    var document = new Document(collection, 'id', { some: 'content', _version: 123 }, {author: 'toto'});
+    var copy = new Document(document, 'another id');
+
+    should(copy.id).be.exactly('another id');
+    should(copy.content).match({some: 'content'});
+    should(copy.meta).match({author: 'toto'});
+    should(copy.version).not.be.exactly(123);
+    should(copy.collection).be.exactly('foo');
   });
 });

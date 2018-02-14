@@ -134,6 +134,77 @@ describe('Document methods', function () {
     });
   });
 
+  describe('#create', function () {
+    beforeEach(function () {
+      result = {result: { _id: 'foo', _version: 42}};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'create',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      var
+        options = { queuable: false },
+        document = new Document(collection);
+
+      document.id = 'foo';
+      should(document.create(options)).be.exactly(document);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
+    });
+
+    it('should handle arguments correctly', function () {
+      var
+        document = new Document(collection),
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      document.create(cb1);
+      document.create({}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
+      document.create();
+      document.create({});
+      should(kuzzle.query).be.calledTwice();
+    });
+
+    it('should resolve the callback with itself as a result', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+
+      document.create(function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(document);
+        should(res.id).be.exactly('foo');
+        should(res.version).be.exactly(42);
+        done();
+      });
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should revolve the callback with an error if one occurs', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+
+      document.create(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
   describe('#exists', function () {
     beforeEach(function () {
       result = { result: true };
@@ -307,77 +378,6 @@ describe('Document methods', function () {
     });
   });
 
-  describe('#save', function () {
-    beforeEach(function () {
-      result = {result: { _id: 'foo', _version: 42}};
-      expectedQuery = {
-        index: 'bar',
-        collection: 'foo',
-        action: 'createOrReplace',
-        controller: 'document'
-      };
-    });
-
-    it('should send the right query to Kuzzle', function () {
-      var
-        options = { queuable: false },
-        document = new Document(collection);
-
-      document.id = 'foo';
-      should(document.save(options)).be.exactly(document);
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
-    });
-
-    it('should handle arguments correctly', function () {
-      var
-        document = new Document(collection),
-        cb1 = sinon.stub(),
-        cb2 = sinon.stub();
-
-      document.save(cb1);
-      document.save({}, cb2);
-      should(kuzzle.query).be.calledTwice();
-
-      kuzzle.query.yield(null, result);
-      should(cb1).be.calledOnce();
-      should(cb2).be.calledOnce();
-
-      kuzzle.query.reset();
-      document.save();
-      document.save({});
-      should(kuzzle.query).be.calledTwice();
-    });
-
-    it('should resolve the callback with itself as a result', function (done) {
-      var document = new Document(collection);
-
-      this.timeout(50);
-
-      document.save(function (err, res) {
-        should(err).be.null();
-        should(res).be.exactly(document);
-        should(res.id).be.exactly('foo');
-        should(res.version).be.exactly(42);
-        done();
-      });
-      kuzzle.query.yield(null, result);
-    });
-
-    it('should revolve the callback with an error if one occurs', function (done) {
-      var document = new Document(collection);
-
-      this.timeout(50);
-
-      document.save(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-      kuzzle.query.yield('foobar');
-    });
-  });
-
   describe('#publish', function () {
     beforeEach(function () {
       result = {};
@@ -453,4 +453,76 @@ describe('Document methods', function () {
       should(collection.subscribe).not.be.called();
     });
   });
+
+  describe('#update', function () {
+    beforeEach(function () {
+      result = {result: { _id: 'foo', _version: 42}};
+      expectedQuery = {
+        index: 'bar',
+        collection: 'foo',
+        action: 'update',
+        controller: 'document'
+      };
+    });
+
+    it('should send the right query to Kuzzle', function () {
+      var
+        options = { queuable: false },
+        document = new Document(collection);
+
+      document.id = 'foo';
+      should(document.update(options)).be.exactly(document);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
+    });
+
+    it('should handle arguments correctly', function () {
+      var
+        document = new Document(collection),
+        cb1 = sinon.stub(),
+        cb2 = sinon.stub();
+
+      document.update(cb1);
+      document.update({}, cb2);
+      should(kuzzle.query).be.calledTwice();
+
+      kuzzle.query.yield(null, result);
+      should(cb1).be.calledOnce();
+      should(cb2).be.calledOnce();
+
+      kuzzle.query.reset();
+      document.update();
+      document.update({});
+      should(kuzzle.query).be.calledTwice();
+    });
+
+    it('should resolve the callback with itself as a result', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+
+      document.update(function (err, res) {
+        should(err).be.null();
+        should(res).be.exactly(document);
+        should(res.id).be.exactly('foo');
+        should(res.version).be.exactly(42);
+        done();
+      });
+      kuzzle.query.yield(null, result);
+    });
+
+    it('should revolve the callback with an error if one occurs', function (done) {
+      var document = new Document(collection);
+
+      this.timeout(50);
+
+      document.update(function (err, res) {
+        should(err).be.exactly('foobar');
+        should(res).be.undefined();
+        done();
+      });
+      kuzzle.query.yield('foobar');
+    });
+  });
+
 });

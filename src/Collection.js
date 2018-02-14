@@ -123,75 +123,6 @@ Collection.prototype.create = function (options, cb) {
 };
 
 /**
- * Create a new document in Kuzzle.
- *
- * Takes an optional argument object with the following properties:
- *    - volatile (object, default: null):
- *        Additional information passed to notifications to other users
- *    - ifExist (string, allowed values: "error" (default), "replace"):
- *        If the same document already exists:
- *          - resolves with an error if set to "error".
- *          - replaces the existing document if set to "replace"
- *
- * @param {string} [id] - (optional) document identifier
- * @param {object} document - either an instance of a Document object, or a document
- * @param {object} [options] - optional arguments
- * @param {responseCallback} [cb] - Handles the query response
- * @returns {Object} this
- */
-Collection.prototype.createDocument = function (id, document, options, cb) {
-  var
-    self = this,
-    data = {},
-    action = 'create';
-
-  if (id && typeof id !== 'string') {
-    cb = options;
-    options = document;
-    document = id;
-    id = null;
-  }
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  if (document instanceof Document) {
-    data = document.serialize();
-  } else {
-    data.body = document;
-  }
-
-  if (options && options.ifExist) {
-    if (options.ifExist === 'replace') {
-      action = 'createOrReplace';
-    }
-    else if (options.ifExist !== 'error') {
-      throw new Error('Invalid value for the "ifExist" option: ' + options.ifExist);
-    }
-  }
-
-  if (id) {
-    data._id = id;
-  }
-
-  self.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
-    var doc;
-
-    if (err) {
-      return cb(err);
-    }
-
-    doc = new Document(self, res.result._id, res.result._source, res.result._meta);
-    doc.version = res.result._version;
-    cb(null, doc);
-  });
-
-  return this;
-};
-
-/**
  * Delete persistent documents.
  *
  * There is a small delay between documents creation and their existence in our advanced search layer,
@@ -591,47 +522,6 @@ Collection.prototype.publishMessage = function (document, options, cb) {
   }
 
   this.kuzzle.query(this.buildQueryArgs('realtime', 'publish'), data, options, cb);
-
-  return this;
-};
-
-/**
- * Replace an existing document with a new one.
- *
- * Takes an optional argument object with the following properties:
- *    - volatile (object, default: null):
- *        Additional information passed to notifications to other users
- *
- * @param {string} documentId - Unique document identifier of the document to replace
- * @param {object} content - JSON object representing the new document version
- * @param {object} [options] - additional arguments
- * @param {responseCallback} [cb] - Returns an instantiated Document object
- * @return {object} this
- */
-Collection.prototype.replaceDocument = function (documentId, content, options, cb) {
-  var
-    self = this,
-    data = {
-      _id: documentId,
-      body: content
-    };
-
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
-  }
-
-  self.kuzzle.query(this.buildQueryArgs('document', 'createOrReplace'), data, options, cb && function (err, res) {
-    var document;
-
-    if (err) {
-      return cb(err);
-    }
-
-    document = new Document(self, res.result._id, res.result._source, res.result._meta);
-    document.version = res.result._version;
-    cb(null, document);
-  });
 
   return this;
 };

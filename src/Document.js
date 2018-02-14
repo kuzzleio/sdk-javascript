@@ -22,6 +22,9 @@
  * @constructor
  */
 function Document(collection, documentId, content, meta) {
+  if (collection instanceof Document) {
+    return new Document(collection.dataCollection, documentId, collection.content, collection.meta);
+  }
   Object.defineProperties(this, {
     // read-only properties
     collection: {
@@ -85,7 +88,7 @@ function Document(collection, documentId, content, meta) {
     return this.kuzzle.bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        var whitelist = ['delete', 'refresh', 'save'];
+        var whitelist = ['delete', 'refresh', 'create', 'update', 'replace'];
 
         return passes && whitelist.indexOf(name) !== -1;
       }
@@ -125,6 +128,57 @@ Document.prototype.serialize = function () {
  */
 Document.prototype.toString = function () {
   return JSON.stringify(this.serialize());
+};
+
+/**
+ * Create a new document in Kuzzle.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - volatile (object, default: null):
+ *        Additional information passed to notifications to other users
+ *    - ifExist (string, allowed values: "error" (default), "replace"):
+ *        If the same document already exists:
+ *          - resolves with an error if set to "error".
+ *          - replaces the existing document if set to "replace"
+ *
+ * @param {object} [options] - optional arguments
+ * @param {responseCallback} [cb] - Handles the query response
+ * @returns {Object} this
+ */
+Document.prototype.create = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this,
+    action = 'create';
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  if (options && options.ifExist) {
+    if (options.ifExist === 'replace') {
+      action = 'createOrReplace';
+    }
+    else if (options.ifExist !== 'error') {
+      throw new Error('Invalid value for the "ifExist" option: ' + options.ifExist);
+    }
+  }
+
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('document', action), data, options, function (error, res) {
+    if (error) {
+      return cb && cb(error);
+    }
+
+    self.id = res.result._id;
+    self.version = res.result._version;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
 };
 
 /**
@@ -215,21 +269,35 @@ Document.prototype.refresh = function (options, cb) {
 };
 
 /**
- * Saves this document into Kuzzle.
- *
- * If this is a new document, this function will create it in Kuzzle and the id property will be made available.
- * Otherwise, this method will replace the latest version of this document in Kuzzle by the current content
- * of this object.
+ * Sends the content of this document as a realtime message.
  *
  * Takes an optional argument object with the following properties:
  *    - volatile (object, default: null):
  *        Additional information passed to notifications to other users
  *
  * @param {object} [options] - Optional parameters
- * @param {responseCallback} [cb] - Handles the query response
  * @returns {*} this
  */
-Document.prototype.save = function (options, cb) {
+Document.prototype.publish = function (options) {
+  var data = this.serialize();
+
+  this.kuzzle.query(this.dataCollection.buildQueryArgs('realtime', 'publish'), data, options);
+
+  return this;
+};
+
+/**
+ * Replace an existing document with a new one.
+ *
+ * Takes an optional argument object with the following properties:
+ *    - volatile (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - additional arguments
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
+ * @return {object} this
+ */
+Document.prototype.replace = function (options, cb) {
   var
     data = this.serialize(),
     self = this;
@@ -253,24 +321,6 @@ Document.prototype.save = function (options, cb) {
   });
 
   return self;
-};
-
-/**
- * Sends the content of this document as a realtime message.
- *
- * Takes an optional argument object with the following properties:
- *    - volatile (object, default: null):
- *        Additional information passed to notifications to other users
- *
- * @param {object} [options] - Optional parameters
- * @returns {*} this
- */
-Document.prototype.publish = function (options) {
-  var data = this.serialize();
-
-  this.kuzzle.query(this.dataCollection.buildQueryArgs('realtime', 'publish'), data, options);
-
-  return this;
 };
 
 /**
@@ -319,6 +369,43 @@ Document.prototype.subscribe = function (options, cb) {
   filters = { ids: { values: [this.id] } };
 
   return this.dataCollection.subscribe(filters, options, cb);
+};
+
+/**
+ * Update parts of a document
+ *
+ * Takes an optional argument object with the following properties:
+ *    - volatile (object, default: null):
+ *        Additional information passed to notifications to other users
+ *
+ * @param {object} [options] - Optional parameters
+ * @param {responseCallback} [cb] - Returns an instantiated Document object
+ * @return {object} this
+ */
+Document.prototype.update = function (options, cb) {
+  var
+    data = this.serialize(),
+    self = this;
+
+  if (options && cb === undefined && typeof options === 'function') {
+    cb = options;
+    options = null;
+  }
+
+  self.kuzzle.query(this.dataCollection.buildQueryArgs('document', 'update'), data, options, function (error, res) {
+    if (error) {
+      return cb && cb(error);
+    }
+
+    self.id = res.result._id;
+    self.version = res.result._version;
+
+    if (cb) {
+      cb(null, self);
+    }
+  });
+
+  return self;
 };
 
 module.exports = Document;
