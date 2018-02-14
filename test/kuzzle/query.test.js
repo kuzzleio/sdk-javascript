@@ -36,7 +36,7 @@ describe('Kuzzle query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -50,7 +50,7 @@ describe('Kuzzle query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -66,7 +66,7 @@ describe('Kuzzle query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, null, sinon.match(function(f) {return f === cb;}));
     });
@@ -81,7 +81,7 @@ describe('Kuzzle query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkVersion: kuzzle.sdkVersion },
+        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       }, null, sinon.match(function(f) {return f === cb;}));
     });

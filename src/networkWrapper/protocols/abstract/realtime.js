@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('../../../eventEmitter');
 
 class RTWrapper extends KuzzleEventEmitter {
@@ -9,9 +10,8 @@ class RTWrapper extends KuzzleEventEmitter {
     super();
 
     Object.defineProperties(this, {
-      cleanHistoryTimer: {
-        value: null,
-        writable: true
+      id: {
+        value: uuidv4()
       },
       host: {
         value: host,
@@ -107,11 +107,6 @@ class RTWrapper extends KuzzleEventEmitter {
       }
     }
 
-    Object.defineProperty(this, 'requestHistory', {
-      value: {},
-      writable: true
-    });
-
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
@@ -140,12 +135,6 @@ class RTWrapper extends KuzzleEventEmitter {
     if (this.autoReplay) {
       this.playQueue();
     }
-
-    if (!this.cleanHistoryTimer) {
-      this.cleanHistoryTimer = setInterval(() => { 
-        cleanHistory(this.requestHistory); 
-      }, 1000);
-    }
   }
 
   /**
@@ -157,7 +146,6 @@ class RTWrapper extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
-    this.clearHistoryTimer();
     this.emit('disconnect');
   }
 
@@ -171,8 +159,6 @@ class RTWrapper extends KuzzleEventEmitter {
     if (this.autoQueue) {
       this.startQueuing();
     }
-
-    this.clearHistoryTimer();
 
     this.emit('networkError', error);
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
@@ -226,7 +212,7 @@ class RTWrapper extends KuzzleEventEmitter {
         return cb(error);
       }
       this.on(response.result.channel, data => {
-        data.fromSelf = this.requestHistory[data.requestId] !== undefined;
+        data.fromSelf = data.volatile !== undefined && data.volatile.sdkInstanceId === this.id;
         notificationCB(data);
       });
       cb(null, response.result);
@@ -261,13 +247,6 @@ class RTWrapper extends KuzzleEventEmitter {
 
     return discardRequest(object, cb);
   }
-
-  clearHistoryTimer() {
-    if (this.cleanHistoryTimer) {
-      clearInterval(this.cleanHistoryTimer);
-      this.cleanHistoryTimer = null;
-    }
-  }
 }
 /**
  * Emit a request to Kuzzle
@@ -298,7 +277,6 @@ function emitRequest (network, request, cb) {
     });
   }
   // Track requests made to allow Room.subscribeToSelf to work
-  network.requestHistory[request.requestId] = Date.now();
   network.send(request);
 }
 
@@ -381,20 +359,6 @@ function dequeue (network) {
   }
 
   dequeuingProcess();
-}
-
-/**
- * Clean history from requests made more than 10s ago
- */
-function cleanHistory (requestHistory) {
-  var
-    now = Date.now();
-
-  Object.keys(requestHistory).forEach(function (key) {
-    if (requestHistory[key] < now - 10000) {
-      delete requestHistory[key];
-    }
-  });
 }
 
 module.exports = RTWrapper;

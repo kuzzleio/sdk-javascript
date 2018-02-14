@@ -26,18 +26,6 @@ describe('Network query management', function () {
       should(sendSpy).be.calledWith(request);
     });
 
-    it('should populate the request History when the request has been emitted', function (done) {
-      var
-        now = Date.now();
-
-      network.requestHistory = {};
-
-      emitRequest(network, {requestId: 'foo', response: 'bar'}, function() {
-        should(network.requestHistory.foo).not.be.undefined().and.be.approximately(now, 10);
-        done();
-      });
-    });
-
     it('should trigger a "tokenExpired" event if the token has expired', function (done) {
       var
         eventStub = sinon.stub(),
@@ -339,20 +327,26 @@ describe('Network query management', function () {
         notificationCB = sinon.stub(),
         cb = sinon.stub();
 
-      network.requestHistory.bar = {};
       network.subscribe({foo: 'bar'}, {bar: 'foo'}, notificationCB, cb);
-      network.emit('foobar', {type: 'document', result: {}, action: 'foo', requestId: 'bar'});
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo', volatile: {sdkInstanceId: network.id}});
 
       should(notificationCB)
         .be.calledOnce()
         .be.calledWithMatch({fromSelf: true});
 
       notificationCB.reset();
-      network.emit('foobar', {type: 'document', result: {}, action: 'foo', requestId: 'foo'});
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo', volatile: {sdkInstanceId: 'foobar'}});
 
       should(notificationCB)
         .be.calledOnce()
-        .not.be.calledWithMatch({fromSelf: true});
+        .be.calledWithMatch({fromSelf: false});
+
+      notificationCB.reset();
+      network.emit('foobar', {type: 'document', result: {}, action: 'foo'});
+
+      should(notificationCB)
+        .be.calledOnce()
+        .be.calledWithMatch({fromSelf: false});
     });
   });
 
@@ -429,69 +423,6 @@ describe('Network query management', function () {
 
       network.emit('channel', {type: 'document', result: {}, action: 'foo'});
       should(notificationCB).not.be.called();
-    });
-  });
-
-  describe('#cleanHistory', function () {
-    it('should be started by network wrapper constructor', function () {
-      var
-        clock = sinon.useFakeTimers(),
-        cleanStub = sinon.stub(),
-        network;
-
-      RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
-      RTWrapper.__set__('cleanHistory', cleanStub);
-      network = new RTWrapper('somewhere');
-
-      should(network.cleanHistoryTimer).be.null();
-      should(cleanStub).not.be.called();
-
-      network.clientConnected();
-      
-      should(network.cleanHistoryTimer).be.not.null();
-      should(cleanStub).not.be.called();
-
-      clock.tick(1000);
-
-      should(network.cleanHistoryTimer).be.not.null();
-      should(cleanStub).be.calledOnce();
-
-      network.clearHistoryTimer();
-      should(network.cleanHistoryTimer).be.null();
-
-      clock.restore();
-    });
-    
-    it('should clean oldest entries every 1s', function () {
-      var
-        i,
-        clock = sinon.useFakeTimers(),
-        network;
-
-      RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
-      network = new RTWrapper('somewhere');
-      network.clientConnected();
-
-      for (i = 100000; i >= 0; i -= 10000) {
-        network.requestHistory[i] = -i;
-      }
-
-      should(Object.keys(network.requestHistory).length).be.eql(11);
-      clock.tick(1000);
-
-      // should only contains i == 0 entry
-      should(Object.keys(network.requestHistory).length).be.eql(1);
-      should(Object.keys(network.requestHistory)).eql(['0']);
-
-      network.requestHistory.foobar = -100000;
-      should(Object.keys(network.requestHistory).length).be.eql(2);
-
-      clock.tick(1000);
-      should(Object.keys(network.requestHistory).length).be.eql(1);
-      should(Object.keys(network.requestHistory)).eql(['0']);
-
-      clock.restore();
-      network.clearHistoryTimer();
     });
   });
 });
