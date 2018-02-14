@@ -72,7 +72,9 @@ describe('Document constructor', function () {
     should.not.exist(document.existsPromise);
     should.not.exist(document.publishPromise);
     should.exist(document.refreshPromise);
-    should.exist(document.savePromise);
+    should.exist(document.createPromise);
+    should.exist(document.updatePromise);
+    should.exist(document.replacePromise);
     should.not.exist(document.setContentPromise);
     should.not.exist(document.subscribePromise);
   });

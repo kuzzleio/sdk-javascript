@@ -34,7 +34,6 @@ describe('Collection constructor', function () {
 
     should.exist(collection.countPromise);
     should.exist(collection.createPromise);
-    should.exist(collection.createDocumentPromise);
     should.exist(collection.deleteDocumentPromise);
     should.exist(collection.deleteSpecificationsPromise);
     should.exist(collection.documentExistsPromise);
@@ -48,12 +47,10 @@ describe('Collection constructor', function () {
     should.exist(collection.mReplaceDocumentPromise);
     should.exist(collection.mUpdateDocumentPromise);
     should.exist(collection.publishMessagePromise);
-    should.exist(collection.replaceDocumentPromise);
     should.exist(collection.scrollSpecificationsPromise);
     should.exist(collection.searchSpecificationsPromise);
     should.not.exist(collection.subscribePromise);
     should.exist(collection.truncatePromise);
-    should.exist(collection.updateDocumentPromise);
     should.exist(collection.updateSpecificationsPromise);
     should.exist(collection.validateSpecificationsPromise);
   });
