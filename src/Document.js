@@ -23,7 +23,7 @@
  */
 function Document(collection, documentId, content, meta) {
   if (collection instanceof Document) {
-    return new Document(collection.collection, documentId, collection.content, collection.meta);
+    return new Document(collection.dataCollection, documentId, collection.content, collection.meta);
   }
   Object.defineProperties(this, {
     // read-only properties
