@@ -81,7 +81,7 @@ class RTWrapper extends AbtractWrapper {
   }
 
   subscribe(object, options, notificationCB, cb) {
-    if (this.state !== 'connected') {
+    if (! this.isReady()) {
       return cb(new Error('Not Connected'));
     }
     this.query(object, options, (error, response) => {
@@ -103,6 +103,10 @@ class RTWrapper extends AbtractWrapper {
         cb(err, err ? undefined : res.result);
       }
     });
+  }
+
+  isReady() {
+    return this.state === 'connected';
   }
 }
 

@@ -134,7 +134,7 @@ class AbtractWrapper extends KuzzleEventEmitter {
    * Replays the requests queued during offline mode.
    */
   playQueue() {
-    if (isConnected(this.state)) {
+    if (this.isReady()) {
       cleanQueue(this);
       dequeue(this);
     }
@@ -175,11 +175,15 @@ class AbtractWrapper extends KuzzleEventEmitter {
       return this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
     }
 
-    if (isConnected(this.state)) {
+    if (this.isReady()) {
       return emitRequest(this, object, cb);
     }
 
     return discardRequest(object, cb);
+  }
+
+  isReady() {
+    return this.state === 'ready';
   }
 }
 
@@ -294,10 +298,6 @@ function dequeue (network) {
   }
 
   dequeuingProcess();
-}
-
-function isConnected(state) {
-  return state === 'ready' || state === 'connected';
 }
 
 module.exports = AbtractWrapper;

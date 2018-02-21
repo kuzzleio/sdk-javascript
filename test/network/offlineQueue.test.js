@@ -224,19 +224,13 @@ describe('Offline queue management', function () {
     });
 
     it('should play the queue if the instance is connected', function () {
-      network.state = 'connected';
+      network.isReady = sinon.stub().returns(true);
       network.playQueue();
       should(dequeueStub).be.calledOnce();
     });
 
     it('should not play the queue if the instance is offline', function () {
-      network.state = 'offline';
-      network.playQueue();
-      should(dequeueStub).not.be.called();
-    });
-
-    it('should not play the queue if the instance is still connecting', function () {
-      network.state = 'connecting';
+      network.isReady = sinon.stub().returns(false);
       network.playQueue();
       should(dequeueStub).not.be.called();
     });

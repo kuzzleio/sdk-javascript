@@ -336,7 +336,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {function} [cb] Connection callback
    */
   connect (cb) {
-    if (this.network.state !== 'offline') {
+    if (this.network.isReady()) {
       if (cb) {
         cb(null, this);
       }
