@@ -302,7 +302,7 @@ class Kuzzle extends KuzzleEventEmitter {
             'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
             'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
             'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
-            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
+            'createIndex', 'deleteIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
           ];
 
           return passes && whitelist.indexOf(name) !== -1;
@@ -449,7 +449,7 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('Kuzzle.login: strategy required');
     }
 
-    const 
+    const
       request = {
         strategy,
         body: {}
@@ -633,6 +633,31 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     return this;
+  }
+
+  /**
+   * Delete a kuzzle index
+   *
+   * @param {string} index
+   * @param {object} [options]
+   * @param {responseCallback} cb
+   * @returns {Kuzzle}
+   */
+  deleteIndex (index, options, cb) {
+    if (!index) {
+      throw new Error('Kuzzle.createIndex: index required');
+    }
+
+    if (!cb && typeof options === 'function') {
+      cb = options;
+      options = null;
+    }
+
+    this.query({controller: 'index', action: 'delete', index: index}, {}, options, (err, res) => {
+      if (typeof cb === 'function') {
+        cb(err, err ? undefined : res.result);
+      }
+    });
   }
 
   /**
@@ -944,6 +969,10 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   disconnect () {
     this.network.close();
+
+    for (const collection of Object.keys(this.collections)) {
+      delete this.collections[collection];
+    }
   }
 
   /**

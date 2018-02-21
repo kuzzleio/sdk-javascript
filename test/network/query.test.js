@@ -263,14 +263,9 @@ describe('Network query management', function () {
     });
 
     it('should throw an error if the protocol does not support realtime', function() {
-      var cb = sinon.stub();
-
       network = new AbstractWrapper('somewhere');
 
-      network.subscribe({}, {}, sinon.stub(), cb);
-      should(cb).be.calledOnce();
-      should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-      should(cb.firstCall.args[0].message).be.eql('Not Implemented');
+      should(() => network.subscribe({}, {}, sinon.stub(), sinon.stub())).throw('Not Implemented');
       should(network.query).not.be.called();
     });
 
@@ -386,14 +381,9 @@ describe('Network query management', function () {
     });
 
     it('should throw an error if the protocol does not support realtime', function() {
-      var cb = sinon.stub();
-
       network = new AbstractWrapper('somewhere');
 
-      network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', cb);
-      should(cb).be.calledOnce();
-      should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-      should(cb.firstCall.args[0].message).be.eql('Not Implemented');
+      should(() => network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', sinon.stub())).throw('Not Implemented');
       should(network.query).not.be.called();
     });
 
