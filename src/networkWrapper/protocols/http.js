@@ -68,6 +68,10 @@ class HttpWrapper extends AbtractWrapper {
    * Connect to the websocket server
    */
   connect () {
+    if (this.autoQueue) {
+      this.startQueuing();
+    }
+
     sendHttpRequest(this, 'GET', '/', (err, res) => {
       if (err) {
         return this.emit('networkError', err);
@@ -102,7 +106,6 @@ class HttpWrapper extends AbtractWrapper {
    * @param {Object} payload
    */
   send (data) {
-
     const
       payload = {
         action: undefined,
@@ -144,7 +147,8 @@ class HttpWrapper extends AbtractWrapper {
       route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
 
     if (route === undefined) {
-      return this.emit(payload.requestId, `No route found for ${payload.controller}/${payload.action}`);
+      const error = new Error(`No route found for ${payload.controller}/${payload.action}`);
+      return this.emit(payload.requestId, {status: 400, error});
     }
 
     const
@@ -178,7 +182,6 @@ class HttpWrapper extends AbtractWrapper {
       url += '?' + queryString.join('&');
     }
 
-console.log('HTTP SEND', method, url);
     sendHttpRequest(this, method, url, payload, (error, response) => {
       if (error && response) {
         response.error = error;
@@ -226,9 +229,7 @@ function sendHttpRequest (network, method, path, payload, cb) {
         response += chunk;
       });
 
-      res.on('end', () => {
-        cb(null, JSON.parse(response));
-      });
+      res.on('end', () => callbackHttpResponse(response, cb));
     });
 
     req.write(body);
@@ -250,14 +251,23 @@ function sendHttpRequest (network, method, path, payload, cb) {
       xhr.setRequestHeader(header, payload.headers[header]);
     }
 
-    xhr.onload = () => {
-      const response = JSON.parse(xhr.responseText);
-      cb(null, response);
-    };
+    xhr.onload = () => callbackHttpResponse(xhr.responseText, cb);
 
     xhr.send(payload.body);
   }
 }
 
+/**
+ * Handles HTTP Response
+ *
+ */
+function callbackHttpResponse(response, cb) {
+  try {
+    const jsonResponse = JSON.parse(response);
+    cb(null, jsonResponse);
+  } catch (err) {
+    cb(err);
+  }
+}
 
 module.exports = HttpWrapper;
