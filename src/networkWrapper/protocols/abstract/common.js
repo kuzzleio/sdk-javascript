@@ -154,11 +154,11 @@ class AbtractWrapper extends KuzzleEventEmitter {
     this.queuing = false;
   }
 
-  subscribe(object, options, notificationCB, cb) {
+  subscribe(object, options, notificationCB, cb) { // eslint-disable-line
     throw new Error('Not Implemented');
   }
 
-  unsubscribe(object, options, channel, cb) {
+  unsubscribe(object, options, channel, cb) { // eslint-disable-line
     throw new Error('Not Implemented');
   }
 

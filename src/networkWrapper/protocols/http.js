@@ -58,8 +58,10 @@ class HttpWrapper extends AbtractWrapper {
 
     // Application-side HTTP route overrides:
     if (options.http && options.http.customRoutes) {
-       for (const controller in options.http.customRoutes) {
-        this.http.routes[controller] = Object.assign(this.http.routes[controller] || {}, options.http.customRoutes[controller]);
+      for (const controller in options.http.customRoutes) {
+        if (options.http.customRoutes.hasOwnProperty(controller)) {
+          this.http.routes[controller] = Object.assign(this.http.routes[controller] || {}, options.http.customRoutes[controller]);
+        }
       }
     }
   }
@@ -81,16 +83,18 @@ class HttpWrapper extends AbtractWrapper {
       // (if more than 1 available route for a given action, get the first one):
       const routes = res.result.serverInfo.kuzzle.api.routes;
       for (const controller in routes) {
-        if (this.http.routes[controller] === undefined) {
-          this.http.routes[controller] = {};
-        }
+        if (routes.hasOwnProperty(controller)) {
+          if (this.http.routes[controller] === undefined) {
+            this.http.routes[controller] = {};
+          }
 
-        for (const action in routes[controller]) {
-          if (this.http.routes[controller][action] === undefined
-            && Array.isArray(routes[controller][action].http)
-            && routes[controller][action].http.length > 0) {
+          for (const action in routes[controller]) {
+            if (this.http.routes[controller][action] === undefined
+              && Array.isArray(routes[controller][action].http)
+              && routes[controller][action].http.length > 0) {
 
-            this.http.routes[controller][action] = routes[controller][action].http[0];
+              this.http.routes[controller][action] = routes[controller][action].http[0];
+            }
           }
         }
       }
@@ -122,22 +126,24 @@ class HttpWrapper extends AbtractWrapper {
       queryArgs = {};
 
     for (const key in data) {
-      const value = data[key];
+      if (data.hasOwnProperty(key)) {
+        const value = data[key];
 
-      if (key === 'body') {
-        payload.body = JSON.stringify(value);
+        if (key === 'body') {
+          payload.body = JSON.stringify(value);
 
-      } else if (key === 'jwt') {
-        payload.headers.authorization = 'Bearer ' + value;
+        } else if (key === 'jwt') {
+          payload.headers.authorization = 'Bearer ' + value;
 
-      } else if (key === 'volatile') {
-        payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
+        } else if (key === 'volatile') {
+          payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
 
-      } else if (payload.hasOwnProperty(key)) {
-        payload[key] = value;
+        } else if (payload.hasOwnProperty(key)) {
+          payload[key] = value;
 
-      } else {
-        queryArgs[key] = value;
+        } else {
+          queryArgs[key] = value;
+        }
       }
     }
 
@@ -168,13 +174,15 @@ class HttpWrapper extends AbtractWrapper {
     // inject queryString arguments:
     const queryString = [];
     for (const key in queryArgs) {
-      const value = queryArgs[key];
+      if (queryArgs.hasOwnProperty(key)) {
+        const value = queryArgs[key];
 
-      if (Array.isArray(value)) {
-        queryString.push(...value.map(v => `${key}=${v}`));
+        if (Array.isArray(value)) {
+          queryString.push(...value.map(v => `${key}=${v}`));
 
-      } else {
-        queryString.push(`${key}=${value}`);
+        } else {
+          queryString.push(`${key}=${value}`);
+        }
       }
     }
 
@@ -248,7 +256,9 @@ function sendHttpRequest (network, method, path, payload, cb) {
     xhr.open(method, url);
 
     for (const header in payload.headers) {
-      xhr.setRequestHeader(header, payload.headers[header]);
+      if (payload.headers.hasOwnProperty(header)) {
+        xhr.setRequestHeader(header, payload.headers[header]);
+      }
     }
 
     xhr.onload = () => callbackHttpResponse(xhr.responseText, cb);

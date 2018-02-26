@@ -226,7 +226,10 @@ Collection.prototype.deleteDocument = function (arg, options, cb) {
   }
 
   this.kuzzle.query(this.buildQueryArgs('document', action), data, options, cb && function (err, res) {
-    cb(err, err ? undefined : (action === 'delete' ? [res.result._id] : res.result.ids));
+    if (err) {
+      return cb(err);
+    }
+    cb(null, (action === 'delete' ? [res.result._id] : res.result.ids));
   });
 
   return this;

@@ -93,7 +93,7 @@ describe('HTTP networking module', () => {
               routes: {
                 foo: {
                   bar: {
-                    http: [{verb: 'VERB', url: "/foo/bar"}]
+                    http: [{verb: 'VERB', url: '/foo/bar'}]
                   },
                   empty: {
                     http: []
@@ -130,7 +130,7 @@ describe('HTTP networking module', () => {
       sendHttpRequestStub.yield(null, connectHttpResult);
       should(network.state).be.eql('ready');
 
-      should(network.http.routes.foo.bar).match({verb: 'VERB', url: "/foo/bar"});
+      should(network.http.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
       should(network.http.routes.foo.empty).be.undefined();
       should(network.http.routes.baz).be.an.Object().and.be.empty();
     });
@@ -191,7 +191,7 @@ describe('HTTP networking module', () => {
       network.status = 'ready';
       network.http.routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar'}}
-      }
+      };
     });
 
     afterEach(() => {
@@ -300,7 +300,7 @@ describe('HTTP networking module', () => {
       };
       network.http.routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar/:foo'}}
-      }
+      };
 
       network.send(data);
       should(sendHttpRequestStub).be.calledOnce();
@@ -325,7 +325,7 @@ describe('HTTP networking module', () => {
       should(eventStub).be.calledOnce();
       const calledArgument = eventStub.firstCall.args[0];
       should(calledArgument.status).be.equal(400);
-      should(calledArgument.error.message).be.equal('No route found for bar/foo')
+      should(calledArgument.error.message).be.equal('No route found for bar/foo');
     });
 
     it('should emit an event with the backend response to the "requestId" listeners', () => {
@@ -394,10 +394,7 @@ describe('HTTP networking module', () => {
         on: (evt, cb) => listenEvent(responseMock, evt, cb),
       };
 
-      httpMock = {
-        request: httpRequestStub,
-      };
-      mockrequire('http', httpMock);
+      mockrequire('http', {request: httpRequestStub});
       MockHttpWrapper = mockrequire.reRequire('../../src/networkWrapper/protocols/http');
 
       network = new MockHttpWrapper('address', {
@@ -450,14 +447,6 @@ describe('HTTP networking module', () => {
     });
 
     it('should call the callback with the error in case of error', () => {
-      const options = {
-        protocol: 'http:',
-        host: 'address',
-        port: 1234,
-        method: 'VERB',
-        path: '/foo/bar'
-      };
-
       sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
 
       should(reqCB).not.be.called();
@@ -471,13 +460,6 @@ describe('HTTP networking module', () => {
         response = {
           status: 200,
           result: 'Kuzzle Result'
-        },
-        options = {
-          protocol: 'http:',
-          host: 'address',
-          port: 1234,
-          method: 'VERB',
-          path: '/foo/bar'
         };
 
       sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
