@@ -14,6 +14,76 @@ describe('HTTP networking module', () => {
     });
   });
 
+  describe('#constructor', () => {
+    it('should initialize http network with default routes', () => {
+      should(network.http.routes).match({
+        auth: {
+          login: {
+            verb: 'POST',
+            url: '/_login/:strategy'
+          }
+        },
+        bulk: {
+          import: {
+            verb: 'POST',
+            url: '/:index/:collection/_bulk'
+          }
+        },
+        document: {
+          create: {
+            verb: 'POST',
+            url: '/:index/:collection/_create'
+          }
+        },
+        security: {
+          createFirstAdmin: {
+            verb: 'POST',
+            url: '/_createFirstAdmin'
+          },
+          createRestrictedUser: {
+            verb: 'POST',
+            url: '/users/_createRestricted'
+          },
+          createUser: {
+            verb: 'POST',
+            url: '/users/_create'
+          }
+        }
+      });
+    });
+
+    it('should initialize http network with custom routes', () => {
+      const customNetwork = new HttpWrapper('address', {
+        port: 1234,
+        http: {
+          customRoutes: {
+            foo: {
+              bar: {verb: 'VERB', url: '/foo/bar'}
+            },
+            document: {
+              create: {verb: 'VERB', url: '/:index/:collection/_custom/_create'}
+            }
+          }
+        }
+      });
+
+      should(customNetwork.http.routes).match({
+        document: {
+          create: {
+            verb: 'VERB',
+            url: '/:index/:collection/_custom/_create'
+          }
+        },
+        foo: {
+          bar: {
+            verb: 'VERB',
+            url: '/foo/bar'
+          }
+        }
+      });
+    });
+  });
+
   describe('#connect', () => {
     const connectHttpResult = {
       result: {
