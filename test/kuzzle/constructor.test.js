@@ -37,18 +37,14 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.deleteMyCredentials).be.a.Function();
     should(kuzzle.disconnect).be.a.Function();
     should(kuzzle.flushQueue).be.a.Function();
-    should(kuzzle.getAllStatistics).be.a.Function();
     should(kuzzle.getAutoRefresh).be.a.Function();
     should(kuzzle.getJwt).be.a.Function();
     should(kuzzle.getMyCredentials).be.a.Function();
     should(kuzzle.getMyRights).be.a.Function();
-    should(kuzzle.getServerInfo).be.a.Function();
-    should(kuzzle.getStatistics).be.a.Function();
     should(kuzzle.listCollections).be.a.Function();
     should(kuzzle.listIndexes).be.a.Function();
     should(kuzzle.login).be.a.Function();
     should(kuzzle.logout).be.a.Function();
-    should(kuzzle.now).be.a.Function();
     should(kuzzle.playQueue).be.a.Function();
     should(kuzzle.query).be.a.Function();
     should(kuzzle.refreshIndex).be.a.Function();
@@ -67,7 +63,7 @@ describe('Kuzzle constructor', function () {
   });
 
   it('should expose the documented writable properties', function () {
-    var 
+    var
       kuzzle = new Kuzzle('somewhere'),
       fn = function() {};
 
@@ -108,7 +104,7 @@ describe('Kuzzle constructor', function () {
     kuzzle.queueTTL = 123;
     should(kuzzle.queueTTL).be.eql(123);
     should(function() {kuzzle.queueTTL = 'foobar';}).throw();
-    
+
     should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true });
     should(kuzzle.replayInterval).be.eql(10);
     kuzzle.replayInterval = 123;
@@ -158,7 +154,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
     kuzzle.offlineQueue = ['foo', 'bar'];
     should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
-    
+
     should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
   });
 
@@ -222,7 +218,7 @@ describe('Kuzzle constructor', function () {
         return new NetworkWrapperMock(host, options);
       }
     });
-    
+
     var
       sdkVersion = require('../../package.json').version,
       options = {
@@ -279,18 +275,14 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.deleteMyCredentialsPromise).be.a.Function();
     should(kuzzle.disconnectPromise).be.undefined();
     should(kuzzle.flushQueuePromise).be.undefined();
-    should(kuzzle.getAllStatisticsPromise).be.a.Function();
     should(kuzzle.getAutoRefreshPromise).be.a.Function();
     should(kuzzle.getJwtPromise).be.undefined();
     should(kuzzle.getMyCredentialsPromise).be.a.Function();
     should(kuzzle.getMyRightsPromise).be.a.Function();
-    should(kuzzle.getServerInfoPromise).be.a.Function();
-    should(kuzzle.getStatisticsPromise).be.a.Function();
     should(kuzzle.listCollectionsPromise).be.a.Function();
     should(kuzzle.listIndexesPromise).be.a.Function();
     should(kuzzle.loginPromise).be.a.Function();
     should(kuzzle.logoutPromise).be.a.Function();
-    should(kuzzle.nowPromise).be.a.Function();
     should(kuzzle.playQueuePromise).be.undefined();
     should(kuzzle.queryPromise).be.a.Function();
     should(kuzzle.refreshIndexPromise).be.a.Function();
