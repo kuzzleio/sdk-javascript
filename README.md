@@ -12,7 +12,6 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 * [Basic usage](#basic-usage)
 * [SDK Documentation](#sdk-documentation)
-* [Report an issue](#report-an-issue)
 * [Protocols used](#protocols-used)
 * [Installation](#installation)
   * [NodeJS](#nodejs)
@@ -27,12 +26,6 @@ Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/getting-started/#sdk-play-time
 ## SDK Documentation
 
 The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/)
-
-## Report an issue
-
-Use following meta repository to report issues on SDK:
-
-https://github.com/kuzzleio/kuzzle-sdk/issues
 
 ## Protocols used
 
