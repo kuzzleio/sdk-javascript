@@ -1,6 +1,5 @@
 const
   should = require('should'),
-  sinon = require('sinon'),
   KuzzleMock = require('../mocks/kuzzle.mock'),
   Server = require('../../src/Server.js');
 
@@ -21,13 +20,13 @@ describe('Kuzzle Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves a boolean value', () => {
-      kuzzle.queryPromise.resolves({result: {exists: true}})
+      kuzzle.queryPromise.resolves({result: {exists: true}});
 
       return server.adminExists()
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
-          should(res).be.exactly(true)
+          should(res).be.exactly(true);
         })
         .then(() => {
           kuzzle.queryPromise.resetHistory();
@@ -36,7 +35,7 @@ describe('Kuzzle Server Controller', () => {
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
-          should(res).be.exactly(true)
+          should(res).be.exactly(true);
         })
         .then(() => {
           kuzzle.queryPromise.reset();
@@ -46,17 +45,17 @@ describe('Kuzzle Server Controller', () => {
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery);
-          should(res).be.exactly(false)
-        })
+          should(res).be.exactly(false);
+        });
     });
 
     it('should reject the promise if receiving a response in bad format (missing "exists" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {foo: 'bar'}})
+      kuzzle.queryPromise.resolves({result: {foo: 'bar'}});
       return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
     it('should reject the promise if receiving a response in bad format (bad type of "exists" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {exists: 'foobar'}})
+      kuzzle.queryPromise.resolves({result: {exists: 'foobar'}});
       return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
@@ -103,7 +102,7 @@ describe('Kuzzle Server Controller', () => {
             }
           ]
         }
-      }
+      };
 
     it('should call query with the right arguments and return Promise which resolves all the statistics frames', () => {
       kuzzle.queryPromise.resolves(response);
@@ -122,7 +121,7 @@ describe('Kuzzle Server Controller', () => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
-        })
+        });
     });
 
     it('should reject the promise if an error occurs', () => {
@@ -163,7 +162,7 @@ describe('Kuzzle Server Controller', () => {
           },
           version: '<current kuzzle version>'
         }
-      }
+      };
 
     it('should call query with the right arguments and return Promise which resolves the configuration', () => {
       kuzzle.queryPromise.resolves(response);
@@ -182,7 +181,7 @@ describe('Kuzzle Server Controller', () => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
-        })
+        });
     });
 
     it('should reject the promise if an error occurs', () => {
@@ -223,7 +222,7 @@ describe('Kuzzle Server Controller', () => {
           },
           timestamp: 1453110641308
         }
-      }
+      };
 
     it('should call query with the right arguments and return Promise which resolves the last statistic frame', () => {
       kuzzle.queryPromise.resolves(response);
@@ -242,7 +241,7 @@ describe('Kuzzle Server Controller', () => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
-        })
+        });
     });
 
     it('should reject the promise if an error occurs', () => {
@@ -288,7 +287,7 @@ describe('Kuzzle Server Controller', () => {
             }
           ]
         }
-      }
+      };
 
     it('should call query with the right arguments and return Promise which resolves the requested statistics frames', () => {
       kuzzle.queryPromise.resolves(response);
@@ -404,7 +403,7 @@ describe('Kuzzle Server Controller', () => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
-        })
+        });
     });
 
     it('should reject the promise if an error occurs', () => {
@@ -422,13 +421,13 @@ describe('Kuzzle Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves current server timestamp', () => {
-      kuzzle.queryPromise.resolves({result: {now: 12345}})
+      kuzzle.queryPromise.resolves({result: {now: 12345}});
 
       return server.now()
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
-          should(res).be.exactly(12345)
+          should(res).be.exactly(12345);
         })
         .then(() => {
           kuzzle.queryPromise.resetHistory();
@@ -437,17 +436,17 @@ describe('Kuzzle Server Controller', () => {
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
-          should(res).be.exactly(12345)
+          should(res).be.exactly(12345);
         });
     });
 
     it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {foo: 'bar'}})
+      kuzzle.queryPromise.resolves({result: {foo: 'bar'}});
       return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
     it('should reject the promise if receiving a response in bad format (bad type for "now" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {now: 'bar'}})
+      kuzzle.queryPromise.resolves({result: {now: 'bar'}});
       return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
