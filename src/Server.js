@@ -45,6 +45,17 @@ class Server {
     return this.kuzzle.queryPromise({controller: 'server', action: 'getAllStats'}, {}, options)
       .then(res => res.result);
   }
+
+
+  /**
+   * Returns the Kuzzle configuration
+   *
+   * @returns {Promise<Object>}
+   */
+  getConfig(options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'getConfig'}, {}, options)
+      .then(res => res.result);
+  }
 }
 
 module.exports = Server;

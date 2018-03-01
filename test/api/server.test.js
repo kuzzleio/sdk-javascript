@@ -127,4 +127,64 @@ describe('Kuzzle Server Controller', () => {
       return should(server.adminExists()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
+
+  describe('#getConfig', () => {
+    const
+      expectedQuery = {
+        controller: 'server',
+        action: 'getConfig'
+      },
+      response = {
+        status: 200,
+        error: null,
+        action: 'getConfig',
+        controller: 'server',
+        requestId: 'requestId',
+        result: {
+          stats: {
+            ttl: 3600,
+            statsInterval: 10
+          },
+          validation: {},
+          dump: {
+            enabled: false,
+            path: './dump/',
+            gcore: 'gcore',
+            dateFormat: 'YYYYMMDD-HHmm',
+            handledErrors: {
+              enabled: true,
+              whitelist: ['RangeError','TypeError','KuzzleError','InternalError']
+            }
+          },
+          version: '<current kuzzle version>'
+        }
+      }
+
+    it('should call query with the right arguments and return Promise which resolves the configuration', () => {
+      kuzzle.queryPromise.resolves(response);
+
+      return server.getConfig()
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(res).match(response.result);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.getConfig({queuable: false});
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(res).match(response.result);
+        })
+    });
+
+    it('should reject the promise if an error occurs', () => {
+      const error = new Error('foobar error');
+      error.status = 412;
+      kuzzle.queryPromise.rejects(error);
+      return should(server.getConfig()).be.rejectedWith({status: 412, message: 'foobar error'});
+    });
+  });
 });
