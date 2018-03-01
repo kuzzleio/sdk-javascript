@@ -80,6 +80,17 @@ class Server {
     return this.kuzzle.queryPromise({controller: 'server', action: 'getStats'}, {startTime, stopTime}, options)
       .then(res => res.result);
   }
+
+  /**
+   * Returns the Kuzzle server information
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
+  info(options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'info'}, {}, options)
+      .then(res => res.result.serverInfo);
+  }
 }
 
 module.exports = Server;

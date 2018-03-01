@@ -339,4 +339,74 @@ describe('Kuzzle Server Controller', () => {
       return should(server.getStats(1234, 9876)).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
+
+  describe('#info', () => {
+    const
+      expectedQuery = {
+        controller: 'server',
+        action: 'info'
+      },
+      response = {
+        status: 200,
+        error: null,
+        controller: 'server',
+        action: 'info',
+        requestId: 'requestId',
+        result: {
+          serverInfo: {
+            kuzzle: {
+              api: {
+                routes: {
+                  controller1: {
+                    action1: {
+                      controller: 'controller1',
+                      action: 'action1',
+                      http: {
+                        verb: 'GET',
+                        url: '/action1/url'
+                      }
+                    },
+                    action2: {
+                      controller: 'controller1',
+                      action: 'action2',
+                      http: {
+                        verb: 'POST',
+                        url: '/action2/url'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+
+    it('should call query with the right arguments and return Promise which resolves the server informations', () => {
+      kuzzle.queryPromise.resolves(response);
+
+      return server.info()
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(res).match(response.result.serverInfo);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.info({queuable: false});
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(res).match(response.result.serverInfo);
+        })
+    });
+
+    it('should reject the promise if an error occurs', () => {
+      const error = new Error('foobar error');
+      error.status = 412;
+      kuzzle.queryPromise.rejects(error);
+      return should(server.info()).be.rejectedWith({status: 412, message: 'foobar error'});
+    });
+  });
 });
