@@ -34,6 +34,17 @@ class Server {
         return res.result.exists;
       });
   }
+
+  /**
+   * Returns all stored statistics frames
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
+  getAllStats(options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'getAllStats'}, {}, options)
+      .then(res => res.result);
+  }
 }
 
 module.exports = Server;
