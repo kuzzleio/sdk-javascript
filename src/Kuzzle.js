@@ -1,5 +1,6 @@
 const
   uuidv4 = require('uuid/v4'),
+  bluebird = require('bluebird'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Document = require('./Document.js'),
@@ -294,20 +295,18 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('tokenExpired');
     });
 
-    if (this.bluebird) {
-      return this.bluebird.promisifyAll(this, {
-        suffix: 'Promise',
-        filter: function (name, func, target, passes) {
-          const whitelist = ['listCollections', 'listIndexes', 'login', 'logout', 'query',
-            'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
-            'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
-            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
-          ];
+    return bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        const whitelist = ['listCollections', 'listIndexes', 'login', 'logout', 'query',
+          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
+          'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
+          'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
+        ];
 
-          return passes && whitelist.indexOf(name) !== -1;
-        }
-      });
-    }
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
   }
 
   /**
@@ -445,7 +444,7 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('Kuzzle.login: strategy required');
     }
 
-    const 
+    const
       request = {
         strategy,
         body: {}
@@ -996,6 +995,8 @@ class Kuzzle extends KuzzleEventEmitter {
    * Base method used to send read queries to Kuzzle
    *
    * Takes an optional argument object with the following properties:
+   *    - queuable (boolean, default: true):
+   *        Tell if the query can be queuable in case of offline mode
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
