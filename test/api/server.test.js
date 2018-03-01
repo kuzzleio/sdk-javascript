@@ -124,7 +124,7 @@ describe('Kuzzle Server Controller', () => {
       const error = new Error('foobar error');
       error.status = 412;
       kuzzle.queryPromise.rejects(error);
-      return should(server.adminExists()).be.rejectedWith({status: 412, message: 'foobar error'});
+      return should(server.getAllStats()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
 
@@ -244,7 +244,7 @@ describe('Kuzzle Server Controller', () => {
       const error = new Error('foobar error');
       error.status = 412;
       kuzzle.queryPromise.rejects(error);
-      return should(server.adminExists()).be.rejectedWith({status: 412, message: 'foobar error'});
+      return should(server.getLastStats()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
 });

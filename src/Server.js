@@ -49,6 +49,7 @@ class Server {
   /**
    * Returns the Kuzzle configuration
    *
+   * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
   getConfig(options) {
@@ -59,6 +60,7 @@ class Server {
   /**
    * Returns the last statistics frame
    *
+   * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
   getLastStats(options) {
