@@ -394,7 +394,7 @@ describe('Kuzzle Server Controller', () => {
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
-          should(res).match(response.result.serverInfo);
+          should(res).match(response.result);
         })
         .then(() => {
           kuzzle.queryPromise.resetHistory();
@@ -403,7 +403,7 @@ describe('Kuzzle Server Controller', () => {
         .then(res => {
           should(kuzzle.queryPromise).be.calledOnce();
           should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
-          should(res).match(response.result.serverInfo);
+          should(res).match(response.result);
         })
     });
 

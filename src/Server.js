@@ -89,7 +89,7 @@ class Server {
    */
   info(options) {
     return this.kuzzle.queryPromise({controller: 'server', action: 'info'}, {}, options)
-      .then(res => res.result.serverInfo);
+      .then(res => res.result);
   }
 
   /**
