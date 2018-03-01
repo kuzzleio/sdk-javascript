@@ -91,6 +91,25 @@ class Server {
     return this.kuzzle.queryPromise({controller: 'server', action: 'info'}, {}, options)
       .then(res => res.result.serverInfo);
   }
+
+  /**
+   * Get server's current timestamp
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Number>}
+   */
+  now(options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'now'}, {}, options)
+      .then(res => {
+        if (res.result === undefined || typeof res.result.now !== 'number') {
+          const error = new Error('now: bad response format');
+          error.status = 400;
+          error.response = res;
+          return bluebird.reject(error);
+        }
+        return res.result.now;
+      });
+  }
 }
 
 module.exports = Server;

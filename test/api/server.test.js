@@ -414,4 +414,48 @@ describe('Kuzzle Server Controller', () => {
       return should(server.info()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
+
+  describe('#now', () => {
+    const expectedQuery = {
+      controller: 'server',
+      action: 'now'
+    };
+
+    it('should call query with the right arguments and return Promise which resolves current server timestamp', () => {
+      kuzzle.queryPromise.resolves({result: {now: 12345}})
+
+      return server.now()
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(res).be.exactly(12345)
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.now({queuable: false});
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(res).be.exactly(12345)
+        });
+    });
+
+    it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
+      kuzzle.queryPromise.resolves({result: {foo: 'bar'}})
+      return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
+    });
+
+    it('should reject the promise if receiving a response in bad format (bad type for "now" attribute)', () => {
+      kuzzle.queryPromise.resolves({result: {now: 'bar'}})
+      return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
+    });
+
+    it('should reject the promise if an error occurs', () => {
+      const error = new Error('foobar error');
+      error.status = 412;
+      kuzzle.queryPromise.rejects(error);
+      return should(server.now()).be.rejectedWith({status: 412, message: 'foobar error'});
+    });
+  });
 });
