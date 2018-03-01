@@ -247,4 +247,96 @@ describe('Kuzzle Server Controller', () => {
       return should(server.getLastStats()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
+
+  describe('#getStats', () => {
+    const
+      expectedQuery = {
+        controller: 'server',
+        action: 'getStats'
+      },
+      response = {
+        status: 200,
+        error: null,
+        action: 'getStats',
+        controller: 'server',
+        requestId: 'requestId',
+        result: {
+          total: 25,
+          hits: [
+            {
+              completedRequests: {
+                websocket: 148,
+                http: 24,
+                mqtt: 78
+              },
+              failedRequests: {
+                websocket: 3
+              },
+              ongoingRequests: {
+                mqtt: 8,
+                http: 2
+              },
+              connections: {
+                websocket: 13
+              },
+              timestamp: 1453110641308
+            }
+          ]
+        }
+      }
+
+    it('should call query with the right arguments and return Promise which resolves the requested statistics frames', () => {
+      kuzzle.queryPromise.resolves(response);
+
+      return server.getStats(1234, 9876)
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, undefined);
+          should(res).match(response.result);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.getStats(1234, 9876, {queuable: false});
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, {queuable: false});
+          should(res).match(response.result);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.getStats(1234, null);
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: null}, undefined);
+          should(res).match(response.result);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.getStats(null, 9876);
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: null, stopTime: 9876}, undefined);
+          should(res).match(response.result);
+        })
+        .then(() => {
+          kuzzle.queryPromise.resetHistory();
+          return server.getStats(null, null);
+        })
+        .then(res => {
+          should(kuzzle.queryPromise).be.calledOnce();
+          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: null, stopTime: null}, undefined);
+          should(res).match(response.result);
+        });
+    });
+
+    it('should reject the promise if an error occurs', () => {
+      const error = new Error('foobar error');
+      error.status = 412;
+      kuzzle.queryPromise.rejects(error);
+      return should(server.getStats(1234, 9876)).be.rejectedWith({status: 412, message: 'foobar error'});
+    });
+  });
 });

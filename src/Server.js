@@ -67,6 +67,19 @@ class Server {
     return this.kuzzle.queryPromise({controller: 'server', action: 'getLastStats'}, {}, options)
       .then(res => res.result);
   }
+
+  /**
+   * Returns the statistics frame from a date
+   *
+   * @param {Number|String} startTime - begining of statistics frame set (timestamp or datetime format)
+   * @param {Number|String} stopTime - end of statistics frame set (timestamp or datetime format)
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
+  getStats(startTime, stopTime, options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'getStats'}, {startTime, stopTime}, options)
+      .then(res => res.result);
+  }
 }
 
 module.exports = Server;
