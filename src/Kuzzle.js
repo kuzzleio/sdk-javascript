@@ -5,6 +5,7 @@ const
   Collection = require('./Collection.js'),
   Document = require('./Document.js'),
   Security = require('./security/Security'),
+  Server = require('./Server.js'),
   MemoryStorage = require('./MemoryStorage'),
   User = require('./security/User'),
   networkWrapper = require('./networkWrapper');
@@ -161,6 +162,15 @@ class Kuzzle extends KuzzleEventEmitter {
         }
       }
     });
+
+    /**
+     * Singletons for Kuzzle API
+     */
+    Object.defineProperty(this, 'server', {
+      value: new Server(this),
+      enumerable: true
+    });
+
 
     /**
      * Create an attribute security that embed all methods to manage Role, Profile and User
