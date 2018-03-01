@@ -50,8 +50,13 @@ describe('Kuzzle Server Controller', () => {
         })
     });
 
-    it('should reject the promise if receiving a response in bad format', () => {
+    it('should reject the promise if receiving a response in bad format (missing "exists" attribute)', () => {
       kuzzle.queryPromise.resolves({result: {foo: 'bar'}})
+      return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
+    });
+
+    it('should reject the promise if receiving a response in bad format (bad type of "exists" attribute)', () => {
+      kuzzle.queryPromise.resolves({result: {exists: 'foobar'}})
       return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
