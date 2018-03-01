@@ -46,7 +46,6 @@ class Server {
       .then(res => res.result);
   }
 
-
   /**
    * Returns the Kuzzle configuration
    *
@@ -54,6 +53,16 @@ class Server {
    */
   getConfig(options) {
     return this.kuzzle.queryPromise({controller: 'server', action: 'getConfig'}, {}, options)
+      .then(res => res.result);
+  }
+
+  /**
+   * Returns the last statistics frame
+   *
+   * @returns {Promise<Object>}
+   */
+  getLastStats(options) {
+    return this.kuzzle.queryPromise({controller: 'server', action: 'getLastStats'}, {}, options)
       .then(res => res.result);
   }
 }
