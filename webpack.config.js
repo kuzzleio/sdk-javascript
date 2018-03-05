@@ -5,6 +5,7 @@ const
   version = require('./package.json').version;
 
 module.exports = {
+  mode: "production",
   entry: './src/Kuzzle.js',
   output: {
     path: `${__dirname}/dist`,
@@ -24,7 +25,7 @@ module.exports = {
     setImmediate: false
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         include: [
