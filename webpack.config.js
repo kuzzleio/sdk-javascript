@@ -49,7 +49,7 @@ module.exports = {
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.IgnorePlugin(/ws/),
+    new webpack.IgnorePlugin(/uws/),
     new webpack.DefinePlugin({
       global: 'window',
       SDKVERSION: JSON.stringify(version),

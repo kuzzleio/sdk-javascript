@@ -10,7 +10,7 @@ class WSNode extends RTWrapper {
   constructor(host, options) {
     super(host, options);
 
-    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
+    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('uws');
     this.client = null;
     this.lasturl = null;
   }
