@@ -1,6 +1,7 @@
 const
   uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
+  IndexController = require('./controllers/index'),
   Collection = require('./Collection.js'),
   Document = require('./Document.js'),
   Security = require('./security/Security'),
@@ -74,6 +75,10 @@ class Kuzzle extends KuzzleEventEmitter {
         value: {},
         enumerable: true,
         writable: true
+      },
+      index: {
+        value: new IndexController(this),
+        enumerable: true
       }
     });
 
@@ -320,10 +325,10 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Emit an event to all registered listeners
-   * An event cannot be emitted multiple times before a timeout has been reached.
-   */
-  emit(eventName, ...payload) {
+  * Emit an event to all registered listeners
+  * An event cannot be emitted multiple times before a timeout has been reached.
+  */
+  emit (eventName, ...payload) {
     const
       now = Date.now(),
       protectedEvent = this.protectedEvents[eventName];
@@ -338,12 +343,11 @@ class Kuzzle extends KuzzleEventEmitter {
     super.emit(eventName, ...payload);
   }
 
-
   /**
    * Connects to a Kuzzle instance using the provided host name
    * @param {function} [cb] Connection callback
    */
-  connect(cb) {
+  connect (cb) {
     if (this.network.isReady()) {
       if (cb) {
         cb(null, this);
@@ -403,7 +407,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param token
    * @returns {Kuzzle}
    */
-  setJwt(token) {
+  setJwt (token) {
     if (typeof token === 'string') {
       this.jwt = token;
     } else if (typeof token === 'object') {
@@ -423,7 +427,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Unset the jwt used to query kuzzle
    * @returns {Kuzzle}
    */
-  unsetJwt() {
+  unsetJwt () {
     this.jwt = undefined;
     return this;
   }
@@ -432,39 +436,10 @@ class Kuzzle extends KuzzleEventEmitter {
    * Get the jwt used by kuzzle
    * @returns {Kuzzle}
    */
-  getJwt() {
+  getJwt () {
     return this.jwt;
   }
 
-  /**
-   * Create a kuzzle index
-   *
-   * @param {string} index
-   * @param {object} [options]
-   * @param {responseCallback} cb
-   * @returns {Kuzzle}
-   */
-  createIndex(index, options, cb) {
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Kuzzle.createIndex: index required');
-      }
-      index = this.defaultIndex;
-    }
-
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'index', action: 'create', index}, {}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
 
   /**
    * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
@@ -473,7 +448,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {string} event - name of the global event to subscribe to
    * @param {function} listener - callback to invoke each time an event is fired
    */
-  addListener(event, listener) {
+  addListener (event, listener) {
     if (this.eventActions.indexOf(event) === -1) {
       throw new Error(`[${event}] is not a known event. Known events: ${this.eventActions.toString()}`);
     }
@@ -488,7 +463,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  getAllStatistics(options, cb) {
+  getAllStatistics (options, cb) {
     if (!cb && typeof options === 'function') {
       cb = options;
       options = null;
@@ -510,7 +485,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  getStatistics(...args) {
+  getStatistics (...args) {
     let
       startTime,
       stopTime,
@@ -571,7 +546,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {string} [index] - The name of the data index containing the data collection
    * @returns {Collection} A Collection instance
    */
-  collection(collection, index) {
+  collection (collection, index) {
     if (!index) {
       if (!this.defaultIndex) {
         throw new Error('Unable to create a new data collection object: no index specified');
@@ -600,7 +575,7 @@ class Kuzzle extends KuzzleEventEmitter {
    *
    * @returns {Kuzzle}
    */
-  flushQueue() {
+  flushQueue () {
     this.network.flushQueue();
     return this;
   }
@@ -612,7 +587,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  listCollections(...args) {
+  listCollections (...args) {
     let
       index,
       options,
@@ -650,28 +625,9 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Returns the list of existing indexes in Kuzzle
-   *
-   * @param {object} [options] - Optional arguments
-   * @param {responseCallback} cb - Handles the query response
-   */
-  listIndexes(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.listIndexes', cb);
-
-    this.query({controller: 'index', action: 'list'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.indexes);
-    });
-  }
-
-  /**
    * Disconnects from Kuzzle and invalidate this instance.
    */
-  disconnect() {
+  disconnect () {
     this.network.close();
 
     for (const collection of Object.keys(this.collections)) {
@@ -680,157 +636,11 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Returns the server informations
-   *
-   * @param {object} [options] - Optional arguments
-   * @param {responseCallback} cb - Handles the query response
-   */
-  getServerInfo(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.getServerInfo', cb);
-
-    this.query({controller: 'server', action: 'info'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.serverInfo);
-    });
-  }
-
-  /**
-   * Forces an index refresh
-   *
-   * @param {string} index - The index to refresh. Defaults to Kuzzle.defaultIndex
-   * @param {object} options - Optional arguments
-   * @param {responseCallback} cb - Handles the query response
-   * @returns {Kuzzle}
-   */
-  refreshIndex(...args) {
-    let
-      index,
-      options,
-      cb;
-
-    for (const arg of args) {
-      switch (typeof arg) {
-        case 'string':
-          index = arg;
-          break;
-        case 'object':
-          options = arg;
-          break;
-        case 'function':
-          cb = arg;
-          break;
-      }
-    }
-
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Kuzzle.refreshIndex: index required');
-      }
-      index = this.defaultIndex;
-    }
-
-    this.query({index, controller: 'index', action: 'refresh'}, {}, options, cb);
-
-    return this;
-  }
-
-  /**
-   * Returns de current autoRefresh status for the given index
-   *
-   * @param {string} index - The index to get the status from. Defaults to Kuzzle.defaultIndex
-   * @param {object} options - Optinal arguments
-   * @param {responseCallback} cb - Handles the query response
-   */
-  getAutoRefresh(...args) {
-    let
-      index,
-      options,
-      cb;
-
-    for (const arg of args) {
-      switch (typeof arg) {
-        case 'string':
-          index = arg;
-          break;
-        case 'object':
-          options = arg;
-          break;
-        case 'function':
-          cb = arg;
-          break;
-      }
-    }
-
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Kuzzle.getAutoRefresh: index required');
-      }
-      index = this.defaultIndex;
-    }
-
-    this.callbackRequired('Kuzzle.getAutoRefresh', cb);
-    this.query({index, controller: 'index', action: 'getAutoRefresh'}, {}, options, cb);
-  }
-
-  /**
-   * (Un)Sets the autoRefresh flag on the given index
-   *
-   * @param {string} index - the index to modify. Defaults to Kuzzle.defaultIndex
-   * @param {boolean} autoRefresh - The autoRefresh value to set
-   * @param {object} options - Optional arguments
-   * @param {responseCallback} cb - Handles the query result
-   * @returns {object} this
-   */
-  setAutoRefresh(...args) {
-    var
-      index,
-      autoRefresh,
-      options,
-      cb;
-
-    for (const arg of args) {
-      switch (typeof arg) {
-        case 'string':
-          index = arg;
-          break;
-        case 'boolean':
-          autoRefresh = arg;
-          break;
-        case 'object':
-          options = arg;
-          break;
-        case 'function':
-          cb = arg;
-          break;
-      }
-    }
-
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Kuzzle.setAutoRefresh: index required');
-      }
-      index = this.defaultIndex;
-    }
-
-    if (autoRefresh === undefined) {
-      throw new Error('Kuzzle.setAutoRefresh: autoRefresh value is required');
-    }
-
-    this.query({index, controller: 'index', action: 'setAutoRefresh'}, {body: {autoRefresh}}, options, cb);
-
-    return this;
-  }
-
-  /**
    * Return the current Kuzzle's UTC Epoch time, in milliseconds
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  now(options, cb) {
+  now (options, cb) {
     if (!cb && typeof options === 'function') {
       cb = options;
       options = null;
@@ -856,7 +666,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @param {responseCallback} [cb] - Handles the query response
    */
-  query(queryArgs, query = {}, options = null) {
+  query (queryArgs, query = {}, options = null) {
     const
       object = {
         action: queryArgs.action,
@@ -918,7 +728,7 @@ class Kuzzle extends KuzzleEventEmitter {
   /**
    * Starts the requests queuing.
    */
-  startQueuing() {
+  startQueuing () {
     this.network.startQueuing();
     return this;
   }
@@ -926,7 +736,7 @@ class Kuzzle extends KuzzleEventEmitter {
   /**
    * Stops the requests queuing.
    */
-  stopQueuing() {
+  stopQueuing () {
     this.network.stopQueuing();
     return this;
   }
@@ -935,14 +745,14 @@ class Kuzzle extends KuzzleEventEmitter {
    * @DEPRECATED
    * See Kuzzle.prototype.playQueue();
    */
-  replayQueue() {
+  replayQueue () {
     return this.playQueue();
   }
 
   /**
    * Plays the requests queued during offline mode.
    */
-  playQueue() {
+  playQueue () {
     this.network.playQueue();
     return this;
   }
@@ -953,7 +763,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param index
    * @returns this
    */
-  setDefaultIndex(index) {
+  setDefaultIndex (index) {
     if (typeof index !== 'string') {
       throw new Error(`Invalid default index: [${index}] (an index name is expected)`);
     }
