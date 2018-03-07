@@ -500,30 +500,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Create credentials of the specified <strategy> for the current user.
-   *
-   * @param credentials
-   * @param strategy
-   * @param options
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  createMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'createMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result._source);
-      }
-    });
-
-    return this;
-  }
-
-  /**
    * Delete credentials of the specified <strategy> for the current user.
    *
    * @param strategy

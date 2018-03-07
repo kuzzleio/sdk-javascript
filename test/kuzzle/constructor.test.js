@@ -32,7 +32,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.collection).be.a.Function();
     should(kuzzle.connect).be.a.Function();
     should(kuzzle.createIndex).be.a.Function();
-    should(kuzzle.createMyCredentials).be.a.Function();
     should(kuzzle.deleteMyCredentials).be.a.Function();
     should(kuzzle.disconnect).be.a.Function();
     should(kuzzle.flushQueue).be.a.Function();
@@ -273,7 +272,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.collectionPromise).be.undefined();
     should(kuzzle.connectPromise).be.a.Function();
     should(kuzzle.createIndexPromise).be.a.Function();
-    should(kuzzle.createMyCredentialsPromise).be.a.Function();
     should(kuzzle.deleteMyCredentialsPromise).be.a.Function();
     should(kuzzle.disconnectPromise).be.undefined();
     should(kuzzle.flushQueuePromise).be.undefined();
