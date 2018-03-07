@@ -79,7 +79,7 @@ describe('Kuzzle Auth controller', function () {
 
 			return auth.credentialsExist('strategy')
 				.then(res => {
-					should(kuzzle.queryPromise).be.calledOnce();
+					should(kuzzle.queryProm).be.calledOnce();
 					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
 					should(res).be.exactly(result.result);
 				});

@@ -10,7 +10,6 @@ function KuzzleMock () {
   this.network = new NetworkWrapperMock();
 
   this.query = sinon.stub();
-  this.queryPromise = sinon.stub();
   this.subscribe = sinon.stub();
   this.unsubscribe = sinon.stub();
 

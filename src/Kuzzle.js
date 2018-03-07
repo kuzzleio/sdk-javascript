@@ -619,20 +619,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Fetches the current user.
-   *
-   * @param  {function} cb  The callback to be called when the response is
-   *                              available. The signature is `function(error, response)`.
-   */
-  whoAmI (cb) {
-    this.callbackRequired('Kuzzle.whoAmI', cb);
-
-    this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, (err, res) => {
-      cb(err, err ? undefined : new User(this.security, res.result._id, res.result._source, res.result._meta));
-    });
-  }
-
-  /**
    * Gets the rights array of the currently logged user.
    *
    * @param {object} [options] - Optional parameters

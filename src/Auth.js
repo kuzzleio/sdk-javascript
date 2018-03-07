@@ -1,3 +1,5 @@
+const User = require('./User.js')
+
 /**
  * Auth controller
  *
@@ -54,7 +56,7 @@ class Auth {
 	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
 	 */
 	credentialsExist (strategy, options) {
-		return this.kuzzle.queryPromise({controller: 'auth', action: 'credentialsExist'}, {strategy}, options)
+		return this.kuzzle.query({controller: 'auth', action: 'credentialsExist'}, {strategy}, options)
 			.then(res => res.result)
 	}
 
@@ -70,6 +72,17 @@ class Auth {
 			.then(res => res.result);
 	}
 
+	/**
+	 * Fetches the current user.
+	 *
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	getCurrentUser () {
+		return this.kuzzle.queryPromise({controller: 'auth', action: 'getCurrentUser'}, {}, {})
+			.then(res => {
+				return new User(this.security, res.result._id, res.result._source, res.result._meta)
+			})
+	}
 
 }
 

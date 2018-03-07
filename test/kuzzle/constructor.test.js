@@ -60,7 +60,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.updateMyCredentials).be.a.Function();
     should(kuzzle.updateSelf).be.a.Function();
     should(kuzzle.validateMyCredentials).be.a.Function();
-    should(kuzzle.whoAmI).be.a.Function();
   });
 
   it('should expose the documented writable properties', function () {
@@ -299,6 +298,5 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.updateMyCredentialsPromise).be.a.Function();
     should(kuzzle.updateSelfPromise).be.a.Function();
     should(kuzzle.validateMyCredentialsPromise).be.a.Function();
-    should(kuzzle.whoAmIPromise).be.a.Function();
   });
 });
