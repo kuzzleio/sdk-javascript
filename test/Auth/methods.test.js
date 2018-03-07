@@ -62,4 +62,51 @@ describe('Kuzzle Auth controller', function () {
 				});
 		});
 	});
+
+	describe('#credentialsExist', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'credentialsExist'
+			},
+			result = {
+				result: {
+					acknowledged: true
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.queryPromise.resolves(result);
+
+			return auth.credentialsExist('strategy')
+				.then(res => {
+					should(kuzzle.queryPromise).be.calledOnce();
+					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
+					should(res).be.exactly(result.result);
+				});
+		});
+	});
+
+	describe('#deleteMyCredentials', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'deleteMyCredentials'
+			},
+			result = {
+				result: {
+					acknowledged: true
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.queryPromise.resolves(result);
+
+			return auth.deleteMyCredentials('strategy')
+				.then(res => {
+					should(kuzzle.queryPromise).be.calledOnce();
+					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
+					should(res).be.exactly(result.result);
+				});
+		});
+	});
+
 });
