@@ -32,54 +32,6 @@ describe('Kuzzle methods', function () {
     sandbox.restore();
   });
 
-  describe('#checkToken', function () {
-    var token = 'fakeToken-eoijaodmowifnw8h';
-
-    beforeEach(function() {
-      sandbox.stub(kuzzle, 'query').callsFake(queryStub);
-    });
-
-    it('should throw an error if no callback is provided', function () {
-      should(function () { kuzzle.checkToken(); }).throw(Error);
-      should(kuzzle.query).not.be.called();
-      should(function () { kuzzle.checkToken(token); }).throw(Error);
-      should(kuzzle.query).not.be.called();
-    });
-
-    it('should call query with the right arguments', function () {
-      var
-        now = Date.now(),
-        cb = sinon.stub(),
-        expectedQuery = {
-          controller: 'auth',
-          action: 'checkToken'
-        };
-
-      result = {
-        result: {
-          valid: true,
-          state: 'Error message',
-          expiresAt: now + 1000
-        }
-      };
-
-      kuzzle.checkToken(token,cb);
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {body: {token: token}}, {queuable: false});
-      should(cb).be.calledOnce();
-      should(cb).be.calledWithExactly(null, result.result);
-    });
-
-    it('should execute the callback with an error if an error occurs', function () {
-      var cb = sinon.stub();
-
-      error = 'foobar';
-      kuzzle.checkToken(token, cb);
-      should(cb).be.calledOnce();
-      should(cb).be.calledWithExactly('foobar', undefined);
-    });
-  });
-
   describe('#collection', function () {
     it('should throw an error if arguments are not strings', function () {
       kuzzle.defaultIndex = 'foobar';

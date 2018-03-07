@@ -6,6 +6,7 @@ const
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
   User = require('./security/User'),
+  Auth = require('./Auth.js'),
   networkWrapper = require('./networkWrapper');
 
 /**
@@ -159,6 +160,14 @@ class Kuzzle extends KuzzleEventEmitter {
           throw new Error(`${errorMessagePrefix}: a callback argument is required for read queries`);
         }
       }
+    });
+
+    /**
+    * Singletons for Kuzzle API
+    */
+    Object.defineProperty(this, 'auth', {
+      value: new Auth(this),
+      enumerable: true
     });
 
     /**
@@ -446,7 +455,7 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('Kuzzle.login: strategy required');
     }
 
-    const 
+    const
       request = {
         strategy,
         body: {}
@@ -654,28 +663,6 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     return this.unsetJwt();
-  }
-
-  /**
-   * Checks whether a given jwt token still represents a valid session in Kuzzle.
-   *
-   * @param  {string}   token     The jwt token to check
-   * @param  {function} cb  The callback to be called when the response is
-   *                              available. The signature is `function(error, response)`.
-   */
-  checkToken (token, cb) {
-    const
-      request = {
-        body: {
-          token
-        }
-      };
-
-    this.callbackRequired('Kuzzle.checkToken', cb);
-
-    this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, (err, res) => {
-      cb(err, err ? undefined : res.result);
-    });
   }
 
   /**

@@ -29,7 +29,6 @@ describe('Kuzzle constructor', function () {
     var kuzzle = new Kuzzle('somewhere');
 
     should(kuzzle.addListener).be.a.Function();
-    should(kuzzle.checkToken).be.a.Function();
     should(kuzzle.collection).be.a.Function();
     should(kuzzle.connect).be.a.Function();
     should(kuzzle.createIndex).be.a.Function();
@@ -271,7 +270,6 @@ describe('Kuzzle constructor', function () {
     kuzzle = new Kuzzle('somewhere');
 
     should(kuzzle.addListenerPromise).be.undefined();
-    should(kuzzle.checkTokenPromise).be.a.Function();
     should(kuzzle.collectionPromise).be.undefined();
     should(kuzzle.connectPromise).be.a.Function();
     should(kuzzle.createIndexPromise).be.a.Function();
