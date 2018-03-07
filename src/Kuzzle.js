@@ -1050,22 +1050,13 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @param {responseCallback} [cb] - Handles the query response
    */
-  query (queryArgs, query, options, cb) {
+  query (queryArgs, query = {}, options = null) {
     const
       object = {
         action: queryArgs.action,
         controller: queryArgs.controller,
         volatile: this.volatile
       };
-
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    } else if (!cb && !options && typeof query === 'function') {
-      cb = query;
-      query = {};
-      options = null;
-    }
 
     if (options) {
       for (const prop of ['refresh', 'from', 'size', 'scroll', 'scrollId']) {
@@ -1080,10 +1071,13 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     if (!query || typeof query !== 'object' || Array.isArray(query)) {
-      throw new Error('Invalid query parameter: ' + query);
+      return Promise.reject(Error(`Invalid query parameter: ${JSON.stringify(query)}`));
     }
 
-    Object.assign(object.volatile, query.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
+    Object.assign(object.volatile, query.volatile, {
+      sdkInstanceId: this.network.id,
+      sdkVersion: this.sdkVersion
+    });
 
     for (const attr of Object.keys(query)) {
       if (attr !== 'volatile') {
@@ -1111,9 +1105,8 @@ class Kuzzle extends KuzzleEventEmitter {
       object.requestId = uuidv4();
     }
 
-    this.network.query(object, options, cb);
-
-    return this;
+    return this.network.query(object, options)
+      .then(response => response.result);
   }
 
   /**

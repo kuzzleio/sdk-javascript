@@ -59,7 +59,8 @@ class RTWrapper extends KuzzleEventEmitter {
                 {
                   ts: <query timestamp>,
                   query: 'query',
-                  cb: callbackFunction
+                  resolve,
+                  reject
                 }
               ]
        */
@@ -165,7 +166,7 @@ class RTWrapper extends KuzzleEventEmitter {
       this.retrying = true;
       setTimeout(() => {
         this.retrying = false;
-        this.connect(this.host);
+        this.connect();
       }, this.reconnectionDelay);
     } else {
       this.emit('disconnect');
@@ -184,8 +185,8 @@ class RTWrapper extends KuzzleEventEmitter {
    */
   playQueue() {
     if (this.state === 'connected') {
-      cleanQueue(this);
-      dequeue(this);
+      this._cleanQueue();
+      this._dequeue();
     }
   }
 
@@ -203,162 +204,184 @@ class RTWrapper extends KuzzleEventEmitter {
     this.queuing = false;
   }
 
-  subscribe(object, options, notificationCB, cb) {
+  subscribe(object, options, cb) {
     if (this.state !== 'connected') {
-      return cb(new Error('Not Connected'));
+      return Promise.reject(new Error('Not Connected'));
     }
-    this.query(object, options, (error, response) => {
-      if (error) {
-        return cb(error);
-      }
-      this.on(response.result.channel, data => {
-        data.fromSelf = data.volatile !== undefined && data.volatile.sdkInstanceId === this.id;
-        notificationCB(data);
+
+    return this.query(object, options)
+      .then(response => {
+        this.on(response.result.channel, data => {
+          data.fromSelf = data.volatile !== undefined && data.volatile.sdkInstanceId === this.id;
+          cb(data);
+        });
+
+        return response.result;
       });
-      cb(null, response.result);
-    });
   }
 
-  unsubscribe(object, channel, cb) {
+  unsubscribe(object, channel) {
     this.removeAllListeners(channel);
-    this.query(object, null, (err, res) => {
-      if (cb) {
-        cb(err, err ? undefined : res.result);
-      }
-    });
+    return this.query(object);
   }
 
-  query(object, options, cb) {
+  /**
+   * Sends a raw request to Kuzzle
+   *
+   * @param {object} request
+   * @param options
+   * @returns {Promise}
+   */
+  query(request, options) {
     let queuable = options && (options.queuable !== false) || true;
 
     if (this.queueFilter) {
-      queuable = queuable && this.queueFilter(object);
+      queuable = queuable && this.queueFilter(request);
     }
 
     if (this.queuing && queuable) {
-      cleanQueue(this, object, cb);
-      this.emit('offlineQueuePush', {query: object, cb: cb});
-      return this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+      this._cleanQueue();
+
+      this.emit('offlineQueuePush', {query: request});
+      return new Promise((resolve, reject) => {
+        this.offlineQueue.push({
+          resolve,
+          reject,
+          ts: Date.now(),
+          query: request
+        });
+      });
     }
 
     if (this.state === 'connected') {
-      return emitRequest(this, object, cb);
+      return this._emitRequest(request);
     }
 
-    return discardRequest(object, cb);
-  }
-}
-/**
- * Emit a request to Kuzzle
- *
- * @param {RTWrapper} network
- * @param {object} request
- * @param {responseCallback} [cb]
- */
-function emitRequest (network, request, cb) {
-  if (request.jwt !== undefined || cb) {
-    network.once(request.requestId, response => {
-      let error = null;
-
-      if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
-        network.emit('tokenExpired', request, cb);
-      }
-
-      if (response.error) {
-        error = new Error(response.error.message);
-        Object.assign(error, response.error);
-        error.status = response.status;
-        network.emit('queryError', error, request, cb);
-      }
-
-      if (cb) {
-        cb(error, response);
-      }
-    });
-  }
-  // Track requests made to allow Room.subscribeToSelf to work
-  network.send(request);
-}
-
-function discardRequest(object, cb) {
-  if (cb) {
-    cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
-  }
-}
-
-/**
- * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
- * @param {RTWrapper} network
- */
-function cleanQueue (network) {
-  const now = Date.now();
-  let lastDocumentIndex = -1;
-
-  if (network.queueTTL > 0) {
-    network.offlineQueue.forEach((query, index) => {
-      if (query.ts < now - network.queueTTL) {
-        lastDocumentIndex = index;
-      }
-    });
-
-    if (lastDocumentIndex !== -1) {
-      network.offlineQueue
-        .splice(0, lastDocumentIndex + 1)
-        .forEach(droppedRequest => {
-          network.emit('offlineQueuePop', droppedRequest.query);
-        });
-    }
+    return this.constructor._discardRequest(request);
   }
 
-  if (network.queueMaxSize > 0 && network.offlineQueue.length > network.queueMaxSize) {
-    network.offlineQueue
-      .splice(0, network.offlineQueue.length - network.queueMaxSize)
-      .forEach(droppedRequest => {
-        network.emit('offlineQueuePop', droppedRequest.query);
+  /**
+   * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
+   *
+   * @private
+   */
+  _cleanQueue () {
+    const now = Date.now();
+    let lastDocumentIndex = -1;
+
+    if (this.queueTTL > 0) {
+      this.offlineQueue.forEach((query, index) => {
+        if (query.ts < now - this.queueTTL) {
+          lastDocumentIndex = index;
+        }
       });
-  }
-}
 
-/**
- * Play all queued requests, in order.
- */
-function dequeue (network) {
-  const
-    uniqueQueue = {},
-    dequeuingProcess = () => {
-      if (network.offlineQueue.length > 0) {
-        emitRequest(network, network.offlineQueue[0].query, network.offlineQueue[0].cb);
-        network.emit('offlineQueuePop', network.offlineQueue.shift());
-
-        setTimeout(() => {
-          dequeuingProcess();
-        }, Math.max(0, network.replayInterval));
+      if (lastDocumentIndex !== -1) {
+        this.offlineQueue
+          .splice(0, lastDocumentIndex + 1)
+          .forEach(droppedRequest => {
+            this.emit('offlineQueuePop', droppedRequest.query);
+          });
       }
-    };
-
-  if (network.offlineQueueLoader) {
-    if (typeof network.offlineQueueLoader !== 'function') {
-      throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof network.offlineQueueLoader);
     }
 
-    const additionalQueue = network.offlineQueueLoader();
-    if (Array.isArray(additionalQueue)) {
-      network.offlineQueue = additionalQueue
-        .concat(network.offlineQueue)
-        .filter(request => {
-          // throws if the query object does not contain required attributes
-          if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
-            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
-          }
-
-          return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+    if (this.queueMaxSize > 0 && this.offlineQueue.length > this.queueMaxSize) {
+      this.offlineQueue
+        .splice(0, this.offlineQueue.length - this.queueMaxSize)
+        .forEach(droppedRequest => {
+          this.emit('offlineQueuePop', droppedRequest.query);
         });
-    } else {
-      throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
     }
+
   }
 
-  dequeuingProcess();
+  /**
+   * Play all queued requests, in order.
+   *
+   * @private
+   */
+  _dequeue () {
+    const
+      uniqueQueue = {},
+      dequeuingProcess = () => {
+        if (this.offlineQueue.length > 0) {
+          this._emitRequest(this.offlineQueue[0].query)
+            .then(response => this.offlineQueue[0].resolve(response))
+            .catch(error => this.offlineQueue[0].reject(error));
+
+          this.emit('offlineQueuePop', this.offlineQueue.shift());
+
+          setTimeout(() => {
+            dequeuingProcess();
+          }, Math.max(0, this.replayInterval));
+        }
+      };
+
+    if (this.offlineQueueLoader) {
+      if (typeof this.offlineQueueLoader !== 'function') {
+        throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof this.offlineQueueLoader);
+      }
+
+      const additionalQueue = this.offlineQueueLoader();
+      if (Array.isArray(additionalQueue)) {
+        this.offlineQueue = additionalQueue
+          .concat(this.offlineQueue)
+          .filter(request => {
+            // throws if the query object does not contain required attributes
+            if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
+              throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+            }
+
+            return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+          });
+      } else {
+        throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+      }
+    }
+
+    dequeuingProcess();
+  }
+
+  /**
+   * @param request
+   * @returns {Promise<any>}
+   * @private
+   */
+  _emitRequest (request) {
+    return new Promise((resolve, reject) => {
+      this.once(request.requestId, response => {
+        let error = null;
+
+        if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
+          this.emit('tokenExpired', request);
+        }
+
+        if (response.error) {
+          error = new Error(response.error.message);
+          Object.assign(error, response.error);
+          error.status = response.status;
+
+          this.emit('queryError', error);
+          return reject(error);
+        }
+
+        return resolve(response);
+      });
+
+      // Track requests made to allow Room.subscribeToSelf to work
+      this.send(request);
+    });
+  }
+
+  /**
+   * @param object
+   * @returns {Promise<never>}
+   * @private
+   */
+  static _discardRequest (object) {
+    return Promise.reject(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
+  }
+
 }
 
 module.exports = RTWrapper;
