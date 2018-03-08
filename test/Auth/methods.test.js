@@ -240,4 +240,28 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#getStrategies', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'getStrategies'
+			},
+			result = {
+				result: [
+					'local',
+					'facebook'
+				]
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.getStrategies()
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(res).be.an.Array().and.eql(result.result);
+				});
+		});
+	});
+
 });

@@ -106,6 +106,17 @@ class Auth {
 			.then(res => res.result.hits)
 	}
 
+	/**
+	 * Get all the strategies registered in Kuzzle by all auth plugins
+	 *
+	 * @param {object} [options] - Optional parameters
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	getStrategies (options) {
+		return this.kuzzle.query({controller: 'auth', action:'getStrategies'}, {}, options)
+			.then(res => res.result)
+	}
+
 }
 
 module.exports = Auth;

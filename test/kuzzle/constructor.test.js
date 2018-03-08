@@ -37,7 +37,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.getAllStatistics).be.a.Function();
     should(kuzzle.getAutoRefresh).be.a.Function();
     should(kuzzle.getJwt).be.a.Function();
-    should(kuzzle.getMyRights).be.a.Function();
     should(kuzzle.getServerInfo).be.a.Function();
     should(kuzzle.getStatistics).be.a.Function();
     should(kuzzle.listCollections).be.a.Function();
@@ -274,7 +273,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.getAllStatisticsPromise).be.a.Function();
     should(kuzzle.getAutoRefreshPromise).be.a.Function();
     should(kuzzle.getJwtPromise).be.undefined();
-    should(kuzzle.getMyRightsPromise).be.a.Function();
     should(kuzzle.getServerInfoPromise).be.a.Function();
     should(kuzzle.getStatisticsPromise).be.a.Function();
     should(kuzzle.listCollectionsPromise).be.a.Function();
