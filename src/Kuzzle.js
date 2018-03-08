@@ -599,25 +599,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Gets the rights array of the currently logged user.
-   *
-   * @param {object} [options] - Optional parameters
-   * @param  {function} cb The callback containing the normalized array of rights.
-   */
-  getMyRights (options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.getMyRights', cb);
-
-    this.query({controller: 'auth', action:'getMyRights'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.hits);
-    });
-  }
-
-  /**
    * Update current user in Kuzzle.
    *
    * @param {object} content - a plain javascript object representing the user's modification

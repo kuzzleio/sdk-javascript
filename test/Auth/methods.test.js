@@ -209,5 +209,35 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#getMyRights', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'getMyRights'
+			},
+			result = {
+				result: {
+					'hits': [
+						{
+							'controller': 'ctrl_name',
+							'action': 'action_name',
+							'index': 'index_name',
+							'collection': 'collection_name',
+							'value': 'allowed|denied|conditional'
+						}
+					]
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.getMyCredentials('strategy')
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
+					should(res).be.an.Array().and.containEql(result.result.hits);
+				});
+		});
+	});
 
 });
