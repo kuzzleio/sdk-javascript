@@ -176,24 +176,4 @@ describe('Kuzzle Login', function () {
       });
     });
   });
-
-  describe('#Logout', function () {
-    it('should have a empty token in logout callback', function () {
-      var unsetJwt = sinon.spy(kuzzle, 'unsetJwt');
-
-      kuzzle.logout();
-      should(unsetJwt).be.calledOnce();
-    });
-
-    it('should give an error if logout query fail to the logout callback if is set', function (done) {
-      sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
-        cb(new Error());
-      });
-
-      kuzzle.logout(function(error) {
-        should(error).be.an.instanceOf(Error);
-        done();
-      });
-    });
-  });
 });

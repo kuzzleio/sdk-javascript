@@ -1,4 +1,4 @@
-const User = require('./security/User.js')
+const User = require('./security/User.js');
 
 /**
  * Auth controller
@@ -160,6 +160,16 @@ class Auth {
 				this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
 				return new Error(err);
 			});
+	}
+
+	/**
+	 * Send logout request to kuzzle with jwt.
+	 *
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	logout () {
+		return this.kuzzle.query({controller: 'auth', action: 'logout'}, {}, {queuable: false})
+			.then(() => this.kuzzle.unsetJwt());
 	}
 
 }

@@ -356,4 +356,23 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#logout', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'logout'
+			},
+			result = {};
+
+		it('should call query with the right arguments and return Promise which resolves an array', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.logout()
+				.then(() => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
+					should(kuzzle.unsetJwt).be.calledOnce();
+				});
+		});
+	});
+
 });

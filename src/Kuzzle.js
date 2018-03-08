@@ -517,30 +517,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Send logout request to kuzzle with jwt.
-   *
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  logout (cb) {
-    const
-      request = {
-        action: 'logout',
-        controller: 'auth',
-        requestId: uuidv4(),
-        body: {}
-      };
-
-    this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, error => {
-      if (typeof cb === 'function') {
-        cb(error, this);
-      }
-    });
-
-    return this.unsetJwt();
-  }
-
-  /**
    * Update current user in Kuzzle.
    *
    * @param {object} content - a plain javascript object representing the user's modification
