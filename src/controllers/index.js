@@ -7,7 +7,7 @@ class IndexController {
     this.kuzzle = kuzzle;
   }
 
-  create (index = this.kuzzle.defaultIndex) {
+  create (index, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.index.create: index required'));
     }
@@ -16,10 +16,10 @@ class IndexController {
       index,
       controller: 'index',
       action : 'create'
-    });
+    }, undefined, options);
   }
 
-  delete (index) {
+  delete (index, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.index.delete: index required'));
     }
@@ -28,10 +28,10 @@ class IndexController {
       index,
       controller: 'index',
       action : 'delete'
-    });
+    }, undefined, options);
   }
 
-  exists (index) {
+  exists (index, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.index.exists: index required'));
     }
@@ -40,10 +40,10 @@ class IndexController {
       index,
       controller: 'index',
       action : 'exists'
-    });
+    }, undefined, options);
   }
 
-  getAutoRefresh (index = this.kuzzle.defaultIndex) {
+  getAutoRefresh (index, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.index.getAutoRefresh: index is required'));
     }
@@ -52,17 +52,17 @@ class IndexController {
       index,
       controller: 'index',
       action: 'getAutoRefresh'
-    });
+    }, undefined, options);
   }
 
-  list () {
+  list (options) {
     return this.kuzzle.query({
       controller: 'index',
       action: 'list'
-    });
+    }, undefined, options);
   }
 
-  mDelete (indexes) {
+  mDelete (indexes, options) {
     if (!Array.isArray(indexes)) {
       return Promise.reject(new Error('Kuzzle.index.mDelete: indexes must be an array'));
     }
@@ -74,30 +74,29 @@ class IndexController {
       body: {
         indexes
       }
-    });
+    }, undefined, options);
   }
 
-  refresh (index = this.kuzzle.defaultIndex) {
+  refresh (index, options) {
     if (!index || index === '') {
-      return Promise.reject(new Error('Kuzzle.index.refresh: index required'));
+      return Promise.reject(new Error('Kuzzle.index.refresh: index is required'));
     }
 
     return this.kuzzle.query({
       index,
       controller: 'index',
       action: 'refresh'
-    });
-
+    }, undefined, options);
   }
 
-  refreshInternal () {
+  refreshInternal (options) {
     return this.kuzzle.query({
       controller: 'index',
       action: 'refreshInternal'
-    });
+    }, undefined, options);
   }
 
-  setAutoRefresh (index, autoRefresh) {
+  setAutoRefresh (index, autoRefresh, options) {
     if (autoRefresh === undefined && typeof index === 'boolean') {
       autoRefresh = index;
       index = this.kuzzle.defaultIndex;
@@ -119,7 +118,7 @@ class IndexController {
       body: {
         autoRefresh
       }
-    });
+    }, undefined, options);
   }
 }
 

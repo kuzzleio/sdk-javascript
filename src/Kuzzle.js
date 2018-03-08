@@ -1,10 +1,10 @@
 const
   uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
+  CollectionController = require('./controllers/collection'),
+  DocumentController = require('./controllers/document'),
   IndexController = require('./controllers/index'),
   ServerController = require('./controllers/server'),
-  Collection = require('./Collection.js'),
-  Document = require('./Document.js'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
   Auth = require('./Auth.js'),
@@ -76,6 +76,14 @@ class Kuzzle extends KuzzleEventEmitter {
         value: {},
         enumerable: true,
         writable: true
+      },
+      collection: {
+        value: new CollectionController(this),
+        enumerable: true
+      },
+      document: {
+        value: new DocumentController(this),
+        enumerable: true
       },
       index: {
         value: new IndexController(this),
@@ -311,22 +319,6 @@ class Kuzzle extends KuzzleEventEmitter {
       this.unsetJwt();
       this.emit('tokenExpired');
     });
-
-    if (this.bluebird) {
-      return this.bluebird.promisifyAll(this, {
-        suffix: 'Promise',
-        filter: function (name, func, target, passes) {
-          const whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
-            'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-            'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
-            'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
-            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
-          ];
-
-          return passes && whitelist.indexOf(name) !== -1;
-        }
-      });
-    }
   }
 
   /**
@@ -462,38 +454,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Create a new instance of a Collection object.
-   * If no index is specified, takes the default index.
-   *
-   * @param {string} collection - The name of the data collection you want to manipulate
-   * @param {string} [index] - The name of the data index containing the data collection
-   * @returns {Collection} A Collection instance
-   */
-  collection (collection, index) {
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Unable to create a new data collection object: no index specified');
-      }
-
-      index = this.defaultIndex;
-    }
-
-    if (typeof index !== 'string' || typeof collection !== 'string') {
-      throw new Error('Invalid index or collection argument: string expected');
-    }
-
-    if (!this.collections[index]) {
-      this.collections[index] = {};
-    }
-
-    if (!this.collections[index][collection]) {
-      this.collections[index][collection] = new Collection(this, collection, index);
-    }
-
-    return this.collections[index][collection];
-  }
-
-  /**
    * Empties the offline queue without replaying it.
    *
    * @returns {Kuzzle}
@@ -501,50 +461,6 @@ class Kuzzle extends KuzzleEventEmitter {
   flushQueue () {
     this.network.flushQueue();
     return this;
-  }
-
-  /**
-   * Returns the list of known persisted data collections.
-   *
-   * @param {string} [index] - Index containing collections to be listed
-   * @param {object} [options] - Optional parameters
-   * @param {responseCallback} cb - Handles the query response
-   */
-  listCollections (...args) {
-    let
-      index,
-      options,
-      cb;
-
-    for (const arg of args) {
-      switch (typeof arg) {
-        case 'string':
-          index = arg;
-          break;
-        case 'object':
-          options = arg;
-          break;
-        case 'function':
-          cb = arg;
-          break;
-      }
-    }
-
-    if (!index) {
-      if (!this.defaultIndex) {
-        throw new Error('Kuzzle.listCollections: index required');
-      }
-
-      index = this.defaultIndex;
-    }
-
-    this.callbackRequired('Kuzzle.listCollections', cb);
-
-    const query = {type: options && options.type || 'all'};
-
-    this.query({index, controller: 'collection', action: 'list'}, query, options, (err, res) => {
-      cb(err, err ? undefined : res.result.collections);
-    });
   }
 
   /**
@@ -571,7 +487,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @param {responseCallback} [cb] - Handles the query response
    */
-  query (queryArgs, query = {}, options = null) {
+  query (queryArgs, query = {}, options = {}) {
     const
       object = {
         action: queryArgs.action,
@@ -579,16 +495,15 @@ class Kuzzle extends KuzzleEventEmitter {
         volatile: this.volatile
       };
 
-    if (options) {
-      for (const prop of ['refresh', 'from', 'size', 'scroll', 'scrollId']) {
-        if (options[prop] !== undefined) {
-          object[prop] = options[prop];
-        }
-      }
+    for (const prop of ['from', 'size', 'scroll', 'scrollId']) {
+      object[prop] = options[prop];
+    }
+    if (options.refresh) {
+      object.refresh = 'wait_for';
+    }
 
-      if (options.volatile && typeof options.volatile === 'object') {
-        Object.assign(object.volatile, options.volatile);
-      }
+    if (options.volatile && typeof options.volatile === 'object') {
+      Object.assign(object.volatile, options.volatile);
     }
 
     if (!query || typeof query !== 'object' || Array.isArray(query)) {

@@ -7,47 +7,47 @@ class ServerController {
     this.kuzzle = kuzzle;
   }
 
-  adminExists () {
+  adminExists (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'adminExists'
-    })
+    }, undefined, options)
       .then(result => result.exists);
   }
 
-  getAllStats () {
+  getAllStats (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getAllStats'
-    });
+    }, undefined, options);
   }
 
-  getConfig () {
+  getConfig (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getConfig'
-    });
+    }, undefined, options);
   }
 
-  getLastStats () {
+  getLastStats (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getLastStats'
-    });
+    }, undefined, options);
   }
 
-  info () {
+  info (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'info'
-    });
+    }, undefined, options);
   }
 
-  now () {
+  now (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'now'
-    });
+    }, undefined, options);
   }
 }
 

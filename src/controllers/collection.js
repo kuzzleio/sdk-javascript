@@ -10,12 +10,7 @@ class CollectionController {
     this.kuzzle = kuzzle;
   }
 
-  create (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  create (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.create: index is required'));
     }
@@ -28,15 +23,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'create'
-    });
+    }, undefined, options);
   }
 
-  deleteSpecification (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  deleteSpecification (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.deleteSpecification: index is required'));
     }
@@ -49,15 +39,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'deleteSpecification'
-    });
+    }, undefined, options);
   }
 
-  exists (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  exists (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.exists: index is required'));
     }
@@ -70,15 +55,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'exists'
-    });
+    }, undefined, options);
   }
 
-  getMapping (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  getMapping (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.getMapping: index is required'));
     }
@@ -91,15 +71,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getMapping'
-    });
+    }, undefined, options);
   }
 
-  getSpecifications (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  getSpecifications (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.getSpecifications: index is required'));
     }
@@ -112,15 +87,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getSpecifications'
-    });
+    }, undefined, options);
   }
 
-  list (index, options = null) {
-    if (options === null && typeof index === 'object') {
-      options = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  list (index, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.list: index is required'));
     }
@@ -129,10 +99,10 @@ class CollectionController {
       index,
       controller: 'collection',
       action: 'list'
-    }, {}, options);
+    }, undefined, options);
   }
 
-  searchSpecifications (query = {}, options = {}) {
+  searchSpecifications (query = {}, options) {
     return this.kuzzle.query({
       controller: 'collection',
       action: 'searchSpecifications'
@@ -140,12 +110,7 @@ class CollectionController {
       .then(response => new SpecificationsSearchResult(this.kuzzle, query, options, response));
   }
 
-  truncate (index, collection) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  truncate (index, collection, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.truncate: index is required'));
     }
@@ -158,16 +123,10 @@ class CollectionController {
       collection,
       controller: 'colleciton',
       action: 'truncate'
-    });
-
+    }, undefined, options);
   }
 
-  updateMapping (index, collection, body) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  updateMapping (index, collection, body, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.updateMapping: index is required'));
     }
@@ -180,15 +139,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'updateMapping'
-    }, body);
+    }, {body}, options);
   }
 
-  updateSpecifications (index, collection, body) {
-    if (collection === undefined && typeof index === 'string') {
-      collection = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
+  updateSpecifications (index, collection, body, options) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.updateSpecifications: index is required'));
     }
@@ -201,14 +155,14 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'updateSpecifications'
-    }, body);
+    }, {body}, options);
   }
 
-  validateSpecifications (body) {
+  validateSpecifications (body, options) {
     return this.kuzzle.query({
       controller: 'collection',
       action: 'validateSpecifications'
-    }, body);
+    }, {body}, options);
   }
 }
 
