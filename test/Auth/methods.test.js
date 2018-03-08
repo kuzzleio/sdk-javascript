@@ -200,10 +200,10 @@ describe.only('Kuzzle Auth controller', function () {
 		it('should call query with the right arguments and return Promise which resolves an object', () => {
 			kuzzle.query.resolves(result);
 
-			return auth.getCurrentUser()
+			return auth.getMyCredentials('strategy')
 				.then(res => {
 					should(kuzzle.query).be.calledOnce();
-					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
 					should(res).be.exactly(result.result);
 				});
 		});

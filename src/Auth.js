@@ -89,10 +89,9 @@ class Auth {
 	 *
 	 * @param strategy
 	 * @param options
-	 * @param cb
 	 */
 	getMyCredentials (strategy, options) {
-		this.query({controller: 'auth', action: 'getMyCredentials'}, {strategy}, options)
+		return this.kuzzle.query({controller: 'auth', action: 'getMyCredentials'}, {strategy}, options)
 			.then(res => res.result);
 	}
 
