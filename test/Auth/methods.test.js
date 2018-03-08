@@ -375,4 +375,29 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#updateMyCredentials', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'updateMyCredentials'
+			},
+			result = {
+				result: {
+					username: 'foo',
+					kuid: '42'
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an array', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.updateMyCredentials('strategy', {username: 'foo'})
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy', body: { username: 'foo'}}, undefined);
+					should(res).be.eql(result.result);
+				});
+		});
+	});
+
+
 });

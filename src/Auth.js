@@ -172,6 +172,19 @@ class Auth {
 			.then(() => this.kuzzle.unsetJwt());
 	}
 
+	/**
+	 * Update credentials of the specified <strategy> for the current user.
+	 *
+	 * @param strategy
+	 * @param credentals
+	 * @param options
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	updateMyCredentials (strategy, credentials, options) {
+		return this.kuzzle.query({controller: 'auth', action: 'updateMyCredentials'}, {strategy, body: credentials}, options)
+			.then(res => res.result);
+	}
+
 }
 
 module.exports = Auth;

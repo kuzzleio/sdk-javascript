@@ -840,46 +840,6 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#updateMyCredentials', function() {
-    it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
-
-      kuzzle.updateMyCredentials('strategy', {username: 'foo'}, function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('updateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-
-    it('should call query with right arguments', function (done) {
-      var
-        doc = {username: 'foo'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
-        args;
-
-      kuzzle.updateMyCredentials('strategy', doc, function (err, res) {
-        should(res).be.exactly(doc);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('updateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-  });
-
   describe('#updateSelf', function () {
     var expectedQuery = {
       action: 'updateSelf',

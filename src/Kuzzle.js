@@ -442,30 +442,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Update credentials of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param credentals
-   * @param options
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  updateMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'updateMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
-
-  /**
    * Validate credentials of the specified <strategy> for the current user.
    *
    * @param strategy
