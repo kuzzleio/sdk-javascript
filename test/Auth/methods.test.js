@@ -148,4 +148,66 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#getCurrentUser', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'getCurrentUser'
+			},
+			result = {
+				result: {
+					_id: 'foobar',
+					_source: {
+						name: {
+							first: 'John',
+							last: 'Doe'
+						},
+						profile: {
+							_id: 'default',
+							roles: [
+								{_id: 'default'}
+							]
+						}
+					}
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.query.resolves(result);
+			const userResponse = new User(new Security(kuzzle), result.result._id, result.result._source, result.result._meta);
+
+			return auth.getCurrentUser()
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(res.id).be.exactly(userResponse.id);
+					should(res.content).be.exactly(userResponse.content);
+				});
+		});
+	});
+
+	describe('#getMyCredentials', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'getMyCredentials'
+			},
+			result = {
+				result: {
+					username: 'foo',
+					kuid: '42'
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.getCurrentUser()
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(res).be.exactly(result.result);
+				});
+		});
+	});
+
+
 });

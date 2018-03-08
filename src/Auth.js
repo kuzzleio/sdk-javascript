@@ -84,6 +84,18 @@ class Auth {
 			})
 	}
 
+	/**
+	 * Get credential information of the specified <strategy> for the current user.
+	 *
+	 * @param strategy
+	 * @param options
+	 * @param cb
+	 */
+	getMyCredentials (strategy, options) {
+		this.query({controller: 'auth', action: 'getMyCredentials'}, {strategy}, options)
+			.then(res => res.result);
+	}
+
 }
 
 module.exports = Auth;

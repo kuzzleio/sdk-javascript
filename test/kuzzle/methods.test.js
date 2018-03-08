@@ -263,46 +263,6 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#getMyCredentials', function() {
-    it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
-
-      kuzzle.getMyCredentials('strategy', function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-
-    it('should call query with right arguments', function (done) {
-      var
-        doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
-        args;
-
-      kuzzle.getMyCredentials('strategy', function (err, res) {
-        should(res).be.exactly(doc);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-  });
-
   describe('#getMyRights', function() {
     it('should trigger callback with an error', function (done) {
       var
