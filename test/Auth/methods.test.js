@@ -216,7 +216,7 @@ describe.only('Kuzzle Auth controller', function () {
 			},
 			result = {
 				result: {
-					'hits': [
+					hits: [
 						{
 							'controller': 'ctrl_name',
 							'action': 'action_name',
@@ -231,11 +231,11 @@ describe.only('Kuzzle Auth controller', function () {
 		it('should call query with the right arguments and return Promise which resolves an object', () => {
 			kuzzle.query.resolves(result);
 
-			return auth.getMyCredentials('strategy')
+			return auth.getMyRights()
 				.then(res => {
 					should(kuzzle.query).be.calledOnce();
-					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
-					should(res).be.an.Array().and.containEql(result.result.hits);
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(res).be.an.Array().and.eql(result.result.hits);
 				});
 		});
 	});
