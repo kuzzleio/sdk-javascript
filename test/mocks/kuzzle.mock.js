@@ -14,6 +14,8 @@ function KuzzleMock () {
   this.subscribe = sinon.stub();
   this.unsubscribe = sinon.stub();
   this.security = new Security(this);
+  this.setJwt = sinon.stub();
+  this.emit = sinon.stub();
 
   this.callbackRequired = function (errorMessagePrefix, callback) {
     if (!callback || typeof callback !== 'function') {

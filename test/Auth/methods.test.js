@@ -134,7 +134,7 @@ describe.only('Kuzzle Auth controller', function () {
 				}
 			};
 
-		it('should call query with the right arguments and return Promise which resolves an object', () => {
+		it('should call query with the right arguments and return Promise which resolves a user', () => {
 			kuzzle.query.resolves(result);
 			const userResponse = new User(new Security(kuzzle), result.result._id, result.result._source, result.result._meta);
 
@@ -171,7 +171,7 @@ describe.only('Kuzzle Auth controller', function () {
 				}
 			};
 
-		it('should call query with the right arguments and return Promise which resolves an object', () => {
+		it('should call query with the right arguments and return Promise which resolves a user', () => {
 			kuzzle.query.resolves(result);
 			const userResponse = new User(new Security(kuzzle), result.result._id, result.result._source, result.result._meta);
 
@@ -228,7 +228,7 @@ describe.only('Kuzzle Auth controller', function () {
 				}
 			};
 
-		it('should call query with the right arguments and return Promise which resolves an object', () => {
+		it('should call query with the right arguments and return Promise which resolves an array', () => {
 			kuzzle.query.resolves(result);
 
 			return auth.getMyRights()
@@ -252,7 +252,7 @@ describe.only('Kuzzle Auth controller', function () {
 				]
 			};
 
-		it('should call query with the right arguments and return Promise which resolves an object', () => {
+		it('should call query with the right arguments and return Promise which resolves an array', () => {
 			kuzzle.query.resolves(result);
 
 			return auth.getStrategies()
@@ -260,6 +260,98 @@ describe.only('Kuzzle Auth controller', function () {
 					should(kuzzle.query).be.calledOnce();
 					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
 					should(res).be.an.Array().and.eql(result.result);
+				});
+		});
+	});
+
+	describe('#login', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'login'
+			},
+			result = {
+				result: {
+					jwt: 'jwt'
+				}
+			};
+
+		it('should reject if no strategy is given', () => {
+			return auth.login().should.be.rejected();
+		});
+
+		it('should reject if query rejects', () => {
+			kuzzle.query.rejects(new Error('error'));
+
+			return auth.login('strategy')
+				.catch(() => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.emit).be.calledWith('loginAttempt', {success: false, error: 'error'});
+				});
+		});
+
+		it('should call query with right arguments and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy')
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {}, strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
+				});
+		});
+
+		it('should call query with right arguments and credentials and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy', {username: 'foo'})
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {username: 'foo'}, strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
+				});
+		});
+
+		it('should call query with right arguments and expiresIn as int and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy', 42)
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {}, expiresIn: 42, strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
+				});
+		});
+
+		it('should call query with right arguments and expiresIn as string and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy', '4h')
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {}, expiresIn: '4h', strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
+				});
+		});
+
+		it('should call query with right arguments and credentials and expiresIn as int and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy', {username: 'foo'}, 42)
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {username: 'foo'}, expiresIn: 42, strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
+				});
+		});
+
+		it('should call query with right arguments and credentials and expiresIn as int and return Promise which resolves a jwt', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.login('strategy', {username: 'foo'}, '4h')
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {username: 'foo'}, expiresIn: '4h', strategy: 'strategy'}, {queuable: false});
+					should(res).be.eql(result.result.jwt);
 				});
 		});
 	});

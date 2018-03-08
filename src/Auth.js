@@ -117,6 +117,51 @@ class Auth {
 			.then(res => res.result)
 	}
 
+	/**
+	 * Send login request to kuzzle with credentials
+	 * If login success, store the jwt into kuzzle object
+	 *
+	 * @param strategy
+	 * @param credentials
+	 * @param expiresIn
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	login (strategy, ...args) {
+		if (!strategy || typeof strategy !== 'string') {
+			return Promise.reject(new Error('Auth.login: strategy required'));
+		}
+
+		const
+			request = {
+				strategy,
+				body: {}
+			};
+
+		// Handle arguments (credentials, expiresIn)
+		if (args[0]) {
+			if (typeof args[0] === 'object') {
+				request.body = args[0];
+			} else if (typeof args[0] === 'number' || typeof args[0] === 'string') {
+				request.expiresIn = args[0];
+			}
+		}
+		if (args[1]) {
+			if (typeof args[1] === 'number' || typeof args[1] === 'string') {
+				request.expiresIn = args[1];
+			}
+		}
+
+		return this.kuzzle.query({controller: 'auth', action: 'login'}, request, {queuable: false})
+			.then(response => {
+				this.kuzzle.setJwt(response.result.jwt);
+				return response.result.jwt;
+			})
+			.catch(err => {
+				this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
+				return new Error(err);
+			});
+	}
+
 }
 
 module.exports = Auth;

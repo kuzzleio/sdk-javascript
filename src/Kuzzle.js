@@ -442,64 +442,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Send login request to kuzzle with credentials
-   * If login success, store the jwt into kuzzle object
-   *
-   * @param strategy
-   * @param credentials
-   * @param expiresIn
-   * @param cb
-   */
-  login (strategy, ...args) {
-    if (!strategy || typeof strategy !== 'string') {
-      throw new Error('Kuzzle.login: strategy required');
-    }
-
-    const
-      request = {
-        strategy,
-        body: {}
-      };
-
-    let cb = null;
-
-    // Handle arguments (credentials, expiresIn, cb)
-    if (args[0]) {
-      if (typeof args[0] === 'object') {
-        request.body = args[0];
-      } else if (typeof args[0] === 'number' || typeof args[0] === 'string') {
-        request.expiresIn = args[0];
-      } else if (typeof args[0] === 'function') {
-        cb = args[0];
-      }
-    }
-    if (args[1]) {
-      if (typeof args[1] === 'number' || typeof args[1] === 'string') {
-        request.expiresIn = args[1];
-      } else if (typeof args[1] === 'function') {
-        cb = args[1];
-      }
-    }
-    if (args[2] && typeof args[2] === 'function') {
-      cb = args[2];
-    }
-
-    this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, (error, response) => {
-      if (!error) {
-        if (response.result.jwt) {
-          this.setJwt(response.result.jwt);
-        }
-
-        cb && cb(null, response.result);
-      }
-      else {
-        cb && cb(error);
-        this.emit('loginAttempt', {success: false, error: error.message});
-      }
-    });
-  }
-
-  /**
    * Update credentials of the specified <strategy> for the current user.
    *
    * @param strategy
