@@ -1,8 +1,7 @@
 var
   should = require('should'),
-  rewire = require('rewire'),
   sinon = require('sinon'),
-  RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
+  RTWrapper = require('../../src/networkWrapper/protocols/abstract/realtime');
 
 describe('Offline queue management', function () {
   var
@@ -39,9 +38,6 @@ describe('Offline queue management', function () {
   });
 
   describe('#cleanQueue', function () {
-    var
-      cleanQueue = RTWrapper.__get__('cleanQueue');
-
     it('should remove outdated queued requests', function () {
       var eventStub = sinon.stub();
 
@@ -49,7 +45,7 @@ describe('Offline queue management', function () {
       network.queueTTL = 5000;
       network.addListener('offlineQueuePop', eventStub);
 
-      cleanQueue(network);
+			network._cleanQueue();
 
       // should keep only the latest requests, dating from a few ms ago
       should(network.offlineQueue.length).be.exactly(1);
@@ -61,7 +57,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueTTL = 0;
-      cleanQueue(network);
+      network._cleanQueue();
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
 
@@ -72,7 +68,7 @@ describe('Offline queue management', function () {
 
       network.queueMaxSize = 1;
       network.addListener('offlineQueuePop', eventStub);
-      cleanQueue(network);
+      network._cleanQueue();
 
       should(network.offlineQueue.length).be.exactly(1);
       should(network.offlineQueue[0]).match(lastRequest);
@@ -83,7 +79,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueMaxSize = 0;
-      cleanQueue(network);
+      network._cleanQueue();
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
   });
@@ -91,12 +87,11 @@ describe('Offline queue management', function () {
   describe('#dequeue', function () {
     var
       emitRequestRevert,
-      emitRequestStub,
-      dequeue = RTWrapper.__get__('dequeue');
+      emitRequestStub;
 
     before(function () {
       emitRequestStub = sinon.stub();
-      emitRequestRevert = RTWrapper.__set__('emitRequest', emitRequestStub);
+      emitRequestRevert = emitRequestStub;
     });
 
     after(function () {
@@ -114,7 +109,7 @@ describe('Offline queue management', function () {
         eventStub = sinon.stub();
 
       network.addListener('offlineQueuePop', eventStub);
-      dequeue(network);
+      network._dequeue();
 
       clock.tick(numRequests * network.replayInterval + 50);
 

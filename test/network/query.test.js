@@ -7,7 +7,6 @@ var
 describe('Network query management', function () {
   describe('#emitRequest', function () {
     var
-      emitRequest = RTWrapper.__get__('emitRequest'),
       sendSpy,
       network;
 
@@ -22,7 +21,7 @@ describe('Network query management', function () {
     it('should emit the request when asked to', function () {
       var request = {requestId: 'bar'};
 
-      emitRequest(network, request);
+      network.emitRequest(request);
       should(sendSpy).be.calledWith(request);
     });
 

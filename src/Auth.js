@@ -1,4 +1,4 @@
-const User = require('./User.js')
+const User = require('./security/User.js')
 
 /**
  * Auth controller
@@ -32,7 +32,7 @@ class Auth {
 				}
 			};
 
-		return this.kuzzle.queryPromise({controller: 'auth', action: 'checkToken'}, request, {queuable: false})
+		return this.kuzzle.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false})
 			.then(res => res.result)
 	}
 
@@ -45,7 +45,7 @@ class Auth {
 	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
 	 */
 	createMyCredentials (strategy, credentials, options) {
-		return this.kuzzle.queryPromise({controller: 'auth', action: 'createMyCredentials'}, {strategy, body: credentials}, options)
+		return this.kuzzle.query({controller: 'auth', action: 'createMyCredentials'}, {strategy, body: credentials}, options)
 			.then(res => res.result);
 	}
 
@@ -68,7 +68,7 @@ class Auth {
 	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
 	 */
 	deleteMyCredentials (strategy, options) {
-		return this.kuzzle.queryPromise({controller: 'auth', action: 'deleteMyCredentials'}, {strategy}, options)
+		return this.kuzzle.query({controller: 'auth', action: 'deleteMyCredentials'}, {strategy}, options)
 			.then(res => res.result);
 	}
 
@@ -78,9 +78,9 @@ class Auth {
 	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
 	 */
 	getCurrentUser () {
-		return this.kuzzle.queryPromise({controller: 'auth', action: 'getCurrentUser'}, {}, {})
+		return this.kuzzle.query({controller: 'auth', action: 'getCurrentUser'}, {}, undefined)
 			.then(res => {
-				return new User(this.security, res.result._id, res.result._source, res.result._meta)
+				return new User(this.kuzzle.security, res.result._id, res.result._source, res.result._meta)
 			})
 	}
 

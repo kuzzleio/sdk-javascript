@@ -1,9 +1,11 @@
 const
 	should = require('should'),
 	KuzzleMock = require('../mocks/kuzzle.mock'),
-	Auth = require('../../src/Auth.js');
+	Auth = require('../../src/Auth.js'),
+	User = require('../../src/security/User.js'),
+	Security = require('../../src/security/Security.js');
 
-describe('Kuzzle Auth controller', function () {
+describe.only('Kuzzle Auth controller', function () {
 	let
 		auth,
 		kuzzle;
@@ -28,12 +30,12 @@ describe('Kuzzle Auth controller', function () {
 			};
 
 		it('should call query with the right arguments and return Promise which resolves', () => {
-			kuzzle.queryPromise.resolves(result);
+			kuzzle.query.resolves(result);
 
 			return auth.checkToken(token)
 				.then(res => {
-					should(kuzzle.queryPromise).be.calledOnce();
-					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {body: {token: token}}, {queuable: false});
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {token: token}}, {queuable: false});
 					should(res).be.exactly(result.result);
 				});
 		});
@@ -52,12 +54,12 @@ describe('Kuzzle Auth controller', function () {
 			};
 
 		it('should call query with the right arguments and return Promise which resolves an object', () => {
-			kuzzle.queryPromise.resolves(result);
+			kuzzle.query.resolves(result);
 
 			return auth.createMyCredentials('strategy', credentials)
 				.then(res => {
-					should(kuzzle.queryPromise).be.calledOnce();
-					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {body: {foo: 'bar'}, strategy: 'strategy'}, undefined);
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: {foo: 'bar'}, strategy: 'strategy'}, undefined);
 					should(res).be.exactly(result.result);
 				});
 		});
@@ -75,12 +77,12 @@ describe('Kuzzle Auth controller', function () {
 			};
 
 		it('should call query with the right arguments and return Promise which resolves an object', () => {
-			kuzzle.queryPromise.resolves(result);
+			kuzzle.query.resolves(result);
 
 			return auth.credentialsExist('strategy')
 				.then(res => {
-					should(kuzzle.queryProm).be.calledOnce();
-					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
 					should(res).be.exactly(result.result);
 				});
 		});
@@ -98,13 +100,50 @@ describe('Kuzzle Auth controller', function () {
 			};
 
 		it('should call query with the right arguments and return Promise which resolves an object', () => {
-			kuzzle.queryPromise.resolves(result);
+			kuzzle.query.resolves(result);
 
 			return auth.deleteMyCredentials('strategy')
 				.then(res => {
-					should(kuzzle.queryPromise).be.calledOnce();
-					should(kuzzle.queryPromise).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy'}, undefined);
 					should(res).be.exactly(result.result);
+				});
+		});
+	});
+
+	describe('#getCurrentUser', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'getCurrentUser'
+			},
+			result = {
+				result: {
+					_id: 'foobar',
+					_source: {
+						name: {
+							first: 'John',
+							last: 'Doe'
+						},
+						profile: {
+							_id: 'default',
+							roles: [
+								{_id: 'default'}
+							]
+						}
+					}
+				}
+			};
+
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
+			kuzzle.query.resolves(result);
+			const userResponse = new User(new Security(kuzzle), result.result._id, result.result._source, result.result._meta);
+
+			return auth.getCurrentUser()
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
+					should(res.id).be.exactly(userResponse.id);
+					should(res.content).be.exactly(userResponse.content);
 				});
 		});
 	});
