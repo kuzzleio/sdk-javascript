@@ -119,6 +119,7 @@ class SocketIO extends RTWrapper {
     this.state = 'offline';
     this.socket.close();
     this.socket = null;
+    this.disconnect();
   }
 
   _addEventWrapper(event, callback, once = false) {

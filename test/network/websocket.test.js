@@ -417,4 +417,21 @@ describe('WebSocket networking module', function () {
     should(clientStub.close.called).be.true();
     should(websocket.wasConnected).be.false();
   });
+
+  describe('#isReady', function() {
+    it('should be ready if the instance is connected', function () {
+      websocket.state = 'connected';
+      should(websocket.isReady()).be.true();
+    });
+
+    it('should not be ready if the instance is offline', function () {
+      websocket.state = 'offline';
+      should(websocket.isReady()).be.false();
+    });
+
+    it('should not be ready if the instance is still connecting', function () {
+      websocket.state = 'connecting';
+      should(websocket.isReady()).be.false();
+    });
+  });
 });
