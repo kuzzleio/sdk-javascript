@@ -1,18 +1,19 @@
-var
+const
   webpack = require('webpack'),
   path = require('path'),
+  UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
   version = require('./package.json').version;
 
 module.exports = {
+  mode: "production",
   entry: './src/Kuzzle.js',
   output: {
-    path: './dist',
+    path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
     library: 'Kuzzle',
     libraryTarget: 'umd'
   },
   watch: false,
-  debug: false,
   devtool: 'source-map',
   node: {
     console: false,
@@ -24,7 +25,7 @@ module.exports = {
     setImmediate: false
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         include: [
@@ -36,7 +37,7 @@ module.exports = {
         ],
         loader: 'babel-loader',
         query: {
-          presets: ['es2015']
+          presets: ['env']
         }
       },
       {
@@ -47,23 +48,18 @@ module.exports = {
       }
     ]
   },
-  eslint: {
-    formatter: require('eslint-friendly-formatter')
-  },
   plugins: [
-    new webpack.NoErrorsPlugin(),
-    new webpack.IgnorePlugin(/ws/),
-    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.IgnorePlugin(/uws/),
     new webpack.DefinePlugin({
       global: 'window',
       SDKVERSION: JSON.stringify(version),
       BUILT: true
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        warnings: false
-      }
-    })
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new UglifyJsPlugin({
+      sourceMap: true
+    }),
   ]
 };

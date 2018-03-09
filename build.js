@@ -1,7 +1,8 @@
-var ora = require('ora');
-var webpack = require('webpack');
-var webpackConfig = require('./webpack.config.js');
-var spinner = ora('Building SDK for browser use...');
+const
+  ora = require('ora'),
+  webpack = require('webpack'),
+  webpackConfig = require('./webpack.config.js'),
+  spinner = ora('Building SDK for browser use...');
 
 process.env.NODE_ENV = 'production';
 
