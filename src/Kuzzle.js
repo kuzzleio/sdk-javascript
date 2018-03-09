@@ -336,7 +336,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {function} [cb] Connection callback
    */
   connect (cb) {
-    if (this.network.state !== 'offline') {
+    if (this.network.isReady()) {
       if (cb) {
         cb(null, this);
       }
@@ -365,7 +365,10 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.addListener('disconnect', () => {
-      this.disconnect();
+      for (const collection of Object.keys(this.collections)) {
+        delete this.collections[collection];
+      }
+
       this.emit('disconnected');
     });
 
@@ -446,7 +449,7 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('Kuzzle.login: strategy required');
     }
 
-    const 
+    const
       request = {
         strategy,
         body: {}

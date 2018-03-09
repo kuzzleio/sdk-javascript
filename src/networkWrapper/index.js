@@ -8,6 +8,8 @@
 
 function network(protocol, host, options) {
   switch (protocol) {
+    case 'http':
+      return new (require('./protocols/http'))(host, options);
     case 'websocket':
       if (typeof window !== 'undefined' && typeof WebSocket === 'undefined') {
         throw new Error('Aborting: no websocket support detected.');
