@@ -89,7 +89,7 @@ class RTWrapper extends AbtractWrapper {
         return cb(error);
       }
       this.on(response.result.channel, data => {
-        data.fromSelf = data.volatile !== undefined && data.volatile.sdkInstanceId === this.id;
+        data.fromSelf = data.volatile !== undefined && data.volatile !== null && data.volatile.sdkInstanceId === this.id;
         notificationCB(data);
       });
       cb(null, response.result);
