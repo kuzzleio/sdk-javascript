@@ -53,7 +53,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
     should(kuzzle.unsetJwt).be.a.Function();
-    should(kuzzle.validateMyCredentials).be.a.Function();
   });
 
   it('should expose the documented writable properties', function () {
@@ -285,6 +284,5 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();
     should(kuzzle.unsetJwtPromise).be.undefined();
-    should(kuzzle.validateMyCredentialsPromise).be.a.Function();
   });
 });

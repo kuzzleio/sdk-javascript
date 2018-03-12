@@ -442,27 +442,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Validate credentials of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param credentials
-   * @param options
-   * @param cb
-   */
-  validateMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'validateMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-  }
-
-  /**
    * Create a kuzzle index
    *
    * @param {string} index

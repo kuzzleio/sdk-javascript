@@ -422,4 +422,26 @@ describe.only('Kuzzle Auth controller', function () {
 				});
 		});
 	});
+
+	describe('#validateMyCredentials', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'validateMyCredentials'
+			},
+			result = {
+				result: true
+			};
+
+		it('should call query with the right arguments and return Promise which resolves a boolean', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.validateMyCredentials('strategy', {username: 'foo'})
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {strategy: 'strategy', body: { username: 'foo'}}, undefined);
+					should(res).be.eql(result.result);
+				});
+		});
+	});
+
 });

@@ -197,6 +197,19 @@ class Auth {
 			.then(res => res.result);
 	}
 
+	/**
+	 * Validate credentials of the specified <strategy> for the current user.
+	 *
+	 * @param strategy
+	 * @param credentials
+	 * @param options
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	validateMyCredentials (strategy, credentials, options) {
+		return this.kuzzle.query({controller: 'auth', action: 'validateMyCredentials'}, {strategy, body: credentials}, options)
+			.then(res => res.result);
+	}
+
 }
 
 module.exports = Auth;
