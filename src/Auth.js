@@ -185,6 +185,18 @@ class Auth {
 			.then(res => res.result);
 	}
 
+	/**
+	 * Update current user in Kuzzle.
+	 *
+	 * @param {object} content - a plain javascript object representing the user's modification
+	 * @param {object} [options] - (optional) arguments
+	 * @returns {Promise|*|PromiseLike<T>|Promise<T>}
+	 */
+	updateSelf (content, options) {
+		return this.kuzzle.query({controller: 'auth', action: 'updateSelf'}, {body: content}, options)
+			.then(res => res.result);
+	}
+
 }
 
 module.exports = Auth;

@@ -493,29 +493,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Update current user in Kuzzle.
-   *
-   * @param {object} content - a plain javascript object representing the user's modification
-   * @param {object} [options] - (optional) arguments
-   * @param {responseCallback} [cb] - (optional) Handles the query response
-   * @returns {Kuzzle} this object
-   */
-  updateSelf (content, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'updateSelf'}, {body: content}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
-
-  /**
    * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
    * insertion.
    *

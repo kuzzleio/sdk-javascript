@@ -387,7 +387,7 @@ describe.only('Kuzzle Auth controller', function () {
 				}
 			};
 
-		it('should call query with the right arguments and return Promise which resolves an array', () => {
+		it('should call query with the right arguments and return Promise which resolves an object', () => {
 			kuzzle.query.resolves(result);
 
 			return auth.updateMyCredentials('strategy', {username: 'foo'})
@@ -399,5 +399,27 @@ describe.only('Kuzzle Auth controller', function () {
 		});
 	});
 
+	describe('#updateSelf', function () {
+		const expectedQuery = {
+				controller: 'auth',
+				action: 'updateSelf'
+			},
+			result = {
+				result: {
+					username: 'foo',
+					kuid: '42'
+				}
+			};
 
+		it('should call query with the right arguments and return Promise which resolves a user', () => {
+			kuzzle.query.resolves(result);
+
+			return auth.updateSelf({username: 'foo'})
+				.then(res => {
+					should(kuzzle.query).be.calledOnce();
+					should(kuzzle.query).be.calledWith(expectedQuery, {body: { username: 'foo'}}, undefined);
+					should(res).be.eql(result.result);
+				});
+		});
+	});
 });

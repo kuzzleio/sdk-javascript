@@ -41,8 +41,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.getStatistics).be.a.Function();
     should(kuzzle.listCollections).be.a.Function();
     should(kuzzle.listIndexes).be.a.Function();
-    should(kuzzle.login).be.a.Function();
-    should(kuzzle.logout).be.a.Function();
     should(kuzzle.now).be.a.Function();
     should(kuzzle.playQueue).be.a.Function();
     should(kuzzle.query).be.a.Function();
@@ -55,8 +53,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
     should(kuzzle.unsetJwt).be.a.Function();
-    should(kuzzle.updateMyCredentials).be.a.Function();
-    should(kuzzle.updateSelf).be.a.Function();
     should(kuzzle.validateMyCredentials).be.a.Function();
   });
 
@@ -277,8 +273,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.getStatisticsPromise).be.a.Function();
     should(kuzzle.listCollectionsPromise).be.a.Function();
     should(kuzzle.listIndexesPromise).be.a.Function();
-    should(kuzzle.loginPromise).be.a.Function();
-    should(kuzzle.logoutPromise).be.a.Function();
     should(kuzzle.nowPromise).be.a.Function();
     should(kuzzle.playQueuePromise).be.undefined();
     should(kuzzle.queryPromise).be.a.Function();
@@ -291,8 +285,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();
     should(kuzzle.unsetJwtPromise).be.undefined();
-    should(kuzzle.updateMyCredentialsPromise).be.a.Function();
-    should(kuzzle.updateSelfPromise).be.a.Function();
     should(kuzzle.validateMyCredentialsPromise).be.a.Function();
   });
 });
