@@ -4,15 +4,14 @@ var
   sinon = require('sinon'),
   sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/Kuzzle'),
-  Collection = require('../../src/Collection.js'),
-  User = require('../../src/security/User');
+  Collection = require('../../src/Collection.js');
 
 describe('Kuzzle methods', function () {
   var
     error,
     result,
     kuzzle,
-    queryStub = function(queryArgs, query, options, cb) {
+    queryStub = function (queryArgs, query, options, cb) {
       if (!cb && typeof options === 'function') {
         cb = options;
         options = null;
@@ -35,28 +34,58 @@ describe('Kuzzle methods', function () {
   describe('#collection', function () {
     it('should throw an error if arguments are not strings', function () {
       kuzzle.defaultIndex = 'foobar';
-      should(function () { kuzzle.collection(undefined); }).throw(/string expected/);
-      should(function () { kuzzle.collection(undefined, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.collection(null); }).throw(/string expected/);
-      should(function () { kuzzle.collection(null, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.collection(123); }).throw(/string expected/);
-      should(function () { kuzzle.collection(123, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.collection('foo', 123); }).throw(/string expected/);
-      should(function () { kuzzle.collection({foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.collection({foo: 'bar'}, 'foo'); }).throw(/string expected/);
-      should(function () { kuzzle.collection('foo', {foo: 'bar'}); }).throw(/string expected/);
-      should(function () { kuzzle.collection(['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.collection('foo', ['bar']); }).throw(/string expected/);
-      should(function () { kuzzle.collection(['bar'], 'foo'); }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(undefined);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(undefined, 'foo');
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(null);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(null, 'foo');
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(123);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(123, 'foo');
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection('foo', 123);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection({foo: 'bar'});
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection({foo: 'bar'}, 'foo');
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection('foo', {foo: 'bar'});
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(['bar']);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection('foo', ['bar']);
+      }).throw(/string expected/);
+      should(function () {
+        kuzzle.collection(['bar'], 'foo');
+      }).throw(/string expected/);
     });
 
     it('should throw an error if the kuzzle instance has been invalidated', function () {
       kuzzle.state = 'disconnected';
-      should(function () { kuzzle.collection('foo'); }).throw(Error);
+      should(function () {
+        kuzzle.collection('foo');
+      }).throw(Error);
     });
 
     it('should throw an error if no index is provided and no default index has been set', function () {
-      should(function () { kuzzle.collection('foo'); }).throw(/no index specified/);
+      should(function () {
+        kuzzle.collection('foo');
+      }).throw(/no index specified/);
     });
 
     it('should create and store the data collection instance', function () {
@@ -67,7 +96,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should simply pull the collection from the collection history if reinvoked', function () {
-      kuzzle.collections.foo = { bar: 'qux'};
+      kuzzle.collections.foo = {bar: 'qux'};
       should(kuzzle.collection('bar', 'foo')).be.a.String().and.be.exactly('qux');
     });
 
@@ -89,7 +118,9 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index is given and no defaultIndex is set', function () {
-      should(function () { kuzzle.createIndex(); }).throw('Kuzzle.createIndex: index required');
+      should(function () {
+        kuzzle.createIndex();
+      }).throw('Kuzzle.createIndex: index required');
     });
 
     it('should send the right query to Kuzzle even without callback', function () {
@@ -157,9 +188,13 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () { kuzzle.getAllStatistics(); }).throw(Error);
+      should(function () {
+        kuzzle.getAllStatistics();
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
-      should(function () { kuzzle.getAllStatistics({some: 'options'}); }).throw(Error);
+      should(function () {
+        kuzzle.getAllStatistics({some: 'options'});
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
@@ -203,11 +238,15 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index is given and no defaultIndex is set', function () {
-      should(function () { kuzzle.getAutoRefresh(); }).throw('Kuzzle.getAutoRefresh: index required');
+      should(function () {
+        kuzzle.getAutoRefresh();
+      }).throw('Kuzzle.getAutoRefresh: index required');
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () { kuzzle.getAutoRefresh('index'); }).throw(Error);
+      should(function () {
+        kuzzle.getAutoRefresh('index');
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
@@ -232,7 +271,7 @@ describe('Kuzzle methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         cb = sinon.stub(),
-        options = { foo: 'bar'},
+        options = {foo: 'bar'},
         expectedQuery = {
           controller: 'index',
           action: 'getAutoRefresh',
@@ -271,35 +310,47 @@ describe('Kuzzle methods', function () {
 
     beforeEach(function () {
       sandbox.stub(kuzzle, 'query').callsFake(queryStub);
-      result = {result: {serverInfo: {
-        kuzzle:
-        { version: '0.9.2',
-          api: { version: '1.0', routes: {} },
-          nodeVersion: 'v4.2.1',
-          memoryUsed: 100020224,
-          uptime: '161089.628s',
-          plugins:
-          { 'kuzzle-plugin-logger': {},
-            'kuzzle-plugin-socketio': {},
-            'kuzzle-plugin-auth-passport-local': {} },
-          system: { memory: {}, cpus: {} } },
-        services: {
-          writeEngine: {
-            type: 'elasticsearch',
-            api: '1.7',
-            version: '1.5.2',
-            lucene: '4.10.4',
-            status: 'red',
-            nodes: {},
-            spaceUsed: '14.5kb'
+      result = {
+        result: {
+          serverInfo: {
+            kuzzle:
+              {
+                version: '0.9.2',
+                api: {version: '1.0', routes: {}},
+                nodeVersion: 'v4.2.1',
+                memoryUsed: 100020224,
+                uptime: '161089.628s',
+                plugins:
+                  {
+                    'kuzzle-plugin-logger': {},
+                    'kuzzle-plugin-socketio': {},
+                    'kuzzle-plugin-auth-passport-local': {}
+                  },
+                system: {memory: {}, cpus: {}}
+              },
+            services: {
+              writeEngine: {
+                type: 'elasticsearch',
+                api: '1.7',
+                version: '1.5.2',
+                lucene: '4.10.4',
+                status: 'red',
+                nodes: {},
+                spaceUsed: '14.5kb'
+              }
+            }
           }
         }
-      }}};
+      };
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () {kuzzle.getServerInfo();}).throw(Error);
-      should(function () {kuzzle.getServerInfo({some: 'options'});}).throw(Error);
+      should(function () {
+        kuzzle.getServerInfo();
+      }).throw(Error);
+      should(function () {
+        kuzzle.getServerInfo({some: 'options'});
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
@@ -341,10 +392,18 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () { kuzzle.getStatistics(); }).throw(Error);
-      should(function () { kuzzle.getStatistics(123456); }).throw(Error);
-      should(function () { kuzzle.getStatistics({}); }).throw(Error);
-      should(function () { kuzzle.getStatistics(123456, {}); }).throw(Error);
+      should(function () {
+        kuzzle.getStatistics();
+      }).throw(Error);
+      should(function () {
+        kuzzle.getStatistics(123456);
+      }).throw(Error);
+      should(function () {
+        kuzzle.getStatistics({});
+      }).throw(Error);
+      should(function () {
+        kuzzle.getStatistics(123456, {});
+      }).throw(Error);
     });
 
     it('should call the query function with getLastStats action if no timestamp is given', function () {
@@ -391,7 +450,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123 }, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123}, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });
@@ -413,7 +472,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, 456, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456 }, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456}, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });
@@ -435,7 +494,7 @@ describe('Kuzzle methods', function () {
 
       kuzzle.getStatistics(123, 456, options, cb);
       should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456 }, options);
+      should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 123, stopTime: 456}, options);
       should(cb).be.calledOnce();
       should(cb).be.calledWithExactly(null, hits);
     });
@@ -464,21 +523,29 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no callback has been provided', function () {
-      should(function () { kuzzle.listCollections('foo'); }).throw(Error);
-      should(function () { kuzzle.listCollections('foo', {}); }).throw(Error);
+      should(function () {
+        kuzzle.listCollections('foo');
+      }).throw(Error);
+      should(function () {
+        kuzzle.listCollections('foo', {});
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
     it('should throw an error if no index has been provided', function () {
-      should(function () {kuzzle.listCollections(sinon.stub());}).throw(Error);
-      should(function () {kuzzle.listCollections({}, sinon.stub());}).throw(Error);
+      should(function () {
+        kuzzle.listCollections(sinon.stub());
+      }).throw(Error);
+      should(function () {
+        kuzzle.listCollections({}, sinon.stub());
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
     it('should call the query function with the right arguments', function () {
       var cb = sinon.stub();
 
-      result = { result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux'] } } };
+      result = {result: {collections: {stored: ['foo', 'bar', 'baz'], realtime: ['qux']}}};
 
       kuzzle.listCollections('foo', cb);
       should(kuzzle.query).be.calledOnce();
@@ -525,10 +592,14 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no callback is provided', function () {
-      should(function () { kuzzle.listIndexes(); }).throw(Error);
+      should(function () {
+        kuzzle.listIndexes();
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
 
-      should(function () {kuzzle.listIndexes({some: 'options'});}).throw(Error);
+      should(function () {
+        kuzzle.listIndexes({some: 'options'});
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
@@ -575,9 +646,13 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if called without a callback', function () {
-      should(function () { kuzzle.now(); }).throw(Error);
+      should(function () {
+        kuzzle.now();
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
-      should(function () { kuzzle.now({}); }).throw(Error);
+      should(function () {
+        kuzzle.now({});
+      }).throw(Error);
       should(kuzzle.query).not.be.called();
     });
 
@@ -611,7 +686,7 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#refreshIndex', function () {
-    beforeEach(function() {
+    beforeEach(function () {
       sandbox.stub(kuzzle, 'query').callsFake(queryStub);
       result = {
         result: {
@@ -625,7 +700,9 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index is given and no defaultIndex is set', function () {
-      should(function () {kuzzle.refreshIndex();}).throw('Kuzzle.refreshIndex: index required');
+      should(function () {
+        kuzzle.refreshIndex();
+      }).throw('Kuzzle.refreshIndex: index required');
     });
 
     it('should send the right query to Kuzzle even without callback', function () {
@@ -689,7 +766,9 @@ describe('Kuzzle methods', function () {
     });
 
     it('should throw an error if no index is given', function () {
-      should(function () { kuzzle.setAutoRefresh(); }).throw('Kuzzle.setAutoRefresh: index required');
+      should(function () {
+        kuzzle.setAutoRefresh();
+      }).throw('Kuzzle.setAutoRefresh: index required');
     });
 
     it('should throw an error is now autorefresh value is given', function () {
@@ -729,7 +808,7 @@ describe('Kuzzle methods', function () {
     it('should send the right query to Kuzzle', function () {
       var
         cb = sinon.stub(),
-        options = { foo: 'bar'},
+        options = {foo: 'bar'},
         expectedQuery = {
           controller: 'index',
           action: 'setAutoRefresh',
@@ -755,16 +834,30 @@ describe('Kuzzle methods', function () {
 
   describe('#setDefaultIndex', function () {
     it('should throw an error if the provided index is not a string', function () {
-      should((function () {kuzzle.setDefaultIndex();})).throw();
-      should((function () {kuzzle.setDefaultIndex({});})).throw();
-      should((function () {kuzzle.setDefaultIndex([]);})).throw();
-      should((function () {kuzzle.setDefaultIndex(123);})).throw();
-      should((function () {kuzzle.setDefaultIndex(null);})).throw();
-      should((function () {kuzzle.setDefaultIndex(undefined);})).throw();
+      should((function () {
+        kuzzle.setDefaultIndex();
+      })).throw();
+      should((function () {
+        kuzzle.setDefaultIndex({});
+      })).throw();
+      should((function () {
+        kuzzle.setDefaultIndex([]);
+      })).throw();
+      should((function () {
+        kuzzle.setDefaultIndex(123);
+      })).throw();
+      should((function () {
+        kuzzle.setDefaultIndex(null);
+      })).throw();
+      should((function () {
+        kuzzle.setDefaultIndex(undefined);
+      })).throw();
     });
 
     it('should throw an error if the provided index is an empty string', function () {
-      should((function () {kuzzle.setDefaultIndex('');})).throw();
+      should((function () {
+        kuzzle.setDefaultIndex('');
+      })).throw();
     });
 
     it('should set the default index in all other cases', function () {
@@ -790,7 +883,7 @@ describe('Kuzzle methods', function () {
     });
 
     it('should set the token when provided with a kuzzle response argument', function () {
-      kuzzle.setJwt({result:{jwt: 'foobar'}});
+      kuzzle.setJwt({result: {jwt: 'foobar'}});
 
       should(kuzzle.jwt).be.eql('foobar');
       should(loginAttemptStub).be.calledOnce();
@@ -802,7 +895,7 @@ describe('Kuzzle methods', function () {
 
       should(kuzzle.jwt).be.undefined();
       should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({ error: 'Invalid token argument: undefined', success: false });
+      should(loginAttemptStub).be.calledWith({error: 'Invalid token argument: undefined', success: false});
     });
 
     it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
@@ -810,7 +903,10 @@ describe('Kuzzle methods', function () {
 
       should(kuzzle.jwt).be.undefined();
       should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({ error: 'Cannot find a valid JWT in the following object: {"foo":"bar"}', success: false });
+      should(loginAttemptStub).be.calledWith({
+        error: 'Cannot find a valid JWT in the following object: {"foo":"bar"}',
+        success: false
+      });
     });
   });
 

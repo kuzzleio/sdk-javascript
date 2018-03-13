@@ -19,25 +19,25 @@ describe('Kuzzle query management', function () {
 
     beforeEach(function () {
       Kuzzle = proxyquire('../../src/Kuzzle', {
-        './networkWrapper': function(protocol, host, options) {
+        './networkWrapper': function (protocol, host, options) {
           return new NetworkWrapperMock(host, options);
         }
       });
 
       kuzzle = new Kuzzle('foo');
-			kuzzle.network.query.resolves({result:{}});
-		});
+      kuzzle.network.query.resolves({result: {}});
+    });
 
     it('should generate a valid request object with no "options" argument and no callback', function () {
       kuzzle.query(queryArgs, queryBody);
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWith({
         action: 'action',
-        body: { some: 'query' },
+        body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
+        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -47,11 +47,11 @@ describe('Kuzzle query management', function () {
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWith({
         action: 'action',
-        body: { some: 'query' },
+        body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
+        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -61,11 +61,11 @@ describe('Kuzzle query management', function () {
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWith({
         action: 'action',
-        body: { some: 'query' },
+        body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
+        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -78,7 +78,7 @@ describe('Kuzzle query management', function () {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
+        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -114,7 +114,7 @@ describe('Kuzzle query management', function () {
           baz: ['foo', 'bar', 'qux']
         };
 
-      kuzzle.query(queryArgs, { body: { some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
+      kuzzle.query(queryArgs, {body: {some: 'query'}, volatile: {foo: 'foo'}}, {volatile: volatile});
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
     });
@@ -150,7 +150,7 @@ describe('Kuzzle query management', function () {
     });
 
     it('should not generate a new request ID if one is already defined', function () {
-      kuzzle.query(queryArgs, { body: { some: 'query'}, requestId: 'foobar'});
+      kuzzle.query(queryArgs, {body: {some: 'query'}, requestId: 'foobar'});
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWithMatch({requestId: 'foobar'});
     });
