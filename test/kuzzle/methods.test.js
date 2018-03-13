@@ -263,46 +263,6 @@ describe('Kuzzle methods', function () {
     });
   });
 
-  describe('#getMyRights', function() {
-    it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
-
-      kuzzle.getMyRights(function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyRights');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-
-    it('should call query with right arguments', function (done) {
-      var
-        doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {hits: [doc]}}),
-        args;
-
-      kuzzle.getMyRights(function (err, res) {
-        should(res).be.an.Array().and.containEql(doc);
-        args = spy.firstCall.args;
-
-        should(spy).be.calledOnce();
-
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyRights');
-        should(args[2]).be.exactly(null);
-        done();
-      });
-    });
-  });
-
   describe('#getServerInfo', function () {
     var expectedQuery = {
       controller: 'server',

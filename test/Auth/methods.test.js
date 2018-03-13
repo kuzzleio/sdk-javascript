@@ -5,7 +5,7 @@ const
 	User = require('../../src/security/User.js'),
 	Security = require('../../src/security/Security.js');
 
-describe.only('Kuzzle Auth controller', function () {
+describe('Kuzzle Auth controller', function () {
 	let
 		auth,
 		kuzzle;

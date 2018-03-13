@@ -25,7 +25,8 @@ describe('Kuzzle query management', function () {
       });
 
       kuzzle = new Kuzzle('foo');
-    });
+			kuzzle.network.query.resolves({result:{}});
+		});
 
     it('should generate a valid request object with no "options" argument and no callback', function () {
       kuzzle.query(queryArgs, queryBody);
@@ -56,9 +57,7 @@ describe('Kuzzle query management', function () {
     });
 
     it('should manage arguments properly if no options are provided', function () {
-      var cb = sinon.stub();
-
-      kuzzle.query(queryArgs, queryBody, cb);
+      kuzzle.query(queryArgs, queryBody);
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWith({
         action: 'action',
@@ -68,13 +67,11 @@ describe('Kuzzle query management', function () {
         index: 'index',
         volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      }, null, sinon.match(function(f) {return f === cb;}));
+      });
     });
 
     it('should manage arguments properly if empty query and no options are provided', function () {
-      var cb = sinon.stub();
-
-      kuzzle.query(queryArgs, cb);
+      kuzzle.query(queryArgs);
       should(kuzzle.network.query).be.calledOnce();
       should(kuzzle.network.query).be.calledWith({
         action: 'action',
@@ -83,7 +80,7 @@ describe('Kuzzle query management', function () {
         index: 'index',
         volatile: { sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion },
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      }, null, sinon.match(function(f) {return f === cb;}));
+      });
     });
 
     it('should not define optional members if none was provided', function () {
@@ -92,10 +89,10 @@ describe('Kuzzle query management', function () {
       should(kuzzle.network.query).be.calledWithMatch({index: undefined});
     });
 
-    it('should invoke the callback with an error if no query is provided', function () {
-      should(function () { kuzzle.query(queryArgs, ['foo', 'bar']); }).throw(Error);
-      should(function () { kuzzle.query(queryArgs); }).throw(Error);
-      should(function () { kuzzle.query(queryArgs, 'foobar'); }).throw(Error);
+    it('should reject if no query is provided', function () {
+      should(kuzzle.query(queryArgs, ['foo', 'bar'])).be.rejected();
+      should(kuzzle.query(queryArgs)).be.rejected();
+      should(kuzzle.query(queryArgs, 'foobar')).be.rejected();
     });
 
     it('should handle options "volatile" properly', function () {
