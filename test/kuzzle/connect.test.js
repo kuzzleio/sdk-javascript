@@ -22,32 +22,25 @@ describe('Kuzzle connect', function () {
   afterEach(function() {
     clock.restore();
   });
-  it('should return immediately if already connected', function () {
-    var promises = [];
-    ['connecting', 'connected'].forEach(function (state) {
-      promises.push(new Promise(function(resolve) {
-        var kuzzle = new Kuzzle('somewhere');
-        kuzzle.network.state = state;
-        kuzzle.connect(function (err, res) {
-          should(err).be.null();
-          should(res).be.exactly(kuzzle);
-          should(res.network.connectCalled).be.false();
-          should(res.network.state).be.exactly(state);
-          resolve();
-        });
-      }));
+
+  it('should return immediately if already connected', function (done) {
+    var kuzzle = new Kuzzle('somewhere');
+    kuzzle.network.isReady.returns(true);
+    kuzzle.connect(function (err, res) {
+      should(err).be.null();
+      should(res).be.exactly(kuzzle);
+      should(res.network.connectCalled).be.false();
+      done();
     });
     clock.tick();
-    return Promise.all(promises);
   });
 
   it('should call network wrapper connect() method when the instance is offline', function (done) {
     var kuzzle = new Kuzzle('somewhere');
-    kuzzle.network.state = 'offline';
+    kuzzle.network.isReady.returns(false);
     kuzzle.connect(function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
-      should(res.network.state).be.exactly('connected');
       should(res.network.connectCalled).be.true();
       done();
     });

@@ -1,7 +1,8 @@
 var
   should = require('should'),
+  rewire = require('rewire'),
   sinon = require('sinon'),
-  RTWrapper = require('../../src/networkWrapper/protocols/abstract/realtime');
+  AbstractWrapper = rewire('../../src/networkWrapper/protocols/abstract/common');
 
 describe('Offline queue management', function () {
   var
@@ -13,13 +14,13 @@ describe('Offline queue management', function () {
   beforeEach(function () {
     var pastTime = 60050;
 
-    network = new RTWrapper('somewhere');
+    network = new AbstractWrapper('somewhere');
 
     // queuing a bunch of 7 requests from 1min ago to right now, 10s apart
     now = Date.now();
     clock = sinon.useFakeTimers(now);
 
-    reset = RTWrapper.__set__({
+    reset = AbstractWrapper.__set__({
       setTimeout: clock.setTimeout,
       setInterval: clock.setInterval,
       clearTimeout: clock.clearTimeout,
@@ -38,6 +39,9 @@ describe('Offline queue management', function () {
   });
 
   describe('#cleanQueue', function () {
+    var
+      cleanQueue = AbstractWrapper.__get__('cleanQueue');
+
     it('should remove outdated queued requests', function () {
       var eventStub = sinon.stub();
 
@@ -45,7 +49,7 @@ describe('Offline queue management', function () {
       network.queueTTL = 5000;
       network.addListener('offlineQueuePop', eventStub);
 
-			network._cleanQueue();
+      cleanQueue(network);
 
       // should keep only the latest requests, dating from a few ms ago
       should(network.offlineQueue.length).be.exactly(1);
@@ -57,7 +61,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueTTL = 0;
-      network._cleanQueue();
+      cleanQueue(network);
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
 
@@ -68,7 +72,7 @@ describe('Offline queue management', function () {
 
       network.queueMaxSize = 1;
       network.addListener('offlineQueuePop', eventStub);
-      network._cleanQueue();
+      cleanQueue(network);
 
       should(network.offlineQueue.length).be.exactly(1);
       should(network.offlineQueue[0]).match(lastRequest);
@@ -79,7 +83,7 @@ describe('Offline queue management', function () {
       var numRequests = network.offlineQueue.length;
 
       network.queueMaxSize = 0;
-      network._cleanQueue();
+      cleanQueue(network);
       should(network.offlineQueue.length).be.exactly(numRequests);
     });
   });
@@ -87,11 +91,12 @@ describe('Offline queue management', function () {
   describe('#dequeue', function () {
     var
       emitRequestRevert,
-      emitRequestStub;
+      emitRequestStub,
+      dequeue = AbstractWrapper.__get__('dequeue');
 
     before(function () {
       emitRequestStub = sinon.stub();
-      emitRequestRevert = emitRequestStub;
+      emitRequestRevert = AbstractWrapper.__set__('emitRequest', emitRequestStub);
     });
 
     after(function () {
@@ -109,7 +114,7 @@ describe('Offline queue management', function () {
         eventStub = sinon.stub();
 
       network.addListener('offlineQueuePop', eventStub);
-      network._dequeue();
+      dequeue(network);
 
       clock.tick(numRequests * network.replayInterval + 50);
 
@@ -207,7 +212,7 @@ describe('Offline queue management', function () {
 
     before(function () {
       dequeueStub = sinon.stub();
-      dequeueRevert = RTWrapper.__set__('dequeue', dequeueStub);
+      dequeueRevert = AbstractWrapper.__set__('dequeue', dequeueStub);
     });
 
     after(function () {
@@ -219,19 +224,13 @@ describe('Offline queue management', function () {
     });
 
     it('should play the queue if the instance is connected', function () {
-      network.state = 'connected';
+      network.isReady = sinon.stub().returns(true);
       network.playQueue();
       should(dequeueStub).be.calledOnce();
     });
 
     it('should not play the queue if the instance is offline', function () {
-      network.state = 'offline';
-      network.playQueue();
-      should(dequeueStub).not.be.called();
-    });
-
-    it('should not play the queue if the instance is still connecting', function () {
-      network.state = 'connecting';
+      network.isReady = sinon.stub().returns(false);
       network.playQueue();
       should(dequeueStub).not.be.called();
     });

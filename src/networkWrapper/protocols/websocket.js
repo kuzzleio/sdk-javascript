@@ -106,6 +106,7 @@ class WSNode extends RTWrapper {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
+    this.disconnect();
   }
 }
 

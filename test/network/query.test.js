@@ -2,16 +2,18 @@ var
   should = require('should'),
   sinon = require('sinon'),
   rewire = require('rewire'),
+  AbstractWrapper = rewire('../../src/networkWrapper/protocols/abstract/common'),
   RTWrapper = rewire('../../src/networkWrapper/protocols/abstract/realtime');
 
 describe('Network query management', function () {
   describe('#emitRequest', function () {
     var
+      emitRequest = AbstractWrapper.__get__('emitRequest'),
       sendSpy,
       network;
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere');
+      network = new AbstractWrapper('somewhere');
       network.send = function(request) {
         network.emit(request.requestId, request.response);
       };
@@ -21,7 +23,7 @@ describe('Network query management', function () {
     it('should emit the request when asked to', function () {
       var request = {requestId: 'bar'};
 
-      network.emitRequest(request);
+      emitRequest(network, request);
       should(sendSpy).be.calledWith(request);
     });
 
@@ -93,7 +95,7 @@ describe('Network query management', function () {
 
     before(function () {
       emitRequestStub = sinon.stub();
-      emitRequestRevert = RTWrapper.__set__('emitRequest', emitRequestStub);
+      emitRequestRevert = AbstractWrapper.__set__('emitRequest', emitRequestStub);
     });
 
     after(function () {
@@ -101,19 +103,22 @@ describe('Network query management', function () {
     });
 
     beforeEach(function () {
-      network = new RTWrapper('somewhere');
-      network.state = 'connected';
+      network = new AbstractWrapper('somewhere');
+      network.isReady = sinon.stub().returns(true);
       emitRequestStub.reset();
     });
 
+    afterEach(function () {
+      network.isReady.reset();
+    });
+
     it('should exit early if the query is not queuable and the SDK is offline', function () {
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.query(queryBody, {queuable: false});
       should(emitRequestStub).not.be.called();
     });
 
     it('should emit the request directly without waiting the end of dequeuing if queuable is false', function () {
-      network.state = 'connected';
       network.query(queryBody, {queuable: false});
       should(emitRequestStub).be.calledOnce();
     });
@@ -125,7 +130,7 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       network.addListener('offlineQueuePush', queueStub);
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.queuing = true;
 
       network.query(queryBody, {}, cb);
@@ -144,29 +149,10 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       network.addListener('offlineQueuePush', queueStub);
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.queuing = false;
 
       network.query(queryBody, {queuable: true}, cb);
-
-      should(emitRequestStub).not.be.called();
-      should(network.offlineQueue).be.empty();
-      should(queueStub).not.be.called();
-      should(cb).be.calledOnce();
-      should(cb.firstCall.args[0]).be.instanceof(Error);
-      should(cb.firstCall.args[0].message).startWith('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request');
-    });
-
-    it('should discard the request if state is "connecting" and if queuing is deactivated', function () {
-      var
-        queueStub = sinon.stub(),
-        cb = sinon.stub();
-
-      network.addListener('offlineQueuePush', queueStub);
-      network.state = 'connecting';
-      network.queuing = false;
-
-      network.query(queryBody, {}, cb);
 
       should(emitRequestStub).not.be.called();
       should(network.offlineQueue).be.empty();
@@ -182,7 +168,7 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       network.addListener('offlineQueuePush', queueStub);
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.queuing = false;
 
       network.query(queryBody, {}, cb);
@@ -202,7 +188,7 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       network.addListener('offlineQueuePush', queueStub);
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.queuing = true;
       network.queueFilter = function () { return true; };
 
@@ -223,7 +209,7 @@ describe('Network query management', function () {
         cb = sinon.stub();
 
       network.addListener('offlineQueuePush', queueStub);
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.queuing = true;
       network.queueFilter = function () { return false; };
 
@@ -254,16 +240,23 @@ describe('Network query management', function () {
 
     beforeEach(function () {
       network = new RTWrapper('somewhere');
-      network.state = 'connected';
+      network.isReady = sinon.stub().returns(true);
       network.query = sinon.stub().callsFake(queryStub);
       error = null;
       response = {result: {channel: 'foobar', roomId: 'barfoo'}};
     });
 
+    it('should throw an error if the protocol does not support realtime', function() {
+      network = new AbstractWrapper('somewhere');
+
+      should(() => network.subscribe({}, {}, sinon.stub(), sinon.stub())).throw('Not Implemented');
+      should(network.query).not.be.called();
+    });
+
     it('should throw an error if not connected', function() {
       var cb = sinon.stub();
 
-      network.state = 'offline';
+      network.isReady.returns(false);
       network.subscribe({}, {}, sinon.stub(), cb);
       should(cb).be.calledOnce();
       should(cb.firstCall.args[0]).be.an.instanceOf(Error);
@@ -365,10 +358,17 @@ describe('Network query management', function () {
 
     beforeEach(function () {
       network = new RTWrapper('somewhere');
-      network.state = 'connected';
+      network.isReady = sinon.stub().returns(true);
       network.query = sinon.stub().callsFake(queryStub);
       error = null;
       response = {result: {roomId: 'foobar'}};
+    });
+
+    it('should throw an error if the protocol does not support realtime', function() {
+      network = new AbstractWrapper('somewhere');
+
+      should(() => network.unsubscribe({foo: 'bar'}, {bar: 'foo'}, 'channel', sinon.stub())).throw('Not Implemented');
+      should(network.query).not.be.called();
     });
 
     it('should call query method with good arguments', function() {
