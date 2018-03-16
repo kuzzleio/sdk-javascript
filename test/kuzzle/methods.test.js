@@ -867,46 +867,34 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#setJwt', function () {
-    var loginAttemptStub = sinon.stub();
-
-    beforeEach(function () {
-      loginAttemptStub.reset();
-      kuzzle.addListener('loginAttempt', loginAttemptStub);
-    });
-
     it('should set the token when provided with a string argument', function () {
       kuzzle.setJwt('foobar');
 
       should(kuzzle.jwt).be.eql('foobar');
-      should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({success: true});
     });
 
     it('should set the token when provided with a kuzzle response argument', function () {
       kuzzle.setJwt({result: {jwt: 'foobar'}});
 
       should(kuzzle.jwt).be.eql('foobar');
-      should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({success: true});
     });
 
-    it('should send an "attempt failed" event if provided with an invalid argument type', function () {
-      kuzzle.setJwt();
-
-      should(kuzzle.jwt).be.undefined();
-      should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({error: 'Invalid token argument: undefined', success: false});
+    it('should throw if provided with an invalid argument type', function (done) {
+      try {
+        kuzzle.setJwt();
+      } catch (e) {
+        should(e.message).be.eql('Invalid token argument: undefined');
+        done();
+      }
     });
 
-    it('should send an "attempt failed" event if the provided kuzzle response does not contain a token', function () {
-      kuzzle.setJwt({foo: 'bar'});
-
-      should(kuzzle.jwt).be.undefined();
-      should(loginAttemptStub).be.calledOnce();
-      should(loginAttemptStub).be.calledWith({
-        error: 'Cannot find a valid JWT in the following object: {"foo":"bar"}',
-        success: false
-      });
+    it('should throw if the provided kuzzle response does not contain a token', function (done) {
+      try {
+        kuzzle.setJwt({foo: 'bar'});
+      } catch (e) {
+        should(e.message).be.eql('Cannot find a valid JWT in the following object: {"foo":"bar"}');
+        done();
+      }
     });
   });
 

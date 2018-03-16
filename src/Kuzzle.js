@@ -410,19 +410,12 @@ class Kuzzle extends KuzzleEventEmitter {
       if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
         this.jwt = token.result.jwt;
       } else {
-        this.emit('loginAttempt', {
-          success: false,
-          error: 'Cannot find a valid JWT in the following object: ' + JSON.stringify(token)
-        });
-
-        return this;
+        throw new Error('Cannot find a valid JWT in the following object: ' + JSON.stringify(token));
       }
     } else {
-      this.emit('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
-      return this;
+      throw new Error('Invalid token argument: ' + token);
     }
 
-    this.emit('loginAttempt', {success: true});
     return this;
   }
 

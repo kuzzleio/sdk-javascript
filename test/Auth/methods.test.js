@@ -3,7 +3,8 @@ const
   KuzzleMock = require('../mocks/kuzzle.mock'),
   Auth = require('../../src/Auth.js'),
   User = require('../../src/security/User.js'),
-  Security = require('../../src/security/Security.js');
+  Security = require('../../src/security/Security.js'),
+  sinon = require('sinon');
 
 describe('Kuzzle Auth controller', function () {
   let
@@ -372,6 +373,19 @@ describe('Kuzzle Auth controller', function () {
           }, {queuable: false});
           should(res).be.eql(result.result.jwt);
         });
+    });
+
+    it('should reject if setJwt fails', function () {
+      kuzzle.query.resolves(result);
+
+      kuzzle.setJwt = sinon.stub();
+      kuzzle.setJwt.throws(new Error('error'));
+
+      return auth.login('strategy', {username: 'foo'})
+        .catch(err => {
+          should(err).be.eql('error');
+        });
+      should(kuzzle.emit).not.be.called();
     });
   });
 
