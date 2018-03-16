@@ -132,68 +132,6 @@ describe('Security user rights methods', function () {
     });
   });
 
-  describe('#getMyRights', function () {
-    beforeEach(function () {
-      result = { result: { hits: exampleRights } };
-      expectedQuery = {
-        action: 'getMyRights',
-        controller: 'auth'
-      };
-    });
-
-    it('should send the right query to Kuzzle', function (done) {
-      this.timeout(50);
-
-      kuzzle.getMyRights(function (err, res) {
-        should(err).be.null();
-        should(res).be.exactly(exampleRights);
-        done();
-      });
-
-      should(kuzzle.query).be.calledOnce();
-      should(kuzzle.query).be.calledWith(expectedQuery, {}, null, sinon.match.func);
-
-      kuzzle.query.yield(null, result);
-    });
-
-    it('should throw if called with no callback', function () {
-      should(function () {kuzzle.getMyRights();}).throw(Error);
-      should(kuzzle.query).not.be.called();
-    });
-
-    it('should call the callback with an error if one occurs', function (done) {
-      this.timeout(50);
-
-      kuzzle.getMyRights(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
-      });
-
-      kuzzle.query.yield('foobar');
-    });
-
-    it('should call callback with an array containing rights (if not empty)', function (done) {
-      this.timeout(50);
-
-      kuzzle.getMyRights(function (err, res) {
-        should(err).be.exactly(null);
-        should(res).be.an.instanceOf(Array);
-
-        should(res[0]).have.ownProperty('controller');
-        should(res[0]).have.ownProperty('action');
-        should(res[0]).have.ownProperty('index');
-        should(res[0]).have.ownProperty('collection');
-        should(res[0]).have.ownProperty('value');
-        should(res[0].value).be.oneOf('allowed', 'denied', 'conditional');
-
-        done();
-      });
-
-      kuzzle.query.yield(null, result);
-    });
-  });
-
   describe('#isActionAllowed', function () {
     it('should return "allowed" to ("read", "get")', function() {
       should(kuzzle.security.isActionAllowed(exampleRights, 'read', 'get'))

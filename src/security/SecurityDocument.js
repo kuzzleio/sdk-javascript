@@ -1,5 +1,4 @@
 function SecurityDocument(Security, id, content, meta) {
-
   if (!id) {
     throw new Error('A security document must have an id');
   }

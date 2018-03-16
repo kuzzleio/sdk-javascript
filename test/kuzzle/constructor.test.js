@@ -29,25 +29,18 @@ describe('Kuzzle constructor', function () {
     var kuzzle = new Kuzzle('somewhere');
 
     should(kuzzle.addListener).be.a.Function();
-    should(kuzzle.checkToken).be.a.Function();
     should(kuzzle.collection).be.a.Function();
     should(kuzzle.connect).be.a.Function();
     should(kuzzle.createIndex).be.a.Function();
-    should(kuzzle.createMyCredentials).be.a.Function();
-    should(kuzzle.deleteMyCredentials).be.a.Function();
     should(kuzzle.disconnect).be.a.Function();
     should(kuzzle.flushQueue).be.a.Function();
     should(kuzzle.getAllStatistics).be.a.Function();
     should(kuzzle.getAutoRefresh).be.a.Function();
     should(kuzzle.getJwt).be.a.Function();
-    should(kuzzle.getMyCredentials).be.a.Function();
-    should(kuzzle.getMyRights).be.a.Function();
     should(kuzzle.getServerInfo).be.a.Function();
     should(kuzzle.getStatistics).be.a.Function();
     should(kuzzle.listCollections).be.a.Function();
     should(kuzzle.listIndexes).be.a.Function();
-    should(kuzzle.login).be.a.Function();
-    should(kuzzle.logout).be.a.Function();
     should(kuzzle.now).be.a.Function();
     should(kuzzle.playQueue).be.a.Function();
     should(kuzzle.query).be.a.Function();
@@ -60,10 +53,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
     should(kuzzle.unsetJwt).be.a.Function();
-    should(kuzzle.updateMyCredentials).be.a.Function();
-    should(kuzzle.updateSelf).be.a.Function();
-    should(kuzzle.validateMyCredentials).be.a.Function();
-    should(kuzzle.whoAmI).be.a.Function();
   });
 
   it('should expose the documented writable properties', function () {
@@ -271,25 +260,18 @@ describe('Kuzzle constructor', function () {
     kuzzle = new Kuzzle('somewhere');
 
     should(kuzzle.addListenerPromise).be.undefined();
-    should(kuzzle.checkTokenPromise).be.a.Function();
     should(kuzzle.collectionPromise).be.undefined();
     should(kuzzle.connectPromise).be.a.Function();
     should(kuzzle.createIndexPromise).be.a.Function();
-    should(kuzzle.createMyCredentialsPromise).be.a.Function();
-    should(kuzzle.deleteMyCredentialsPromise).be.a.Function();
     should(kuzzle.disconnectPromise).be.undefined();
     should(kuzzle.flushQueuePromise).be.undefined();
     should(kuzzle.getAllStatisticsPromise).be.a.Function();
     should(kuzzle.getAutoRefreshPromise).be.a.Function();
     should(kuzzle.getJwtPromise).be.undefined();
-    should(kuzzle.getMyCredentialsPromise).be.a.Function();
-    should(kuzzle.getMyRightsPromise).be.a.Function();
     should(kuzzle.getServerInfoPromise).be.a.Function();
     should(kuzzle.getStatisticsPromise).be.a.Function();
     should(kuzzle.listCollectionsPromise).be.a.Function();
     should(kuzzle.listIndexesPromise).be.a.Function();
-    should(kuzzle.loginPromise).be.a.Function();
-    should(kuzzle.logoutPromise).be.a.Function();
     should(kuzzle.nowPromise).be.a.Function();
     should(kuzzle.playQueuePromise).be.undefined();
     should(kuzzle.queryPromise).be.a.Function();
@@ -302,9 +284,5 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();
     should(kuzzle.unsetJwtPromise).be.undefined();
-    should(kuzzle.updateMyCredentialsPromise).be.a.Function();
-    should(kuzzle.updateSelfPromise).be.a.Function();
-    should(kuzzle.validateMyCredentialsPromise).be.a.Function();
-    should(kuzzle.whoAmIPromise).be.a.Function();
   });
 });
