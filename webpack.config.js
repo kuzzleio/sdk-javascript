@@ -32,6 +32,7 @@ module.exports = {
           path.resolve(__dirname, './src/networkWrapper/protocols/'),
           path.resolve(__dirname, './src/Kuzzle.js'),
           path.resolve(__dirname, './src/Auth.js'),
+          path.resolve(__dirname, './src/Server.js'),
           path.resolve(__dirname, './src/Room.js'),
           path.resolve(__dirname, './src/eventEmitter/'),
           path.resolve(__dirname, './src/SearchResult.js')

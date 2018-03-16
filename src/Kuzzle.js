@@ -1,9 +1,11 @@
 const
   uuidv4 = require('uuid/v4'),
+  bluebird = require('bluebird'),
   KuzzleEventEmitter = require('./eventEmitter'),
   Collection = require('./Collection.js'),
   Document = require('./Document.js'),
   Security = require('./security/Security'),
+  Server = require('./Server.js'),
   MemoryStorage = require('./MemoryStorage'),
   Auth = require('./Auth.js'),
   networkWrapper = require('./networkWrapper');
@@ -164,9 +166,15 @@ class Kuzzle extends KuzzleEventEmitter {
     /**
      * Singletons for Kuzzle API
      */
-    Object.defineProperty(this, 'auth', {
-      value: new Auth(this),
-      enumerable: true
+    Object.defineProperties(this, {
+      auth: {
+        value: new Auth(this),
+        enumerable: true
+      },
+      server: {
+        value: new Server(this),
+        enumerable: true
+      }
     });
 
     /**
@@ -302,21 +310,16 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('tokenExpired');
     });
 
-    if (this.bluebird) {
-      return this.bluebird.promisifyAll(this, {
-        suffix: 'Promise',
-        filter: function (name, func, target, passes) {
-          const whitelist = ['getAllStatistics', 'getServerInfo', 'getStatistics',
-            'listCollections', 'listIndexes', 'login', 'logout', 'now', 'query',
-            'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
-            'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
-            'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
-          ];
+    return bluebird.promisifyAll(this, {
+      suffix: 'Promise',
+      filter: function (name, func, target, passes) {
+        const whitelist = ['listCollections', 'listIndexes',
+          'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
+        ];
 
-          return passes && whitelist.indexOf(name) !== -1;
-        }
-      });
-    }
+        return passes && whitelist.indexOf(name) !== -1;
+      }
+    });
   }
 
   /**
@@ -481,87 +484,6 @@ class Kuzzle extends KuzzleEventEmitter {
     return super.addListener(event, listener);
   }
 
-  /**
-   * Kuzzle monitors active connections, and ongoing/completed/failed requests.
-   * This method returns all available statistics from Kuzzle.
-   *
-   * @param {object} [options] - Optional parameters
-   * @param {responseCallback} cb - Handles the query response
-   */
-  getAllStatistics(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.getAllStatistics', cb);
-
-    this.query({controller: 'server', action: 'getAllStats'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.hits);
-    });
-  }
-
-  /**
-   * Kuzzle monitors active connections, and ongoing/completed/failed requests.
-   * This method allows getting either the last statistics frame, or a set of frames starting from a provided timestamp.
-   *
-   * @param {number} startTime -  Epoch time. Starting time from which the frames are to be retrieved
-   * @param {number} stopTime -  Epoch time. End time from which the frames are to be retrieved
-   * @param {object} [options] - Optional parameters
-   * @param {responseCallback} cb - Handles the query response
-   */
-  getStatistics(...args) {
-    let
-      startTime,
-      stopTime,
-      options,
-      cb;
-
-    switch (args.length) {
-      case 1:
-        cb = args[0];
-        startTime = null;
-        stopTime = null;
-        options = null;
-        break;
-      case 2:
-        if (typeof args[0] === 'object') {
-          [options, cb] = args;
-        } else {
-          [startTime, cb] = args;
-        }
-        break;
-      case 3:
-        if (typeof args[1] === 'object') {
-          [startTime, options, cb] = args;
-        } else {
-          [startTime, stopTime, cb] = args;
-        }
-        break;
-      case 4:
-        [startTime, stopTime, options, cb] = args;
-        break;
-      default:
-        throw new Error('Bad arguments list. Usage: kuzzle.getStatistics([startTime,] [stopTime,] [options,] callback)');
-    }
-
-    this.callbackRequired('Kuzzle.getStatistics', cb);
-
-    const queryCB = (err, res) => {
-      if (err) {
-        return cb(err);
-      }
-
-      cb(null, startTime ? res.result.hits : [res.result]);
-    };
-
-    let query = {};
-    if (startTime) {
-      query = stopTime ? {startTime, stopTime} : {startTime};
-    }
-
-    this.query({controller: 'server', action: startTime ? 'getStats' : 'getLastStats'}, query, options, queryCB);
-  }
 
   /**
    * Create a new instance of a Collection object.
@@ -677,25 +599,6 @@ class Kuzzle extends KuzzleEventEmitter {
     for (const collection of Object.keys(this.collections)) {
       delete this.collections[collection];
     }
-  }
-
-  /**
-   * Returns the server informations
-   *
-   * @param {object} [options] - Optional arguments
-   * @param {responseCallback} cb - Handles the query response
-   */
-  getServerInfo(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.getServerInfo', cb);
-
-    this.query({controller: 'server', action: 'info'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.serverInfo);
-    });
   }
 
   /**
@@ -826,35 +729,19 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Return the current Kuzzle's UTC Epoch time, in milliseconds
-   * @param {object} [options] - Optional parameters
-   * @param {responseCallback} cb - Handles the query response
-   */
-  now(options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.now', cb);
-
-    this.query({controller: 'server', action: 'now'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.now);
-    });
-  }
-
-  /**
    * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
    * Base method used to send read queries to Kuzzle
    *
    * Takes an optional argument object with the following properties:
+   *    - queuable (boolean, default: true):
+   *        Tell if the query can be queuable in case of offline mode
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
    * @param {object} queryArgs - Query configuration
    * @param {object} query - The query data
    * @param {object} [options] - Optional arguments
-   * @param {responseCallback} [cb] - Handles the query response
+   * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   query(queryArgs, query = {}, options = null) {
     const
