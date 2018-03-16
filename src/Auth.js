@@ -156,7 +156,11 @@ class Auth {
 
     return this.kuzzle.query({controller: 'auth', action: 'login'}, request, {queuable: false})
       .then(response => {
-        this.kuzzle.setJwt(response.result.jwt);
+        if (response.result.jwt) {
+          this.kuzzle.setJwt(response.result.jwt);
+        } else {
+          this.kuzzle.emit('loginAttempt', {success: true});
+        }
         return response.result.jwt;
       })
       .catch(err => {
