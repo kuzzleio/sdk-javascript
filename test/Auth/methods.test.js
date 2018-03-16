@@ -384,8 +384,8 @@ describe('Kuzzle Auth controller', function () {
       return auth.login('strategy', {username: 'foo'})
         .catch(err => {
           should(err).be.eql('error');
+          should(kuzzle.emit).not.be.called();
         });
-      should(kuzzle.emit).not.be.called();
     });
   });
 

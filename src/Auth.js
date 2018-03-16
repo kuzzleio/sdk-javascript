@@ -140,7 +140,7 @@ class Auth {
         body: {}
       };
 
-    request.body = credentials || {};
+    request.body = credentials || {};
     if (expiresIn) {
       request.expiresIn = expiresIn;
     }
