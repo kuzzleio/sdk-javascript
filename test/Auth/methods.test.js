@@ -317,7 +317,7 @@ describe('Kuzzle Auth controller', function () {
     it('should call query with right arguments and expiresIn as int and return Promise which resolves a jwt', () => {
       kuzzle.query.resolves(result);
 
-      return auth.login('strategy', 42)
+      return auth.login('strategy', null, 42)
         .then(res => {
           should(kuzzle.query).be.calledOnce();
           should(kuzzle.query).be.calledWith(expectedQuery, {
@@ -332,7 +332,7 @@ describe('Kuzzle Auth controller', function () {
     it('should call query with right arguments and expiresIn as string and return Promise which resolves a jwt', () => {
       kuzzle.query.resolves(result);
 
-      return auth.login('strategy', '4h')
+      return auth.login('strategy', null, '4h')
         .then(res => {
           should(kuzzle.query).be.calledOnce();
           should(kuzzle.query).be.calledWith(expectedQuery, {

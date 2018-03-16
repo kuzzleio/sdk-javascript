@@ -129,7 +129,7 @@ class Auth {
    * @param expiresIn
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  login(strategy, ...args) {
+  login(strategy, credentials, expiresIn) {
     if (!strategy || typeof strategy !== 'string') {
       return Promise.reject(new Error('Auth.login: strategy required'));
     }
@@ -140,18 +140,9 @@ class Auth {
         body: {}
       };
 
-    // Handle arguments (credentials, expiresIn)
-    if (args[0]) {
-      if (typeof args[0] === 'object') {
-        request.body = args[0];
-      } else if (typeof args[0] === 'number' || typeof args[0] === 'string') {
-        request.expiresIn = args[0];
-      }
-    }
-    if (args[1]) {
-      if (typeof args[1] === 'number' || typeof args[1] === 'string') {
-        request.expiresIn = args[1];
-      }
+    request.body = credentials || {};
+    if (expiresIn) {
+      request.expiresIn = expiresIn;
     }
 
     return this.kuzzle.query({controller: 'auth', action: 'login'}, request, {queuable: false})
