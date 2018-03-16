@@ -1,6 +1,7 @@
 var
   NetworkWrapperMock = require('./networkWrapper.mock'),
-  sinon = require('sinon');
+  sinon = require('sinon'),
+  Security = require('../../src/security/Security.js');
 
 /**
  * @param err
@@ -10,9 +11,11 @@ function KuzzleMock () {
   this.network = new NetworkWrapperMock();
 
   this.query = sinon.stub();
-  this.queryPromise = sinon.stub();
   this.subscribe = sinon.stub();
   this.unsubscribe = sinon.stub();
+  this.security = new Security(this);
+  this.setJwt = sinon.stub();
+  this.unsetJwt = sinon.stub();
 
   this.callbackRequired = function (errorMessagePrefix, callback) {
     if (!callback || typeof callback !== 'function') {

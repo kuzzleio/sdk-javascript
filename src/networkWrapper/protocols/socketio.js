@@ -47,6 +47,7 @@ class SocketIO extends RTWrapper {
    *
    * @param {string} event
    * @param {function} callback
+   * @param {boolean} once
    */
   addListener(event, callback, once = false) {
     this._addEventWrapper(event, callback, once);
@@ -119,6 +120,7 @@ class SocketIO extends RTWrapper {
     this.state = 'offline';
     this.socket.close();
     this.socket = null;
+    this.disconnect();
   }
 
   _addEventWrapper(event, callback, once = false) {

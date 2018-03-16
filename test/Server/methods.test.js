@@ -20,49 +20,49 @@ describe('Kuzzle Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves a boolean value', () => {
-      kuzzle.queryPromise.resolves({result: {exists: true}});
+      kuzzle.query.resolves({result: {exists: true}});
 
       return server.adminExists()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).be.exactly(true);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.adminExists({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).be.exactly(true);
         })
         .then(() => {
-          kuzzle.queryPromise.reset();
-          kuzzle.queryPromise.resolves({result: {exists: false}});
+          kuzzle.query.reset();
+          kuzzle.query.resolves({result: {exists: false}});
           return server.adminExists();
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery);
           should(res).be.exactly(false);
         });
     });
 
     it('should reject the promise if receiving a response in bad format (missing "exists" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {foo: 'bar'}});
+      kuzzle.query.resolves({result: {foo: 'bar'}});
       return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
     it('should reject the promise if receiving a response in bad format (bad type of "exists" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {exists: 'foobar'}});
+      kuzzle.query.resolves({result: {exists: 'foobar'}});
       return should(server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.adminExists()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -105,21 +105,21 @@ describe('Kuzzle Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves all the statistics frames', () => {
-      kuzzle.queryPromise.resolves(response);
+      kuzzle.query.resolves(response);
 
       return server.getAllStats()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getAllStats({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
         });
     });
@@ -127,7 +127,7 @@ describe('Kuzzle Server Controller', () => {
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.getAllStats()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -165,21 +165,21 @@ describe('Kuzzle Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the configuration', () => {
-      kuzzle.queryPromise.resolves(response);
+      kuzzle.query.resolves(response);
 
       return server.getConfig()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getConfig({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
         });
     });
@@ -187,7 +187,7 @@ describe('Kuzzle Server Controller', () => {
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.getConfig()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -225,21 +225,21 @@ describe('Kuzzle Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the last statistic frame', () => {
-      kuzzle.queryPromise.resolves(response);
+      kuzzle.query.resolves(response);
 
       return server.getLastStats()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getLastStats({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
         });
     });
@@ -247,7 +247,7 @@ describe('Kuzzle Server Controller', () => {
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.getLastStats()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -290,48 +290,48 @@ describe('Kuzzle Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the requested statistics frames', () => {
-      kuzzle.queryPromise.resolves(response);
+      kuzzle.query.resolves(response);
 
       return server.getStats(1234, 9876)
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getStats(1234, 9876, {queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 1234, stopTime: 9876}, {queuable: false});
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getStats(1234, null);
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: 1234, stopTime: null}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {startTime: 1234, stopTime: null}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getStats(null, 9876);
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: null, stopTime: 9876}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {startTime: null, stopTime: 9876}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.getStats(null, null);
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {startTime: null, stopTime: null}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {startTime: null, stopTime: null}, undefined);
           should(res).match(response.result);
         });
     });
@@ -339,7 +339,7 @@ describe('Kuzzle Server Controller', () => {
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.getStats(1234, 9876)).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -387,21 +387,21 @@ describe('Kuzzle Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the server informations', () => {
-      kuzzle.queryPromise.resolves(response);
+      kuzzle.query.resolves(response);
 
       return server.info()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).match(response.result);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.info({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).match(response.result);
         });
     });
@@ -409,7 +409,7 @@ describe('Kuzzle Server Controller', () => {
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.info()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });
@@ -421,39 +421,39 @@ describe('Kuzzle Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves current server timestamp', () => {
-      kuzzle.queryPromise.resolves({result: {now: 12345}});
+      kuzzle.query.resolves({result: {now: 12345}});
 
       return server.now()
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, undefined);
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, undefined);
           should(res).be.exactly(12345);
         })
         .then(() => {
-          kuzzle.queryPromise.resetHistory();
+          kuzzle.query.resetHistory();
           return server.now({queuable: false});
         })
         .then(res => {
-          should(kuzzle.queryPromise).be.calledOnce();
-          should(kuzzle.queryPromise).be.calledWith(expectedQuery, {}, {queuable: false});
+          should(kuzzle.query).be.calledOnce();
+          should(kuzzle.query).be.calledWith(expectedQuery, {}, {queuable: false});
           should(res).be.exactly(12345);
         });
     });
 
     it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {foo: 'bar'}});
+      kuzzle.query.resolves({result: {foo: 'bar'}});
       return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
     it('should reject the promise if receiving a response in bad format (bad type for "now" attribute)', () => {
-      kuzzle.queryPromise.resolves({result: {now: 'bar'}});
+      kuzzle.query.resolves({result: {now: 'bar'}});
       return should(server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
-      kuzzle.queryPromise.rejects(error);
+      kuzzle.query.rejects(error);
       return should(server.now()).be.rejectedWith({status: 412, message: 'foobar error'});
     });
   });

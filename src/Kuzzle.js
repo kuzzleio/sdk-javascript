@@ -7,7 +7,7 @@ const
   Security = require('./security/Security'),
   Server = require('./Server.js'),
   MemoryStorage = require('./MemoryStorage'),
-  User = require('./security/User'),
+  Auth = require('./Auth.js'),
   networkWrapper = require('./networkWrapper');
 
 /**
@@ -89,7 +89,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
     // Forward the subscribe query to the network wrapper
     Object.defineProperty(this, 'subscribe', {
-      value: function(room, opts, subscribeCB) {
+      value: function (room, opts, subscribeCB) {
         const
           object = {
             requestId: uuidv4(),
@@ -166,11 +166,16 @@ class Kuzzle extends KuzzleEventEmitter {
     /**
      * Singletons for Kuzzle API
      */
-    Object.defineProperty(this, 'server', {
-      value: new Server(this),
-      enumerable: true
+    Object.defineProperties(this, {
+      auth: {
+        value: new Auth(this),
+        enumerable: true
+      },
+      server: {
+        value: new Server(this),
+        enumerable: true
+      }
     });
-
 
     /**
      * Create an attribute security that embed all methods to manage Role, Profile and User
@@ -185,12 +190,12 @@ class Kuzzle extends KuzzleEventEmitter {
       enumerable: true
     });
 
-    Object.defineProperty(this, 'collections',{
+    Object.defineProperty(this, 'collections', {
       value: {},
       writable: true
     });
 
-    Object.defineProperty(this, 'eventTimeout',{
+    Object.defineProperty(this, 'eventTimeout', {
       value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200
     });
 
@@ -308,9 +313,7 @@ class Kuzzle extends KuzzleEventEmitter {
     return bluebird.promisifyAll(this, {
       suffix: 'Promise',
       filter: function (name, func, target, passes) {
-        const whitelist = ['listCollections', 'listIndexes', 'login', 'logout', 'query',
-          'checkToken', 'whoAmI', 'updateSelf', 'getMyRights', 'getMyCredentials',
-          'createMyCredentials', 'deleteMyCredentials', 'updateMyCredentials', 'validateMyCredentials',
+        const whitelist = ['listCollections', 'listIndexes',
           'createIndex', 'refreshIndex', 'getAutoRefresh', 'setAutoRefresh', 'connect'
         ];
 
@@ -320,10 +323,10 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-  * Emit an event to all registered listeners
-  * An event cannot be emitted multiple times before a timeout has been reached.
-  */
-  emit (eventName, ...payload) {
+   * Emit an event to all registered listeners
+   * An event cannot be emitted multiple times before a timeout has been reached.
+   */
+  emit(eventName, ...payload) {
     const
       now = Date.now(),
       protectedEvent = this.protectedEvents[eventName];
@@ -343,8 +346,8 @@ class Kuzzle extends KuzzleEventEmitter {
    * Connects to a Kuzzle instance using the provided host name
    * @param {function} [cb] Connection callback
    */
-  connect (cb) {
-    if (this.network.state !== 'offline') {
+  connect(cb) {
+    if (this.network.isReady()) {
       if (cb) {
         cb(null, this);
       }
@@ -373,7 +376,10 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.addListener('disconnect', () => {
-      this.disconnect();
+      for (const collection of Object.keys(this.collections)) {
+        delete this.collections[collection];
+      }
+
       this.emit('disconnected');
     });
 
@@ -400,26 +406,19 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param token
    * @returns {Kuzzle}
    */
-  setJwt (token) {
+  setJwt(token) {
     if (typeof token === 'string') {
       this.jwt = token;
     } else if (typeof token === 'object') {
       if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
         this.jwt = token.result.jwt;
       } else {
-        this.emit('loginAttempt', {
-          success: false,
-          error: 'Cannot find a valid JWT in the following object: ' + JSON.stringify(token)
-        });
-
-        return this;
+        throw new Error('Cannot find a valid JWT in the following object: ' + JSON.stringify(token));
       }
     } else {
-      this.emit('loginAttempt', {success: false, error: 'Invalid token argument: ' + token});
-      return this;
+      throw new Error('Invalid token argument: ' + token);
     }
 
-    this.emit('loginAttempt', {success: true});
     return this;
   }
 
@@ -427,7 +426,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Unset the jwt used to query kuzzle
    * @returns {Kuzzle}
    */
-  unsetJwt () {
+  unsetJwt() {
     this.jwt = undefined;
     return this;
   }
@@ -436,178 +435,8 @@ class Kuzzle extends KuzzleEventEmitter {
    * Get the jwt used by kuzzle
    * @returns {Kuzzle}
    */
-  getJwt () {
+  getJwt() {
     return this.jwt;
-  }
-
-  /**
-   * Send login request to kuzzle with credentials
-   * If login success, store the jwt into kuzzle object
-   *
-   * @param strategy
-   * @param credentials
-   * @param expiresIn
-   * @param cb
-   */
-  login (strategy, ...args) {
-    if (!strategy || typeof strategy !== 'string') {
-      throw new Error('Kuzzle.login: strategy required');
-    }
-
-    const
-      request = {
-        strategy,
-        body: {}
-      };
-
-    let cb = null;
-
-    // Handle arguments (credentials, expiresIn, cb)
-    if (args[0]) {
-      if (typeof args[0] === 'object') {
-        request.body = args[0];
-      } else if (typeof args[0] === 'number' || typeof args[0] === 'string') {
-        request.expiresIn = args[0];
-      } else if (typeof args[0] === 'function') {
-        cb = args[0];
-      }
-    }
-    if (args[1]) {
-      if (typeof args[1] === 'number' || typeof args[1] === 'string') {
-        request.expiresIn = args[1];
-      } else if (typeof args[1] === 'function') {
-        cb = args[1];
-      }
-    }
-    if (args[2] && typeof args[2] === 'function') {
-      cb = args[2];
-    }
-
-    this.query({controller: 'auth', action: 'login'}, request, {queuable: false}, (error, response) => {
-      if (!error) {
-        if (response.result.jwt) {
-          this.setJwt(response.result.jwt);
-        }
-
-        cb && cb(null, response.result);
-      }
-      else {
-        cb && cb(error);
-        this.emit('loginAttempt', {success: false, error: error.message});
-      }
-    });
-  }
-
-  /**
-   * Create credentials of the specified <strategy> for the current user.
-   *
-   * @param credentials
-   * @param strategy
-   * @param options
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  createMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'createMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result._source);
-      }
-    });
-
-    return this;
-  }
-
-  /**
-   * Delete credentials of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param options
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  deleteMyCredentials (strategy, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'deleteMyCredentials'}, {strategy}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
-
-  /**
-   * Get credential information of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param options
-   * @param cb
-   */
-  getMyCredentials (strategy, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'getMyCredentials'}, {strategy}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-  }
-
-  /**
-   * Update credentials of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param credentals
-   * @param options
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  updateMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'updateMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
-
-  /**
-   * Validate credentials of the specified <strategy> for the current user.
-   *
-   * @param strategy
-   * @param credentials
-   * @param options
-   * @param cb
-   */
-  validateMyCredentials (strategy, credentials, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'validateMyCredentials'}, {strategy, body: credentials}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
   }
 
   /**
@@ -618,7 +447,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {responseCallback} cb
    * @returns {Kuzzle}
    */
-  createIndex (index, options, cb) {
+  createIndex(index, options, cb) {
     if (!index) {
       if (!this.defaultIndex) {
         throw new Error('Kuzzle.createIndex: index required');
@@ -641,121 +470,20 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Send logout request to kuzzle with jwt.
-   *
-   * @param cb
-   * @returns {Kuzzle}
-   */
-  logout (cb) {
-    const
-      request = {
-        action: 'logout',
-        controller: 'auth',
-        requestId: uuidv4(),
-        body: {}
-      };
-
-    this.query({controller: 'auth', action: 'logout'}, request, {queuable: false}, error => {
-      if (typeof cb === 'function') {
-        cb(error, this);
-      }
-    });
-
-    return this.unsetJwt();
-  }
-
-  /**
-   * Checks whether a given jwt token still represents a valid session in Kuzzle.
-   *
-   * @param  {string}   token     The jwt token to check
-   * @param  {function} cb  The callback to be called when the response is
-   *                              available. The signature is `function(error, response)`.
-   */
-  checkToken (token, cb) {
-    const
-      request = {
-        body: {
-          token
-        }
-      };
-
-    this.callbackRequired('Kuzzle.checkToken', cb);
-
-    this.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false}, (err, res) => {
-      cb(err, err ? undefined : res.result);
-    });
-  }
-
-  /**
-   * Fetches the current user.
-   *
-   * @param  {function} cb  The callback to be called when the response is
-   *                              available. The signature is `function(error, response)`.
-   */
-  whoAmI (cb) {
-    this.callbackRequired('Kuzzle.whoAmI', cb);
-
-    this.query({controller: 'auth', action: 'getCurrentUser'}, {}, {}, (err, res) => {
-      cb(err, err ? undefined : new User(this.security, res.result._id, res.result._source, res.result._meta));
-    });
-  }
-
-  /**
-   * Gets the rights array of the currently logged user.
-   *
-   * @param {object} [options] - Optional parameters
-   * @param  {function} cb The callback containing the normalized array of rights.
-   */
-  getMyRights (options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.callbackRequired('Kuzzle.getMyRights', cb);
-
-    this.query({controller: 'auth', action:'getMyRights'}, {}, options, (err, res) => {
-      cb(err, err ? undefined : res.result.hits);
-    });
-  }
-
-  /**
-   * Update current user in Kuzzle.
-   *
-   * @param {object} content - a plain javascript object representing the user's modification
-   * @param {object} [options] - (optional) arguments
-   * @param {responseCallback} [cb] - (optional) Handles the query response
-   * @returns {Kuzzle} this object
-   */
-  updateSelf (content, options, cb) {
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    }
-
-    this.query({controller: 'auth', action: 'updateSelf'}, {body: content}, options, (err, res) => {
-      if (typeof cb === 'function') {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-
-    return this;
-  }
-
-  /**
    * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
    * insertion.
    *
    * @param {string} event - name of the global event to subscribe to
    * @param {function} listener - callback to invoke each time an event is fired
    */
-  addListener (event, listener) {
+  addListener(event, listener) {
     if (this.eventActions.indexOf(event) === -1) {
       throw new Error(`[${event}] is not a known event. Known events: ${this.eventActions.toString()}`);
     }
 
     return super.addListener(event, listener);
   }
+
 
   /**
    * Create a new instance of a Collection object.
@@ -765,7 +493,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {string} [index] - The name of the data index containing the data collection
    * @returns {Collection} A Collection instance
    */
-  collection (collection, index) {
+  collection(collection, index) {
     if (!index) {
       if (!this.defaultIndex) {
         throw new Error('Unable to create a new data collection object: no index specified');
@@ -794,7 +522,7 @@ class Kuzzle extends KuzzleEventEmitter {
    *
    * @returns {Kuzzle}
    */
-  flushQueue () {
+  flushQueue() {
     this.network.flushQueue();
     return this;
   }
@@ -806,7 +534,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional parameters
    * @param {responseCallback} cb - Handles the query response
    */
-  listCollections (...args) {
+  listCollections(...args) {
     let
       index,
       options,
@@ -849,7 +577,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @param {responseCallback} cb - Handles the query response
    */
-  listIndexes (options, cb) {
+  listIndexes(options, cb) {
     if (!cb && typeof options === 'function') {
       cb = options;
       options = null;
@@ -865,7 +593,7 @@ class Kuzzle extends KuzzleEventEmitter {
   /**
    * Disconnects from Kuzzle and invalidate this instance.
    */
-  disconnect () {
+  disconnect() {
     this.network.close();
 
     for (const collection of Object.keys(this.collections)) {
@@ -881,7 +609,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {responseCallback} cb - Handles the query response
    * @returns {Kuzzle}
    */
-  refreshIndex (...args) {
+  refreshIndex(...args) {
     let
       index,
       options,
@@ -920,7 +648,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} options - Optinal arguments
    * @param {responseCallback} cb - Handles the query response
    */
-  getAutoRefresh (...args) {
+  getAutoRefresh(...args) {
     let
       index,
       options,
@@ -960,7 +688,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {responseCallback} cb - Handles the query result
    * @returns {object} this
    */
-  setAutoRefresh (...args) {
+  setAutoRefresh(...args) {
     var
       index,
       autoRefresh,
@@ -1013,24 +741,15 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} queryArgs - Query configuration
    * @param {object} query - The query data
    * @param {object} [options] - Optional arguments
-   * @param {responseCallback} [cb] - Handles the query response
+   * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  query (queryArgs, query, options, cb) {
+  query(queryArgs, query = {}, options = null) {
     const
       object = {
         action: queryArgs.action,
         controller: queryArgs.controller,
         volatile: this.volatile
       };
-
-    if (!cb && typeof options === 'function') {
-      cb = options;
-      options = null;
-    } else if (!cb && !options && typeof query === 'function') {
-      cb = query;
-      query = {};
-      options = null;
-    }
 
     if (options) {
       for (const prop of ['refresh', 'from', 'size', 'scroll', 'scrollId']) {
@@ -1045,10 +764,13 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     if (!query || typeof query !== 'object' || Array.isArray(query)) {
-      throw new Error('Invalid query parameter: ' + query);
+      return Promise.reject(Error(`Invalid query parameter: ${JSON.stringify(query)}`));
     }
 
-    Object.assign(object.volatile, query.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
+    Object.assign(object.volatile, query.volatile, {
+      sdkInstanceId: this.network.id,
+      sdkVersion: this.sdkVersion
+    });
 
     for (const attr of Object.keys(query)) {
       if (attr !== 'volatile') {
@@ -1076,15 +798,14 @@ class Kuzzle extends KuzzleEventEmitter {
       object.requestId = uuidv4();
     }
 
-    this.network.query(object, options, cb);
-
-    return this;
+    return this.network.query(object, options)
+      .then(response => response.result);
   }
 
   /**
    * Starts the requests queuing.
    */
-  startQueuing () {
+  startQueuing() {
     this.network.startQueuing();
     return this;
   }
@@ -1092,7 +813,7 @@ class Kuzzle extends KuzzleEventEmitter {
   /**
    * Stops the requests queuing.
    */
-  stopQueuing () {
+  stopQueuing() {
     this.network.stopQueuing();
     return this;
   }
@@ -1101,14 +822,14 @@ class Kuzzle extends KuzzleEventEmitter {
    * @DEPRECATED
    * See Kuzzle.prototype.playQueue();
    */
-  replayQueue () {
+  replayQueue() {
     return this.playQueue();
   }
 
   /**
    * Plays the requests queued during offline mode.
    */
-  playQueue () {
+  playQueue() {
     this.network.playQueue();
     return this;
   }
@@ -1119,7 +840,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param index
    * @returns this
    */
-  setDefaultIndex (index) {
+  setDefaultIndex(index) {
     if (typeof index !== 'string') {
       throw new Error(`Invalid default index: [${index}] (an index name is expected)`);
     }

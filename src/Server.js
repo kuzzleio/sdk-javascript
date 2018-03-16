@@ -23,7 +23,7 @@ class Server {
    * @returns {Promise<Boolean>}
    */
   adminExists(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'adminExists'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'adminExists'}, {}, options)
       .then(res => {
         if (res.result === undefined || typeof res.result.exists !== 'boolean') {
           const error = new Error('adminExists: bad response format');
@@ -42,7 +42,7 @@ class Server {
    * @returns {Promise<Object>}
    */
   getAllStats(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'getAllStats'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'getAllStats'}, {}, options)
       .then(res => res.result);
   }
 
@@ -53,7 +53,7 @@ class Server {
    * @returns {Promise<Object>}
    */
   getConfig(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'getConfig'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'getConfig'}, {}, options)
       .then(res => res.result);
   }
 
@@ -64,7 +64,7 @@ class Server {
    * @returns {Promise<Object>}
    */
   getLastStats(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'getLastStats'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'getLastStats'}, {}, options)
       .then(res => res.result);
   }
 
@@ -77,7 +77,7 @@ class Server {
    * @returns {Promise<Object>}
    */
   getStats(startTime, stopTime, options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'getStats'}, {startTime, stopTime}, options)
+    return this.kuzzle.query({controller: 'server', action: 'getStats'}, {startTime, stopTime}, options)
       .then(res => res.result);
   }
 
@@ -88,7 +88,7 @@ class Server {
    * @returns {Promise<Object>}
    */
   info(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'info'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'info'}, {}, options)
       .then(res => res.result);
   }
 
@@ -99,7 +99,7 @@ class Server {
    * @returns {Promise<Number>}
    */
   now(options) {
-    return this.kuzzle.queryPromise({controller: 'server', action: 'now'}, {}, options)
+    return this.kuzzle.query({controller: 'server', action: 'now'}, {}, options)
       .then(res => {
         if (res.result === undefined || typeof res.result.now !== 'number') {
           const error = new Error('now: bad response format');
