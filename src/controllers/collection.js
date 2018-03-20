@@ -10,7 +10,7 @@ class CollectionController {
     this.kuzzle = kuzzle;
   }
 
-  create (index, collection, options) {
+  create (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.create: index is required'));
     }
@@ -23,10 +23,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'create'
-    }, undefined, options);
+    }, options);
   }
 
-  deleteSpecification (index, collection, options) {
+  deleteSpecification (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.deleteSpecification: index is required'));
     }
@@ -39,10 +39,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'deleteSpecification'
-    }, undefined, options);
+    }, options);
   }
 
-  exists (index, collection, options) {
+  exists (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.exists: index is required'));
     }
@@ -55,10 +55,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'exists'
-    }, undefined, options);
+    }, options);
   }
 
-  getMapping (index, collection, options) {
+  getMapping (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.getMapping: index is required'));
     }
@@ -71,10 +71,10 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getMapping'
-    }, undefined, options);
+    }, options);
   }
 
-  getSpecifications (index, collection, options) {
+  getSpecifications (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.getSpecifications: index is required'));
     }
@@ -87,30 +87,43 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getSpecifications'
-    }, undefined, options);
+    }, options);
   }
 
-  list (index, options) {
+  list (index, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.list: index is required'));
     }
 
-    return this.kuzzle.query({
+    const request = {
       index,
       controller: 'collection',
-      action: 'list'
-    }, undefined, options);
+      action: 'list',
+      from: options.from,
+      size: options.size
+    };
+    delete options.from;
+    delete topions.size;
+
+    return this.kuzzle.query(request, options);
   }
 
-  searchSpecifications (query = {}, options) {
-    return this.kuzzle.query({
+  searchSpecifications (body = {}, options = {}) {
+    const request = {
+      body,
       controller: 'collection',
       action: 'searchSpecifications'
-    }, query, options)
+    };
+    for (const opt of ['from', 'size', 'scroll']) {
+      request[opt] = options[opt];
+      delete options[opt];
+    }
+
+    return this.kuzzle.query(request, options)
       .then(response => new SpecificationsSearchResult(this.kuzzle, query, options, response));
   }
 
-  truncate (index, collection, options) {
+  truncate (index, collection, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.truncate: index is required'));
     }
@@ -123,10 +136,10 @@ class CollectionController {
       collection,
       controller: 'colleciton',
       action: 'truncate'
-    }, undefined, options);
+    }, options);
   }
 
-  updateMapping (index, collection, body, options) {
+  updateMapping (index, collection, body, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.updateMapping: index is required'));
     }
@@ -137,12 +150,13 @@ class CollectionController {
     return this.kuzzle.query({
       index,
       collection,
+      body,
       controller: 'collection',
       action: 'updateMapping'
-    }, {body}, options);
+    }, options);
   }
 
-  updateSpecifications (index, collection, body, options) {
+  updateSpecifications (index, collection, body, options = {}) {
     if (!index) {
       return Promise.reject(new Error('Kuzzle.collection.updateSpecifications: index is required'));
     }
@@ -153,16 +167,18 @@ class CollectionController {
     return this.kuzzle.query({
       index,
       collection,
+      body,
       controller: 'collection',
       action: 'updateSpecifications'
-    }, {body}, options);
+    }, options);
   }
 
-  validateSpecifications (body, options) {
+  validateSpecifications (body, options = {}) {
     return this.kuzzle.query({
+      body,
       controller: 'collection',
       action: 'validateSpecifications'
-    }, {body}, options);
+    }, options);
   }
 }
 

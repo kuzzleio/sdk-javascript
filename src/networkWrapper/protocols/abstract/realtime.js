@@ -4,15 +4,15 @@ const
   uuidv4 = require('uuid/v4'),
   AbtractWrapper = require('./common');
 
+let
+  _id = uuidv4();
+
 class RTWrapper extends AbtractWrapper {
 
   constructor (host, options) {
     super(host, options);
 
     Object.defineProperties(this, {
-      id: {
-        value: uuidv4()
-      },
       autoReconnect: {
         value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
         enumerable: true

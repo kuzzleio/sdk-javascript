@@ -16,11 +16,12 @@ const
 class Room extends KuzzleEventEmitter {
   /*
    * @constructor
-   * @param {object} collection - an instantiated and valid kuzzle object
+   * @param {string} index
+   * @param {string} collection
    * @param {object} [filters] - Filters in Kuzzle DSL format
    * @param {object} [options] - subscription optional configuration
    */
-  constructor(collection, filters, options) {
+  constructor(kuzzle, index, collection, filters, options) {
     super();
 
     let _roomId = null;
@@ -114,17 +115,6 @@ class Room extends KuzzleEventEmitter {
         enumerable: true
       }
     });
-
-    if (this.kuzzle.bluebird) {
-      return this.kuzzle.bluebird.promisifyAll(this, {
-        suffix: 'Promise',
-        filter: function (name, func, target, passes) {
-          const whitelist = ['count', 'subscribe', 'unsubscribe', 'onDone'];
-
-          return passes && whitelist.indexOf(name) !== -1;
-        }
-      });
-    }
   }
 
   /**

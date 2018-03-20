@@ -4,10 +4,11 @@ const
   CollectionController = require('./controllers/collection'),
   DocumentController = require('./controllers/document'),
   IndexController = require('./controllers/index'),
+  RealtimeController = require('./controllers/realtime'),
   ServerController = require('./controllers/server'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
-  Auth = require('./Auth.js'),
+  User = require('./security/User'),
   networkWrapper = require('./networkWrapper');
 
 /**
@@ -89,6 +90,10 @@ class Kuzzle extends KuzzleEventEmitter {
         value: new IndexController(this),
         enumerable: true
       },
+      realtime: {
+        value: new RealtimeController(this),
+        enumerable: true
+      },
       server: {
         value: new ServerController(this),
         enumerable: true
@@ -102,70 +107,6 @@ class Kuzzle extends KuzzleEventEmitter {
         }
       }
     }
-
-    // Forward the subscribe query to the network wrapper
-    Object.defineProperty(this, 'subscribe', {
-      value: function (room, opts, subscribeCB) {
-        const
-          object = {
-            requestId: uuidv4(),
-            controller: 'realtime',
-            action: 'subscribe',
-            index: room.collection.index,
-            collection: room.collection.collection,
-            volatile: this.volatile,
-            body: room.filters,
-            scope: room.scope,
-            state: room.state,
-            users: room.users
-          },
-          notificationCB = data => {
-            if (data.type === 'TokenExpired') {
-              this.unsetJwt();
-              return this.emit('tokenExpired');
-            }
-
-            if (data.type === 'document') {
-              const copy = Object.assign({}, data);
-              copy.document = new Document(room.collection, data.result._id, data.result._source, data.result._meta);
-              delete copy.result;
-              return room.notify(copy);
-            }
-
-            room.notify(data);
-          };
-
-        if (this.jwt !== undefined) {
-          object.jwt = this.jwt;
-        }
-
-        Object.assign(object.volatile, room.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
-
-        this.network.subscribe(object, opts, notificationCB, subscribeCB);
-      }
-    });
-
-    // Forward the unsubscribe query to the network wrapper
-    Object.defineProperty(this, 'unsubscribe', {
-      value: (room, unsubscribeCB) => {
-        const
-          object = {
-            requestId: uuidv4(),
-            controller: 'realtime',
-            action: 'unsubscribe',
-            volatile: this.volatile,
-            body: {roomId: room.roomId}
-          };
-
-        if (this.jwt !== undefined) {
-          object.jwt = this.jwt;
-        }
-
-        Object.assign(object.volatile, room.volatile, {sdkInstanceId: this.network.id, sdkVersion: this.sdkVersion});
-
-        this.network.unsubscribe(object, room.channel, unsubscribeCB);
-      }
-    });
 
     /**
      * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
@@ -487,61 +428,37 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @param {responseCallback} [cb] - Handles the query response
    */
-  query (queryArgs, query = {}, options = {}) {
-    const
-      object = {
-        action: queryArgs.action,
-        controller: queryArgs.controller,
-        volatile: this.volatile
-      };
-
-    for (const prop of ['from', 'size', 'scroll', 'scrollId']) {
-      object[prop] = options[prop];
-    }
-    if (options.refresh) {
-      object.refresh = 'wait_for';
+  query (request = {}, options = {}) {
+    if (!request || typeof request !== 'object' || Array.isArray(request)) {
+      return Promise.reject(new Error(`Invalid request: ${JSON.stringify(request)}`));
     }
 
-    if (options.volatile && typeof options.volatile === 'object') {
-      Object.assign(object.volatile, options.volatile);
+    // we follow the api but allow some more logical "mistakes"
+    if (request.options) {
+      request.options = 'wait_for';
     }
 
-    if (!query || typeof query !== 'object' || Array.isArray(query)) {
-      return Promise.reject(Error(`Invalid query parameter: ${JSON.stringify(query)}`));
+    if (!request.volatile) {
+      request.volatile = {};
     }
-
-    Object.assign(object.volatile, query.volatile, {
-      sdkInstanceId: this.network.id,
-      sdkVersion: this.sdkVersion
-    });
-
-    for (const attr of Object.keys(query)) {
-      if (attr !== 'volatile') {
-        object[attr] = query[attr];
-      }
+    if (!request.volatile || typeof request.volatile !== 'object' || Array.isArray(request.volatile)) {
+      return Promise.reject(new Error('Invalid volatile argument received. Must be an object.'));
     }
+    request.volatile.sdkInstanceId= this.network.id;
+    request.volatile.sdkVersion = this.sdkVersion;
 
     /*
      * Do not add the token for the checkToken route, to avoid getting a token error when
      * a developer simply wish to verify his token
      */
-    if (this.jwt !== undefined && !(object.controller === 'auth' && object.action === 'checkToken')) {
-      object.jwt = this.jwt;
+    if (this.jwt !== undefined
+      && request.controller !== 'auth'
+      && request.action !== 'checkToken'
+    ) {
+      request.jwt = this.jwt;
     }
 
-    if (queryArgs.collection) {
-      object.collection = queryArgs.collection;
-    }
-
-    if (queryArgs.index) {
-      object.index = queryArgs.index;
-    }
-
-    if (!object.requestId) {
-      object.requestId = uuidv4();
-    }
-
-    return this.network.query(object, options)
+    return this.network.query(request, options)
       .then(response => response.result);
   }
 

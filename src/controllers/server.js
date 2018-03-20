@@ -11,7 +11,7 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'adminExists'
-    }, undefined, options)
+    }, options)
       .then(result => result.exists);
   }
 
@@ -19,35 +19,35 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getAllStats'
-    }, undefined, options);
+    }, options);
   }
 
   getConfig (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getConfig'
-    }, undefined, options);
+    }, options);
   }
 
   getLastStats (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getLastStats'
-    }, undefined, options);
+    }, options);
   }
 
   info (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'info'
-    }, undefined, options);
+    }, options);
   }
 
   now (options) {
     return this.kuzzle.query({
       controller: 'server',
       action: 'now'
-    }, undefined, options);
+    }, options);
   }
 }
 

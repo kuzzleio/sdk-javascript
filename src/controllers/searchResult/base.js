@@ -3,13 +3,13 @@ class SearchResultBase {
   /**
    *
    * @param {Kuzzle} kuzzle
-   * @param {object} query
+   * @param {object} request
    * @param {object} options
    * @param {object} response
    */
-  constructor (kuzzle, query = {}, options = {}, response = {}) {
+  constructor (kuzzle, request = {}, options = {}, response = {}) {
     this.kuzzle = kuzzle;
-    this.query = query;
+    this.request = request;
     this.options = options;
     this.response = response;
 
@@ -26,14 +26,10 @@ class SearchResultBase {
       return Promise.resolve(null);
     }
 
-    if (this.options.scroll) {
-      const options = Object.assign({}, this.options);
-      options.scrollId = this.response.scrollId;
-
-      return this.kuzzle.query({
-        controller: this.controller,
-        action: this.scrollAction,
-      }, this.query, options)
+    if (this.request.scroll) {
+      return this.kuzzle.query(Object.assign({}, this.request, {
+        scrollId: this.response.scrollId
+      }), options)
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
@@ -41,26 +37,23 @@ class SearchResultBase {
         });
     }
 
-    if (this.options.size && this.options.sort) {
+    if (this.request.size && this.request.sort) {
       const
-        query = Object.assign({}, this.query, {
+        request = Object.assign({}, this.request, {
           search_after: []
         }),
         hit = this.response.hits && this.response.hits[this.response.hits.length -1];
 
-      for (const sort of this.query.sort) {
+      for (const sort of this.request.sort) {
         if (typeof sort === 'string') {
-          query.search_after.push(hit._source[sort]);
+          request.search_after.push(hit._source[sort]);
         }
         else {
-          query.search_after.push(hit._source[Object.keys(sort)[0]]);
+          request.search_after.push(hit._source[Object.keys(sort)[0]]);
         }
       }
 
-      return this.kuzzle.query({
-        controller: this.controller,
-        action: this.searchAction
-      }, query, this.options)
+      return this.kuzzle.query(request, this.options)
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
@@ -68,17 +61,14 @@ class SearchResultBase {
         });
     }
 
-    if (this.options.from && this.options.size) {
-      if (this.options.from >= this.response.total) {
+    if (this.request.from && this.request.size) {
+      if (this.request.from >= this.response.total) {
         return Promise.resolve(null);
       }
 
-      this.options.from += this.options.size;
-
-      return this.kuzzle.query({
-        controller: this.controller,
-        action: this.searchAction,
-      }, this.query, this.options)
+      return this.kuzzle.query(Object.assign({}, this.request, {
+        from: this.fetched + 1
+      }), this.options)
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
