@@ -1,7 +1,11 @@
 'use strict';
 
 const
+  uuid = require('uuid'),
   KuzzleEventEmitter = require('../../../eventEmitter');
+
+const
+  _id = uuid.v4();
 
 class AbtractWrapper extends KuzzleEventEmitter {
 
@@ -92,6 +96,10 @@ class AbtractWrapper extends KuzzleEventEmitter {
     }
   }
 
+  get id () {
+    return _id;
+  }
+
   /* @Abstract */
   connect() {
     throw new Error('Method "connect" is not implemented');
@@ -154,150 +162,140 @@ class AbtractWrapper extends KuzzleEventEmitter {
     this.queuing = false;
   }
 
-  subscribe(object, options, notificationCB, cb) { // eslint-disable-line
-    throw new Error('Not Implemented');
-  }
-
-  unsubscribe(object, options, channel, cb) { // eslint-disable-line
-    throw new Error('Not Implemented');
-  }
-
-  query(object, options, cb) {
+  query(request, options) {
     let queuable = options && (options.queuable !== false) || true;
 
     if (this.queueFilter) {
-      queuable = queuable && this.queueFilter(object);
+      queuable = queuable && this.queueFilter(request);
     }
 
     if (this.queuing && queuable) {
-      cleanQueue(this, object, cb);
-      this.emit('offlineQueuePush', {query: object, cb: cb});
-      return this.offlineQueue.push({ts: Date.now(), query: object, cb: cb});
+      this._cleanQueue();
+      this.emit('offlineQueuePush', {request});
+      return new Promise((resolve, reject) => {
+        this.offlineQueue.push({
+          resolve,
+          reject,
+          request,
+          ts: Date.now()
+        });
+      });
     }
 
     if (this.isReady()) {
-      return emitRequest(this, object, cb);
+      return this._emitRequest(request);
     }
 
-    return discardRequest(object, cb);
+    return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
+Discarded request: ${JSON.stringify(request)}`));
   }
 
   isReady() {
     return this.state === 'ready';
   }
-}
 
-/**
- * Emit a request to Kuzzle
- *
- * @param {AbstractWrapper} network
- * @param {object} request
- * @param {responseCallback} [cb]
- */
-function emitRequest (network, request, cb) {
-  if (request.jwt !== undefined || cb) {
-    network.once(request.requestId, response => {
-      let error = null;
+  /**
+   * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
+   */
+  _cleanQueue () {
+    const now = Date.now();
+    let lastDocumentIndex = -1;
 
-      if (request.action !== 'logout' && response.error && response.error.message === 'Token expired') {
-        network.emit('tokenExpired', request, cb);
-      }
-
-      if (response.error) {
-        error = new Error(response.error.message);
-        Object.assign(error, response.error);
-        error.status = response.status;
-        network.emit('queryError', error, request, cb);
-      }
-
-      if (cb) {
-        cb(error, response);
-      }
-    });
-  }
-  // Track requests made to allow Room.subscribeToSelf to work
-  network.send(request);
-}
-
-function discardRequest(object, cb) {
-  if (cb) {
-    cb(new Error('Unable to execute request: not connected to a Kuzzle server.\nDiscarded request: ' + JSON.stringify(object)));
-  }
-}
-
-/**
- * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
- * @param {AbstractWrapper} network
- */
-function cleanQueue (network) {
-  const now = Date.now();
-  let lastDocumentIndex = -1;
-
-  if (network.queueTTL > 0) {
-    network.offlineQueue.forEach((query, index) => {
-      if (query.ts < now - network.queueTTL) {
-        lastDocumentIndex = index;
-      }
-    });
-
-    if (lastDocumentIndex !== -1) {
-      network.offlineQueue
-        .splice(0, lastDocumentIndex + 1)
-        .forEach(droppedRequest => {
-          network.emit('offlineQueuePop', droppedRequest.query);
-        });
-    }
-  }
-
-  if (network.queueMaxSize > 0 && network.offlineQueue.length > network.queueMaxSize) {
-    network.offlineQueue
-      .splice(0, network.offlineQueue.length - network.queueMaxSize)
-      .forEach(droppedRequest => {
-        network.emit('offlineQueuePop', droppedRequest.query);
+    if (this.queueTTL > 0) {
+      this.offlineQueue.forEach((query, index) => {
+        if (query.ts < now - this.queueTTL) {
+          lastDocumentIndex = index;
+        }
       });
+
+      if (lastDocumentIndex !== -1) {
+        this.offlineQueue
+          .splice(0, lastDocumentIndex + 1)
+          .forEach(droppedRequest => {
+            this.emit('offlineQueuePop', droppedRequest.query);
+          });
+      }
+    }
+
+    if (this.queueMaxSize > 0 && this.offlineQueue.length > this.queueMaxSize) {
+      this.offlineQueue
+        .splice(0, this.offlineQueue.length - this.queueMaxSize)
+        .forEach(droppedRequest => {
+          this.emit('offlineQueuePop', droppedRequest.query);
+        });
+    }
+  }
+
+  /**
+   * Play all queued requests, in order.
+   */
+  _dequeue () {
+    const
+      uniqueQueue = {},
+      dequeuingProcess = () => {
+        if (this.offlineQueue.length > 0) {
+          this._emitRequest(this.offlineQueue[0].request)
+            .then(this.offlineQueue[0].resolve)
+            .catch(this.offlineQueue[0].reject);
+          this.emit('offlineQueuePop', this.offlineQueue.shift());
+
+          setTimeout(() => {
+            dequeuingProcess();
+          }, Math.max(0, this.replayInterval));
+        }
+      };
+
+    if (this.offlineQueueLoader) {
+      if (typeof this.offlineQueueLoader !== 'function') {
+        throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof this.offlineQueueLoader);
+      }
+
+      const additionalQueue = this.offlineQueueLoader();
+      if (Array.isArray(additionalQueue)) {
+        this.offlineQueue = additionalQueue
+          .concat(this.offlineQueue)
+          .filter(request => {
+            // throws if the query object does not contain required attributes
+            if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
+              throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+            }
+
+            return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+          });
+      } else {
+        throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+      }
+    }
+
+    dequeuingProcess();
+  }
+
+  _emitRequest (request) {
+    return new Promise((resolve, reject) => {
+      this.once(request.requestId, response => {
+        if (request.action !== 'logout'
+          && response.error
+          && response.error.message === 'Token expired'
+        ) {
+          const error = new Error(response.error.message);
+          Object.assign(error, response.error);
+          error.status = response.status;
+          this.emit('queryError', error, request);
+
+          return reject(error);
+        }
+
+        return resolve(response);
+      });
+
+      this.send(request);
+    });
   }
 }
 
-/**
- * Play all queued requests, in order.
- */
-function dequeue (network) {
-  const
-    uniqueQueue = {},
-    dequeuingProcess = () => {
-      if (network.offlineQueue.length > 0) {
-        emitRequest(network, network.offlineQueue[0].query, network.offlineQueue[0].cb);
-        network.emit('offlineQueuePop', network.offlineQueue.shift());
-
-        setTimeout(() => {
-          dequeuingProcess();
-        }, Math.max(0, network.replayInterval));
-      }
-    };
-
-  if (network.offlineQueueLoader) {
-    if (typeof network.offlineQueueLoader !== 'function') {
-      throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof network.offlineQueueLoader);
-    }
-
-    const additionalQueue = network.offlineQueueLoader();
-    if (Array.isArray(additionalQueue)) {
-      network.offlineQueue = additionalQueue
-        .concat(network.offlineQueue)
-        .filter(request => {
-          // throws if the query object does not contain required attributes
-          if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
-            throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
-          }
-
-          return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
-        });
-    } else {
-      throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
-    }
-  }
-
-  dequeuingProcess();
+// make public getters enumerable
+for (const prop of ['id']) {
+  Object.defineProperty(AbstractWrapper.prototype, prop, {enumerable: true});
 }
 
 module.exports = AbtractWrapper;

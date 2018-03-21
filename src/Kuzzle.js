@@ -1,6 +1,6 @@
 const
-  uuidv4 = require('uuid/v4'),
   KuzzleEventEmitter = require('./eventEmitter'),
+  AuthController = require('./controllers/auth'),
   CollectionController = require('./controllers/collection'),
   DocumentController = require('./controllers/document'),
   IndexController = require('./controllers/index'),
@@ -8,26 +8,15 @@ const
   ServerController = require('./controllers/server'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
-  User = require('./security/User'),
   networkWrapper = require('./networkWrapper');
 
-/**
- * This is a global callback pattern, called by all asynchronous functions of the Kuzzle object.
- *
- * @callback responseCallback
- * @param {Object} err - Error object, NULL if the query is successful
- * @param {Object} [data] - The content of the query response
- */
 
-/**
- * Kuzzle object constructor.
- *
- * @constructor
- * @param host - Server name or IP Address to the Kuzzle instance
- * @param [options] - Connection options
- * @param {responseCallback} [cb] - Handles connection response
- */
 class Kuzzle extends KuzzleEventEmitter {
+
+  /**
+   * @param host - Server name or IP Address to the Kuzzle instance
+   * @param [options] - Connection options
+   */
   constructor(host, options) {
     super();
 
@@ -124,7 +113,7 @@ class Kuzzle extends KuzzleEventEmitter {
      * Singletons for Kuzzle API
      */
     Object.defineProperty(this, 'auth', {
-      value: new Auth(this),
+      value: new AuthController(this),
       enumerable: true
     });
 

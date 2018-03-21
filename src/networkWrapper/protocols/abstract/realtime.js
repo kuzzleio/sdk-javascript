@@ -1,11 +1,7 @@
 'use strict';
 
 const
-  uuidv4 = require('uuid/v4'),
   AbtractWrapper = require('./common');
-
-let
-  _id = uuidv4();
 
 class RTWrapper extends AbtractWrapper {
 
@@ -89,7 +85,7 @@ class RTWrapper extends AbtractWrapper {
         return cb(error);
       }
       this.on(response.result.channel, data => {
-        data.fromSelf = data.volatile !== undefined && data.volatile !== null && data.volatile.sdkInstanceId === this.id;
+        data.fromSelf = data.volatile !== undefined && data.volatile !== null && data.volatile.sdkInstanceId === tt his.id;
         notificationCB(data);
       });
       cb(null, response.result);
