@@ -8,7 +8,8 @@ const
   ServerController = require('./controllers/server'),
   Security = require('./security/Security'),
   MemoryStorage = require('./MemoryStorage'),
-  networkWrapper = require('./networkWrapper');
+  networkWrapper = require('./networkWrapper'),
+  uuid = require('uuid');
 
 
 class Kuzzle extends KuzzleEventEmitter {
@@ -87,6 +88,7 @@ class Kuzzle extends KuzzleEventEmitter {
         value: new ServerController(this),
         enumerable: true
       }
+
     });
 
     if (options) {
@@ -274,22 +276,13 @@ class Kuzzle extends KuzzleEventEmitter {
    * Connects to a Kuzzle instance using the provided host name
    * @param {function} [cb] Connection callback
    */
-  connect (cb) {
+  connect () {
     if (this.network.isReady()) {
-      if (cb) {
-        cb(null, this);
-      }
-      return;
+      return Promise.resolve(this);
     }
-
-    this.network.connect();
 
     this.network.addListener('connect', () => {
       this.emit('connected');
-
-      if (cb) {
-        cb(null, this);
-      }
     });
 
     this.network.addListener('networkError', error => {
@@ -297,10 +290,6 @@ class Kuzzle extends KuzzleEventEmitter {
 
       connectionError.internal = error;
       this.emit('networkError', connectionError);
-
-      if (cb) {
-        cb(connectionError);
-      }
     });
 
     this.network.addListener('disconnect', () => {
@@ -327,6 +316,8 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.on('discarded', data => this.emit('discarded', data));
+
+    return this.network.connect();
   }
 
   /**
@@ -412,14 +403,17 @@ class Kuzzle extends KuzzleEventEmitter {
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
-   * @param {object} queryArgs - Query configuration
-   * @param {object} query - The query data
+   * @param {object} request
    * @param {object} [options] - Optional arguments
-   * @param {responseCallback} [cb] - Handles the query response
+   * @returns {Promise<object>}
    */
   query (request = {}, options = {}) {
     if (!request || typeof request !== 'object' || Array.isArray(request)) {
       return Promise.reject(new Error(`Invalid request: ${JSON.stringify(request)}`));
+    }
+
+    if (!request.requestId) {
+      request.requestId = uuid.v4();
     }
 
     // we follow the api but allow some more logical "mistakes"

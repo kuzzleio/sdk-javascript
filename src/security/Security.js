@@ -1,4 +1,4 @@
-var
+const
   Role = require('./Role'),
   Profile = require('./Profile'),
   User = require('./User');
@@ -24,17 +24,6 @@ function Security(kuzzle) {
       };
     }
   });
-
-  if (this.kuzzle.bluebird) {
-    return this.kuzzle.bluebird.promisifyAll(this, {
-      suffix: 'Promise',
-      filter: function (name, func, target, passes) {
-        var blacklist = ['role', 'profile', 'user', 'isActionAllowed'];
-
-        return passes && blacklist.indexOf(name) === -1;
-      }
-    });
-  }
 
   return this;
 }

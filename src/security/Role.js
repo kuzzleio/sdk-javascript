@@ -1,4 +1,4 @@
-var SecurityDocument = require('./SecurityDocument');
+const SecurityDocument = require('./SecurityDocument');
 
 function Role(Security, id, content, meta) {
 
@@ -14,18 +14,6 @@ function Role(Security, id, content, meta) {
       value: 'updateRole'
     }
   });
-
-  // promisifying
-  if (Security.kuzzle.bluebird) {
-    return Security.kuzzle.bluebird.promisifyAll(this, {
-      suffix: 'Promise',
-      filter: function (name, func, target, passes) {
-        var whitelist = ['save'];
-
-        return passes && whitelist.indexOf(name) !== -1;
-      }
-    });
-  }
 
 }
 

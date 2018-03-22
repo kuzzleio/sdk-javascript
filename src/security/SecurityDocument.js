@@ -34,17 +34,6 @@ function SecurityDocument(Security, id, content, meta) {
     this.setContent(content, true);
   }
 
-  // promisifying
-  if (Security.kuzzle.bluebird) {
-    return Security.kuzzle.bluebird.promisifyAll(this, {
-      suffix: 'Promise',
-      filter: function (name, func, target, passes) {
-        var whitelist = ['delete', 'update'];
-
-        return passes && whitelist.indexOf(name) !== -1;
-      }
-    });
-  }
 }
 
 /**

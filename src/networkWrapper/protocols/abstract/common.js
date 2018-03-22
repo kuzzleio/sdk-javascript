@@ -6,86 +6,31 @@ const
 
 const
   _id = uuid.v4();
+// read-only properties
+let
+  _host,
+  _port,
+  _ssl;
 
-class AbtractWrapper extends KuzzleEventEmitter {
+class AbstractWrapper extends KuzzleEventEmitter {
 
   constructor (host, options) {
     super();
 
-    Object.defineProperties(this, {
-      host: {
-        value: host,
-        enumerable: true
-      },
-      port: {
-        value: (options && typeof options.port === 'number') ? options.port : 7512,
-        enumerable: true
-      },
-      ssl: {
-        value: (options && typeof options.sslConnection === 'boolean') ? options.sslConnection : false,
-        enumerable: true
-      },
-      queuing: {
-        value: false,
-        writable: true
-      },
-      // configuration properties
-      autoQueue: {
-        value: false,
-        enumerable: true,
-        writable: true
-      },
-      autoReplay: {
-        value: false,
-        enumerable: true,
-        writable: true
-      },
-      state: {
-        value: 'offline',
-        enumerable: true,
-        writable: true
-      },
-      /*
-        Offline queue use the following format:
-              [
-                {
-                  ts: <query timestamp>,
-                  query: 'query',
-                  cb: callbackFunction
-                }
-              ]
-       */
-      offlineQueue: {
-        value: [],
-        enumerable: true,
-        writable: true
-      },
-      queueFilter: {
-        value: null,
-        enumerable: true,
-        writable: true
-      },
-      queueMaxSize: {
-        value: 500,
-        enumerable: true,
-        writable: true
-      },
-      queueTTL: {
-        value: 120000,
-        enumerable: true,
-        writable: true
-      },
-      replayInterval: {
-        value: 10,
-        enumerable: true,
-        writable: true
-      },
-      offlineQueueLoader: {
-        value: null,
-        enumerable: true,
-        writable: true
-      }
-    });
+    _host = host;
+    _port = options && typeof options.port === 'number' ? options.port : 7512;
+    _ssl = options && typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
+
+    this.autoReplay = false;
+    this.autoQueue = false;
+    this.offlineQueue = [];
+    this.offlineQueueLoader = null;
+    this.queueFilter = null;
+    this.queueMaxSize = 500;
+    this.queueTTL = 120000;
+    this.queuing = false;
+    this.replayInterval = 10;
+    this.state = 'offline';
 
     if (options) {
       Object.keys(options).forEach(opt => {
@@ -100,15 +45,29 @@ class AbtractWrapper extends KuzzleEventEmitter {
     return _id;
   }
 
-  /* @Abstract */
-  connect() {
+  get host () {
+    return _host;
+  }
+
+  get port () {
+    return _port;
+  }
+
+  get ssl () {
+    return _ssl;
+  }
+
+  /**
+   * @abstract
+   */
+  connect () {
     throw new Error('Method "connect" is not implemented');
   }
 
   /**
    * Called when the client's connection is established
    */
-  clientConnected(state, wasConnected) {
+  clientConnected (state, wasConnected) {
     this.state = state || 'ready';
     this.emit(wasConnected && 'reconnect' || 'connect');
 
@@ -134,35 +93,35 @@ class AbtractWrapper extends KuzzleEventEmitter {
   /**
    * Empties the offline queue without replaying it.
    */
-  flushQueue() {
+  flushQueue () {
     this.offlineQueue = [];
   }
 
   /**
    * Replays the requests queued during offline mode.
    */
-  playQueue() {
+  playQueue () {
     if (this.isReady()) {
-      cleanQueue(this);
-      dequeue(this);
+      this._cleanQueue();
+      this._dequeue();
     }
   }
 
   /**
    * Starts the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
    */
-  startQueuing() {
+  startQueuing () {
     this.queuing = true;
   }
 
   /**
    * Stops the requests queuing. Works only during offline mode, and if the autoQueue option is set to false.
    */
-  stopQueuing() {
+  stopQueuing () {
     this.queuing = false;
   }
 
-  query(request, options) {
+  query (request, options) {
     let queuable = options && (options.queuable !== false) || true;
 
     if (this.queueFilter) {
@@ -190,7 +149,7 @@ class AbtractWrapper extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
   }
 
-  isReady() {
+  isReady () {
     return this.state === 'ready';
   }
 
@@ -294,8 +253,13 @@ Discarded request: ${JSON.stringify(request)}`));
 }
 
 // make public getters enumerable
-for (const prop of ['id']) {
+for (const prop of [
+  'host',
+  'id',
+  'port',
+  'ssl'
+]) {
   Object.defineProperty(AbstractWrapper.prototype, prop, {enumerable: true});
 }
 
-module.exports = AbtractWrapper;
+module.exports = AbstractWrapper;

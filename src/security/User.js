@@ -1,4 +1,4 @@
-var
+const
   KuzzleSecurityDocument = require('./SecurityDocument');
 
 /**
@@ -26,17 +26,6 @@ function User(Security, id, content, meta) {
     }
   });
 
-  // promisifying
-  if (Security.kuzzle.bluebird) {
-    return Security.kuzzle.bluebird.promisifyAll(this, {
-      suffix: 'Promise',
-      filter: function (name, func, target, passes) {
-        var whitelist = ['create', 'replace', 'saveRestricted', 'update', 'getProfiles'];
-
-        return passes && whitelist.indexOf(name) !== -1;
-      }
-    });
-  }
 }
 
 User.prototype = Object.create(KuzzleSecurityDocument.prototype, {

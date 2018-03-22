@@ -1,4 +1,4 @@
-const User = require('./security/User.js');
+const User = require('../security/User.js');
 
 /**
  * Auth controller
@@ -6,7 +6,7 @@ const User = require('./security/User.js');
  * @param kuzzle
  * @constructor
  */
-class Auth {
+class AuthController {
 
   /**
    * constructor
@@ -217,4 +217,4 @@ class Auth {
 
 }
 
-module.exports = Auth;
+module.exports = AuthController;

@@ -3,58 +3,49 @@
 const
   AbtractWrapper = require('./abstract/common');
 
+const
+  _routes = {
+    routes: {
+      auth: {
+        login: {
+          verb: 'POST',
+          url: '/_login/:strategy'
+        }
+      },
+      bulk: {
+        import: {
+          verb: 'POST',
+          url: '/:index/:collection/_bulk'
+        }
+      },
+      document: {
+        create: {
+          verb: 'POST',
+          url: '/:index/:collection/_create'
+        }
+      },
+      security: {
+        createFirstAdmin: {
+          verb: 'POST',
+          url: '/_createFirstAdmin'
+        },
+        createRestrictedUser: {
+          verb: 'POST',
+          url: '/users/_createRestricted'
+        },
+        createUser: {
+          verb: 'POST',
+          url: '/users/_create'
+        }
+      }
+    }
+  };
+
+
 class HttpWrapper extends AbtractWrapper {
 
   constructor(host, options) {
     super(host, options);
-    Object.defineProperties(this, {
-      protocol: {
-        value: (this.ssl ? 'https:' : 'http:'),
-        writeable: false,
-        enumerable: false
-      },
-      http: {
-        value: {
-          // Global default HTTP route overrides (use these routes instead of ones provided by Kuzzle serverInfo):
-          routes: {
-            auth: {
-              login: {
-                verb: 'POST',
-                url: '/_login/:strategy'
-              }
-            },
-            bulk: {
-              import: {
-                verb: 'POST',
-                url: '/:index/:collection/_bulk'
-              }
-            },
-            document: {
-              create: {
-                verb: 'POST',
-                url: '/:index/:collection/_create'
-              }
-            },
-            security: {
-              createFirstAdmin: {
-                verb: 'POST',
-                url: '/_createFirstAdmin'
-              },
-              createRestrictedUser: {
-                verb: 'POST',
-                url: '/users/_createRestricted'
-              },
-              createUser: {
-                verb: 'POST',
-                url: '/users/_create'
-              }
-            }
-          }
-        },
-        writable: false,
-        enumerable: false
-      }
-    });
 
     // Application-side HTTP route overrides:
     if (options.http && options.http.customRoutes) {
@@ -66,6 +57,14 @@ class HttpWrapper extends AbtractWrapper {
     }
   }
 
+  get http () {
+    return _routes;
+  }
+
+  get protocol () {
+    return this.ssl ? 'https' : 'http';
+  }
+
   /**
    * Connect to the websocket server
    */
@@ -74,21 +73,21 @@ class HttpWrapper extends AbtractWrapper {
       this.startQueuing();
     }
 
-    sendHttpRequest(this, 'GET', '/', (err, res) => {
-      if (err) {
-        return this.emit('networkError', err);
-      }
+    if (this.state === 'ready') {
+      return Promise.resolve();
+    }
 
-      // Get HTTP Routes from Kuzzle serverInfo
-      // (if more than 1 available route for a given action, get the first one):
-      const routes = res.result.serverInfo.kuzzle.api.routes;
-      for (const controller in routes) {
-        if (routes.hasOwnProperty(controller)) {
+    return this._sendHttpRequest('GET', '/')
+      .then(res => {
+        // Get HTTP Routes from Kuzzle serverInfo
+        // (if more than 1 available route for a given action, get the first one):
+        const routes = res.result.serverInfo.kuzzle.api.routes;
+        for (const controller of Object.keys(routes)) {
           if (this.http.routes[controller] === undefined) {
             this.http.routes[controller] = {};
           }
 
-          for (const action in routes[controller]) {
+          for (const action of Object.keys(routes[controller])) {
             if (this.http.routes[controller][action] === undefined
               && Array.isArray(routes[controller][action].http)
               && routes[controller][action].http.length > 0) {
@@ -97,17 +96,20 @@ class HttpWrapper extends AbtractWrapper {
             }
           }
         }
-      }
 
-      // Client is ready
-      this.clientConnected();
-    });
+        // Client is ready
+        this.clientConnected();
+      })
+      .catch(err => {
+        this.emit('networkError', err);
+        throw err;
+      });
   }
 
   /**
    * Sends a payload to the connected server
    *
-   * @param {Object} payload
+   * @param {Object} data
    */
   send (data) {
     const
@@ -125,29 +127,27 @@ class HttpWrapper extends AbtractWrapper {
       },
       queryArgs = {};
 
-    for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-        const value = data[key];
+    for (const key of Object.keys(data)) {
+      const value = data[key];
 
-        if (key === 'body') {
-          payload.body = JSON.stringify(value);
-
-        } else if (key === 'jwt') {
-          payload.headers.authorization = 'Bearer ' + value;
-
-        } else if (key === 'volatile') {
-          payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
-
-        } else if (payload.hasOwnProperty(key)) {
-          payload[key] = value;
-
-        } else {
-          queryArgs[key] = value;
-        }
+      if (key === 'body') {
+        payload.body = JSON.stringify(value);
+      }
+      else if (key === 'jwt') {
+        payload.headers.authorization = 'Bearer ' + value;
+      }
+      else if (key === 'volatile') {
+        payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
+      }
+      else if (payload.hasOwnProperty(key)) {
+        payload[key] = value;
+      }
+      else {
+        queryArgs[key] = value;
       }
     }
 
-    payload.headers['Content-Length'] = Buffer.byteLength(payload.body || '');
+    //payload.headers['Content-Length'] = Buffer.byteLength(payload.body || '');
 
     const
       route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
@@ -159,7 +159,7 @@ class HttpWrapper extends AbtractWrapper {
 
     const
       method = route.verb,
-      regex = /\/\:([^\/]*)/; //eslint-disable-line
+      regex = /\/:([^/]*)/;
 
     let
       url = route.url,
@@ -173,16 +173,15 @@ class HttpWrapper extends AbtractWrapper {
 
     // inject queryString arguments:
     const queryString = [];
-    for (const key in queryArgs) {
-      if (queryArgs.hasOwnProperty(key)) {
-        const value = queryArgs[key];
+    for (const key of Object.keys(queryArgs)) {
+      const value = queryArgs[key];
 
-        if (Array.isArray(value)) {
-          queryString.push(...value.map(v => `${key}=${v}`));
+      if (Array.isArray(value)) {
+        queryString.push(...value.map(v => `${key}=${v}`));
 
-        } else {
-          queryString.push(`${key}=${value}`);
-        }
+      }
+      else {
+        queryString.push(`${key}=${value}`);
       }
     }
 
@@ -190,12 +189,9 @@ class HttpWrapper extends AbtractWrapper {
       url += '?' + queryString.join('&');
     }
 
-    sendHttpRequest(this, method, url, payload, (error, response) => {
-      if (error && response) {
-        response.error = error;
-      }
-      this.emit(payload.requestId, response || {error});
-    });
+    return this._sendHttpRequest(method, url, payload)
+      .then(response => this.emit(payload.requestId, response))
+      .catch(error => this.emit(payload.requestId, {error}));
   }
 
   /**
@@ -205,79 +201,53 @@ class HttpWrapper extends AbtractWrapper {
     this.disconnect();
   }
 
-}
+  _sendHttpRequest (method, path, payload = {}) {
+    if (typeof XMLHttpRequest === 'undefined') {
+      // NodeJS implementation, using http.request:
 
-/**
- * Handles HTTP Request
- *
- */
-function sendHttpRequest (network, method, path, payload, cb) {
-  if (!cb && typeof payload === 'function') {
-    cb = payload;
-    payload = {};
-  }
+      const httpClient = require('min-req-promise');
+      const url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
-  if (typeof XMLHttpRequest === 'undefined') { // NodeJS implementation, using http.request:
-    const
-      http = network.ssl && require('https') || require('http'),
-      body = payload.body || '',
-      options = {
-        protocol: network.protocol,
-        host: network.host,
-        port: network.port,
-        method,
-        path,
-        headers: payload.headers
-      };
-
-    const req = http.request(options, res => {
-      let response = '';
-
-      res.on('data', chunk => {
-        response += chunk;
-      });
-
-      res.on('end', () => callbackHttpResponse(response, cb));
-    });
-
-    req.write(body);
-
-    req.on('error', err => {
-      cb(err);
-    });
-
-    req.end();
-
-  } else { // Browser implementation, using XMLHttpRequest:
-    const
-      xhr = new XMLHttpRequest(),
-      url = network.protocol + '//' + network.host + ':' + network.port + path;
-
-    xhr.open(method, url);
-
-    for (const header in payload.headers) {
-      if (payload.headers.hasOwnProperty(header)) {
-        xhr.setRequestHeader(header, payload.headers[header]);
-      }
+      return httpClient.request(url, method, {
+        headers: payload.headers,
+        body: payload.body
+      })
+        .then(response => JSON.parse(response.body));
     }
 
-    xhr.onload = () => callbackHttpResponse(xhr.responseText, cb);
+    // Browser implementation, using XMLHttpRequest:
+    return new Promise((resolve, reject) => {
+      const
+        xhr = new XMLHttpRequest(),
+        url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
-    xhr.send(payload.body);
+      console.log(payload); // eslint-disable-line no-console
+      xhr.open(method, url);
+
+      for (const header of Object.keys(payload.headers || {})) {
+        xhr.setRequestHeader(header, payload.headers[header]);
+      }
+
+      xhr.onload = () => {
+        try {
+          const json = JSON.parse(xhr.responseText);
+          resolve(json);
+        }
+        catch (err) {
+          reject(err);
+        }
+      };
+
+      xhr.send(payload.body);
+    });
   }
+
 }
 
-/**
- * Handles HTTP Response
- *
- */
-function callbackHttpResponse(response, cb) {
-  try {
-    const jsonResponse = JSON.parse(response);
-    cb(null, jsonResponse);
-  } catch (err) {
-    cb(err);
-  }
+for (const prop of [
+  'protocol'
+]) {
+  Object.defineProperty(HttpWrapper.prototype, prop, {enumerable: true});
 }
 
 module.exports = HttpWrapper;

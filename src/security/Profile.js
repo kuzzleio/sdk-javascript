@@ -1,4 +1,4 @@
-var SecurityDocument = require('./SecurityDocument');
+const SecurityDocument = require('./SecurityDocument');
 
 function Profile(Security, id, content, meta) {
 
@@ -14,19 +14,6 @@ function Profile(Security, id, content, meta) {
       value: 'updateProfile'
     }
   });
-
-  // promisifying
-  if (Security.kuzzle.bluebird) {
-    return Security.kuzzle.bluebird.promisifyAll(this, {
-      suffix: 'Promise',
-      filter: function (name, func, target, passes) {
-        var whitelist = ['hydrate', 'save'];
-
-        return passes && whitelist.indexOf(name) !== -1;
-      }
-    });
-  }
-
 }
 
 Profile.prototype = Object.create(SecurityDocument.prototype, {

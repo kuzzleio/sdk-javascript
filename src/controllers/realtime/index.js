@@ -69,6 +69,19 @@ class RealTimeController {
   }
 
   subscribe (index, collection, body, callback, options = {}) {
+    if (!index) {
+      return Promise.reject(new Error('Kuzzle.realtime.subscribe: index is required'));
+    }
+    if (!collection) {
+      return Promise.reject(new Error('Kuzzle.realtime.subscribe: collection is required'));
+    }
+    if (!body) {
+      return Promise.reject(new Error('Kuzzle.realtime.subscribe: body is required'));
+    }
+    if (!callback || typeof callback !== 'function') {
+      return Promise.reject(new Error('Kuzzle.realtime.subscribe: a callback function is required'));
+    }
+
     const room = new Room(this.kuzzle, index, collection, body, callback, options);
 
     return room.subscribe()
@@ -118,7 +131,6 @@ class RealTimeController {
       controller: 'realtime',
       action: 'validate'
     }, options);
-
   }
 
 }

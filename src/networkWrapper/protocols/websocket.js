@@ -19,68 +19,77 @@ class WSNode extends RTWrapper {
    * Connect to the websocket server
    */
   connect () {
-    const
-      url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
-      opts = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
+    return new Promise((resolve, reject) => {
+      const
+        url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
+        opts = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
 
-    super.connect();
+      super.connect();
 
-    if (url !== this.lasturl) {
-      this.wasConnected = false;
-      this.lasturl = url;
-    }
-
-    this.client = new WebSocketClient(url, opts);
-
-    this.client.onopen = () => {
-      this.clientConnected();
-    };
-
-    this.client.onclose = (closeEvent, message) => {
-      let
-        status,
-        reason = message;
-
-      if (typeof closeEvent === 'number') {
-        status = closeEvent;
+      if (url !== this.lasturl) {
+        this.wasConnected = false;
+        this.lasturl = url;
       }
-      else {
-        status = closeEvent.code;
 
-        if (closeEvent.reason) {
-          reason = closeEvent.reason;
+      this.client = new WebSocketClient(url, opts);
+
+      this.client.onopen = () => {
+        this.clientConnected();
+        return resolve();
+      };
+
+      this.client.onclose = (closeEvent, message) => {
+        let
+          status,
+          reason = message;
+
+        if (typeof closeEvent === 'number') {
+          status = closeEvent;
         }
-      }
+        else {
+          status = closeEvent.code;
 
-      if (status === 1000) {
-        this.clientDisconnected();
-      }
-      // do not forward a connection close error if no 
-      // connection has been previously established
-      else if (this.wasConnected) {
-        const error = new Error(reason);
-        error.status = status;
+          if (closeEvent.reason) {
+            reason = closeEvent.reason;
+          }
+        }
 
-        this.clientNetworkError(error);
-      }
-    };
+        if (status === 1000) {
+          this.clientDisconnected();
+        }
+        // do not forward a connection close error if no
+        // connection has been previously established
+        else if (this.wasConnected) {
+          const error = new Error(reason);
+          error.status = status;
 
-    this.client.onerror = error => {
-      const err = (error instanceof Error) && error || new Error(error);
+          this.clientNetworkError(error);
+        }
+      };
 
-      this.clientNetworkError(err);
-    };
+      this.client.onerror = error => {
+        const err = (error instanceof Error) && error || new Error(error);
 
-    this.client.onmessage = payload => {
-      const data = JSON.parse(payload.data || payload);
+        this.clientNetworkError(err);
 
-      if (data.room) {
-        this.emit(data.room, data);
-      }
-      else {
-        this.emit('discarded', data);
-      }
-    };
+        if ([this.client.CLOSING, this.client.CLOSED].indexOf(this.client.readyState) > -1) {
+          return reject(err);
+        }
+      };
+
+      this.client.onmessage = payload => {
+        const data = JSON.parse(payload.data || payload);
+
+        // for responses, data.room == requestId
+        if (data.room) {
+          this.emit(data.room, data);
+        }
+        else {
+          this.emit('discarded', data);
+        }
+      };
+
+    });
   }
 
   /**

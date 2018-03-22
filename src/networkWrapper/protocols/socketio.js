@@ -17,28 +17,35 @@ class SocketIO extends RTWrapper {
    * Connect to the SocketIO server
    */
   connect() {
-    super.connect();
+    return new Promise((resolve, reject) => {
+      super.connect();
 
-    this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
-      reconnection: this.autoReconnect,
-      reconnectionDelay: this.reconnectionDelay,
-      forceNew: true
-    });
+      this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
+        reconnection: this.autoReconnect,
+        reconnectionDelay: this.reconnectionDelay,
+        forceNew: true
+      });
 
-    this.socket.on('connect', () => this.clientConnected());
-    this.socket.on('connect_error', error => this.clientNetworkError(error));
-
-    this.socket.on('disconnect', () => {
-      if (this.forceDisconnect) {
-        this.clientDisconnected();
-      } else {
-        const error = new Error('An error occurred, kuzzle may not be ready yet');
-        error.status = 500;
-
+      this.socket.on('connect', () => resolve(this.clientConnected()));
+      this.socket.on('connect_error', error => {
         this.clientNetworkError(error);
-      }
+        reject(error);
+      });
 
-      this.forceDisconnect = false;
+      this.socket.on('disconnect', () => {
+        if (this.forceDisconnect) {
+          this.clientDisconnected();
+        } else {
+          const error = new Error('An error occurred, kuzzle may not be ready yet');
+          error.status = 500;
+
+          this.clientNetworkError(error);
+          reject(error);
+        }
+
+        this.forceDisconnect = false;
+      });
+
     });
   }
 
