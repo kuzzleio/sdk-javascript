@@ -41,10 +41,7 @@ module.exports = {
           presets: [
             ['env', {
               debug: true,
-              modules: false,
-              targets: {
-                chrome: 53
-              }
+              modules: false
             }]]
         }
       },
@@ -58,7 +55,7 @@ module.exports = {
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.IgnorePlugin(/(uws|min-req-promise)/),
+    new webpack.IgnorePlugin(/(uws|min-req-promise|package)/),
     new webpack.IgnorePlugin(/^http$/),
     new webpack.DefinePlugin({
       global: 'window',

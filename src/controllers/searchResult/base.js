@@ -16,7 +16,7 @@ class SearchResultBase {
     this.fetched = response.hits && response.hits.length || 0;
     this.total = response.total && response.total || 0;
 
-    this.controller = 'controller';
+    this.controller = request.controller;
     this.searchAction = 'search';
     this.scrollAction = 'scroll';
   }

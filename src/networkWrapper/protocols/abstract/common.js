@@ -1,11 +1,11 @@
 'use strict';
 
 const
-  uuid = require('uuid'),
+  uuidv4 = require('../../../uuidv4'),
   KuzzleEventEmitter = require('../../../eventEmitter');
 
 const
-  _id = uuid.v4();
+  _id = uuidv4();
 // read-only properties
 let
   _host,
@@ -59,6 +59,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
 
   /**
    * @abstract
+   * @returns {Promise<any>}
    */
   connect () {
     throw new Error('Method "connect" is not implemented');

@@ -6,11 +6,47 @@ const
   IndexController = require('./controllers/index'),
   RealtimeController = require('./controllers/realtime'),
   ServerController = require('./controllers/server'),
-  Security = require('./security/Security'),
-  MemoryStorage = require('./MemoryStorage'),
+  SecurityController = require('./controllers/security'),
+  MemoryStorageController = require('./controllers/memoryStorage'),
   networkWrapper = require('./networkWrapper'),
-  uuid = require('uuid');
+  uuidv4 = require('./uuidv4');
 
+const
+  events = [
+    'connected',
+    'discarded',
+    'disconnected',
+    'loginAttempt',
+    'networkError',
+    'offlineQueuePush',
+    'offlineQueuePop',
+    'queryError',
+    'reconnected',
+    'tokenExpired'
+  ],
+  protectedEvents = {
+    connected: {},
+    error: {},
+    disconnected: {},
+    reconnected: {},
+    tokenExpired: {},
+    loginAttempt: {}
+  };
+
+let
+  _autoResubscribe,
+  _eventTimeout,
+  _jwt,
+  _protocol,
+  _version,
+  _auth,
+  _collection,
+  _document,
+  _index,
+  _ms,
+  _realtime,
+  _security,
+  _server;
 
 class Kuzzle extends KuzzleEventEmitter {
 
@@ -18,78 +54,31 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param host - Server name or IP Address to the Kuzzle instance
    * @param [options] - Connection options
    */
-  constructor(host, options) {
+  constructor(host, options = {}) {
     super();
 
     if (!host || host === '') {
       throw new Error('host argument missing');
     }
 
-    Object.defineProperties(this, {
-      // 'private' properties
-      eventActions: {
-        value: [
-          'connected',
-          'discarded',
-          'disconnected',
-          'loginAttempt',
-          'networkError',
-          'offlineQueuePush',
-          'offlineQueuePop',
-          'queryError',
-          'reconnected',
-          'tokenExpired'
-        ]
-      },
-      // configuration properties
-      autoResubscribe: {
-        value: options && typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true,
-        enumerable: true
-      },
-      defaultIndex: {
-        value: (options && typeof options.defaultIndex === 'string') ? options.defaultIndex : undefined,
-        writable: true,
-        enumerable: true
-      },
-      jwt: {
-        value: undefined,
-        enumerable: true,
-        writable: true
-      },
-      protocol: {
-        value: (options && typeof options.protocol === 'string') ? options.protocol : 'websocket',
-        enumerable: true
-      },
-      sdkVersion: {
-        value: (typeof SDKVERSION === 'undefined') ? require('../package.json').version : SDKVERSION
-      },
-      volatile: {
-        value: {},
-        enumerable: true,
-        writable: true
-      },
-      collection: {
-        value: new CollectionController(this),
-        enumerable: true
-      },
-      document: {
-        value: new DocumentController(this),
-        enumerable: true
-      },
-      index: {
-        value: new IndexController(this),
-        enumerable: true
-      },
-      realtime: {
-        value: new RealtimeController(this),
-        enumerable: true
-      },
-      server: {
-        value: new ServerController(this),
-        enumerable: true
-      }
+    _autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
+    _eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
+    _protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
+    _version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
 
-    });
+    // controllers
+    _auth = new AuthController(this);
+    _collection = new CollectionController(this);
+    _document = new DocumentController(this);
+    _index = new IndexController(this);
+    _ms = new MemoryStorageController(this);
+    _realtime = new RealtimeController(this);
+    _security = new SecurityController(this);
+    _server = new ServerController(this);
+
+    this.defaultIndex = typeof options.defaultIndex === 'string' ? options.defaultIndex : undefined;
+    this.network = networkWrapper(this.protocol, host, options);
+    this.volatile = {};
 
     if (options) {
       for (const opt of Object.keys(options)) {
@@ -99,158 +88,176 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     }
 
-    /**
-     * Some methods (mainly read queries) require a callback function. This function exists to avoid repetition of code,
-     * and is called by these methods
-     */
-    Object.defineProperty(this, 'callbackRequired', {
-      value: (errorMessagePrefix, callback) => {
-        if (!callback || typeof callback !== 'function') {
-          throw new Error(`${errorMessagePrefix}: a callback argument is required for read queries`);
-        }
-      }
-    });
-
-    /**
-     * Singletons for Kuzzle API
-     */
-    Object.defineProperty(this, 'auth', {
-      value: new AuthController(this),
-      enumerable: true
-    });
-
-    /**
-     * Create an attribute security that embed all methods to manage Role, Profile and User
-     */
-    Object.defineProperty(this, 'security', {
-      value: new Security(this),
-      enumerable: true
-    });
-
-    Object.defineProperty(this, 'memoryStorage', {
-      value: new MemoryStorage(this),
-      enumerable: true
-    });
-
-    Object.defineProperty(this, 'collections', {
-      value: {},
-      writable: true
-    });
-
-    Object.defineProperty(this, 'eventTimeout', {
-      value: options && typeof options.eventTimeout === 'number' ? options.eventTimeout : 200
-    });
-
-    Object.defineProperty(this, 'protectedEvents', {
-      value: {
-        connected: {timeout: this.eventTimeout},
-        error: {timeout: this.eventTimeout},
-        disconnected: {timeout: this.eventTimeout},
-        reconnected: {timeout: this.eventTimeout},
-        tokenExpired: {timeout: this.eventTimeout},
-        loginAttempt: {timeout: this.eventTimeout}
-      }
-    });
-
-    this.network = networkWrapper(this.protocol, host, options);
-
-    // Properties related to the network layer
-    // Accessing a property irrelevant for a given protocol
-    // (e.g. "autoReconnect" for the HTTP layer) should
-    // throw an exception
-    Object.defineProperties(this, {
-      autoQueue: {
-        enumerable: true,
-        get: () => this.network.autoQueue,
-        set: value => {
-          checkPropertyType('autoQueue', 'boolean', value);
-          this.network.autoQueue = value;
-        }
-      },
-      autoReconnect: {
-        enumerable: true,
-        get: () => this.network.autoReconnect
-      },
-      autoReplay: {
-        enumerable: true,
-        get: () => this.network.autoReplay,
-        set: value => {
-          checkPropertyType('autoReplay', 'boolean', value);
-          this.network.autoReplay = value;
-        }
-      },
-      host: {
-        enumerable: true,
-        get: () => this.network.host
-      },
-      offlineQueue: {
-        enumerable: true,
-        get: () => this.network.offlineQueue
-      },
-      offlineQueueLoader: {
-        enumerable: true,
-        get: () => this.network.offlineQueueLoader,
-        set: value => {
-          if (value !== null) {
-            checkPropertyType('offlineQueueLoader', 'function', value);
-          }
-          this.network.offlineQueueLoader = value;
-        }
-      },
-      port: {
-        enumerable: true,
-        get: () => this.network.port
-      },
-      queueFilter: {
-        enumerable: true,
-        get: () => this.network.queueFilter,
-        set: value => {
-          checkPropertyType('queueFilter', 'function', value);
-          this.network.queueFilter = value;
-        }
-      },
-      queueMaxSize: {
-        enumerable: true,
-        get: () => this.network.queueMaxSize,
-        set: value => {
-          checkPropertyType('queueMaxSize', 'number', value);
-          this.network.queueMaxSize = value;
-        }
-      },
-      queueTTL: {
-        enumerable: true,
-        get: () => this.network.queueTTL,
-        set: value => {
-          checkPropertyType('queueTTL', 'number', value);
-          this.network.queueTTL = value;
-        }
-      },
-      replayInterval: {
-        enumerable: true,
-        get: () => this.network.replayInterval,
-        set: value => {
-          checkPropertyType('replayInterval', 'number', value);
-          this.network.replayInterval = value;
-        }
-      },
-      reconnectionDelay: {
-        enumerable: true,
-        get: () => this.network.reconnectionDelay
-      },
-      sslConnection: {
-        eumerable: true,
-        get: () => this.network.ssl
-      }
-    });
-
     this.network.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
     this.network.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
     this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
 
     this.network.addListener('tokenExpired', () => {
-      this.unsetJwt();
+      this.jwt = undefined;
       this.emit('tokenExpired');
     });
+  }
+
+  get auth () {
+    return _auth;
+  }
+
+  get autoQueue () {
+    return this.network.autoQueue;
+  }
+
+  set autoQueue (value) {
+    this._checkPropertyType('autoQueue', 'boolean', value);
+    this.network.autoQueue = value;
+  }
+
+  get autoReconnect () {
+    return this.network.autoReconnect;
+  }
+
+  set autoReconnect (value) {
+    this._checkPropertyType('autoReconnect', 'boolean', value);
+    this.network.autoReconnect = value;
+  }
+
+  get autoReplay () {
+    return this.network.autoReplay;
+  }
+
+  set autoReplay (value) {
+    this._checkPropertyType('autoReplay', 'boolean', value);
+    this.network.autoReplay = value;
+  }
+
+  get autoResubscribe () {
+    return _autoResubscribe;
+  }
+
+  get collection () {
+    return _collection;
+  }
+
+  get document () {
+    return _document;
+  }
+
+  get eventTimeout () {
+    return _eventTimeout;
+  }
+
+  get index () {
+    return _index;
+  }
+
+  get jwt () {
+    return _jwt;
+  }
+
+  set jwt (token) {
+    if (token === undefined) {
+      _jwt = undefined;
+    }
+    else if (typeof token === 'string') {
+      _jwt = token;
+    }
+    else if (typeof token === 'object'
+      && token.result
+      && token.result.jwt
+      && typeof token.result.jwt === 'string'
+    ) {
+      _jwt = token.result.jwt;
+    }
+
+    throw new Error(`Invalid token argument: ${token}`);
+  }
+
+  get host () {
+    return this.network.host;
+  }
+
+  get ms () {
+    return _ms;
+  }
+
+  get offlineQueue () {
+    return this.network.offlineQueue;
+  }
+
+  get offlineQueueLoader () {
+    return this.network.offlineQueueLoader;
+  }
+
+  set offlineQueueLoader (value) {
+    this._checkPropertyType('offlineQueueLoader', 'function', value);
+    this.network.offlineQueueLoader = value;
+  }
+
+  get port () {
+    return this.network.port;
+  }
+
+  get protocol () {
+    return _protocol;
+  }
+
+  get queueFilter () {
+    return this.network.queueFilter;
+  }
+
+  set queueFilter (value) {
+    this._checkPropertyType('queueFilter', 'function', value);
+    this.network.queueFilter = value;
+  }
+
+  get queueMaxSize () {
+    return this.network.queuMaxSize();
+  }
+
+  set queueMaxSize (value) {
+    this._checkPropertyType('queueMaxSize');
+    this.network.queueMaxSize = value;
+  }
+
+  get queueTTL () {
+    return this.network.queueTTL;
+  }
+
+  set queueTTL (value) {
+    this._checkPropertyType('queueTTL', 'number', value);
+    this.network.queueTTL = value;
+  }
+
+  get realtime () {
+    return _realtime;
+  }
+
+  get reconnectionDelay () {
+    return this.network.reconnectionDelay;
+  }
+
+  get replayInterval () {
+    return this.network.replayInterval;
+  }
+
+  set replayInterval (value) {
+    this._checkPropertyType('replayInterval', 'number', value);
+    this.network.replayInterval = value;
+  }
+
+  get security () {
+    return _security;
+  }
+
+  get server () {
+    return _server;
+  }
+
+  get sslConnection () {
+    return this.network.sslConnection;
+  }
+
+  get version () {
+    return _version;
   }
 
   /**
@@ -260,10 +267,10 @@ class Kuzzle extends KuzzleEventEmitter {
   emit (eventName, ...payload) {
     const
       now = Date.now(),
-      protectedEvent = this.protectedEvents[eventName];
+      protectedEvent = protectedEvents[eventName];
 
     if (protectedEvent) {
-      if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - protectedEvent.timeout) {
+      if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - this.eventTimeout) {
         return false;
       }
       protectedEvent.lastEmitted = now;
@@ -305,7 +312,7 @@ class Kuzzle extends KuzzleEventEmitter {
         this.checkToken(this.jwt, (err, res) => {
           // shouldn't obtain an error but let's invalidate the token anyway
           if (err || !res.valid) {
-            this.unsetJwt();
+            this.jwt = undefined;
           }
 
           this.emit('reconnected');
@@ -321,45 +328,6 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * Set the jwt used to query kuzzle
-   * @param token
-   * @returns {Kuzzle}
-   */
-  setJwt (token) {
-    if (typeof token === 'string') {
-      this.jwt = token;
-    } else if (typeof token === 'object') {
-      if (token.result && token.result.jwt && typeof token.result.jwt === 'string') {
-        this.jwt = token.result.jwt;
-      } else {
-        throw new Error('Cannot find a valid JWT in the following object: ' + JSON.stringify(token));
-      }
-    } else {
-      throw new Error('Invalid token argument: ' + token);
-    }
-
-    return this;
-  }
-
-  /**
-   * Unset the jwt used to query kuzzle
-   * @returns {Kuzzle}
-   */
-  unsetJwt () {
-    this.jwt = undefined;
-    return this;
-  }
-
-  /**
-   * Get the jwt used by kuzzle
-   * @returns {Kuzzle}
-   */
-  getJwt () {
-    return this.jwt;
-  }
-
-
-  /**
    * Adds a listener to a Kuzzle global event. When an event is fired, listeners are called in the order of their
    * insertion.
    *
@@ -367,8 +335,8 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {function} listener - callback to invoke each time an event is fired
    */
   addListener (event, listener) {
-    if (this.eventActions.indexOf(event) === -1) {
-      throw new Error(`[${event}] is not a known event. Known events: ${this.eventActions.toString()}`);
+    if (events.indexOf(event) === -1) {
+      throw new Error(`[${event}] is not a known event. Known events: ${events.toString()}`);
     }
 
     return super.addListener(event, listener);
@@ -413,7 +381,7 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     if (!request.requestId) {
-      request.requestId = uuid.v4();
+      request.requestId = uuidv4();
     }
 
     // we follow the api but allow some more logical "mistakes"
@@ -496,14 +464,19 @@ class Kuzzle extends KuzzleEventEmitter {
 
     return this;
   }
+
+  _checkPropertyType (prop, typestr, value) {
+    const wrongType = typestr === 'array' ? !Array.isArray(value) : typeof value !== typestr;
+
+    if (wrongType) {
+      throw new Error(`Expected ${prop} to be a ${typestr}, ${typeof value} received`);
+    }
+  }
 }
 
-function checkPropertyType(prop, typestr, value) {
-  const wrongType = typestr === 'array' ? !Array.isArray(value) : typeof value !== typestr;
 
-  if (wrongType) {
-    throw new Error(`Can only assign a ${typestr} value to property "${prop}"`);
-  }
+for (const prop of ['autoResubscribe']) {
+  Object.defineProperty(Kuzzle.prototype, prop, {enumerable: true});
 }
 
 module.exports = Kuzzle;

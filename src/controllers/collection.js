@@ -1,13 +1,19 @@
 const
   SpecificationsSearchResult = require('./searchResult/specifications');
 
+let _kuzzle;
+
 class CollectionController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this.kuzzle = kuzzle;
+    _kuzzle = kuzzle;
+  }
+
+  get kuzzle () {
+    return _kuzzle;
   }
 
   create (index, collection, options = {}) {

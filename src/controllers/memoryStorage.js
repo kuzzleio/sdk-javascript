@@ -1,5 +1,5 @@
 // Parameter mutualization
-var
+const
   getId = {getter: true, required: ['_id']},
   getIdField = {getter: true, required: ['_id', 'field']},
   getKeys = {getter: true, required: ['keys']},
@@ -26,7 +26,7 @@ var
   setIdValue = {required: ['_id', 'value']};
 
 // Redis commands
-var
+const
   commands = {
     append: setIdValue,
     bitcount: {getter: true, required: ['_id'], opts: ['start', 'end']},
@@ -171,6 +171,10 @@ var
  */
 
 
+let
+  _kuzzle;
+
+
 /**
  * Kuzzle's memory storage is a separate data store from the database layer.
  * It is internaly based on Redis. You can access most of Redis functions (all
@@ -188,71 +192,63 @@ var
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @constructor
  */
-function MemoryStorage(kuzzle) {
-  Object.defineProperties(this, {
-    // read-only properties
-    kuzzle: {
-      value: kuzzle,
-      enumerable: true
-    }
-  });
-  return this;
+class MemoryStorageController {
+
+  constructor (kuzzle) {
+    _kuzzle = kuzzle;
+  }
+
+  get kuzzle () {
+    return _kuzzle;
+  }
 }
 
+
 // Dynamically builds this class' prototypes using the "commands" global variable
-(function () {
-  Object.keys(commands).forEach(function (command) {
-    MemoryStorage.prototype[command] = function () {
-      var
-        args = Array.prototype.slice.call(arguments),
-        options = null,
-        cb,
-        query = {
-          controller: 'ms',
-          action: command
+(() => {
+  for (const action of Object.keys(commands)) {
+    // eslint-disable-next-line no-loop-func
+    MemoryStorageController.prototype[action] = (...args) => {
+      const
+        command = commands[action],
+        request = {
+          action,
+          controller: 'ms'
         },
-        data = {};
+        options = {};
 
-      if (args.length && typeof args[args.length - 1] === 'function') {
-        cb = args.pop();
+      if (!command.getter) {
+        request.body = {};
       }
 
-      commands[command].getter && this.kuzzle.callbackRequired('MemoryStorage.' + command, cb);
+      for (const param of command.required || []) {
+        const value = args.shift();
 
-      if (!commands[command].getter) {
-        data.body = {};
-      }
+        if (value === undefined) {
+          throw new Error(`ms.${action}: missing parameter ${param}`);
+        }
 
-      if (commands[command].required) {
-        commands[command].required.forEach(function (param) {
-          var value = args.shift();
-
-          if (value === undefined) {
-            throw new Error('MemoryStorage.' + command + ': Missing parameter "' + param + '"');
-          }
-
-          assignParameter(data, commands[command].getter, param, value);
-        });
+        assignParameter(request, command.getter, param, value);
       }
 
       if (args.length > 1) {
-        throw new Error('MemoryStorage.' + command + ': Too many parameters provided');
-      }
-
-      if (args.length === 1 && typeof args[0] !== 'object' || Array.isArray(args[0])) {
-        throw new Error('MemoryStorage.' + command + ': Invalid optional parameter (expected an object)');
+        throw new Error(`ms.${action}: too many parameters provided`);
       }
 
       if (args.length) {
-        options = Object.assign({}, args[0]);
+        if (typeof args[0] !== 'object' || Array.isArray(args[0])) {
+          throw new Error(`ms.${action}: invalid optional paramater (expected an object`);
+        }
 
-        if (Array.isArray(commands[command].opts)) {
-          commands[command].opts.forEach(function (opt) {
+        Object.assign(options, args[0]);
+
+        if (Array.isArray(command.opts)) {
+          for (const opt of command.opts) {
             if (options[opt] !== null && options[opt] !== undefined) {
-              assignParameter(data, commands[command].getter, opt, options[opt]);
+              assignParameter(request, command.getter, opt, options[opt]);
               delete options[opt];
             }
-          });
+          }
         }
       }
 
@@ -260,27 +256,19 @@ function MemoryStorage(kuzzle) {
        Options function mapper does not necessarily need
        options to be passed by clients.
        */
-      if (typeof commands[command].opts === 'function') {
-        commands[command].opts(data, options || {});
+      if (typeof command.opts === 'function') {
+        command.opts(data, options);
       }
 
-      this.kuzzle.query(query, data, options, cb && function (err, res) {
-        if (err) {
-          return cb(err);
-        }
-
-        if (commands[command].mapResults) {
-          return cb(null, commands[command].mapResults(res.result));
-        }
-
-        cb(null, res.result);
-      });
-
-      if (!commands[command].getter) {
-        return this;
-      }
+      return this.kuzzle.query(request, options)
+        .then(res => {
+          if (command.mapResults) {
+            return command.mapResults(res.result);
+          }
+          return res.result;
+        });
     };
-  });
+  }
 })();
 
 /**
@@ -309,7 +297,7 @@ function assignParameter(data, getter, name, value) {
  * @param {object} options
  */
 function assignGeoRadiusOptions(data, options) {
-  var parsed = [];
+  const parsed = [];
 
   Object.keys(options)
     .filter(function (opt) {
@@ -344,7 +332,7 @@ function assignGeoRadiusOptions(data, options) {
  * @param {object} data
  * @param {object} options
  */
-function assignZrangeOptions(data, options) {
+function assignZrangeOptions (data, options) {
   data.options = ['withscores'];
 
   if (options.limit) {
@@ -359,14 +347,9 @@ function assignZrangeOptions(data, options) {
  * @param {Array.<Array.<string>>} results
  * @return {Array.<Array.<Number>>}
  */
-function mapGeoposResults(results) {
-  return results.map(function (coords) {
-    return coords.map(function (latlon) {
-      return parseFloat(latlon);
-    });
-  });
+function mapGeoposResults (results) {
+  return results.map(coords => coords.map(parseFloat));
 }
-
 
 /**
  * Maps georadius results to the format specified in the SDK documentation,
@@ -390,21 +373,18 @@ function mapGeoRadiusResults(results) {
 
   return results.map(function (point) {
     // The point id is always the first item
-    var p = {
-        name: point[0]
-      },
-      i;
+    const p = {
+      name: point.shift()
+    };
 
-    for (i = 1; i < point.length; i++) {
-      // withcoord result are in an array...
-      if (Array.isArray(point[i])) {
-        p.coordinates = point[i].map(function (coord) {
-          return parseFloat(coord);
-        });
+    for (const elem of point) {
+      if (Array.isArray(elem)) {
+        // withcoord result are in an array...
+        p.coordinates = elem.map(parseFloat);
       }
       else {
         // ... and withdist are not
-        p.distance = parseFloat(point[i]);
+        p.distance = parseFloat(elem);
       }
     }
 
@@ -429,19 +409,15 @@ function mapStringToArray(results) {
  * @param {Array.<string>} results
  * @return {Array.<Number>}
  */
-function mapArrayStringToArrayInt(results) {
-  return results.map(function (value) {
-    return parseInt(value);
-  });
+function mapArrayStringToArrayInt (results) {
+  return results.map(parseInt);
 }
 
 /**
  * Disable results for routes like flushdb
  * @return {undefined}
  */
-function mapNoResult() {
-  return undefined;
-}
+function mapNoResult () {}
 
 /**
  * Map zrange results with WITHSCORES:
@@ -462,20 +438,15 @@ function mapNoResult() {
  * @param {Array.<string>} results
  * @return {Array.<Object>}
  */
-function mapZrangeResults(results) {
-  var
-    buffer = null,
-    mapped = [];
+function mapZrangeResults (results) {
+  const mapped = [];
 
-  results.forEach(function (value) {
-    if (buffer === null) {
-      buffer = value;
-    }
-    else {
-      mapped.push({member: buffer, score: parseFloat(value)});
-      buffer = null;
-    }
-  });
+  for (let i = 0; i < results.length; i += 2) {
+    mapped.push({
+      member: results[i],
+      score: parseFloat(results[i + 1])
+    });
+  }
 
   return mapped;
 }
@@ -504,11 +475,11 @@ function mapZrangeResults(results) {
  * @param  {array.<string|array>} results 
  * @return {object}
  */
-function mapScanResults(results) {
+function mapScanResults (results) {
   return {
     cursor: results[0],
     values: results[1]
   };
 }
 
-module.exports = MemoryStorage;
+module.exports = MemoryStorageController;

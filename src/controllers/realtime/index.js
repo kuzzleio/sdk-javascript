@@ -1,18 +1,24 @@
 const
   Room = require('./room');
 
+let _kuzzle;
+
 class RealTimeController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this.kuzzle = kuzzle;
+    _kuzzle = kuzzle;
 
     this.subscriptions = {
       filters: {},
       channels: {}
     };
+  }
+
+  get kuzzle () {
+    return _kuzzle;
   }
 
   count (roomId, options = {}) {

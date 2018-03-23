@@ -1,4 +1,6 @@
-const User = require('../security/User.js');
+const User = require('./security/user');
+
+let _kuzzle;
 
 /**
  * Auth controller
@@ -12,10 +14,12 @@ class AuthController {
    * constructor
    * @param kuzzle
    */
-  constructor(kuzzle) {
-    Object.defineProperty(this, 'kuzzle', {
-      value: kuzzle
-    });
+  constructor (kuzzle) {
+    _kuzzle = kuzzle;
+  }
+
+  get kuzzle () {
+    return _kuzzle;
   }
 
   /**
@@ -24,16 +28,12 @@ class AuthController {
    * @param  {string}   token     The jwt token to check
    * @return {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  checkToken(token) {
-    const
-      request = {
-        body: {
-          token
-        }
-      };
-
-    return this.kuzzle.query({controller: 'auth', action: 'checkToken'}, request, {queuable: false})
-      .then(res => res.result);
+  checkToken (token) {
+    return this.kuzzle.query({
+      controller: 'auth',
+      action: 'checkToken',
+      body: {token}
+    }, {queuable: false});
   }
 
   /**
@@ -44,12 +44,13 @@ class AuthController {
    * @param options
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  createMyCredentials(strategy, credentials, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'createMyCredentials'}, {
+  createMyCredentials (strategy, credentials, options = {}) {
+    return this.kuzzle.query({
       strategy,
+      controller: 'auth',
+      action: 'createMyCredentials',
       body: credentials
-    }, options)
-      .then(res => res.result);
+    }, options);
   }
 
   /**
@@ -58,9 +59,12 @@ class AuthController {
    * @param strategy
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  credentialsExist(strategy, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'credentialsExist'}, {strategy}, options)
-      .then(res => res.result);
+  credentialsExist (strategy, options = {}) {
+    return this.kuzzle.query({
+      strategy,
+      controller: 'auth',
+      action: 'credentialsExist'
+    }, options);
   }
 
   /**
@@ -70,9 +74,12 @@ class AuthController {
    * @param options
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  deleteMyCredentials(strategy, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'deleteMyCredentials'}, {strategy}, options)
-      .then(res => res.result);
+  deleteMyCredentials (strategy, options = {}) {
+    return this.kuzzle.query({
+      strategy,
+      controller: 'auth',
+      action: 'deleteMyCredentials'
+    }, options);
   }
 
   /**
@@ -80,10 +87,18 @@ class AuthController {
    *
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  getCurrentUser() {
-    return this.kuzzle.query({controller: 'auth', action: 'getCurrentUser'}, {}, undefined)
-      .then(res => {
-        return new User(this.kuzzle.security, res.result._id, res.result._source, res.result._meta);
+  getCurrentUser (options = {}) {
+    return this.kuzzle.query({
+      controller: 'auth',
+      action: 'getCurrentUser'
+    }, options)
+      .then(result => {
+        const user = new User(this.kuzzle);
+        user.id = result.id;
+        user.content = result._source;
+        user.meta = result._meta;
+
+        return user;
       });
   }
 
@@ -93,9 +108,12 @@ class AuthController {
    * @param strategy
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  getMyCredentials(strategy, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'getMyCredentials'}, {strategy}, options)
-      .then(res => res.result);
+  getMyCredentials(strategy, options = {}) {
+    return this.kuzzle.query({
+      strategy,
+      controller: 'auth',
+      action: 'getMyCredentials'
+    }, options);
   }
 
   /**
@@ -104,9 +122,12 @@ class AuthController {
    * @param {object} [options] - Optional parameters
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  getMyRights(options) {
-    return this.kuzzle.query({controller: 'auth', action: 'getMyRights'}, {}, options)
-      .then(res => res.result.hits);
+  getMyRights (options = {}) {
+    return this.kuzzle.query({
+      controller: 'auth',
+      action: 'getMyRights'
+    }, options)
+      .then(res => res.hits);
   }
 
   /**
@@ -115,9 +136,11 @@ class AuthController {
    * @param {object} [options] - Optional parameters
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  getStrategies(options) {
-    return this.kuzzle.query({controller: 'auth', action: 'getStrategies'}, {}, options)
-      .then(res => res.result);
+  getStrategies (options = {}) {
+    return this.kuzzle.query({
+      controller: 'auth',
+      action: 'getStrategies'
+    }, options);
   }
 
   /**
@@ -129,35 +152,34 @@ class AuthController {
    * @param expiresIn
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  login(strategy, credentials, expiresIn) {
-    if (!strategy || typeof strategy !== 'string') {
-      return Promise.reject(new Error('Auth.login: strategy required'));
+  login (strategy, credentials, expiresIn) {
+    if (typeof strategy !== 'string' || strategy === '') {
+      return Promise.reject(new Error('auth.login: strategy required'));
     }
 
     const
       request = {
         strategy,
-        body: {}
+        expiresIn,
+        body: credentials || {},
+        controller: 'auth',
+        action: 'login'
       };
 
-    request.body = credentials || {};
-    if (expiresIn) {
-      request.expiresIn = expiresIn;
-    }
-
-    return this.kuzzle.query({controller: 'auth', action: 'login'}, request, {queuable: false})
-      .then(response => {
+    return this.kuzzle.query(request, {queuable: false})
+      .then(result => {
         try {
-          this.kuzzle.setJwt(response.result.jwt);
+          this.kuzzle.jwt = result.jwt;
           this.kuzzle.emit('loginAttempt', {success: true});
-        } catch (err) {
+        }
+        catch (err) {
           return Promise.reject(err);
         }
-        return response.result.jwt;
+        return result.jwt;
       })
       .catch(err => {
         this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
-        return new Error(err);
+        throw err;
       });
   }
 
@@ -166,9 +188,14 @@ class AuthController {
    *
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  logout() {
-    return this.kuzzle.query({controller: 'auth', action: 'logout'}, {}, {queuable: false})
-      .then(() => this.kuzzle.unsetJwt());
+  logout () {
+    return this.kuzzle.query({
+      controller: 'auth',
+      action: 'logout'
+    }, {queuable: false})
+      .then(() => {
+        this.kuzzle.jwt = undefined;
+      });
   }
 
   /**
@@ -179,24 +206,28 @@ class AuthController {
    * @param options
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  updateMyCredentials(strategy, credentials, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'updateMyCredentials'}, {
+  updateMyCredentials (strategy, credentials, options = {}) {
+    return this.kuzzle.query({
       strategy,
-      body: credentials
-    }, options)
-      .then(res => res.result);
+      body: credentials,
+      controller: 'auth',
+      action: 'updateMyCredentials'
+    }, options);
   }
 
   /**
    * Update current user in Kuzzle.
    *
-   * @param {object} content - a plain javascript object representing the user's modification
+   * @param {object} body - a plain javascript object representing the user's modification
    * @param {object} [options] - (optional) arguments
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  updateSelf(content, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'updateSelf'}, {body: content}, options)
-      .then(res => res.result);
+  updateSelf (body, options = {}) {
+    return this.kuzzle.query({
+      body,
+      controller: 'auth',
+      action: 'updateSelf'
+    }, options);
   }
 
   /**
@@ -207,12 +238,13 @@ class AuthController {
    * @param options
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  validateMyCredentials(strategy, credentials, options) {
-    return this.kuzzle.query({controller: 'auth', action: 'validateMyCredentials'}, {
+  validateMyCredentials (strategy, credentials, options = {}) {
+    return this.kuzzle.query({
       strategy,
-      body: credentials
-    }, options)
-      .then(res => res.result);
+      body: credentials,
+      controller: 'auth',
+      action: 'validateMyCredentials'
+    }, options);
   }
 
 }

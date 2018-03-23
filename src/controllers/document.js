@@ -1,13 +1,19 @@
 const
   DocumentSearchResult = require('./searchResult/document');
 
+let _kuzzle;
+
 class DocumentController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this.kuzzle = kuzzle;
+    _kuzzle = kuzzle;
+  }
+
+  get kuzzle () {
+    return _kuzzle;
   }
 
   count (index, collection, body, options = {}) {

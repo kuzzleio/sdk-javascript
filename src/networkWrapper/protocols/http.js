@@ -110,6 +110,7 @@ class HttpWrapper extends AbtractWrapper {
    * Sends a payload to the connected server
    *
    * @param {Object} data
+   * @returns {Promise<any>}
    */
   send (data) {
     const

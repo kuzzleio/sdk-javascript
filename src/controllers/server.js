@@ -1,10 +1,16 @@
+let _kuzzle;
+
 class ServerController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this.kuzzle = kuzzle;
+    _kuzzle = kuzzle;
+  }
+
+  get kuzzle () {
+    return _kuzzle;
   }
 
   adminExists (options) {
@@ -47,7 +53,8 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'now'
-    }, options);
+    }, options)
+      .then(result => result.now);
   }
 }
 
