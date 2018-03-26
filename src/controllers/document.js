@@ -1,7 +1,7 @@
 const
   DocumentSearchResult = require('./searchResult/document');
 
-let _kuzzle;
+const _kuzzle = Symbol();
 
 class DocumentController {
 
@@ -9,11 +9,11 @@ class DocumentController {
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    _kuzzle = kuzzle;
+    this[_kuzzle] = kuzzle;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return this[_kuzzle];
   }
 
   count (index, collection, body, options = {}) {

@@ -171,9 +171,7 @@ const
  */
 
 
-let
-  _kuzzle;
-
+const _kuzzle = Symbol();
 
 /**
  * Kuzzle's memory storage is a separate data store from the database layer.
@@ -195,11 +193,11 @@ let
 class MemoryStorageController {
 
   constructor (kuzzle) {
-    _kuzzle = kuzzle;
+    this[_kuzzle] = kuzzle;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return this[_kuzzle];
   }
 }
 

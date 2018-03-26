@@ -33,21 +33,6 @@ const
     loginAttempt: {}
   };
 
-let
-  _autoResubscribe,
-  _eventTimeout,
-  _jwt,
-  _protocol,
-  _version,
-  _auth,
-  _collection,
-  _document,
-  _index,
-  _ms,
-  _realtime,
-  _security,
-  _server;
-
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
@@ -61,30 +46,28 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('host argument missing');
     }
 
-    _autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
-    _eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
-    _protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
-    _version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
+    this.autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
+    this.eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
+    this.protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
+    this.version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
 
     // controllers
-    _auth = new AuthController(this);
-    _collection = new CollectionController(this);
-    _document = new DocumentController(this);
-    _index = new IndexController(this);
-    _ms = new MemoryStorageController(this);
-    _realtime = new RealtimeController(this);
-    _security = new SecurityController(this);
-    _server = new ServerController(this);
+    this.auth = new AuthController(this);
+    this.collection = new CollectionController(this);
+    this.document = new DocumentController(this);
+    this.index = new IndexController(this);
+    this.ms = new MemoryStorageController(this);
+    this.realtime = new RealtimeController(this);
+    this.security = new SecurityController(this);
+    this.server = new ServerController(this);
 
     this.defaultIndex = typeof options.defaultIndex === 'string' ? options.defaultIndex : undefined;
     this.network = networkWrapper(this.protocol, host, options);
     this.volatile = {};
 
-    if (options) {
-      for (const opt of Object.keys(options)) {
-        if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
-          this[opt] = options[opt];
-        }
+    for (const opt of Object.keys(options)) {
+      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
+        this[opt] = options[opt];
       }
     }
 
@@ -96,10 +79,6 @@ class Kuzzle extends KuzzleEventEmitter {
       this.jwt = undefined;
       this.emit('tokenExpired');
     });
-  }
-
-  get auth () {
-    return _auth;
   }
 
   get autoQueue () {
@@ -129,43 +108,23 @@ class Kuzzle extends KuzzleEventEmitter {
     this.network.autoReplay = value;
   }
 
-  get autoResubscribe () {
-    return _autoResubscribe;
-  }
-
-  get collection () {
-    return _collection;
-  }
-
-  get document () {
-    return _document;
-  }
-
-  get eventTimeout () {
-    return _eventTimeout;
-  }
-
-  get index () {
-    return _index;
-  }
-
   get jwt () {
-    return _jwt;
+    return this._jwt;
   }
 
   set jwt (token) {
     if (token === undefined) {
-      _jwt = undefined;
+      this._jwt = undefined;
     }
     else if (typeof token === 'string') {
-      _jwt = token;
+      this._jwt = token;
     }
     else if (typeof token === 'object'
       && token.result
       && token.result.jwt
       && typeof token.result.jwt === 'string'
     ) {
-      _jwt = token.result.jwt;
+      this._jwt = token.result.jwt;
     }
 
     throw new Error(`Invalid token argument: ${token}`);
@@ -173,10 +132,6 @@ class Kuzzle extends KuzzleEventEmitter {
 
   get host () {
     return this.network.host;
-  }
-
-  get ms () {
-    return _ms;
   }
 
   get offlineQueue () {
@@ -194,10 +149,6 @@ class Kuzzle extends KuzzleEventEmitter {
 
   get port () {
     return this.network.port;
-  }
-
-  get protocol () {
-    return _protocol;
   }
 
   get queueFilter () {
@@ -227,10 +178,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this.network.queueTTL = value;
   }
 
-  get realtime () {
-    return _realtime;
-  }
-
   get reconnectionDelay () {
     return this.network.reconnectionDelay;
   }
@@ -244,20 +191,8 @@ class Kuzzle extends KuzzleEventEmitter {
     this.network.replayInterval = value;
   }
 
-  get security () {
-    return _security;
-  }
-
-  get server () {
-    return _server;
-  }
-
   get sslConnection () {
     return this.network.sslConnection;
-  }
-
-  get version () {
-    return _version;
   }
 
   /**
@@ -475,7 +410,22 @@ class Kuzzle extends KuzzleEventEmitter {
 }
 
 
-for (const prop of ['autoResubscribe']) {
+for (const prop of [
+  'autoQueue',
+  'autoReconnect',
+  'autoReplay',
+  'jwt',
+  'host',
+  'offlineQueue',
+  'offlineQueueLoader',
+  'port',
+  'queueFilter',
+  'queueMaxSize',
+  'queueTTL',
+  'reconnectionDelay',
+  'replayInterval',
+  'sslConnection'
+]) {
   Object.defineProperty(Kuzzle.prototype, prop, {enumerable: true});
 }
 

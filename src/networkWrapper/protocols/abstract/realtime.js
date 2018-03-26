@@ -3,17 +3,13 @@
 const
   AbstractWrapper = require('./common');
 
-let
-  _autoReconnect,
-  _reconnectionDelay;
-
 class RTWrapper extends AbstractWrapper {
 
   constructor (host, options) {
     super(host, options);
 
-    _autoReconnect = options && typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
-    _reconnectionDelay = options && typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
+    this._autoReconnect = options && typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
+    this._reconnectionDelay = options && typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
 
     if (options && options.offlineMode === 'auto' && this.autoReconnect) {
       this.autoQueue = this.autoReplay = true;
@@ -25,11 +21,11 @@ class RTWrapper extends AbstractWrapper {
   }
 
   get autoReconnect () {
-    return _autoReconnect;
+    return this._autoReconnect;
   }
 
   get reconnectionDelay () {
-    return _reconnectionDelay;
+    return this._reconnectionDelay;
   }
 
   connect() {

@@ -16,7 +16,7 @@ module.exports = {
   devtool: 'source-map',
   node: {
     console: false,
-    global: true,
+    global: false,
     process: false,
     Buffer: false,
     __filename: false,
@@ -27,16 +27,8 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        include: [
-          path.resolve(__dirname, './src/networkWrapper/protocols/'),
-          path.resolve(__dirname, './src/networkWrapper/protocols/http'),
-          path.resolve(__dirname, './src/Kuzzle.js'),
-          path.resolve(__dirname, './src/eventEmitter/')
-        ],
         loader: 'babel-loader',
         query: {
-          compact: false,
-          minified: false,
           only: /^src/,
           presets: [
             ['env', {
@@ -54,13 +46,9 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.IgnorePlugin(/(uws|min-req-promise|package)/),
-    new webpack.IgnorePlugin(/^http$/),
+    new webpack.IgnorePlugin(/^(http|min-req-promise|package|uws)$/),
     new webpack.DefinePlugin({
-      global: 'window',
-      SDKVERSION: JSON.stringify(version),
-      BUILT: true
+      SDKVERSION: JSON.stringify(version)
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
     new webpack.optimize.OccurrenceOrderPlugin()

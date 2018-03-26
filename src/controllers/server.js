@@ -1,4 +1,4 @@
-let _kuzzle;
+const _kuzzle = Symbol();
 
 class ServerController {
 
@@ -6,11 +6,11 @@ class ServerController {
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    _kuzzle = kuzzle;
+    this[_kuzzle] = kuzzle;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return this[_kuzzle];
   }
 
   adminExists (options) {

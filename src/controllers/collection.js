@@ -1,7 +1,7 @@
 const
   SpecificationsSearchResult = require('./searchResult/specifications');
 
-let _kuzzle;
+const _kuzzle = Symbol();
 
 class CollectionController {
 
@@ -9,11 +9,11 @@ class CollectionController {
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    _kuzzle = kuzzle;
+    this[_kuzzle] = kuzzle;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return [_kuzzle];
   }
 
   create (index, collection, options = {}) {
