@@ -1,6 +1,7 @@
 const
   KuzzleEventEmitter = require('./eventEmitter'),
   AuthController = require('./controllers/auth'),
+  BulkController = require('./controllers/bulk'),
   CollectionController = require('./controllers/collection'),
   DocumentController = require('./controllers/document'),
   IndexController = require('./controllers/index'),
@@ -53,6 +54,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
     // controllers
     this.auth = new AuthController(this);
+    this.bulk = new BulkController(this);
     this.collection = new CollectionController(this);
     this.document = new DocumentController(this);
     this.index = new IndexController(this);

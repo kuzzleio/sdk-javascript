@@ -13,7 +13,7 @@ class CollectionController {
   }
 
   get kuzzle () {
-    return [_kuzzle];
+    return this[_kuzzle];
   }
 
   create (index, collection, options = {}) {
@@ -109,7 +109,7 @@ class CollectionController {
       size: options.size
     };
     delete options.from;
-    delete topions.size;
+    delete options.size;
 
     return this.kuzzle.query(request, options);
   }
@@ -126,7 +126,7 @@ class CollectionController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(response => new SpecificationsSearchResult(this.kuzzle, query, options, response));
+      .then(response => new SpecificationsSearchResult(this.kuzzle, request, options, response));
   }
 
   truncate (index, collection, options = {}) {
@@ -140,7 +140,7 @@ class CollectionController {
     return this.kuzzle.query({
       index,
       collection,
-      controller: 'colleciton',
+      controller: 'collection',
       action: 'truncate'
     }, options);
   }

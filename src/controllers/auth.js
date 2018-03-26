@@ -19,7 +19,7 @@ class AuthController {
   }
 
   get kuzzle () {
-    return [_kuzzle];
+    return this[_kuzzle];
   }
 
   /**
