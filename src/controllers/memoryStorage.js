@@ -203,71 +203,69 @@ class MemoryStorageController {
 
 
 // Dynamically builds this class' prototypes using the "commands" global variable
-(() => {
-  for (const action of Object.keys(commands)) {
-    // eslint-disable-next-line no-loop-func
-    MemoryStorageController.prototype[action] = (...args) => {
-      const
-        command = commands[action],
-        request = {
-          action,
-          controller: 'ms'
-        },
-        options = {};
+for (const action of Object.keys(commands)) {
+  // eslint-disable-next-line no-loop-func
+  MemoryStorageController.prototype[action] = function (...args) {
+    const
+      command = commands[action],
+      request = {
+        action,
+        controller: 'ms'
+      },
+      options = {};
 
-      if (!command.getter) {
-        request.body = {};
+    if (!command.getter) {
+      request.body = {};
+    }
+
+    for (const param of command.required || []) {
+      const value = args.shift();
+
+      if (value === undefined) {
+        throw new Error(`ms.${action}: missing parameter ${param}`);
       }
 
-      for (const param of command.required || []) {
-        const value = args.shift();
+      assignParameter(request, command.getter, param, value);
+    }
 
-        if (value === undefined) {
-          throw new Error(`ms.${action}: missing parameter ${param}`);
-        }
+    if (args.length > 1) {
+      throw new Error(`ms.${action}: too many parameters provided`);
+    }
 
-        assignParameter(request, command.getter, param, value);
+    if (args.length) {
+      if (typeof args[0] !== 'object' || Array.isArray(args[0])) {
+        throw new Error(`ms.${action}: invalid optional paramater (expected an object`);
       }
 
-      if (args.length > 1) {
-        throw new Error(`ms.${action}: too many parameters provided`);
-      }
+      Object.assign(options, args[0]);
 
-      if (args.length) {
-        if (typeof args[0] !== 'object' || Array.isArray(args[0])) {
-          throw new Error(`ms.${action}: invalid optional paramater (expected an object`);
-        }
-
-        Object.assign(options, args[0]);
-
-        if (Array.isArray(command.opts)) {
-          for (const opt of command.opts) {
-            if (options[opt] !== null && options[opt] !== undefined) {
-              assignParameter(request, command.getter, opt, options[opt]);
-              delete options[opt];
-            }
+      if (Array.isArray(command.opts)) {
+        for (const opt of command.opts) {
+          if (options[opt] !== null && options[opt] !== undefined) {
+            assignParameter(request, command.getter, opt, options[opt]);
+            delete options[opt];
           }
         }
       }
+    }
 
-      /*
-       Options function mapper does not necessarily need
-       options to be passed by clients.
-       */
-      if (typeof command.opts === 'function') {
-        command.opts(data, options);
-      }
+    /*
+     Options function mapper does not necessarily need
+     options to be passed by clients.
+     */
+    if (typeof command.opts === 'function') {
+      command.opts(data, options);
+    }
 
-      return this.kuzzle.query(request, options)
-        .then(res => {
-          if (command.mapResults) {
-            return command.mapResults(res.result);
-          }
-          return res.result;
-        });
-    };
-  }
-})();
+    return this.kuzzle.query(request, options)
+      .then(res => {
+        if (command.mapResults) {
+          return command.mapResults(res.result);
+        }
+        return res.result;
+      });
+  };
+}
 
 /**
  *

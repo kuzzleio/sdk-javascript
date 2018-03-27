@@ -1,74 +1,72 @@
-var
+const
+  MemoryStorageController = require('../../src/controllers/memoryStorage'),
   should = require('should'),
-  Kuzzle = require('../../src/Kuzzle'),
-  MemoryStorage = require('../../src/MemoryStorage'),
   sinon = require('sinon');
 
-describe('MemoryStorage methods', function () {
-  var
-    kuzzle,
-    ms,
-    emptyFunc = function () {};
+describe('ms', function () {
+  let kuzzle;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo');
-    kuzzle.bluebird = require('bluebird');
-    kuzzle.query = sinon.stub();
-    ms = new MemoryStorage(kuzzle);
+    kuzzle = {
+      query: sinon.stub().resolves({result: 'foo'})
+    };
+    kuzzle.ms = new MemoryStorageController(kuzzle);
   });
 
 
-  function testReadCommand(command, args, opts, expArgs, expOpts, result, expected, defaultOpts) {
-    var
-      query = {controller: 'ms', action: command},
-      expectedQueryArgs = Object.assign({}, expArgs, defaultOpts || {}),
-      expectedQueryArgsWithOpts = Object.assign({}, expectedQueryArgs, expOpts);
+  const testReadCommand = (command, args, opts, expArgs, expOpts, result, expected, defaultOpts = {}) => {
+    kuzzle.query.resolves(result);
 
-    should(function () {ms[command].apply(ms, args);}).throw('MemoryStorage.' + command + ': a callback argument is required for read queries');
-    should(function () {ms[command].apply(ms, args.concat(opts));}).throw('MemoryStorage.' + command + ': a callback argument is required for read queries');
+    return kuzzle.ms[command](...args)
+      .then(res => {
+        should(res).eql(expected);
 
-    ms[command].apply(ms, args.concat(emptyFunc));
-    should(kuzzle.query).calledWith(query, expectedQueryArgs, null, sinon.match.func);
+        should(kuzzle.query)
+          .be.calledOnce()
+          .be.calledWith(Object.assign({
+            controller: 'ms',
+            action: command
+          }, expArgs));
 
-    ms[command].apply(ms, args.concat(opts, emptyFunc));
-    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
-
-    kuzzle.query.yields(null, {result: result});
-    return ms[command + 'Promise'].apply(ms, args)
-      .then(function (res) {
-        should(res).be.eql(expected);
+        return kuzzle.ms[command](...(args.concat(opts)));
+      })
+      .then(() => {
+        should(kuzzle.query)
+          .be.calledWith(Object.assign({
+            controller: 'ms',
+            action: command
+          }, expArgs, expOpts));
       });
-  }
+  };
 
-  function testWriteCommand(command, args, opts, expArgs, expOpts, result, expected) {
-    var
-      query = {controller: 'ms', action: command},
-      expectedQueryArgsWithOpts = Object.assign({}, expArgs);
-
+  const testWriteCommand = (command, args, opts, expArgs, expOpts, result, expected) => {
     if (!expArgs.body) {
       expArgs.body = {};
     }
 
-    expectedQueryArgsWithOpts.body = Object.assign({}, expArgs.body, expOpts);
+    kuzzle.query.resolves({result});
 
-    ms[command].apply(ms, args);
-    should(kuzzle.query).calledWith(query, expArgs, null, undefined);
+    return kuzzle.ms[command](...args)
+      .then(res => {
+        should(res).eql(expected);
 
-    ms[command].apply(ms, args.concat(opts));
-    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, undefined);
+        should(kuzzle.query)
+          .be.calledOnce()
+          .be.calledWith(Object.assign({
+            controller: 'ms',
+            action: command
+          }, expArgs));
 
-    ms[command].apply(ms, args.concat(emptyFunc));
-    should(kuzzle.query).calledWith(query, expArgs, null, sinon.match.func);
-
-    ms[command].apply(ms, args.concat(opts, emptyFunc));
-    should(kuzzle.query).calledWith(query, expectedQueryArgsWithOpts, {}, sinon.match.func);
-
-    kuzzle.query.yields(null, {result: result});
-    return ms[command + 'Promise'].apply(ms, args)
-      .then(function (res) {
-        should(res).be.eql(expected);
+        return kuzzle.ms[command](...(args.concat(opts)));
+      })
+      .then(() => {
+        should(kuzzle.query)
+          .be.calledWith(Object.assign({
+            controller: 'ms',
+            action: command
+          }, expArgs, expOpts));
       });
-  }
+  };
 
   it('#append', function () {
     return testWriteCommand(
