@@ -1,9 +1,13 @@
 const _kuzzle = Symbol();
 
+/**
+ * @class ServerController
+ * @property {Kuzzle} kuzzle - The Kuzzle SDK Instance
+ */
 class ServerController {
 
   /**
-   * @param {Kuzzle} kuzzle
+   * @param {Kuzzle} kuzzle - The Kuzzle SDK Instance
    */
   constructor (kuzzle) {
     this[_kuzzle] = kuzzle;
@@ -13,6 +17,12 @@ class ServerController {
     return this[_kuzzle];
   }
 
+  /**
+   * Checks if an administrator user exists
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Boolean>}
+   */
   adminExists (options) {
     return this.kuzzle.query({
       controller: 'server',
@@ -21,6 +31,13 @@ class ServerController {
       .then(result => result.exists);
   }
 
+
+  /**
+   * Returns all stored statistics frames
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
   getAllStats (options) {
     return this.kuzzle.query({
       controller: 'server',
@@ -28,6 +45,12 @@ class ServerController {
     }, options);
   }
 
+  /**
+   * Returns the Kuzzle configuration
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
   getConfig (options) {
     return this.kuzzle.query({
       controller: 'server',
@@ -35,6 +58,12 @@ class ServerController {
     }, options);
   }
 
+  /**
+   * Returns the last statistics frame
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
   getLastStats (options) {
     return this.kuzzle.query({
       controller: 'server',
@@ -42,6 +71,12 @@ class ServerController {
     }, options);
   }
 
+  /**
+   * Returns the Kuzzle server information
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
   info (options) {
     return this.kuzzle.query({
       controller: 'server',
@@ -49,6 +84,12 @@ class ServerController {
     }, options);
   }
 
+  /**
+   * Get server's current timestamp
+   *
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Number>}
+   */
   now (options) {
     return this.kuzzle.query({
       controller: 'server',
