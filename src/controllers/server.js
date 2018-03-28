@@ -72,6 +72,23 @@ class ServerController {
   }
 
   /**
+   * Returns the statistics frame from a date
+   *
+   * @param {Number|String} startTime - begining of statistics frame set (timestamp or datetime format)
+   * @param {Number|String} stopTime - end of statistics frame set (timestamp or datetime format)
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
+  getStats(startTime, stopTime, options) {
+    return this.kuzzle.query({
+      controller: 'server',
+      action: 'getStats',
+      startTime,
+      stopTime
+    }, options);
+  }
+
+  /**
    * Returns the Kuzzle server information
    *
    * @param {Object} options - {queuable: Boolean(true)}
