@@ -218,7 +218,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
   /**
    * Connects to a Kuzzle instance using the provided host name
-   * @param {function} [cb] Connection callback
+   * @returns {Promise<Object>}
    */
   connect () {
     if (this.network.isReady()) {
@@ -321,9 +321,9 @@ class Kuzzle extends KuzzleEventEmitter {
       request.requestId = uuidv4();
     }
 
-    // we follow the api but allow some more logical "mistakes"
-    if (request.options) {
-      request.options = 'wait_for';
+    // we follow the api but allow some more logical "mistakes" (the only allowed value for refresh arg is "wait_for")
+    if (request.refresh) {
+      request.refresh = 'wait_for';
     }
 
     if (!request.volatile) {
