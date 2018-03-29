@@ -327,9 +327,14 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     if (!request.volatile) {
-      request.volatile = {};
+      request.volatile = this.volatile;
     } else if (typeof request.volatile !== 'object' || Array.isArray(request.volatile)) {
       return Promise.reject(new Error('Invalid volatile argument received. Must be an object.'));
+    }
+    for (const item of Object.keys(this.volatile)) {
+      if (request.volatile[item] === undefined) {
+        request.volatile[item] = this.volatile[item];
+      }
     }
     request.volatile.sdkInstanceId = this.network.id;
     request.volatile.sdkVersion = this.sdkVersion;
