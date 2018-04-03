@@ -26,6 +26,9 @@ class User {
    * @returns {Promise<[Profile]>}
    */
   getProfiles () {
+    if (!this.profileIds || this.profileIds.length === 0) {
+      return Promise.resolve([]);
+    }
     return this.kuzzle.security.mGetProfiles(this.profileIds);
   }
 
