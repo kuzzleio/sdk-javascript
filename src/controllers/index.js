@@ -103,11 +103,6 @@ class IndexController {
   }
 
   setAutoRefresh (index, autoRefresh, options) {
-    if (autoRefresh === undefined && typeof index === 'boolean') {
-      autoRefresh = index;
-      index = this.kuzzle.defaultIndex;
-    }
-
     if (!index || index === '') {
       return Promise.reject(new Error('Kuzzle.index.setAutoRefresh: index is required'));
     }

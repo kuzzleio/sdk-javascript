@@ -51,6 +51,8 @@ class Kuzzle extends KuzzleEventEmitter {
     this.eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
     this.protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
     this.version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
+    this.network = networkWrapper(this.protocol, host, options);
+    this.volatile = {};
 
     // controllers
     this.auth = new AuthController(this);
@@ -62,10 +64,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this.realtime = new RealtimeController(this);
     this.security = new SecurityController(this);
     this.server = new ServerController(this);
-
-    this.defaultIndex = typeof options.defaultIndex === 'string' ? options.defaultIndex : undefined;
-    this.network = networkWrapper(this.protocol, host, options);
-    this.volatile = {};
 
     for (const opt of Object.keys(options)) {
       if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
@@ -383,26 +381,6 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   playQueue () {
     this.network.playQueue();
-    return this;
-  }
-
-  /**
-   * Sets the default Kuzzle index
-   *
-   * @param index
-   * @returns this
-   */
-  setDefaultIndex (index) {
-    if (typeof index !== 'string') {
-      throw new Error(`Invalid default index: [${index}] (an index name is expected)`);
-    }
-
-    if (index.length === 0) {
-      throw new Error('Cannot set an empty index as the default index');
-    }
-
-    this.defaultIndex = index;
-
     return this;
   }
 
