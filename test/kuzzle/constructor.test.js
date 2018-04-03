@@ -4,9 +4,7 @@ var
   bluebird = require('bluebird'),
   proxyquire = require('proxyquire'),
   Kuzzle = require('../../src/Kuzzle'),
-  MemoryStorage = require('../../src/MemoryStorage'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
-  Security = require('../../src/security/Security');
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 describe('Kuzzle constructor', function () {
   var connectStub;
@@ -48,7 +46,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.removeAllListeners).be.a.Function();
     should(kuzzle.removeListener).be.a.Function();
     should(kuzzle.setAutoRefresh).be.a.Function();
-    should(kuzzle.setDefaultIndex).be.a.Function();
     should(kuzzle.setJwt).be.a.Function();
     should(kuzzle.startQueuing).be.a.Function();
     should(kuzzle.stopQueuing).be.a.Function();
@@ -56,7 +53,7 @@ describe('Kuzzle constructor', function () {
   });
 
   it('should expose the documented writable properties', function () {
-    var 
+    var
       kuzzle = new Kuzzle('somewhere'),
       fn = function() {};
 
@@ -74,7 +71,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.autoReplay).be.true();
     should(function() {kuzzle.autoReplay = 123;}).throw();
 
-    should(kuzzle).have.propertyWithDescriptor('defaultIndex', { enumerable: true, writable: true, configurable: false });
     should(kuzzle).have.propertyWithDescriptor('jwt', { enumerable: true, writable: true, configurable: false });
 
     should(kuzzle).have.propertyWithDescriptor('offlineQueueLoader', { enumerable: true});
@@ -97,7 +93,7 @@ describe('Kuzzle constructor', function () {
     kuzzle.queueTTL = 123;
     should(kuzzle.queueTTL).be.eql(123);
     should(function() {kuzzle.queueTTL = 'foobar';}).throw();
-    
+
     should(kuzzle).have.propertyWithDescriptor('replayInterval', { enumerable: true });
     should(kuzzle.replayInterval).be.eql(10);
     kuzzle.replayInterval = 123;
@@ -147,7 +143,7 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
     kuzzle.offlineQueue = ['foo', 'bar'];
     should(kuzzle.offlineQueue).be.an.Array().and.be.empty();
-    
+
     should(kuzzle).have.propertyWithDescriptor('sdkVersion', { enumerable: false, writable: false, configurable: false });
   });
 
@@ -170,7 +166,6 @@ describe('Kuzzle constructor', function () {
       kuzzle = new Kuzzle('somewhere');
 
     should(kuzzle.autoResubscribe).be.true();
-    should(kuzzle.defaultIndex).be.undefined();
     should(kuzzle.jwt).be.undefined();
     should(kuzzle.protocol).be.exactly('websocket');
     should(kuzzle.sdkVersion).be.exactly(sdkVersion);
@@ -198,34 +193,25 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.protectedEvents.loginAttempt).be.eql({timeout: 200});
   });
 
-  it('should expose the right singletons', function () {
-    var kuzzle = new Kuzzle('somewhere');
-
-    should(kuzzle.security).be.an.instanceOf(Security);
-    should(kuzzle.memoryStorage).be.an.instanceOf(MemoryStorage);
-  });
-
   it('should initialize correctly properties using the "options" argument', function () {
     var MockedKuzzle = proxyquire('../../src/Kuzzle', {
       './networkWrapper': function(protocol, host, options) {
         return new NetworkWrapperMock(host, options);
       }
     });
-    
+
     var
       sdkVersion = require('../../package.json').version,
       options = {
         autoResubscribe: false,
         protocol: 'fakeproto',
         volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
-        defaultIndex: 'foobar',
         jwt: 'fakejwt',
         eventTimeout: 1000
       },
       kuzzle = new MockedKuzzle('somewhere', options);
 
     should(kuzzle.autoResubscribe).be.false();
-    should(kuzzle.defaultIndex).be.exactly('foobar');
     should(kuzzle.jwt).be.exactly('fakejwt');
     should(kuzzle.protocol).be.exactly('fakeproto');
     should(kuzzle.sdkVersion).be.exactly(sdkVersion);
@@ -279,7 +265,6 @@ describe('Kuzzle constructor', function () {
     should(kuzzle.removeAllListenersPromise).be.undefined();
     should(kuzzle.removeListenerPromise).be.undefined();
     should(kuzzle.setAutoRefreshPromise).be.a.Function();
-    should(kuzzle.setDefaultIndexPromise).be.undefined();
     should(kuzzle.setJwtPromise).be.undefined();
     should(kuzzle.startQueuingPromise).be.undefined();
     should(kuzzle.stopQueuingPromise).be.undefined();
