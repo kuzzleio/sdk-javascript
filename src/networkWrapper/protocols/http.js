@@ -148,14 +148,15 @@ class HttpWrapper extends AbtractWrapper {
       }
     }
 
-    //payload.headers['Content-Length'] = Buffer.byteLength(payload.body || '');
+    payload.headers['Content-Length'] = Buffer.byteLength(payload.body || '');
 
     const
       route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
 
     if (route === undefined) {
       const error = new Error(`No route found for ${payload.controller}/${payload.action}`);
-      return this.emit(payload.requestId, {status: 400, error});
+      this.emit(payload.requestId, {status: 400, error});
+      return Promise.reject(error);
     }
 
     const
@@ -192,7 +193,10 @@ class HttpWrapper extends AbtractWrapper {
 
     return this._sendHttpRequest(method, url, payload)
       .then(response => this.emit(payload.requestId, response))
-      .catch(error => this.emit(payload.requestId, {error}));
+      .catch(error => {
+        this.emit(payload.requestId, {error});
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -222,7 +226,6 @@ class HttpWrapper extends AbtractWrapper {
         xhr = new XMLHttpRequest(),
         url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
-      console.log(payload); // eslint-disable-line no-console
       xhr.open(method, url);
 
       for (const header of Object.keys(payload.headers || {})) {

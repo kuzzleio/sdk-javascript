@@ -1,9 +1,8 @@
 const
-  mockrequire = require('mock-require'),
-  rewire = require('rewire'),
+  proxyquire = require('proxyquire'),
   should = require('should'),
   sinon = require('sinon'),
-  HttpWrapper = rewire('../../src/networkWrapper/protocols/http');
+  HttpWrapper = require('../../src/networkWrapper/protocols/http');
 
 describe('HTTP networking module', () => {
   let network;
@@ -107,95 +106,69 @@ describe('HTTP networking module', () => {
       }
     };
 
-    let
-      reset,
-      sendHttpRequestStub;
-
     beforeEach(() => {
-      sendHttpRequestStub = sinon.stub();
-
-      reset = HttpWrapper.__set__({
-        sendHttpRequest: sendHttpRequestStub
-      });
+      network._sendHttpRequest = sinon.stub().resolves(connectHttpResult);
     });
 
-    afterEach(() => {
-      reset();
-    });
 
     it('should initialize network status and route list', () => {
-      network.connect();
+      const promise = network.connect();
       should(network.state).be.eql('offline');
 
-      sendHttpRequestStub.yield(null, connectHttpResult);
-      should(network.state).be.eql('ready');
+      return promise.then(() => {
+        should(network.state).be.eql('ready');
 
-      should(network.http.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
-      should(network.http.routes.foo.empty).be.undefined();
-      should(network.http.routes.baz).be.an.Object().and.be.empty();
+        should(network.http.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
+        should(network.http.routes.foo.empty).be.undefined();
+        should(network.http.routes.baz).be.an.Object().and.be.empty();
+      });
     });
 
     it('should start queuing while connecting, and then stop once the connection is ready if autoQueue option is set', () => {
       network.autoQueue = true;
 
-      network.connect();
+      const promise = network.connect();
       should(network.queuing).be.true();
 
-      sendHttpRequestStub.yield(null, connectHttpResult);
-      should(network.queuing).be.false();
+      return promise.then(() => should(network.queuing).be.false());
     });
 
     it('should not stop queuing when the client connection is ready if autoQueue option is not set', () => {
       network.queuing = true;
       network.autoQueue = false;
 
-      network.connect();
+      const promise = network.connect();
 
-      sendHttpRequestStub.yield(null, connectHttpResult);
-      should(network.queuing).be.true();
+      return promise.then(() => should(network.queuing).be.true());
     });
 
     it('should play the queue when the client connection is established if autoReplay option is set', () => {
       network.playQueue = sinon.stub();
       network.autoReplay = true;
 
-      network.connect();
+      const promise = network.connect();
 
-      sendHttpRequestStub.yield(null, connectHttpResult);
-      should(network.playQueue).be.calledOnce();
+      return promise.then(() => should(network.playQueue).be.calledOnce());
     });
 
     it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
       network.playQueue = sinon.stub();
       network.autoReplay = false;
 
-      network.connect();
+      const promise = network.connect();
 
-      sendHttpRequestStub.yield(null, connectHttpResult);
-      should(network.playQueue).not.be.called();
+      return promise.then(() => should(network.playQueue).not.be.called());
     });
   });
 
   describe('#send', () => {
-    let
-      sendHttpRequestStub,
-      reset;
-
     beforeEach(() => {
-      sendHttpRequestStub = sinon.stub();
-
-      reset = HttpWrapper.__set__({
-        sendHttpRequest: sendHttpRequestStub
-      });
+      network._sendHttpRequest = sinon.stub().resolves();
 
       network.status = 'ready';
       network.http.routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar'}}
       };
-    });
-
-    afterEach(() => {
-      reset();
     });
 
     it('should send an HTTP request to the backend', () => {
@@ -209,23 +182,25 @@ describe('HTTP networking module', () => {
         body: {foo: 'bar'}
       };
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(sendHttpRequestStub.firstCall.args[1]).be.equal('VERB');
-      should(sendHttpRequestStub.firstCall.args[2]).be.equal('/foo/bar');
-      should(sendHttpRequestStub.firstCall.args[3]).match({
-        requestId: 'requestId',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        controller: 'foo',
-        action: 'bar',
-        index: 'index',
-        collection: 'collection',
-        meta: 'meta',
-        body: JSON.stringify({foo: 'bar'})
-      });
+          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(network._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            controller: 'foo',
+            action: 'bar',
+            index: 'index',
+            collection: 'collection',
+            meta: 'meta',
+            body: JSON.stringify({foo: 'bar'})
+          });
+        });
     });
 
     it('should inject JWT header to the HTTP request', () => {
@@ -236,19 +211,21 @@ describe('HTTP networking module', () => {
         jwt: 'fake-jwt'
       };
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(sendHttpRequestStub.firstCall.args[1]).be.equal('VERB');
-      should(sendHttpRequestStub.firstCall.args[2]).be.equal('/foo/bar');
-      should(sendHttpRequestStub.firstCall.args[3]).match({
-        requestId: 'requestId',
-        headers: {
-          authorization: 'Bearer fake-jwt'
-        },
-        controller: 'foo',
-        action: 'bar'
-      });
+          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(network._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              authorization: 'Bearer fake-jwt'
+            },
+            controller: 'foo',
+            action: 'bar'
+          });
+        });
     });
 
     it('should inject volatile headers to the HTTP request', () => {
@@ -261,19 +238,21 @@ describe('HTTP networking module', () => {
         }
       };
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(sendHttpRequestStub.firstCall.args[1]).be.equal('VERB');
-      should(sendHttpRequestStub.firstCall.args[2]).be.equal('/foo/bar');
-      should(sendHttpRequestStub.firstCall.args[3]).match({
-        requestId: 'requestId',
-        headers: {
-          'x-kuzzle-volatile': '{"some":"volatile-data"}'
-        },
-        controller: 'foo',
-        action: 'bar'
-      });
+          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(network._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              'x-kuzzle-volatile': '{"some":"volatile-data"}'
+            },
+            controller: 'foo',
+            action: 'bar'
+          });
+        });
     });
 
     it('should inject queryString to the HTTP request', () => {
@@ -284,11 +263,13 @@ describe('HTTP networking module', () => {
         foo: 'bar'
       };
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(sendHttpRequestStub.firstCall.args[1]).be.equal('VERB');
-      should(sendHttpRequestStub.firstCall.args[2]).be.equal('/foo/bar?foo=bar');
+          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo=bar');
+        });
     });
 
     it('should inject placeholders parameters', () => {
@@ -302,11 +283,13 @@ describe('HTTP networking module', () => {
         foo: {bar: {verb: 'VERB', url: '/foo/bar/:foo'}}
       };
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(sendHttpRequestStub.firstCall.args[1]).be.equal('VERB');
-      should(sendHttpRequestStub.firstCall.args[2]).be.equal('/foo/bar/baz');
+          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar/baz');
+        });
     });
 
     it('should not send any HTTP request and emit a "No route found" event if no route is defined', () => {
@@ -320,12 +303,18 @@ describe('HTTP networking module', () => {
 
       network.addListener('requestId', eventStub);
 
-      network.send(data);
-      should(sendHttpRequestStub).not.be.called();
-      should(eventStub).be.calledOnce();
-      const calledArgument = eventStub.firstCall.args[0];
-      should(calledArgument.status).be.equal(400);
-      should(calledArgument.error.message).be.equal('No route found for bar/foo');
+      return network.send(data)
+        .then(() => Promise.reject('No error'))
+        .catch(err => {
+          should(network._sendHttpRequest).not.be.called();
+          should(eventStub).be.calledOnce();
+
+          const calledArgument = eventStub.firstCall.args[0];
+          should(calledArgument.status).be.equal(400);
+          should(calledArgument.error.message).be.equal('No route found for bar/foo');
+
+          should(err.message).be.equal('No route found for bar/foo');
+        });
     });
 
     it('should emit an event with the backend response to the "requestId" listeners', () => {
@@ -339,141 +328,70 @@ describe('HTTP networking module', () => {
 
       network.addListener('requestId', eventStub);
 
-      network.send(data);
-      should(sendHttpRequestStub).be.calledOnce();
-
       const result = {status: 200, backend: 'response'};
+      network._sendHttpRequest.resolves(result);
 
-      sendHttpRequestStub.yield(null, result);
+      return network.send(data)
+        .then(() => {
+          should(network._sendHttpRequest).be.calledOnce();
 
-      should(eventStub).be.calledOnce();
-      should(eventStub.firstCall.args[0]).match({status: 200, backend: 'response'});
+          should(eventStub).be.calledOnce();
+          should(eventStub.firstCall.args[0]).match({status: 200, backend: 'response'});
+        });
     });
   });
 
   describe('#sendHttpRequest NodeJS', () => {
     const
-      emitEvent = (mock, evt, ...payload) => {
-        for (const cb of mock._events[evt]) {
-          cb(...payload);
-        }
-      },
-      listenEvent = (mock, evt, cb) => {
-        if (mock._events[evt] === undefined) {
-          mock._events[evt] = [];
-        }
-        if (typeof cb === 'function') {
-          mock._events[evt].push(cb);
-        }
+      mockResponseBody = {
+        status: 200,
+        result: 'Kuzzle Result'
       };
 
-    let
-      reqCB,
-      MockHttpWrapper,
-      requestMock,
-      responseMock,
-      httpRequestStub,
-      sendHttpRequest;
+    let httpRequestStub;
 
     beforeEach(() => {
-      MockHttpWrapper = rewire('../../src/networkWrapper/protocols/http');
-      sendHttpRequest = MockHttpWrapper.__get__('sendHttpRequest');
+      httpRequestStub = sinon.stub().resolves({body: JSON.stringify(mockResponseBody)});
 
-      requestMock = {
-        _events: {},
-        emit: (evt, ...payload) => emitEvent(requestMock, evt, ...payload),
-        on: (evt, cb) => listenEvent(requestMock, evt, cb),
-        write: sinon.stub(),
-        end: sinon.stub()
-      };
-      httpRequestStub = sinon.stub().returns(requestMock);
-
-      responseMock = {
-        _events: {},
-        emit: (evt, ...payload) => emitEvent(responseMock, evt, ...payload),
-        on: (evt, cb) => listenEvent(responseMock, evt, cb),
-      };
-
-      mockrequire('http', {request: httpRequestStub});
-      MockHttpWrapper = mockrequire.reRequire('../../src/networkWrapper/protocols/http');
-
-      network = new MockHttpWrapper('address', {
-        port: 1234
+      const MockHttpWrapper = proxyquire('../../src/networkWrapper/protocols/http', {
+        'min-req-promise': {request: httpRequestStub}
       });
 
-      reqCB = sinon.stub();
-    });
-
-    afterEach(() => {
-      mockrequire.stopAll();
+      network = new MockHttpWrapper('address', {port: 1234});
     });
 
     it('should call http.request with empty body', () => {
-      const options = {
-        protocol: 'http:',
-        host: 'address',
-        port: 1234,
-        method: 'VERB',
-        path: '/foo/bar'
-      };
+      network._sendHttpRequest('VERB', '/foo/bar');
 
-      sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWithMatch(options);
-
-      should(requestMock.write).be.calledOnce();
-      should(requestMock.write).be.calledWith('');
-
-      should(requestMock.end).be.calledOnce();
+      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', { body: undefined, headers: undefined });
     });
 
     it('should call http.request with a body', () => {
-      const options = {
-        protocol: 'http:',
-        host: 'address',
-        port: 1234,
-        method: 'VERB',
-        path: '/foo/bar'
-      };
+      network._sendHttpRequest('VERB', '/foo/bar', {body: 'http request body'});
 
-      sendHttpRequest(network, 'VERB', '/foo/bar', {body: 'http request body'}, reqCB);
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWithMatch(options);
-
-      should(requestMock.write).be.calledOnce();
-      should(requestMock.write).be.calledWith('http request body');
-
-      should(requestMock.end).be.calledOnce();
+      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {body: 'http request body', headers: undefined });
     });
 
-    it('should call the callback with the error in case of error', () => {
-      sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
+    it('should reject the request in case of error', () => {
+      httpRequestStub.rejects('My HTTP Error');
 
-      should(reqCB).not.be.called();
-      requestMock.emit('error', 'My HTTP Error');
-      should(reqCB).be.calledOnce();
-      should(reqCB).be.calledWith('My HTTP Error');
+      return network._sendHttpRequest('VERB', '/foo/bar')
+        .then(() => Promise.reject('No error'))
+        .catch(err => {
+          should(err).be.an.instanceof(Error);
+          should(err.name).be.exactly('My HTTP Error');
+        });
     });
 
-    it('should call the callback with the backend response', () => {
-      const
-        response = {
-          status: 200,
-          result: 'Kuzzle Result'
-        };
-
-      sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
-
-      should(reqCB).not.be.called();
-
-      const resCB = httpRequestStub.firstCall.args[1];
-
-      resCB(responseMock);
-      responseMock.emit('data', JSON.stringify(response));
-      responseMock.emit('end');
-
-      should(reqCB).be.calledOnce();
-      should(reqCB).be.calledWith(null, response);
+    it('should resolve with the backend response', () => {
+      return network._sendHttpRequest(network, 'VERB', '/foo/bar')
+        .then(res => {
+          should(res).be.an.Object();
+          should(res.status).be.equal(mockResponseBody.status);
+          should(res.result).be.equal(mockResponseBody.result);
+        });
     });
   });
 
@@ -481,10 +399,7 @@ describe('HTTP networking module', () => {
    * @global XMLHttpRequest
    */
   describe('#sendHttpRequest XMLHttpRequest', () => {
-    let
-      xhrStub,
-      reqCB,
-      sendHttpRequest;
+    let xhrStub;
 
     beforeEach(() => {
       xhrStub = {
@@ -496,23 +411,18 @@ describe('HTTP networking module', () => {
         return xhrStub;
       };
 
-      sendHttpRequest = HttpWrapper.__get__('sendHttpRequest');
       network = new HttpWrapper('address', {
         port: 1234
       });
-
-      reqCB = sinon.stub();
     });
 
     afterEach(() => {
       // eslint-disable-next-line no-native-reassign, no-global-assign
       XMLHttpRequest = undefined;
-
-      mockrequire.stopAll();
     });
 
     it('should call XMLHttpRequest with empty body', () => {
-      sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
+      network._sendHttpRequest('VERB', '/foo/bar');
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
@@ -522,7 +432,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should call XMLHttpRequest with a body', () => {
-      sendHttpRequest(network, 'VERB', '/foo/bar', {body: 'http request body'}, reqCB);
+      network._sendHttpRequest('VERB', '/foo/bar', {body: 'http request body'});
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
@@ -531,23 +441,18 @@ describe('HTTP networking module', () => {
       should(xhrStub.send).be.calledWith('http request body');
     });
 
-    it('should call the callback with the backend response', () => {
-      const
-        response = {
-          status: 200,
-          result: 'Kuzzle Result'
-        };
+    it('should resolve with the backend response', () => {
+      const promise = network._sendHttpRequest('VERB', '/foo/bar');
 
-      sendHttpRequest(network, 'VERB', '/foo/bar', reqCB);
-
-      should(reqCB).not.be.called();
-
-      xhrStub.responseText = JSON.stringify(response);
-
+      xhrStub.responseText = '{"status": 200, "result": "Kuzzle Result"}';
       xhrStub.onload();
 
-      should(reqCB).be.calledOnce();
-      should(reqCB).be.calledWith(null, response);
+      return promise
+        .then(res => {
+          should(res).be.an.Object();
+          should(res.status).be.exactly(200);
+          should(res.result).be.exactly('Kuzzle Result');
+        });
     });
   });
 

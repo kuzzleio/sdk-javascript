@@ -214,13 +214,13 @@ Discarded request: ${JSON.stringify(request)}`));
       if (Array.isArray(additionalQueue)) {
         this.offlineQueue = additionalQueue
           .concat(this.offlineQueue)
-          .filter(request => {
-            // throws if the query object does not contain required attributes
-            if (!request.query || request.query.requestId === undefined || !request.query.action || !request.query.controller) {
+          .filter(query => {
+            // throws if the request does not contain required attributes
+            if (!query.request || query.request.requestId === undefined || !query.request.action || !query.request.controller) {
               throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
             }
 
-            return uniqueQueue.hasOwnProperty(request.query.requestId) ? false : (uniqueQueue[request.query.requestId] = true);
+            return uniqueQueue.hasOwnProperty(query.request.requestId) ? false : (uniqueQueue[query.request.requestId] = true);
           });
       } else {
         throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
@@ -233,14 +233,16 @@ Discarded request: ${JSON.stringify(request)}`));
   _emitRequest (request) {
     return new Promise((resolve, reject) => {
       this.once(request.requestId, response => {
-        if (request.action !== 'logout'
-          && response.error
-          && response.error.message === 'Token expired'
-        ) {
+        if (response.error) {
           const error = new Error(response.error.message);
           Object.assign(error, response.error);
           error.status = response.status;
+          response.error = error;
           this.emit('queryError', error, request);
+
+          if (request.action !== 'logout' && error.message === 'Token expired') {
+            this.emit('tokenExpired');
+          }
 
           return reject(error);
         }
@@ -248,7 +250,8 @@ Discarded request: ${JSON.stringify(request)}`));
         return resolve(response);
       });
 
-      this.send(request);
+      this.send(request)
+        .catch(err => reject(err));
     });
   }
 }

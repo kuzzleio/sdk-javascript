@@ -1,16 +1,16 @@
-var
+const
   should = require('should'),
   sinon = require('sinon'),
   WS = require('../../src/networkWrapper/protocols/websocket');
 
-describe('WebSocket networking module', function () {
-  var
+describe('WebSocket networking module', () => {
+  let
     clock,
     websocket,
     wsargs,
     clientStub;
 
-  beforeEach(function () {
+  beforeEach(() => {
     clock = sinon.useFakeTimers();
     clientStub = {
       send: sinon.stub(),
@@ -30,25 +30,25 @@ describe('WebSocket networking module', function () {
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     clock.restore();
     WebSocket = undefined; // eslint-disable-line
     window = undefined; // eslint-disable-line
   });
 
-  it('should initialize network status when connecting', function () {
+  it('should initialize network status when connecting', () => {
     websocket.connect();
     should(websocket.state).be.eql('connecting');
     should(websocket.queuing).be.false();
   });
 
-  it('should start queuing if autoQueue option is set', function () {
+  it('should start queuing if autoQueue option is set', () => {
     websocket.autoQueue = true;
     websocket.connect();
     should(websocket.queuing).be.true();
   });
 
-  it('should initialize a WS connection properly', function () {
+  it('should initialize a WS connection properly', () => {
     clientStub.on = sinon.stub();
     websocket.connect();
     should(wsargs).match(['ws://address:1234']);
@@ -58,7 +58,7 @@ describe('WebSocket networking module', function () {
     should(clientStub.onmessage).not.be.undefined();
   });
 
-  it('should initialize a WS secure connection', function () {
+  it('should initialize a WS secure connection', () => {
     clientStub.on = sinon.stub();
     websocket = new WS('address', {
       port: 1234,
@@ -70,8 +70,8 @@ describe('WebSocket networking module', function () {
     should(wsargs).match(['wss://address:1234']);
   });
 
-  it('should call listeners on a "open" event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on a "open" event', () => {
+    const cb = sinon.stub();
 
     should(websocket.listeners('connect').length).be.eql(0);
     should(websocket.listeners('reconnect').length).be.eql(0);
@@ -86,7 +86,7 @@ describe('WebSocket networking module', function () {
     should(cb).be.calledOnce();
   });
 
-  it('should change the state when the client connection is established', function () {
+  it('should change the state when the client connection is established', () => {
     websocket.state = 'connecting';
 
     websocket.connect();
@@ -96,7 +96,7 @@ describe('WebSocket networking module', function () {
     should(websocket.stopRetryingToConnect).be.false();
   });
 
-  it('should stop queuing when the client connection is established if autoQueue option is set', function () {
+  it('should stop queuing when the client connection is established if autoQueue option is set', () => {
     websocket.queuing = true;
     websocket.autoQueue = true;
 
@@ -105,7 +105,7 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.false();
   });
 
-  it('should not stop queuing when the client connection is established if autoQueue option is not set', function () {
+  it('should not stop queuing when the client connection is established if autoQueue option is not set', () => {
     websocket.queuing = true;
     websocket.autoQueue = false;
 
@@ -114,7 +114,7 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.true();
   });
 
-  it('should play the queue when the client connection is established if autoReplay option is set', function () {
+  it('should play the queue when the client connection is established if autoReplay option is set', () => {
     websocket.playQueue = sinon.stub();
     websocket.autoReplay = true;
 
@@ -123,7 +123,7 @@ describe('WebSocket networking module', function () {
     should(websocket.playQueue).be.calledOnce();
   });
 
-  it('should not play the queue when the client connection is established if autoReplay option is not set', function () {
+  it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
     websocket.playQueue = sinon.stub();
     websocket.autoReplay = false;
 
@@ -132,8 +132,8 @@ describe('WebSocket networking module', function () {
     should(websocket.playQueue).not.be.called();
   });
 
-  it('should call listeners on a "reconnect" event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on a "reconnect" event', () => {
+    const cb = sinon.stub();
 
     should(websocket.listeners('connect').length).be.eql(0);
     should(websocket.listeners('reconnect').length).be.eql(0);
@@ -150,8 +150,8 @@ describe('WebSocket networking module', function () {
     should(cb).be.calledOnce();
   });
 
-  it('should try to reconnect on a connection error with autoReconnect = true', function () {
-    var cb = sinon.stub();
+  it('should try to reconnect on a connection error with autoReconnect = true', () => {
+    const cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.addListener('networkError', cb);
@@ -159,6 +159,7 @@ describe('WebSocket networking module', function () {
 
     websocket.connect();
     websocket.connect = sinon.stub();
+    clientStub.onopen();
     clientStub.onerror();
     should(websocket.retrying).be.true();
     clock.tick(10);
@@ -168,8 +169,8 @@ describe('WebSocket networking module', function () {
     should(websocket.connect).be.calledOnce();
   });
 
-  it('should not try to reconnect on a connection error with autoReconnect = false', function () {
-    var cb = sinon.stub();
+  it('should not try to reconnect on a connection error with autoReconnect = false', () => {
+    const cb = sinon.stub();
 
     websocket = new WS('address', {
       port: 1234,
@@ -181,18 +182,20 @@ describe('WebSocket networking module', function () {
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
-    websocket.connect();
+    const promise = websocket.connect();
     websocket.connect = sinon.stub();
-    clientStub.onerror();
+    clientStub.onerror('foobar');
     clock.tick(10);
 
     should(cb).be.calledOnce();
     should(websocket.retrying).be.false();
     should(websocket.connect).not.be.called();
+
+    return should(promise).be.rejectedWith('foobar');
   });
 
-  it('should call listeners on a "disconnect" event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on a "disconnect" event', () => {
+    const cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.addListener('disconnect', cb);
@@ -206,7 +209,7 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('disconnect').length).be.eql(1);
   });
 
-  it('should start queuing when the client is disconnected if autoQueue option is set', function () {
+  it('should start queuing when the client is disconnected if autoQueue option is set', () => {
     websocket.queuing = false;
     websocket.autoQueue = true;
 
@@ -217,7 +220,7 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.true();
   });
 
-  it('should not start queuing when the client is disconnected if autoQueue option is not set', function () {
+  it('should not start queuing when the client is disconnected if autoQueue option is not set', () => {
     websocket.queuing = false;
     websocket.autoQueue = false;
 
@@ -228,8 +231,8 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.false();
   });
 
-  it('should call error listeners on a "disconnect" event with an abnormal websocket code', function () {
-    var cb = sinon.stub();
+  it('should call error listeners on a "disconnect" event with an abnormal websocket code', () => {
+    const cb = sinon.stub();
 
     websocket.retrying = false;
     websocket.addListener('networkError', cb);
@@ -254,7 +257,7 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('networkError').length).be.eql(1);
   });
 
-  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', function () {
+  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', () => {
     websocket.queuing = false;
     websocket.autoQueue = true;
 
@@ -265,7 +268,7 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.true();
   });
 
-  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', function () {
+  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', () => {
     websocket.queuing = false;
     websocket.autoQueue = false;
 
@@ -276,12 +279,11 @@ describe('WebSocket networking module', function () {
     should(websocket.queuing).be.false();
   });
 
-  it('should be able to register ephemeral callbacks on an event', function () {
-    var
+  it('should be able to register ephemeral callbacks on an event', () => {
+    let
       cb1,
       cb2,
-      cb3,
-      payload = {room: 'foobar'};
+      cb3;
 
     websocket.once('foobar', function(arg) {cb1 = arg;});
     websocket.once('foobar', function(arg) {cb2 = arg;});
@@ -291,6 +293,7 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('foobar').length).be.equal(2);
     should(websocket.listeners('barfoo').length).be.equal(1);
 
+    const payload = {room: 'foobar'};
     clientStub.onmessage({data: JSON.stringify(payload)});
 
     clock.tick(10);
@@ -301,11 +304,10 @@ describe('WebSocket networking module', function () {
     should(cb3).be.undefined();
   });
 
-  it('should be able to register persistent callbacks on an event', function () {
-    var
+  it('should be able to register persistent callbacks on an event', () => {
+    let
       cb1,
-      cb2,
-      payload = {room: 'foobar'};
+      cb2;
 
     websocket.on('foobar', function(arg) {cb1 = arg;});
     websocket.on('foobar', function(arg) {cb2 = arg;});
@@ -313,6 +315,7 @@ describe('WebSocket networking module', function () {
 
     should(websocket.listeners('foobar').length).be.equal(2);
 
+    const payload = {room: 'foobar'};
     clientStub.onmessage({data: JSON.stringify(payload)});
 
     clock.tick(10);
@@ -321,14 +324,13 @@ describe('WebSocket networking module', function () {
     should(cb2).match(payload);
   });
 
-  it('should send the message on room "discarded" if no room specified', function () {
-    var
-      cb = sinon.stub(),
-      payload = {};
+  it('should send the message on room "discarded" if no room specified', () => {
+    const cb = sinon.stub();
 
     websocket.on('discarded', cb);
     websocket.connect();
 
+    const payload = {};
     clientStub.onmessage({data: JSON.stringify(payload)});
 
     clock.tick(10);
@@ -336,10 +338,10 @@ describe('WebSocket networking module', function () {
     should(cb.alwaysCalledWithMatch(payload)).be.true();
   });
 
-  it('should be able to unregister a callback on an event', function () {
-    var
-      cb1 = function(arg) {cb1 = arg;},
-      cb2 = function(arg) {cb2 = arg;};
+  it('should be able to unregister a callback on an event', () => {
+    const
+      cb1 = sinon.stub(),
+      cb2 = sinon.stub();
 
     websocket.on('foobar', cb1);
     websocket.on('foobar', cb2);
@@ -354,10 +356,10 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('foobar').length).be.exactly(0);
   });
 
-  it('should do nothing if trying to unregister an non-existent event/callback', function () {
-    var
-      cb1 = function(arg) {cb1 = arg;},
-      cb2 = function(arg) {cb2 = arg;};
+  it('should do nothing if trying to unregister an non-existent event/callback', () => {
+    const
+      cb1 = sinon.stub(),
+      cb2 = sinon.stub();
 
     websocket.on('foobar', cb1);
     websocket.on('foobar', cb2);
@@ -372,8 +374,8 @@ describe('WebSocket networking module', function () {
     should(websocket.listeners('foobar').length).be.equal(2);
   });
 
-  it('should send data payload through websocket', function () {
-    var data = {foo: 'bar'};
+  it('should send data payload through websocket', () => {
+    const data = {foo: 'bar'};
 
     clientStub.readyState = clientStub.OPEN = true;
     websocket.connect();
@@ -383,8 +385,8 @@ describe('WebSocket networking module', function () {
     should(clientStub.send.calledWith(JSON.stringify(data))).be.true();
   });
 
-  it('should discard messages if the socket is not ready', function () {
-    var data = {foo: 'bar'};
+  it('should discard messages if the socket is not ready', () => {
+    const data = {foo: 'bar'};
 
     clientStub.readyState = 'foo';
     clientStub.OPEN = 'bar';
@@ -394,9 +396,8 @@ describe('WebSocket networking module', function () {
     should(clientStub.send).not.be.called();
   });
 
-  it('should properly close a connection when asked', function () {
-    var
-      cb = sinon.stub();
+  it('should properly close a connection when asked', () => {
+    const cb = sinon.stub();
 
     websocket.on('foobar', cb);
     websocket.addListener('connect', cb);
@@ -419,17 +420,17 @@ describe('WebSocket networking module', function () {
   });
 
   describe('#isReady', function() {
-    it('should be ready if the instance is connected', function () {
+    it('should be ready if the instance is connected', () => {
       websocket.state = 'connected';
       should(websocket.isReady()).be.true();
     });
 
-    it('should not be ready if the instance is offline', function () {
+    it('should not be ready if the instance is offline', () => {
       websocket.state = 'offline';
       should(websocket.isReady()).be.false();
     });
 
-    it('should not be ready if the instance is still connecting', function () {
+    it('should not be ready if the instance is still connecting', () => {
       websocket.state = 'connecting';
       should(websocket.isReady()).be.false();
     });
