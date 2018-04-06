@@ -1,62 +1,59 @@
-var
-  sinon = require('sinon');
+const
+  sinon = require('sinon'),
+  KuzzleEventEmitter = require('../../src/eventEmitter');
 
-/**
- * @param err
- * @constructor
- */
-function NetworkWrapperMock (host, options) {
-  var self = this;
+class NetworkWrapperMock extends KuzzleEventEmitter {
 
-  this.host = host;
-  this.options = options || {};
-  this.port = this.options.port || 7512;
-  this.state = 'offline';
-  this.connectCalled = false;
+  constructor (host, options) {
+    super();
 
-  this.removeAllListeners();
+    this.host = host;
+    this.options = options || {};
+    this.port = this.options.port || 7512;
+    this.state = 'offline';
+    this.connectCalled = false;
 
-  this.connect = function() {
-    self.state = 'connecting';
-    self.connectCalled = true;
-    setTimeout(function () {
-      switch (self.host) {
+    this.close = sinon.stub();
+    this.query = sinon.stub();
+    this.playQueue = sinon.stub();
+    this.flushQueue = sinon.stub();
+    this.startQueuing = sinon.stub();
+    this.stopQueuing = sinon.stub();
+    this.subscribe = sinon.stub();
+    this.unsubscribe = sinon.stub();
+    this.isReady = sinon.stub();
+
+    this.removeAllListeners();
+  }
+
+  connect () {
+    this.state = 'connecting';
+    this.connectCalled = true;
+    setTimeout(() => {
+      switch (this.host) {
         case 'nowhere':
-          self.state = 'error';
-          self.emit('networkError', new Error('Mock Error'));
+          this.state = 'error';
+          this.emit('networkError', new Error('Mock Error'));
           break;
         case 'somewhereagain':
-          self.state = 'connected';
-          self.emit('reconnect');
+          this.state = 'connected';
+          this.emit('reconnect');
           break;
         default:
-          self.state = 'connected';
-          self.emit('connect');
+          this.state = 'connected';
+          this.emit('connect');
       }
     }, 0);
-  };
+  }
 
-  this.disconnect = function() {
-    self.state = 'offline';
-    self.emit('disconnect');
-  };
+  disconnect () {
+    this.state = 'offline';
+    this.emit('disconnect');
+  }
 
-  this.send = function (request) {
-    self.emit(request.requestId, request.response);
-  };
-
-  this.close = sinon.stub();
-  this.query = sinon.stub();
-  this.playQueue = sinon.stub();
-  this.flushQueue = sinon.stub();
-  this.startQueuing = sinon.stub();
-  this.stopQueuing = sinon.stub();
-  this.subscribe = sinon.stub();
-  this.unsubscribe = sinon.stub();
-  this.isReady = sinon.stub();
+  send (request) {
+    this.emit(request.requestId, request.response);
+  }
 }
-
-NetworkWrapperMock.prototype = new (require('events'))();
-NetworkWrapperMock.prototype.constructor = NetworkWrapperMock;
 
 module.exports = NetworkWrapperMock;

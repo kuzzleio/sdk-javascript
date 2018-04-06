@@ -24,15 +24,7 @@ const
     'queryError',
     'reconnected',
     'tokenExpired'
-  ],
-  protectedEvents = {
-    connected: {},
-    error: {},
-    disconnected: {},
-    reconnected: {},
-    tokenExpired: {},
-    loginAttempt: {}
-  };
+  ];
 
 class Kuzzle extends KuzzleEventEmitter {
 
@@ -47,12 +39,21 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error('host argument missing');
     }
 
+    this._protectedEvents = {
+      connected: {},
+      error: {},
+      disconnected: {},
+      reconnected: {},
+      tokenExpired: {},
+      loginAttempt: {}
+    };
+
     this.autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
     this.eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
     this.protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
     this.version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
     this.network = networkWrapper(this.protocol, host, options);
-    this.volatile = {};
+    this.volatile = typeof options.volatile === 'object' ? options.volatile : {};
 
     // controllers
     this.auth = new AuthController(this);
@@ -64,12 +65,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this.realtime = new RealtimeController(this);
     this.security = new SecurityController(this);
     this.server = new ServerController(this);
-
-    for (const opt of Object.keys(options)) {
-      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
-        this[opt] = options[opt];
-      }
-    }
 
     this.network.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
     this.network.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
@@ -113,7 +108,7 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   set jwt (token) {
-    if (token === undefined) {
+    if (token === undefined || token === null) {
       this._jwt = undefined;
     }
     else if (typeof token === 'string') {
@@ -125,9 +120,9 @@ class Kuzzle extends KuzzleEventEmitter {
       && typeof token.result.jwt === 'string'
     ) {
       this._jwt = token.result.jwt;
+    } else {
+      throw new Error(`Invalid token argument: ${token}`);
     }
-
-    throw new Error(`Invalid token argument: ${token}`);
   }
 
   get host () {
@@ -161,11 +156,11 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get queueMaxSize () {
-    return this.network.queuMaxSize();
+    return this.network.queueMaxSize;
   }
 
   set queueMaxSize (value) {
-    this._checkPropertyType('queueMaxSize');
+    this._checkPropertyType('queueMaxSize', 'number', value);
     this.network.queueMaxSize = value;
   }
 
@@ -202,7 +197,7 @@ class Kuzzle extends KuzzleEventEmitter {
   emit (eventName, ...payload) {
     const
       now = Date.now(),
-      protectedEvent = protectedEvents[eventName];
+      protectedEvent = this._protectedEvents[eventName];
 
     if (protectedEvent) {
       if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - this.eventTimeout) {
