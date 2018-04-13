@@ -28,7 +28,15 @@ class ServerController {
       controller: 'server',
       action: 'adminExists'
     }, options)
-      .then(result => result.exists);
+      .then(result => {
+        if (typeof result.exists !== 'boolean') {
+          const error = new Error('adminExists: bad response format');
+          error.status = 400;
+          error.response = result;
+          return Promise.reject(error);
+        }
+        return result.exists;
+      });
   }
 
 
@@ -112,7 +120,15 @@ class ServerController {
       controller: 'server',
       action: 'now'
     }, options)
-      .then(result => result.now);
+      .then(result => {
+        if (typeof result.now !== 'number') {
+          const error = new Error('now: bad response format');
+          error.status = 400;
+          error.response = result;
+          return Promise.reject(error);
+        }
+        return result.now;
+      });
   }
 }
 
