@@ -3,7 +3,7 @@ const
   should = require('should'),
   sinon = require('sinon');
 
-describe('ms', function () {
+describe('MemoryStorage Controller', function () {
   let kuzzle;
 
   beforeEach(function () {

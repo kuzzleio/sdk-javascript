@@ -4,7 +4,7 @@ const
   sinon = require('sinon'),
   should = require('should');
 
-describe('collection', () => {
+describe('Collection Controller', () => {
   const options = {opt: 'in'};
   let kuzzle;
 

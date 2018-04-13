@@ -3,7 +3,7 @@ const
   sinon = require('sinon'),
   should = require('should');
 
-describe('bulk', () => {
+describe('Bulk Controller', () => {
   const options = {opt: 'in'};
 
   let kuzzle;
