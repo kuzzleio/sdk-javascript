@@ -215,7 +215,7 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   connect () {
     if (this.network.isReady()) {
-      return Promise.resolve(this);
+      return Promise.resolve();
     }
 
     this.network.addListener('connect', () => {
@@ -223,17 +223,13 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.addListener('networkError', error => {
-      const connectionError = new Error(`Unable to connect to kuzzle proxy server at ${this.network.host}:${this.network.port}`);
+      const connectionError = new Error(`Unable to connect to kuzzle server at ${this.network.host}:${this.network.port}`);
 
       connectionError.internal = error;
       this.emit('networkError', connectionError);
     });
 
     this.network.addListener('disconnect', () => {
-      for (const collection of Object.keys(this.collections)) {
-        delete this.collections[collection];
-      }
-
       this.emit('disconnected');
     });
 
@@ -287,10 +283,6 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   disconnect () {
     this.network.close();
-
-    for (const collection of Object.keys(this.collections)) {
-      delete this.collections[collection];
-    }
   }
 
   /**

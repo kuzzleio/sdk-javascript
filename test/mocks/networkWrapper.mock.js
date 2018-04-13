@@ -29,21 +29,25 @@ class NetworkWrapperMock extends KuzzleEventEmitter {
   connect () {
     this.state = 'connecting';
     this.connectCalled = true;
-    setTimeout(() => {
+    return new Promise((resolve, reject) => {
       switch (this.host) {
         case 'nowhere':
+          const error = new Error('Mock Error');
           this.state = 'error';
-          this.emit('networkError', new Error('Mock Error'));
+          this.emit('networkError', error);
+          reject(error);
           break;
         case 'somewhereagain':
           this.state = 'connected';
           this.emit('reconnect');
+          resolve();
           break;
         default:
           this.state = 'connected';
           this.emit('connect');
+          resolve();
       }
-    }, 0);
+    });
   }
 
   disconnect () {
