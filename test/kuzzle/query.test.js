@@ -18,7 +18,7 @@ describe('Kuzzle query management', () => {
     let kuzzle;
 
     beforeEach(() => {
-    const Kuzzle = proxyquire('../../src/Kuzzle', {
+      const Kuzzle = proxyquire('../../src/Kuzzle', {
         './networkWrapper': function (protocol, host, options) {
           return new NetworkWrapperMock(host, options);
         }
@@ -81,7 +81,7 @@ describe('Kuzzle query management', () => {
         .then(() => Promise.reject(new Error('No Error')))
         .catch(err => {
           should(err.message).be.equal('Invalid request: "foobar"');
-          return kuzzle.query(['foo', 'bar'])
+          return kuzzle.query(['foo', 'bar']);
         })
         .then(() => Promise.reject(new Error('No Error')))
         .catch(err => {
@@ -94,7 +94,7 @@ describe('Kuzzle query management', () => {
         .then(() => Promise.reject(new Error('No Error')))
         .catch(err => {
           should(err.message).be.equal('Invalid "options" argument: "foobar"');
-          return kuzzle.query({}, ['foo', 'bar'])
+          return kuzzle.query({}, ['foo', 'bar']);
         })
         .then(() => Promise.reject(new Error('No Error')))
         .catch(err => {
@@ -104,9 +104,9 @@ describe('Kuzzle query management', () => {
 
     it('should handle kuzzle "volatile" properly', () => {
       const volatile = {
-          foo: 'bar',
-          baz: ['foo', 'bar', 'qux']
-        };
+        foo: 'bar',
+        baz: ['foo', 'bar', 'qux']
+      };
 
       kuzzle.volatile = volatile;
       kuzzle.query();
@@ -116,9 +116,9 @@ describe('Kuzzle query management', () => {
 
     it('should copy request local volatile over kuzzle object ones', () => {
       const volatile = {
-          foo: 'bar',
-          baz: ['foo', 'bar', 'qux']
-        };
+        foo: 'bar',
+        baz: ['foo', 'bar', 'qux']
+      };
 
       kuzzle.volatile = volatile;
 

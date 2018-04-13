@@ -30,9 +30,9 @@ class NetworkWrapperMock extends KuzzleEventEmitter {
     this.state = 'connecting';
     this.connectCalled = true;
     return new Promise((resolve, reject) => {
+      const error = new Error('Mock Error');
       switch (this.host) {
         case 'nowhere':
-          const error = new Error('Mock Error');
           this.state = 'error';
           this.emit('networkError', error);
           reject(error);

@@ -40,9 +40,7 @@ describe('Kuzzle connect', () => {
       kuzzle.addListener('networkError', eventStub);
 
       return kuzzle.connect()
-        .catch(err => {
-          should(eventStub).be.calledOnce();
-        });
+        .catch(() => should(eventStub).be.calledOnce());
     });
 
     it('should registered listeners upon receiving a "connect" event', () => {
@@ -105,7 +103,7 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "disconnect" event', () => {
       const
-        kuzzle = new Kuzzle('somewhere');
+        kuzzle = new Kuzzle('somewhere'),
         eventStub = sinon.stub();
 
       kuzzle.addListener('disconnected', eventStub);
