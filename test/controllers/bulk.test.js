@@ -15,20 +15,30 @@ describe('bulk', () => {
     kuzzle.bulk = new BulkController(kuzzle);
   });
 
-  it('import', () => {
-    const data = {foo: 'bar'};
+  describe('import', () => {
+    it('should call bulk/import query with the bulk data and return a Promise which resolves json object', () => {
+      kuzzle.query.resolves({hits: [
+        {create: {_id: 'foo'}, status: 200},
+        {update: {_id: 'bar'}, status: 200}
+      ]});
 
-    return kuzzle.bulk.import(data, options)
-      .then(() => {
-        should(kuzzle.query)
-          .be.calledOnce()
-          .be.calledWith({
-            controller: 'bulk',
-            action: 'import',
-            body: {
-              bulkData: data
-            }
-          }, options);
-      });
+      const data = {foo: 'bar'};
+
+      return kuzzle.bulk.import(data, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              body: {bulkData: data},
+              controller: 'bulk',
+              action: 'import'
+            }, options);
+
+          should(res).match({hits: [
+            {create: {_id: 'foo'}, status: 200},
+            {update: {_id: 'bar'}, status: 200}
+          ]});
+        });
+    });
   });
 });
