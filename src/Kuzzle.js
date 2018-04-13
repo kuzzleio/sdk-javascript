@@ -298,8 +298,12 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Promise<object>}
    */
   query (request = {}, options = {}) {
-    if (!request || typeof request !== 'object' || Array.isArray(request)) {
+    if (typeof request !== 'object' || Array.isArray(request)) {
       return Promise.reject(new Error(`Invalid request: ${JSON.stringify(request)}`));
+    }
+
+    if (typeof options !== 'object' || Array.isArray(options)) {
+      return Promise.reject(new Error(`Invalid "options" argument: ${JSON.stringify(options)}`));
     }
 
     if (!request.requestId) {
