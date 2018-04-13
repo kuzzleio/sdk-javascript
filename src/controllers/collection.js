@@ -18,10 +18,10 @@ class CollectionController {
 
   create (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.create: index is required'));
+      throw new Error('Kuzzle.collection.create: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.create: collection is required'));
+      throw new Error('Kuzzle.collection.create: collection is required');
     }
 
     return this.kuzzle.query({
@@ -34,10 +34,10 @@ class CollectionController {
 
   deleteSpecification (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.deleteSpecification: index is required'));
+      throw new Error('Kuzzle.collection.deleteSpecification: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.deleteSpecification: collection is required'));
+      throw new Error('Kuzzle.collection.deleteSpecification: collection is required');
     }
 
     return this.kuzzle.query({
@@ -50,10 +50,10 @@ class CollectionController {
 
   exists (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.exists: index is required'));
+      throw new Error('Kuzzle.collection.exists: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.exists: collection is required'));
+      throw new Error('Kuzzle.collection.exists: collection is required');
     }
 
     return this.kuzzle.query({
@@ -66,10 +66,10 @@ class CollectionController {
 
   getMapping (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.getMapping: index is required'));
+      throw new Error('Kuzzle.collection.getMapping: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.getMapping: collection is required'));
+      throw new Error('Kuzzle.collection.getMapping: collection is required');
     }
 
     return this.kuzzle.query({
@@ -82,10 +82,10 @@ class CollectionController {
 
   getSpecifications (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.getSpecifications: index is required'));
+      throw new Error('Kuzzle.collection.getSpecifications: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.getSpecifications: collection is required'));
+      throw new Error('Kuzzle.collection.getSpecifications: collection is required');
     }
 
     return this.kuzzle.query({
@@ -98,7 +98,7 @@ class CollectionController {
 
   list (index, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.list: index is required'));
+      throw new Error('Kuzzle.collection.list: index is required');
     }
 
     const request = {
@@ -131,10 +131,10 @@ class CollectionController {
 
   truncate (index, collection, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.truncate: index is required'));
+      throw new Error('Kuzzle.collection.truncate: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.truncate: collection is required'));
+      throw new Error('Kuzzle.collection.truncate: collection is required');
     }
 
     return this.kuzzle.query({
@@ -147,10 +147,10 @@ class CollectionController {
 
   updateMapping (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.updateMapping: index is required'));
+      throw new Error('Kuzzle.collection.updateMapping: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.updateMapping: collection is required'));
+      throw new Error('Kuzzle.collection.updateMapping: collection is required');
     }
 
     return this.kuzzle.query({
@@ -164,10 +164,10 @@ class CollectionController {
 
   updateSpecifications (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.collection.updateSpecifications: index is required'));
+      throw new Error('Kuzzle.collection.updateSpecifications: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.collection.updateSpecifications: collection is required'));
+      throw new Error('Kuzzle.collection.updateSpecifications: collection is required');
     }
 
     return this.kuzzle.query({
