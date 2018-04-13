@@ -5,8 +5,8 @@ const
   getKeys = {getter: true, required: ['keys']},
   getMember = {getter: true, required: ['_id', 'member']},
   getxScan = {
-    getter: true, 
-    required: ['_id', 'cursor'], 
+    getter: true,
+    required: ['_id', 'cursor'],
     opts: ['match', 'count'],
     mapResults: mapScanResults
   },
@@ -254,7 +254,7 @@ for (const action of Object.keys(commands)) {
      options to be passed by clients.
      */
     if (typeof command.opts === 'function') {
-      command.opts(data, options);
+      command.opts(request, options);
     }
 
     return this.kuzzle.query(request, options)
@@ -406,7 +406,7 @@ function mapStringToArray(results) {
  * @return {Array.<Number>}
  */
 function mapArrayStringToArrayInt (results) {
-  return results.map(parseInt);
+  return results.map(x => parseInt(x));
 }
 
 /**
@@ -453,7 +453,7 @@ function mapZrangeResults (results) {
  *   "<cursor>",
  *   [
  *     "value1",
- *     "value2", 
+ *     "value2",
  *     "..."
  *   ]
  * ]
@@ -467,8 +467,8 @@ function mapZrangeResults (results) {
  *     "..."
  *   ]
  * }
- * 
- * @param  {array.<string|array>} results 
+ *
+ * @param  {array.<string|array>} results
  * @return {object}
  */
 function mapScanResults (results) {

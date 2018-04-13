@@ -14,24 +14,16 @@ describe('ms', function () {
   });
 
 
-  const testReadCommand = (command, args, opts, expArgs, expOpts, result, expected, defaultOpts = {}) => {
-    kuzzle.query.resolves(result);
+  const testReadCommand = (command, args, opts, expArgs, expOpts, result, expected) => {
+    kuzzle.query.reset();
+    kuzzle.query.resolves({result});
 
-    return kuzzle.ms[command](...args)
+    return kuzzle.ms[command](...(args.concat(opts)))
       .then(res => {
         should(res).eql(expected);
 
         should(kuzzle.query)
           .be.calledOnce()
-          .be.calledWith(Object.assign({
-            controller: 'ms',
-            action: command
-          }, expArgs));
-
-        return kuzzle.ms[command](...(args.concat(opts)));
-      })
-      .then(() => {
-        should(kuzzle.query)
           .be.calledWith(Object.assign({
             controller: 'ms',
             action: command
@@ -46,7 +38,7 @@ describe('ms', function () {
 
     kuzzle.query.resolves({result});
 
-    return kuzzle.ms[command](...args)
+    return kuzzle.ms[command](...(args.concat(opts)))
       .then(res => {
         should(res).eql(expected);
 
@@ -55,16 +47,9 @@ describe('ms', function () {
           .be.calledWith(Object.assign({
             controller: 'ms',
             action: command
-          }, expArgs));
+          }, expArgs, expOpts));
 
         return kuzzle.ms[command](...(args.concat(opts)));
-      })
-      .then(() => {
-        should(kuzzle.query)
-          .be.calledWith(Object.assign({
-            controller: 'ms',
-            action: command
-          }, expArgs, expOpts));
       });
   };
 
@@ -1009,8 +994,8 @@ describe('ms', function () {
       'set',
       ['key', 'foo'],
       {ex: 0, nx: true, px: 42, xx: true},
-      {_id: 'key', body: {value: 'foo'}},
-      {ex: 0, nx: true, px: 42, xx: true},
+      {_id: 'key', body: {value: 'foo', ex: 0, nx: true, px: 42, xx: true}},
+      {},
       'OK',
       undefined
     );
@@ -1117,8 +1102,8 @@ describe('ms', function () {
       'spop',
       ['key'],
       {count: 2},
-      {_id: 'key'},
-      {count: 2},
+      {_id: 'key', body: {count: 2}},
+      {},
       ['foo', 'bar'],
       ['foo', 'bar']
     );
@@ -1247,8 +1232,8 @@ describe('ms', function () {
       'zadd',
       ['key', elements],
       {ch: true, incr: false, nx: true, xx: true},
-      {_id: 'key', body: {elements: elements}},
-      {ch: true, incr: false, nx: true, xx: true},
+      {_id: 'key', body: {ch: true, elements: elements, incr: false, nx: true, xx: true}},
+      {},
       3,
       3
     );
@@ -1295,8 +1280,8 @@ describe('ms', function () {
       'zinterstore',
       ['key', ['k1', 'k2', 'k3']],
       {aggregate: 'min', weights: [1, 2, 3]},
-      {_id: 'key', body: {keys: ['k1', 'k2', 'k3']}},
-      {aggregate: 'min', weights: [1, 2, 3]},
+      {_id: 'key', body: {aggregate: 'min', keys: ['k1', 'k2', 'k3'], weights: [1, 2, 3]}},
+      {},
       1,
       1
     );
@@ -1319,11 +1304,10 @@ describe('ms', function () {
       'zrange',
       ['key', 0, -1],
       {},
-      {_id: 'key', start: 0, stop: -1},
+      {_id: 'key', start: 0, stop: -1, options: ['withscores']},
       {},
       ['foo', 123, 'bar', 456],
-      [{member: 'foo', score: 123}, {member: 'bar', score: 456}],
-      {options: ['withscores']}
+      [{member: 'foo', score: 123}, {member: 'bar', score: 456}]
     );
   });
 
@@ -1356,11 +1340,10 @@ describe('ms', function () {
       'zrangebyscore',
       ['key', 0, 1000],
       {limit: [0, 1]},
-      {_id: 'key', min: 0, max: 1000},
+      {_id: 'key', min: 0, max: 1000, options: ['withscores']},
       {limit: [0, 1]},
       ['foo', 123, 'bar', 456],
-      [{member: 'foo', score: 123}, {member: 'bar', score: 456}],
-      {options: ['withscores']}
+      [{member: 'foo', score: 123}, {member: 'bar', score: 456}]
     );
   });
 
@@ -1429,11 +1412,10 @@ describe('ms', function () {
       'zrevrange',
       ['key', 0, -1],
       {},
-      {_id: 'key', start: 0, stop: -1},
+      {_id: 'key', start: 0, stop: -1, options: ['withscores']},
       {},
       ['foo', 123, 'bar', 456],
-      [{member: 'foo', score: 123}, {member: 'bar', score: 456}],
-      {options: ['withscores']}
+      [{member: 'foo', score: 123}, {member: 'bar', score: 456}]
     );
   });
 
@@ -1442,11 +1424,10 @@ describe('ms', function () {
       'zrangebyscore',
       ['key', 0, 1000],
       {limit: [0, 1]},
-      {_id: 'key', min: 0, max: 1000},
+      {_id: 'key', min: 0, max: 1000, options: ['withscores']},
       {limit: [0, 1]},
       ['foo', 123, 'bar', 456],
-      [{member: 'foo', score: 123}, {member: 'bar', score: 456}],
-      {options: ['withscores']}
+      [{member: 'foo', score: 123}, {member: 'bar', score: 456}]
     );
   });
 
@@ -1491,8 +1472,8 @@ describe('ms', function () {
       'zunionstore',
       ['key', ['k1', 'k2', 'k3']],
       {aggregate: 'min', weights: [1, 2, 3]},
-      {_id: 'key', body: {keys: ['k1', 'k2', 'k3']}},
-      {aggregate: 'min', weights: [1, 2, 3]},
+      {_id: 'key', body: {aggregate: 'min', keys: ['k1', 'k2', 'k3'], weights: [1, 2, 3]}},
+      {},
       1,
       1
     );
