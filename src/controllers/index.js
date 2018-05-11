@@ -15,7 +15,7 @@ class IndexController {
 
   create (index, options) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.index.create: index required'));
+      throw new Error('Kuzzle.index.create: index is required');
     }
 
     return this.kuzzle.query({
@@ -27,7 +27,7 @@ class IndexController {
 
   delete (index, options) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.index.delete: index required'));
+      throw new Error('Kuzzle.index.delete: index is required');
     }
 
     return this.kuzzle.query({
@@ -39,7 +39,7 @@ class IndexController {
 
   exists (index, options) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.index.exists: index required'));
+      throw new Error('Kuzzle.index.exists: index is required');
     }
 
     return this.kuzzle.query({
@@ -51,7 +51,7 @@ class IndexController {
 
   getAutoRefresh (index, options) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.index.getAutoRefresh: index is required'));
+      throw new Error('Kuzzle.index.getAutoRefresh: index is required');
     }
 
     return this.kuzzle.query({
@@ -70,13 +70,12 @@ class IndexController {
 
   mDelete (indexes, options) {
     if (!Array.isArray(indexes)) {
-      return Promise.reject(new Error('Kuzzle.index.mDelete: indexes must be an array'));
+      throw new Error('Kuzzle.index.mDelete: indexes must be an array');
     }
 
     return this.kuzzle.query({
       controller: 'index',
-      action: 'mDelete'
-    }, {
+      action: 'mDelete',
       body: {
         indexes
       }
@@ -85,7 +84,7 @@ class IndexController {
 
   refresh (index, options) {
     if (!index || index === '') {
-      return Promise.reject(new Error('Kuzzle.index.refresh: index is required'));
+      throw new Error('Kuzzle.index.refresh: index is required');
     }
 
     return this.kuzzle.query({
@@ -104,11 +103,11 @@ class IndexController {
 
   setAutoRefresh (index, autoRefresh, options) {
     if (!index || index === '') {
-      return Promise.reject(new Error('Kuzzle.index.setAutoRefresh: index is required'));
+      throw new Error('Kuzzle.index.setAutoRefresh: index is required');
     }
 
     if (typeof autoRefresh !== 'boolean') {
-      return Promise.reject(new Error('Kuzzle.index.setAutoRefresh: autoRefresh must be a boolean'));
+      throw new Error('Kuzzle.index.setAutoRefresh: autoRefresh must be a boolean');
     }
 
     return this.kuzzle.query({
