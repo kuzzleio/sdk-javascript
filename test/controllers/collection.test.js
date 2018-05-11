@@ -402,7 +402,7 @@ describe('Collection Controller', () => {
   });
 
   describe('validateSpecifications', () => {
-    it('should call collection/updateSpecifications query with the specifications to validate and return a Promise which resolves a json object', () => {
+    it('should call collection/validateSpecifications query with the specifications to validate and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
         valid: false,
         description: 'foo bar',
