@@ -18,10 +18,10 @@ class DocumentController {
 
   count (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.count: index is required'));
+      throw new Error('Kuzzle.document.count: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.count: collection is required'));
+      throw new Error('Kuzzle.document.count: collection is required');
     }
 
     const request = {
@@ -40,10 +40,13 @@ class DocumentController {
 
   create (index, collection, _id, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.create: index is required'));
+      throw new Error('Kuzzle.document.create: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.create: collection is required'));
+      throw new Error('Kuzzle.document.create: collection is required');
+    }
+    if (!body) {
+      throw new Error('Kuzzle.document.create: body is required');
     }
 
     const request = {
@@ -62,16 +65,16 @@ class DocumentController {
 
   createOrReplace (index, collection, _id, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.createOrReplace: index is required'));
+      throw new Error('Kuzzle.document.createOrReplace: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.createOrReplace: collection is required'));
+      throw new Error('Kuzzle.document.createOrReplace: collection is required');
     }
     if (!_id) {
-      return Promise.reject(new Error('Kuzzle.document.createOrReplace: _id is required'));
+      throw new Error('Kuzzle.document.createOrReplace: _id is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.document.createOrReplace: body is required'));
+      throw new Error('Kuzzle.document.createOrReplace: body is required');
     }
 
     const request = {
@@ -90,20 +93,19 @@ class DocumentController {
 
   delete (index, collection, _id, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.delete: index is required'));
+      throw new Error('Kuzzle.document.delete: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.delete: collection is required'));
+      throw new Error('Kuzzle.document.delete: collection is required');
     }
     if (!_id) {
-      return Promise.reject(new Error('Kuzzle.document.delete: _id is required'));
+      throw new Error('Kuzzle.document.delete: _id is required');
     }
 
     const request = {
       index,
       collection,
       _id,
-      body,
       controller: 'document',
       action: 'delete',
       refresh: options.refresh
@@ -115,10 +117,10 @@ class DocumentController {
 
   deleteByQuery(index, collection, body = {}, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.deleteByQuery: index is required'));
+      throw new Error('Kuzzle.document.deleteByQuery: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.deleteByQuery: collection is required'));
+      throw new Error('Kuzzle.document.deleteByQuery: collection is required');
     }
 
     const request = {
@@ -136,10 +138,13 @@ class DocumentController {
 
   get (index, collection, _id, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.get: index is required'));
+      throw new Error('Kuzzle.document.get: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.get: collection is required'));
+      throw new Error('Kuzzle.document.get: collection is required');
+    }
+    if (!_id) {
+      throw new Error('Kuzzle.document.get: _id is required');
     }
 
     const request = {
@@ -157,13 +162,13 @@ class DocumentController {
 
   mCreate (index, collection, documents, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mCreate: index is required'));
+      throw new Error('Kuzzle.document.mCreate: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mCreate: collection is required'));
+      throw new Error('Kuzzle.document.mCreate: collection is required');
     }
     if (!Array.isArray(documents)) {
-      return Promise.reject(new Error('Kuzzle.document.mCreate: documents must be an array'));
+      throw new Error('Kuzzle.document.mCreate: documents must be an array');
     }
 
     const request = {
@@ -181,13 +186,13 @@ class DocumentController {
 
   mCreateOrReplace (index, collection, documents, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mCreateOrReplace: index is required'));
+      throw new Error('Kuzzle.document.mCreateOrReplace: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mCreateOrReplace: collection is required'));
+      throw new Error('Kuzzle.document.mCreateOrReplace: collection is required');
     }
     if (!Array.isArray(documents)) {
-      return Promise.reject(new Error('Kuzzle.document.mCreateOrReplace: documents must be an array'));
+      throw new Error('Kuzzle.document.mCreateOrReplace: documents must be an array');
     }
 
     const request = {
@@ -205,13 +210,13 @@ class DocumentController {
 
   mDelete (index, collection, ids, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mDelete: index is required'));
+      throw new Error('Kuzzle.document.mDelete: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mDelete: collection is required'));
+      throw new Error('Kuzzle.document.mDelete: collection is required');
     }
     if (!Array.isArray(ids)) {
-      return Promise.reject(new Error('Kuzzle.document.mDelete: ids must be an array'));
+      throw new Error('Kuzzle.document.mDelete: ids must be an array');
     }
 
     const request = {
@@ -229,13 +234,13 @@ class DocumentController {
 
   mGet (index, collection, ids, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mGet: index is required'));
+      throw new Error('Kuzzle.document.mGet: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mGet: collection is required'));
+      throw new Error('Kuzzle.document.mGet: collection is required');
     }
     if (!Array.isArray(ids)) {
-      return Promise.reject(new Error('Kuzzle.document.mGet: ids must be an array'));
+      throw new Error('Kuzzle.document.mGet: ids must be an array');
     }
 
     const request = {
@@ -253,13 +258,13 @@ class DocumentController {
 
   mReplace (index, collection, documents, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mReplace: index is required'));
+      throw new Error('Kuzzle.document.mReplace: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mReplace: collection is required'));
+      throw new Error('Kuzzle.document.mReplace: collection is required');
     }
     if (!Array.isArray(documents)) {
-      return Promise.reject(new Error('Kuzzle.document.mReplace: documents must be an array'));
+      throw new Error('Kuzzle.document.mReplace: documents must be an array');
     }
 
     const request = {
@@ -276,13 +281,13 @@ class DocumentController {
 
   mUpdate (index, collection, documents, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.mUpdate: index is required'));
+      throw new Error('Kuzzle.document.mUpdate: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.mUpdate: collection is required'));
+      throw new Error('Kuzzle.document.mUpdate: collection is required');
     }
     if (!Array.isArray(documents)) {
-      return Promise.reject(new Error('Kuzzle.document.mUpdate: documents must be an array'));
+      throw new Error('Kuzzle.document.mUpdate: documents must be an array');
     }
 
     const request = {
@@ -300,16 +305,16 @@ class DocumentController {
 
   replace (index, collection, _id, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.replace: index is required'));
+      throw new Error('Kuzzle.document.replace: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.replace: collection is required'));
+      throw new Error('Kuzzle.document.replace: collection is required');
     }
     if (!_id) {
-      return Promise.reject(new Error('Kuzzle.document.replace: _id is required'));
+      throw new Error('Kuzzle.document.replace: _id is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.document.replace: body is required'));
+      throw new Error('Kuzzle.document.replace: body is required');
     }
 
     const request = {
@@ -328,10 +333,10 @@ class DocumentController {
 
   search (index, collection, body = {}, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.search: index is required'));
+      throw new Error('Kuzzle.document.search: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.search: collection is required'));
+      throw new Error('Kuzzle.document.search: collection is required');
     }
 
     const request = {
@@ -341,7 +346,7 @@ class DocumentController {
       controller: 'document',
       action: 'search',
     };
-    for (const opt of ['from', 'size', 'scroll', 'sort', 'includeTrash']) {
+    for (const opt of ['from', 'size', 'scroll', 'includeTrash']) {
       request[opt] = options[opt];
       delete options[opt];
     }
@@ -352,16 +357,16 @@ class DocumentController {
 
   update (index, collection, _id, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.update: index is required'));
+      throw new Error('Kuzzle.document.update: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.update: collection is required'));
+      throw new Error('Kuzzle.document.update: collection is required');
     }
     if (!_id) {
-      return Promise.reject(new Error('Kuzzle.document.update: _id is required'));
+      throw new Error('Kuzzle.document.update: _id is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.document.update: body is required'));
+      throw new Error('Kuzzle.document.update: body is required');
     }
 
     const request = {
@@ -382,13 +387,13 @@ class DocumentController {
 
   validate (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.document.validate: index is required'));
+      throw new Error('Kuzzle.document.validate: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.document.validate: collection is required'));
+      throw new Error('Kuzzle.document.validate: collection is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.document.validate: body is required'));
+      throw new Error('Kuzzle.document.validate: body is required');
     }
 
     return this.kuzzle.query({
