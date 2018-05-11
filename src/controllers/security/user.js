@@ -5,13 +5,14 @@ class User {
   /**
    *
    * @param {Kuzzle} kuzzle
+   * @param {Object} data
    */
-  constructor (kuzzle) {
+  constructor (kuzzle, _id = null, content = {}, meta = {}) {
     _kuzzle = kuzzle;
 
-    this.id = null;
-    this.content = {};
-    this.meta = {};
+    this._id = _id;
+    this.content = content;
+    this.meta = meta;
   }
 
   get kuzzle () {

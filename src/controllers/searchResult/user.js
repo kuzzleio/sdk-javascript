@@ -18,15 +18,7 @@ class UserSearchResult extends SearchResultBase {
           return result;
         }
 
-        return result.hits.map(hit => {
-          const user = new User(this.kuzzle);
-
-          user._id = hit._id;
-          user.content = hit._source;
-          user.meta = hit._meta;
-
-          return user;
-        });
+        return result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
       });
   }
 }

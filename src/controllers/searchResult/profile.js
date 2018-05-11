@@ -18,14 +18,7 @@ class ProfileSearchResult extends SearchResultBase {
           return result;
         }
 
-        return result.hits.map(hit => {
-          const profile = new Profile(this.kuzzle);
-
-          profile._id = hit._id;
-          profile.policies = hit._source.policies;
-
-          return profile;
-        });
+        return result.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
       });
   }
 }

@@ -1,17 +1,26 @@
 let _kuzzle;
 
 class Profile {
-  constructor (kuzzle) {
+  /**
+   *
+   * @param {Kuzzle} kuzzle
+   * @param {Object} data
+   */
+  constructor (kuzzle, _id = null, policies = []) {
     _kuzzle = kuzzle;
 
-    this._id = null;
-    this.policies = [];
+    this._id = _id;
+    this.policies = policies;
   }
 
   get kuzzle () {
     return _kuzzle;
   }
 
+
+  /**
+   * @returns {Promise<[Role]>}
+   */
   getRoles (options = {}) {
     if (!this.policies || this.policies.length === 0) {
       return Promise.resolve([]);

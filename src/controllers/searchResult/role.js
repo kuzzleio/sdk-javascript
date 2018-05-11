@@ -18,14 +18,7 @@ class RoleSearchResult extends SearchResultBase {
           return result;
         }
 
-        return result.hits.map(hit => {
-          const role = new Role(this.kuzzle);
-
-          role._id = hit._id;
-          role.controllers = hit._source.controllers;
-
-          return role;
-        });
+        return result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers));
       });
   }
 }

@@ -1,5 +1,6 @@
 const
   AuthController = require('../../src/controllers/auth'),
+  User = require('../../src/controllers/security/user'),
   sinon = require('sinon'),
   should = require('should');
 
@@ -109,7 +110,7 @@ describe('Auth Controller', () => {
   describe('getCurrentUser', () => {
     it('should call auth/getCurrentUser query and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
-        id: 'id',
+        _id: 'id',
         _source: {
           name: 'Doe'
         }
@@ -124,7 +125,8 @@ describe('Auth Controller', () => {
               action: 'getCurrentUser'
             }, options);
 
-          should(user.id).eql('id');
+          should(user).be.an.instanceOf(User);
+          should(user._id).eql('id');
           should(user.content).eql({name: 'Doe'});
         });
     });

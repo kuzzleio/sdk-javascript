@@ -92,14 +92,7 @@ class AuthController {
       controller: 'auth',
       action: 'getCurrentUser'
     }, options)
-      .then(result => {
-        const user = new User(this.kuzzle);
-        user.id = result.id;
-        user.content = result._source;
-        user.meta = result._meta;
-
-        return user;
-      });
+      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
   }
 
   /**

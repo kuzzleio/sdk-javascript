@@ -147,14 +147,7 @@ class SecurityController {
       controller: 'security',
       action: 'getProfile'
     }, options)
-      .then(result => {
-        const profile = new Profile(this.kuzzle);
-
-        profile._id = result._id;
-        profile.policies = result._source.policies;
-
-        return profile;
-      });
+      .then(result => new Profile(this.kuzzle, result._id, result._source.policies));
   }
 
   getProfileMapping (options = {}) {
@@ -178,14 +171,7 @@ class SecurityController {
       controller: 'security',
       action: 'getRole'
     }, options)
-      .then(result => {
-        const role = new Role(this.kuzzle);
-
-        role._id = result._id;
-        role.controllers = result._source.controllers;
-
-        return role;
-      });
+      .then(result => new Role(this.kuzzle, result._id, result._source.controllers));
   }
 
   getRoleMapping (options = {}) {
@@ -201,15 +187,7 @@ class SecurityController {
       controller: 'security',
       action: 'getUser'
     }, options)
-      .then(result => {
-        const user = new User(this.kuzzle);
-
-        user._id = result._id;
-        user.content = result._source;
-        user.meta = result._meta;
-
-        return user;
-      });
+      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
   }
 
   getUserMapping (options = {}) {
@@ -267,14 +245,7 @@ class SecurityController {
       action: 'mGetProfiles',
       body: {ids}
     }, options)
-      .then(result => result.hits.map(hit => {
-        const profile = new Profile(this.kuzzle);
-
-        profile._id = hit._id;
-        profile.policies = hit._source.policies;
-
-        return profile;
-      }));
+      .then(result => result.hits.map(hit => new Profile(this.kuzzle, hit._id , hit._source.policies)));
   }
 
   mGetRoles (ids, options = {}) {
@@ -283,14 +254,7 @@ class SecurityController {
       action: 'mGetRoles',
       body: {ids}
     }, options)
-      .then(result => result.hits.map(hit => {
-        const role = new Role(this.kuzzle);
-
-        role._id = hit._id;
-        role.controllers = hit._source.controllers;
-
-        return role;
-      }));
+      .then(result => result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
   }
 
   replaceUser (_id, body, options = {}) {

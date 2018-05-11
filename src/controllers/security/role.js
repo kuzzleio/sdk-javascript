@@ -4,12 +4,13 @@ class Role {
 
   /**
    * @param {Kuzzle} kuzzle
+   * @param {Object} data
    */
-  constructor (kuzzle) {
+  constructor (kuzzle, _id = null, controllers = {}) {
     _kuzzle = kuzzle;
 
-    this._id = null;
-    this.controllers = {};
+    this._id = _id;
+    this.controllers = controllers;
   }
 
   get kuzzle () {
