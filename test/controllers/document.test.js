@@ -680,7 +680,7 @@ describe('Document Controller', () => {
       const result = {
         hits: [
           {_id: 'document1', _version: 1, _source: {foo: 'bar'}},
-          {_id: 'document2', _version: 3, _source: {foo: 'baz'}},
+          {_id: 'document2', _version: 3, _source: {foo: 'baz'}}
         ],
         total: 2
       };
