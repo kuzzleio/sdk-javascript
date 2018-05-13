@@ -13,8 +13,9 @@ class SearchResultBase {
     this.options = options;
     this.response = response;
 
-    this.fetched = response.hits && response.hits.length || 0;
-    this.total = response.total && response.total || 0;
+    this.hits = response.hits || [];
+    this.fetched = this.hits.length;
+    this.total = response.total || 0;
 
     this.controller = request.controller;
     this.searchAction = 'search';
@@ -34,6 +35,7 @@ class SearchResultBase {
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
+          this.hits = r.hits;
           return this;
         });
     }
@@ -59,6 +61,7 @@ class SearchResultBase {
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
+          this.hits = r.hits;
           return this;
         });
     }
@@ -75,6 +78,7 @@ class SearchResultBase {
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
+          this.hits = r.hits;
           return this;
         });
     }

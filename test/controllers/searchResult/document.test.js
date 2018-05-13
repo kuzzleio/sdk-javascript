@@ -43,6 +43,7 @@ describe('DocumentSearchResult', () => {
       should(searchResult.options).be.equal(options);
       should(searchResult.response).be.equal(response);
 
+      should(searchResult.hits).be.equal(response.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
 
@@ -141,6 +142,7 @@ describe('DocumentSearchResult', () => {
           .then(() => {
             should(searchResult.fetched).be.equal(4);
             should(searchResult.response).be.equal(nextResponse);
+            should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });
@@ -196,6 +198,7 @@ describe('DocumentSearchResult', () => {
           .then(() => {
             should(searchResult.fetched).be.equal(4);
             should(searchResult.response).be.equal(nextResponse);
+            should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });
@@ -262,6 +265,7 @@ describe('DocumentSearchResult', () => {
           .then(() => {
             should(searchResult.fetched).be.equal(4);
             should(searchResult.response).be.equal(nextResponse);
+            should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });
