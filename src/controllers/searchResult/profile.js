@@ -9,16 +9,18 @@ class ProfileSearchResult extends SearchResultBase {
 
     this.searchAction = 'searchProfiles';
     this.scrollAction = 'scrollProfiles';
+    this.hits = response.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
   }
 
   next () {
     return super.next()
       .then(result => {
-        if (!result) {
+        if (! result) {
           return result;
         }
 
-        return result.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
+        this.hits = this.response.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
+        return this;
       });
   }
 }
