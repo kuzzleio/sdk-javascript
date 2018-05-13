@@ -28,8 +28,9 @@ class SearchResultBase {
 
     if (this.request.scroll) {
       return this.kuzzle.query(Object.assign({}, this.request, {
+        action: this.scrollAction,
         scrollId: this.response.scrollId
-      }), options)
+      }), this.options)
         .then(r => {
           this.fetched += r.hits.length;
           this.response = r;
@@ -40,6 +41,7 @@ class SearchResultBase {
     if (this.request.size && this.request.sort) {
       const
         request = Object.assign({}, this.request, {
+          action: this.searchAction,
           search_after: []
         }),
         hit = this.response.hits && this.response.hits[this.response.hits.length -1];
@@ -67,7 +69,8 @@ class SearchResultBase {
       }
 
       return this.kuzzle.query(Object.assign({}, this.request, {
-        from: this.fetched + 1
+        action: this.searchAction,
+        from: this.fetched
       }), this.options)
         .then(r => {
           this.fetched += r.hits.length;
@@ -76,7 +79,7 @@ class SearchResultBase {
         });
     }
 
-    return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId or from/size params'));
+    throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
   }
 }
 

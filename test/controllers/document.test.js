@@ -990,7 +990,7 @@ describe('Document Controller', () => {
 
     it('should call document/search query and return a Promise which resolves a DocumentSearchResult instance', () => {
       const result = {
-        _scroll_id: 'scroll-id',
+        scrollId: 'scroll-id',
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
           {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}},
@@ -1026,7 +1026,7 @@ describe('Document Controller', () => {
 
     it('should inject the "includeTrash" option into the request', () => {
       const result = {
-        _scroll_id: 'scroll-id',
+        scrollId: 'scroll-id',
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
           {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}},
@@ -1062,7 +1062,7 @@ describe('Document Controller', () => {
 
     it('should inject the "from", "size", "scroll" options into the request', () => {
       const result = {
-        _scroll_id: 'scroll-id',
+        scrollId: 'scroll-id',
         hits: [
           {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}},
           {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz'}}
