@@ -9,6 +9,7 @@ class UserSearchResult extends SearchResultBase {
 
     this.searchAction = 'searchUsers';
     this.scrollAction = 'scrollUsers';
+    this.hits = this.response.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
   }
 
   next () {
@@ -18,7 +19,8 @@ class UserSearchResult extends SearchResultBase {
           return result;
         }
 
-        return result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
+        this.hits = this.response.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
+        return this;
       });
   }
 }
