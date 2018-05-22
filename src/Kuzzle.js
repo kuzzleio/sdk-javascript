@@ -299,11 +299,11 @@ class Kuzzle extends KuzzleEventEmitter {
    */
   query (request = {}, options = {}) {
     if (typeof request !== 'object' || Array.isArray(request)) {
-      return Promise.reject(new Error(`Invalid request: ${JSON.stringify(request)}`));
+      throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }
 
     if (typeof options !== 'object' || Array.isArray(options)) {
-      return Promise.reject(new Error(`Invalid "options" argument: ${JSON.stringify(options)}`));
+      throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(options)}`);
     }
 
     if (!request.requestId) {
@@ -318,7 +318,7 @@ class Kuzzle extends KuzzleEventEmitter {
     if (!request.volatile) {
       request.volatile = this.volatile;
     } else if (typeof request.volatile !== 'object' || Array.isArray(request.volatile)) {
-      return Promise.reject(new Error('Invalid volatile argument received. Must be an object.'));
+      throw new Error(`Kuzzle.query: Invalid volatile argument received: ${JSON.stringify(request.volatile)}`);
     }
     for (const item of Object.keys(this.volatile)) {
       if (request.volatile[item] === undefined) {

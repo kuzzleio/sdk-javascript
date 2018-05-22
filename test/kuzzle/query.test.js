@@ -76,30 +76,31 @@ describe('Kuzzle query management', () => {
       should(kuzzle.network.query).be.calledWithMatch({index: undefined});
     });
 
-    it('should reject if the "request" argument if maformed', () => {
-      return kuzzle.query('foobar')
-        .then(() => Promise.reject(new Error('No Error')))
-        .catch(err => {
-          should(err.message).be.equal('Invalid request: "foobar"');
-          return kuzzle.query(['foo', 'bar']);
-        })
-        .then(() => Promise.reject(new Error('No Error')))
-        .catch(err => {
-          should(err.message).be.equal('Invalid request: ["foo","bar"]');
-        });
+    it('should throw an error if the "request" argument if maformed', () => {
+      should(function () {
+        kuzzle.query('foobar');
+      }).throw('Kuzzle.query: Invalid request: "foobar"');
+      should(function () {
+        kuzzle.query(['foo', 'bar']);
+      }).throw('Kuzzle.query: Invalid request: ["foo","bar"]');
     });
 
-    it('should reject if the "options" argument if maformed', () => {
-      return kuzzle.query({}, 'foobar')
-        .then(() => Promise.reject(new Error('No Error')))
-        .catch(err => {
-          should(err.message).be.equal('Invalid "options" argument: "foobar"');
-          return kuzzle.query({}, ['foo', 'bar']);
-        })
-        .then(() => Promise.reject(new Error('No Error')))
-        .catch(err => {
-          should(err.message).be.equal('Invalid "options" argument: ["foo","bar"]');
-        });
+    it('should throw an error if the "request.volatile" argument if maformed', () => {
+      should(function () {
+        kuzzle.query({volatile: 'foobar'});
+      }).throw('Kuzzle.query: Invalid volatile argument received: "foobar"');
+      should(function () {
+        kuzzle.query({volatile: ['foo', 'bar']});
+      }).throw('Kuzzle.query: Invalid volatile argument received: ["foo","bar"]');
+    });
+
+    it('should throw an error if the "options" argument if maformed', () => {
+      should(function () {
+        kuzzle.query({}, 'foobar');
+      }).throw('Kuzzle.query: Invalid "options" argument: "foobar"');
+      should(function () {
+        kuzzle.query({}, ['foo', 'bar']);
+      }).throw('Kuzzle.query: Invalid "options" argument: ["foo","bar"]');
     });
 
     it('should handle kuzzle "volatile" properly', () => {

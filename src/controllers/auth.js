@@ -147,7 +147,7 @@ class AuthController {
    */
   login (strategy, credentials, expiresIn) {
     if (typeof strategy !== 'string' || strategy === '') {
-      return Promise.reject(new Error('auth.login: strategy required'));
+      throw new Error('Kuzzle.auth.login: strategy is required');
     }
 
     const

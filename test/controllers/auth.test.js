@@ -207,6 +207,18 @@ describe('Auth Controller', () => {
       });
     });
 
+    it('should throw an error if the "strategy" argument is not set', () => {
+      should(function () {
+        kuzzle.auth.login(undefined, {}, options);
+      }).throw('Kuzzle.auth.login: strategy is required');
+    });
+
+    it('should throw an error if the "strategy" argument is empty', () => {
+      should(function () {
+        kuzzle.auth.login('', {}, options);
+      }).throw('Kuzzle.auth.login: strategy is required');
+    });
+
     it('should call auth/login query and return a Promise which resolves a JWT', () => {
       return kuzzle.auth.login('strategy', credentials, 'expiresIn')
         .then(res => {
