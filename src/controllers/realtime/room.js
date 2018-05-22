@@ -38,6 +38,10 @@ class Room {
       ? options.subscribeToSelf
       : true;
 
+    for (const opt of ['autoResubscribe', 'subscribeToSelf']) {
+      delete this.options[opt];
+    }
+
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
     this._reSubscribeListener = this._reSubscribeListener.bind(this);

@@ -22,26 +22,15 @@ class RealTimeController {
 
   count (roomId, options = {}) {
     if (!roomId) {
-      return Promise.reject(new Error('Kuzzle.realtime.count: roomId is required'));
+      throw new Error('Kuzzle.realtime.count: roomId is required');
     }
 
     return this.kuzzle.query({
       controller: 'realtime',
       action: 'count',
       body: {roomId}
-    }, options);
-  }
-
-  join (roomId, options = {}) {
-    if (!roomId) {
-      return Promise.reject(new Error('Kuzzle.realtime.join: roomId is required'));
-    }
-
-    return this.kuzzle.query({
-      controller: 'realtime',
-      action: 'join',
-      body: {roomId}
-    }, options);
+    }, options)
+      .then(response => response.count);
   }
 
   list (options = {}) {
@@ -53,13 +42,13 @@ class RealTimeController {
 
   publish (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: index is required'));
+      throw new Error('Kuzzle.realtime.publish: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: collection is required'));
+      throw new Error('Kuzzle.realtime.publish: collection is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: body is required'));
+      throw new Error('Kuzzle.realtime.publish: body is required');
     }
 
     const request = {
@@ -75,16 +64,16 @@ class RealTimeController {
 
   subscribe (index, collection, body, callback, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.realtime.subscribe: index is required'));
+      throw new Error('Kuzzle.realtime.subscribe: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.realtime.subscribe: collection is required'));
+      throw new Error('Kuzzle.realtime.subscribe: collection is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.realtime.subscribe: body is required'));
+      throw new Error('Kuzzle.realtime.subscribe: body is required');
     }
     if (!callback || typeof callback !== 'function') {
-      return Promise.reject(new Error('Kuzzle.realtime.subscribe: a callback function is required'));
+      throw new Error('Kuzzle.realtime.subscribe: a callback function is required');
     }
 
     const room = new Room(this.kuzzle, index, collection, body, callback, options);
@@ -100,6 +89,10 @@ class RealTimeController {
   }
 
   unsubscribe (roomId, options = {}) {
+    if (!roomId) {
+      throw new Error('Kuzzle.realtime.unsubscribe: roomId is required');
+    }
+
     const rooms = this.subscriptions[roomId];
 
     if (!rooms) {
@@ -120,13 +113,13 @@ class RealTimeController {
 
   validate (index, collection, body, options = {}) {
     if (!index) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: index is required'));
+      throw new Error('Kuzzle.realtime.validate: index is required');
     }
     if (!collection) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: collection is required'));
+      throw new Error('Kuzzle.realtime.validate: collection is required');
     }
     if (!body) {
-      return Promise.reject(new Error('Kuzzle.realtime.publish: body is required'));
+      throw new Error('Kuzzle.realtime.validate: body is required');
     }
 
     return this.kuzzle.query({
