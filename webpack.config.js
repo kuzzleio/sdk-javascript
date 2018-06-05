@@ -1,11 +1,10 @@
 const
   webpack = require('webpack'),
   path = require('path'),
-  UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
   version = require('./package.json').version;
 
 module.exports = {
-  mode: "production",
+  mode: 'production',
   entry: './src/Kuzzle.js',
   output: {
     path: `${__dirname}/dist`,
@@ -17,7 +16,7 @@ module.exports = {
   devtool: 'source-map',
   node: {
     console: false,
-    global: true,
+    global: false,
     process: false,
     Buffer: false,
     __filename: false,
@@ -28,17 +27,14 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        include: [
-          path.resolve(__dirname, './src/networkWrapper/protocols/'),
-          path.resolve(__dirname, './src/Kuzzle.js'),
-          path.resolve(__dirname, './src/Auth.js'),
-          path.resolve(__dirname, './src/Room.js'),
-          path.resolve(__dirname, './src/eventEmitter/'),
-          path.resolve(__dirname, './src/SearchResult.js')
-        ],
         loader: 'babel-loader',
         query: {
-          presets: ['env']
+          only: /^src/,
+          presets: [
+            ['env', {
+              debug: true,
+              modules: false
+            }]]
         }
       },
       {
@@ -50,17 +46,11 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.IgnorePlugin(/uws/),
+    new webpack.IgnorePlugin(/^(http|min-req-promise|package|uws)$/),
     new webpack.DefinePlugin({
-      global: 'window',
-      SDKVERSION: JSON.stringify(version),
-      BUILT: true
+      SDKVERSION: JSON.stringify(version)
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new UglifyJsPlugin({
-      sourceMap: true
-    }),
+    new webpack.optimize.OccurrenceOrderPlugin()
   ]
 };

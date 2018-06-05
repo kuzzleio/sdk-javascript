@@ -1,27 +1,15 @@
 'use strict';
 
 const
-  uuidv4 = require('uuid/v4'),
-  AbtractWrapper = require('./common');
+  AbstractWrapper = require('./common');
 
-class RTWrapper extends AbtractWrapper {
+class RTWrapper extends AbstractWrapper {
 
   constructor (host, options) {
     super(host, options);
 
-    Object.defineProperties(this, {
-      id: {
-        value: uuidv4()
-      },
-      autoReconnect: {
-        value: (options && typeof options.autoReconnect === 'boolean') ? options.autoReconnect : true,
-        enumerable: true
-      },
-      reconnectionDelay: {
-        value: (options && typeof options.reconnectionDelay === 'number') ? options.reconnectionDelay : 1000,
-        enumerable: true
-      }
-    });
+    this._autoReconnect = options && typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
+    this._reconnectionDelay = options && typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
 
     if (options && options.offlineMode === 'auto' && this.autoReconnect) {
       this.autoQueue = this.autoReplay = true;
@@ -30,6 +18,14 @@ class RTWrapper extends AbtractWrapper {
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
+  }
+
+  get autoReconnect () {
+    return this._autoReconnect;
+  }
+
+  get reconnectionDelay () {
+    return this._reconnectionDelay;
   }
 
   connect() {
@@ -80,34 +76,17 @@ class RTWrapper extends AbtractWrapper {
     }
   }
 
-  subscribe(object, options, notificationCB, cb) {
-    if (! this.isReady()) {
-      return cb(new Error('Not Connected'));
-    }
-    this.query(object, options, (error, response) => {
-      if (error) {
-        return cb(error);
-      }
-      this.on(response.result.channel, data => {
-        data.fromSelf = data.volatile !== undefined && data.volatile !== null && data.volatile.sdkInstanceId === this.id;
-        notificationCB(data);
-      });
-      cb(null, response.result);
-    });
-  }
-
-  unsubscribe(object, channel, cb) {
-    this.removeAllListeners(channel);
-    this.query(object, null, (err, res) => {
-      if (cb) {
-        cb(err, err ? undefined : res.result);
-      }
-    });
-  }
-
   isReady() {
     return this.state === 'connected';
   }
+}
+
+// make public properties enumerable
+for (const prop of [
+  'autoReconnect',
+  'reconnectionDelay'
+]) {
+  Object.defineProperty(RTWrapper.prototype, prop, {enumerable: true});
 }
 
 module.exports = RTWrapper;

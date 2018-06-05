@@ -14,31 +14,39 @@ class SocketIO extends RTWrapper {
   }
 
   /**
-   * Connect to the SocketIO server
+   *
+   * @returns {Promise<any>}
    */
-  connect() {
-    super.connect();
+  connect () {
+    return new Promise((resolve, reject) => {
+      super.connect();
 
-    this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
-      reconnection: this.autoReconnect,
-      reconnectionDelay: this.reconnectionDelay,
-      forceNew: true
-    });
+      this.socket = window.io((this.ssl ? 'https://' : 'http://') + this.host + ':' + this.port, {
+        reconnection: this.autoReconnect,
+        reconnectionDelay: this.reconnectionDelay,
+        forceNew: true
+      });
 
-    this.socket.on('connect', () => this.clientConnected());
-    this.socket.on('connect_error', error => this.clientNetworkError(error));
-
-    this.socket.on('disconnect', () => {
-      if (this.forceDisconnect) {
-        this.clientDisconnected();
-      } else {
-        const error = new Error('An error occurred, kuzzle may not be ready yet');
-        error.status = 500;
-
+      this.socket.on('connect', () => resolve(this.clientConnected()));
+      this.socket.on('connect_error', error => {
         this.clientNetworkError(error);
-      }
+        reject(error);
+      });
 
-      this.forceDisconnect = false;
+      this.socket.on('disconnect', () => {
+        if (this.forceDisconnect) {
+          this.clientDisconnected();
+        } else {
+          const error = new Error('An error occurred, kuzzle may not be ready yet');
+          error.status = 500;
+
+          this.clientNetworkError(error);
+          reject(error);
+        }
+
+        this.forceDisconnect = false;
+      });
+
     });
   }
 
@@ -49,14 +57,14 @@ class SocketIO extends RTWrapper {
    * @param {function} callback
    * @param {boolean} once
    */
-  addListener(event, callback, once = false) {
+  addListener (event, callback, once = false) {
     this._addEventWrapper(event, callback, once);
     super.addListener(event, callback, once);
 
     return this;
   }
 
-  prependListener(event, callback, once = false) {
+  prependListener (event, callback, once = false) {
     this._addEventWrapper(event, callback, once);
     return super.prependListener(event, callback, once);
   }
@@ -67,7 +75,7 @@ class SocketIO extends RTWrapper {
    * @param {string} event
    * @param {function} callback
    */
-  removeListener(event, callback) {
+  removeListener (event, callback) {
     if (this.eventsWrapper[event]) {
       this.eventsWrapper[event].listeners.delete(callback);
 
@@ -87,7 +95,7 @@ class SocketIO extends RTWrapper {
    *
    * @param {string} [event]
    */
-  removeAllListeners(event) {
+  removeAllListeners (event) {
     if (event !== undefined) {
       if (this.eventsWrapper[event] !== undefined) {
         for (const listener of this.eventsWrapper[event].listeners) {
@@ -115,7 +123,7 @@ class SocketIO extends RTWrapper {
   /**
    * Closes the connection
    */
-  close() {
+  close () {
     this.forceDisconnect = true;
     this.state = 'offline';
     this.socket.close();
@@ -123,7 +131,7 @@ class SocketIO extends RTWrapper {
     this.disconnect();
   }
 
-  _addEventWrapper(event, callback, once = false) {
+  _addEventWrapper (event, callback, once = false) {
     if (!this.eventsWrapper[event]) {
       const wrapper = (...args) => this.emit(event, ...args);
 

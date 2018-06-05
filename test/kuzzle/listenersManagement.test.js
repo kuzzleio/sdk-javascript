@@ -1,17 +1,19 @@
-var
+const
   should = require('should'),
   sinon = require('sinon'),
   proxyquire = require('proxyquire');
 
-describe('Kuzzle listeners management', function () {
-  var
-    Kuzzle,
+describe('Kuzzle listeners management', () => {
+  const
     addListenerStub = sinon.stub(),
-    emitStub = sinon.stub(),
+    emitStub = sinon.stub();
+
+  let
+    Kuzzle,
     kuzzle;
 
-  before(function () {
-    var KuzzleEventEmitterMock = function() {};
+  before(() => {
+    const KuzzleEventEmitterMock = function() {};
 
     KuzzleEventEmitterMock.prototype.addListener = addListenerStub;
     KuzzleEventEmitterMock.prototype.emit = emitStub;
@@ -22,29 +24,29 @@ describe('Kuzzle listeners management', function () {
   });
 
 
-  beforeEach(function () {
+  beforeEach(() => {
     kuzzle = new Kuzzle('foo', {eventTimeout: 20});
     addListenerStub.reset();
     emitStub.reset();
   });
 
-  it('should only listen to allowed events', function() {
-    var
-      i,
-      knownEvents = [
-        'connected',
-        'discarded',
-        'disconnected',
-        'loginAttempt',
-        'networkError',
-        'offlineQueuePush',
-        'offlineQueuePop',
-        'queryError',
-        'reconnected',
-        'tokenExpired'
-      ];
+  it('should only listen to allowed events', () => {
+    const knownEvents = [
+      'connected',
+      'discarded',
+      'disconnected',
+      'loginAttempt',
+      'networkError',
+      'offlineQueuePush',
+      'offlineQueuePop',
+      'queryError',
+      'reconnected',
+      'tokenExpired'
+    ];
 
     should(function() {kuzzle.addListener('foo', sinon.stub());}).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());
+
+    let i;
     for (i = 0; i < knownEvents.length; i++) {
       kuzzle.addListener(knownEvents[i], sinon.stub());
     }
@@ -55,7 +57,7 @@ describe('Kuzzle listeners management', function () {
     }
   });
 
-  it('should not re-emit an event before event timeout', function (done) {
+  it('should not re-emit an event before event timeout', done => {
 
     kuzzle.emit('connected', 'foo');
     kuzzle.emit('connected', 'foo');

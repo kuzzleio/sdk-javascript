@@ -1,4 +1,4 @@
-var
+const
   should = require('should'),
   sinon = require('sinon'),
   SocketIO = require('../../src/networkWrapper/protocols/socketio');
@@ -7,12 +7,13 @@ var
  * @global window
  */
 
-describe('SocketIO networking module', function() {
-  var
+describe('SocketIO networking module', () => {
+  let
     clock,
     socketIO,
     socketStub;
-  beforeEach(function () {
+
+  beforeEach(() => {
     clock = sinon.useFakeTimers();
     socketStub = {
       events: {},
@@ -26,7 +27,7 @@ describe('SocketIO networking module', function() {
         socketStub.events[evt].push(cb);
       },
       off: function(evt, cb) {
-        var i;
+        let i;
 
         if (typeof cb === 'undefined') {
           delete socketStub.eventOnce[evt];
@@ -45,8 +46,9 @@ describe('SocketIO networking module', function() {
         }
       },
       emit: function(evt) {
-        var i;
-        var args = Array.prototype.slice.call(arguments, 1);
+        let i;
+
+        const args = Array.prototype.slice.call(arguments, 1);
         if (socketStub.eventOnce[evt]) {
           for (i in socketStub.eventOnce[evt]) {
             if (typeof socketStub.eventOnce[evt][i] === 'function') {
@@ -76,23 +78,23 @@ describe('SocketIO networking module', function() {
     window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
   });
 
-  afterEach(function () {
+  afterEach(() => {
     clock.restore();
   });
 
-  it('should initialize network status when connecting', function () {
+  it('should initialize network status when connecting', () => {
     socketIO.connect();
     should(socketIO.state).be.eql('connecting');
     should(socketIO.queuing).be.false();
   });
 
-  it('should start queuing if autoQueue option is set', function () {
+  it('should start queuing if autoQueue option is set', () => {
     socketIO.autoQueue = true;
     socketIO.connect();
     should(socketIO.queuing).be.true();
   });
 
-  it('should connect with the right parameters', function () {
+  it('should connect with the right parameters', () => {
     socketIO.connect();
     should(window.io).be.calledOnce();
     should(window.io).be.calledWithMatch('http://address:1234', {
@@ -102,7 +104,7 @@ describe('SocketIO networking module', function() {
     });
   });
 
-  it('should connect with the secure connection', function () {
+  it('should connect with the secure connection', () => {
     socketIO = new SocketIO('address', {
       port: 1234,
       autoReconnect: false,
@@ -119,8 +121,8 @@ describe('SocketIO networking module', function() {
     });
   });
 
-  it('should call listeners on connect event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on connect event', () => {
+    const cb = sinon.stub();
 
     should(socketIO.listeners('connect').length).be.eql(0);
     should(socketIO.listeners('reconnect').length).be.eql(0);
@@ -136,7 +138,7 @@ describe('SocketIO networking module', function() {
     should(cb).be.calledOnce();
   });
 
-  it('should change the state when the client connection is established', function () {
+  it('should change the state when the client connection is established', () => {
     socketIO.state = 'connecting';
     socketIO.queuing = true;
 
@@ -147,7 +149,7 @@ describe('SocketIO networking module', function() {
     should(socketIO.stopRetryingToConnect).be.false();
   });
 
-  it('should stop queuing when the client connection is established if autoQueue option is set', function () {
+  it('should stop queuing when the client connection is established if autoQueue option is set', () => {
     socketIO.queuing = true;
     socketIO.autoQueue = true;
 
@@ -156,7 +158,7 @@ describe('SocketIO networking module', function() {
     should(socketIO.queuing).be.false();
   });
 
-  it('should not stop queuing when the client connection is established if autoQueue option is not set', function () {
+  it('should not stop queuing when the client connection is established if autoQueue option is not set', () => {
     socketIO.queuing = true;
     socketIO.autoQueue = false;
 
@@ -165,7 +167,7 @@ describe('SocketIO networking module', function() {
     should(socketIO.queuing).be.true();
   });
 
-  it('should play the queue when the client connection is established if autoReplay option is set', function () {
+  it('should play the queue when the client connection is established if autoReplay option is set', () => {
     socketIO.playQueue = sinon.stub();
     socketIO.autoReplay = true;
 
@@ -174,7 +176,7 @@ describe('SocketIO networking module', function() {
     should(socketIO.playQueue).be.calledOnce();
   });
 
-  it('should not play the queue when the client connection is established if autoReplay option is not set', function () {
+  it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
     socketIO.playQueue = sinon.stub();
     socketIO.autoReplay = false;
 
@@ -183,8 +185,8 @@ describe('SocketIO networking module', function() {
     should(socketIO.playQueue).not.be.called();
   });
 
-  it('should call listeners on a "reconnect" event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on a "reconnect" event', () => {
+    const cb = sinon.stub();
 
     should(socketIO.listeners('connect').length).be.eql(0);
     should(socketIO.listeners('reconnect').length).be.eql(0);
@@ -201,8 +203,8 @@ describe('SocketIO networking module', function() {
     should(cb).be.calledOnce();
   });
 
-  it('should call listeners on a "disconnect" event', function () {
-    var cb = sinon.stub();
+  it('should call listeners on a "disconnect" event', () => {
+    const cb = sinon.stub();
 
     should(socketIO.listeners('disconnect').length).be.eql(0);
 
@@ -216,30 +218,34 @@ describe('SocketIO networking module', function() {
     should(cb).be.calledOnce();
   });
 
-  it('should start queuing when the client is disconnected if autoQueue option is set', function () {
+  it('should start queuing when the client is disconnected if autoQueue option is set', () => {
     socketIO.queuing = false;
     socketIO.autoQueue = true;
 
-    socketIO.connect();
+    const promise = socketIO.connect();
     socketIO.socket.emit('disconnect');
 
     clock.tick(10);
     should(socketIO.queuing).be.true();
+
+    return should(promise).be.rejectedWith('An error occurred, kuzzle may not be ready yet');
   });
 
-  it('should not start queuing when the client is disconnected if autoQueue option is not set', function () {
+  it('should not start queuing when the client is disconnected if autoQueue option is not set', () => {
     socketIO.queuing = false;
     socketIO.autoQueue = false;
 
-    socketIO.connect();
+    const promise = socketIO.connect();
     socketIO.socket.emit('disconnect');
 
     clock.tick(10);
     should(socketIO.queuing).be.false();
+
+    return should(promise).be.rejectedWith('An error occurred, kuzzle may not be ready yet');
   });
 
-  it('should call listeners on a connect error event', function () {
-    var
+  it('should call listeners on a connect error event', () => {
+    const
       cb = sinon.stub(),
       err = new Error('foobar');
 
@@ -249,47 +255,52 @@ describe('SocketIO networking module', function() {
     socketIO.addListener('networkError', cb);
     should(socketIO.listeners('networkError').length).be.eql(1);
 
-    socketIO.connect();
+    const promise = socketIO.connect();
     socketIO.socket.emit('connect_error', err);
 
     should(cb).be.calledOnce();
     should(cb).be.calledWith(err);
+
+    return should(promise).be.rejectedWith('foobar');
   });
 
-  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', function () {
-    var err = new Error('foobar');
+  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', () => {
+    const err = new Error('foobar');
 
     socketIO.queuing = false;
     socketIO.autoQueue = true;
     socketIO.forceDisconnect = true;
 
     socketIO.connect();
+    socketIO.socket.emit('connect');
     socketIO.socket.emit('connect_error', err);
 
     clock.tick(10);
     should(socketIO.queuing).be.true();
   });
 
-  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', function () {
-    var err = new Error('foobar');
+  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', () => {
+    const err = new Error('foobar');
 
     socketIO.queuing = false;
     socketIO.autoQueue = false;
     socketIO.forceDisconnect = true;
 
     socketIO.connect();
+    socketIO.socket.emit('connect');
     socketIO.socket.emit('connect_error', err);
 
     clock.tick(10);
     should(socketIO.queuing).be.false();
   });
 
-  it('should call connectError handler on unattended disconnect event', function () {
-    var cb = sinon.spy();
+  it('should call connectError handler on unattended disconnect event', () => {
+    const cb = sinon.spy();
 
     socketIO.forceDisconnect = false;
     socketIO.addListener('networkError', cb);
     socketIO.connect();
+    socketIO.socket.emit('connect');
 
     socketIO.socket.emit('disconnect');
 
@@ -297,8 +308,8 @@ describe('SocketIO networking module', function() {
   });
 });
 
-describe('SocketIO exposed methods', function() {
-  beforeEach(function () {
+describe('SocketIO exposed methods', () => {
+  beforeEach(() => {
     socketStub = {
       once: sinon.spy(),
       on: sinon.spy(),
@@ -313,8 +324,8 @@ describe('SocketIO exposed methods', function() {
     window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
   });
 
-  it('should be able to listen to an event just once', function () {
-    var cb = sinon.stub();
+  it('should be able to listen to an event just once', () => {
+    const cb = sinon.stub();
 
     socketIO.once('event', cb);
     should(socketIO.listeners('event')).match([cb]).and.have.length(1);
@@ -325,8 +336,8 @@ describe('SocketIO exposed methods', function() {
     should(socketIO.listeners('event')).have.length(0);
   });
 
-  it('should be able to listen to an event', function () {
-    var cb = sinon.stub();
+  it('should be able to listen to an event', () => {
+    const cb = sinon.stub();
 
     socketIO.on('event', cb);
     should(socketIO.listeners('event')).match([cb]).and.have.length(1);
@@ -337,8 +348,8 @@ describe('SocketIO exposed methods', function() {
     should(socketIO.listeners('event')).match([cb]).and.have.length(1);
   });
 
-  it('should be able to remove an event listener', function () {
-    var cb = function () {};
+  it('should be able to remove an event listener', () => {
+    const cb = function () {};
 
     socketIO.on('event', cb);
     should(socketIO.listeners('event')).match([cb]).and.have.length(1);
@@ -349,19 +360,19 @@ describe('SocketIO exposed methods', function() {
     should(socketIO.listeners('event')).have.length(0);
   });
 
-  it('should be able to send a payload', function () {
+  it('should be able to send a payload', () => {
     socketIO.send('some data');
     should(socketStub.emit).be.calledOnce();
     should(socketStub.emit).be.calledWith('kuzzle', 'some data');
   });
 
-  it('should be able to be closed', function () {
+  it('should be able to be closed', () => {
     socketIO.close();
     should(socketStub.close).be.calledOnce();
     should(socketIO.socket).be.null();
   });
 
-  it('should remove all listeners from a given event', function () {
+  it('should remove all listeners from a given event', () => {
     socketIO.on('foo', function () {});
     socketIO.on('foo', function () {});
     socketIO.on('foo', function () {});
@@ -376,7 +387,7 @@ describe('SocketIO exposed methods', function() {
     should(socketIO.listeners('bar')).have.length(1);
   });
 
-  it('should remove all listeners from all events', function () {
+  it('should remove all listeners from all events', () => {
     socketIO.on('foo', function () {});
     socketIO.on('foo', function () {});
     socketIO.on('foo', function () {});
@@ -395,18 +406,18 @@ describe('SocketIO exposed methods', function() {
     should(socketIO.listeners('baz')).have.length(0);
   });
 
-  describe('#isReady', function() {
-    it('should be ready if the instance is connected', function () {
+  describe('#isReady', () => {
+    it('should be ready if the instance is connected', () => {
       socketIO.state = 'connected';
       should(socketIO.isReady()).be.true();
     });
 
-    it('should not be ready if the instance is offline', function () {
+    it('should not be ready if the instance is offline', () => {
       socketIO.state = 'offline';
       should(socketIO.isReady()).be.false();
     });
 
-    it('should not be ready if the instance is still connecting', function () {
+    it('should not be ready if the instance is still connecting', () => {
       socketIO.state = 'connecting';
       should(socketIO.isReady()).be.false();
     });

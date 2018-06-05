@@ -1,89 +1,77 @@
-var
+const
   should = require('should'),
   proxyquire = require('proxyquire'),
   sinon = require('sinon'),
   NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
-describe('Kuzzle network methods', function () {
-  var 
-    Kuzzle,
-    kuzzle;
+describe('Kuzzle network methods', () => {
+  const Kuzzle = proxyquire('../../src/Kuzzle', {
+    './networkWrapper': function(protocol, host, options) {
+      return new NetworkWrapperMock(host, options);
+    }
+  });
 
-  beforeEach(function () {
-    Kuzzle = proxyquire('../../src/Kuzzle', {
-      './networkWrapper': function(protocol, host, options) {
-        return new NetworkWrapperMock(host, options);
-      }
-    });
+  let kuzzle;
 
+  beforeEach(() => {
     kuzzle = new Kuzzle('somewhere');
     kuzzle.network.close = sinon.stub();
   });
 
-  describe('#flushQueue', function() {
-    it('should return Kuzzle instance', function () {
-      var result = kuzzle.flushQueue();
-      should(result).be.exactly(kuzzle);
+  describe('#flushQueue', () => {
+    it('should return Kuzzle instance', () => {
+      should(kuzzle.flushQueue()).be.exactly(kuzzle);
     });
 
-    it('should call network flushQueue method', function () {
+    it('should call network flushQueue method', () => {
       kuzzle.flushQueue();
       should(kuzzle.network.flushQueue).be.calledOnce();
     });
   });
 
-  describe('#playQueue', function() {
-    it('should return Kuzzle instance', function () {
-      var result = kuzzle.playQueue();
-      should(result).be.exactly(kuzzle);
+  describe('#playQueue', () => {
+    it('should return Kuzzle instance', () => {
+      should(kuzzle.playQueue()).be.exactly(kuzzle);
     });
 
-    it('should call network playQueue method', function () {
+    it('should call network playQueue method', () => {
       kuzzle.playQueue();
       should(kuzzle.network.playQueue).be.calledOnce();
     });
   });
 
-  describe('#startQueuing', function() {
-    it('should return Kuzzle instance', function () {
-      var result = kuzzle.startQueuing();
-      should(result).be.exactly(kuzzle);
+  describe('#startQueuing', () => {
+    it('should return Kuzzle instance', () => {
+      should(kuzzle.startQueuing()).be.exactly(kuzzle);
     });
 
-    it('should call network startQueuing method', function () {
+    it('should call network startQueuing method', () => {
       kuzzle.startQueuing();
       should(kuzzle.network.startQueuing).be.calledOnce();
     });
   });
 
-  describe('#stopQueuing', function() {
-    it('should return Kuzzle instance', function () {
-      var result = kuzzle.stopQueuing();
-      should(result).be.exactly(kuzzle);
+  describe('#stopQueuing', () => {
+    it('should return Kuzzle instance', () => {
+      should(kuzzle.stopQueuing()).be.exactly(kuzzle);
     });
 
-    it('should call network stopQueuing method', function () {
+    it('should call network stopQueuing method', () => {
       kuzzle.stopQueuing();
       should(kuzzle.network.stopQueuing).be.calledOnce();
     });
   });
 
-  describe('#disconnect', function() {
-    it('should close network connection', function () {
+  describe('#disconnect', () => {
+    it('should close network connection', () => {
       kuzzle.disconnect();
       should(kuzzle.network.close).be.calledOnce();
     });
-
-    it('should correctly invalidate kuzzle instance', function () {
-      kuzzle.collections = {foo: 'bar', baz: 'yolo'};
-      kuzzle.disconnect();
-      should(kuzzle.collections).be.empty();
-    });
   });
 
-  describe('#events', function() {
-    it('should propagate network "queryError" events', function () {
-      var
+  describe('#events', () => {
+    it('should propagate network "queryError" events', () => {
+      const
         eventStub = sinon.stub(),
         error = {message: 'foo-bar'},
         query = {foo: 'bar'};
@@ -95,8 +83,8 @@ describe('Kuzzle network methods', function () {
       should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
     });
 
-    it('should propagate network "offlineQueuePush" events', function () {
-      var eventStub = sinon.stub();
+    it('should propagate network "offlineQueuePush" events', () => {
+      const eventStub = sinon.stub();
 
       kuzzle.addListener('offlineQueuePush', eventStub);
       kuzzle.network.emit('offlineQueuePush', {query: {foo: 'bar'}, cb: 'callback'});
@@ -105,8 +93,8 @@ describe('Kuzzle network methods', function () {
       should(eventStub).be.calledWithMatch({query: {foo: 'bar'}, cb: 'callback'});
     });
 
-    it('should propagate network "offlineQueuePop" events', function () {
-      var eventStub = sinon.stub();
+    it('should propagate network "offlineQueuePop" events', () => {
+      const eventStub = sinon.stub();
 
       kuzzle.addListener('offlineQueuePop', eventStub);
       kuzzle.network.emit('offlineQueuePop', {foo: 'bar'});
@@ -115,8 +103,8 @@ describe('Kuzzle network methods', function () {
       should(eventStub).be.calledWithMatch({foo: 'bar'});
     });
 
-    it('should propagate network "tokenExpired" events', function () {
-      var eventStub = sinon.stub();
+    it('should propagate network "tokenExpired" events', () => {
+      const eventStub = sinon.stub();
 
       kuzzle.addListener('tokenExpired', eventStub);
       kuzzle.network.emit('tokenExpired');
@@ -124,7 +112,7 @@ describe('Kuzzle network methods', function () {
       should(eventStub).be.calledOnce();
     });
 
-    it('should empty the jwt when a "tokenExpired" events is triggered', function () {
+    it('should empty the jwt when a "tokenExpired" events is triggered', () => {
       kuzzle.jwt = 'foobar';
       kuzzle.network.emit('tokenExpired');
 

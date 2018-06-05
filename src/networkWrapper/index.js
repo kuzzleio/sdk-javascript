@@ -3,10 +3,10 @@
  * @param protocol
  * @param host
  * @param options
- * @returns {Object} Instantiated WebSocket/Socket.IO object
+ * @returns {AbstractWrapper} Instantiated WebSocket/Socket.IO object
  */
 
-function network(protocol, host, options) {
+function network (protocol, host, options) {
   switch (protocol) {
     case 'http':
       return new (require('./protocols/http'))(host, options);
