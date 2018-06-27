@@ -1,21 +1,17 @@
 const
   should = require('should'),
-  proxyquire = require('proxyquire'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle network methods', () => {
-  const Kuzzle = proxyquire('../../src/Kuzzle', {
-    './networkWrapper': function(protocol, host, options) {
-      return new NetworkWrapperMock(host, options);
-    }
-  });
-
   let kuzzle;
 
   beforeEach(() => {
-    kuzzle = new Kuzzle('somewhere');
-    kuzzle.network.close = sinon.stub();
+    const network = new NetworkWrapperMock({host: 'somewhere'});
+
+    network.close = sinon.stub();
+    kuzzle = new Kuzzle(network);
   });
 
   describe('#flushQueue', () => {

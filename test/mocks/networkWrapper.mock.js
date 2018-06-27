@@ -4,11 +4,11 @@ const
 
 class NetworkWrapperMock extends KuzzleEventEmitter {
 
-  constructor (host, options) {
+  constructor (options = {}) {
     super();
 
-    this.host = host;
     this.options = options || {};
+    this.host = this.options.host;
     this.port = this.options.port || 7512;
     this.state = 'offline';
     this.connectCalled = false;

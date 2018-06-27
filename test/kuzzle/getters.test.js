@@ -1,19 +1,14 @@
 const
   should = require('should'),
-  proxyquire = require('proxyquire'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
-
-const Kuzzle = proxyquire('../../src/Kuzzle', {
-  './networkWrapper': function(protocol, host, options) {
-    return new NetworkWrapperMock(host, options);
-  }
-});
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle getters', () => {
   let kuzzle;
 
   beforeEach(() => {
-    kuzzle = new Kuzzle('somewhere');
+    const network = new NetworkWrapperMock({host: 'somewhere'});
+    kuzzle = new Kuzzle(network);
   });
 
   it('should get "autoQueue" property from network instance', () => {

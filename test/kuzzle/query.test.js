@@ -1,8 +1,8 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle query management', () => {
   describe('#query', () => {
@@ -18,13 +18,9 @@ describe('Kuzzle query management', () => {
     let kuzzle;
 
     beforeEach(() => {
-      const Kuzzle = proxyquire('../../src/Kuzzle', {
-        './networkWrapper': function (protocol, host, options) {
-          return new NetworkWrapperMock(host, options);
-        }
-      });
+      const network = new NetworkWrapperMock({host: 'somewhere'});
 
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle(network);
       kuzzle.network.query.resolves({result: {}});
     });
 

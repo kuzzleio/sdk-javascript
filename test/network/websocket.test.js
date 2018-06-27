@@ -23,7 +23,8 @@ describe('WebSocket networking module', () => {
       return clientStub;
     };
 
-    websocket = new WS('address', {
+    websocket = new WS({
+      host: 'address',
       port: 1234,
       autoReconnect: true,
       reconnectionDelay: 10
@@ -60,7 +61,8 @@ describe('WebSocket networking module', () => {
 
   it('should initialize a WS secure connection', () => {
     clientStub.on = sinon.stub();
-    websocket = new WS('address', {
+    websocket = new WS({
+      host: 'address',
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234,
@@ -172,7 +174,8 @@ describe('WebSocket networking module', () => {
   it('should not try to reconnect on a connection error with autoReconnect = false', () => {
     const cb = sinon.stub();
 
-    websocket = new WS('address', {
+    websocket = new WS({
+      host: 'address',
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 10
@@ -244,7 +247,9 @@ describe('WebSocket networking module', () => {
 
     clock.tick(10);
     should(cb).be.calledOnce();
-    should(cb.calledWith('foobar'));
+    should(cb.firstCall.args[0]).be.an.instanceOf(Error);
+    should(cb.firstCall.args[0].internal.status).be.equal(4666);
+    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
 
     cb.reset();
@@ -253,7 +258,9 @@ describe('WebSocket networking module', () => {
 
     clock.tick(10);
     should(cb).be.calledOnce();
-    should(cb.calledWith('foobar'));
+    should(cb.firstCall.args[0]).be.an.instanceOf(Error);
+    should(cb.firstCall.args[0].internal.status).be.equal(4666);
+    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
   });
 
