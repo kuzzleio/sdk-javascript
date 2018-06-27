@@ -6,22 +6,22 @@
  * @returns {AbstractWrapper} Instantiated WebSocket/Socket.IO object
  */
 
-function network (protocol, host, options) {
+function network (protocol, options) {
   switch (protocol) {
     case 'http':
-      return new (require('./protocols/http'))(host, options);
+      return new (require('./protocols/http'))(options);
     case 'websocket':
       if (typeof window !== 'undefined' && typeof WebSocket === 'undefined') {
         throw new Error('Aborting: no websocket support detected.');
       }
-      return new (require('./protocols/websocket'))(host, options);
+      return new (require('./protocols/websocket'))(options);
     case 'socketio':
       if (!window.io) {
         throw new Error('Aborting: no socket.io library loaded.');
       }
-      return new (require('./protocols/socketio'))(host, options);
+      return new (require('./protocols/socketio'))(options);
     default:
-      throw new Error('Aborting: unknown protocol "' + protocol + '" (only "websocket" and "socketio" are available).');
+      throw new Error('Aborting: unknown protocol "' + protocol + '" (only "http", "websocket" and "socketio" are available).');
   }
 }
 

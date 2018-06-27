@@ -44,8 +44,12 @@ const
 
 class HttpWrapper extends AbtractWrapper {
 
-  constructor(host, options) {
-    super(host, options);
+  constructor(options = {}) {
+    super(options);
+
+    if (typeof this.host !== 'string' || this.host === '') {
+      throw new Error('options.host is required');
+    }
 
     // Application-side HTTP route overrides:
     if (options.http && options.http.customRoutes) {
@@ -101,7 +105,10 @@ class HttpWrapper extends AbtractWrapper {
         this.clientConnected();
       })
       .catch(err => {
-        this.emit('networkError', err);
+        const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
+        connectionError.internal = err;
+
+        this.emit('networkError', connectionError);
         throw err;
       });
   }
@@ -197,13 +204,6 @@ class HttpWrapper extends AbtractWrapper {
         this.emit(payload.requestId, {error});
         return Promise.reject(error);
       });
-  }
-
-  /**
-   * Closes the connection
-   */
-  close () {
-    this.disconnect();
   }
 
   _sendHttpRequest (method, path, payload = {}) {

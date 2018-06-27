@@ -7,8 +7,12 @@ let WebSocketClient;
 
 class WSNode extends RTWrapper {
 
-  constructor(host, options) {
-    super(host, options);
+  constructor(options = {}) {
+    super(options);
+
+    if (typeof this.host !== 'string' || this.host === '') {
+      throw new Error('options.host is required');
+    }
 
     WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('uws');
     this.client = null;
@@ -115,7 +119,7 @@ class WSNode extends RTWrapper {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
-    this.disconnect();
+    super.close();
   }
 }
 
