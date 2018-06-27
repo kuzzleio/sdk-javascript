@@ -35,13 +35,16 @@ class Kuzzle extends KuzzleEventEmitter {
   constructor(network, options = {}) {
     super();
 
-    /* Verify if `network` param exists and implements required methods */
     if (network === undefined || network === null) {
       throw new Error('"network" argument missing');
     }
+
+    // embedded network protocol (http/websocket/socketio):
     if (typeof network === 'string') {
       return new Kuzzle(networkWrapper(network, options), options);
     }
+
+    // custom protocol: check the existence of required methods
     for (const method of ['addListener', 'isReady', 'query']) {
       if (typeof network[method] !== 'function') {
         throw new Error(`Network instance must implement a "${method}" method`);
