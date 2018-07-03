@@ -250,8 +250,7 @@ Discarded request: ${JSON.stringify(request)}`));
         return resolve(response);
       });
 
-      this.send(request)
-        .catch(err => reject(err));
+      this.send(request);
     });
   }
 }

@@ -191,12 +191,9 @@ class HttpWrapper extends AbtractWrapper {
       url += '?' + queryString.join('&');
     }
 
-    return this._sendHttpRequest(method, url, payload)
+    this._sendHttpRequest(method, url, payload)
       .then(response => this.emit(payload.requestId, response))
-      .catch(error => {
-        this.emit(payload.requestId, {error});
-        return Promise.reject(error);
-      });
+      .catch(error => this.emit(payload.requestId, {error}));
   }
 
   /**
