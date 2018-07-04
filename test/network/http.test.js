@@ -171,7 +171,7 @@ describe('HTTP networking module', () => {
       };
     });
 
-    it('should send an HTTP request to the backend', () => {
+    it('should send an HTTP request to the backend', done => {
       const data = {
         requestId: 'requestId',
         controller: 'foo',
@@ -182,28 +182,31 @@ describe('HTTP networking module', () => {
         body: {foo: 'bar'}
       };
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', () => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(network._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            controller: 'foo',
-            action: 'bar',
-            index: 'index',
-            collection: 'collection',
-            meta: 'meta',
-            body: JSON.stringify({foo: 'bar'})
-          });
+        should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+        should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+        should(network._sendHttpRequest.firstCall.args[2]).match({
+          requestId: 'requestId',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          controller: 'foo',
+          action: 'bar',
+          index: 'index',
+          collection: 'collection',
+          meta: 'meta',
+          body: JSON.stringify({foo: 'bar'})
         });
+
+        done();
+      });
+
+      network.send(data);
     });
 
-    it('should inject JWT header to the HTTP request', () => {
+    it('should inject JWT header to the HTTP request', done => {
       const data = {
         requestId: 'requestId',
         controller: 'foo',
@@ -211,24 +214,27 @@ describe('HTTP networking module', () => {
         jwt: 'fake-jwt'
       };
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', () => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(network._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              authorization: 'Bearer fake-jwt'
-            },
-            controller: 'foo',
-            action: 'bar'
-          });
+        should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+        should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+        should(network._sendHttpRequest.firstCall.args[2]).match({
+          requestId: 'requestId',
+          headers: {
+            authorization: 'Bearer fake-jwt'
+          },
+          controller: 'foo',
+          action: 'bar'
         });
+
+        done();
+      });
+
+      network.send(data);
     });
 
-    it('should inject volatile headers to the HTTP request', () => {
+    it('should inject volatile headers to the HTTP request', done => {
       const data = {
         requestId: 'requestId',
         controller: 'foo',
@@ -238,24 +244,27 @@ describe('HTTP networking module', () => {
         }
       };
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', () => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(network._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              'x-kuzzle-volatile': '{"some":"volatile-data"}'
-            },
-            controller: 'foo',
-            action: 'bar'
-          });
+        should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+        should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+        should(network._sendHttpRequest.firstCall.args[2]).match({
+          requestId: 'requestId',
+          headers: {
+            'x-kuzzle-volatile': '{"some":"volatile-data"}'
+          },
+          controller: 'foo',
+          action: 'bar'
         });
+
+        done();
+      });
+
+      network.send(data);
     });
 
-    it('should inject queryString to the HTTP request', () => {
+    it('should inject queryString to the HTTP request', done => {
       const data = {
         requestId: 'requestId',
         action: 'bar',
@@ -263,16 +272,19 @@ describe('HTTP networking module', () => {
         foo: 'bar'
       };
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', () => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo=bar');
-        });
+        should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+        should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo=bar');
+
+        done();
+      });
+
+      network.send(data);
     });
 
-    it('should inject placeholders parameters', () => {
+    it('should inject placeholders parameters', done => {
       const data = {
         requestId: 'requestId',
         controller: 'foo',
@@ -283,61 +295,56 @@ describe('HTTP networking module', () => {
         foo: {bar: {verb: 'VERB', url: '/foo/bar/:foo'}}
       };
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', () => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar/baz');
-        });
+        should(network._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+        should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar/baz');
+
+        done();
+      });
+
+      network.send(data);
     });
 
-    it('should not send any HTTP request and emit a "No route found" event if no route is defined', () => {
-      const
-        eventStub = sinon.stub(),
-        data = {
-          requestId: 'requestId',
-          controller: 'bar',
-          action: 'foo'
-        };
+    it('should not send any HTTP request and emit a "No route found" event if no route is defined', done => {
+      const data = {
+        requestId: 'requestId',
+        controller: 'bar',
+        action: 'foo'
+      };
 
-      network.addListener('requestId', eventStub);
+      network.on('requestId', ({ status, error }) => {
+        should(network._sendHttpRequest).not.be.called();
 
-      return network.send(data)
-        .then(() => Promise.reject('No error'))
-        .catch(err => {
-          should(network._sendHttpRequest).not.be.called();
-          should(eventStub).be.calledOnce();
+        should(status).be.equal(400);
+        should(error.message).be.equal('No route found for bar/foo');
 
-          const calledArgument = eventStub.firstCall.args[0];
-          should(calledArgument.status).be.equal(400);
-          should(calledArgument.error.message).be.equal('No route found for bar/foo');
+        done();
+      });
 
-          should(err.message).be.equal('No route found for bar/foo');
-        });
+      network.send(data);
     });
 
-    it('should emit an event with the backend response to the "requestId" listeners', () => {
-      const
-        eventStub = sinon.stub(),
-        data = {
-          requestId: 'requestId',
-          controller: 'foo',
-          action: 'bar'
-        };
-
-      network.addListener('requestId', eventStub);
+    it('should emit an event with the backend response to the "requestId" listeners', done => {
+      const data = {
+        requestId: 'requestId',
+        controller: 'foo',
+        action: 'bar'
+      };
 
       const result = {status: 200, backend: 'response'};
       network._sendHttpRequest.resolves(result);
 
-      return network.send(data)
-        .then(() => {
-          should(network._sendHttpRequest).be.calledOnce();
+      network.on('requestId', response => {
+        should(network._sendHttpRequest).be.calledOnce();
 
-          should(eventStub).be.calledOnce();
-          should(eventStub.firstCall.args[0]).match({status: 200, backend: 'response'});
-        });
+        should(response).match({status: 200, backend: 'response'});
+
+        done();
+      });
+
+      network.send(data);
     });
   });
 
