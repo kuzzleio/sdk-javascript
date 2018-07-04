@@ -156,6 +156,7 @@ class HttpWrapper extends AbtractWrapper {
     if (route === undefined) {
       const error = new Error(`No route found for ${payload.controller}/${payload.action}`);
       this.emit(payload.requestId, {status: 400, error});
+      return Promise.reject(error);
     }
 
     const
@@ -190,9 +191,12 @@ class HttpWrapper extends AbtractWrapper {
       url += '?' + queryString.join('&');
     }
 
-    this._sendHttpRequest(method, url, payload)
+    return this._sendHttpRequest(method, url, payload)
       .then(response => this.emit(payload.requestId, response))
-      .catch(error => this.emit(payload.requestId, {error}));
+      .catch(error => {
+        this.emit(payload.requestId, {error});
+        return Promise.reject(error);
+      });
   }
 
   /**
