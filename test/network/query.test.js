@@ -26,22 +26,6 @@ describe('Network query management', () => {
         .be.calledWith(request);
     });
 
-    it('should reject if an error occurs sending the request', () => {
-      network.send = sinon.stub().rejects('Error sending request');
-
-      const request = {foo: 'bar'};
-
-      return network._emitRequest({foo: 'bar'})
-        .then(() => Promise.reject('No error'))
-        .catch(err => {
-          should(network.send)
-            .be.calledOnce()
-            .be.calledWith(request);
-          should(err).be.an.instanceof(Error);
-          should(err.name).be.exactly('Error sending request');
-        });
-    });
-
     it('should fire a "queryError" event and reject if an error occurred', () => {
       const
         eventStub = sinon.stub(),
