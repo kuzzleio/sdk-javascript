@@ -14,7 +14,7 @@ describe('Offline queue management', function () {
   beforeEach(function () {
     var pastTime = 60050;
 
-    network = new AbstractWrapper('somewhere');
+    network = new AbstractWrapper();
 
     // queuing a bunch of 7 requests from 1min ago to right now, 10s apart
     now = Date.now();

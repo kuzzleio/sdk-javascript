@@ -1,9 +1,7 @@
-var
-  bluebird = require('bluebird'),
-  Kuzzle = require('./src/Kuzzle');
-
-// Adds on the fly methods promisification
-Kuzzle.prototype.bluebird = bluebird;
+const
+  Kuzzle = require('./src/Kuzzle'),
+  KuzzleAbstractNetwork = require('./src/networkWrapper/protocols/abstract/common'),
+  KuzzleEventEmitter = require('./src/eventEmitter');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
@@ -12,4 +10,4 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
                'Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser');
 }
 
-module.exports = Kuzzle;
+module.exports = {Kuzzle, KuzzleAbstractNetwork, KuzzleEventEmitter};

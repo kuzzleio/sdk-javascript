@@ -5,14 +5,15 @@ const
 
 class RTWrapper extends AbstractWrapper {
 
-  constructor (host, options) {
-    super(host, options);
+  constructor (options = {}) {
+    super(options);
 
-    this._autoReconnect = options && typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
-    this._reconnectionDelay = options && typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
+    this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
+    this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
 
-    if (options && options.offlineMode === 'auto' && this.autoReconnect) {
-      this.autoQueue = this.autoReplay = true;
+    if (options.offlineMode === 'auto' && this.autoReconnect) {
+      this.autoQueue = true;
+      this.autoReplay = true;
     }
 
     this.wasConnected = false;
@@ -64,7 +65,10 @@ class RTWrapper extends AbstractWrapper {
       this.startQueuing();
     }
 
-    this.emit('networkError', error);
+    const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
+    connectionError.internal = error;
+
+    this.emit('networkError', connectionError);
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
       this.retrying = true;
       setTimeout(() => {

@@ -29,15 +29,28 @@ const
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
-   * @param host - Server name or IP Address to the Kuzzle instance
+   * @param network - the network wrapper to use. if the argument is a string, creates an embeed network wrapper if a
    * @param [options] - Connection options
    */
-  constructor(host, options = {}) {
+  constructor(network, options = {}) {
     super();
 
-    if (!host || host === '') {
-      throw new Error('host argument missing');
+    if (network === undefined || network === null) {
+      throw new Error('"network" argument missing');
     }
+
+    // embedded network protocol (http/websocket/socketio):
+    if (typeof network === 'string') {
+      return new Kuzzle(networkWrapper(network, options), options);
+    }
+
+    // custom protocol: check the existence of required methods
+    for (const method of ['addListener', 'isReady', 'query']) {
+      if (typeof network[method] !== 'function') {
+        throw new Error(`Network instance must implement a "${method}" method`);
+      }
+    }
+    this.network = network;
 
     this._protectedEvents = {
       connected: {},
@@ -50,9 +63,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
     this.autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
     this.eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
-    this.protocol = typeof options.protocol === 'string' ? options.protocol : 'websocket';
-    this.version = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
-    this.network = networkWrapper(this.protocol, host, options);
+    this.sdkVersion = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
     this.volatile = typeof options.volatile === 'object' ? options.volatile : {};
 
     // controllers
@@ -223,10 +234,7 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.network.addListener('networkError', error => {
-      const connectionError = new Error(`Unable to connect to kuzzle server at ${this.network.host}:${this.network.port}`);
-
-      connectionError.internal = error;
-      this.emit('networkError', connectionError);
+      this.emit('networkError', error);
     });
 
     this.network.addListener('disconnect', () => {
@@ -248,7 +256,7 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     });
 
-    this.network.on('discarded', data => this.emit('discarded', data));
+    this.network.addListener('discarded', data => this.emit('discarded', data));
 
     return this.network.connect();
   }

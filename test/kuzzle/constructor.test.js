@@ -1,5 +1,6 @@
 const
   should = require('should'),
+  sinon = require('sinon'),
   proxyquire = require('proxyquire'),
   AuthController = require('../../src/controllers/auth'),
   BulkController = require('../../src/controllers/bulk'),
@@ -13,20 +14,73 @@ const
   NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 const Kuzzle = proxyquire('../../src/Kuzzle', {
-  './networkWrapper': function(protocol, host, options) {
-    return new NetworkWrapperMock(host, options);
+  './networkWrapper': function(protocol, options) {
+    const network = new NetworkWrapperMock(options);
+    network.protocol = protocol;
+    return network;
   }
 });
 
+
 describe('Kuzzle constructor', () => {
-  it('should throw an error if no URL is provided', () => {
+  const networkMock = new NetworkWrapperMock({host: 'somewhere'});
+
+  it('should throw an error if no network wrapper is provided', () => {
     should(function () {
       new Kuzzle();
-    }).throw();
+    }).throw('"network" argument missing');
+  });
+
+  it('should throw an error if the network wrapper does not implement required methods', () => {
+    const network = {};
+    should(function () {
+      new Kuzzle(network);
+    }).throw('Network instance must implement a "addListener" method');
+
+    network.addListener = sinon.stub();
+    should(function () {
+      new Kuzzle(network);
+    }).throw('Network instance must implement a "isReady" method');
+
+    network.isReady = sinon.stub();
+    should(function () {
+      new Kuzzle(network);
+    }).throw('Network instance must implement a "query" method');
+
+    network.query = sinon.stub();
+    should(function () {
+      new Kuzzle(network);
+    }).not.throw();
+  });
+
+  it('should intialize embed network instance with the "options" argument', () => {
+    const
+      options = {foo: ['bar', 'baz', 'qux'], bar: 'foo' },
+      kuzWS = new Kuzzle('websocket', options),
+      kuzSocketIO = new Kuzzle('socketio', options),
+      kuzHTTP = new Kuzzle('http', options);
+
+    should(kuzWS.network).be.an.instanceOf(NetworkWrapperMock);
+    should(kuzWS.network.options).match(options);
+    should(kuzWS.network.protocol).be.eql('websocket');
+
+    should(kuzSocketIO.network).be.an.instanceOf(NetworkWrapperMock);
+    should(kuzSocketIO.network.options).match(options);
+    should(kuzSocketIO.network.protocol).be.eql('socketio');
+
+    should(kuzHTTP.network).be.an.instanceOf(NetworkWrapperMock);
+    should(kuzHTTP.network.options).match(options);
+    should(kuzHTTP.network.protocol).be.eql('http');
+  });
+
+  it('should get a custom network instance', () => {
+    const kuzzle = new Kuzzle(networkMock);
+    should(kuzzle.network).be.an.instanceOf(NetworkWrapperMock);
+    should(kuzzle.network).be.equal(networkMock);
   });
 
   it('should expose the documented controllers', () => {
-    const kuzzle = new Kuzzle('somewhere');
+    const kuzzle = new Kuzzle(networkMock);
 
     should(kuzzle.auth).be.an.instanceof(AuthController);
     should(kuzzle.bulk).be.an.instanceof(BulkController);
@@ -42,13 +96,12 @@ describe('Kuzzle constructor', () => {
   it('should expose the documented properties wwith their default values', () => {
     const
       version = require('../../package').version,
-      kuzzle = new Kuzzle('somewhere');
+      kuzzle = new Kuzzle(networkMock);
 
     should(kuzzle.autoResubscribe).be.a.Boolean().and.be.true();
     should(kuzzle.eventTimeout).be.a.Number().and.be.equal(200);
     should(kuzzle.network).be.an.instanceof(NetworkWrapperMock);
-    should(kuzzle.protocol).be.a.String().and.be.equal('websocket');
-    should(kuzzle.version).be.a.String().and.be.equal(version);
+    should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
     should(kuzzle.volatile).be.an.Object().and.be.empty();
   });
 
@@ -56,16 +109,14 @@ describe('Kuzzle constructor', () => {
     const
       options = {
         autoResubscribe: false,
-        protocol: 'fakeproto',
         volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
         eventTimeout: 1000,
         foo: 'bar'
       },
-      kuzzle = new Kuzzle('somewhere', options);
+      kuzzle = new Kuzzle(networkMock, options);
 
     should(kuzzle.autoResubscribe).be.a.Boolean().and.be.false();
     should(kuzzle.eventTimeout).be.a.Number().and.be.exactly(1000);
-    should(kuzzle.protocol).be.exactly('fakeproto');
     should(kuzzle.volatile).be.an.Object().and.match(options.volatile);
   });
 
@@ -86,7 +137,7 @@ describe('Kuzzle constructor', () => {
         jwt: 'jwt',
         version: 'version'
       },
-      kuzzle = new Kuzzle('somewhere', options);
+      kuzzle = new Kuzzle(networkMock, options);
 
     should(kuzzle.auth).be.an.instanceof(AuthController);
     should(kuzzle.bulk).be.an.instanceof(BulkController);
@@ -98,15 +149,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.server).be.an.instanceof(ServerController);
     should(kuzzle.realtime).be.an.instanceof(RealTimeController);
     should(kuzzle.network).be.an.instanceof(NetworkWrapperMock);
-    should(kuzzle.version).be.a.String().and.be.equal(version);
+    should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
     should(kuzzle.jwt).be.undefined();
-  });
-
-  it('should intialize network instance with the "options" argument', () => {
-    const
-      options = {foo: ['bar', 'baz', 'qux'], bar: 'foo' },
-      kuzzle = new Kuzzle('somewhere', options);
-
-    should(kuzzle.network.options).match(options);
   });
 });

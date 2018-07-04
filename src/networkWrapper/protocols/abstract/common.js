@@ -14,12 +14,12 @@ let
 
 class AbstractWrapper extends KuzzleEventEmitter {
 
-  constructor (host, options) {
+  constructor (options = {}) {
     super();
 
-    _host = host;
-    _port = options && typeof options.port === 'number' ? options.port : 7512;
-    _ssl = options && typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
+    _host = options.host;
+    _port = typeof options.port === 'number' ? options.port : 7512;
+    _ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
     this.autoReplay = false;
     this.autoQueue = false;
@@ -32,13 +32,11 @@ class AbstractWrapper extends KuzzleEventEmitter {
     this.replayInterval = 10;
     this.state = 'offline';
 
-    if (options) {
-      Object.keys(options).forEach(opt => {
-        if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
-          this[opt] = options[opt];
-        }
-      });
-    }
+    Object.keys(options).forEach(opt => {
+      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
+        this[opt] = options[opt];
+      }
+    });
   }
 
   get id () {
@@ -66,6 +64,15 @@ class AbstractWrapper extends KuzzleEventEmitter {
   }
 
   /**
+   * @abstract
+   * @param request
+   * @returns {Promise<any>}
+   */
+  send () {
+    throw new Error('Method "send" is not implemented');
+  }
+
+  /**
    * Called when the client's connection is established
    */
   clientConnected (state, wasConnected) {
@@ -84,7 +91,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
   /**
    * Called when the client's connection is closed
    */
-  disconnect() {
+  close () {
     this.state = 'offline';
     if (this.autoQueue) {
       this.startQueuing();

@@ -1,7 +1,8 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire');
+  proxyquire = require('proxyquire'),
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
 
 describe('Kuzzle listeners management', () => {
   const
@@ -25,7 +26,8 @@ describe('Kuzzle listeners management', () => {
 
 
   beforeEach(() => {
-    kuzzle = new Kuzzle('foo', {eventTimeout: 20});
+    const network = new NetworkWrapperMock();
+    kuzzle = new Kuzzle(network, {eventTimeout: 20});
     addListenerStub.reset();
     emitStub.reset();
   });

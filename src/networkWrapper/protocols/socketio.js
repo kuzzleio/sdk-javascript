@@ -5,8 +5,12 @@ const
 
 class SocketIO extends RTWrapper {
 
-  constructor(host, options) {
-    super(host, options);
+  constructor(options = {}) {
+    super(options);
+
+    if (typeof this.host !== 'string' || this.host === '') {
+      throw new Error('options.host is required');
+    }
 
     this.socket = null;
     this.forceDisconnect = false;
@@ -128,7 +132,7 @@ class SocketIO extends RTWrapper {
     this.state = 'offline';
     this.socket.close();
     this.socket = null;
-    this.disconnect();
+    super.close();
   }
 
   _addEventWrapper (event, callback, once = false) {

@@ -1,18 +1,19 @@
-var
+const
   should = require('should'),
   sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock');
+  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle connect', () => {
-  const Kuzzle = proxyquire('../../src/Kuzzle', {
-    './networkWrapper': function(protocol, host, options) {
-      return new NetworkWrapperMock(host, options);
-    }
-  });
+
+  const networks = {
+    somewhere: new NetworkWrapperMock({host: 'somewhere'}),
+    somewhereagain: new NetworkWrapperMock({host: 'somewhereagain'}),
+    nowhere: new NetworkWrapperMock({host: 'nowhere'})
+  };
 
   it('should return immediately if already connected', () => {
-    const kuzzle = new Kuzzle('somewhere');
+    const kuzzle = new Kuzzle(networks.somewhere);
     kuzzle.network.isReady.returns(true);
 
     return kuzzle.connect()
@@ -22,7 +23,7 @@ describe('Kuzzle connect', () => {
   });
 
   it('should call network wrapper connect() method when the instance is offline', () => {
-    const kuzzle = new Kuzzle('somewhere');
+    const kuzzle = new Kuzzle(networks.somewhere);
     kuzzle.network.isReady.returns(false);
 
     return kuzzle.connect()
@@ -34,7 +35,7 @@ describe('Kuzzle connect', () => {
   describe('=> Connection Events', () => {
     it('should registered listeners upon receiving a "error" event', () => {
       const
-        kuzzle = new Kuzzle('nowhere'),
+        kuzzle = new Kuzzle(networks.nowhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('networkError', eventStub);
@@ -45,7 +46,7 @@ describe('Kuzzle connect', () => {
 
     it('should registered listeners upon receiving a "connect" event', () => {
       const
-        kuzzle = new Kuzzle('somewhere'),
+        kuzzle = new Kuzzle(networks.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('connected', eventStub);
@@ -58,7 +59,7 @@ describe('Kuzzle connect', () => {
 
     it('should registered listeners upon receiving a "reconnect" event', () => {
       const
-        kuzzle = new Kuzzle('somewhereagain'),
+        kuzzle = new Kuzzle(networks.somewhereagain),
         eventStub = sinon.stub();
 
       kuzzle.addListener('reconnected', eventStub);
@@ -70,7 +71,7 @@ describe('Kuzzle connect', () => {
     });
 
     it('should keep a valid JWT at reconnection', () => {
-      const kuzzle = new Kuzzle('somewhereagain');
+      const kuzzle = new Kuzzle(networks.somewhereagain);
 
       kuzzle.checkToken = sinon.stub();
       kuzzle.jwt = 'foobar';
@@ -86,7 +87,7 @@ describe('Kuzzle connect', () => {
     });
 
     it('should empty the JWT at reconnection if it has expired', () => {
-      const kuzzle = new Kuzzle('somewhereagain');
+      const kuzzle = new Kuzzle(networks.somewhereagain);
 
       kuzzle.checkToken = sinon.stub();
       kuzzle.jwt = 'foobar';
@@ -103,7 +104,7 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "disconnect" event', () => {
       const
-        kuzzle = new Kuzzle('somewhere'),
+        kuzzle = new Kuzzle(networks.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('disconnected', eventStub);
@@ -117,7 +118,7 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "discarded" event', () => {
       const
-        kuzzle = new Kuzzle('somewhere'),
+        kuzzle = new Kuzzle(networks.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('discarded', eventStub);

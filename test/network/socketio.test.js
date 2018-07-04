@@ -68,7 +68,8 @@ describe('SocketIO networking module', () => {
       close: sinon.spy()
     };
 
-    socketIO = new SocketIO('address', {
+    socketIO = new SocketIO({
+      host: 'address',
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234
@@ -105,7 +106,8 @@ describe('SocketIO networking module', () => {
   });
 
   it('should connect with the secure connection', () => {
-    socketIO = new SocketIO('address', {
+    socketIO = new SocketIO({
+      host: 'address',
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234,
@@ -259,7 +261,8 @@ describe('SocketIO networking module', () => {
     socketIO.socket.emit('connect_error', err);
 
     should(cb).be.calledOnce();
-    should(cb).be.calledWith(err);
+    should(cb.firstCall.args[0]).be.an.instanceOf(Error);
+    should(cb.firstCall.args[0].internal).be.equal(err);
 
     return should(promise).be.rejectedWith('foobar');
   });
@@ -318,7 +321,7 @@ describe('SocketIO exposed methods', () => {
       close: sinon.spy()
     };
 
-    socketIO = new SocketIO('address');
+    socketIO = new SocketIO({host: 'address'});
     socketIO.socket = socketStub;
 
     window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
