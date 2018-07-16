@@ -351,7 +351,7 @@ describe('Kuzzle connect', function () {
       should(function () { kuzzle.isValid(); }).throw(Error);
     });
     
-    it.only('should trigger "disconnected" event', function (done) {
+    it('should trigger "disconnected" event', function (done) {
       const
         disconnectedStub = sinon.stub(),
         kuzzle = new Kuzzle('somewhere');
