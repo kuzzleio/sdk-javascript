@@ -1146,6 +1146,8 @@ Kuzzle.prototype.disconnect = function () {
       delete this.collections[collection];
     }
   }
+
+  this.emit('disconnected');
 };
 
 /**
