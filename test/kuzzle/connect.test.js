@@ -6,7 +6,7 @@ var
   Kuzzle = rewire('../../src/Kuzzle');
 
 describe('Kuzzle connect', function () {
-  let networkWrapperRevert;
+  var networkWrapperRevert;
 
   beforeEach(function () {
     networkWrapperRevert = Kuzzle.__set__({
@@ -21,7 +21,7 @@ describe('Kuzzle connect', function () {
   });
 
   it('should return the current Kuzzle instance', function () {
-    const
+    var
       kuzzle = new Kuzzle('somewhere', {connect: 'manual'}),
       connectedKuzzle = kuzzle.connect();
 
@@ -29,7 +29,7 @@ describe('Kuzzle connect', function () {
   });
 
   it('should return immediately if already connected', function (done) {
-    const kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
       should(res.state).be.exactly('connected');
@@ -42,13 +42,13 @@ describe('Kuzzle connect', function () {
   });
   
   it('should trigger "connected" event', function (done) {
-    const
+    var
       connectedStub = sinon.stub(),
       kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
     
     kuzzle.addListener('connected', function () {
       connectedStub();
-    })
+    });
     
     kuzzle.connect();
     
@@ -59,7 +59,7 @@ describe('Kuzzle connect', function () {
   });
 
   it('should return immediately if trying to reconnect', function (done) {
-    const kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
       should(err).be.null();
       should(res).be.exactly(kuzzle);
       should(res.state).be.exactly('reconnecting');
@@ -72,7 +72,7 @@ describe('Kuzzle connect', function () {
   });
 
   it('should first disconnect if it was connected', function () {
-    const kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+    var kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
 
     kuzzle.disconnect = sinon.stub();
 
@@ -85,7 +85,7 @@ describe('Kuzzle connect', function () {
 
   it('should try to connect when the instance is in a not-connected state', function () {
     ['initializing', 'ready', 'disconnected', 'error', 'offline'].forEach(function (state) {
-      const kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
 
       kuzzle.state = state;
       should(kuzzle.connect()).be.exactly(kuzzle);
@@ -96,7 +96,7 @@ describe('Kuzzle connect', function () {
 
   describe('=> on connection error', function () {
     it('should call the provided callback on a connection error', function (done) {
-      const kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
+      var kuzzle = new Kuzzle('nowhere', {connect: 'manual'}, function (err, res) {
         should(err).be.instanceOf(Error);
         should(err.message).be.exactly('Unable to connect to kuzzle proxy server at "nowhere:7512"');
         should(err.internal.message).be.exactly('Mock Error');
@@ -124,7 +124,7 @@ describe('Kuzzle connect', function () {
 
   describe('=> on connection success', function () {
     it('should call the provided callback on a connection success', function (done) {
-      const kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
         should(err).be.null();
         should(res).be.instanceof(Kuzzle);
         should(res.state).be.exactly('connected');
@@ -189,7 +189,7 @@ describe('Kuzzle connect', function () {
 
   describe('=> on disconnection', function () {
     it('should enter offline mode and call listeners', function (done) {
-      const kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function() {
           kuzzle.network.disconnect();
         }),
         disconnectStub = sinon.stub();
@@ -207,7 +207,7 @@ describe('Kuzzle connect', function () {
     });
 
     it('should enable queuing if autoQueue is set to true', function (done) {
-      const kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoQueue: true}, function() {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoQueue: true}, function() {
         kuzzle.network.disconnect();
       });
 
@@ -221,7 +221,7 @@ describe('Kuzzle connect', function () {
     });
 
     it('should invalidate the instance if autoReconnect is set to false', function () {
-      const kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReconnect: false}, function() {
+      var kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReconnect: false}, function() {
         kuzzle.network.disconnect();
       });
 
@@ -341,7 +341,7 @@ describe('Kuzzle connect', function () {
 
   describe('#disconnect', function () {
     it('should clean up and invalidate the instance if called', function () {
-      const kuzzle = new Kuzzle('somewhere');
+      var kuzzle = new Kuzzle('somewhere');
 
       kuzzle.collections = { foo: {}, bar: {}, baz: {} };
       kuzzle.disconnect();
@@ -352,7 +352,7 @@ describe('Kuzzle connect', function () {
     });
     
     it('should trigger "disconnected" event', function (done) {
-      const
+      var
         disconnectedStub = sinon.stub(),
         kuzzle = new Kuzzle('somewhere');
       
