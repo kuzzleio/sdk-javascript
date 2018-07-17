@@ -40,6 +40,23 @@ describe('Kuzzle connect', function () {
     kuzzle.state = 'connected';
     kuzzle.connect();
   });
+  
+  it('should trigger "connected" event', function (done) {
+    var
+      connectedStub = sinon.stub(),
+      kuzzle = new Kuzzle('somewhere', {connect: 'manual'});
+    
+    kuzzle.addListener('connected', function () {
+      connectedStub();
+    });
+    
+    kuzzle.connect();
+    
+    process.nextTick(function () {
+      should(connectedStub).be.calledOnce();
+      done();
+    });
+  });
 
   it('should return immediately if trying to reconnect', function (done) {
     var kuzzle = new Kuzzle('somewhere', {connect: 'manual'}, function (err, res) {
@@ -332,6 +349,23 @@ describe('Kuzzle connect', function () {
       should(kuzzle.network).be.null();
       should(kuzzle.collections).be.empty();
       should(function () { kuzzle.isValid(); }).throw(Error);
+    });
+    
+    it('should trigger "disconnected" event', function (done) {
+      var
+        disconnectedStub = sinon.stub(),
+        kuzzle = new Kuzzle('somewhere');
+      
+      kuzzle.addListener('disconnected', function () {
+        disconnectedStub();
+      });
+      
+      kuzzle.disconnect();
+      
+      process.nextTick(function () {
+        should(disconnectedStub).be.calledOnce();
+        done();
+      });
     });
   });
 });
