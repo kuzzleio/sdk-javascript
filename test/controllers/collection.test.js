@@ -18,26 +18,46 @@ describe('Collection Controller', () => {
   describe('create', () => {
     it('should throw an error if the "index" argument is not provided', () => {
       should(function () {
-        kuzzle.collection.create(undefined, 'collection', options);
+        kuzzle.collection.create(null, 'collection', null, options);
       }).throw('Kuzzle.collection.create: index is required');
     });
 
     it('should throw an error if the "collection" argument is not provided', () => {
       should(function () {
-        kuzzle.collection.create('index', undefined, options);
+        kuzzle.collection.create('index', null, null, options);
       }).throw('Kuzzle.collection.create: collection is required');
     });
 
     it('should call collection/create query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({acknowledged: true});
 
-      return kuzzle.collection.create('index', 'collection', options)
+      return kuzzle.collection.create('index', 'collection', null, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
               controller: 'collection',
               action: 'create',
+              body: null,
+              index: 'index',
+              collection: 'collection'
+            }, options);
+
+          should(res.acknowledged).be.a.Boolean().and.be.true();
+        });
+    });
+
+    it('should handle a collection mapping, if one is provided', () => {
+      kuzzle.query.resolves({acknowledged: true});
+
+      return kuzzle.collection.create('index', 'collection', {properties: true}, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'collection',
+              action: 'create',
+              body: {properties: true},
               index: 'index',
               collection: 'collection'
             }, options);
