@@ -317,14 +317,14 @@ describe('Collection methods', function () {
         action: 'create',
         collection: 'foo',
         index: 'bar'
-      }, {mapping: 'gnippam'}, null, sinon.match.func);
+      }, {body: {mapping: 'gnippam'}}, null, sinon.match.func);
 
       should(kuzzle.query).calledWithMatch({
         controller: 'collection',
         action: 'create',
         collection: 'foo',
         index: 'bar'
-      }, {mapping: 'foobar'}, {queuable: true}, sinon.match.func);
+      }, {body: {mapping: 'foobar'}}, {queuable: true}, sinon.match.func);
 
       should(kuzzle.query).calledWithMatch({
         controller: 'collection',

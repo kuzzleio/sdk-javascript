@@ -120,7 +120,8 @@ Collection.prototype.count = function (filters, options, cb) {
 Collection.prototype.create = function () {
   var
     i,
-    data = null,
+    data = {},
+    mapping = null,
     options = null,
     cb = null,
     self = this;
@@ -133,8 +134,8 @@ Collection.prototype.create = function () {
 
       cb = arguments[i];
     } else if (typeof arguments[i] === 'object' && !Array.isArray(arguments[i])) {
-      if (data === null) {
-        data = arguments[i];
+      if (mapping === null) {
+        mapping = arguments[i];
       } else if (options === null) {
         options = arguments[i];
       } else {
@@ -145,9 +146,11 @@ Collection.prototype.create = function () {
     }
   }
 
-  if (data === null || (options === null && typeof data.queuable === 'boolean')) {
-    options = data;
+  if (mapping === null || (options === null && typeof mapping.queuable === 'boolean')) {
+    options = mapping;
     data = {};
+  } else {
+    data = {body: mapping};
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
