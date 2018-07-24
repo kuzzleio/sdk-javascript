@@ -203,19 +203,24 @@ describe('Kuzzle connect', function () {
       });
     });
 
-    it('should invalidate the instance if autoReconnect is set to false', function () {
+    it('should invalidate the instance if autoReconnect is set to false', function (done) {
       var kuzzle = new Kuzzle('somewhere', {connect: 'manual', autoReconnect: false}, function() {
         kuzzle.network.disconnect();
       });
 
       kuzzle.connect();
       process.nextTick(function() {
-        should(kuzzle.state).be.exactly('disconnected');
-        should(kuzzle.queuing).be.false();
-        should(function () {
-          kuzzle.isValid();
-        }).throw();
-        done();
+        try {
+          should(kuzzle.state).be.exactly('disconnected');
+          should(kuzzle.queuing).be.false();
+          should(function () {
+            kuzzle.isValid();
+          }).throw();
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
       });
     });
   });
@@ -304,7 +309,7 @@ describe('Kuzzle connect', function () {
         kuzzle = new Kuzzle('somewhereagain', {connect: 'manual'}),
         tokenExpiredStub = sinon.stub();
 
-      sinon.stub(kuzzle, 'checkToken', function (token, cb) {
+      sinon.stub(kuzzle, 'checkToken').callsFake(function (token, cb) {
         should(token).be.eql(kuzzle.jwtToken);
         cb(null, {valid: false});
       });

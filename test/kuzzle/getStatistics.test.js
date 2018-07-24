@@ -9,7 +9,7 @@ describe('Kuzzle.getStatistics', function () {
     emitted;
 
   beforeEach(function () {
-    kuzzle = new Kuzzle('foo', 'this is not an index');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
     emitted = false;
   });
 

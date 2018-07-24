@@ -7,7 +7,7 @@ var
 describe('Security constructor', function () {
   it('should initialize properties and return a valid Security object', function () {
     var
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
     should(kuzzle.security).be.instanceof(Security);
     should(kuzzle.security).have.propertyWithDescriptor('kuzzle', { enumerable: false, writable: false, configurable: false });
@@ -20,7 +20,7 @@ describe('Security constructor', function () {
       kuzzle;
 
     Kuzzle.prototype.bluebird = bluebird;
-    kuzzle = new Kuzzle('foo');
+    kuzzle = new Kuzzle('foo', {connect: 'manual'});
 
     should.exist(kuzzle.security.createRolePromise);
     should.exist(kuzzle.security.fetchRolePromise);

@@ -2,7 +2,6 @@ var
   should = require('should'),
   rewire = require('rewire'),
   sinon = require('sinon'),
-  sandbox = sinon.sandbox.create(),
   Kuzzle = rewire('../../src/Kuzzle'),
   Collection = require('../../src/Collection.js'),
   User = require('../../src/security/User');
@@ -23,13 +22,13 @@ describe('Kuzzle methods', function () {
 
   beforeEach(function () {
     kuzzle = new Kuzzle('foo', {connect: 'manual'});
-    sandbox.stub(kuzzle, 'query').callsFake(queryStub);
+    sinon.stub(kuzzle, 'query').callsFake(queryStub);
     result = null;
     error = null;
   });
 
   afterEach(function () {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('#getAllStatistics', function () {
@@ -977,220 +976,239 @@ describe('Kuzzle methods', function () {
   });
 
   describe('#createMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
-
+      error = {message: 'i am an error'};
       kuzzle.createMyCredentials('strategy', {foo: 'bar'}, function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(err).be.exactly(error);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('createMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('createMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
 
     it('should call query with right arguments', function (done) {
-      var
-        doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {_source: doc}}),
-        args;
+      var doc = {_id: '42'};
+
+      result = {result: {_source: doc}};
 
       kuzzle.createMyCredentials('strategy', {foo: 'bar'}, function (err, res) {
-        should(res).be.exactly(doc);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(res).be.exactly(doc);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('createMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('createMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
 
   describe('#deleteMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
 
     it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
+      error = {message: 'i am an error'};
 
       kuzzle.deleteMyCredentials('strategy', function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(err).be.exactly(error);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('deleteMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('deleteMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
 
     it('should call query with right arguments', function (done) {
-      var
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {acknowledged: true}}),
-        args;
+      result = {result: {acknowledged: true}};
 
       kuzzle.deleteMyCredentials('strategy', function (err, res) {
-        should(res.acknowledged).be.exactly(true);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(res.acknowledged).be.exactly(true);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('deleteMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('deleteMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
 
   describe('#getMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
+      error = {message: 'i am an error'};
 
       kuzzle.getMyCredentials('strategy', function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(err).be.exactly(error);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('getMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
 
     it('should call query with right arguments', function (done) {
-      var
-        doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
-        args;
+      var doc = {_id: '42'};
+
+      result = {result: doc};
 
       kuzzle.getMyCredentials('strategy', function (err, res) {
-        should(res).be.exactly(doc);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(res).be.exactly(doc);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('getMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('getMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
 
   describe('#updateMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
+      error = {message: 'i am an error'};
 
       kuzzle.updateMyCredentials('strategy', {username: 'foo'}, function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(err).be.exactly(error);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('updateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('updateMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
 
     it('should call query with right arguments', function (done) {
-      var
-        doc = {username: 'foo'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
-        args;
+      var doc = {username: 'foo'};
+
+      result = {result: doc};
 
       kuzzle.updateMyCredentials('strategy', doc, function (err, res) {
-        should(res).be.exactly(doc);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(res).be.exactly(doc);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('updateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('updateMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
 
   describe('#validateMyCredentials', function() {
-    beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
-    });
-
     it('should trigger callback with an error', function (done) {
-      var
-        cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
-        args;
+      error = {message: 'i am an error'};
 
       kuzzle.validateMyCredentials('strategy', {username: 'foo'}, function (err) {
-        should(err).be.exactly(cberror);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(err).be.exactly(error);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('validateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('validateMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
 
     it('should call query with right arguments', function (done) {
-      var
-        doc = {username: 'foo'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: true}),
-        args;
+      var doc = {username: 'foo'};
+
+      result = {result: true};
 
       kuzzle.validateMyCredentials('strategy', doc, function (err, res) {
-        should(res).be.exactly(true);
-        args = spy.firstCall.args;
+        var args;
 
-        should(spy.calledOnce).be.true();
+        try {
+          should(res).be.exactly(true);
+          args = kuzzle.query.firstCall.args;
 
-        should(args[0].controller).be.exactly('auth');
-        should(args[0].action).be.exactly('validateMyCredentials');
-        should(args[2]).be.exactly(null);
-        done();
+          should(kuzzle.query.calledOnce).be.true();
+
+          should(args[0].controller).be.exactly('auth');
+          should(args[0].action).be.exactly('validateMyCredentials');
+          should(args[2]).be.exactly(null);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });

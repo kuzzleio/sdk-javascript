@@ -22,6 +22,10 @@ describe('Room methods', function () {
     collection = kuzzle.collection('foo', 'bar');
   });
 
+  afterEach(function () {
+    kuzzle.disconnect();
+  });
+
   describe('#count', function () {
     var room;
 
@@ -152,6 +156,7 @@ describe('Room methods', function () {
 
       should(room.subscribing).be.false();
       should(kuzzle.query).be.called();
+      kuzzle.network.removeAllListeners();
     });
 
     it('should register itself in the global subscription list', function () {

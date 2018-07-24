@@ -3,8 +3,7 @@ var
   sinon = require('sinon'),
   Kuzzle = require('../../../src/Kuzzle'),
   User = require('../../../src/security/User'),
-  Profile = require('../../../src/security/Profile'),
-  sandbox = sinon.sandbox.create();
+  Profile = require('../../../src/security/Profile');
 
 describe('User methods', function () {
   var
@@ -21,7 +20,7 @@ describe('User methods', function () {
 
   describe('#create', function () {
     beforeEach(function () {
-      sandbox.reset();
+      sinon.reset();
       result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });
@@ -37,7 +36,7 @@ describe('User methods', function () {
     });
 
     it('should call createUser if the user does not exist', function (done) {
-      kuzzle.query = sandbox.stub();
+      kuzzle.query = sinon.stub();
       kuzzle.query
         .onCall(0).callsArgWith(3, null);
 
@@ -53,7 +52,7 @@ describe('User methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      kuzzle.query = sandbox.stub();
+      kuzzle.query = sinon.stub();
       kuzzle.query
         .onCall(0).callsArgWith(3, 'error');
 
@@ -67,8 +66,8 @@ describe('User methods', function () {
 
   describe('#replace', function () {
     beforeEach(function () {
-      sandbox.reset();
-      kuzzle = new Kuzzle('http://localhost:7512');
+      sinon.reset();
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
       result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });
@@ -85,7 +84,7 @@ describe('User methods', function () {
     });
 
     it('should call replaceUser if the user already exist', function (done) {
-      kuzzle.query = sandbox.stub();
+      kuzzle.query = sinon.stub();
       kuzzle.query
         .onCall(0).callsArgWith(3, null);
 
@@ -101,7 +100,7 @@ describe('User methods', function () {
     });
 
     it('should call the callback with an error if one occurs', function (done) {
-      kuzzle.query = sandbox.stub();
+      kuzzle.query = sinon.stub();
       kuzzle.query
         .onCall(0).callsArgWith(3, 'error');
 

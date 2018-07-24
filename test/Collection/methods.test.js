@@ -289,25 +289,75 @@ describe('Collection methods', function () {
     it('should handle the callback argument correctly', function () {
       var
         cb1 = sinon.stub(),
-        cb2 = sinon.stub();
+        cb2 = sinon.stub(),
+        cb3 = sinon.stub(),
+        cb4 = sinon.stub();
 
-      collection.create(cb1);
-      collection.create({}, cb2);
-      should(kuzzle.query).be.calledTwice();
+      should(collection.create(cb1)).eql(collection);
+      should(collection.create({mapping: 'gnippam'}, cb2)).eql(collection);
+      should(collection.create({mapping: 'foobar'}, {queuable: true}, cb3)).eql(collection);
+      should(collection.create({queuable: true}, cb4)).eql(collection);
+      should(kuzzle.query.callCount).eql(4);
 
       kuzzle.query.yield(null, result);
-      should(cb1).be.calledOnce();
-      should(cb2).be.calledOnce();
+      should(cb1).calledOnce();
+      should(cb2).calledOnce();
+      should(cb3).calledOnce();
+      should(cb4).calledOnce();
+
+      should(kuzzle.query).calledWithMatch({
+        controller: 'collection',
+        action: 'create',
+        collection: 'foo',
+        index: 'bar'
+      }, {}, null, sinon.match.func);
+
+      should(kuzzle.query).calledWithMatch({
+        controller: 'collection',
+        action: 'create',
+        collection: 'foo',
+        index: 'bar'
+      }, {mapping: 'gnippam'}, null, sinon.match.func);
+
+      should(kuzzle.query).calledWithMatch({
+        controller: 'collection',
+        action: 'create',
+        collection: 'foo',
+        index: 'bar'
+      }, {mapping: 'foobar'}, {queuable: true}, sinon.match.func);
+
+      should(kuzzle.query).calledWithMatch({
+        controller: 'collection',
+        action: 'create',
+        collection: 'foo',
+        index: 'bar'
+      }, {}, {queuable: true}, sinon.match.func);
+    });
+
+    it('should throw if invalid arguments are provided', function () {
+      should(function () { collection.create(function() {}, 'foobar'); })
+        .throw(Error, {message: 'Invalid argument: foobar'});
+
+      should(function () { collection.create('foobar', function() {}); })
+        .throw(Error, {message: 'Invalid argument: foobar'});
+
+      should(function () { collection.create({}, {}, {}, function () {}); })
+        .throw(Error, {message: 'Too many objects arguments'});
     });
 
     it('should call the callback with an error if one occurs', function (done) {
       this.timeout(50);
 
       collection.create(function (err, res) {
-        should(err).be.exactly('foobar');
-        should(res).be.undefined();
-        done();
+        try {
+          should(err).be.exactly('foobar');
+          should(res).be.undefined();
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
+
       kuzzle.query.yield('foobar');
     });
   });
