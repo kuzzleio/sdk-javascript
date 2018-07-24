@@ -28,7 +28,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "3.5.1",
-    "eslint-loader": "^2.1.0",
     "uuid": "3.3.2",
     "ws": "6.0.0"
   },
@@ -40,6 +39,7 @@
     "codecov": "^3.0.4",
     "eslint": "^5.2.0",
     "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.1.0",
     "istanbul": "0.4.5",
     "istanbul-middleware": "0.2.2",
     "mocha": "5.2.0",
