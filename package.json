@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "min-req-promise": "^1.0.1",
-    "uws": "^10.148.0"
+    "uws": "10.148.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
