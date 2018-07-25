@@ -16,7 +16,7 @@ class CollectionController {
     return this[_kuzzle];
   }
 
-  create (index, collection, options = {}) {
+  create (index, collection, body = {}, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.collection.create: index is required');
     }
@@ -27,6 +27,7 @@ class CollectionController {
     return this.kuzzle.query({
       index,
       collection,
+      body,
       controller: 'collection',
       action: 'create'
     }, options);
