@@ -5,7 +5,6 @@ var
 
 describe('Kuzzle Login', function () {
   var
-    sandbox = sinon.sandbox.create(),
     loginCredentials = {username: 'foo', password: 'bar'},
     kuzzle;
 
@@ -14,14 +13,14 @@ describe('Kuzzle Login', function () {
   });
 
   afterEach(function() {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('# with callback', function () {
     var queryStub;
 
     beforeEach(function() {
-      queryStub = sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
+      queryStub = sinon.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
         cb(null, {result: {jwt: 'test-toto'}});
       });
     });
@@ -79,7 +78,7 @@ describe('Kuzzle Login', function () {
     var queryStub;
 
     beforeEach(function() {
-      queryStub = sandbox.stub(kuzzle, 'query');
+      queryStub = sinon.stub(kuzzle, 'query');
     });
 
     it('should handle login with only the strategy', function () {
@@ -136,7 +135,7 @@ describe('Kuzzle Login', function () {
     });
 
     it('should send a failed loginAttempt event if logging in fails', function (done) {
-      sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
+      sinon.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
         cb({message: 'foobar'});
       });
 
@@ -151,7 +150,7 @@ describe('Kuzzle Login', function () {
 
     it('should not forward an event if there is no JWT token in the response', function (done) {
       var loginAttemptStub = sinon.stub();
-      sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
+      sinon.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
         cb(null, {result: {}});
       });
 
@@ -166,7 +165,7 @@ describe('Kuzzle Login', function () {
     });
 
     it('should give an error if login query fail to the login callback if is set', function (done) {
-      sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
+      sinon.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
         cb(new Error());
       });
 
@@ -186,7 +185,7 @@ describe('Kuzzle Login', function () {
     });
 
     it('should give an error if logout query fail to the logout callback if is set', function (done) {
-      sandbox.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
+      sinon.stub(kuzzle, 'query').callsFake(function(queryArgs, query, options, cb) {
         cb(new Error());
       });
 
