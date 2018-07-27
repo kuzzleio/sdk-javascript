@@ -4,15 +4,8 @@
 # Node
 *.log
 node_modules/
-examples/node_modules/
-
-# Other
-.DS_STORE
-*#
-*~
+.nyc_output/
 
 # Compiled files
 coverage/
 
-# Bower
-bower_components/
