@@ -1,7 +1,6 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  sandbox = sinon.sandbox.create(),
   Kuzzle = require('../../../src/Kuzzle');
 
 describe('Credentials methods', function() {
@@ -9,13 +8,13 @@ describe('Credentials methods', function() {
 
   describe('#createCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.createCredentials('strategy', 'kuid', {foo: 'bar'}, function (err) {
@@ -34,7 +33,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {_source: doc}}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: {_source: doc}}),
         args;
 
       kuzzle.security.createCredentials('strategy', 'kuid', {foo: 'bar'}, function (err, res) {
@@ -53,13 +52,13 @@ describe('Credentials methods', function() {
 
   describe('#deleteCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.deleteCredentials('strategy', 'kuid', function (err) {
@@ -77,7 +76,7 @@ describe('Credentials methods', function() {
 
     it('should call query with right arguments', function (done) {
       var
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: {acknowledged: true}}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: {acknowledged: true}}),
         args;
 
       kuzzle.security.deleteCredentials('strategy', 'kuid', function (err, res) {
@@ -96,13 +95,13 @@ describe('Credentials methods', function() {
 
   describe('#getAllCredentialFields', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.getAllCredentialFields(function (err) {
@@ -120,7 +119,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = ['usernae'],
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: doc}),
         args;
 
       kuzzle.security.getAllCredentialFields(function (err, res) {
@@ -138,13 +137,13 @@ describe('Credentials methods', function() {
 
   describe('#getCredentialFields', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.getCredentialFields('strategy', function (err) {
@@ -162,7 +161,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = ['usernae'],
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: doc}),
         args;
 
       kuzzle.security.getCredentialFields('strategy', function (err, res) {
@@ -180,13 +179,13 @@ describe('Credentials methods', function() {
 
   describe('#getCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.getCredentials('strategy', 'kuid', function (err) {
@@ -205,7 +204,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = {_id: '42'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: doc}),
         args;
 
       kuzzle.security.getCredentials('strategy', 'kuid', function (err, res) {
@@ -224,13 +223,13 @@ describe('Credentials methods', function() {
 
   describe('#hasCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.hasCredentials('strategy', 'kuid', function (err) {
@@ -248,7 +247,7 @@ describe('Credentials methods', function() {
 
     it('should call query with right arguments', function (done) {
       var
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: true}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: true}),
         args;
 
       kuzzle.security.hasCredentials('strategy', 'kuid', function (err, res) {
@@ -267,13 +266,13 @@ describe('Credentials methods', function() {
 
   describe('#updateCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.updateCredentials('strategy', 'kuid', {username: 'foo'}, function (err) {
@@ -292,7 +291,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = {username: 'foo'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: doc}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: doc}),
         args;
 
       kuzzle.security.updateCredentials('strategy', 'kuid', doc, function (err, res) {
@@ -311,13 +310,13 @@ describe('Credentials methods', function() {
 
   describe('#validateCredentials', function() {
     beforeEach(function() {
-      kuzzle = new Kuzzle('foo');
+      kuzzle = new Kuzzle('foo', {connect: 'manual'});
     });
 
     it('should trigger callback with an error', function (done) {
       var
         cberror = {message: 'i am an error'},
-        spy = sandbox.stub(kuzzle, 'query').yields(cberror),
+        spy = sinon.stub(kuzzle, 'query').yields(cberror),
         args;
 
       kuzzle.security.validateCredentials('strategy', 'kuid', {username: 'foo'}, function (err) {
@@ -336,7 +335,7 @@ describe('Credentials methods', function() {
     it('should call query with right arguments', function (done) {
       var
         doc = {username: 'foo'},
-        spy = sandbox.stub(kuzzle, 'query').yields(null, {result: true}),
+        spy = sinon.stub(kuzzle, 'query').yields(null, {result: true}),
         args;
 
       kuzzle.security.validateCredentials('strategy', 'kuid', doc, function (err, res) {

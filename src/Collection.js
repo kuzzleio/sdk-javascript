@@ -112,20 +112,49 @@ Collection.prototype.count = function (filters, options, cb) {
  * Kuzzle automatically creates data collections when storing documents, but there are cases where we
  * want to create and prepare data collections before storing documents in it.
  *
+ * @param {object} [mappings] - Optional collection mappings
  * @param {object} [options] - Optional parameters
  * @param {responseCallback} [cb] - returns Kuzzle's response
  * @returns {*} this
  */
-Collection.prototype.create = function (options, cb) {
-  var data = {},
+Collection.prototype.create = function () {
+  var
+    i,
+    data = {},
+    mapping = null,
+    options = null,
+    cb = null,
     self = this;
 
-  if (!cb && typeof options === 'function') {
-    cb = options;
-    options = null;
+  for (i = 0; i < arguments.length; i++) {
+    if (typeof arguments[i] === 'function') {
+      if (i < arguments.length - 1) {
+        throw new Error('Invalid argument: ' + arguments[i+1]);
+      }
+
+      cb = arguments[i];
+    } else if (typeof arguments[i] === 'object' && !Array.isArray(arguments[i])) {
+      if (mapping === null) {
+        mapping = arguments[i];
+      } else if (options === null) {
+        options = arguments[i];
+      } else {
+        throw new Error('Too many objects arguments');
+      }
+    } else {
+      throw new Error('Invalid argument: ' + arguments[i]);
+    }
+  }
+
+  if (mapping === null || (options === null && typeof mapping.queuable === 'boolean')) {
+    options = mapping;
+    data = {};
+  } else {
+    data = {body: mapping};
   }
 
   data = this.kuzzle.addHeaders(data, this.headers);
+
   this.kuzzle.query(this.buildQueryArgs('collection', 'create'), data, options, function(err) {
     cb(err, err ? undefined : self);
   });

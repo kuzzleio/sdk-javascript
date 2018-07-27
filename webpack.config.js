@@ -6,13 +6,13 @@ var
 module.exports = {
   entry: './src/Kuzzle.js',
   output: {
-    path: './dist',
+    path: path.join(__dirname, 'dist'),
     filename: 'kuzzle.js',
     library: 'Kuzzle',
     libraryTarget: 'umd'
   },
   watch: false,
-  debug: false,
+  mode: 'production',
   devtool: 'source-map',
   node: {
     console: false,
@@ -24,32 +24,30 @@ module.exports = {
     setImmediate: false
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         loader: 'eslint-loader',
         include: path.resolve(__dirname, './src/'),
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          formatter: require('eslint-friendly-formatter')
+        }
       }
-    ]
-  },
-  eslint: {
-    formatter: require('eslint-friendly-formatter')
+    ],
   },
   plugins: [
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
     new webpack.IgnorePlugin(/ws/),
-    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
       global: 'window',
       SDKVERSION: JSON.stringify(version),
       BUILT: true
     }),
-    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        warnings: false
-      }
-    })
-  ]
+    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version)
+  ],
+  optimization: {
+    minimize: true
+  }
 };

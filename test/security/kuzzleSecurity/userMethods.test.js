@@ -353,7 +353,7 @@ describe('Security user methods', function () {
 
   describe('#scrollUsers', function () {
     beforeEach(function () {
-      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar'});
+      kuzzle = new Kuzzle('foo', {defaultIndex: 'bar', connect: 'manual'});
       result = { result: { _scroll_id: 'banana', total: 123, hits: [ {_id: 'foobar', _source: { foo: 'bar'}} ] } };
     });
 

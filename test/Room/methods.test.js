@@ -22,6 +22,10 @@ describe('Room methods', function () {
     collection = kuzzle.collection('foo', 'bar');
   });
 
+  afterEach(function () {
+    kuzzle.disconnect();
+  });
+
   describe('#count', function () {
     var room;
 
