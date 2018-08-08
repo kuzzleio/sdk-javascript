@@ -20,7 +20,7 @@ describe('User methods', function () {
 
   describe('#create', function () {
     beforeEach(function () {
-      sinon.reset();
+      sinon.sandbox.reset();
       result = { result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}} };
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);
     });
@@ -66,7 +66,7 @@ describe('User methods', function () {
 
   describe('#replace', function () {
     beforeEach(function () {
-      sinon.reset();
+      sinon.sandbox.reset();
       kuzzle = new Kuzzle('foo', {connect: 'manual'});
       result = {result: {_id: 'myUser', _source: {some: 'content', profileIds: ['myProfile']}}};
       kuzzleUser = new User(kuzzle.security, result.result._id, result.result._source);

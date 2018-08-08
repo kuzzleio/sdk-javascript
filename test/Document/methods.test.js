@@ -318,7 +318,7 @@ describe('Document methods', function () {
       };
     });
 
-    it('should send the right query to Kuzzle', function () {
+    it('should send a createOrReplace query to Kuzzle if document has id', function () {
       var
         options = { queuable: false },
         document = new Document(collection);
@@ -327,6 +327,17 @@ describe('Document methods', function () {
       should(document.save(options)).be.exactly(document);
       should(kuzzle.query).be.calledOnce();
       should(kuzzle.query).calledWith(expectedQuery, {_id: 'foo', body: {}, meta: {}}, options);
+    });
+
+    it('should send a create query to Kuzzle if document does not have id', function () {
+      var
+        options = { queuable: false },
+        document = new Document(collection);
+
+      expectedQuery.action = 'create';
+      should(document.save(options)).be.exactly(document);
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).calledWith(expectedQuery, { body: {}, meta: {} }, options);
     });
 
     it('should handle arguments correctly', function () {
