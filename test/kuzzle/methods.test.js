@@ -28,7 +28,7 @@ describe('Kuzzle methods', function () {
   });
 
   afterEach(function () {
-    sinon.sandbox.restore();
+    sinon.restore();
   });
 
   describe('#getAllStatistics', function () {

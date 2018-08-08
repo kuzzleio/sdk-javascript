@@ -13,7 +13,7 @@ describe('Kuzzle Login', function () {
   });
 
   afterEach(function() {
-    sinon.sandbox.restore();
+    sinon.restore();
   });
 
   describe('# with callback', function () {
