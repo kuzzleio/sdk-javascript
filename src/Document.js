@@ -238,14 +238,13 @@ Document.prototype.refresh = function (options, cb) {
 Document.prototype.save = function (options, cb) {
   var
     data = this.serialize(),
+    action = data._id ? 'createOrReplace' : 'create',
     self = this;
 
   if (options && cb === undefined && typeof options === 'function') {
     cb = options;
     options = null;
   }
-
-  var action = data._id ? 'createOrReplace' : 'create';
 
   self.kuzzle.query(this.dataCollection.buildQueryArgs('document', action), data, options, function (error, res) {
     if (error) {
