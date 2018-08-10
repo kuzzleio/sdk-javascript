@@ -37,7 +37,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'createCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   createFirstAdmin (_id, body, options = {}) {
@@ -58,7 +59,7 @@ class SecurityController {
     delete options.reset;
 
     return this.kuzzle.query(request, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   createOrReplaceProfile (_id, body, options = {}) {
@@ -79,7 +80,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Profile(this.kuzzle, result._id, result._source.policies));
+      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   createOrReplaceRole (_id, body, options = {}) {
@@ -100,7 +101,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Role(this.kuzzle, result._id, result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   createProfile (_id, body, options = {}) {
@@ -121,7 +122,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Profile(this.kuzzle, result._id, result._source.policies));
+      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   createRole (_id, body, options = {}) {
@@ -142,7 +143,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Role(this.kuzzle, result._id, result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   createUser (_id, body, options = {}) {
@@ -169,7 +170,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   deleteCredentials (strategy, _id, options = {}) {
@@ -185,7 +186,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'deleteCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   deleteProfile (_id, options = {}) {
@@ -197,7 +199,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'deleteProfile'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   deleteRole (_id, options = {}) {
@@ -209,7 +212,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'deleteRole'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   deleteUser (_id, options = {}) {
@@ -221,14 +225,16 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'deleteUser'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getAllCredentialFields (options = {}) {
     return this.kuzzle.query({
       controller: 'security',
       action: 'getAllCredentialFields'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getCredentialFields (strategy, options = {}) {
@@ -240,7 +246,8 @@ class SecurityController {
       strategy,
       controller: 'security',
       action: 'getCredentialFields'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getCredentials (strategy, _id, options = {}) {
@@ -256,7 +263,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'getCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getCredentialsById (strategy, _id, options = {}) {
@@ -272,7 +280,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'getCredentialsById'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getProfile (_id, options = {}) {
@@ -285,14 +294,15 @@ class SecurityController {
       controller: 'security',
       action: 'getProfile'
     }, options)
-      .then(result => new Profile(this.kuzzle, result._id, result._source.policies));
+      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   getProfileMapping (options = {}) {
     return this.kuzzle.query({
       controller: 'security',
       action: 'getProfileMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getProfileRights (_id, options = {}) {
@@ -305,7 +315,7 @@ class SecurityController {
       controller: 'security',
       action: 'getProfileRights'
     }, options)
-      .then(result => result.hits);
+      .then(response => response.result.hits);
   }
 
   getRole (_id, options = {}) {
@@ -318,14 +328,15 @@ class SecurityController {
       controller: 'security',
       action: 'getRole'
     }, options)
-      .then(result => new Role(this.kuzzle, result._id, result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   getRoleMapping (options = {}) {
     return this.kuzzle.query({
       controller: 'security',
       action: 'getRoleMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getUser (_id, options = {}) {
@@ -338,14 +349,15 @@ class SecurityController {
       controller: 'security',
       action: 'getUser'
     }, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   getUserMapping (options = {}) {
     return this.kuzzle.query({
       controller: 'security',
       action: 'getUserMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getUserRights (_id, options = {}) {
@@ -358,7 +370,7 @@ class SecurityController {
       controller: 'security',
       action: 'getUserRights'
     }, options)
-      .then(result => result.hits);
+      .then(response => response.result.hits);
   }
 
   hasCredentials (strategy, _id, options = {}) {
@@ -374,7 +386,8 @@ class SecurityController {
       _id,
       controller: 'security',
       action: 'hasCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   mDeleteProfiles (ids, options = {}) {
@@ -390,7 +403,8 @@ class SecurityController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mDeleteRoles (ids, options = {}) {
@@ -406,7 +420,8 @@ class SecurityController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mDeleteUsers (ids, options = {}) {
@@ -422,7 +437,8 @@ class SecurityController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mGetProfiles (ids, options = {}) {
@@ -435,7 +451,7 @@ class SecurityController {
       action: 'mGetProfiles',
       body: {ids}
     }, options)
-      .then(result => result.hits.map(hit => new Profile(this.kuzzle, hit._id , hit._source.policies)));
+      .then(response => response.result.hits.map(hit => new Profile(this.kuzzle, hit._id , hit._source.policies)));
   }
 
   mGetRoles (ids, options = {}) {
@@ -448,7 +464,7 @@ class SecurityController {
       action: 'mGetRoles',
       body: {ids}
     }, options)
-      .then(result => result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
+      .then(response => response.result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
   }
 
   replaceUser (_id, body, options = {}) {
@@ -469,7 +485,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   searchProfiles (body, options= {}) {
@@ -484,7 +500,7 @@ class SecurityController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(result => new ProfileSearchResult(this.kuzzle, request, options, result));
+      .then(response => new ProfileSearchResult(this.kuzzle, request, options, response.result));
   }
 
   searchRoles (body, options = {}) {
@@ -499,7 +515,7 @@ class SecurityController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(result => new RoleSearchResult(this.kuzzle, request, options, result));
+      .then(response => new RoleSearchResult(this.kuzzle, request, options, response.result));
   }
 
   searchUsers (body, options = {}) {
@@ -514,7 +530,7 @@ class SecurityController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(result => new UserSearchResult(this.kuzzle, request, options, result));
+      .then(response => new UserSearchResult(this.kuzzle, request, options, response.result));
   }
 
   updateCredentials (strategy, _id, body, options = {}) {
@@ -534,7 +550,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'updateCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   updateProfile (_id, body, options = {}) {
@@ -555,7 +572,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Profile(this.kuzzle, result._id, result._source.policies));
+      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   updateProfileMapping (body, options = {}) {
@@ -563,7 +580,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'updateProfileMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   updateRole (_id, body, options = {}) {
@@ -584,7 +602,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new Role(this.kuzzle, result._id, result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   updateRoleMapping (body, options = {}) {
@@ -592,7 +610,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'updateRoleMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   updateUser (_id, body, options = {}) {
@@ -613,7 +632,7 @@ class SecurityController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   updateUserMapping (body, options = {}) {
@@ -621,7 +640,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'updateUserMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   validateCredentials (strategy, _id, body, options = {}) {
@@ -641,7 +661,8 @@ class SecurityController {
       body,
       controller: 'security',
       action: 'validateCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 }
 

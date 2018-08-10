@@ -30,7 +30,8 @@ class CollectionController {
       body,
       controller: 'collection',
       action: 'create'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   deleteSpecification (index, collection, options = {}) {
@@ -46,7 +47,8 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'deleteSpecification'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   exists (index, collection, options = {}) {
@@ -62,7 +64,8 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'exists'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getMapping (index, collection, options = {}) {
@@ -78,7 +81,8 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getSpecifications (index, collection, options = {}) {
@@ -94,7 +98,8 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'getSpecifications'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   list (index, options = {}) {
@@ -112,7 +117,8 @@ class CollectionController {
     delete options.from;
     delete options.size;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   searchSpecifications (body = {}, options = {}) {
@@ -127,7 +133,7 @@ class CollectionController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(response => new SpecificationsSearchResult(this.kuzzle, request, options, response));
+      .then(response => new SpecificationsSearchResult(this.kuzzle, request, options, response.result));
   }
 
   truncate (index, collection, options = {}) {
@@ -143,7 +149,8 @@ class CollectionController {
       collection,
       controller: 'collection',
       action: 'truncate'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   updateMapping (index, collection, body, options = {}) {
@@ -160,7 +167,8 @@ class CollectionController {
       body,
       controller: 'collection',
       action: 'updateMapping'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   updateSpecifications (index, collection, body, options = {}) {
@@ -177,7 +185,8 @@ class CollectionController {
       body,
       controller: 'collection',
       action: 'updateSpecifications'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   validateSpecifications (body, options = {}) {
@@ -185,7 +194,8 @@ class CollectionController {
       body,
       controller: 'collection',
       action: 'validateSpecifications'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 }
 

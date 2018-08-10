@@ -17,10 +17,10 @@ describe('Bulk Controller', () => {
 
   describe('import', () => {
     it('should call bulk/import query with the bulk data and return a Promise which resolves json object', () => {
-      kuzzle.query.resolves({hits: [
+      kuzzle.query.resolves({result: {hits: [
         {create: {_id: 'foo'}, status: 200},
         {update: {_id: 'bar'}, status: 200}
-      ]});
+      ]}});
 
       const data = {foo: 'bar'};
 

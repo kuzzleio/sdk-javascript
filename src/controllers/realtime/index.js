@@ -30,14 +30,15 @@ class RealTimeController {
       action: 'count',
       body: {roomId}
     }, options)
-      .then(response => response.count);
+      .then(response => response.result.count);
   }
 
   list (options = {}) {
     return this.kuzzle.query({
       controller: 'realtime',
       action: 'list'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   publish (index, collection, body, options = {}) {
@@ -59,7 +60,8 @@ class RealTimeController {
       action: 'publish'
     };
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   subscribe (index, collection, body, callback, options = {}) {
@@ -84,7 +86,7 @@ class RealTimeController {
           this.subscriptions[room.id] = [];
         }
         this.subscriptions[room.id].push(room);
-        return response;
+        return response.result;
       });
   }
 
@@ -108,7 +110,10 @@ class RealTimeController {
       controller: 'realtime',
       action: 'unsubscribe',
       body: {roomId}
-    }, options);
+    }, options)
+      .then(response => {
+        return response.result;
+      });
   }
 
   validate (index, collection, body, options = {}) {
@@ -128,7 +133,8 @@ class RealTimeController {
       body,
       controller: 'realtime',
       action: 'validate'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
 }

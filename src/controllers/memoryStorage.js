@@ -258,11 +258,11 @@ for (const action of Object.keys(commands)) {
     }
 
     return this.kuzzle.query(request, options)
-      .then(res => {
+      .then(response => {
         if (command.mapResults) {
-          return command.mapResults(res.result);
+          return command.mapResults(response.result);
         }
-        return res.result;
+        return response.result;
       });
   };
 }

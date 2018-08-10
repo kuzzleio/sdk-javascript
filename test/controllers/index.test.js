@@ -23,8 +23,10 @@ describe('Index Controller', () => {
 
     it('should call index/create query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({
-        acknowledged: true,
-        shards_acknowledged: true
+        result: {
+          acknowledged: true,
+          shards_acknowledged: true
+        }
       });
 
       return kuzzle.index.create('index', options)
@@ -52,7 +54,7 @@ describe('Index Controller', () => {
 
     it('should call index/delete query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({
-        acknowledged: true
+        result: {acknowledged: true}
       });
 
       return kuzzle.index.delete('index', options)
@@ -78,7 +80,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/exists query and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.index.exists('index', options)
         .then(res => {
@@ -103,7 +105,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/getAutoRefresh query and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.index.getAutoRefresh('index', options)
         .then(res => {
@@ -126,7 +128,7 @@ describe('Index Controller', () => {
         total: 3,
         hits: ['foo', 'bar', 'baz']
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.index.list(options)
         .then(res => {
@@ -159,7 +161,7 @@ describe('Index Controller', () => {
       const result = {
         deleted: ['foo', 'bar']
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.index.mDelete(['foo', 'bar'], options)
         .then(res => {
@@ -191,7 +193,7 @@ describe('Index Controller', () => {
           total: 10
         }
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.index.refresh('index', options)
         .then(res => {
@@ -211,7 +213,7 @@ describe('Index Controller', () => {
   describe('refreshInternal', () => {
     it('should call index/refreshInternal query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({
-        acknowledged: true
+        result: {acknowledged: true}
       });
 
       return kuzzle.index.refreshInternal(options)
@@ -236,7 +238,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/setAutoRefresh query to enable autorefresh and return a Promise which resolves true', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.index.setAutoRefresh('index', true, options)
         .then(res => {
@@ -254,7 +256,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/setAutoRefresh query to disable autorefresh and return a Promise which resolves false', () => {
-      kuzzle.query.resolves(false);
+      kuzzle.query.resolves({result: false});
 
       return kuzzle.index.setAutoRefresh('index', false, options)
         .then(res => {

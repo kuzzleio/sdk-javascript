@@ -32,10 +32,11 @@ class SearchResultBase {
         action: this.scrollAction,
         scrollId: this.response.scrollId
       }), this.options)
-        .then(r => {
-          this.fetched += r.hits.length;
-          this.response = r;
-          this.hits = r.hits;
+        .then(response => {
+          const result = response.result;
+          this.fetched += result.hits.length;
+          this.response = result;
+          this.hits = result.hits;
           return this;
         });
     }
@@ -58,10 +59,11 @@ class SearchResultBase {
       }
 
       return this.kuzzle.query(request, this.options)
-        .then(r => {
-          this.fetched += r.hits.length;
-          this.response = r;
-          this.hits = r.hits;
+        .then(response => {
+          const result = response.result;
+          this.fetched += result.hits.length;
+          this.response = result;
+          this.hits = result.hits;
           return this;
         });
     }
@@ -75,10 +77,11 @@ class SearchResultBase {
         action: this.searchAction,
         from: this.fetched
       }), this.options)
-        .then(r => {
-          this.fetched += r.hits.length;
-          this.response = r;
-          this.hits = r.hits;
+        .then(response => {
+          const result = response.result;
+          this.fetched += result.hits.length;
+          this.response = result;
+          this.hits = result.hits;
           return this;
         });
     }

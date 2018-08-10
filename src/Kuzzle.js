@@ -347,8 +347,7 @@ class Kuzzle extends KuzzleEventEmitter {
       request.jwt = this.jwt;
     }
 
-    return this.network.query(request, options)
-      .then(response => response.result);
+    return this.network.query(request, options);
   }
 
   /**

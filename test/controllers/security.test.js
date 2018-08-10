@@ -45,7 +45,7 @@ describe('Security Controller', () => {
         username: 'foo',
         kuid: 'kuid'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.createCredentials('strategy', 'kuid', {foo: 'bar'}, options)
         .then(res => {
@@ -79,10 +79,9 @@ describe('Security Controller', () => {
 
     it('should call security/createFirstAdmin query with the first admin content and credentials and return a Promise which resolves the created user object', () => {
       kuzzle.query.resolves({
-        _id: 'id',
-        _source: {
-          name: 'Doe',
-          profileIds: ['admin']
+        result: {
+          _id: 'id',
+          _source: {name: 'Doe', profileIds: ['admin']}
         }
       });
 
@@ -107,10 +106,9 @@ describe('Security Controller', () => {
 
     it('should inject the "reset" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'id',
-        _source: {
-          name: 'Doe',
-          profileIds: ['admin']
+        result: {
+          _id: 'id',
+          _source: {name: 'Doe', profileIds: ['admin']}
         }
       });
 
@@ -149,14 +147,14 @@ describe('Security Controller', () => {
 
     it('should call security/createOrReplaceProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: false
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: {policies: ['foo', 'bar']},
+          created: false
+        }
       });
 
       return kuzzle.security.createOrReplaceProfile('profileId', {foo: 'bar'}, options)
@@ -179,14 +177,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: false
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { policies: ['foo', 'bar'] },
+          created: false
+        }
       });
 
       return kuzzle.security.createOrReplaceProfile('profileId', {foo: 'bar'}, {refresh: true})
@@ -223,14 +221,14 @@ describe('Security Controller', () => {
 
     it('should call security/createOrReplaceRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'roles',
-        _version: 1,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: false
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'roles',
+          _version: 1,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: false
+        }
       });
 
       return kuzzle.security.createOrReplaceRole('roleId', {foo: 'bar'}, options)
@@ -253,14 +251,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: false
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: false
+        }
       });
 
       return kuzzle.security.createOrReplaceRole('roleId', {foo: 'bar'}, {refresh: true})
@@ -297,14 +295,14 @@ describe('Security Controller', () => {
 
     it('should call security/createProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: true
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { policies: ['foo', 'bar'] },
+          created: true
+        }
       });
 
       return kuzzle.security.createProfile('profileId', {foo: 'bar'}, options)
@@ -327,14 +325,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: true
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { policies: ['foo', 'bar'] },
+          created: true
+        }
       });
 
       return kuzzle.security.createProfile('profileId', {foo: 'bar'}, {refresh: true})
@@ -371,14 +369,14 @@ describe('Security Controller', () => {
 
     it('should call security/createRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'roles',
-        _version: 1,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: true
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'roles',
+          _version: 1,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: true
+        }
       });
 
       return kuzzle.security.createRole('roleId', {foo: 'bar'}, options)
@@ -401,14 +399,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: true
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: true
+        }
       });
 
       return kuzzle.security.createRole('roleId', {foo: 'bar'}, {refresh: true})
@@ -478,15 +476,14 @@ describe('Security Controller', () => {
       };
 
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 1,
-        created: true
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 1,
+          created: true
+        }
       });
 
       return kuzzle.security.createUser('userId', body, options)
@@ -517,15 +514,14 @@ describe('Security Controller', () => {
       };
 
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 1,
-        created: true
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 1,
+          created: true
+        }
       });
 
       return kuzzle.security.createUser('userId', body, {refresh: true})
@@ -565,7 +561,7 @@ describe('Security Controller', () => {
       const result = {
         acknowledged: true
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.deleteCredentials('strategy', 'kuid', options)
         .then(res => {
@@ -594,7 +590,7 @@ describe('Security Controller', () => {
       const result = {
         _id: 'profileId'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.deleteProfile('profileId', options)
         .then(res => {
@@ -622,7 +618,7 @@ describe('Security Controller', () => {
       const result = {
         _id: 'roleId'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.deleteRole('roleId', options)
         .then(res => {
@@ -650,7 +646,7 @@ describe('Security Controller', () => {
       const result = {
         _id: 'kuid'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.deleteUser('kuid', options)
         .then(res => {
@@ -673,7 +669,7 @@ describe('Security Controller', () => {
         local: ['username', 'password'],
         foo: ['bar']
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getAllCredentialFields(options)
         .then(res => {
@@ -698,7 +694,7 @@ describe('Security Controller', () => {
 
     it('should call security/getCredentialFields query and return a Promise which resolves the list of credendial fields', () => {
       const result = ['username', 'password'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getCredentialFields('strategy', options)
         .then(res => {
@@ -733,7 +729,7 @@ describe('Security Controller', () => {
         username: 'foo',
         kuid: 'kuid'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getCredentials('strategy', 'kuid', options)
         .then(res => {
@@ -769,7 +765,7 @@ describe('Security Controller', () => {
         username: 'foo',
         kuid: 'kuid'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getCredentialsById('strategy', 'userId', options)
         .then(res => {
@@ -796,12 +792,12 @@ describe('Security Controller', () => {
 
     it('should call security/getProfile query with the profile id a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 1,
-        _source: {
-          policies: ['foo', 'bar']
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 1,
+          _source: { policies: ['foo', 'bar'] }
         }
       });
 
@@ -827,7 +823,7 @@ describe('Security Controller', () => {
       const result = {
         mapping: {foo: 'bar'}
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getProfileMapping(options)
         .then(res => {
@@ -857,7 +853,7 @@ describe('Security Controller', () => {
           {controller: 'foo', action: 'bar', index: 'index', collection: 'collecton', value: 'allowed'}
         ]
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getProfileRights('profileId', options)
         .then(res => {
@@ -883,12 +879,12 @@ describe('Security Controller', () => {
 
     it('should call security/getRole query with the role id a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'roles',
-        _version: 1,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'roles',
+          _version: 1,
+          _source: { controllers: {foo: {actions: {bar: true}}} }
         }
       });
 
@@ -914,7 +910,7 @@ describe('Security Controller', () => {
       const result = {
         mapping: {foo: 'bar'}
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getRoleMapping(options)
         .then(res => {
@@ -939,14 +935,13 @@ describe('Security Controller', () => {
 
     it('should call security/getUser query with the user id a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 1
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe'},
+          _type: 'users',
+          _version: 1
+        }
       });
 
       return kuzzle.security.getUser('kuid', options)
@@ -972,7 +967,7 @@ describe('Security Controller', () => {
       const result = {
         mapping: {foo: 'bar'}
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getUserMapping(options)
         .then(res => {
@@ -1002,7 +997,7 @@ describe('Security Controller', () => {
           {controller: 'foo', action: 'bar', index: 'index', collection: 'collecton', value: 'allowed'}
         ]
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.getUserRights('kuid', options)
         .then(res => {
@@ -1033,7 +1028,7 @@ describe('Security Controller', () => {
     });
 
     it('should call security/hasCredentials query and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.security.hasCredentials('strategy', 'kuid', options)
         .then(res => {
@@ -1066,7 +1061,7 @@ describe('Security Controller', () => {
 
     it('should call security/mDeleteProfiles query and return a Promise which resolves the list of deleted profiles ids', () => {
       const result = ['profile1', 'profile2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteProfiles(['profile1', 'profile2'], options)
         .then(res => {
@@ -1085,7 +1080,7 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       const result = ['profile1', 'profile2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteProfiles(['profile1', 'profile2'], {refresh: true})
         .then(res => {
@@ -1118,7 +1113,7 @@ describe('Security Controller', () => {
 
     it('should call security/mDeleteRoles query and return a Promise which resolves the list of deleted roles ids', () => {
       const result = ['role1', 'role2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteRoles(['role1', 'role2'], options)
         .then(res => {
@@ -1137,7 +1132,7 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       const result = ['role1', 'role2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteRoles(['role1', 'role2'], {refresh: true})
         .then(res => {
@@ -1170,7 +1165,7 @@ describe('Security Controller', () => {
 
     it('should call security/mDeleteUsers query and return a Promise which resolves the list of deleted users ids', () => {
       const result = ['user1', 'user2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteUsers(['user1', 'user2'], options)
         .then(res => {
@@ -1189,7 +1184,7 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       const result = ['user1', 'user2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mDeleteUsers(['user1', 'user2'], {refresh: true})
         .then(res => {
@@ -1228,7 +1223,7 @@ describe('Security Controller', () => {
         ],
         total: 2
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mGetProfiles(['profile1', 'profile2'], options)
         .then(res => {
@@ -1275,7 +1270,7 @@ describe('Security Controller', () => {
         ],
         total: 2
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.mGetRoles(['role1', 'role2'], options)
         .then(res => {
@@ -1316,15 +1311,14 @@ describe('Security Controller', () => {
 
     it('should call security/replaceUser query with the user content and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 2,
-        created: false
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 2,
+          created: false
+        }
       });
 
       return kuzzle.security.replaceUser('userId', {foo: 'bar'}, options)
@@ -1348,15 +1342,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 1,
-        created: true
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 1,
+          created: true
+        }
       });
 
       return kuzzle.security.replaceUser('userId', {foo: 'bar'}, {refresh: true})
@@ -1389,7 +1382,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchProfiles({roles: ['foo', 'bar']}, options)
         .then(res => {
@@ -1420,7 +1413,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchProfiles({roles: ['foo', 'bar']}, {from: 1, size: 2, scroll: '1m'})
         .then(res => {
@@ -1454,7 +1447,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchRoles({controllers: ['foo', 'bar']}, options)
         .then(res => {
@@ -1484,7 +1477,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchRoles({controllers: ['foo', 'bar']}, {from: 1, size: 2})
         .then(res => {
@@ -1517,7 +1510,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchUsers({foo: 'bar'}, options)
         .then(res => {
@@ -1548,7 +1541,7 @@ describe('Security Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.searchUsers({foo: 'bar'}, {from: 1, size: 2, scroll: '1m'})
         .then(res => {
@@ -1596,7 +1589,7 @@ describe('Security Controller', () => {
         username: 'foo',
         kuid: 'kuid'
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.security.updateCredentials('strategy', 'kuid', {foo: 'bar'}, options)
         .then(res => {
@@ -1630,14 +1623,14 @@ describe('Security Controller', () => {
 
     it('should call security/updateProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 2,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: false
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 2,
+          _source: { policies: ['foo', 'bar'] },
+          created: false
+        }
       });
 
       return kuzzle.security.updateProfile('profileId', {foo: 'bar'}, options)
@@ -1660,14 +1653,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'profileId',
-        _index: '%kuzzle',
-        _type: 'profiles',
-        _version: 2,
-        _source: {
-          policies: ['foo', 'bar']
-        },
-        created: false
+        result: {
+          _id: 'profileId',
+          _index: '%kuzzle',
+          _type: 'profiles',
+          _version: 2,
+          _source: { policies: ['foo', 'bar'] },
+          created: false
+        }
       });
 
       return kuzzle.security.updateProfile('profileId', {foo: 'bar'}, {refresh: true})
@@ -1691,7 +1684,7 @@ describe('Security Controller', () => {
 
   describe('updateProfileMapping', () => {
     it('should call security/updateProfileMapping query with the new mapping and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.security.updateProfileMapping({foo: 'bar'}, options)
         .then(res => {
@@ -1723,14 +1716,14 @@ describe('Security Controller', () => {
 
     it('should call security/updateRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'roles',
-        _version: 2,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: false
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'roles',
+          _version: 2,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: false
+        }
       });
 
       return kuzzle.security.updateRole('roleId', {foo: 'bar'}, options)
@@ -1753,14 +1746,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'roleId',
-        _index: '%kuzzle',
-        _type: 'roles',
-        _version: 2,
-        _source: {
-          controllers: {foo: {actions: {bar: true}}}
-        },
-        created: false
+        result: {
+          _id: 'roleId',
+          _index: '%kuzzle',
+          _type: 'roles',
+          _version: 2,
+          _source: { controllers: {foo: {actions: {bar: true}}} },
+          created: false
+        }
       });
 
       return kuzzle.security.updateRole('roleId', {foo: 'bar'}, {refresh: true})
@@ -1784,7 +1777,7 @@ describe('Security Controller', () => {
 
   describe('updateRoleMapping', () => {
     it('should call security/updateRoleMapping query with the new mapping and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.security.updateRoleMapping({foo: 'bar'}, options)
         .then(res => {
@@ -1816,15 +1809,14 @@ describe('Security Controller', () => {
 
     it('should call security/updateUser query with the user content to update and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 2,
-        created: false
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 2,
+          created: false
+        }
       });
 
       return kuzzle.security.updateUser('userId', {foo: 'bar'}, options)
@@ -1848,15 +1840,14 @@ describe('Security Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _index: '%kuzzle',
-        _source: {
-          profileIds: ['profileId'],
-          name: 'John Doe',
-        },
-        _type: 'users',
-        _version: 2,
-        created: false
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 2,
+          created: false
+        }
       });
 
       return kuzzle.security.updateUser('userId', {foo: 'bar'}, {refresh: true})
@@ -1881,7 +1872,7 @@ describe('Security Controller', () => {
 
   describe('updateUserMapping', () => {
     it('should call security/updateUserMapping query with the new mapping and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.security.updateUserMapping({foo: 'bar'}, options)
         .then(res => {
@@ -1918,7 +1909,7 @@ describe('Security Controller', () => {
     });
 
     it('should call security/validateCredentials query with the user credentials and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.security.validateCredentials('strategy', 'kuid', {foo: 'bar'}, options)
         .then(res => {

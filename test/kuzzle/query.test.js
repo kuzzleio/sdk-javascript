@@ -13,6 +13,9 @@ describe('Kuzzle query management', () => {
         collection: 'collection',
         index: 'index',
         body: {some: 'query'}
+      },
+      response = {
+        result: {foo: 'bar'}
       };
 
     let kuzzle;
@@ -21,7 +24,7 @@ describe('Kuzzle query management', () => {
       const network = new NetworkWrapperMock({host: 'somewhere'});
 
       kuzzle = new Kuzzle(network);
-      kuzzle.network.query.resolves({result: {}});
+      kuzzle.network.query.resolves(response);
     });
 
     it('should generate a valid request object with no "options" argument and no callback', () => {
@@ -50,6 +53,11 @@ describe('Kuzzle query management', () => {
         volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
+    });
+
+    it('should return the good response from Kuzzle', () => {
+      return kuzzle.query(query, {foo: 'bar', baz: 'yolo'})
+        .then(res => should(res).be.equal(response));
     });
 
     it('should manage arguments properly if no options are provided', () => {

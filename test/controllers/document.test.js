@@ -29,7 +29,7 @@ describe('Document Controller', () => {
     });
 
     it('should call document/count query and return a Promise which resolves a numeric value', () => {
-      kuzzle.query.resolves({count: 1234});
+      kuzzle.query.resolves({result: {count: 1234}});
 
       return kuzzle.document.count('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -49,7 +49,7 @@ describe('Document Controller', () => {
     });
 
     it('should inject the "includeTrash" option into the request', () => {
-      kuzzle.query.resolves({count: 1234});
+      kuzzle.query.resolves({result: {count: 1234}});
 
       return kuzzle.document.count('index', 'collection', {foo: 'bar'}, {includeTrash: true})
         .then(res => {
@@ -94,7 +94,7 @@ describe('Document Controller', () => {
         _version: 1,
         _source: {foo: 'bar'}
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.create('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -120,7 +120,7 @@ describe('Document Controller', () => {
         _version: 1,
         _source: {foo: 'bar'}
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.create('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -173,7 +173,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.createOrReplace('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -200,7 +200,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.createOrReplace('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -241,7 +241,7 @@ describe('Document Controller', () => {
     });
 
     it('should call document/delete query and return a Promise which resolves the id of the deleted document', () => {
-      kuzzle.query.resolves({_id: 'document-id'});
+      kuzzle.query.resolves({result: {_id: 'document-id'}});
 
       return kuzzle.document.delete('index', 'collection', 'document-id', options)
         .then(res => {
@@ -261,7 +261,7 @@ describe('Document Controller', () => {
     });
 
     it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({_id: 'document-id'});
+      kuzzle.query.resolves({result: {_id: 'document-id'}});
 
       return kuzzle.document.delete('index', 'collection', 'document-id', {refresh: true})
         .then(res => {
@@ -295,7 +295,7 @@ describe('Document Controller', () => {
     });
 
     it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
-      kuzzle.query.resolves({hits: ['foo', 'bar', 'baz']});
+      kuzzle.query.resolves({result: {hits: ['foo', 'bar', 'baz']}});
 
       return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -319,7 +319,7 @@ describe('Document Controller', () => {
     });
 
     it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({hits: ['foo', 'bar', 'baz']});
+      kuzzle.query.resolves({result: {hits: ['foo', 'bar', 'baz']}});
 
       return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -364,10 +364,12 @@ describe('Document Controller', () => {
 
     it('should call document/get query and return a Promise which resolves the document', () => {
       kuzzle.query.resolves({
-        _id: 'document-id',
-        _index: 'index',
-        _type: 'collection',
-        _source: {foo: 'bar'},
+        result: {
+          _id: 'document-id',
+          _index: 'index',
+          _type: 'collection',
+          _source: {foo: 'bar'}
+        }
       });
 
       return kuzzle.document.get('index', 'collection', 'document-id', options)
@@ -392,10 +394,12 @@ describe('Document Controller', () => {
 
     it('should inject the "includeTrash" option into the request', () => {
       kuzzle.query.resolves({
-        _id: 'document-id',
-        _index: 'index',
-        _type: 'collection',
-        _source: {foo: 'bar'},
+        result: {
+          _id: 'document-id',
+          _index: 'index',
+          _type: 'collection',
+          _source: {foo: 'bar'}
+        }
       });
 
       return kuzzle.document.get('index', 'collection', 'document-id', {includeTrash: true})
@@ -453,7 +457,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mCreate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -481,7 +485,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mCreate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
         .then(res => {
@@ -535,7 +539,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mCreateOrReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -563,7 +567,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mCreateOrReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
         .then(res => {
@@ -610,7 +614,7 @@ describe('Document Controller', () => {
 
     it('should call document/mDelete query and return a Promise which resolves the list of deleted documents ids', () => {
       const result = ['document1', 'document2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mDelete('index', 'collection', ['document1', 'document2'], options)
         .then(res => {
@@ -631,7 +635,7 @@ describe('Document Controller', () => {
 
     it('should inject the "refresh" option into the request', () => {
       const result = ['document1', 'document2'];
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mDelete('index', 'collection', ['document1', 'document2'], {refresh: true})
         .then(res => {
@@ -684,7 +688,7 @@ describe('Document Controller', () => {
         ],
         total: 2
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mGet('index', 'collection', ['document1', 'document2'], options)
         .then(res => {
@@ -711,7 +715,7 @@ describe('Document Controller', () => {
         ],
         total: 2
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mGet('index', 'collection', ['document1', 'document2'], {includeTrash: true})
         .then(res => {
@@ -765,7 +769,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -793,7 +797,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
         .then(res => {
@@ -847,7 +851,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mUpdate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -875,7 +879,7 @@ describe('Document Controller', () => {
         }],
         total: 1
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.mUpdate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
         .then(res => {
@@ -927,7 +931,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.replace('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -954,7 +958,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.replace('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -998,7 +1002,7 @@ describe('Document Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -1034,7 +1038,7 @@ describe('Document Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {includeTrash: true})
         .then(res => {
@@ -1069,7 +1073,7 @@ describe('Document Controller', () => {
         ],
         total: 3
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {from: 1, size: 2, scroll: '1m'})
         .then(res => {
@@ -1128,7 +1132,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.update('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -1156,7 +1160,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.update('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -1184,7 +1188,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'},
         created: false
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.update('index', 'collection', 'document-id', {foo: 'bar'}, {retryOnConflict: true})
         .then(res => {
@@ -1230,7 +1234,7 @@ describe('Document Controller', () => {
         errorMessages: {},
         valid: true
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.document.validate('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
