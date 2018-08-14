@@ -114,7 +114,7 @@ describe('DocumentSearchResult', () => {
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call document/scroll action with scrollId parameter and resolve the current object', () => {
@@ -169,7 +169,7 @@ describe('DocumentSearchResult', () => {
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call document/search action with search_after parameter and resolve the current object', () => {
@@ -225,7 +225,7 @@ describe('DocumentSearchResult', () => {
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should resolve null without calling kuzzle query if from parameter is greater than the search count', () => {

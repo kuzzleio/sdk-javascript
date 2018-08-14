@@ -28,7 +28,7 @@ describe('Realtime Controller', () => {
     });
 
     it('should call realtime/count query with the roomId and return a Promise which resolves a number', () => {
-      kuzzle.query.resolves({roomId: 'roomId', count: 1234});
+      kuzzle.query.resolves({result: {roomId: 'roomId', count: 1234}});
 
       return kuzzle.realtime.count('roomId', options)
         .then(res => {
@@ -63,7 +63,7 @@ describe('Realtime Controller', () => {
           }
         }
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.realtime.list(options)
         .then(res => {
@@ -99,7 +99,7 @@ describe('Realtime Controller', () => {
     });
 
     it('should call realtime/publish query with the index, collection and body and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({published: true});
+      kuzzle.query.resolves({result: {published: true}});
 
       return kuzzle.realtime.publish('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -122,8 +122,7 @@ describe('Realtime Controller', () => {
     const
       roomId = uuidv4(),
       subscribeResponse = {
-        roomId,
-        channel: 'notification-channel'
+        result: {roomId, channel: 'notification-channel'}
       };
 
     let room;
@@ -192,7 +191,7 @@ describe('Realtime Controller', () => {
           should(room.callback).be.equal(cb);
           should(room.options).be.equal(options);
           should(room.subscribe).be.calledOnce();
-          should(res).be.equal(subscribeResponse);
+          should(res).be.equal(subscribeResponse.result);
         });
     });
 
@@ -239,6 +238,8 @@ describe('Realtime Controller', () => {
 
       kuzzle.realtime.subscriptions[roomId] = [room1, room2];
       kuzzle.realtime.subscriptions.foo = [room3];
+
+      kuzzle.query.resolves({result: roomId});
     });
 
     it('should throw an error if the "roomId" argument is not provided', () => {
@@ -279,8 +280,6 @@ describe('Realtime Controller', () => {
     });
 
     it('should call realtime/unsubiscribe query with the roomId and return a Promise which resolves the roomId', () => {
-      kuzzle.query.resolves(roomId);
-
       return kuzzle.realtime.unsubscribe(roomId, options)
         .then(res => {
           should(kuzzle.query)
@@ -320,7 +319,7 @@ describe('Realtime Controller', () => {
         errorMessages: {},
         valid: true
       };
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.realtime.validate('index', 'collection', {foo: 'bar'}, options)
         .then(res => {

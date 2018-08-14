@@ -29,7 +29,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/create query and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.create('index', 'collection', null, options)
         .then(res => {
@@ -48,7 +48,7 @@ describe('Collection Controller', () => {
     });
 
     it('should handle a collection mapping, if one is provided', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.create('index', 'collection', {properties: true}, options)
         .then(res => {
@@ -81,7 +81,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/deleteSpecification query and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.deleteSpecification('index', 'collection', options)
         .then(res => {
@@ -113,7 +113,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/exists query names and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.collection.exists('index', 'collection', options)
         .then(res => {
@@ -146,12 +146,14 @@ describe('Collection Controller', () => {
 
     it('should call collection/getMapping query and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
-        index: {
-          mappings: {
-            collection: {
-              properties: {
-                field1: {type: 'foo'},
-                field2: {type: 'bar'}
+        result: {
+          index: {
+            mappings: {
+              collection: {
+                properties: {
+                  field1: {type: 'foo'},
+                  field2: {type: 'bar'}
+                }
               }
             }
           }
@@ -200,13 +202,15 @@ describe('Collection Controller', () => {
 
     it('should call collection/getSpecifications query and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
-        index: 'index',
-        collection: 'collection',
-        validation: {
-          fields: {
-            foobar: {type: 'integer', mandatory: true, defaultValue: 42}
-          },
-          strict: true
+        result: {
+          index: 'index',
+          collection: 'collection',
+          validation: {
+            fields: {
+              foobar: {type: 'integer', mandatory: true, defaultValue: 42}
+            },
+            strict: true
+          }
         }
       });
 
@@ -244,12 +248,14 @@ describe('Collection Controller', () => {
 
     it('should call collection/list query and return a Promise which resolves collection list', () => {
       kuzzle.query.resolves({
-        collections: [
-          {name: 'foo', type: 'realtime'},
-          {name: 'bar', type: 'realtime'},
-          {name: 'foobar', type: 'stored'},
-          {name: 'barfoo', type: 'stored'}
-        ]
+        result: {
+          collections: [
+            {name: 'foo', type: 'realtime'},
+            {name: 'bar', type: 'realtime'},
+            {name: 'foobar', type: 'stored'},
+            {name: 'barfoo', type: 'stored'}
+          ]
+        }
       });
 
       return kuzzle.collection.list('index', options)
@@ -279,11 +285,13 @@ describe('Collection Controller', () => {
   describe('searchSpecifications', () => {
     it('should call collection/searchSpecifications query with search filter and return a Promise which resolves a SpecificationsSearchResult object', () => {
       kuzzle.query.resolves({
-        hits: [
-          {foo: 'bar'},
-          {bar: 'foo'}
-        ],
-        total: 2
+        result: {
+          hits: [
+            {foo: 'bar'},
+            {bar: 'foo'}
+          ],
+          total: 2
+        }
       });
 
       const body = {foo: 'bar'};
@@ -335,7 +343,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/truncate query and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.truncate('index', 'collection', options)
         .then(res => {
@@ -367,7 +375,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/updateMapping query with the new mapping and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({foo: 'bar'});
+      kuzzle.query.resolves({result: {foo: 'bar'}});
 
       const body = {foo: 'bar'};
       return kuzzle.collection.updateMapping('index', 'collection', body, options)
@@ -401,7 +409,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({foo: 'bar'});
+      kuzzle.query.resolves({result: {foo: 'bar'}});
 
       const body = {foo: 'bar'};
       return kuzzle.collection.updateSpecifications('index', 'collection', body, options)
@@ -424,9 +432,11 @@ describe('Collection Controller', () => {
   describe('validateSpecifications', () => {
     it('should call collection/validateSpecifications query with the specifications to validate and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
-        valid: false,
-        description: 'foo bar',
-        details: ['foo', 'bar']
+        result: {
+          valid: false,
+          description: 'foo bar',
+          details: ['foo', 'bar']
+        }
       });
 
       const body = {foo: 'bar'};

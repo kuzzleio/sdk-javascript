@@ -20,7 +20,7 @@ describe('Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves a boolean value', () => {
-      kuzzle.query.resolves({exists: true});
+      kuzzle.query.resolves({result: {exists: true}});
 
       return kuzzle.server.adminExists()
         .then(res => {
@@ -37,7 +37,7 @@ describe('Server Controller', () => {
           should(res).be.exactly(true);
 
           kuzzle.query.reset();
-          kuzzle.query.resolves({exists: false});
+          kuzzle.query.resolves({result: {exists: false}});
           return kuzzle.server.adminExists();
         })
         .then(res => {
@@ -45,6 +45,11 @@ describe('Server Controller', () => {
           should(kuzzle.query).be.calledWith(expectedQuery);
           should(res).be.exactly(false);
         });
+    });
+
+    it('should reject the promise if receiving a response in bad format (missing result)', () => {
+      kuzzle.query.resolves({foo: 'bar'});
+      return should(kuzzle.server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
     });
 
     it('should reject the promise if receiving a response in bad format (missing "exists" attribute)', () => {
@@ -96,7 +101,7 @@ describe('Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves all the statistics frames', () => {
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.server.getAllStats()
         .then(res => {
@@ -149,7 +154,7 @@ describe('Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the configuration', () => {
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.server.getConfig()
         .then(res => {
@@ -209,7 +214,7 @@ describe('Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the last statistic frame', () => {
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.server.getLastStats()
         .then(res => {
@@ -263,7 +268,7 @@ describe('Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the requested statistics frames', () => {
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       const expectedQuery = {
         controller: 'server',
@@ -369,7 +374,7 @@ describe('Server Controller', () => {
       };
 
     it('should call query with the right arguments and return Promise which resolves the server informations', () => {
-      kuzzle.query.resolves(result);
+      kuzzle.query.resolves({result});
 
       return kuzzle.server.info()
         .then(res => {
@@ -403,7 +408,7 @@ describe('Server Controller', () => {
     };
 
     it('should call query with the right arguments and return Promise which resolves current server timestamp', () => {
-      kuzzle.query.resolves({now: 12345});
+      kuzzle.query.resolves({result: {now: 12345}});
 
       return kuzzle.server.now()
         .then(res => {
@@ -422,13 +427,18 @@ describe('Server Controller', () => {
         });
     });
 
-    it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
+    it('should reject the promise if receiving a response in bad format (missing result)', () => {
       kuzzle.query.resolves({foo: 'bar'});
       return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
+    it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
+      kuzzle.query.resolves({result: {foo: 'bar'}});
+      return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
+    });
+
     it('should reject the promise if receiving a response in bad format (bad type for "now" attribute)', () => {
-      kuzzle.query.resolves({now: 'bar'});
+      kuzzle.query.resolves({result: {now: 'bar'}});
       return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 

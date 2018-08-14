@@ -19,9 +19,11 @@ describe('Auth Controller', () => {
   describe('checkToken', () => {
     it('should call auth/checkToken query with the token and return a Promise which resolves the token validity', () => {
       kuzzle.query.resolves({
-        valid: true,
-        state: 'Error message',
-        expiresAt: 42424242
+        result: {
+          valid: true,
+          state: 'Error message',
+          expiresAt: 42424242
+        }
       });
 
       return kuzzle.auth.checkToken('token', options)
@@ -49,8 +51,10 @@ describe('Auth Controller', () => {
       const credentials = {foo: 'bar'};
 
       kuzzle.query.resolves({
-        username: 'foo',
-        kuid: 'bar'
+        result: {
+          username: 'foo',
+          kuid: 'bar'
+        }
       });
 
       return kuzzle.auth.createMyCredentials('strategy', credentials, options)
@@ -71,7 +75,7 @@ describe('Auth Controller', () => {
 
   describe('credentialsExist', () => {
     it('should call auth/credentialExists query with the strategy name and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.auth.credentialsExist('strategy', options)
         .then(res => {
@@ -90,7 +94,7 @@ describe('Auth Controller', () => {
 
   describe('deleteMyCredentials', () => {
     it('should call auth/deleteMyCredentials query with the strategy name and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({acknowledged: true});
+      kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.auth.deleteMyCredentials('strategy', options)
         .then(res => {
@@ -110,9 +114,9 @@ describe('Auth Controller', () => {
   describe('getCurrentUser', () => {
     it('should call auth/getCurrentUser query and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
-        _id: 'id',
-        _source: {
-          name: 'Doe'
+        result: {
+          _id: 'id',
+          _source: {name: 'Doe'}
         }
       });
 
@@ -135,8 +139,10 @@ describe('Auth Controller', () => {
   describe('getMyCredentials', () => {
     it('should call auth/getMyCredentials query with the strategy name and return a Promise which resolves the user credentials', () => {
       kuzzle.query.resolves({
-        username: 'foo',
-        kuid: 'bar'
+        result: {
+          username: 'foo',
+          kuid: 'bar'
+        }
       });
 
       return kuzzle.auth.getMyCredentials('strategy', options)
@@ -156,9 +162,9 @@ describe('Auth Controller', () => {
 
   describe('getMyRights', () => {
     it('should call auth/getMyCredentials query with the strategy name and return a Promise which resolves the user permissions as an array', () => {
-      kuzzle.query.resolves({hits: [
+      kuzzle.query.resolves({result: {hits: [
         {controller: 'foo', action: 'bar', index: 'foobar', collection: '*', value: 'allowed'}
-      ]});
+      ]}});
 
       return kuzzle.auth.getMyRights(options)
         .then(res => {
@@ -177,7 +183,7 @@ describe('Auth Controller', () => {
 
   describe('getStrategies', () => {
     it('should call auth/getStrategies query and return a Promise which resolves the list of strategies as an array', () => {
-      kuzzle.query.resolves(['local', 'github', 'foo', 'bar']);
+      kuzzle.query.resolves({result: ['local', 'github', 'foo', 'bar']});
 
       return kuzzle.auth.getStrategies(options)
         .then(res => {
@@ -202,8 +208,10 @@ describe('Auth Controller', () => {
 
     beforeEach(() => {
       kuzzle.query.resolves({
-        _id: 'kuid',
-        jwt: 'jwt'
+        result: {
+          _id: 'kuid',
+          jwt: 'jwt'
+        }
       });
     });
 
@@ -256,7 +264,7 @@ describe('Auth Controller', () => {
   describe('logout', () => {
     beforeEach(() => {
       kuzzle.jwt = 'jwt';
-      kuzzle.query.resolves({aknowledged: true});
+      kuzzle.query.resolves({result: {aknowledged: true}});
     });
 
     it('should call auth/logout query and return an empty Promise', () => {
@@ -286,8 +294,10 @@ describe('Auth Controller', () => {
       const credentials = {foo: 'bar'};
 
       kuzzle.query.resolves({
-        username: 'foo',
-        kuid: 'bar'
+        result: {
+          username: 'foo',
+          kuid: 'bar'
+        }
       });
 
       return kuzzle.auth.updateMyCredentials('strategy', credentials, options)
@@ -311,9 +321,9 @@ describe('Auth Controller', () => {
       const body = {foo: 'bar'};
 
       kuzzle.query.resolves({
-        _id: 'kuid',
-        _source: {
-          foo: 'bar'
+        result: {
+          _id: 'kuid',
+          _source: {foo: 'bar'}
         }
       });
 
@@ -336,7 +346,7 @@ describe('Auth Controller', () => {
     it('should call auth/validateMyCredentials query with the strategy and its credentials and return a Promise which resolves a boolean', () => {
       const body = {foo: 'bar'};
 
-      kuzzle.query.resolves(true);
+      kuzzle.query.resolves({result: true});
 
       return kuzzle.auth.validateMyCredentials('strategy', body, options)
         .then(res => {

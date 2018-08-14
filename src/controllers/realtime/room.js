@@ -50,8 +50,8 @@ class Room {
   subscribe () {
     return this.kuzzle.query(this.request, this.options)
       .then(response => {
-        this.id = response.roomId;
-        this.channel = response.channel;
+        this.id = response.result.roomId;
+        this.channel = response.result.channel;
 
         // we rely on kuzzle event emitter to not duplicate the listeners here
         this.kuzzle.network.on(this.channel, this._channelListener);

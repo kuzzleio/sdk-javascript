@@ -28,14 +28,14 @@ class ServerController {
       controller: 'server',
       action: 'adminExists'
     }, options)
-      .then(result => {
-        if (typeof result.exists !== 'boolean') {
+      .then(response => {
+        if (typeof response.result !== 'object' || typeof response.result.exists !== 'boolean') {
           const error = new Error('adminExists: bad response format');
           error.status = 400;
-          error.response = result;
+          error.response = response;
           return Promise.reject(error);
         }
-        return result.exists;
+        return response.result.exists;
       });
   }
 
@@ -50,7 +50,8 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getAllStats'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -63,7 +64,8 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getConfig'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -76,7 +78,8 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'getLastStats'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -93,7 +96,8 @@ class ServerController {
       action: 'getStats',
       startTime,
       stopTime
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -106,7 +110,8 @@ class ServerController {
     return this.kuzzle.query({
       controller: 'server',
       action: 'info'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -120,14 +125,14 @@ class ServerController {
       controller: 'server',
       action: 'now'
     }, options)
-      .then(result => {
-        if (typeof result.now !== 'number') {
+      .then(response => {
+        if (typeof response.result !== 'object' || typeof response.result.now !== 'number') {
           const error = new Error('now: bad response format');
           error.status = 400;
-          error.response = result;
+          error.response = response;
           return Promise.reject(error);
         }
-        return result.now;
+        return response.result.now;
       });
   }
 }

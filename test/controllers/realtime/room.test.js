@@ -123,10 +123,13 @@ describe('Room', () => {
   });
 
   describe('subscribe', () => {
-    it('should call realtime/subscribe action with subscribe filters and return a promise that resolve the roomId and channel', () => {
-      const result = {roomId: 'my-room-id', channel: 'subscription-channel'};
-      kuzzle.query.resolves(result);
+    const response = {result: {roomId: 'my-room-id', channel: 'subscription-channel'}};
 
+    beforeEach(() => {
+      kuzzle.query.resolves(response);
+    });
+
+    it('should call realtime/subscribe action with subscribe filters and return a promise that resolve the roomId and channel', () => {
       const
         opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
         body = {foo: 'bar'},
@@ -149,14 +152,11 @@ describe('Room', () => {
               volatile: {bar: 'foo'}
             }, options);
 
-          should(res).be.equal(result);
+          should(res).be.equal(response);
         });
     });
 
     it('should set "id" and "channel" properties', () => {
-      const result = {roomId: 'my-room-id', channel: 'subscription-channel'};
-      kuzzle.query.resolves(result);
-
       const
         opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
         body = {foo: 'bar'},
@@ -171,9 +171,6 @@ describe('Room', () => {
     });
 
     it('should call _channelListener while receiving data on the current channel', () => {
-      const result = {roomId: 'my-room-id', channel: 'subscription-channel'};
-      kuzzle.query.resolves(result);
-
       const
         opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
         body = {foo: 'bar'},
@@ -194,9 +191,6 @@ describe('Room', () => {
     });
 
     it('should call _reSubscribeListener once reconnected', () => {
-      const result = {roomId: 'my-room-id', channel: 'subscription-channel'};
-      kuzzle.query.resolves(result);
-
       const
         opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
         body = {foo: 'bar'},

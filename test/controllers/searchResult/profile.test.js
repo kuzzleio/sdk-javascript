@@ -123,7 +123,7 @@ describe('ProfileSearchResult', () => {
         };
         searchResult = new ProfileSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call security/scrollProfiles action with scrollId parameter and resolve the current object', () => {
@@ -186,7 +186,7 @@ describe('ProfileSearchResult', () => {
         };
         searchResult = new ProfileSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call security/searchProfiles action with search_after parameter and resolve the current object', () => {
@@ -250,7 +250,7 @@ describe('ProfileSearchResult', () => {
         };
         searchResult = new ProfileSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should resolve null without calling kuzzle query if from parameter is greater than the search count', () => {

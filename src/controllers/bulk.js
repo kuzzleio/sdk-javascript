@@ -16,7 +16,8 @@ class BulkController {
       body: {
         bulkData: data
       }
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
 }

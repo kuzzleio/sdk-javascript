@@ -33,7 +33,8 @@ class AuthController {
       controller: 'auth',
       action: 'checkToken',
       body: {token}
-    }, {queuable: false});
+    }, {queuable: false})
+      .then(response => response.result);
   }
 
   /**
@@ -50,7 +51,8 @@ class AuthController {
       controller: 'auth',
       action: 'createMyCredentials',
       body: credentials
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -64,7 +66,8 @@ class AuthController {
       strategy,
       controller: 'auth',
       action: 'credentialsExist'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -79,7 +82,8 @@ class AuthController {
       strategy,
       controller: 'auth',
       action: 'deleteMyCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -92,7 +96,7 @@ class AuthController {
       controller: 'auth',
       action: 'getCurrentUser'
     }, options)
-      .then(result => new User(this.kuzzle, result._id, result._source, result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   /**
@@ -106,7 +110,8 @@ class AuthController {
       strategy,
       controller: 'auth',
       action: 'getMyCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -120,7 +125,7 @@ class AuthController {
       controller: 'auth',
       action: 'getMyRights'
     }, options)
-      .then(res => res.hits);
+      .then(response => response.result.hits);
   }
 
   /**
@@ -133,7 +138,8 @@ class AuthController {
     return this.kuzzle.query({
       controller: 'auth',
       action: 'getStrategies'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -160,15 +166,15 @@ class AuthController {
       };
 
     return this.kuzzle.query(request, {queuable: false})
-      .then(result => {
+      .then(response => {
         try {
-          this.kuzzle.jwt = result.jwt;
+          this.kuzzle.jwt = response.result.jwt;
           this.kuzzle.emit('loginAttempt', {success: true});
         }
         catch (err) {
           return Promise.reject(err);
         }
-        return result.jwt;
+        return response.result.jwt;
       })
       .catch(err => {
         this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
@@ -205,7 +211,8 @@ class AuthController {
       body: credentials,
       controller: 'auth',
       action: 'updateMyCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -220,7 +227,8 @@ class AuthController {
       body,
       controller: 'auth',
       action: 'updateSelf'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   /**
@@ -237,7 +245,8 @@ class AuthController {
       body: credentials,
       controller: 'auth',
       action: 'validateMyCredentials'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
 }

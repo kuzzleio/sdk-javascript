@@ -35,7 +35,7 @@ class DocumentController {
     delete options.includeTrash;
 
     return this.kuzzle.query(request, options)
-      .then(response => response.count);
+      .then(response => response.result.count);
   }
 
   create (index, collection, _id, body, options = {}) {
@@ -60,7 +60,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   createOrReplace (index, collection, _id, body, options = {}) {
@@ -88,7 +89,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   delete (index, collection, _id, options = {}) {
@@ -112,7 +114,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   deleteByQuery(index, collection, body = {}, options = {}) {
@@ -133,7 +136,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   get (index, collection, _id, options = {}) {
@@ -157,7 +161,8 @@ class DocumentController {
     };
     delete options.includeTrash;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mCreate (index, collection, documents, options = {}) {
@@ -181,7 +186,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mCreateOrReplace (index, collection, documents, options = {}) {
@@ -205,7 +211,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mDelete (index, collection, ids, options = {}) {
@@ -229,7 +236,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mGet (index, collection, ids, options = {}) {
@@ -253,7 +261,8 @@ class DocumentController {
     };
     delete options.includeTrash;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mReplace (index, collection, documents, options = {}) {
@@ -276,7 +285,8 @@ class DocumentController {
       refresh: options.refresh
     };
     delete options.refresh;
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   mUpdate (index, collection, documents, options = {}) {
@@ -300,7 +310,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   replace (index, collection, _id, body, options = {}) {
@@ -328,7 +339,8 @@ class DocumentController {
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   search (index, collection, body = {}, options = {}) {
@@ -352,7 +364,7 @@ class DocumentController {
     }
 
     return this.kuzzle.query(request, options)
-      .then(response => new DocumentSearchResult(this.kuzzle, request, options, response));
+      .then(response => new DocumentSearchResult(this.kuzzle, request, options, response.result));
   }
 
   update (index, collection, _id, body, options = {}) {
@@ -382,7 +394,8 @@ class DocumentController {
     delete options.refresh;
     delete options.retryOnConflict;
 
-    return this.kuzzle.query(request, options);
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
   }
 
   validate (index, collection, body, options = {}) {
@@ -402,7 +415,8 @@ class DocumentController {
       body,
       controller: 'document',
       action: 'validate'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 }
 

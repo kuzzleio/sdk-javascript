@@ -22,7 +22,8 @@ class IndexController {
       index,
       controller: 'index',
       action : 'create'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   delete (index, options) {
@@ -34,7 +35,8 @@ class IndexController {
       index,
       controller: 'index',
       action : 'delete'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   exists (index, options) {
@@ -46,7 +48,8 @@ class IndexController {
       index,
       controller: 'index',
       action : 'exists'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   getAutoRefresh (index, options) {
@@ -58,14 +61,16 @@ class IndexController {
       index,
       controller: 'index',
       action: 'getAutoRefresh'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   list (options) {
     return this.kuzzle.query({
       controller: 'index',
       action: 'list'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   mDelete (indexes, options) {
@@ -79,7 +84,8 @@ class IndexController {
       body: {
         indexes
       }
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   refresh (index, options) {
@@ -91,14 +97,16 @@ class IndexController {
       index,
       controller: 'index',
       action: 'refresh'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   refreshInternal (options) {
     return this.kuzzle.query({
       controller: 'index',
       action: 'refreshInternal'
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 
   setAutoRefresh (index, autoRefresh, options) {
@@ -117,7 +125,8 @@ class IndexController {
       body: {
         autoRefresh
       }
-    }, options);
+    }, options)
+      .then(response => response.result);
   }
 }
 

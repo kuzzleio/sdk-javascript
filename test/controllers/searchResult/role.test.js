@@ -125,7 +125,7 @@ describe('RoleSearchResult', () => {
 
         searchResult = new RoleSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should resolve null without calling kuzzle query if from parameter is greater than the search count', () => {

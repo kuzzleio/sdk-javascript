@@ -125,7 +125,7 @@ describe('UserSearchResult', () => {
         };
         searchResult = new UserSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call security/scrollUsers action with scrollId parameter and resolve the current object', () => {
@@ -190,7 +190,7 @@ describe('UserSearchResult', () => {
         };
         searchResult = new UserSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should call security/searchUsers action with search_after parameter and resolve the current object', () => {
@@ -256,7 +256,7 @@ describe('UserSearchResult', () => {
         };
         searchResult = new UserSearchResult(kuzzle, request, options, response);
 
-        kuzzle.query.resolves(nextResponse);
+        kuzzle.query.resolves({result: nextResponse});
       });
 
       it('should resolve null without calling kuzzle query if from parameter is greater than the search count', () => {
