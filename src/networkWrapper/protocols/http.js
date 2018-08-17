@@ -155,8 +155,6 @@ class HttpWrapper extends AbtractWrapper {
       }
     }
 
-    payload.headers['Content-Length'] = Buffer.byteLength(payload.body || '');
-
     const
       route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
 
@@ -209,8 +207,11 @@ class HttpWrapper extends AbtractWrapper {
       const httpClient = require('min-req-promise');
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
+      const headers = payload.headers || {};
+      headers['Content-Length'] = Buffer.byteLength(payload.body || '');
+
       return httpClient.request(url, method, {
-        headers: payload.headers,
+        headers,
         body: payload.body
       })
         .then(response => JSON.parse(response.body));
