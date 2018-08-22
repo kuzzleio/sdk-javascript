@@ -373,14 +373,26 @@ describe('HTTP networking module', () => {
       network._sendHttpRequest('VERB', '/foo/bar');
 
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', { body: undefined, headers: undefined });
+      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', { body: undefined, headers: {'Content-Length': 0} });
     });
 
     it('should call http.request with a body', () => {
-      network._sendHttpRequest('VERB', '/foo/bar', {body: 'http request body'});
+      const body = 'http request body';
+      network._sendHttpRequest('VERB', '/foo/bar', {body});
 
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {body: 'http request body', headers: undefined });
+      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {body: 'http request body', headers: {'Content-Length': body.length}});
+    });
+
+    it('should call http.request with a body and some headers', () => {
+      const body = 'http request body';
+      network._sendHttpRequest('VERB', '/foo/bar', {body, headers: {foo: 'bar'}});
+
+      should(httpRequestStub).be.calledOnce();
+      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {
+        body: 'http request body',
+        headers: {'Content-Length': body.length, foo: 'bar'}
+      });
     });
 
     it('should reject the request in case of error', () => {
@@ -413,7 +425,8 @@ describe('HTTP networking module', () => {
     beforeEach(() => {
       xhrStub = {
         open: sinon.stub(),
-        send: sinon.stub()
+        send: sinon.stub(),
+        setRequestHeader: sinon.stub()
       };
       // eslint-disable-next-line no-native-reassign, no-global-assign
       XMLHttpRequest = function() {
@@ -439,16 +452,35 @@ describe('HTTP networking module', () => {
 
       should(xhrStub.send).be.calledOnce();
       should(xhrStub.send).be.calledWith(undefined);
+
+      should(xhrStub.setRequestHeader).not.be.called();
     });
 
     it('should call XMLHttpRequest with a body', () => {
-      network._sendHttpRequest('VERB', '/foo/bar', {body: 'http request body'});
+      const body = 'http request body';
+      network._sendHttpRequest('VERB', '/foo/bar', {body});
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
 
       should(xhrStub.send).be.calledOnce();
       should(xhrStub.send).be.calledWith('http request body');
+
+      should(xhrStub.setRequestHeader).not.be.called();
+    });
+
+    it('should call XMLHttpRequest with a body and some headers', () => {
+      const body = 'http request body';
+      network._sendHttpRequest('VERB', '/foo/bar', {body, headers: {foo: 'bar'}});
+
+      should(xhrStub.open).be.calledOnce();
+      should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
+
+      should(xhrStub.send).be.calledOnce();
+      should(xhrStub.send).be.calledWith('http request body');
+
+      should(xhrStub.setRequestHeader).be.calledOnce();
+      should(xhrStub.setRequestHeader).be.calledWith('foo', 'bar');
     });
 
     it('should resolve with the backend response', () => {
