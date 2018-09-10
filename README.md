@@ -46,11 +46,13 @@ This SDK can be used either in NodeJS or in a browser.
 
 ```
 npm install kuzzle-sdk --save
+# Beta v6
+npm install git://github.com/kuzzleio/sdk-javascript.git#6-beta --save
 ```
 
 ### Browser
 
-To run the SDK in the browser, you need to pick the [built version available here](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/master/dist/kuzzle.js). You can also build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
+To run the SDK in the browser, you need to pick the [built beta v6 version available here](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/tree/6-beta/dist/kuzzle.js). You can also build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
 
 ```html
 <script type="text/javascript" src="dist/kuzzle.js"></script>
@@ -58,7 +60,7 @@ To run the SDK in the browser, you need to pick the [built version available her
 The browser version is also available from CDN:
 
 ```html
-<script type="text/javascript" src="https://cdn.rawgit.com/kuzzleio/sdk-javascript/master/dist/kuzzle.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/kuzzleio/sdk-javascript/tree/6-beta/dist/kuzzle.js"></script>
 ```
 
 If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
@@ -143,7 +145,7 @@ kuzzle.document.create('my-index', 'my-collection', 'my-uniq-id', documentBody, 
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
-To get the details of the parameters of each method, it is necessary for the moment to see the code of each controller on [Github](https://github.com/kuzzleio/sdk-javascript/tree/6-dev/src/controllers).
+To get the details of the parameters of each method, it is necessary for the moment to see the code of each controller on [Github](https://github.com/kuzzleio/sdk-javascript/tree/6-beta/src/controllers).
 
 ### Promise based
 
