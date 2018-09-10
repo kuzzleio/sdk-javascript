@@ -21,26 +21,22 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 
 ## Basic usage
 
-Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/getting-started/#sdk-play-time)
+Le SDK supporte différents protocols. Lors de l'instanciation, vous devez choisir le protocol à utiliser et renseigner les différentes options nécessaires à la connection à Kuzzle.  
 
-## SDK Documentation
+Exemple:
+```js
+const { Kuzzle } = require('kuzzle-sdk');
 
-The complete SDK documentation is available [here](http://docs.kuzzle.io/sdk-reference/)
+const kuzzle = new Kuzzle('websocket', { host: 'localhost', port: 7512 });
 
-## Protocols used
-
-The Javascript SDK implements two network protocols: raw WebSocket, and [Socket.IO](http://socket.io/)  
-The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
-
-Which protocol is used when you connect to Kuzzle depends on multiple factors:
-
-#### NodeJS
-
-The protocol used is always raw WebSocket.
-
-#### Web Browsers
-
-The SDK will first try to use raw WebSocket to connect to Kuzzle. If the web browser does not support this protocol, then the SDK falls back to Socket.IO
+kuzzle.connect()
+  .then(() => {
+    // You are now connected to your Kuzzle instance.
+    return kuzzle.server.now();
+  })
+  .then(serverTime => console.log(serverTime))
+  .catch(error => console.error(error));
+```
 
 ## Installation
 
@@ -88,6 +84,39 @@ let Kuzzle = require('kuzzle-sdk/dist/kuzzle.js')
 // ... or with the new import directive.
 import Kuzzle from 'kuzzle-sdk/dist/kuzzle.js'
 ```
+
+## Protocols used
+Actuellement, le SDK supporte nativement 3 protocols: `http`, `websocket` et `socketio`.  
+
+The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
+
+Which protocol is used when you connect to Kuzzle depends on multiple factors:
+
+#### NodeJS
+
+The protocol used is always raw WebSocket.
+
+#### Web Browsers
+
+The SDK will first try to use raw WebSocket to connect to Kuzzle. If the web browser does not support this protocol, then the SDK falls back to Socket.IO
+
+
+## SDK Documentation
+
+The version 6 of the JS SDK is still in beta release.  
+This new version involve a massive refactor of the SDK structure to match the [Kuzzle API](https://docs.kuzzle.io/api-documentation/connecting-to-kuzzle/).  
+
+Chaque contrôleur est accessible à partir de l'objet Kuzzle. Les actions du contrôleur sont nommées de la même manière que dans l'API.  
+
+Par exemple, pour l'action `create` du contrôleur `document`:
+```js
+const options = { refresh: 'wait_for' };
+const documentBody = { hello: 'world' };
+kuzzle.document.create('my-index', 'my-collection', 'my-uniq-id', documentBody, options)
+```
+
+Pour avoir le détails des paramètres de chaque méthode, il est pour le moment nécessaire d'aller voir le code de chacun des contrôleurs sur [Github](https://github.com/kuzzleio/sdk-javascript/tree/6-dev/src/controllers).
+
 
 ## License
 
