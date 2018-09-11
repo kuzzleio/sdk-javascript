@@ -10,12 +10,16 @@ A backend software, self-hostable and ready to use to power modern apps.
 
 You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
+This is the documentation for the beta-6 SDK. We are currently refactoring in deep our documentation to support many versions of each SDK. You can see it [here](https://docs-v2.kuzzle.io/sdk-reference/kuzzle/constructor/) but notice that this is an beta version of the documentation.  
+
+This new documentation will be available soon. In the meantime, you can still use the SDK 5 and the old documentation at https://docs.kuzzle.io/sdk-reference/essentials/.
+
 * [Basic usage](#basic-usage)
-* [SDK Documentation](#sdk-documentation)
-* [Protocols used](#protocols-used)
 * [Installation](#installation)
   * [NodeJS](#nodejs)
   * [Javascript](#javascript)
+* [Protocols used](#protocols-used)
+* [SDK Documentation](#sdk-documentation)
 * [Building manually](#building-manually)
 * [License](#license)
 
@@ -88,19 +92,84 @@ import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
 ```
 
 ## Protocols used
-Actuellement, le SDK supporte nativement 3 protocols: `http`, `websocket` et `socketio`.  
+Actually, the SDK support 3 protocols: `http`, `websocket` et `socketio`.  
 
-The main reason behind this is that while Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster
-
-Which protocol is used when you connect to Kuzzle depends on multiple factors:
+Websocket and Socket.IO protocols implement the whole Kuzzle API, while HTTP protocol does not implement realtime features (rooms and subscriptions).  
+While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
 #### NodeJS
 
-The protocol used is always raw WebSocket for `websocket`.
+We recommend to use the `websocket` protocol, but you can still use `http`, `socketio` or even a custom protocol if you want.  
 
 #### Web Browsers
 
-If you choose `websocket`, the SDK will first try to use raw WebSocket to connect to Kuzzle. If the web browser does not support this protocol, then the SDK falls back to Socket.IO.
+We also recommend to use the `webSocket` or `http` protocol, but some old browser may not support Websocket, so you have to implement a fallback to `socketio` in that case.
+
+```js
+let kuzzle;
+
+if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
+  kuzzle = new Kuzzle('websocket', { host: 'localhost' });
+} else {
+  kuzzle = new Kuzzle('socketio', { host: 'localhost' });
+}
+```
+
+#### Custom protocol
+
+The SDK also proposes to create custom protocols.  
+
+There are two ways to write these protocols, the first is to inherit the `KuzzleAbstractNetwork` class provided with the SDK and implement only the `connect` and `send` methods.
+
+```js
+const { KuzzleAbstractNetwork } = require('kuzzle-sdk');
+
+class MyCustomProtocol extends KuzzleAbstractNetwork {
+  connect() {
+    // (...) do custom connection steps...
+
+    // change state and resolve:
+    this.state = 'ready';
+    return Promise.resolve();
+  }
+
+  send(request) {
+    // (...) here the protocol-specific code to send the request to kuzzle and get the result into `result` variable
+
+    // Send back the result to SDK and resolve:
+    this.emit(request.requestId, { result });
+    return Promise.resolve();
+  }
+}
+```
+
+The second way is to implement the `isReady` and `query` methods as well as javascript [Event API](https://nodejs.org/api/events.html) by inheriting the `KuzzleEventEmitter` class.
+
+```js
+const { KuzzleEventEmitter } = require('kuzzle-sdk');
+
+class MyCustomProtocol extends KuzzleEventEmitter {
+
+  isReady() {
+    return true;
+  }
+
+  query (request, options) {
+    // (...) here the protocol-specific code to send the request to kuzzle and get the result into `result` variable
+
+    // Resolves the response:
+    return Promise.resolve({ result });
+  }
+}
+```
+
+These customized protocols can then be used by the SDK by passing them as parameters at instantiation.
+
+```js
+const protocol = new MyCustomProtocol();
+
+const kuzzle = new Kuzzle(protocol);
+```
 
 ## SDK Documentation
 
@@ -131,7 +200,7 @@ try {
 }
 ```
 
-### ISO with the Kuzzle API
+### Match Kuzzle's API
 
 The version 6 of this SDK involve a massive refactor of the SDK structure to match the [Kuzzle API](https://docs.kuzzle.io/api-documentation/connecting-to-kuzzle/).  
 
@@ -145,17 +214,56 @@ kuzzle.document.create('my-index', 'my-collection', 'my-uniq-id', documentBody, 
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
-To get the details of the parameters of each method, it is necessary for the moment to see the code of each controller on [Github](https://github.com/kuzzleio/sdk-javascript/tree/6-beta/src/controllers).
+If you want to get the details of the parameters for each method, it is necessary for the moment to see the code of each controller on [Github](https://github.com/kuzzleio/sdk-javascript/tree/6-beta/src/controllers).
+
+#### Query method
+
+This SDK also expose a low level `query` method to access the API even if the controller is not available inside the SDK.  
+
+This method take the controller and action name with all parameters needed by the action (`body`, `_id`, etc.) and return the raw Kuzzle response. This is the method used internally for every controller action in this SDK.
+
+Example with the [Admin](https://docs.kuzzle.io/api-documentation/controller-admin/) controller:
+```js
+const query = {
+  controller: 'admin',
+  action: 'resetCache',
+  database: 'memoryStorage'
+};
+const options = {
+  refresh: 'wait_for'
+};
+
+try {
+  const response = await kuzzle.query(query, options);
+  /*
+  {
+    requestId: '6526be09-330d-4183-be2b-8c30183db0f0',
+    status: 200,
+    error: null,
+    controller: 'admin',
+    action: 'resetCache',
+    collection: null,
+    index: null,
+    volatile:
+     { sdkInstanceId: 'c6fbe345-1d8b-4324-bf1f-2be3cc1a7d27',
+       sdkVersion: '6.0.0' },
+    result: { acknowledge: true },
+    room: '6526be09-330d-4183-be2b-8c30183db0f0'
+  }
+  */
+  console.log('Kuzzle memory storage successfully reset');
+} catch (error) {  
+  console.error(error);
+}
+```
 
 ### Promise based
 
-Each SDK method returns a Promise resolving on the result of the API return (the `result` property described in the API documentation).  
+All SDK methods return a promise resolving the `result` part of Kuzzle API responses. If an error occurs, the promise is rejected with an `Error` object embedding the `error` part of the API response.
 
 For example, for the action `create` of the controller `collection` ([collection#create](https://docs.kuzzle.io/api-documentation/controller-collection/create)), the property `result` contains `{ "acknowledged": true} `. This is therefore what will be returned by the SDK method if successful.
 
-Any errors must be caught either at the end of the Promise chain, or by using `async/await` and a `try...catch`.
-
-Translated with www.DeepL.com/Translator
+Any error must be caught either at the end of the Promise chain, or by using `async/await` and a `try...catch`.
 
 ```js
 const mapping = {
@@ -172,7 +280,7 @@ kuzzle.collection.create('my-index', 'my-collection', mapping)
 try {
   const result = await kuzzle.collection.create('my-index', 'my-collection', mapping);
   // result contain { "acknowledged": true }
-  console.log('Success');
+  console.log(result);
 } catch (error) {
   console.error(`Hu oh, we've got some error: ${error.message}`)
 }
