@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
 
-if [ "${TRAVIS_BRANCH}" = "master"  -a "${TRAVIS_PULL_REQUEST}" = "false" ]
+if ([ "${TRAVIS_BRANCH}" = "master" ] || [ "${TRAVIS_BRANCH}" = "6-beta" ]) && [ "${TRAVIS_PULL_REQUEST}" = "false" ]
 then
   echo "Push generated dist folder"
   git config --global user.email "support@kuzzle.io"
