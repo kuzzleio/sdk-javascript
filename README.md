@@ -10,7 +10,7 @@ A backend software, self-hostable and ready to use to power modern apps.
 
 You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
-This is the documentation for the beta-6 SDK. We are currently refactoring in deep our documentation to support many versions of each SDK. You can see it [here](https://docs-v2.kuzzle.io/sdk-reference/kuzzle/constructor/) but notice that this is an beta version of the documentation.  
+This is the documentation for the beta-6 SDK. We are currently refactoring in deep our documentation to support many versions of each SDK. You can see it [here](https://docs-v2.kuzzle.io/sdk-reference/kuzzle/constructor/) but notice that this is a beta version of the documentation.  
 
 This new documentation will be available soon. In the meantime, you can still use the SDK 5 and the old documentation at https://docs.kuzzle.io/sdk-reference/essentials/.
 
