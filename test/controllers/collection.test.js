@@ -67,29 +67,29 @@ describe('Collection Controller', () => {
     });
   });
 
-  describe('deleteSpecifications', () => {
+  describe('deleteSpecificationss', () => {
     it('should throw an error if the "index" argument is not provided', () => {
       should(function () {
-        kuzzle.collection.deleteSpecification(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.deleteSpecification: index is required');
+        kuzzle.collection.deleteSpecifications(undefined, 'collection', options);
+      }).throw('Kuzzle.collection.deleteSpecifications: index is required');
     });
 
     it('should throw an error if the "collection" argument is not provided', () => {
       should(function () {
-        kuzzle.collection.deleteSpecification('index', undefined, options);
-      }).throw('Kuzzle.collection.deleteSpecification: collection is required');
+        kuzzle.collection.deleteSpecifications('index', undefined, options);
+      }).throw('Kuzzle.collection.deleteSpecifications: collection is required');
     });
 
-    it('should call collection/deleteSpecification query and return a Promise which resolves an acknowledgement', () => {
+    it('should call collection/deleteSpecifications query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
-      return kuzzle.collection.deleteSpecification('index', 'collection', options)
+      return kuzzle.collection.deleteSpecifications('index', 'collection', options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
               controller: 'collection',
-              action: 'deleteSpecification',
+              action: 'deleteSpecifications',
               index: 'index',
               collection: 'collection'
             }, options);

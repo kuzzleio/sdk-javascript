@@ -34,19 +34,19 @@ class CollectionController {
       .then(response => response.result);
   }
 
-  deleteSpecification (index, collection, options = {}) {
+  deleteSpecifications (index, collection, options = {}) {
     if (!index) {
-      throw new Error('Kuzzle.collection.deleteSpecification: index is required');
+      throw new Error('Kuzzle.collection.deleteSpecifications: index is required');
     }
     if (!collection) {
-      throw new Error('Kuzzle.collection.deleteSpecification: collection is required');
+      throw new Error('Kuzzle.collection.deleteSpecifications: collection is required');
     }
 
     return this.kuzzle.query({
       index,
       collection,
       controller: 'collection',
-      action: 'deleteSpecification'
+      action: 'deleteSpecifications'
     }, options)
       .then(response => response.result);
   }
