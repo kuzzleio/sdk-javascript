@@ -245,10 +245,4 @@ class HttpWrapper extends AbtractWrapper {
 
 }
 
-for (const prop of [
-  'protocol'
-]) {
-  Object.defineProperty(HttpWrapper.prototype, prop, {enumerable: true});
-}
-
 module.exports = HttpWrapper;

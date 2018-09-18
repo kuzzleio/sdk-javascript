@@ -85,12 +85,4 @@ class RTWrapper extends AbstractWrapper {
   }
 }
 
-// make public properties enumerable
-for (const prop of [
-  'autoReconnect',
-  'reconnectionDelay'
-]) {
-  Object.defineProperty(RTWrapper.prototype, prop, {enumerable: true});
-}
-
 module.exports = RTWrapper;
