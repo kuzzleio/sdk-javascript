@@ -391,24 +391,4 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 }
 
-
-for (const prop of [
-  'autoQueue',
-  'autoReconnect',
-  'autoReplay',
-  'jwt',
-  'host',
-  'offlineQueue',
-  'offlineQueueLoader',
-  'port',
-  'queueFilter',
-  'queueMaxSize',
-  'queueTTL',
-  'reconnectionDelay',
-  'replayInterval',
-  'sslConnection'
-]) {
-  Object.defineProperty(Kuzzle.prototype, prop, {enumerable: true});
-}
-
 module.exports = Kuzzle;
