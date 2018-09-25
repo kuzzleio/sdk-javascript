@@ -341,8 +341,8 @@ class Kuzzle extends KuzzleEventEmitter {
      * a developer simply wish to verify his token
      */
     if (this.jwt !== undefined
-      && request.controller !== 'auth'
-      && request.action !== 'checkToken'
+      && !(request.controller === 'auth' 
+      && request.action === 'checkToken')
     ) {
       request.jwt = this.jwt;
     }
