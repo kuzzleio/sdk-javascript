@@ -341,8 +341,8 @@ class Kuzzle extends KuzzleEventEmitter {
      * a developer simply wish to verify his token
      */
     if (this.jwt !== undefined
-      && request.controller !== 'auth'
-      && request.action !== 'checkToken'
+      && !(request.controller === 'auth' 
+      && request.action === 'checkToken')
     ) {
       request.jwt = this.jwt;
     }
@@ -389,26 +389,6 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error(`Expected ${prop} to be a ${typestr}, ${typeof value} received`);
     }
   }
-}
-
-
-for (const prop of [
-  'autoQueue',
-  'autoReconnect',
-  'autoReplay',
-  'jwt',
-  'host',
-  'offlineQueue',
-  'offlineQueueLoader',
-  'port',
-  'queueFilter',
-  'queueMaxSize',
-  'queueTTL',
-  'reconnectionDelay',
-  'replayInterval',
-  'sslConnection'
-]) {
-  Object.defineProperty(Kuzzle.prototype, prop, {enumerable: true});
 }
 
 module.exports = Kuzzle;

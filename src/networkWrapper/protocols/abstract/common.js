@@ -1,11 +1,8 @@
 'use strict';
 
 const
-  uuidv4 = require('../../../uuidv4'),
   KuzzleEventEmitter = require('../../../eventEmitter');
 
-const
-  _id = uuidv4();
 // read-only properties
 let
   _host,
@@ -37,10 +34,6 @@ class AbstractWrapper extends KuzzleEventEmitter {
         this[opt] = options[opt];
       }
     });
-  }
-
-  get id () {
-    return _id;
   }
 
   get host () {
@@ -260,16 +253,6 @@ Discarded request: ${JSON.stringify(request)}`));
       this.send(request);
     });
   }
-}
-
-// make public getters enumerable
-for (const prop of [
-  'host',
-  'id',
-  'port',
-  'ssl'
-]) {
-  Object.defineProperty(AbstractWrapper.prototype, prop, {enumerable: true});
 }
 
 module.exports = AbstractWrapper;
