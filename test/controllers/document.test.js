@@ -256,7 +256,7 @@ describe('Document Controller', () => {
               refresh: undefined
             }, options);
 
-          should(res._id).be.equal('document-id');
+          should(res).equal('document-id');
         });
     });
 
@@ -276,7 +276,7 @@ describe('Document Controller', () => {
               refresh: true
             }, {});
 
-          should(res._id).be.equal('document-id');
+          should(res).equal('document-id');
         });
     });
   });

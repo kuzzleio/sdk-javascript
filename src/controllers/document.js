@@ -115,7 +115,7 @@ class DocumentController {
     delete options.refresh;
 
     return this.kuzzle.query(request, options)
-      .then(response => response.result);
+      .then(response => response.result._id);
   }
 
   deleteByQuery(index, collection, body = {}, options = {}) {
