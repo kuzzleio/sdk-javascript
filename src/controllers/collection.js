@@ -171,7 +171,7 @@ class CollectionController {
       .then(response => response.result);
   }
 
-  updateSpecifications (index, collection, body, options = {}) {
+  updateSpecifications (index, collection, specifications, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.collection.updateSpecifications: index is required');
     }
@@ -179,9 +179,13 @@ class CollectionController {
       throw new Error('Kuzzle.collection.updateSpecifications: collection is required');
     }
 
+    const body = {
+      [index]: {
+        [collection]: specifications
+      }
+    };
+
     return this.kuzzle.query({
-      index,
-      collection,
       body,
       controller: 'collection',
       action: 'updateSpecifications'
@@ -189,7 +193,20 @@ class CollectionController {
       .then(response => response.result);
   }
 
-  validateSpecifications (body, options = {}) {
+  validateSpecifications (index, collection, specifications, options = {}) {
+    if (!index) {
+      throw new Error('Kuzzle.collection.validateSpecifications: index is required');
+    }
+    if (!collection) {
+      throw new Error('Kuzzle.collection.validateSpecifications: collection is required');
+    }
+
+    const body = {
+      [index]: {
+        [collection]: specifications
+      }
+    };
+
     return this.kuzzle.query({
       body,
       controller: 'collection',
