@@ -179,7 +179,7 @@ class CollectionController {
       throw new Error('Kuzzle.collection.updateSpecifications: collection is required');
     }
     if (!specifications) {
-      throw new Error('Kuzzle.collection.updateSpecifications: specifications is required');
+      throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
     }
 
     const body = {
@@ -204,7 +204,7 @@ class CollectionController {
       throw new Error('Kuzzle.collection.validateSpecifications: collection is required');
     }
     if (!specifications) {
-      throw new Error('Kuzzle.collection.updateSpecifications: specifications is required');
+      throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
     }
 
     const body = {
