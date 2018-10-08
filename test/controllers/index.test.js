@@ -125,8 +125,7 @@ describe('Index Controller', () => {
   describe('list', () => {
     it('should call index/list query and return a Promise which resolves the list of available indexes', () => {
       const result = {
-        total: 3,
-        hits: ['foo', 'bar', 'baz']
+        indexes: ['foo', 'bar', 'baz']
       };
       kuzzle.query.resolves({result});
 
@@ -139,7 +138,7 @@ describe('Index Controller', () => {
               action: 'list'
             }, options);
 
-          should(res).be.equal(result);
+          should(res).be.equal(result.indexes);
         });
     });
   });
@@ -173,7 +172,7 @@ describe('Index Controller', () => {
               body: {indexes: ['foo', 'bar']}
             }, options);
 
-          should(res).be.equal(result);
+          should(res).be.equal(result.deleted);
         });
     });
   });
