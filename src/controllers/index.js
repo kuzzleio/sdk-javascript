@@ -70,7 +70,7 @@ class IndexController {
       controller: 'index',
       action: 'list'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.indexes);
   }
 
   mDelete (indexes, options) {
@@ -85,7 +85,7 @@ class IndexController {
         indexes
       }
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.deleted);
   }
 
   refresh (index, options) {
