@@ -411,17 +411,19 @@ describe('Collection Controller', () => {
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({result: {foo: 'bar'}});
 
-      const body = {foo: 'bar'};
-      return kuzzle.collection.updateSpecifications('index', 'collection', body, options)
+      const specifications = {foo: 'bar'};
+      return kuzzle.collection.updateSpecifications('index', 'collection', specifications, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
-              body,
+              body: {
+                index: {
+                  collection: specifications
+                }
+              },
               controller: 'collection',
-              action: 'updateSpecifications',
-              index: 'index',
-              collection: 'collection'
+              action: 'updateSpecifications'
             }, options);
 
           should(res).match({foo: 'bar'});
@@ -439,13 +441,17 @@ describe('Collection Controller', () => {
         }
       });
 
-      const body = {foo: 'bar'};
-      return kuzzle.collection.validateSpecifications(body, options)
+      const specifications = {foo: 'bar'};
+      return kuzzle.collection.validateSpecifications('index', 'collection', specifications, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
-              body,
+              body: {
+                index: {
+                  collection: specifications
+                }
+              },
               controller: 'collection',
               action: 'validateSpecifications'
             }, options);
