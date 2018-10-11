@@ -295,7 +295,7 @@ describe('Document Controller', () => {
     });
 
     it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
-      kuzzle.query.resolves({result: {hits: ['foo', 'bar', 'baz']}});
+      kuzzle.query.resolves({result: {ids: ['foo', 'bar', 'baz']}});
 
       return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -310,16 +310,16 @@ describe('Document Controller', () => {
               refresh: undefined
             }, options);
 
-          should(res.hits).be.an.Array();
-          should(res.hits.length).be.equal(3);
-          should(res.hits[0]).be.equal('foo');
-          should(res.hits[1]).be.equal('bar');
-          should(res.hits[2]).be.equal('baz');
+          should(res).be.an.Array();
+          should(res.length).be.equal(3);
+          should(res[0]).be.equal('foo');
+          should(res[1]).be.equal('bar');
+          should(res[2]).be.equal('baz');
         });
     });
 
     it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({result: {hits: ['foo', 'bar', 'baz']}});
+      kuzzle.query.resolves({result: {ids: ['foo', 'bar', 'baz']}});
 
       return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, {refresh: true})
         .then(res => {
@@ -334,11 +334,11 @@ describe('Document Controller', () => {
               refresh: true
             }, {});
 
-          should(res.hits).be.an.Array();
-          should(res.hits.length).be.equal(3);
-          should(res.hits[0]).be.equal('foo');
-          should(res.hits[1]).be.equal('bar');
-          should(res.hits[2]).be.equal('baz');
+          should(res).be.an.Array();
+          should(res.length).be.equal(3);
+          should(res[0]).be.equal('foo');
+          should(res[1]).be.equal('bar');
+          should(res[2]).be.equal('baz');
         });
     });
   });
