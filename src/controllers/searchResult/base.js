@@ -1,3 +1,5 @@
+let _kuzzle;
+
 class SearchResultBase {
 
   /**
@@ -8,18 +10,19 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    this.kuzzle = kuzzle;
-    this.request = request;
-    this.options = options;
-    this.response = response;
+    _kuzzle = kuzzle;
+    this._request = request;
+    this._response = response;
+    this._options = options;
 
+    this._controller = request.controller;
+    this._searchAction = 'search';
+    this._scrollAction = 'scroll';
+
+    this.aggregations = response.aggregations;
     this.hits = response.hits || [];
     this.fetched = this.hits.length;
     this.total = response.total || 0;
-
-    this.controller = request.controller;
-    this.searchAction = 'search';
-    this.scrollAction = 'scroll';
   }
 
   next () {
@@ -27,29 +30,30 @@ class SearchResultBase {
       return Promise.resolve(null);
     }
 
-    if (this.request.scroll) {
-      return this.kuzzle.query(Object.assign({}, this.request, {
-        action: this.scrollAction,
-        scrollId: this.response.scrollId
-      }), this.options)
+    if (this._request.scroll) {
+      return _kuzzle.query(Object.assign({}, this._request, {
+        action: this._scrollAction,
+        scrollId: this._response.scrollId
+      }), this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
-          this.response = result;
+          this._response = result;
+          this.aggregations = result.aggregations;
           this.hits = result.hits;
           return this;
         });
     }
 
-    if (this.request.size && this.request.sort) {
+    if (this._request.size && this._request.sort) {
       const
-        request = Object.assign({}, this.request, {
-          action: this.searchAction,
+        request = Object.assign({}, this._request, {
+          action: this._searchAction,
           search_after: []
         }),
-        hit = this.response.hits && this.response.hits[this.response.hits.length -1];
+        hit = this._response.hits && this._response.hits[this._response.hits.length -1];
 
-      for (const sort of this.request.sort) {
+      for (const sort of this._request.sort) {
         if (typeof sort === 'string') {
           request.search_after.push(hit._source[sort]);
         }
@@ -58,29 +62,31 @@ class SearchResultBase {
         }
       }
 
-      return this.kuzzle.query(request, this.options)
+      return _kuzzle.query(request, this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
-          this.response = result;
+          this._response = result;
+          this.aggregations = result.aggregations;
           this.hits = result.hits;
           return this;
         });
     }
 
-    if (this.request.from && this.request.size) {
-      if (this.request.from >= this.response.total) {
+    if (this._request.from && this._request.size) {
+      if (this._request.from >= this._response.total) {
         return Promise.resolve(null);
       }
 
-      return this.kuzzle.query(Object.assign({}, this.request, {
-        action: this.searchAction,
+      return _kuzzle.query(Object.assign({}, this._request, {
+        action: this._searchAction,
         from: this.fetched
-      }), this.options)
+      }), this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
-          this.response = result;
+          this._response = result;
+          this.aggregations = result.aggregations;
           this.hits = result.hits;
           return this;
         });

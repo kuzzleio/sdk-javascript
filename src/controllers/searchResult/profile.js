@@ -7,9 +7,9 @@ class ProfileSearchResult extends SearchResultBase {
   constructor (kuzzle, request, options, response) {
     super(kuzzle, request, options, response);
 
-    this.searchAction = 'searchProfiles';
-    this.scrollAction = 'scrollProfiles';
-    this.hits = response.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
+    this._searchAction = 'searchProfiles';
+    this._scrollAction = 'scrollProfiles';
+    this.hits = response.hits.map(hit => new Profile(this._kuzzle, hit._id, hit._source.policies));
   }
 
   next () {
@@ -19,7 +19,7 @@ class ProfileSearchResult extends SearchResultBase {
           return result;
         }
 
-        this.hits = this.response.hits.map(hit => new Profile(this.kuzzle, hit._id, hit._source.policies));
+        this.hits = this._response.hits.map(hit => new Profile(this._kuzzle, hit._id, hit._source.policies));
         return this;
       });
   }

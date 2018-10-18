@@ -1398,8 +1398,8 @@ describe('Security Controller', () => {
             }, options);
 
           should(res).be.an.instanceOf(ProfileSearchResult);
-          should(res.options).be.equal(options);
-          should(res.response).be.equal(result);
+          should(res._options).be.equal(options);
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1429,8 +1429,8 @@ describe('Security Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(ProfileSearchResult);
-          should(res.options).be.empty();
-          should(res.response).be.equal(result);
+          should(res._options).be.empty();
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });
@@ -1462,8 +1462,8 @@ describe('Security Controller', () => {
             }, options);
 
           should(res).be.an.instanceOf(RoleSearchResult);
-          should(res.options).be.equal(options);
-          should(res.response).be.equal(result);
+          should(res._options).be.equal(options);
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1492,8 +1492,8 @@ describe('Security Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(RoleSearchResult);
-          should(res.options).be.empty();
-          should(res.response).be.equal(result);
+          should(res._options).be.empty();
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });
@@ -1526,8 +1526,8 @@ describe('Security Controller', () => {
             }, options);
 
           should(res).be.an.instanceOf(UserSearchResult);
-          should(res.options).be.equal(options);
-          should(res.response).be.equal(result);
+          should(res._options).be.equal(options);
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1557,8 +1557,8 @@ describe('Security Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(UserSearchResult);
-          should(res.options).be.empty();
-          should(res.response).be.equal(result);
+          should(res._options).be.empty();
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });

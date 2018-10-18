@@ -36,18 +36,17 @@ describe('SpecificationsSearchResult', () => {
 
       searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
 
-      should(searchResult.kuzzle).be.equal(kuzzle);
-      should(searchResult.request).be.equal(request);
-      should(searchResult.options).be.equal(options);
-      should(searchResult.response).be.equal(response);
+      should(searchResult._request).be.equal(request);
+      should(searchResult._options).be.equal(options);
+      should(searchResult._response).be.equal(response);
 
       should(searchResult.hits).be.equal(response.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
 
-      should(searchResult.controller).be.equal('collection');
-      should(searchResult.searchAction).be.equal('searchSpecifications');
-      should(searchResult.scrollAction).be.equal('scrollSpecifications');
+      should(searchResult._controller).be.equal('collection');
+      should(searchResult._searchAction).be.equal('searchSpecifications');
+      should(searchResult._scrollAction).be.equal('scrollSpecifications');
     });
   });
 
@@ -133,11 +132,11 @@ describe('SpecificationsSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });
@@ -187,11 +186,11 @@ describe('SpecificationsSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });
@@ -252,11 +251,11 @@ describe('SpecificationsSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
           });
       });

@@ -38,18 +38,17 @@ describe('DocumentSearchResult', () => {
 
       searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
-      should(searchResult.kuzzle).be.equal(kuzzle);
-      should(searchResult.request).be.equal(request);
-      should(searchResult.options).be.equal(options);
-      should(searchResult.response).be.equal(response);
+      should(searchResult._request).be.equal(request);
+      should(searchResult._options).be.equal(options);
+      should(searchResult._response).be.equal(response);
 
       should(searchResult.hits).be.equal(response.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
 
-      should(searchResult.controller).be.equal('document');
-      should(searchResult.searchAction).be.equal('search');
-      should(searchResult.scrollAction).be.equal('scroll');
+      should(searchResult._controller).be.equal('document');
+      should(searchResult._searchAction).be.equal('search');
+      should(searchResult._scrollAction).be.equal('scroll');
     });
   });
 
@@ -98,6 +97,7 @@ describe('DocumentSearchResult', () => {
           {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz'}},
           {_id: 'document4', _score: 0.6123, _source: {foo: 'bazbar'}}
         ],
+        aggregations: 'nextAggregations',
         total: 30
       };
 
@@ -110,6 +110,7 @@ describe('DocumentSearchResult', () => {
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
             {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
           ],
+          aggregations: 'aggregations',
           total: 30
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
@@ -137,12 +138,14 @@ describe('DocumentSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
+        should(searchResult.aggregations).equal(response.aggregations);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
+            should(searchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });
@@ -153,6 +156,7 @@ describe('DocumentSearchResult', () => {
           {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz', bar: 4567}},
           {_id: 'document4', _score: 0.6123, _source: {foo: 'bazbar', bar: 6789}}
         ],
+        aggregations: 'nextAggregations',
         total: 30
       };
 
@@ -165,6 +169,7 @@ describe('DocumentSearchResult', () => {
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar', bar: 1234}},
             {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar', bar: 2345}}
           ],
+          aggregations: 'aggregations',
           total: 30
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
@@ -193,12 +198,14 @@ describe('DocumentSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
+        should(searchResult.aggregations).equal(response.aggregations);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
+            should(searchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });
@@ -209,6 +216,7 @@ describe('DocumentSearchResult', () => {
           {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz', bar: 4567}},
           {_id: 'document4', _score: 0.6123, _source: {foo: 'bazbar', bar: 6789}}
         ],
+        aggregations: 'nextAggregations',
         total: 30
       };
 
@@ -221,6 +229,7 @@ describe('DocumentSearchResult', () => {
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar', bar: 1234}},
             {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar', bar: 2345}}
           ],
+          aggregations: 'aggregations',
           total: 30
         };
         searchResult = new DocumentSearchResult(kuzzle, request, options, response);
@@ -260,12 +269,14 @@ describe('DocumentSearchResult', () => {
 
       it('should set the response and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult.response).be.equal(response);
+        should(searchResult._response).be.equal(response);
+        should(searchResult.aggregations).be.equal(response.aggregations);
         return searchResult.next()
           .then(() => {
             should(searchResult.fetched).be.equal(4);
-            should(searchResult.response).be.equal(nextResponse);
+            should(searchResult._response).be.equal(nextResponse);
             should(searchResult.hits).be.equal(nextResponse.hits);
+            should(searchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });

@@ -12,8 +12,8 @@ class DocumentsSearchResult extends SearchResultBase {
   constructor (kuzzle, query, options, response) {
     super(kuzzle, query, options, response);
 
-    this.searchAction = 'search';
-    this.scrollAction = 'scroll';
+    this._searchAction = 'search';
+    this._scrollAction = 'scroll';
   }
 }
 

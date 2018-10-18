@@ -1021,8 +1021,8 @@ describe('Document Controller', () => {
             }, options);
 
           should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res.options).be.equal(options);
-          should(res.response).be.equal(result);
+          should(res._options).be.equal(options);
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1057,8 +1057,8 @@ describe('Document Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res.options).be.empty();
-          should(res.response).be.equal(result);
+          should(res._options).be.empty();
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1092,8 +1092,8 @@ describe('Document Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res.options).be.empty();
-          should(res.response).be.equal(result);
+          should(res._options).be.empty();
+          should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });
