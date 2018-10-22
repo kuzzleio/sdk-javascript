@@ -17,7 +17,7 @@ class BulkController {
         bulkData: data
       }
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.hits);
   }
 
 }

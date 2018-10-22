@@ -34,10 +34,10 @@ describe('Bulk Controller', () => {
               action: 'import'
             }, options);
 
-          should(res).match({hits: [
+          should(res).match([
             {create: {_id: 'foo'}, status: 200},
             {update: {_id: 'bar'}, status: 200}
-          ]});
+          ]);
         });
     });
   });
