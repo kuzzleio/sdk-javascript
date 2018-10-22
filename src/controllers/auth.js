@@ -228,7 +228,7 @@ class AuthController {
       controller: 'auth',
       action: 'updateSelf'
     }, options)
-      .then(response => response.result);
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   /**
