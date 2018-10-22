@@ -309,7 +309,7 @@ describe('Collection Controller', () => {
             }, {foo: 'bar'});
 
           should(res).be.an.instanceOf(SpecificationsSearchResult);
-          should(res.request).match({
+          should(res._request).match({
             controller: 'collection',
             action: 'searchSpecifications',
             body,
@@ -317,8 +317,8 @@ describe('Collection Controller', () => {
             size: 42,
             scroll: 'scroll'
           });
-          should(res.options).match({foo: 'bar'});
-          should(res.response).match({
+          should(res._options).match({foo: 'bar'});
+          should(res._response).match({
             hits: [
               {foo: 'bar'},
               {bar: 'foo'}

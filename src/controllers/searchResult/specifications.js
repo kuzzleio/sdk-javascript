@@ -5,9 +5,9 @@ class SpecificationsSearchResult extends SearchResultBase {
   constructor (kuzzle, query, options, response) {
     super(kuzzle, query, options, response);
 
-    this.controller = 'collection';
-    this.searchAction = 'searchSpecifications';
-    this.scrollAction = 'scrollSpecifications';
+    this._controller = 'collection';
+    this._searchAction = 'searchSpecifications';
+    this._scrollAction = 'scrollSpecifications';
   }
 }
 

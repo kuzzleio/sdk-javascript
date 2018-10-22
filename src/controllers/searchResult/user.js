@@ -7,9 +7,9 @@ class UserSearchResult extends SearchResultBase {
   constructor (kuzzle, query, options, response) {
     super(kuzzle, query, options, response);
 
-    this.searchAction = 'searchUsers';
-    this.scrollAction = 'scrollUsers';
-    this.hits = this.response.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
+    this._searchAction = 'searchUsers';
+    this._scrollAction = 'scrollUsers';
+    this.hits = this._response.hits.map(hit => new User(this._kuzzle, hit._id, hit._source, hit._meta));
   }
 
   next () {
@@ -19,7 +19,7 @@ class UserSearchResult extends SearchResultBase {
           return result;
         }
 
-        this.hits = this.response.hits.map(hit => new User(this.kuzzle, hit._id, hit._source, hit._meta));
+        this.hits = this._response.hits.map(hit => new User(this._kuzzle, hit._id, hit._source, hit._meta));
         return this;
       });
   }
