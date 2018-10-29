@@ -348,6 +348,35 @@ describe('HTTP networking module', () => {
 
       network.send(data);
     });
+
+    it('should not add null or undefined arguments to the query args', done => {
+      const data = {
+        requestId: 'requestId',
+        controller: 'foo',
+        action: 'bar',
+        _id: null,
+        toto: undefined
+      };
+
+      network.on('requestId', () => {
+        try {
+          should(network._sendHttpRequest).be.calledOnce();
+          should(network._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(network._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            controller: 'foo',
+            action: 'bar'
+          });
+
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
+
+      network.send(data);
+    });
+
   });
 
   describe('#sendHttpRequest NodeJS', () => {
