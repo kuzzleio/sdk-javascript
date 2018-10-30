@@ -61,14 +61,14 @@ describe('Realtime Controller', () => {
     it('should throw an error if the "body" argument is not provided', () => {
       should(function () {
         kuzzle.realtime.publish('index', 'collection', undefined, options);
-      }).throw('Kuzzle.realtime.publish: body is required');
+      }).throw('Kuzzle.realtime.publish: message is required');
     });
 
     it('should call realtime/publish query with the index, collection and body and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {published: true}});
 
       return kuzzle.realtime.publish('index', 'collection', {foo: 'bar'}, options)
-        .then(res => {
+        .then(published => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
@@ -79,7 +79,7 @@ describe('Realtime Controller', () => {
               body: {foo: 'bar'}
             }, options);
 
-          should(res.published).be.a.Boolean().and.be.true();
+          should(published).be.a.Boolean().and.be.true();
         });
     });
   });
@@ -129,7 +129,7 @@ describe('Realtime Controller', () => {
     it('should throw an error if the "body" argument is not provided', () => {
       should(function () {
         kuzzle.realtime.subscribe('index', 'collection', undefined, sinon.stub(), options);
-      }).throw('Kuzzle.realtime.subscribe: body is required');
+      }).throw('Kuzzle.realtime.subscribe: filters is required');
     });
 
     it('should throw an error if the "callback" argument is not provided', () => {
