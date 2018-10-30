@@ -33,14 +33,6 @@ class RealTimeController {
       .then(response => response.result.count);
   }
 
-  list (options = {}) {
-    return this.kuzzle.query({
-      controller: 'realtime',
-      action: 'list'
-    }, options)
-      .then(response => response.result);
-  }
-
   publish (index, collection, message, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.realtime.publish: index is required');
@@ -115,28 +107,6 @@ class RealTimeController {
         return response.result;
       });
   }
-
-  validate (index, collection, document, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.realtime.validate: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.realtime.validate: collection is required');
-    }
-    if (!document) {
-      throw new Error('Kuzzle.realtime.validate: document is required');
-    }
-
-    return this.kuzzle.query({
-      index,
-      collection,
-      body: document,
-      controller: 'realtime',
-      action: 'validate'
-    }, options)
-      .then(response => response.result);
-  }
-
 }
 
 module.exports = RealTimeController;

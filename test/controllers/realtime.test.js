@@ -45,40 +45,6 @@ describe('Realtime Controller', () => {
     });
   });
 
-  describe('#list', () => {
-    it('should call realtime/lsit query and return a Promise which resolves json', () => {
-      const result = {
-        foo: {
-          bar: {
-            afbfc7fde06bde6bb757d077f62722d1: 12,
-            a31fa5eee8f466714c4f643d6eb96f2f: 4
-          },
-          baz: {
-            b589ad149a0f499ffd0c0d03d8b7e9db: 1
-          }
-        },
-        bar: {
-          foo: {
-            bedf9581d24f0772490f0cd95d9646a8: 42
-          }
-        }
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.realtime.list(options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'realtime',
-              action: 'list'
-            }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-  });
-
   describe('#publish', () => {
     it('should throw an error if the "index" argument is not provided', () => {
       should(function () {
@@ -291,49 +257,6 @@ describe('Realtime Controller', () => {
             }, options);
 
           should(res).be.equal(roomId);
-        });
-    });
-  });
-
-  describe('validate', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.validate(undefined, 'collection', {foo: 'bar'}, options);
-      }).throw('Kuzzle.realtime.validate: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.validate('index', undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.realtime.validate: collection is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.validate('index', 'collection', undefined, options);
-      }).throw('Kuzzle.realtime.validate: document is required');
-    });
-
-    it('should call realtime/validate query and return a Promise which resolves the validation result', () => {
-      const result = {
-        errorMessages: {},
-        valid: true
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.realtime.validate('index', 'collection', {foo: 'bar'}, options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'realtime',
-              action: 'validate',
-              index: 'index',
-              collection: 'collection',
-              body: {foo: 'bar'}
-            }, options);
-
-          should(res).be.equal(result);
         });
     });
   });
