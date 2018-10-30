@@ -162,7 +162,7 @@ describe('DocumentSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['foo', {bar: 'asc'}, {_id: 'desc'}];
+        request.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
 
         response = {
           hits: [
@@ -189,7 +189,7 @@ describe('DocumentSearchResult', () => {
                 controller: 'document',
                 action: 'search',
                 size: 2,
-                sort: ['foo', {bar: 'asc'}, {_id: 'desc'}],
+                sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
                 search_after: ['barbar', 2345, 'document2']
               }, options);
             should(res).be.equal(searchResult);
