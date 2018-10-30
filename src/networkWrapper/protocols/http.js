@@ -150,7 +150,7 @@ class HttpWrapper extends AbtractWrapper {
       else if (payload.hasOwnProperty(key)) {
         payload[key] = value;
       }
-      else {
+      else if (value !== undefined && value !== null) {
         queryArgs[key] = value;
       }
     }
