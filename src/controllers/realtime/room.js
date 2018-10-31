@@ -71,7 +71,7 @@ class Room {
   }
 
   _channelListener (data) {
-    const fromSelf = data.volatile !== undefined && data.volatile.sdkInstanceId === this.kuzzle.network.id;
+    const fromSelf = data.volatile && data.volatile.sdkInstanceId === this.kuzzle.network.id;
     if (this.subscribeToSelf || !fromSelf) {
       this.callback(data);
     }
