@@ -311,18 +311,20 @@ Room.prototype.setHeaders = function (content, replace) {
  * @returns {*}
  */
 function notificationCallback (data) {
+  var notificationData = Object.assign({}, data);
+
   if (data.type === 'TokenExpired') {
     this.kuzzle.jwtToken = undefined;
     return this.kuzzle.emitEvent('tokenExpired');
   }
 
-  if (data.type === 'document') {
-    data.document = new Document(this.collection, data.result._id, data.result._source, data.result._meta);
-    delete data.result;
+  if (notificationData.type === 'document') {
+    notificationData.document = new Document(this.collection, notificationData.result._id, notificationData.result._source, notificationData.result._meta);
+    delete notificationData.result;
   }
 
-  if (this.subscribeToSelf || !data.volatile || data.volatile.sdkInstanceId !== this.kuzzle.id) {
-    this.callback(null, data);
+  if (this.subscribeToSelf || !notificationData.volatile || notificationData.volatile.sdkInstanceId !== this.kuzzle.id) {
+    this.callback(null, notificationData);
   }
 }
 
