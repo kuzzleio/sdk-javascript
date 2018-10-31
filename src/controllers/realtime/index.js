@@ -73,12 +73,12 @@ class RealTimeController {
     const room = new Room(this.kuzzle, index, collection, filters, callback, options);
 
     return room.subscribe()
-      .then(response => {
+      .then(() => {
         if (!this.subscriptions[room.id]) {
           this.subscriptions[room.id] = [];
         }
         this.subscriptions[room.id].push(room);
-        return response.result;
+        return room.id;
       });
   }
 
