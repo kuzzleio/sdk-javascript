@@ -374,6 +374,33 @@ describe('Room methods', function () {
         .be.an.instanceOf(Document);
     });
 
+    it('should not alter the notification data', function () {
+      var
+        data = {
+          controller: 'document',
+          type: 'document',
+          result: {
+            _id: 'id',
+            _source: {
+              foo: 'bar'
+            }
+          }
+        };
+
+      notifCB.call(room, data);
+
+      should(data).match({
+        controller: 'document',
+        type: 'document',
+        result: {
+          _id: 'id',
+          _source: {
+            foo: 'bar'
+          }
+        }
+      });
+    });
+
     it('should handle realtime publish notifications', function () {
       notifCB.call(room, {
         controller: 'realtime',
