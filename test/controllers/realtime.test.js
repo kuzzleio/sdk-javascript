@@ -157,7 +157,7 @@ describe('Realtime Controller', () => {
           should(room.callback).be.equal(cb);
           should(room.options).be.equal(options);
           should(room.subscribe).be.calledOnce();
-          should(res).be.equal(subscribeResponse.result);
+          should(res).be.equal(subscribeResponse.result.roomId);
         });
     });
 
