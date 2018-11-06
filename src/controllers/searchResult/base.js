@@ -1,5 +1,3 @@
-const _get = require('lodash.get');
-
 let _kuzzle;
 
 class SearchResultBase {
@@ -59,8 +57,8 @@ class SearchResultBase {
           ? sort
           : Object.keys(sort)[0];
         const value = key === '_uid'
-          ? hit._id
-          : _get(hit._source, key);
+          ? this._request.collection + '#' + hit._id
+          : this._get(hit._source, key.split('.'));
 
         request.search_after.push(value);
       }
@@ -95,6 +93,19 @@ class SearchResultBase {
     }
 
     throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+  }
+
+  _get (object, path) {
+    if (!object) {
+      return object;
+    }
+
+    if (path.length === 1) {
+      return object[path[0]];
+    }
+
+    const key = path.shift();
+    return this._get(object[key], path);
   }
 
 }
