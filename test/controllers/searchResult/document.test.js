@@ -190,7 +190,7 @@ describe('DocumentSearchResult', () => {
                 action: 'search',
                 size: 2,
                 sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
-                search_after: ['barbar', 2345, 'document2']
+                search_after: ['barbar', 2345, 'collection#document2']
               }, options);
             should(res).be.equal(searchResult);
           });

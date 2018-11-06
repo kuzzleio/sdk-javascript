@@ -27,7 +27,6 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "lodash.get": "^4.4.2",
     "min-req-promise": "^1.0.1",
     "uws": "10.148.0"
   },
