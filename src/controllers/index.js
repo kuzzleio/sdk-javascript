@@ -36,7 +36,7 @@ class IndexController {
       controller: 'index',
       action : 'delete'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.acknowledged);
   }
 
   exists (index, options) {
@@ -98,7 +98,7 @@ class IndexController {
       controller: 'index',
       action: 'refresh'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result._shards);
   }
 
   refreshInternal (options) {
@@ -106,7 +106,7 @@ class IndexController {
       controller: 'index',
       action: 'refreshInternal'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.acknowledged);
   }
 
   setAutoRefresh (index, autoRefresh, options) {
@@ -126,7 +126,7 @@ class IndexController {
         autoRefresh
       }
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.response);
   }
 }
 
