@@ -29,7 +29,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         query: {
-          only: /^src/,
+          only: [/^src/],
           presets: [
             ['env', {
               debug: true,
