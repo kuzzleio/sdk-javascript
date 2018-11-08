@@ -44,8 +44,7 @@ class SearchResultBase {
           return this;
         });
     }
-
-    if (this._request.size && this._request.sort) {
+    else if (this._request.size && this._request.sort) {
       const
         request = Object.assign({}, this._request, {
           action: this._searchAction,
@@ -54,12 +53,14 @@ class SearchResultBase {
         hit = this._response.hits && this._response.hits[this._response.hits.length -1];
 
       for (const sort of this._request.sort) {
-        if (typeof sort === 'string') {
-          request.search_after.push(hit._source[sort]);
-        }
-        else {
-          request.search_after.push(hit._source[Object.keys(sort)[0]]);
-        }
+        const key = typeof sort === 'string'
+          ? sort
+          : Object.keys(sort)[0];
+        const value = key === '_uid'
+          ? this._request.collection + '#' + hit._id
+          : this._get(hit._source, key.split('.'));
+
+        request.search_after.push(value);
       }
 
       return _kuzzle.query(request, this._options)
@@ -72,8 +73,7 @@ class SearchResultBase {
           return this;
         });
     }
-
-    if (this._request.from && this._request.size) {
+    else if (this._request.size) {
       if (this._request.from >= this._response.total) {
         return Promise.resolve(null);
       }
@@ -94,6 +94,21 @@ class SearchResultBase {
 
     throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
   }
+
+  _get (object, path) {
+    if (!object) {
+      return object;
+    }
+
+    if (path.length === 1) {
+      return object[path[0]];
+    }
+
+    const key = path.shift();
+    return this._get(object[key], path);
+  }
+
 }
+
 
 module.exports = SearchResultBase;
