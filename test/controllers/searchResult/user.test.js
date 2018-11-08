@@ -133,10 +133,8 @@ describe('UserSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
                 controller: 'security',
                 action: 'scrollUsers',
-                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(res).be.equal(searchResult);

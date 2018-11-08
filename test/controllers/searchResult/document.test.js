@@ -124,12 +124,8 @@ describe('DocumentSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                index: 'index',
-                collection: 'collection',
-                body: {foo: 'bar'},
                 controller: 'document',
                 action: 'scroll',
-                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(res).be.equal(searchResult);

@@ -31,10 +31,11 @@ class SearchResultBase {
     }
 
     if (this._request.scroll) {
-      return _kuzzle.query(Object.assign({}, this._request, {
+      return _kuzzle.query({
+        controller: this._request.controller,
         action: this._scrollAction,
         scrollId: this._response.scrollId
-      }), this._options)
+      }, this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
