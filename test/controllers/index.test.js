@@ -67,7 +67,7 @@ describe('Index Controller', () => {
               index: 'index'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.a.Boolean().and.be.true();
         });
     });
   });
@@ -204,7 +204,7 @@ describe('Index Controller', () => {
               index: 'index'
             }, options);
 
-          should(res).be.equal(result);
+          should(res).be.equal(result._shards);
         });
     });
   });
@@ -224,7 +224,7 @@ describe('Index Controller', () => {
               action: 'refreshInternal'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.a.Boolean().and.be.true();
         });
     });
   });
@@ -237,7 +237,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/setAutoRefresh query to enable autorefresh and return a Promise which resolves true', () => {
-      kuzzle.query.resolves({result: true});
+      kuzzle.query.resolves({result: { response: true }});
 
       return kuzzle.index.setAutoRefresh('index', true, options)
         .then(res => {
@@ -255,7 +255,7 @@ describe('Index Controller', () => {
     });
 
     it('should call index/setAutoRefresh query to disable autorefresh and return a Promise which resolves false', () => {
-      kuzzle.query.resolves({result: false});
+      kuzzle.query.resolves({result: { response: false }});
 
       return kuzzle.index.setAutoRefresh('index', false, options)
         .then(res => {

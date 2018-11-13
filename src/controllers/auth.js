@@ -83,7 +83,7 @@ class AuthController {
       controller: 'auth',
       action: 'deleteMyCredentials'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result.acknowledged);
   }
 
   /**

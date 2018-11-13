@@ -124,12 +124,8 @@ describe('DocumentSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                index: 'index',
-                collection: 'collection',
-                body: {foo: 'bar'},
                 controller: 'document',
                 action: 'scroll',
-                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(res).be.equal(searchResult);
@@ -162,7 +158,7 @@ describe('DocumentSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['foo', {bar: 'asc'}];
+        request.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
 
         response = {
           hits: [
@@ -189,8 +185,8 @@ describe('DocumentSearchResult', () => {
                 controller: 'document',
                 action: 'search',
                 size: 2,
-                sort: ['foo', {bar: 'asc'}],
-                search_after: ['barbar', 2345]
+                sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
+                search_after: ['barbar', 2345, 'collection#document2']
               }, options);
             should(res).be.equal(searchResult);
           });

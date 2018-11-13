@@ -106,7 +106,7 @@ describe('Auth Controller', () => {
               action: 'deleteMyCredentials'
             }, options);
 
-          should(res).match({acknowledged: true});
+          should(res).be.exactly(true);
         });
     });
   });
