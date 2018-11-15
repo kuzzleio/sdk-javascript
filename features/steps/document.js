@@ -27,6 +27,16 @@ When('I count how many documents there is in the collection', async function () 
   this.content = await this.kuzzle.document.count(this.index, this.collection, {});
 });
 
+When('I create a document in {string}', async function (collection) {
+  this.content = await this.kuzzle.document.create(
+    this.index,
+    this.collection,
+    'some-id',
+    {a: 'document'},
+    {refresh: true}
+  );
+});
+
 When('I create a document with id {string}', async function (id) {
   this.ids = [id];
 
@@ -221,6 +231,15 @@ When('I update a document with id {string}', async function (id) {
   catch (error) {
     this.error = error;
   }
+});
+
+When('I update the document with id {string} and content {string} = {string}', async function (id, key, val) {
+  this.content = await this.kuzzle.document.update(
+    this.index,
+    this.collection,
+    id,
+    {[key]: val}
+  );
 });
 
 When('I update the documents [{string}, {string}]', async function (id1, id2) {

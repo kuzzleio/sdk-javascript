@@ -11,7 +11,11 @@ class World {
 
     this.content = null;
     this.error = null;
-    this.success = false;
+    this.notifications = [];
+
+    this.callback = notification => {
+      this.notifications.push(notification);
+    };
   }
 
 }

@@ -11,6 +11,7 @@ BeforeAll(function () {
   this.index = null;
   this.collection = null;
   this.ids = [];
+  this.notifications = [];
 
   this.content = null;
   this.error = null;
