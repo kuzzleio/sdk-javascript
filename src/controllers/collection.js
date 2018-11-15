@@ -194,7 +194,7 @@ class CollectionController {
       controller: 'collection',
       action: 'updateSpecifications'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result[index][collection]);
   }
 
   validateSpecifications (index, collection, specifications, options = {}) {

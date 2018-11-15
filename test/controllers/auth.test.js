@@ -317,7 +317,7 @@ describe('Auth Controller', () => {
   });
 
   describe('updateSelf', () => {
-    it('should call auth/updateSelf query with the user content and return a Promise which resolves a json object', () => {
+    it('should call auth/updateSelf query with the user content and return a Promise which resolves a User object', () => {
       const body = {foo: 'bar'};
 
       kuzzle.query.resolves({
@@ -328,7 +328,7 @@ describe('Auth Controller', () => {
       });
 
       return kuzzle.auth.updateSelf(body, options)
-        .then(res => {
+        .then(user => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
@@ -337,7 +337,9 @@ describe('Auth Controller', () => {
               body
             }, options);
 
-          should(res).match({_id: 'kuid', _source: {foo: 'bar'}});
+          should(user).be.an.instanceOf(User);
+          should(user._id).eql('kuid');
+          should(user.content).eql({foo: 'bar'});
         });
     });
   });
