@@ -6,8 +6,21 @@ Given('Kuzzle Server is running', function () {
 });
 
 
+Then('I get an error', function () {
+  should(this.error).not.be.null();
+});
+
 Then('I get a partial error', function () {
   should(this.error.status).eql(206);
+});
+
+Then('I get {string} and {string}', function (string1, string2) {
+  should(this.content).be.an.Array();
+  should(this.content.length).eql(2);
+
+  for (const val of [string1, string2]) {
+    should(this.content.indexOf(val)).be.greaterThanOrEqual(0);
+  }
 });
 
 Then('I should have no partial error', function () {
