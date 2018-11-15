@@ -8,6 +8,8 @@ class World {
     this.index = null;
     this.collection = null;
     this.ids = [];
+    this.user = null;
+    this.jwt = null;
 
     this.content = null;
     this.error = null;

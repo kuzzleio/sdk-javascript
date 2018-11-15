@@ -11,10 +11,12 @@ BeforeAll(function () {
   this.index = null;
   this.collection = null;
   this.ids = [];
-  this.notifications = [];
+  this.user = null;
+  this.jwt = null;
 
   this.content = null;
   this.error = null;
+  this.notifications = [];
 });
 
 AfterAll(async function () {

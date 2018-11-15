@@ -6,8 +6,12 @@ Given('Kuzzle Server is running', function () {
 });
 
 
-Then('I get an error', function () {
+Then(/^I get an error(?: with status (.*))?$/, function (status) {
   should(this.error).not.be.null();
+
+  if (status) {
+    should(this.error.status).eql(parseInt(status));
+  }
 });
 
 Then('I get a partial error', function () {
@@ -32,6 +36,10 @@ Then('I should have no partial error', function () {
 
 Then('the content should not be null', function () {
   should(this.content).not.be.null();
+});
+
+Then(/^the response '(.*)' field contains the pair '(.*)':'(.*)'$/, function (field, key, val) {
+  should(this.content[field][key]).eql(val);
 });
 
 Then(/^I shall receive (.*?)$/, function (what) {
