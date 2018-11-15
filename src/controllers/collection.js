@@ -148,7 +148,8 @@ class CollectionController {
       index,
       collection,
       controller: 'collection',
-      action: 'truncate'
+      action: 'truncate',
+      refresh: options.refresh
     }, options)
       .then(response => response.result);
   }
