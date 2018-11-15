@@ -410,7 +410,7 @@ describe('Collection Controller', () => {
     });
 
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({result: {foo: 'bar'}});
+      kuzzle.query.resolves({result: { index: { collection: {foo: 'bar'}}}});
 
       const specifications = {foo: 'bar'};
       return kuzzle.collection.updateSpecifications('index', 'collection', specifications, options)
