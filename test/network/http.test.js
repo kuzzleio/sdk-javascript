@@ -15,6 +15,10 @@ describe('HTTP networking module', () => {
   });
 
   describe('#constructor', () => {
+    it('should expose an unique identifier', () => {
+      should(network.id).be.a.String();
+    });
+
     it('should initialize http network with default routes', () => {
       should(network.http.routes).match({
         auth: {
