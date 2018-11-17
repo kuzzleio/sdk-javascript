@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  uuidv4 = require('../../../uuidv4'),
   KuzzleEventEmitter = require('../../../eventEmitter');
 
 // read-only properties
@@ -18,6 +19,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
     _port = typeof options.port === 'number' ? options.port : 7512;
     _ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
+    this.id = uuidv4();
     this.autoReplay = false;
     this.autoQueue = false;
     this.offlineQueue = [];
