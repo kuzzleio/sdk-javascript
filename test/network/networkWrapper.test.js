@@ -1,4 +1,4 @@
-var
+const
   should = require('should'),
   WS = require('../../src/networkWrapper/protocols/websocket'),
   SocketIO = require('../../src/networkWrapper/protocols/socketio'),

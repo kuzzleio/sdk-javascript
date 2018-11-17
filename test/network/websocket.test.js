@@ -18,8 +18,8 @@ describe('WebSocket networking module', () => {
     };
 
     window = 'foobar'; // eslint-disable-line
-    WebSocket = function () { // eslint-disable-line
-      wsargs = Array.prototype.slice.call(arguments);
+    WebSocket = function (...args) { // eslint-disable-line
+      wsargs = args;
       return clientStub;
     };
 
@@ -35,6 +35,10 @@ describe('WebSocket networking module', () => {
     clock.restore();
     WebSocket = undefined; // eslint-disable-line
     window = undefined; // eslint-disable-line
+  });
+
+  it('should expose an unique identifier', () => {
+    should(websocket.id).be.a.String();
   });
 
   it('should initialize network status when connecting', () => {
