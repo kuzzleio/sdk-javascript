@@ -127,7 +127,7 @@ const
     sismember: {getter: true, required: ['_id', 'member'], mapResults: Boolean},
     smembers: getId,
     smove: {required: ['_id', 'destination', 'member'], mapResults: Boolean},
-    sort: {getter: true, required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
+    sort: {required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
     spop: {required: ['_id'], opts: ['count'], mapResults: mapStringToArray },
     srandmember: {getter: true, required: ['_id'], opts: ['count'], mapResults: mapStringToArray},
     srem: {required: ['_id', 'members']},

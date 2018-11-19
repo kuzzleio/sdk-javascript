@@ -45,12 +45,11 @@ describe('SocketIO networking module', () => {
           }
         }
       },
-      emit: function(evt) {
-        let i;
+      emit: function(...args) {
+        const evt = args.shift();
 
-        const args = Array.prototype.slice.call(arguments, 1);
         if (socketStub.eventOnce[evt]) {
-          for (i in socketStub.eventOnce[evt]) {
+          for (const i in socketStub.eventOnce[evt]) {
             if (typeof socketStub.eventOnce[evt][i] === 'function') {
               socketStub.eventOnce[evt][i].apply(socketIO, args);
               delete socketStub.eventOnce[evt][i];
@@ -58,7 +57,7 @@ describe('SocketIO networking module', () => {
           }
         }
         if (socketStub.events[evt]) {
-          for (i in socketStub.events[evt]) {
+          for (const i in socketStub.events[evt]) {
             if (typeof socketStub.events[evt][i] === 'function') {
               socketStub.events[evt][i].apply(socketIO, args);
             }
@@ -81,6 +80,10 @@ describe('SocketIO networking module', () => {
 
   afterEach(() => {
     clock.restore();
+  });
+
+  it('should expose an unique identifier', () => {
+    should(socketIO.id).be.a.String();
   });
 
   it('should initialize network status when connecting', () => {
