@@ -140,6 +140,29 @@ class DocumentController {
       .then(response => response.result.ids);
   }
 
+  exists (index, collection, _id, options = {}) {
+    if (!index) {
+      throw new Error('Kuzzle.document.get: index is required');
+    }
+    if (!collection) {
+      throw new Error('Kuzzle.document.get: collection is required');
+    }
+    if (!_id) {
+      throw new Error('Kuzzle.document.get: _id is required');
+    }
+
+    const request = {
+      index,
+      collection,
+      _id,
+      controller: 'document',
+      action: 'exists'
+    };
+
+    return this.kuzzle.query(request, options)
+      .then(response => response.result);
+  }
+
   get (index, collection, _id, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.document.get: index is required');
