@@ -17,6 +17,8 @@ addons:
 
 before_install:
   - export CC="gcc-4.9" CXX="g++-4.9"
+  - sudo sysctl -w vm.max_map_count=262144
+  - ./.ci/start_kuzzle.sh
 
 install:
   - npm install
