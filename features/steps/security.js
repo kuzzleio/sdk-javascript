@@ -4,6 +4,10 @@ Given('there is an user with id {string}', async function (id) {
   this.user = id;
 
   try {
+    await this.kuzzle.security.createOrReplaceProfile('test', {
+      policies: [{roleId: 'admin'}]
+    });
+
     this.content = await this.kuzzle.security.createUser(id, {
       content: {
         profileIds: ['test']
@@ -17,10 +21,18 @@ Given('there is an user with id {string}', async function (id) {
 });
 
 Given('the user has {string} credentials with name {string} and password {string}', async function (strategy, username, password) {
-  await this.kuzzle.security.updateCredentials(strategy, this.user, {
-    username,
-    password
-  });
+  try {
+    await this.kuzzle.security.createCredentials(strategy, this.user, {
+      username,
+      password
+    })
+  }
+  catch (error) {
+    await this.kuzzle.security.updateCredentials(strategy, this.user, {
+      username,
+      password
+    });
+  }
 });
 
 

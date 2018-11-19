@@ -3,7 +3,7 @@ const Kuzzle = require('../../src/Kuzzle');
 
 class World {
   constructor () {
-    this.kuzzle = new Kuzzle('websocket', {host: 'kuzzle', port: 7512});
+    this.kuzzle = new Kuzzle('websocket', {host: 'localhost', port: 7512});
 
     this.index = null;
     this.collection = null;
