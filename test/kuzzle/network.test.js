@@ -14,50 +14,6 @@ describe('Kuzzle network methods', () => {
     kuzzle = new Kuzzle(network);
   });
 
-  describe('#flushQueue', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.flushQueue()).be.exactly(kuzzle);
-    });
-
-    it('should call network flushQueue method', () => {
-      kuzzle.flushQueue();
-      should(kuzzle.network.flushQueue).be.calledOnce();
-    });
-  });
-
-  describe('#playQueue', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.playQueue()).be.exactly(kuzzle);
-    });
-
-    it('should call network playQueue method', () => {
-      kuzzle.playQueue();
-      should(kuzzle.network.playQueue).be.calledOnce();
-    });
-  });
-
-  describe('#startQueuing', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.startQueuing()).be.exactly(kuzzle);
-    });
-
-    it('should call network startQueuing method', () => {
-      kuzzle.startQueuing();
-      should(kuzzle.network.startQueuing).be.calledOnce();
-    });
-  });
-
-  describe('#stopQueuing', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.stopQueuing()).be.exactly(kuzzle);
-    });
-
-    it('should call network stopQueuing method', () => {
-      kuzzle.stopQueuing();
-      should(kuzzle.network.stopQueuing).be.calledOnce();
-    });
-  });
-
   describe('#disconnect', () => {
     it('should close network connection', () => {
       kuzzle.disconnect();

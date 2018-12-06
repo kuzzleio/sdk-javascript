@@ -130,15 +130,6 @@ describe('HTTP networking module', () => {
       });
     });
 
-    it('should start queuing while connecting, and then stop once the connection is ready if autoQueue option is set', () => {
-      network.autoQueue = true;
-
-      const promise = network.connect();
-      should(network.queuing).be.true();
-
-      return promise.then(() => should(network.queuing).be.false());
-    });
-
     it('should not stop queuing when the client connection is ready if autoQueue option is not set', () => {
       network.queuing = true;
       network.autoQueue = false;
@@ -148,15 +139,6 @@ describe('HTTP networking module', () => {
       return promise.then(() => should(network.queuing).be.true());
     });
 
-    it('should play the queue when the client connection is established if autoReplay option is set', () => {
-      network.playQueue = sinon.stub();
-      network.autoReplay = true;
-
-      const promise = network.connect();
-
-      return promise.then(() => should(network.playQueue).be.calledOnce());
-    });
-
     it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
       network.playQueue = sinon.stub();
       network.autoReplay = false;
@@ -164,6 +146,33 @@ describe('HTTP networking module', () => {
       const promise = network.connect();
 
       return promise.then(() => should(network.playQueue).not.be.called());
+    });
+
+    it('should emit a networkError on failure', () => {
+      const error = new Error('test');
+      const eventStub = sinon.stub();
+
+      network._sendHttpRequest.rejects(error);
+
+      network.addListener('networkError', eventStub);
+
+      return network.connect()
+        .then(() => {
+          throw new Error('no error');
+        })
+        .catch(err => {
+          should(err).eql(error);
+
+          should(eventStub)
+            .be.calledOnce();
+          const emittedError = eventStub.firstCall.args[0];
+
+          should(emittedError.internal)
+            .eql(error);
+          should(emittedError.message)
+            .startWith('Unable to connect to kuzzle server at');
+
+        });
     });
   });
 

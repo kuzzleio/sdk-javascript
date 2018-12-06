@@ -173,5 +173,43 @@ describe('Kuzzle query management', () => {
       should(kuzzle.network.query.firstCall.args[0].jwt).be.exactly('fake-token');
       should(kuzzle.network.query.secondCall.args[0].jwt).be.undefined();
     });
+
+    it('should queue the request if queing and queuable', () => {
+      kuzzle.queuing = true;
+
+      const eventStub = sinon.stub();
+      kuzzle.addListener('offlineQueuePush', eventStub);
+
+      const request = {controller: 'foo', action: 'bar'};
+
+      kuzzle.query(request, {});
+
+      should(kuzzle.network.query).not.be.called();
+      should(eventStub)
+        .be.calledOnce()
+        .be.calledWith({request});
+
+      should(kuzzle._offlineQueue.length).be.eql(1);
+    });
+
+    it('should not queue if the request is not queuable', () => {
+      kuzzle.queuing = true;
+
+      kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: false});
+
+      should(kuzzle.network.query)
+        .be.calledOnce();
+      should(kuzzle._offlineQueue.length).eql(0);
+    });
+
+    it('should not queue if queueFilter is set and says so', () => {
+      kuzzle.queuing = true;
+      kuzzle.queueFilter = () => false;
+
+      kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true});
+
+      should(kuzzle.network.query)
+        .be.calledOnce();
+    });
   });
 });

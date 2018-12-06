@@ -44,13 +44,6 @@ describe('WebSocket networking module', () => {
   it('should initialize network status when connecting', () => {
     websocket.connect();
     should(websocket.state).be.eql('connecting');
-    should(websocket.queuing).be.false();
-  });
-
-  it('should start queuing if autoQueue option is set', () => {
-    websocket.autoQueue = true;
-    websocket.connect();
-    should(websocket.queuing).be.true();
   });
 
   it('should initialize a WS connection properly', () => {
@@ -100,42 +93,6 @@ describe('WebSocket networking module', () => {
     should(websocket.state).be.eql('connected');
     should(websocket.wasConnected).be.true();
     should(websocket.stopRetryingToConnect).be.false();
-  });
-
-  it('should stop queuing when the client connection is established if autoQueue option is set', () => {
-    websocket.queuing = true;
-    websocket.autoQueue = true;
-
-    websocket.connect();
-    clientStub.onopen();
-    should(websocket.queuing).be.false();
-  });
-
-  it('should not stop queuing when the client connection is established if autoQueue option is not set', () => {
-    websocket.queuing = true;
-    websocket.autoQueue = false;
-
-    websocket.connect();
-    clientStub.onopen();
-    should(websocket.queuing).be.true();
-  });
-
-  it('should play the queue when the client connection is established if autoReplay option is set', () => {
-    websocket.playQueue = sinon.stub();
-    websocket.autoReplay = true;
-
-    websocket.connect();
-    clientStub.onopen();
-    should(websocket.playQueue).be.calledOnce();
-  });
-
-  it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
-    websocket.playQueue = sinon.stub();
-    websocket.autoReplay = false;
-
-    websocket.connect();
-    clientStub.onopen();
-    should(websocket.playQueue).not.be.called();
   });
 
   it('should call listeners on a "reconnect" event', () => {
@@ -216,28 +173,6 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners('disconnect').length).be.eql(1);
   });
 
-  it('should start queuing when the client is disconnected if autoQueue option is set', () => {
-    websocket.queuing = false;
-    websocket.autoQueue = true;
-
-    websocket.connect();
-    clientStub.onclose(1000);
-
-    clock.tick(10);
-    should(websocket.queuing).be.true();
-  });
-
-  it('should not start queuing when the client is disconnected if autoQueue option is not set', () => {
-    websocket.queuing = false;
-    websocket.autoQueue = false;
-
-    websocket.connect();
-    clientStub.onclose(1000);
-
-    clock.tick(10);
-    should(websocket.queuing).be.false();
-  });
-
   it('should call error listeners on a "disconnect" event with an abnormal websocket code', () => {
     const cb = sinon.stub();
 
@@ -266,28 +201,6 @@ describe('WebSocket networking module', () => {
     should(cb.firstCall.args[0].internal.status).be.equal(4666);
     should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
-  });
-
-  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', () => {
-    websocket.queuing = false;
-    websocket.autoQueue = true;
-
-    websocket.connect();
-    clientStub.onclose(4666, 'foobar');
-
-    clock.tick(10);
-    should(websocket.queuing).be.true();
-  });
-
-  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', () => {
-    websocket.queuing = false;
-    websocket.autoQueue = false;
-
-    websocket.connect();
-    clientStub.onclose(4666, 'foobar');
-
-    clock.tick(10);
-    should(websocket.queuing).be.false();
   });
 
   it('should be able to register ephemeral callbacks on an event', () => {
