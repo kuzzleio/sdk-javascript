@@ -77,10 +77,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this.security = new SecurityController(this);
     this.server = new ServerController(this);
 
-    this.network.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
-    this.network.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
-    this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
-
     // offline queue
     this._autoQueue = typeof options.autoQueue === 'boolean' ? options.autoQueue : false;
     this._autoReplay = typeof options.autoReplay === 'boolean' ? options.autoReplay : false;
