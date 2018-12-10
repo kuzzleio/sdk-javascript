@@ -195,21 +195,35 @@ describe('Kuzzle query management', () => {
     it('should not queue if the request is not queuable', () => {
       kuzzle.queuing = true;
 
-      kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: false});
+      const eventStub = sinon.stub();
+      kuzzle.addListener('discarded', eventStub);
 
-      should(kuzzle.network.query)
-        .be.calledOnce();
-      should(kuzzle._offlineQueue.length).eql(0);
+      const request = {
+        controller: 'foo',
+        action: 'bar'
+      };
+
+      return kuzzle.query(request, {queuable: false})
+        .then(() => {
+          should(kuzzle.network.query)
+            .not.be.called();
+          should(kuzzle._offlineQueue.length).eql(0);
+          should(eventStub)
+            .be.calledOnce()
+            .be.calledWith(request);
+        });
     });
 
     it('should not queue if queueFilter is set and says so', () => {
       kuzzle.queuing = true;
       kuzzle.queueFilter = () => false;
 
-      kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true});
+      return kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true})
+        .then(() => {
+          should(kuzzle.network.query)
+            .be.not.be.called();
+        });
 
-      should(kuzzle.network.query)
-        .be.calledOnce();
     });
   });
 });

@@ -93,6 +93,8 @@ class Kuzzle extends KuzzleEventEmitter {
     this.queuing = false;
     this.replayInterval = 10;
 
+    this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+
     this.network.addListener('tokenExpired', () => {
       this.jwt = undefined;
       this.emit('tokenExpired');
@@ -391,17 +393,22 @@ class Kuzzle extends KuzzleEventEmitter {
       queuable = queuable && this.queueFilter(request);
     }
 
-    if (this.queuing && queuable) {
-      this._cleanQueue();
-      this.emit('offlineQueuePush', {request});
-      return new Promise((resolve, reject) => {
-        this.offlineQueue.push({
-          resolve,
-          reject,
-          request,
-          ts: Date.now()
+    if (this.queuing) {
+      if (queuable) {
+        this._cleanQueue();
+        this.emit('offlineQueuePush', {request});
+        return new Promise((resolve, reject) => {
+          this.offlineQueue.push({
+            resolve,
+            reject,
+            request,
+            ts: Date.now()
+          });
         });
-      });
+      }
+
+      this.emit('discarded', request);
+      return Promise.resolve();
     }
 
     return this.network.query(request);

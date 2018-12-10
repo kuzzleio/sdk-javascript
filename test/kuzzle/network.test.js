@@ -35,26 +35,6 @@ describe('Kuzzle network methods', () => {
       should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
     });
 
-    it('should propagate network "offlineQueuePush" events', () => {
-      const eventStub = sinon.stub();
-
-      kuzzle.addListener('offlineQueuePush', eventStub);
-      kuzzle.network.emit('offlineQueuePush', {query: {foo: 'bar'}, cb: 'callback'});
-
-      should(eventStub).be.calledOnce();
-      should(eventStub).be.calledWithMatch({query: {foo: 'bar'}, cb: 'callback'});
-    });
-
-    it('should propagate network "offlineQueuePop" events', () => {
-      const eventStub = sinon.stub();
-
-      kuzzle.addListener('offlineQueuePop', eventStub);
-      kuzzle.network.emit('offlineQueuePop', {foo: 'bar'});
-
-      should(eventStub).be.calledOnce();
-      should(eventStub).be.calledWithMatch({foo: 'bar'});
-    });
-
     it('should propagate network "tokenExpired" events', () => {
       const eventStub = sinon.stub();
 
