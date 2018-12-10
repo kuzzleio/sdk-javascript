@@ -20,10 +20,10 @@ describe('Room', () => {
       removeListener: (evt, listener) => {
         eventEmitter.removeListener(evt, listener);
       },
-      network: new KuzzleEventEmitter()
+      protocol: new KuzzleEventEmitter()
     };
 
-    kuzzle.network.id = 'kuz-network-id';
+    kuzzle.protocol.id = 'kuz-protocol-id';
   });
 
   describe('constructor', () => {
@@ -181,9 +181,9 @@ describe('Room', () => {
 
       return room.subscribe()
         .then(() => {
-          kuzzle.network.emit('my-room-id', 'message 1');
-          kuzzle.network.emit('subscription-channel', 'message 2');
-          kuzzle.network.emit('subscription-channel', 'message 3');
+          kuzzle.protocol.emit('my-room-id', 'message 1');
+          kuzzle.protocol.emit('subscription-channel', 'message 2');
+          kuzzle.protocol.emit('subscription-channel', 'message 3');
           should(room._channelListener).be.calledTwice();
           should(room._channelListener.firstCall).be.calledWith('message 2');
           should(room._channelListener.secondCall).be.calledWith('message 3');
@@ -219,15 +219,15 @@ describe('Room', () => {
 
     it('should not listen to channel messages anymore', () => {
       room._channelListener = sinon.stub();
-      kuzzle.network.on('subscription-channel', room._channelListener);
+      kuzzle.protocol.on('subscription-channel', room._channelListener);
 
       should(room._channelListener).not.be.called();
-      kuzzle.network.emit('subscription-channel', 'message');
+      kuzzle.protocol.emit('subscription-channel', 'message');
       should(room._channelListener).be.calledOnce();
 
       room._channelListener.reset();
       room.removeListeners();
-      kuzzle.network.emit('subscription-channel', 'message');
+      kuzzle.protocol.emit('subscription-channel', 'message');
       should(room._channelListener).not.be.called();
     });
 
@@ -299,7 +299,7 @@ describe('Room', () => {
 
       const data = {
         foo: 'bar',
-        volatile: {sdkInstanceId: 'kuz-network-id'}
+        volatile: {sdkInstanceId: 'kuz-protocol-id'}
       };
 
       room._channelListener(data);
@@ -313,7 +313,7 @@ describe('Room', () => {
 
       const data = {
         foo: 'bar',
-        volatile: {sdkInstanceId: 'kuz-network-id'}
+        volatile: {sdkInstanceId: 'kuz-protocol-id'}
       };
 
       room._channelListener(data);

@@ -59,7 +59,7 @@
 
 #### Bug fixes
 
-- [ [#226](https://github.com/kuzzleio/sdk-javascript/pull/226) ] Network error handling ([stafyniaksacha](https://github.com/stafyniaksacha))
+- [ [#226](https://github.com/kuzzleio/sdk-javascript/pull/226) ] Protocol error handling ([stafyniaksacha](https://github.com/stafyniaksacha))
 - [ [#222](https://github.com/kuzzleio/sdk-javascript/pull/222) ] NetworkError payload should be an Error object   ([scottinet](https://github.com/scottinet))
 - [ [#214](https://github.com/kuzzleio/sdk-javascript/pull/214) ] createIndex should only return response.result   ([ballinette](https://github.com/ballinette))
 

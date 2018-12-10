@@ -1,9 +1,9 @@
 'use strict';
 
 const
-  AbstractWrapper = require('./common');
+  KuzzleAbstractProtocol = require('./common');
 
-class RTWrapper extends AbstractWrapper {
+class RTWrapper extends KuzzleAbstractProtocol {
 
   constructor (options = {}) {
     super(options);

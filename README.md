@@ -119,12 +119,12 @@ if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
 
 The SDK also proposes to create custom protocols.  
 
-There are two ways to write these protocols, the first is to inherit the `KuzzleAbstractNetwork` class provided with the SDK and implement only the `connect` and `send` methods.
+There are two ways to write these protocols, the first is to inherit the `KuzzleAbstractProtocol` class provided with the SDK and implement only the `connect` and `send` methods.
 
 ```js
-const { KuzzleAbstractNetwork } = require('kuzzle-sdk');
+const { KuzzleAbstractProtocol } = require('kuzzle-sdk');
 
-class MyCustomProtocol extends KuzzleAbstractNetwork {
+class MyCustomProtocol extends KuzzleAbstractProtocol {
   connect() {
     // (...) do custom connection steps...
 

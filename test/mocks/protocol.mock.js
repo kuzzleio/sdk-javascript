@@ -2,7 +2,7 @@ const
   sinon = require('sinon'),
   KuzzleEventEmitter = require('../../src/eventEmitter');
 
-class NetworkWrapperMock extends KuzzleEventEmitter {
+class ProtocolMock extends KuzzleEventEmitter {
 
   constructor (options = {}) {
     super();
@@ -60,4 +60,4 @@ class NetworkWrapperMock extends KuzzleEventEmitter {
   }
 }
 
-module.exports = NetworkWrapperMock;
+module.exports = ProtocolMock;

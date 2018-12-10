@@ -1,7 +1,7 @@
 'use strict';
 
 const
-  AbtractWrapper = require('./abstract/common');
+  KuzzleAbstractProtocol = require('./abstract/common');
 
 const
   _routes = {
@@ -42,7 +42,7 @@ const
   };
 
 
-class HttpWrapper extends AbtractWrapper {
+class HttpWrapper extends KuzzleAbstractProtocol {
 
   constructor(options = {}) {
     super(options);

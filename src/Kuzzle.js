@@ -9,7 +9,6 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
-  networkWrapper = require('./networkWrapper'),
   uuidv4 = require('./uuidv4');
 
 const
@@ -29,28 +28,23 @@ const
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
-   * @param network - the network wrapper to use. if the argument is a string, creates an embeed network wrapper if a
-   * @param [options] - Connection options
+   * @param protocol - the protocol to use
+   * @param [options] - Kuzzle options
    */
-  constructor(network, options = {}) {
+  constructor(protocol, options = {}) {
     super();
 
-    if (network === undefined || network === null) {
-      throw new Error('"network" argument missing');
+    if (protocol === undefined || protocol === null) {
+      throw new Error('"protocol" argument missing');
     }
 
-    // embedded network protocol (http/websocket/socketio):
-    if (typeof network === 'string') {
-      return new Kuzzle(networkWrapper(network, options), options);
-    }
-
-    // custom protocol: check the existence of required methods
+    // check the existence of required methods
     for (const method of ['addListener', 'isReady', 'query']) {
-      if (typeof network[method] !== 'function') {
-        throw new Error(`Network instance must implement a "${method}" method`);
+      if (typeof protocol[method] !== 'function') {
+        throw new Error(`Protocol instance must implement a "${method}" method`);
       }
     }
-    this.network = network;
+    this.protocol = protocol;
 
     this._protectedEvents = {
       connected: {},
@@ -77,41 +71,41 @@ class Kuzzle extends KuzzleEventEmitter {
     this.security = new SecurityController(this);
     this.server = new ServerController(this);
 
-    this.network.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
-    this.network.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
-    this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+    this.protocol.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
+    this.protocol.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
+    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
 
-    this.network.addListener('tokenExpired', () => {
+    this.protocol.addListener('tokenExpired', () => {
       this.jwt = undefined;
       this.emit('tokenExpired');
     });
   }
 
   get autoQueue () {
-    return this.network.autoQueue;
+    return this.protocol.autoQueue;
   }
 
   set autoQueue (value) {
     this._checkPropertyType('autoQueue', 'boolean', value);
-    this.network.autoQueue = value;
+    this.protocol.autoQueue = value;
   }
 
   get autoReconnect () {
-    return this.network.autoReconnect;
+    return this.protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.network.autoReconnect = value;
+    this.protocol.autoReconnect = value;
   }
 
   get autoReplay () {
-    return this.network.autoReplay;
+    return this.protocol.autoReplay;
   }
 
   set autoReplay (value) {
     this._checkPropertyType('autoReplay', 'boolean', value);
-    this.network.autoReplay = value;
+    this.protocol.autoReplay = value;
   }
 
   get jwt () {
@@ -137,68 +131,68 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get host () {
-    return this.network.host;
+    return this.protocol.host;
   }
 
   get offlineQueue () {
-    return this.network.offlineQueue;
+    return this.protocol.offlineQueue;
   }
 
   get offlineQueueLoader () {
-    return this.network.offlineQueueLoader;
+    return this.protocol.offlineQueueLoader;
   }
 
   set offlineQueueLoader (value) {
     this._checkPropertyType('offlineQueueLoader', 'function', value);
-    this.network.offlineQueueLoader = value;
+    this.protocol.offlineQueueLoader = value;
   }
 
   get port () {
-    return this.network.port;
+    return this.protocol.port;
   }
 
   get queueFilter () {
-    return this.network.queueFilter;
+    return this.protocol.queueFilter;
   }
 
   set queueFilter (value) {
     this._checkPropertyType('queueFilter', 'function', value);
-    this.network.queueFilter = value;
+    this.protocol.queueFilter = value;
   }
 
   get queueMaxSize () {
-    return this.network.queueMaxSize;
+    return this.protocol.queueMaxSize;
   }
 
   set queueMaxSize (value) {
     this._checkPropertyType('queueMaxSize', 'number', value);
-    this.network.queueMaxSize = value;
+    this.protocol.queueMaxSize = value;
   }
 
   get queueTTL () {
-    return this.network.queueTTL;
+    return this.protocol.queueTTL;
   }
 
   set queueTTL (value) {
     this._checkPropertyType('queueTTL', 'number', value);
-    this.network.queueTTL = value;
+    this.protocol.queueTTL = value;
   }
 
   get reconnectionDelay () {
-    return this.network.reconnectionDelay;
+    return this.protocol.reconnectionDelay;
   }
 
   get replayInterval () {
-    return this.network.replayInterval;
+    return this.protocol.replayInterval;
   }
 
   set replayInterval (value) {
     this._checkPropertyType('replayInterval', 'number', value);
-    this.network.replayInterval = value;
+    this.protocol.replayInterval = value;
   }
 
   get sslConnection () {
-    return this.network.sslConnection;
+    return this.protocol.sslConnection;
   }
 
   /**
@@ -225,23 +219,23 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Promise<Object>}
    */
   connect () {
-    if (this.network.isReady()) {
+    if (this.protocol.isReady()) {
       return Promise.resolve();
     }
 
-    this.network.addListener('connect', () => {
+    this.protocol.addListener('connect', () => {
       this.emit('connected');
     });
 
-    this.network.addListener('networkError', error => {
+    this.protocol.addListener('networkError', error => {
       this.emit('networkError', error);
     });
 
-    this.network.addListener('disconnect', () => {
+    this.protocol.addListener('disconnect', () => {
       this.emit('disconnected');
     });
 
-    this.network.addListener('reconnect', () => {
+    this.protocol.addListener('reconnect', () => {
       if (this.jwt) {
         this.checkToken(this.jwt, (err, res) => {
           // shouldn't obtain an error but let's invalidate the token anyway
@@ -256,9 +250,9 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     });
 
-    this.network.addListener('discarded', data => this.emit('discarded', data));
+    this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
-    return this.network.connect();
+    return this.protocol.connect();
   }
 
   /**
@@ -282,7 +276,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Kuzzle}
    */
   flushQueue () {
-    this.network.flushQueue();
+    this.protocol.flushQueue();
     return this;
   }
 
@@ -290,7 +284,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Disconnects from Kuzzle and invalidate this instance.
    */
   disconnect () {
-    this.network.close();
+    this.protocol.close();
   }
 
   /**
@@ -333,7 +327,7 @@ class Kuzzle extends KuzzleEventEmitter {
         request.volatile[item] = this.volatile[item];
       }
     }
-    request.volatile.sdkInstanceId = this.network.id;
+    request.volatile.sdkInstanceId = this.protocol.id;
     request.volatile.sdkVersion = this.sdkVersion;
 
     /*
@@ -347,14 +341,14 @@ class Kuzzle extends KuzzleEventEmitter {
       request.jwt = this.jwt;
     }
 
-    return this.network.query(request, options);
+    return this.protocol.query(request, options);
   }
 
   /**
    * Starts the requests queuing.
    */
   startQueuing () {
-    this.network.startQueuing();
+    this.protocol.startQueuing();
     return this;
   }
 
@@ -362,7 +356,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Stops the requests queuing.
    */
   stopQueuing () {
-    this.network.stopQueuing();
+    this.protocol.stopQueuing();
     return this;
   }
 
@@ -378,7 +372,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Plays the requests queued during offline mode.
    */
   playQueue () {
-    this.network.playQueue();
+    this.protocol.playQueue();
     return this;
   }
 
