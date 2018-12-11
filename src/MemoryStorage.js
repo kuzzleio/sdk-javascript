@@ -5,8 +5,8 @@ var
   getKeys = {getter: true, required: ['keys']},
   getMember = {getter: true, required: ['_id', 'member']},
   getxScan = {
-    getter: true, 
-    required: ['_id', 'cursor'], 
+    getter: true,
+    required: ['_id', 'cursor'],
     opts: ['match', 'count'],
     mapResults: mapScanResults
   },
@@ -129,7 +129,7 @@ var
     sismember: getMember,
     smembers: getId,
     smove: {required: ['_id', 'destination', 'member']},
-    sort: {getter: true, required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
+    sort: {required: ['_id'], opts: ['alpha', 'by', 'direction', 'get', 'limit']},
     spop: {required: ['_id'], opts: ['count'], mapResults: mapStringToArray },
     srandmember: {getter: true, required: ['_id'], opts: ['count'], mapResults: mapStringToArray},
     srem: {required: ['_id', 'members']},
@@ -500,7 +500,7 @@ function mapZrangeResults(results) {
  *   "<cursor>",
  *   [
  *     "value1",
- *     "value2", 
+ *     "value2",
  *     "..."
  *   ]
  * ]
@@ -514,8 +514,8 @@ function mapZrangeResults(results) {
  *     "..."
  *   ]
  * }
- * 
- * @param  {array.<string|array>} results 
+ *
+ * @param  {array.<string|array>} results
  * @return {object}
  */
 function mapScanResults(results) {
