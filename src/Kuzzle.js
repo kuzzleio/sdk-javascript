@@ -407,8 +407,9 @@ class Kuzzle extends KuzzleEventEmitter {
         });
       }
 
-      this.emit('discarded', request);
-      return Promise.resolve();
+      this.emit('discarded', {request});
+      return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
+Discarded request: ${JSON.stringify(request)}`));
     }
 
     return this.network.query(request);

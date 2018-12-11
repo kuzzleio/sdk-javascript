@@ -205,12 +205,15 @@ describe('Kuzzle query management', () => {
 
       return kuzzle.query(request, {queuable: false})
         .then(() => {
+          throw new Error('no error');
+        })
+        .catch(() => {
           should(kuzzle.network.query)
             .not.be.called();
           should(kuzzle._offlineQueue.length).eql(0);
           should(eventStub)
             .be.calledOnce()
-            .be.calledWith(request);
+            .be.calledWith({request});
         });
     });
 
@@ -220,6 +223,9 @@ describe('Kuzzle query management', () => {
 
       return kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true})
         .then(() => {
+          throw new Error('no error');
+        })
+        .catch(() => {
           should(kuzzle.network.query)
             .be.not.be.called();
         });
