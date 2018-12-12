@@ -14,7 +14,7 @@ class ProtocolMock extends KuzzleEventEmitter {
     this.connectCalled = false;
 
     this.close = sinon.stub();
-    this.query = sinon.stub();
+    this.query = sinon.stub().resolves();
     this.playQueue = sinon.stub();
     this.flushQueue = sinon.stub();
     this.startQueuing = sinon.stub();
