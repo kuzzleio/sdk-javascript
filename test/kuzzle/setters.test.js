@@ -172,4 +172,14 @@ describe('Kuzzle setters', () => {
       should(kuzzle._replayInterval).be.equal(1234);
     });
   });
+
+  describe('#flushQueue', () => {
+    it('flush the offline queue', () => {
+      kuzzle._offlineQueue.push({ foo: 'bar' });
+
+      kuzzle.flushQueue();
+
+      should(kuzzle._offlineQueue).be.empty();
+    });
+  });
 });
