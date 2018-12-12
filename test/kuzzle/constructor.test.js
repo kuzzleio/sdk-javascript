@@ -64,7 +64,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.realtime).be.an.instanceof(RealTimeController);
   });
 
-  it('should expose the documented properties wwith their default values', () => {
+  it('should expose the documented properties with their default values', () => {
     const
       version = require('../../package').version,
       kuzzle = new Kuzzle(protocolMock);
@@ -122,5 +122,16 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.protocol).be.an.instanceof(ProtocolMock);
     should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
     should(kuzzle.jwt).be.undefined();
+  });
+
+  it('should set autoQueue and autoReplay if offlineMode is set to auto', () => {
+    const kuzzle = new Kuzzle(protocolMock, {
+      autoQueue: false,
+      autoReplay : true,
+      offlineMode: 'auto'
+    });
+
+    should(kuzzle.autoQueue).be.true();
+    should(kuzzle.autoReplay).be.true();
   });
 });

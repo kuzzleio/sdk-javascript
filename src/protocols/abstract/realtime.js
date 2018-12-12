@@ -11,11 +11,6 @@ class RTWrapper extends KuzzleAbstractProtocol {
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
 
-    if (options.offlineMode === 'auto' && this.autoReconnect) {
-      this.autoQueue = true;
-      this.autoReplay = true;
-    }
-
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
@@ -31,9 +26,6 @@ class RTWrapper extends KuzzleAbstractProtocol {
 
   connect() {
     this.state = 'connecting';
-    if (this.autoQueue) {
-      this.startQueuing();
-    }
   }
 
   /**
@@ -61,9 +53,6 @@ class RTWrapper extends KuzzleAbstractProtocol {
    */
   clientNetworkError(error) {
     this.state = 'offline';
-    if (this.autoQueue) {
-      this.startQueuing();
-    }
 
     const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
     connectionError.internal = error;

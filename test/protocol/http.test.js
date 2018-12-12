@@ -57,7 +57,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should initialize http protocol with custom routes', () => {
-      const customNetwork = new HttpWrapper({
+      const customProtocol = new HttpWrapper({
         host: 'address',
         port: 1234,
         http: {
@@ -72,7 +72,7 @@ describe('HTTP networking module', () => {
         }
       });
 
-      should(customNetwork.http.routes).match({
+      should(customProtocol.http.routes).match({
         document: {
           create: {
             verb: 'VERB',
@@ -130,15 +130,6 @@ describe('HTTP networking module', () => {
       });
     });
 
-    it('should start queuing while connecting, and then stop once the connection is ready if autoQueue option is set', () => {
-      protocol.autoQueue = true;
-
-      const promise = protocol.connect();
-      should(protocol.queuing).be.true();
-
-      return promise.then(() => should(protocol.queuing).be.false());
-    });
-
     it('should not stop queuing when the client connection is ready if autoQueue option is not set', () => {
       protocol.queuing = true;
       protocol.autoQueue = false;
@@ -148,15 +139,6 @@ describe('HTTP networking module', () => {
       return promise.then(() => should(protocol.queuing).be.true());
     });
 
-    it('should play the queue when the client connection is established if autoReplay option is set', () => {
-      protocol.playQueue = sinon.stub();
-      protocol.autoReplay = true;
-
-      const promise = protocol.connect();
-
-      return promise.then(() => should(protocol.playQueue).be.calledOnce());
-    });
-
     it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
       protocol.playQueue = sinon.stub();
       protocol.autoReplay = false;
@@ -164,6 +146,33 @@ describe('HTTP networking module', () => {
       const promise = protocol.connect();
 
       return promise.then(() => should(protocol.playQueue).not.be.called());
+    });
+
+    it('should emit a networkError on failure', () => {
+      const error = new Error('test');
+      const eventStub = sinon.stub();
+
+      protocol._sendHttpRequest.rejects(error);
+
+      protocol.addListener('networkError', eventStub);
+
+      return protocol.connect()
+        .then(() => {
+          throw new Error('no error');
+        })
+        .catch(err => {
+          should(err).eql(error);
+
+          should(eventStub)
+            .be.calledOnce();
+          const emittedError = eventStub.firstCall.args[0];
+
+          should(emittedError.internal)
+            .eql(error);
+          should(emittedError.message)
+            .startWith('Unable to connect to kuzzle server at');
+
+        });
     });
   });
 

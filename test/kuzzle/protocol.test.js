@@ -14,50 +14,6 @@ describe('Kuzzle protocol methods', () => {
     kuzzle = new Kuzzle(protocol);
   });
 
-  describe('#flushQueue', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.flushQueue()).be.exactly(kuzzle);
-    });
-
-    it('should call protocol flushQueue method', () => {
-      kuzzle.flushQueue();
-      should(kuzzle.protocol.flushQueue).be.calledOnce();
-    });
-  });
-
-  describe('#playQueue', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.playQueue()).be.exactly(kuzzle);
-    });
-
-    it('should call protocol playQueue method', () => {
-      kuzzle.playQueue();
-      should(kuzzle.protocol.playQueue).be.calledOnce();
-    });
-  });
-
-  describe('#startQueuing', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.startQueuing()).be.exactly(kuzzle);
-    });
-
-    it('should call protocol startQueuing method', () => {
-      kuzzle.startQueuing();
-      should(kuzzle.protocol.startQueuing).be.calledOnce();
-    });
-  });
-
-  describe('#stopQueuing', () => {
-    it('should return Kuzzle instance', () => {
-      should(kuzzle.stopQueuing()).be.exactly(kuzzle);
-    });
-
-    it('should call protocol stopQueuing method', () => {
-      kuzzle.stopQueuing();
-      should(kuzzle.protocol.stopQueuing).be.calledOnce();
-    });
-  });
-
   describe('#disconnect', () => {
     it('should close protocol connection', () => {
       kuzzle.disconnect();
@@ -77,26 +33,6 @@ describe('Kuzzle protocol methods', () => {
 
       should(eventStub).be.calledOnce();
       should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
-    });
-
-    it('should propagate protocol "offlineQueuePush" events', () => {
-      const eventStub = sinon.stub();
-
-      kuzzle.addListener('offlineQueuePush', eventStub);
-      kuzzle.protocol.emit('offlineQueuePush', {query: {foo: 'bar'}, cb: 'callback'});
-
-      should(eventStub).be.calledOnce();
-      should(eventStub).be.calledWithMatch({query: {foo: 'bar'}, cb: 'callback'});
-    });
-
-    it('should propagate protocol "offlineQueuePop" events', () => {
-      const eventStub = sinon.stub();
-
-      kuzzle.addListener('offlineQueuePop', eventStub);
-      kuzzle.protocol.emit('offlineQueuePop', {foo: 'bar'});
-
-      should(eventStub).be.calledOnce();
-      should(eventStub).be.calledWithMatch({foo: 'bar'});
     });
 
     it('should propagate protocol "tokenExpired" events', () => {

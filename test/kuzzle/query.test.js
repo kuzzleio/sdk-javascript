@@ -173,5 +173,63 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query.firstCall.args[0].jwt).be.exactly('fake-token');
       should(kuzzle.protocol.query.secondCall.args[0].jwt).be.undefined();
     });
+
+    it('should queue the request if queing and queuable', () => {
+      kuzzle.queuing = true;
+
+      const eventStub = sinon.stub();
+      kuzzle.addListener('offlineQueuePush', eventStub);
+
+      const request = {controller: 'foo', action: 'bar'};
+
+      kuzzle.query(request, {});
+
+      should(kuzzle.protocol.query).not.be.called();
+      should(eventStub)
+        .be.calledOnce()
+        .be.calledWith({request});
+
+      should(kuzzle._offlineQueue.length).be.eql(1);
+    });
+
+    it('should not queue if the request is not queuable', () => {
+      kuzzle.queuing = true;
+
+      const eventStub = sinon.stub();
+      kuzzle.addListener('discarded', eventStub);
+
+      const request = {
+        controller: 'foo',
+        action: 'bar'
+      };
+
+      return kuzzle.query(request, {queuable: false})
+        .then(() => {
+          throw new Error('no error');
+        })
+        .catch(() => {
+          should(kuzzle.protocol.query)
+            .not.be.called();
+          should(kuzzle._offlineQueue.length).eql(0);
+          should(eventStub)
+            .be.calledOnce()
+            .be.calledWith({request});
+        });
+    });
+
+    it('should not queue if queueFilter is set and says so', () => {
+      kuzzle.queuing = true;
+      kuzzle.queueFilter = () => false;
+
+      return kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true})
+        .then(() => {
+          throw new Error('no error');
+        })
+        .catch(() => {
+          should(kuzzle.protocol.query)
+            .be.not.be.called();
+        });
+
+    });
   });
 });
