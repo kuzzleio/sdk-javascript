@@ -99,9 +99,9 @@ import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
 ```
 
 ## Protocols used
-Actually, the SDK support 3 protocols: `Http`, `Websocket` and `SocketIO`.  
+Currently, the SDK support 3 protocols: `Http`, `Websocket` and `SocketIO`.  
 
-Websocket and Socket.IO protocols implement the whole Kuzzle API, while **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
+WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
 #### NodeJS
