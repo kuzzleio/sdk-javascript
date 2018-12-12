@@ -73,10 +73,6 @@ class HttpWrapper extends AbtractWrapper {
    * Connect to the websocket server
    */
   connect () {
-    if (this.autoQueue) {
-      this.startQueuing();
-    }
-
     if (this.state === 'ready') {
       return Promise.resolve();
     }
