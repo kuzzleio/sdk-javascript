@@ -1,8 +1,8 @@
 'use strict';
 
 const
-  uuidv4 = require('../../../uuidv4'),
-  KuzzleEventEmitter = require('../../../eventEmitter');
+  uuidv4 = require('../../uuidv4'),
+  KuzzleEventEmitter = require('../../eventEmitter');
 
 // read-only properties
 let

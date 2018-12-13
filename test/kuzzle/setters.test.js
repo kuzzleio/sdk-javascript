@@ -1,15 +1,15 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle setters', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const network = new NetworkWrapperMock({host: 'somewhere'});
-    kuzzle = new Kuzzle(network);
+    const protocol = new ProtocolMock({host: 'somewhere'});
+    kuzzle = new Kuzzle(protocol);
   });
 
   describe('#autoQueue', () => {
@@ -20,7 +20,7 @@ describe('Kuzzle setters', () => {
     });
 
     it('should set private _autoQueue property', () => {
-      should(kuzzle.network.autoQueue).be.undefined();
+      should(kuzzle.protocol.autoQueue).be.undefined();
 
       kuzzle.autoQueue = true;
       should(kuzzle._autoQueue).be.a.Boolean().and.be.true();
@@ -37,14 +37,14 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.autoReconnect property', () => {
-      should(kuzzle.network.autoReconnect).be.undefined();
+    it('should set protocol.autoReconnect property', () => {
+      should(kuzzle.protocol.autoReconnect).be.undefined();
 
       kuzzle.autoReconnect = true;
-      should(kuzzle.network.autoReconnect).be.a.Boolean().and.be.true();
+      should(kuzzle.protocol.autoReconnect).be.a.Boolean().and.be.true();
 
       kuzzle.autoReconnect = false;
-      should(kuzzle.network.autoReconnect).be.a.Boolean().and.be.false();
+      should(kuzzle.protocol.autoReconnect).be.a.Boolean().and.be.false();
     });
   });
 
@@ -56,7 +56,7 @@ describe('Kuzzle setters', () => {
     });
 
     it('should set priavet _autoReplay property', () => {
-      should(kuzzle.network.autoReplay).be.undefined();
+      should(kuzzle.protocol.autoReplay).be.undefined();
 
       kuzzle.autoReplay = true;
       should(kuzzle._autoReplay).be.a.Boolean().and.be.true();
@@ -109,7 +109,7 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.offlineQueueLoader property', () => {
+    it('should set protocol.offlineQueueLoader property', () => {
       should(kuzzle.offlineQueueLoader).be.null();
 
       const cb = sinon.stub();
@@ -170,6 +170,16 @@ describe('Kuzzle setters', () => {
     it('should set private _replayInterval property', () => {
       kuzzle.replayInterval = 1234;
       should(kuzzle._replayInterval).be.equal(1234);
+    });
+  });
+
+  describe('#flushQueue', () => {
+    it('flush the offline queue', () => {
+      kuzzle._offlineQueue.push({ foo: 'bar' });
+
+      kuzzle.flushQueue();
+
+      should(kuzzle._offlineQueue).be.empty();
     });
   });
 });

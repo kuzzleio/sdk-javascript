@@ -1,19 +1,19 @@
 var
   should = require('should'),
   sinon = require('sinon'),
-  AbstractWrapper = require('../../src/networkWrapper/protocols/abstract/common');
+  AbstractWrapper = require('../../src/protocols/abstract/common');
 
-describe('Network query management', () => {
+describe('Protocol query management', () => {
   describe('#query', () => {
     let
-      network;
+      protocol;
 
     beforeEach(function () {
-      network = new AbstractWrapper('somewhere');
-      network.send = function(request) {
-        network.emit(request.requestId, request.response);
+      protocol = new AbstractWrapper('somewhere');
+      protocol.send = function(request) {
+        protocol.emit(request.requestId, request.response);
       };
-      sendSpy = sinon.spy(network, 'send');
+      sendSpy = sinon.spy(protocol, 'send');
     });
 
   });
@@ -21,22 +21,22 @@ describe('Network query management', () => {
   describe('#query', () => {
     let
       sendSpy,
-      network;
+      protocol;
 
     beforeEach(() => {
-      network = new AbstractWrapper('somewhere');
-      network.isReady = sinon.stub().returns(true);
-      network.send = function(request) {
-        network.emit(request.requestId, request.response);
+      protocol = new AbstractWrapper('somewhere');
+      protocol.isReady = sinon.stub().returns(true);
+      protocol.send = function(request) {
+        protocol.emit(request.requestId, request.response);
       };
-      sendSpy = sinon.spy(network, 'send');
-      network._emitRequest = sinon.stub().resolves();
+      sendSpy = sinon.spy(protocol, 'send');
+      protocol._emitRequest = sinon.stub().resolves();
     });
 
     it('should reject if not ready', () => {
-      network.isReady.returns(false);
+      protocol.isReady.returns(false);
 
-      return network.query({controller: 'foo', action: 'bar'})
+      return protocol.query({controller: 'foo', action: 'bar'})
         .then(() => {
           throw new Error('no error');
         })
@@ -48,7 +48,7 @@ describe('Network query management', () => {
     it('should emit the request when asked to', () => {
       const request = {requestId: 'bar', response: {}};
 
-      network.query(request);
+      protocol.query(request);
       should(sendSpy)
         .be.calledOnce()
         .be.calledWith(request);
@@ -63,9 +63,9 @@ describe('Network query management', () => {
           }
         };
 
-      network.addListener('queryError', eventStub);
+      protocol.addListener('queryError', eventStub);
 
-      return network.query({requestId: 'foobar', response: response})
+      return protocol.query({requestId: 'foobar', response: response})
         .then(() => Promise.reject({message: 'No error'}))
         .catch(error => {
           should(eventStub).be.calledOnce();
@@ -82,9 +82,9 @@ describe('Network query management', () => {
           }
         };
 
-      network.addListener('tokenExpired', eventStub);
+      protocol.addListener('tokenExpired', eventStub);
 
-      return network.query({requestId: 'foobar', response: response})
+      return protocol.query({requestId: 'foobar', response: response})
         .then(() => Promise.reject({message: 'No error'}))
         .catch(() => {
           should(eventStub).be.calledOnce();
@@ -96,7 +96,7 @@ describe('Network query management', () => {
         response = {result: 'foo', error: null, status: 42},
         request = {requestId: 'someEvent', response: response};
 
-      return network.query(request)
+      return protocol.query(request)
         .then(res => {
           should(res.error).be.null();
           should(res.result).be.exactly(response.result);

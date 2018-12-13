@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  SocketIO = require('../../src/networkWrapper/protocols/socketio');
+  SocketIO = require('../../src/protocols/socketio');
 
 /**
  * @global window
@@ -86,7 +86,7 @@ describe('SocketIO networking module', () => {
     should(socketIO.id).be.a.String();
   });
 
-  it('should initialize network status when connecting', () => {
+  it('should initialize protocol status when connecting', () => {
     socketIO.connect();
     should(socketIO.state).be.eql('connecting');
   });

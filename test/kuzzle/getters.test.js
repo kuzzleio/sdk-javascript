@@ -1,14 +1,14 @@
 const
   should = require('should'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle getters', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const network = new NetworkWrapperMock({host: 'somewhere'});
-    kuzzle = new Kuzzle(network);
+    const protocol = new ProtocolMock({host: 'somewhere'});
+    kuzzle = new Kuzzle(protocol);
   });
 
   it('should get "autoQueue" property from private _autoQueue one', () => {
@@ -16,8 +16,8 @@ describe('Kuzzle getters', () => {
     should(kuzzle.autoQueue).be.equal('foo-bar');
   });
 
-  it('should get "autoReconnect" property from network instance', () => {
-    kuzzle.network.autoReconnect = 'foo-bar';
+  it('should get "autoReconnect" property from protocol instance', () => {
+    kuzzle.protocol.autoReconnect = 'foo-bar';
     should(kuzzle.autoReconnect).be.equal('foo-bar');
   });
 
@@ -31,8 +31,8 @@ describe('Kuzzle getters', () => {
     should(kuzzle.jwt).be.equal('foo-bar');
   });
 
-  it('should get "host" property from network instance', () => {
-    kuzzle.network.host = 'foo-bar';
+  it('should get "host" property from protocol instance', () => {
+    kuzzle.protocol.host = 'foo-bar';
     should(kuzzle.host).be.equal('foo-bar');
   });
 
@@ -46,8 +46,8 @@ describe('Kuzzle getters', () => {
     should(kuzzle.offlineQueueLoader).be.equal('foo-bar');
   });
 
-  it('should get "port" property from network instance', () => {
-    kuzzle.network.port = 'foo-bar';
+  it('should get "port" property from protocol instance', () => {
+    kuzzle.protocol.port = 'foo-bar';
     should(kuzzle.port).be.equal('foo-bar');
   });
 
@@ -66,8 +66,8 @@ describe('Kuzzle getters', () => {
     should(kuzzle.queueTTL).be.equal('foo-bar');
   });
 
-  it('should get "reconnectionDelay" property from network instance', () => {
-    kuzzle.network.reconnectionDelay = 'foo-bar';
+  it('should get "reconnectionDelay" property from protocol instance', () => {
+    kuzzle.protocol.reconnectionDelay = 'foo-bar';
     should(kuzzle.reconnectionDelay).be.equal('foo-bar');
   });
 
@@ -76,8 +76,8 @@ describe('Kuzzle getters', () => {
     should(kuzzle.replayInterval).be.equal('foo-bar');
   });
 
-  it('should get "sslConnection" property from network instance', () => {
-    kuzzle.network.sslConnection = 'foo-bar';
+  it('should get "sslConnection" property from protocol instance', () => {
+    kuzzle.protocol.sslConnection = 'foo-bar';
     should(kuzzle.sslConnection).be.equal('foo-bar');
   });
 });

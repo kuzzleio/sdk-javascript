@@ -1,52 +1,52 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
-describe('Kuzzle network methods', () => {
+describe('Kuzzle protocol methods', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const network = new NetworkWrapperMock({host: 'somewhere'});
+    const protocol = new ProtocolMock({host: 'somewhere'});
 
-    network.close = sinon.stub();
-    kuzzle = new Kuzzle(network);
+    protocol.close = sinon.stub();
+    kuzzle = new Kuzzle(protocol);
   });
 
   describe('#disconnect', () => {
-    it('should close network connection', () => {
+    it('should close protocol connection', () => {
       kuzzle.disconnect();
-      should(kuzzle.network.close).be.calledOnce();
+      should(kuzzle.protocol.close).be.calledOnce();
     });
   });
 
   describe('#events', () => {
-    it('should propagate network "queryError" events', () => {
+    it('should propagate protocol "queryError" events', () => {
       const
         eventStub = sinon.stub(),
         error = {message: 'foo-bar'},
         query = {foo: 'bar'};
 
       kuzzle.addListener('queryError', eventStub);
-      kuzzle.network.emit('queryError', error, query);
+      kuzzle.protocol.emit('queryError', error, query);
 
       should(eventStub).be.calledOnce();
       should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
     });
 
-    it('should propagate network "tokenExpired" events', () => {
+    it('should propagate protocol "tokenExpired" events', () => {
       const eventStub = sinon.stub();
 
       kuzzle.addListener('tokenExpired', eventStub);
-      kuzzle.network.emit('tokenExpired');
+      kuzzle.protocol.emit('tokenExpired');
 
       should(eventStub).be.calledOnce();
     });
 
     it('should empty the jwt when a "tokenExpired" events is triggered', () => {
       kuzzle.jwt = 'foobar';
-      kuzzle.network.emit('tokenExpired');
+      kuzzle.protocol.emit('tokenExpired');
 
       should(kuzzle.jwt).be.undefined();
     });

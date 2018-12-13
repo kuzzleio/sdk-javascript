@@ -9,7 +9,6 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
-  networkWrapper = require('./networkWrapper'),
   uuidv4 = require('./uuidv4');
 
 const
@@ -29,28 +28,23 @@ const
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
-   * @param network - the network wrapper to use. if the argument is a string, creates an embeed network wrapper if a
-   * @param [options] - Connection options
+   * @param protocol - the protocol to use
+   * @param [options] - Kuzzle options
    */
-  constructor(network, options = {}) {
+  constructor(protocol, options = {}) {
     super();
 
-    if (network === undefined || network === null) {
-      throw new Error('"network" argument missing');
+    if (protocol === undefined || protocol === null) {
+      throw new Error('"protocol" argument missing');
     }
 
-    // embedded network protocol (http/websocket/socketio):
-    if (typeof network === 'string') {
-      return new Kuzzle(networkWrapper(network, options), options);
-    }
-
-    // custom protocol: check the existence of required methods
+    // check the existence of required methods
     for (const method of ['addListener', 'isReady', 'query']) {
-      if (typeof network[method] !== 'function') {
-        throw new Error(`Network instance must implement a "${method}" method`);
+      if (typeof protocol[method] !== 'function') {
+        throw new Error(`Protocol instance must implement a "${method}" method`);
       }
     }
-    this.network = network;
+    this.protocol = protocol;
 
     this._protectedEvents = {
       connected: {},
@@ -93,9 +87,9 @@ class Kuzzle extends KuzzleEventEmitter {
     this.queuing = false;
     this.replayInterval = 10;
 
-    this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
 
-    this.network.addListener('tokenExpired', () => {
+    this.protocol.addListener('tokenExpired', () => {
       this.jwt = undefined;
       this.emit('tokenExpired');
     });
@@ -111,12 +105,12 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get autoReconnect () {
-    return this.network.autoReconnect;
+    return this.protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.network.autoReconnect = value;
+    this.protocol.autoReconnect = value;
   }
 
   get autoReplay () {
@@ -151,7 +145,7 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get host () {
-    return this.network.host;
+    return this.protocol.host;
   }
 
   get offlineQueue () {
@@ -168,7 +162,7 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get port () {
-    return this.network.port;
+    return this.protocol.port;
   }
 
   get queueFilter () {
@@ -199,7 +193,7 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get reconnectionDelay () {
-    return this.network.reconnectionDelay;
+    return this.protocol.reconnectionDelay;
   }
 
   get replayInterval () {
@@ -212,7 +206,7 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get sslConnection () {
-    return this.network.sslConnection;
+    return this.protocol.sslConnection;
   }
 
   /**
@@ -239,7 +233,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Promise<Object>}
    */
   connect () {
-    if (this.network.isReady()) {
+    if (this.protocol.isReady()) {
       return Promise.resolve();
     }
 
@@ -247,7 +241,7 @@ class Kuzzle extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
-    this.network.addListener('connect', () => {
+    this.protocol.addListener('connect', () => {
       if (this.autoQueue) {
         this.stopQueuing();
       }
@@ -259,18 +253,18 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('connected');
     });
 
-    this.network.addListener('networkError', error => {
+    this.protocol.addListener('networkError', error => {
       if (this.autoQueue) {
         this.startQueuing();
       }
       this.emit('networkError', error);
     });
 
-    this.network.addListener('disconnect', () => {
+    this.protocol.addListener('disconnect', () => {
       this.emit('disconnected');
     });
 
-    this.network.addListener('reconnect', () => {
+    this.protocol.addListener('reconnect', () => {
       if (this.autoQueue) {
         this.stopQueuing();
       }
@@ -293,9 +287,9 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     });
 
-    this.network.addListener('discarded', data => this.emit('discarded', data));
+    this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
-    return this.network.connect();
+    return this.protocol.connect();
   }
 
   /**
@@ -327,7 +321,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Disconnects from Kuzzle and invalidate this instance.
    */
   disconnect () {
-    this.network.close();
+    this.protocol.close();
   }
 
   /**
@@ -370,7 +364,7 @@ class Kuzzle extends KuzzleEventEmitter {
         request.volatile[item] = this.volatile[item];
       }
     }
-    request.volatile.sdkInstanceId = this.network.id;
+    request.volatile.sdkInstanceId = this.protocol.id;
     request.volatile.sdkVersion = this.sdkVersion;
 
     /*
@@ -412,7 +406,7 @@ class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.network.query(request);
+    return this.protocol.query(request);
   }
 
   /**
@@ -435,7 +429,7 @@ Discarded request: ${JSON.stringify(request)}`));
    * Plays the requests queued during offline mode.
    */
   playQueue () {
-    if (this.network.isReady()) {
+    if (this.protocol.isReady()) {
       this._cleanQueue();
       this._dequeue();
     }
@@ -490,7 +484,7 @@ Discarded request: ${JSON.stringify(request)}`));
       uniqueQueue = {},
       dequeuingProcess = () => {
         if (this.offlineQueue.length > 0) {
-          this.network.query(this.offlineQueue[0].request)
+          this.protocol.query(this.offlineQueue[0].request)
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
           this.emit('offlineQueuePop', this.offlineQueue.shift());

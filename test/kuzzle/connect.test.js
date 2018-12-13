@@ -1,40 +1,40 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle connect', () => {
 
-  const networks = {
-    somewhere: new NetworkWrapperMock({host: 'somewhere'}),
-    somewhereagain: new NetworkWrapperMock({host: 'somewhereagain'}),
-    nowhere: new NetworkWrapperMock({host: 'nowhere'})
+  const protocols = {
+    somewhere: new ProtocolMock({host: 'somewhere'}),
+    somewhereagain: new ProtocolMock({host: 'somewhereagain'}),
+    nowhere: new ProtocolMock({host: 'nowhere'})
   };
 
   it('should return immediately if already connected', () => {
-    const kuzzle = new Kuzzle(networks.somewhere);
-    kuzzle.network.isReady.returns(true);
+    const kuzzle = new Kuzzle(protocols.somewhere);
+    kuzzle.protocol.isReady.returns(true);
 
     return kuzzle.connect()
       .then(() => {
-        should(kuzzle.network.connectCalled).be.false();
+        should(kuzzle.protocol.connectCalled).be.false();
       });
   });
 
-  it('should call network wrapper connect() method when the instance is offline', () => {
-    const kuzzle = new Kuzzle(networks.somewhere);
-    kuzzle.network.isReady.returns(false);
+  it('should call protocol wrapper connect() method when the instance is offline', () => {
+    const kuzzle = new Kuzzle(protocols.somewhere);
+    kuzzle.protocol.isReady.returns(false);
 
     return kuzzle.connect()
       .then(() => {
-        should(kuzzle.network.connectCalled).be.true();
+        should(kuzzle.protocol.connectCalled).be.true();
       });
   });
 
   it('should start queuing when connecting if autoQueue is set', () => {
-    const kuzzle = new Kuzzle(networks.somewhere);
-    kuzzle.network.isReady.returns(false);
+    const kuzzle = new Kuzzle(protocols.somewhere);
+    kuzzle.protocol.isReady.returns(false);
 
     kuzzle.autoQueue = true;
     kuzzle.startQueuing = sinon.stub();
@@ -49,7 +49,7 @@ describe('Kuzzle connect', () => {
   describe('=> Connection Events', () => {
     it('should register listeners upon receiving a "error" event', () => {
       const
-        kuzzle = new Kuzzle(networks.nowhere),
+        kuzzle = new Kuzzle(protocols.nowhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('networkError', eventStub);
@@ -60,7 +60,7 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "connect" event', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere),
+        kuzzle = new Kuzzle(protocols.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('connected', eventStub);
@@ -73,7 +73,7 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "reconnect" event', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhereagain),
+        kuzzle = new Kuzzle(protocols.somewhereagain),
         eventStub = sinon.stub();
 
       kuzzle.addListener('reconnected', eventStub);
@@ -85,7 +85,7 @@ describe('Kuzzle connect', () => {
     });
 
     it('should keep a valid JWT at reconnection', () => {
-      const kuzzle = new Kuzzle(networks.somewhereagain);
+      const kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.checkToken = sinon.stub();
       kuzzle.jwt = 'foobar';
@@ -101,7 +101,7 @@ describe('Kuzzle connect', () => {
     });
 
     it('should empty the JWT at reconnection if it has expired', () => {
-      const kuzzle = new Kuzzle(networks.somewhereagain);
+      const kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.checkToken = sinon.stub();
       kuzzle.jwt = 'foobar';
@@ -118,13 +118,13 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "disconnect" event', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere),
+        kuzzle = new Kuzzle(protocols.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('disconnected', eventStub);
 
       return kuzzle.connect()
-        .then(() => kuzzle.network.disconnect())
+        .then(() => kuzzle.protocol.disconnect())
         .then(() => {
           should(eventStub).be.calledOnce();
         });
@@ -132,13 +132,13 @@ describe('Kuzzle connect', () => {
 
     it('should register listeners upon receiving a "discarded" event', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere),
+        kuzzle = new Kuzzle(protocols.somewhere),
         eventStub = sinon.stub();
 
       kuzzle.addListener('discarded', eventStub);
 
       return kuzzle.connect()
-        .then(() => kuzzle.network.emit('discarded'))
+        .then(() => kuzzle.protocol.emit('discarded'))
         .then(() => {
           should(eventStub).be.calledOnce();
         });
@@ -146,7 +146,7 @@ describe('Kuzzle connect', () => {
 
     it('should stop queuing once connected if autoQueue option is set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere);
+        kuzzle = new Kuzzle(protocols.somewhere);
 
       kuzzle.autoQueue = true;
       kuzzle.stopQueuing = sinon.stub();
@@ -160,7 +160,7 @@ describe('Kuzzle connect', () => {
 
     it('should not stop queuing once connected if autoQueue option is not set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere);
+        kuzzle = new Kuzzle(protocols.somewhere);
 
       kuzzle.autoQueue = false;
       kuzzle.stopQueuing = sinon.stub();
@@ -174,7 +174,7 @@ describe('Kuzzle connect', () => {
 
     it('should play the queue once connected is autoReplay is set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere);
+        kuzzle = new Kuzzle(protocols.somewhere);
 
       kuzzle.autoReplay = true;
       kuzzle.playQueue = sinon.stub();
@@ -188,7 +188,7 @@ describe('Kuzzle connect', () => {
 
     it('should not replay the queue once connected if autoReplay is not set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhere);
+        kuzzle = new Kuzzle(protocols.somewhere);
 
       kuzzle.autoQueue = true;
       kuzzle.autoReplay = false;
@@ -198,7 +198,7 @@ describe('Kuzzle connect', () => {
       return kuzzle.connect()
         .then(() => {
           // already called by the mock
-          //kuzzle.network.emit('connect');
+          //kuzzle.protocol.emit('connect');
 
           should(kuzzle.stopQueuing)
             .be.calledOnce();
@@ -209,7 +209,7 @@ describe('Kuzzle connect', () => {
 
     it('should start queuing on error if autoQueue is set', () => {
       const
-        kuzzle = new Kuzzle(networks.nowhere);
+        kuzzle = new Kuzzle(protocols.nowhere);
 
       kuzzle.autoQueue = true;
       kuzzle.startQueuing = sinon.stub();
@@ -226,7 +226,7 @@ describe('Kuzzle connect', () => {
 
     it('should not start queuing on error is autoQueue is not set', () => {
       const
-        kuzzle = new Kuzzle(networks.nowhere);
+        kuzzle = new Kuzzle(protocols.nowhere);
 
       kuzzle.autoQueue = false;
       kuzzle.startQueuing = sinon.stub();
@@ -243,7 +243,7 @@ describe('Kuzzle connect', () => {
 
     it('should stop queuing once reconnected if autoQueue is set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhereagain);
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.autoQueue = true;
       kuzzle.stopQueuing = sinon.stub();
@@ -257,7 +257,7 @@ describe('Kuzzle connect', () => {
 
     it('should not stop queuing once reconnected if autoQueue is not set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhereagain);
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.autoQueue = false;
       kuzzle.stopQueuing = sinon.stub();
@@ -271,7 +271,7 @@ describe('Kuzzle connect', () => {
 
     it('should play the queue once reconnected if autoReplay is set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhereagain);
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.autoReplay = true;
       kuzzle.playQueue = sinon.stub();
@@ -285,7 +285,7 @@ describe('Kuzzle connect', () => {
 
     it('should not play the queue once reconnected if autoReplay is not set', () => {
       const
-        kuzzle = new Kuzzle(networks.somewhereagain);
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.autoReplay = false;
       kuzzle.playQueue = sinon.stub();

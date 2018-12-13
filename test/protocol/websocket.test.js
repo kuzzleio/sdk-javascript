@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  WS = require('../../src/networkWrapper/protocols/websocket');
+  WS = require('../../src/protocols/websocket');
 
 describe('WebSocket networking module', () => {
   let
@@ -41,7 +41,7 @@ describe('WebSocket networking module', () => {
     should(websocket.id).be.a.String();
   });
 
-  it('should initialize network status when connecting', () => {
+  it('should initialize protocol status when connecting', () => {
     websocket.connect();
     should(websocket.state).be.eql('connecting');
   });

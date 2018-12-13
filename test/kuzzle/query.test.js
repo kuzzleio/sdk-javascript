@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle query management', () => {
@@ -21,36 +21,36 @@ describe('Kuzzle query management', () => {
     let kuzzle;
 
     beforeEach(() => {
-      const network = new NetworkWrapperMock({host: 'somewhere'});
+      const protocol = new ProtocolMock({host: 'somewhere'});
 
-      kuzzle = new Kuzzle(network);
-      kuzzle.network.query.resolves(response);
+      kuzzle = new Kuzzle(protocol);
+      kuzzle.protocol.query.resolves(response);
     });
 
     it('should generate a valid request object with no "options" argument and no callback', () => {
       kuzzle.query(query);
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWith({
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWith({
         action: 'action',
         body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
 
     it('should generate a valid request object', () => {
       kuzzle.query(query, {foo: 'bar', baz: 'yolo'});
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWith({
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWith({
         action: 'action',
         body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -62,22 +62,22 @@ describe('Kuzzle query management', () => {
 
     it('should manage arguments properly if no options are provided', () => {
       kuzzle.query(query);
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWith({
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWith({
         action: 'action',
         body: {some: 'query'},
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.network.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
 
     it('should not define optional members if none was provided', () => {
       kuzzle.query({controller: 'foo', action: 'bar'});
-      should(kuzzle.network.query).be.calledWithMatch({collection: undefined});
-      should(kuzzle.network.query).be.calledWithMatch({index: undefined});
+      should(kuzzle.protocol.query).be.calledWithMatch({collection: undefined});
+      should(kuzzle.protocol.query).be.calledWithMatch({index: undefined});
     });
 
     it('should throw an error if the "request" argument if maformed', () => {
@@ -115,8 +115,8 @@ describe('Kuzzle query management', () => {
 
       kuzzle.volatile = volatile;
       kuzzle.query();
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({volatile: kuzzle.volatile});
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWithMatch({volatile: kuzzle.volatile});
     });
 
     it('should copy request local volatile over kuzzle object ones', () => {
@@ -128,12 +128,12 @@ describe('Kuzzle query management', () => {
       kuzzle.volatile = volatile;
 
       kuzzle.query({body: {some: 'query'}, volatile: {foo: 'foo'}});
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
     });
 
     it('should not override "sdkInstanceId" and "sdkVersion" volatile data', () => {
-      kuzzle.network.id = 'kuz-sdk-instance-id';
+      kuzzle.protocol.id = 'kuz-sdk-instance-id';
       kuzzle.sdkVersion = 'kuz-sdk-version';
 
       const volatile = {
@@ -142,8 +142,8 @@ describe('Kuzzle query management', () => {
       };
       kuzzle.query({body: {some: 'query'}, volatile});
 
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWithMatch({
         volatile: {
           sdkInstanceId: 'kuz-sdk-instance-id',
           sdkVersion: 'kuz-sdk-version'
@@ -153,14 +153,14 @@ describe('Kuzzle query management', () => {
 
     it('should handle option "refresh" properly', () => {
       kuzzle.query({refresh: 'foo'});
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({refresh: 'wait_for'});
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWithMatch({refresh: 'wait_for'});
     });
 
     it('should not generate a new request ID if one is already defined', () => {
       kuzzle.query({body: {some: 'query'}, requestId: 'foobar'});
-      should(kuzzle.network.query).be.calledOnce();
-      should(kuzzle.network.query).be.calledWithMatch({requestId: 'foobar'});
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWithMatch({requestId: 'foobar'});
     });
 
     it('should set jwt except for auth/checkToken', () => {
@@ -169,9 +169,9 @@ describe('Kuzzle query management', () => {
       kuzzle.query({controller: 'foo', action: 'bar'}, {});
       kuzzle.query({controller: 'auth', action: 'checkToken'}, {});
 
-      should(kuzzle.network.query).be.calledTwice();
-      should(kuzzle.network.query.firstCall.args[0].jwt).be.exactly('fake-token');
-      should(kuzzle.network.query.secondCall.args[0].jwt).be.undefined();
+      should(kuzzle.protocol.query).be.calledTwice();
+      should(kuzzle.protocol.query.firstCall.args[0].jwt).be.exactly('fake-token');
+      should(kuzzle.protocol.query.secondCall.args[0].jwt).be.undefined();
     });
 
     it('should queue the request if queing and queuable', () => {
@@ -184,7 +184,7 @@ describe('Kuzzle query management', () => {
 
       kuzzle.query(request, {});
 
-      should(kuzzle.network.query).not.be.called();
+      should(kuzzle.protocol.query).not.be.called();
       should(eventStub)
         .be.calledOnce()
         .be.calledWith({request});
@@ -208,7 +208,7 @@ describe('Kuzzle query management', () => {
           throw new Error('no error');
         })
         .catch(() => {
-          should(kuzzle.network.query)
+          should(kuzzle.protocol.query)
             .not.be.called();
           should(kuzzle._offlineQueue.length).eql(0);
           should(eventStub)
@@ -226,7 +226,7 @@ describe('Kuzzle query management', () => {
           throw new Error('no error');
         })
         .catch(() => {
-          should(kuzzle.network.query)
+          should(kuzzle.protocol.query)
             .be.not.be.called();
         });
 

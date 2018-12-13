@@ -29,17 +29,24 @@ The SDK supports different protocols. When instantiating, you must choose the pr
 
 Example:
 ```js
-const { Kuzzle } = require('kuzzle-sdk');
+const { 
+  Kuzzle,
+  Websocket,
+  Http,
+  SocketIO
+} = require('kuzzle-sdk');
 
-const kuzzle = new Kuzzle('websocket', { host: 'localhost', port: 7512 });
+const kuzzle = new Kuzzle(
+  new Websocket({ host: 'localhost', port: 7512 })
+);
 
-kuzzle.connect()
-  .then(() => {
-    // You are now connected to your Kuzzle instance.
-    return kuzzle.server.now();
-  })
-  .then(serverTime => console.log(serverTime))
-  .catch(error => console.error(error));
+try {
+  const serverTime = kuzzle.server.now();
+
+  console.log(serverTime);
+} catch (error) {
+  console.error(error);
+}
 ```
 
 ## Installation
@@ -92,9 +99,9 @@ import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
 ```
 
 ## Protocols used
-Actually, the SDK support 3 protocols: `http`, `websocket` et `socketio`.  
+Currently, the SDK support 3 protocols: `Http`, `Websocket` and `SocketIO`.  
 
-Websocket and Socket.IO protocols implement the whole Kuzzle API, while HTTP protocol does not implement realtime features (rooms and subscriptions).  
+WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
 #### NodeJS
@@ -109,9 +116,9 @@ We also recommend to use the `webSocket` or `http` protocol, but some old browse
 let kuzzle;
 
 if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
-  kuzzle = new Kuzzle('websocket', { host: 'localhost' });
+  kuzzle = new Kuzzle(new Websocket({ host: 'localhost' }));
 } else {
-  kuzzle = new Kuzzle('socketio', { host: 'localhost' });
+  kuzzle = new Kuzzle(new SocketIO({ host: 'localhost' }));
 }
 ```
 
@@ -119,12 +126,12 @@ if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
 
 The SDK also proposes to create custom protocols.  
 
-There are two ways to write these protocols, the first is to inherit the `KuzzleAbstractNetwork` class provided with the SDK and implement only the `connect` and `send` methods.
+There are two ways to write these protocols, the first is to inherit the `KuzzleAbstractProtocol` class provided with the SDK and implement only the `connect` and `send` methods.
 
 ```js
-const { KuzzleAbstractNetwork } = require('kuzzle-sdk');
+const { KuzzleAbstractProtocol } = require('kuzzle-sdk');
 
-class MyCustomProtocol extends KuzzleAbstractNetwork {
+class MyCustomProtocol extends KuzzleAbstractProtocol {
   connect() {
     // (...) do custom connection steps...
 

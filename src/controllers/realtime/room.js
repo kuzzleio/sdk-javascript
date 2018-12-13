@@ -54,7 +54,7 @@ class Room {
         this.channel = response.result.channel;
 
         // we rely on kuzzle event emitter to not duplicate the listeners here
-        this.kuzzle.network.on(this.channel, this._channelListener);
+        this.kuzzle.protocol.on(this.channel, this._channelListener);
 
         this.kuzzle.addListener('reconnected', this._reSubscribeListener);
 
@@ -66,12 +66,12 @@ class Room {
     this.kuzzle.removeListener('reconnected', this._reSubscribeListener);
 
     if (this.channel) {
-      this.kuzzle.network.removeListener(this.channel, this._channelListener);
+      this.kuzzle.protocol.removeListener(this.channel, this._channelListener);
     }
   }
 
   _channelListener (data) {
-    const fromSelf = data.volatile && data.volatile.sdkInstanceId === this.kuzzle.network.id;
+    const fromSelf = data.volatile && data.volatile.sdkInstanceId === this.kuzzle.protocol.id;
     if (this.subscribeToSelf || !fromSelf) {
       this.callback(data);
     }
