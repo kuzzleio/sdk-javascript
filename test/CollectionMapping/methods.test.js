@@ -174,7 +174,7 @@ describe('CollectionMapping methods', function () {
     });
 
     it('should return a "no mapping" error if the index is not found in the mapping', function (done) {
-      result = { result: {foobar: { mappings: { foo: { properties: { foo: {type: 'date'}}}}}}};
+      result = { result: {} };
 
       mapping.refresh(function (err, res) {
         should(err).be.an.Error();
