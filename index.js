@@ -1,6 +1,11 @@
 const
   Kuzzle = require('./src/Kuzzle'),
-  KuzzleAbstractNetwork = require('./src/networkWrapper/protocols/abstract/common'),
+  {
+    Http,
+    Websocket,
+    SocketIO
+  } = require('./src/protocols'),
+  KuzzleAbstractProtocol = require('./src/protocols/abstract/common'),
   KuzzleEventEmitter = require('./src/eventEmitter');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
@@ -10,4 +15,11 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
                'Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser');
 }
 
-module.exports = {Kuzzle, KuzzleAbstractNetwork, KuzzleEventEmitter};
+module.exports = {
+  Kuzzle,
+  Http,
+  Websocket,
+  SocketIO,
+  KuzzleAbstractProtocol,
+  KuzzleEventEmitter
+};

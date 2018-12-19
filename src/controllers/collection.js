@@ -148,7 +148,8 @@ class CollectionController {
       index,
       collection,
       controller: 'collection',
-      action: 'truncate'
+      action: 'truncate',
+      refresh: options.refresh
     }, options)
       .then(response => response.result);
   }
@@ -193,7 +194,7 @@ class CollectionController {
       controller: 'collection',
       action: 'updateSpecifications'
     }, options)
-      .then(response => response.result);
+      .then(response => response.result[index][collection]);
   }
 
   validateSpecifications (index, collection, specifications, options = {}) {

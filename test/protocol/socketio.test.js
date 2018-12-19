@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  SocketIO = require('../../src/networkWrapper/protocols/socketio');
+  SocketIO = require('../../src/protocols/socketio');
 
 /**
  * @global window
@@ -45,12 +45,11 @@ describe('SocketIO networking module', () => {
           }
         }
       },
-      emit: function(evt) {
-        let i;
+      emit: function(...args) {
+        const evt = args.shift();
 
-        const args = Array.prototype.slice.call(arguments, 1);
         if (socketStub.eventOnce[evt]) {
-          for (i in socketStub.eventOnce[evt]) {
+          for (const i in socketStub.eventOnce[evt]) {
             if (typeof socketStub.eventOnce[evt][i] === 'function') {
               socketStub.eventOnce[evt][i].apply(socketIO, args);
               delete socketStub.eventOnce[evt][i];
@@ -58,7 +57,7 @@ describe('SocketIO networking module', () => {
           }
         }
         if (socketStub.events[evt]) {
-          for (i in socketStub.events[evt]) {
+          for (const i in socketStub.events[evt]) {
             if (typeof socketStub.events[evt][i] === 'function') {
               socketStub.events[evt][i].apply(socketIO, args);
             }
@@ -83,16 +82,13 @@ describe('SocketIO networking module', () => {
     clock.restore();
   });
 
-  it('should initialize network status when connecting', () => {
-    socketIO.connect();
-    should(socketIO.state).be.eql('connecting');
-    should(socketIO.queuing).be.false();
+  it('should expose an unique identifier', () => {
+    should(socketIO.id).be.a.String();
   });
 
-  it('should start queuing if autoQueue option is set', () => {
-    socketIO.autoQueue = true;
+  it('should initialize protocol status when connecting', () => {
     socketIO.connect();
-    should(socketIO.queuing).be.true();
+    should(socketIO.state).be.eql('connecting');
   });
 
   it('should connect with the right parameters', () => {
@@ -151,42 +147,6 @@ describe('SocketIO networking module', () => {
     should(socketIO.stopRetryingToConnect).be.false();
   });
 
-  it('should stop queuing when the client connection is established if autoQueue option is set', () => {
-    socketIO.queuing = true;
-    socketIO.autoQueue = true;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    should(socketIO.queuing).be.false();
-  });
-
-  it('should not stop queuing when the client connection is established if autoQueue option is not set', () => {
-    socketIO.queuing = true;
-    socketIO.autoQueue = false;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    should(socketIO.queuing).be.true();
-  });
-
-  it('should play the queue when the client connection is established if autoReplay option is set', () => {
-    socketIO.playQueue = sinon.stub();
-    socketIO.autoReplay = true;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    should(socketIO.playQueue).be.calledOnce();
-  });
-
-  it('should not play the queue when the client connection is established if autoReplay option is not set', () => {
-    socketIO.playQueue = sinon.stub();
-    socketIO.autoReplay = false;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    should(socketIO.playQueue).not.be.called();
-  });
-
   it('should call listeners on a "reconnect" event', () => {
     const cb = sinon.stub();
 
@@ -220,32 +180,6 @@ describe('SocketIO networking module', () => {
     should(cb).be.calledOnce();
   });
 
-  it('should start queuing when the client is disconnected if autoQueue option is set', () => {
-    socketIO.queuing = false;
-    socketIO.autoQueue = true;
-
-    const promise = socketIO.connect();
-    socketIO.socket.emit('disconnect');
-
-    clock.tick(10);
-    should(socketIO.queuing).be.true();
-
-    return should(promise).be.rejectedWith('An error occurred, kuzzle may not be ready yet');
-  });
-
-  it('should not start queuing when the client is disconnected if autoQueue option is not set', () => {
-    socketIO.queuing = false;
-    socketIO.autoQueue = false;
-
-    const promise = socketIO.connect();
-    socketIO.socket.emit('disconnect');
-
-    clock.tick(10);
-    should(socketIO.queuing).be.false();
-
-    return should(promise).be.rejectedWith('An error occurred, kuzzle may not be ready yet');
-  });
-
   it('should call listeners on a connect error event', () => {
     const
       cb = sinon.stub(),
@@ -265,36 +199,6 @@ describe('SocketIO networking module', () => {
     should(cb.firstCall.args[0].internal).be.equal(err);
 
     return should(promise).be.rejectedWith('foobar');
-  });
-
-  it('should start queuing when the client is disconnected with an error, if autoQueue option is set', () => {
-    const err = new Error('foobar');
-
-    socketIO.queuing = false;
-    socketIO.autoQueue = true;
-    socketIO.forceDisconnect = true;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    socketIO.socket.emit('connect_error', err);
-
-    clock.tick(10);
-    should(socketIO.queuing).be.true();
-  });
-
-  it('should not start queuing when the client is disconnected with an error, if autoQueue option is not set', () => {
-    const err = new Error('foobar');
-
-    socketIO.queuing = false;
-    socketIO.autoQueue = false;
-    socketIO.forceDisconnect = true;
-
-    socketIO.connect();
-    socketIO.socket.emit('connect');
-    socketIO.socket.emit('connect_error', err);
-
-    clock.tick(10);
-    should(socketIO.queuing).be.false();
   });
 
   it('should call connectError handler on unattended disconnect event', () => {

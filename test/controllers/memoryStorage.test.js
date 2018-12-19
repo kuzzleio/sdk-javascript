@@ -1086,12 +1086,12 @@ describe('MemoryStorage Controller', function () {
   });
 
   it('#sort', function () {
-    return testReadCommand(
+    return testWriteCommand(
       'sort',
       ['key'],
       {alpha: true, by: 'foo', direction: 'asc', get: ['foo', 'bar'], limit: {count: 0, offset: 1}},
-      {_id: 'key'},
-      {alpha: true, by: 'foo', direction: 'asc', get: ['foo', 'bar'], limit: {count: 0, offset: 1}},
+      {_id: 'key', body: {alpha: true, by: 'foo', direction: 'asc', get: ['foo', 'bar'], limit: {count: 0, offset: 1}}},
+      {},
       ['foo', 'bar', 'baz'],
       ['foo', 'bar', 'baz']
     );

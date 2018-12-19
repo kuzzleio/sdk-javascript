@@ -9,7 +9,6 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
-  networkWrapper = require('./networkWrapper'),
   uuidv4 = require('./uuidv4');
 
 const
@@ -29,28 +28,23 @@ const
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
-   * @param network - the network wrapper to use. if the argument is a string, creates an embeed network wrapper if a
-   * @param [options] - Connection options
+   * @param protocol - the protocol to use
+   * @param [options] - Kuzzle options
    */
-  constructor(network, options = {}) {
+  constructor(protocol, options = {}) {
     super();
 
-    if (network === undefined || network === null) {
-      throw new Error('"network" argument missing');
+    if (protocol === undefined || protocol === null) {
+      throw new Error('"protocol" argument missing');
     }
 
-    // embedded network protocol (http/websocket/socketio):
-    if (typeof network === 'string') {
-      return new Kuzzle(networkWrapper(network, options), options);
-    }
-
-    // custom protocol: check the existence of required methods
+    // check the existence of required methods
     for (const method of ['addListener', 'isReady', 'query']) {
-      if (typeof network[method] !== 'function') {
-        throw new Error(`Network instance must implement a "${method}" method`);
+      if (typeof protocol[method] !== 'function') {
+        throw new Error(`Protocol instance must implement a "${method}" method`);
       }
     }
-    this.network = network;
+    this.protocol = protocol;
 
     this._protectedEvents = {
       connected: {},
@@ -77,41 +71,55 @@ class Kuzzle extends KuzzleEventEmitter {
     this.security = new SecurityController(this);
     this.server = new ServerController(this);
 
-    this.network.addListener('offlineQueuePush', data => this.emit('offlineQueuePush', data));
-    this.network.addListener('offlineQueuePop', data => this.emit('offlineQueuePop', data));
-    this.network.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+    // offline queue
+    this._autoQueue = typeof options.autoQueue === 'boolean' ? options.autoQueue : false;
+    this._autoReplay = typeof options.autoReplay === 'boolean' ? options.autoReplay : false;
+    this._offlineQueue = [];
+    this._offlineQueueLoader = typeof options.offlineQueueLoader === 'function' ? options.offlineQueueLoader : null;
+    this._queueFilter = typeof options.queueFilter === 'function' ? options.queueFilter : null;
+    this._queueMaxSize = typeof options.queueMaxSize === 'number' ? options.queueMaxSize : 500;
+    this._queueTTL = typeof options.queueTTL === 'number' ? options.queueTTL : 120000;
 
-    this.network.addListener('tokenExpired', () => {
+    if (options.offlineMode === 'auto') {
+      this._autoQueue = true;
+      this._autoReplay = true;
+    }
+    this.queuing = false;
+    this.replayInterval = 10;
+
+    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+
+    this.protocol.addListener('tokenExpired', () => {
       this.jwt = undefined;
       this.emit('tokenExpired');
     });
   }
 
   get autoQueue () {
-    return this.network.autoQueue;
+    return this._autoQueue;
   }
 
   set autoQueue (value) {
-    this._checkPropertyType('autoQueue', 'boolean', value);
-    this.network.autoQueue = value;
+    this._checkPropertyType('_autoQueue', 'boolean', value);
+    this._autoQueue = value;
   }
 
   get autoReconnect () {
-    return this.network.autoReconnect;
+    return this.protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.network.autoReconnect = value;
+    this.protocol.autoReconnect = value;
   }
 
   get autoReplay () {
-    return this.network.autoReplay;
+    return this._autoReplay;
   }
 
   set autoReplay (value) {
-    this._checkPropertyType('autoReplay', 'boolean', value);
-    this.network.autoReplay = value;
+    this._checkPropertyType('_autoReplay', 'boolean', value);
+    this._autoReplay = value;
   }
 
   get jwt () {
@@ -137,68 +145,68 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   get host () {
-    return this.network.host;
+    return this.protocol.host;
   }
 
   get offlineQueue () {
-    return this.network.offlineQueue;
+    return this._offlineQueue;
   }
 
   get offlineQueueLoader () {
-    return this.network.offlineQueueLoader;
+    return this._offlineQueueLoader;
   }
 
   set offlineQueueLoader (value) {
-    this._checkPropertyType('offlineQueueLoader', 'function', value);
-    this.network.offlineQueueLoader = value;
+    this._checkPropertyType('_offlineQueueLoader', 'function', value);
+    this._offlineQueueLoader = value;
   }
 
   get port () {
-    return this.network.port;
+    return this.protocol.port;
   }
 
   get queueFilter () {
-    return this.network.queueFilter;
+    return this._queueFilter;
   }
 
   set queueFilter (value) {
-    this._checkPropertyType('queueFilter', 'function', value);
-    this.network.queueFilter = value;
+    this._checkPropertyType('_queueFilter', 'function', value);
+    this._queueFilter= value;
   }
 
   get queueMaxSize () {
-    return this.network.queueMaxSize;
+    return this._queueMaxSize;
   }
 
   set queueMaxSize (value) {
-    this._checkPropertyType('queueMaxSize', 'number', value);
-    this.network.queueMaxSize = value;
+    this._checkPropertyType('_queueMaxSize', 'number', value);
+    this._queueMaxSize = value;
   }
 
   get queueTTL () {
-    return this.network.queueTTL;
+    return this._queueTTL;
   }
 
   set queueTTL (value) {
-    this._checkPropertyType('queueTTL', 'number', value);
-    this.network.queueTTL = value;
+    this._checkPropertyType('_queueTTL', 'number', value);
+    this._queueTTL = value;
   }
 
   get reconnectionDelay () {
-    return this.network.reconnectionDelay;
+    return this.protocol.reconnectionDelay;
   }
 
   get replayInterval () {
-    return this.network.replayInterval;
+    return this._replayInterval;
   }
 
   set replayInterval (value) {
-    this._checkPropertyType('replayInterval', 'number', value);
-    this.network.replayInterval = value;
+    this._checkPropertyType('_replayInterval', 'number', value);
+    this._replayInterval = value;
   }
 
   get sslConnection () {
-    return this.network.sslConnection;
+    return this.protocol.sslConnection;
   }
 
   /**
@@ -225,23 +233,46 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Promise<Object>}
    */
   connect () {
-    if (this.network.isReady()) {
+    if (this.protocol.isReady()) {
       return Promise.resolve();
     }
 
-    this.network.addListener('connect', () => {
+    if (this.autoQueue) {
+      this.startQueuing();
+    }
+
+    this.protocol.addListener('connect', () => {
+      if (this.autoQueue) {
+        this.stopQueuing();
+      }
+
+      if (this.autoReplay) {
+        this.playQueue();
+      }
+
       this.emit('connected');
     });
 
-    this.network.addListener('networkError', error => {
+    this.protocol.addListener('networkError', error => {
+      if (this.autoQueue) {
+        this.startQueuing();
+      }
       this.emit('networkError', error);
     });
 
-    this.network.addListener('disconnect', () => {
+    this.protocol.addListener('disconnect', () => {
       this.emit('disconnected');
     });
 
-    this.network.addListener('reconnect', () => {
+    this.protocol.addListener('reconnect', () => {
+      if (this.autoQueue) {
+        this.stopQueuing();
+      }
+
+      if (this.autoReplay) {
+        this.playQueue();
+      }
+
       if (this.jwt) {
         this.checkToken(this.jwt, (err, res) => {
           // shouldn't obtain an error but let's invalidate the token anyway
@@ -256,9 +287,9 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     });
 
-    this.network.addListener('discarded', data => this.emit('discarded', data));
+    this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
-    return this.network.connect();
+    return this.protocol.connect();
   }
 
   /**
@@ -282,7 +313,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @returns {Kuzzle}
    */
   flushQueue () {
-    this.network.flushQueue();
+    this._offlineQueue = [];
     return this;
   }
 
@@ -290,7 +321,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * Disconnects from Kuzzle and invalidate this instance.
    */
   disconnect () {
-    this.network.close();
+    this.protocol.close();
   }
 
   /**
@@ -333,7 +364,7 @@ class Kuzzle extends KuzzleEventEmitter {
         request.volatile[item] = this.volatile[item];
       }
     }
-    request.volatile.sdkInstanceId = this.network.id;
+    request.volatile.sdkInstanceId = this.protocol.id;
     request.volatile.sdkVersion = this.sdkVersion;
 
     /*
@@ -341,20 +372,48 @@ class Kuzzle extends KuzzleEventEmitter {
      * a developer simply wish to verify his token
      */
     if (this.jwt !== undefined
-      && !(request.controller === 'auth' 
+      && !(request.controller === 'auth'
       && request.action === 'checkToken')
     ) {
       request.jwt = this.jwt;
     }
 
-    return this.network.query(request, options);
+    let queuable = true;
+    if (options && options.queuable === false) {
+      queuable = false;
+    }
+
+    if (this.queueFilter) {
+      queuable = queuable && this.queueFilter(request);
+    }
+
+    if (this.queuing) {
+      if (queuable) {
+        this._cleanQueue();
+        this.emit('offlineQueuePush', {request});
+        return new Promise((resolve, reject) => {
+          this.offlineQueue.push({
+            resolve,
+            reject,
+            request,
+            ts: Date.now()
+          });
+        });
+      }
+
+      this.emit('discarded', {request});
+      return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
+Discarded request: ${JSON.stringify(request)}`));
+    }
+
+    return this.protocol.query(request);
   }
 
   /**
    * Starts the requests queuing.
    */
   startQueuing () {
-    this.network.startQueuing();
+    this.queuing = true;
     return this;
   }
 
@@ -362,23 +421,18 @@ class Kuzzle extends KuzzleEventEmitter {
    * Stops the requests queuing.
    */
   stopQueuing () {
-    this.network.stopQueuing();
+    this.queuing = false;
     return this;
-  }
-
-  /**
-   * @DEPRECATED
-   * See Kuzzle.prototype.playQueue();
-   */
-  replayQueue () {
-    return this.playQueue();
   }
 
   /**
    * Plays the requests queued during offline mode.
    */
   playQueue () {
-    this.network.playQueue();
+    if (this.protocol.isReady()) {
+      this._cleanQueue();
+      this._dequeue();
+    }
     return this;
   }
 
@@ -388,6 +442,82 @@ class Kuzzle extends KuzzleEventEmitter {
     if (wrongType) {
       throw new Error(`Expected ${prop} to be a ${typestr}, ${typeof value} received`);
     }
+  }
+
+  /**
+   * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
+   */
+  _cleanQueue () {
+    const now = Date.now();
+    let lastDocumentIndex = -1;
+
+    if (this.queueTTL > 0) {
+      this.offlineQueue.forEach((query, index) => {
+        if (query.ts < now - this.queueTTL) {
+          lastDocumentIndex = index;
+        }
+      });
+
+      if (lastDocumentIndex !== -1) {
+        this.offlineQueue
+          .splice(0, lastDocumentIndex + 1)
+          .forEach(droppedRequest => {
+            this.emit('offlineQueuePop', droppedRequest.query);
+          });
+      }
+    }
+
+    if (this.queueMaxSize > 0 && this.offlineQueue.length > this.queueMaxSize) {
+      this.offlineQueue
+        .splice(0, this.offlineQueue.length - this.queueMaxSize)
+        .forEach(droppedRequest => {
+          this.emit('offlineQueuePop', droppedRequest.query);
+        });
+    }
+  }
+
+  /**
+   * Play all queued requests, in order.
+   */
+  _dequeue () {
+    const
+      uniqueQueue = {},
+      dequeuingProcess = () => {
+        if (this.offlineQueue.length > 0) {
+          this.protocol.query(this.offlineQueue[0].request)
+            .then(this.offlineQueue[0].resolve)
+            .catch(this.offlineQueue[0].reject);
+          this.emit('offlineQueuePop', this.offlineQueue.shift());
+
+          setTimeout(() => {
+            dequeuingProcess();
+          }, Math.max(0, this.replayInterval));
+        }
+      };
+
+    if (this.offlineQueueLoader) {
+      if (typeof this.offlineQueueLoader !== 'function') {
+        throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof this.offlineQueueLoader);
+      }
+
+      const additionalQueue = this.offlineQueueLoader();
+      if (Array.isArray(additionalQueue)) {
+        this._offlineQueue = additionalQueue
+          .concat(this.offlineQueue)
+          .filter(query => {
+            // throws if the request does not contain required attributes
+            if (!query.request || query.request.requestId === undefined || !query.request.action || !query.request.controller) {
+              throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+            }
+
+            return uniqueQueue.hasOwnProperty(query.request.requestId) ? false : (uniqueQueue[query.request.requestId] = true);
+          });
+      } else {
+        throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+      }
+    }
+
+    dequeuingProcess();
   }
 }
 

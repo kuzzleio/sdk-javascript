@@ -1,20 +1,15 @@
 'use strict';
 
 const
-  AbstractWrapper = require('./common');
+  KuzzleAbstractProtocol = require('./common');
 
-class RTWrapper extends AbstractWrapper {
+class RTWrapper extends KuzzleAbstractProtocol {
 
   constructor (options = {}) {
     super(options);
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
-
-    if (options.offlineMode === 'auto' && this.autoReconnect) {
-      this.autoQueue = true;
-      this.autoReplay = true;
-    }
 
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
@@ -31,9 +26,6 @@ class RTWrapper extends AbstractWrapper {
 
   connect() {
     this.state = 'connecting';
-    if (this.autoQueue) {
-      this.startQueuing();
-    }
   }
 
   /**
@@ -61,9 +53,6 @@ class RTWrapper extends AbstractWrapper {
    */
   clientNetworkError(error) {
     this.state = 'offline';
-    if (this.autoQueue) {
-      this.startQueuing();
-    }
 
     const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
     connectionError.internal = error;

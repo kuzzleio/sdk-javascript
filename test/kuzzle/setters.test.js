@@ -1,15 +1,15 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  NetworkWrapperMock = require('../mocks/networkWrapper.mock'),
+  ProtocolMock = require('../mocks/protocol.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle setters', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const network = new NetworkWrapperMock({host: 'somewhere'});
-    kuzzle = new Kuzzle(network);
+    const protocol = new ProtocolMock({host: 'somewhere'});
+    kuzzle = new Kuzzle(protocol);
   });
 
   describe('#autoQueue', () => {
@@ -19,14 +19,14 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.autoQueue property', () => {
-      should(kuzzle.network.autoQueue).be.undefined();
+    it('should set private _autoQueue property', () => {
+      should(kuzzle.protocol.autoQueue).be.undefined();
 
       kuzzle.autoQueue = true;
-      should(kuzzle.network.autoQueue).be.a.Boolean().and.be.true();
+      should(kuzzle._autoQueue).be.a.Boolean().and.be.true();
 
       kuzzle.autoQueue = false;
-      should(kuzzle.network.autoQueue).be.a.Boolean().and.be.false();
+      should(kuzzle._autoQueue).be.a.Boolean().and.be.false();
     });
   });
 
@@ -37,14 +37,14 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.autoReconnect property', () => {
-      should(kuzzle.network.autoReconnect).be.undefined();
+    it('should set protocol.autoReconnect property', () => {
+      should(kuzzle.protocol.autoReconnect).be.undefined();
 
       kuzzle.autoReconnect = true;
-      should(kuzzle.network.autoReconnect).be.a.Boolean().and.be.true();
+      should(kuzzle.protocol.autoReconnect).be.a.Boolean().and.be.true();
 
       kuzzle.autoReconnect = false;
-      should(kuzzle.network.autoReconnect).be.a.Boolean().and.be.false();
+      should(kuzzle.protocol.autoReconnect).be.a.Boolean().and.be.false();
     });
   });
 
@@ -55,14 +55,14 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.autoReplay property', () => {
-      should(kuzzle.network.autoReplay).be.undefined();
+    it('should set priavet _autoReplay property', () => {
+      should(kuzzle.protocol.autoReplay).be.undefined();
 
       kuzzle.autoReplay = true;
-      should(kuzzle.network.autoReplay).be.a.Boolean().and.be.true();
+      should(kuzzle._autoReplay).be.a.Boolean().and.be.true();
 
       kuzzle.autoReplay = false;
-      should(kuzzle.network.autoReplay).be.a.Boolean().and.be.false();
+      should(kuzzle._autoReplay).be.a.Boolean().and.be.false();
     });
   });
 
@@ -109,12 +109,12 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.offlineQueueLoader property', () => {
-      should(kuzzle.network.offlineQueueLoader).be.undefined();
+    it('should set protocol.offlineQueueLoader property', () => {
+      should(kuzzle.offlineQueueLoader).be.null();
 
       const cb = sinon.stub();
       kuzzle.offlineQueueLoader = cb;
-      should(kuzzle.network.offlineQueueLoader).be.equal(cb);
+      should(kuzzle.offlineQueueLoader).be.equal(cb);
     });
   });
 
@@ -125,12 +125,12 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.queueFilter property', () => {
-      should(kuzzle.network.queueFilter).be.undefined();
+    it('should set private _queueFilter property', () => {
+      should(kuzzle.queueFilter).be.null();
 
       const cb = sinon.stub();
       kuzzle.queueFilter = cb;
-      should(kuzzle.network.queueFilter).be.equal(cb);
+      should(kuzzle._queueFilter).be.equal(cb);
     });
   });
 
@@ -141,11 +141,9 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.queueMaxSize property', () => {
-      should(kuzzle.network.queueMaxSize).be.undefined();
-
+    it('should set priavert _queueMaxSize property', () => {
       kuzzle.queueMaxSize = 1234;
-      should(kuzzle.network.queueMaxSize).be.equal(1234);
+      should(kuzzle._queueMaxSize).be.equal(1234);
     });
   });
 
@@ -156,11 +154,9 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.queueTTL property', () => {
-      should(kuzzle.network.queueTTL).be.undefined();
-
+    it('should set private _queueTTL property', () => {
       kuzzle.queueTTL = 1234;
-      should(kuzzle.network.queueTTL).be.equal(1234);
+      should(kuzzle._queueTTL).be.equal(1234);
     });
   });
 
@@ -171,11 +167,19 @@ describe('Kuzzle setters', () => {
       }).throw();
     });
 
-    it('should set network.replayInterval property', () => {
-      should(kuzzle.network.replayInterval).be.undefined();
-
+    it('should set private _replayInterval property', () => {
       kuzzle.replayInterval = 1234;
-      should(kuzzle.network.replayInterval).be.equal(1234);
+      should(kuzzle._replayInterval).be.equal(1234);
+    });
+  });
+
+  describe('#flushQueue', () => {
+    it('flush the offline queue', () => {
+      kuzzle._offlineQueue.push({ foo: 'bar' });
+
+      kuzzle.flushQueue();
+
+      should(kuzzle._offlineQueue).be.empty();
     });
   });
 });
