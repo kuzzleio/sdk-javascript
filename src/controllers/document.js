@@ -38,22 +38,22 @@ class DocumentController {
       .then(response => response.result.count);
   }
 
-  create (index, collection, _id, body, options = {}) {
+  create (index, collection, document, _id = null, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.document.create: index is required');
     }
     if (!collection) {
       throw new Error('Kuzzle.document.create: collection is required');
     }
-    if (!body) {
-      throw new Error('Kuzzle.document.create: body is required');
+    if (!document) {
+      throw new Error('Kuzzle.document.create: document is required');
     }
 
     const request = {
       index,
       collection,
       _id,
-      body,
+      body: document,
       controller: 'document',
       action: 'create',
       refresh: options.refresh
