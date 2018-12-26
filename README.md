@@ -217,7 +217,7 @@ For example, for the `create` action of the `document` controller ([document#cre
 ```js
 const options = { refresh: 'wait_for' };
 const documentBody = { hello: 'world' };
-kuzzle.document.create('my-index', 'my-collection', 'my-uniq-id', documentBody, options)
+kuzzle.document.create('my-index', 'my-collection', documentBody, 'my-uniq-id', options)
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
