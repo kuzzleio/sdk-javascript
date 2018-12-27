@@ -11,11 +11,13 @@ Given(/^the collection doesn't have a document with id '(.*?)'$/, async function
 });
 
 Given('the collection has a document with id {string}', async function (id) {
-  this.content = await this.kuzzle.document.create(this.index, this.collection, id, {
-    a: 'document'
-  }, {
-    refresh: 'wait_for'
-  });
+  this.content = await this.kuzzle.document.create(
+    this.index,
+    this.collection,
+    { a: 'document' },
+    id,
+    { refresh: 'wait_for'}
+  );
 });
 
 
@@ -31,8 +33,8 @@ When('I create a document in {string}', async function (collection) {
   this.content = await this.kuzzle.document.create(
     this.index,
     this.collection,
-    'some-id',
     {a: 'document'},
+    'some-id',
     {refresh: true}
   );
 });
@@ -44,8 +46,8 @@ When('I create a document with id {string}', async function (id) {
     this.content = await this.kuzzle.document.create(
       this.index,
       this.collection,
-      id,
       {a: 'document'},
+      id,
       {refresh: true}
     );
   }
