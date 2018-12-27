@@ -23,8 +23,7 @@ describe('WebSocket networking module', () => {
       return clientStub;
     };
 
-    websocket = new WS({
-      host: 'address',
+    websocket = new WS('address', {
       port: 1234,
       autoReconnect: true,
       reconnectionDelay: 10
@@ -58,8 +57,7 @@ describe('WebSocket networking module', () => {
 
   it('should initialize a WS secure connection', () => {
     clientStub.on = sinon.stub();
-    websocket = new WS({
-      host: 'address',
+    websocket = new WS('address', {
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234,
@@ -135,8 +133,7 @@ describe('WebSocket networking module', () => {
   it('should not try to reconnect on a connection error with autoReconnect = false', () => {
     const cb = sinon.stub();
 
-    websocket = new WS({
-      host: 'address',
+    websocket = new WS('address', {
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 10

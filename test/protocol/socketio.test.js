@@ -67,8 +67,7 @@ describe('SocketIO networking module', () => {
       close: sinon.spy()
     };
 
-    socketIO = new SocketIO({
-      host: 'address',
+    socketIO = new SocketIO('address', {
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234
@@ -102,8 +101,7 @@ describe('SocketIO networking module', () => {
   });
 
   it('should connect with the secure connection', () => {
-    socketIO = new SocketIO({
-      host: 'address',
+    socketIO = new SocketIO('address', {
       port: 1234,
       autoReconnect: false,
       reconnectionDelay: 1234,
@@ -225,7 +223,7 @@ describe('SocketIO exposed methods', () => {
       close: sinon.spy()
     };
 
-    socketIO = new SocketIO({host: 'address'});
+    socketIO = new SocketIO('address');
     socketIO.socket = socketStub;
 
     window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line

@@ -8,8 +8,7 @@ describe('HTTP networking module', () => {
   let protocol;
 
   beforeEach(() => {
-    protocol = new HttpWrapper({
-      host: 'address',
+    protocol = new HttpWrapper('address', {
       port: 1234
     });
   });
@@ -57,8 +56,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should initialize http protocol with custom routes', () => {
-      const customProtocol = new HttpWrapper({
-        host: 'address',
+      const customProtocol = new HttpWrapper('address', {
         port: 1234,
         http: {
           customRoutes: {
@@ -408,7 +406,7 @@ describe('HTTP networking module', () => {
         'min-req-promise': {request: httpRequestStub}
       });
 
-      protocol = new MockHttpWrapper({host: 'address', port: 1234});
+      protocol = new MockHttpWrapper('address', { port: 1234 });
     });
 
     it('should call http.request with empty body', () => {
@@ -475,8 +473,7 @@ describe('HTTP networking module', () => {
         return xhrStub;
       };
 
-      protocol = new HttpWrapper({
-        host: 'address',
+      protocol = new HttpWrapper('address', {
         port: 1234
       });
     });

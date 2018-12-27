@@ -7,7 +7,7 @@ describe('Kuzzle getters', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const protocol = new ProtocolMock({host: 'somewhere'});
+    const protocol = new ProtocolMock('somewhere');
     kuzzle = new Kuzzle(protocol);
   });
 

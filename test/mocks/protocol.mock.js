@@ -4,11 +4,11 @@ const
 
 class ProtocolMock extends KuzzleEventEmitter {
 
-  constructor (options = {}) {
+  constructor (host, options = {}) {
     super();
 
     this.options = options || {};
-    this.host = this.options.host;
+    this.host = host;
     this.port = this.options.port || 7512;
     this.state = 'offline';
     this.connectCalled = false;
