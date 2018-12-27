@@ -5,11 +5,11 @@ const
 
 class SocketIO extends RTWrapper {
 
-  constructor(options = {}) {
-    super(options);
+  constructor(host, options = {}) {
+    super(host, options);
 
-    if (typeof this.host !== 'string' || this.host === '') {
-      throw new Error('options.host is required');
+    if (typeof host !== 'string' || host === '') {
+      throw new Error('host is required');
     }
 
     this.socket = null;

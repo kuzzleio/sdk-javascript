@@ -7,11 +7,11 @@ let WebSocketClient;
 
 class WSNode extends RTWrapper {
 
-  constructor(options = {}) {
-    super(options);
+  constructor(host, options = {}) {
+    super(host, options);
 
-    if (typeof this.host !== 'string' || this.host === '') {
-      throw new Error('options.host is required');
+    if (typeof host !== 'string' || host === '') {
+      throw new Error('host is required');
     }
 
     WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('uws');

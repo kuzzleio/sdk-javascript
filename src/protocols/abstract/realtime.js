@@ -5,8 +5,8 @@ const
 
 class RTWrapper extends KuzzleAbstractProtocol {
 
-  constructor (options = {}) {
-    super(options);
+  constructor (host, options = {}) {
+    super(host, options);
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;

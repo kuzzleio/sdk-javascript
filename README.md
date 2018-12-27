@@ -37,7 +37,7 @@ const {
 } = require('kuzzle-sdk');
 
 const kuzzle = new Kuzzle(
-  new Websocket({ host: 'localhost', port: 7512 })
+  new Websocket('localhost', { port: 7512 })
 );
 
 try {
@@ -116,9 +116,9 @@ We also recommend to use the `webSocket` or `http` protocol, but some old browse
 let kuzzle;
 
 if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
-  kuzzle = new Kuzzle(new Websocket({ host: 'localhost' }));
+  kuzzle = new Kuzzle(new Websocket('localhost'));
 } else {
-  kuzzle = new Kuzzle(new SocketIO({ host: 'localhost' }));
+  kuzzle = new Kuzzle(new SocketIO('localhost'));
 }
 ```
 

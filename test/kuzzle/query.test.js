@@ -21,7 +21,7 @@ describe('Kuzzle query management', () => {
     let kuzzle;
 
     beforeEach(() => {
-      const protocol = new ProtocolMock({host: 'somewhere'});
+      const protocol = new ProtocolMock('somewhere');
 
       kuzzle = new Kuzzle(protocol);
       kuzzle.protocol.query.resolves(response);

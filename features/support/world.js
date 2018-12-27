@@ -7,7 +7,7 @@ const
 
 class World {
   constructor () {
-    this.kuzzle = new Kuzzle(new Websocket({ host: 'localhost', port: 7512 }));
+    this.kuzzle = new Kuzzle(new Websocket('localhost', { port: 7512 }));
 
     this.index = null;
     this.collection = null;
