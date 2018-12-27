@@ -60,9 +60,10 @@ class RTWrapper extends KuzzleAbstractProtocol {
     this.emit('networkError', connectionError);
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
       this.retrying = true;
+
       setTimeout(() => {
         this.retrying = false;
-        this.connect(this.host);
+        this.connect(this.host).catch(err => this.clientNetworkError(err));
       }, this.reconnectionDelay);
     } else {
       this.emit('disconnect');

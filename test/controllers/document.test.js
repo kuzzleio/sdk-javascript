@@ -72,20 +72,20 @@ describe('Document Controller', () => {
   describe('create', () => {
     it('should throw an error if the "index" argument is not provided', () => {
       should(function () {
-        kuzzle.document.create(undefined, 'collection', 'document-id', {foo: 'bar'}, options);
+        kuzzle.document.create(undefined, 'collection', {foo: 'bar'}, 'document-id', options);
       }).throw('Kuzzle.document.create: index is required');
     });
 
     it('should throw an error if the "collection" argument is not provided', () => {
       should(function () {
-        kuzzle.document.create('index', undefined, 'document-id', {foo: 'bar'}, options);
+        kuzzle.document.create('index', undefined, {foo: 'bar'}, 'document-id', options);
       }).throw('Kuzzle.document.create: collection is required');
     });
 
-    it('should throw an error if the "body" argument is not provided', () => {
+    it('should throw an error if the "document" argument is not provided', () => {
       should(function () {
-        kuzzle.document.create('index', 'collection', 'document-id', undefined, options);
-      }).throw('Kuzzle.document.create: body is required');
+        kuzzle.document.create('index', 'collection', undefined, 'document-id', options);
+      }).throw('Kuzzle.document.create: document is required');
     });
 
     it('should call document/create query and return a Promise which resolves the created document', () => {
@@ -96,7 +96,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
 
-      return kuzzle.document.create('index', 'collection', 'document-id', {foo: 'bar'}, options)
+      return kuzzle.document.create('index', 'collection', {foo: 'bar'}, 'document-id', options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -122,7 +122,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
 
-      return kuzzle.document.create('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
+      return kuzzle.document.create('index', 'collection', {foo: 'bar'}, 'document-id', {refresh: true})
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()

@@ -121,7 +121,7 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
-    websocket.connect = sinon.stub();
+    websocket.connect = sinon.stub().rejects();
     clientStub.onopen();
     clientStub.onerror();
     should(websocket.retrying).be.true();

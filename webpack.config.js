@@ -5,11 +5,11 @@ const
 
 module.exports = {
   mode: 'production',
-  entry: './src/Kuzzle.js',
+  entry: './index.js',
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
-    library: 'Kuzzle',
+    library: 'KuzzleSDK',
     libraryTarget: 'umd'
   },
   watch: false,
@@ -48,7 +48,8 @@ module.exports = {
   plugins: [
     new webpack.IgnorePlugin(/^(http|min-req-promise|package|uws)$/),
     new webpack.DefinePlugin({
-      SDKVERSION: JSON.stringify(version)
+      SDKVERSION: JSON.stringify(version),
+      BUILT: true
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
     new webpack.optimize.OccurrenceOrderPlugin()
