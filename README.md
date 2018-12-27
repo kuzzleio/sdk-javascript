@@ -31,13 +31,13 @@ Example:
 ```js
 const { 
   Kuzzle,
-  Websocket,
+  WebSocket,
   Http,
   SocketIO
 } = require('kuzzle-sdk');
 
 const kuzzle = new Kuzzle(
-  new Websocket('localhost', { port: 7512 })
+  new WebSocket('localhost', { port: 7512 })
 );
 
 try {
@@ -56,22 +56,31 @@ This SDK can be used either in NodeJS or in a browser.
 ### NodeJS
 
 ```
-npm install kuzzle-sdk --save
 # Beta v6
-npm install git://github.com/kuzzleio/sdk-javascript.git#6-beta --save
+npm install git://github.com/kuzzleio/sdk-javascript.git#6-beta
 ```
 
 ### Browser
 
-To run the SDK in the browser, you need to pick the [built beta v6 version available here](https://raw.githubusercontent.com/kuzzleio/sdk-javascript/tree/6-beta/dist/kuzzle.js). You can also build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
+To run the SDK in the browser, you have to build it yourself by cloning this repository and running `npm run build`. A `dist` directory will be created, containing a browser version of this SDK.
 
 ```html
 <script type="text/javascript" src="dist/kuzzle.js"></script>
 ```
-The browser version is also available from CDN:
+
+Then the Kuzzle SDK will be available under the `KuzzleSDK` variable:
 
 ```html
-<script type="text/javascript" src="https://cdn.rawgit.com/kuzzleio/sdk-javascript/tree/6-beta/dist/kuzzle.js"></script>
+  <script src="dist/kuzzle.js"></script>
+  <script>
+    const kuzzle = new KuzzleSDK.Kuzzle(
+      new KuzzleSDK.WebSocket('localhost')
+    );
+    kuzzle.connect();
+    kuzzle.addListener('connected', () => {
+      console.log('Hello Kuzzle');
+    });
+  </script>
 ```
 
 If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
@@ -98,25 +107,25 @@ const { Kuzzle } = require('kuzzle-sdk/dist/kuzzle.js')
 import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
 ```
 
-## Protocols used
-Currently, the SDK support 3 protocols: `Http`, `Websocket` and `SocketIO`.  
+## Protocols available
+Currently, the SDK support 3 protocols: `Http`, `WebSocket` and `SocketIO`.  
 
 WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
 #### NodeJS
 
-We recommend to use the `websocket` protocol, but you can still use `http`, `socketio` or even a custom protocol if you want.  
+We recommend to use the `WebSocket` protocol, but you can still use `Http`, `SocketIO` or even a custom protocol if you want.  
 
 #### Web Browsers
 
-We also recommend to use the `webSocket` or `http` protocol, but some old browser may not support Websocket, so you have to implement a fallback to `socketio` in that case.
+We also recommend to use the `WebSocket` or `Http` protocol, but some old browser may not support WebSocket, so you have to implement a fallback to `SocketIO` in that case.
 
 ```js
 let kuzzle;
 
 if ('WebSocket' in window && window.WebSocket.CLOSING === 2) {
-  kuzzle = new Kuzzle(new Websocket('localhost'));
+  kuzzle = new Kuzzle(new WebSocket('localhost'));
 } else {
   kuzzle = new Kuzzle(new SocketIO('localhost'));
 }
@@ -182,7 +191,7 @@ const kuzzle = new Kuzzle(protocol);
 
 ### Connection to Kuzzle
 
-By default, the SDK is not connected to Kuzzle when it is instantiated. You must manually call the `kuzzle.connect()` method before using the SDK.  
+By default, the SDK is not connected to Kuzzle when it is instantiated. You must manually call the [kuzzle:connect](https://docs-v2.kuzzle.io/sdk-reference/js/6/kuzzle/connect/) method before using the SDK.  
 
 It is then possible to interact with the Kuzzle API through the SDK once the Promise returned by `kuzzle.connect()` has been resolved.  
 
@@ -209,15 +218,15 @@ try {
 
 ### Match Kuzzle's API
 
-The version 6 of this SDK involve a massive refactor of the SDK structure to match the [Kuzzle API](https://docs.kuzzle.io/api-documentation/connecting-to-kuzzle/).  
+The version 6 of this SDK involve a massive refactor of the SDK structure to match the [Kuzzle API](https://docs-v2.kuzzle.io/api/1/essentials/connecting-to-kuzzle/).  
 
 Each controller is accessible from the Kuzzle object. The controller's actions are named in the same way as in the API.  
 
-For example, for the `create` action of the `document` controller ([document#create](https://docs.kuzzle.io/api-documentation/controller-document/create)):
+For example, for the `create` action of the `document` controller ([document:create](https://docs-v2.kuzzle.io/api/1/controller-document/create)):
 ```js
 const options = { refresh: 'wait_for' };
-const documentBody = { hello: 'world' };
-kuzzle.document.create('my-index', 'my-collection', 'my-uniq-id', documentBody, options)
+const document = { hello: 'world' };
+kuzzle.document.create('my-index', 'my-collection', document, 'my-uniq-id', options)
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
@@ -229,7 +238,7 @@ This SDK also expose a low level `query` method to access the API even if the co
 
 This method take the controller and action name with all parameters needed by the action (`body`, `_id`, etc.) and return the raw Kuzzle response. This is the method used internally for every controller action in this SDK.
 
-Example with the [Admin](https://docs.kuzzle.io/api-documentation/controller-admin/) controller:
+Example with the [Admin](https://docs-v2.kuzzle.io/api/1/controller-admin/reset-cache) controller:
 ```js
 const query = {
   controller: 'admin',
@@ -268,7 +277,7 @@ try {
 
 All SDK methods return a promise resolving the `result` part of Kuzzle API responses. If an error occurs, the promise is rejected with an `Error` object embedding the `error` part of the API response.
 
-For example, for the action `create` of the controller `collection` ([collection#create](https://docs.kuzzle.io/api-documentation/controller-collection/create)), the property `result` contains `{ "acknowledged": true} `. This is therefore what will be returned by the SDK method if successful.
+For example, for the action `create` of the controller `collection` ([collection:create](https://docs-v2.kuzzle.io/api/1/controller-collection/create)), the property `result` contains `{ "acknowledged": true} `. This is therefore what will be returned by the SDK method if successful.
 
 Any error must be caught either at the end of the Promise chain, or by using `async/await` and a `try...catch`.
 
