@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "6.0.0-beta-4",
+  "version": "6.0.0-beta-5",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "postinstall": "npm run build",
+    "prepublish": "npm run build",
     "test": "npm run --silent lint && npm run unit-testing && npm run functional-testing",
     "unit-testing": "nyc --reporter=text-summary --reporter=lcov mocha",
     "functional-testing": "cucumber-js --exit --fail-fast",
