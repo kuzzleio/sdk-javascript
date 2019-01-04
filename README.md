@@ -225,8 +225,8 @@ Each controller is accessible from the Kuzzle object. The controller's actions a
 For example, for the `create` action of the `document` controller ([document:create](https://docs-v2.kuzzle.io/api/1/controller-document/create)):
 ```js
 const options = { refresh: 'wait_for' };
-const document = { hello: 'world' };
-kuzzle.document.create('my-index', 'my-collection', document, 'my-uniq-id', options)
+const documentBody = { hello: 'world' };
+kuzzle.document.create('my-index', 'my-collection', documentBody, 'my-uniq-id', options)
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
