@@ -458,7 +458,7 @@ Discarded request: ${JSON.stringify(request)}`));
     }
 
     if (this[controller.accessor]) {
-      throw new Error(`There is already a controller with the accessor ${controller.accessor}. Please use another one.`);
+      throw new Error(`There is already a controller with the accessor '${controller.accessor}'. Please use another one.`);
     }
 
     controller.kuzzle = this;
