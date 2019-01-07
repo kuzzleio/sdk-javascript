@@ -6,8 +6,8 @@ const
   Kuzzle = require('../../src/Kuzzle');
 
 class CustomController extends BaseController {
-  constructor (name, accessor) {
-    super(name, accessor);
+  constructor (accessor) {
+    super('custom-plugin/custom', accessor);
   }
 
   sayHello (message) {
@@ -24,8 +24,7 @@ class CustomController extends BaseController {
 }
 
 class WrongController {
-  constructor (name, accessor) {
-    this.name = name;
+  constructor (accessor) {
     this.accessor = accessor;
   }
 }
@@ -43,7 +42,7 @@ describe('Kuzzle custom controllers management', () => {
       };
 
       const protocol = new ProtocolMock('somewhere');
-      customController = new CustomController('custom-plugin/custom', 'custom');
+      customController = new CustomController('custom');
 
       kuzzle = new Kuzzle(protocol);
       kuzzle.protocol.query.resolves(response);
@@ -74,7 +73,8 @@ describe('Kuzzle custom controllers management', () => {
     });
 
     it('should throw if the controller does not inherits from BaseController', () => {
-      const wrongController = new WrongController('wrong-plugin/wrong', 'wrong');
+      const wrongController = new WrongController('wrong');
+      wrongController.name = 'wrong-plugin/wrong';
 
       should(function () {
         kuzzle.useController(wrongController);
@@ -82,30 +82,31 @@ describe('Kuzzle custom controllers management', () => {
     });
 
     it('should throw if the controller does not have a name', () => {
-      const baseController = new BaseController('', 'wrong');
+      customController = new CustomController('wrong');
+      customController.name = '';
 
       should(function () {
-        kuzzle.useController(baseController);
+        kuzzle.useController(customController);
       }).throw('Controllers must have a name.');
     });
 
     it('should throw if the controller does not have an accessor', () => {
-      const baseController = new BaseController('custom-plugin/custom', '');
+      customController = new CustomController('');
 
       should(function () {
-        kuzzle.useController(baseController);
+        kuzzle.useController(customController);
       }).throw('Controllers must have an accessor.');
     });
 
     it('should throw if the accessor is already taken', () => {
       const
-        baseController1 = new BaseController('custom-plugin/custom', 'custom'),
-        baseController2 = new BaseController('custom-plugin/custom2', 'custom');
+        customController1 = new CustomController('custom'),
+        customController2 = new CustomController('custom');
 
-      kuzzle.useController(baseController1);
+      kuzzle.useController(customController1);
 
       should(function () {
-        kuzzle.useController(baseController2);
+        kuzzle.useController(customController2);
       }).throw('There is already a controller with the accessor \'custom\'. Please use another one.');
     });
   });
