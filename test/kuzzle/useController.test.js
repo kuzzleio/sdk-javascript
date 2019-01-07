@@ -43,7 +43,7 @@ describe('Kuzzle custom controllers management', () => {
       };
 
       const protocol = new ProtocolMock('somewhere');
-      customController = new CustomController('custom-plugin/custom', 'custom')
+      customController = new CustomController('custom-plugin/custom', 'custom');
 
       kuzzle = new Kuzzle(protocol);
       kuzzle.protocol.query.resolves(response);
@@ -61,15 +61,16 @@ describe('Kuzzle custom controllers management', () => {
       should(customController.kuzzle).be.eql(kuzzle);
     });
 
-    it('should use the controller name by default for query()', async () => {
+    it('should use the controller name by default for query()', () => {
       kuzzle.useController(customController);
 
-      await kuzzle.custom.sayHello('Wake up, and smell the ashes');
-
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWith(
-        sinon.match.has('controller', 'custom-plugin/custom')
-      );
+      return kuzzle.custom.sayHello('Wake up, and smell the ashes')
+        .then(() => {
+          should(kuzzle.protocol.query).be.calledOnce();
+          should(kuzzle.protocol.query).be.calledWith(
+            sinon.match.has('controller', 'custom-plugin/custom')
+          );
+        });
     });
 
     it('should throw if the controller does not inherits from BaseController', () => {
