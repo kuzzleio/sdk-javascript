@@ -440,8 +440,7 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Adds a new controller and make it available in the SDK.
    *
-   * @param {object} request
-   * @param {object} [options] - Optional arguments
+   * @param {BaseController} controller
    * @returns {Kuzzle}
    */
   useController (controller) {
