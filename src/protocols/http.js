@@ -201,6 +201,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       // NodeJS implementation, using http.request:
 
       const httpClient = require('min-req-promise');
+
+      if (path.indexOf(0) !== '/') {
+        path = `/${path}`;
+      }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
       const headers = payload.headers || {};
