@@ -12,10 +12,10 @@ let
 
 class AbstractWrapper extends KuzzleEventEmitter {
 
-  constructor (options = {}) {
+  constructor (host, options = {}) {
     super();
 
-    _host = options.host;
+    _host = host;
     _port = typeof options.port === 'number' ? options.port : 7512;
     _ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 

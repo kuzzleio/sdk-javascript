@@ -7,9 +7,9 @@ const
 describe('Kuzzle connect', () => {
 
   const protocols = {
-    somewhere: new ProtocolMock({host: 'somewhere'}),
-    somewhereagain: new ProtocolMock({host: 'somewhereagain'}),
-    nowhere: new ProtocolMock({host: 'nowhere'})
+    somewhere: new ProtocolMock('somewhere'),
+    somewhereagain: new ProtocolMock('somewhereagain'),
+    nowhere: new ProtocolMock('nowhere')
   };
 
   it('should return immediately if already connected', () => {

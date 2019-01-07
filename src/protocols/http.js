@@ -44,11 +44,11 @@ const
 
 class HttpWrapper extends KuzzleAbstractProtocol {
 
-  constructor(options = {}) {
-    super(options);
+  constructor(host, options = {}) {
+    super(host, options);
 
-    if (typeof this.host !== 'string' || this.host === '') {
-      throw new Error('options.host is required');
+    if (typeof host !== 'string' || host === '') {
+      throw new Error('host is required');
     }
 
     // Application-side HTTP route overrides:
@@ -201,6 +201,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       // NodeJS implementation, using http.request:
 
       const httpClient = require('min-req-promise');
+
+      if (path[0] !== '/') {
+        path = `/${path}`;
+      }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
       const headers = payload.headers || {};

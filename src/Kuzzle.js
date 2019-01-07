@@ -9,6 +9,7 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
+  BaseController = require('./controllers/base'),
   uuidv4 = require('./uuidv4');
 
 const
@@ -433,6 +434,35 @@ Discarded request: ${JSON.stringify(request)}`));
       this._cleanQueue();
       this._dequeue();
     }
+    return this;
+  }
+
+  /**
+   * Adds a new controller and make it available in the SDK.
+   *
+   * @param {BaseController} controller
+   * @returns {Kuzzle}
+   */
+  useController (controller) {
+    if (!(controller instanceof BaseController)) {
+      throw new Error('Controllers must inherits from the BaseController class.');
+    }
+
+    if (!(controller.name && controller.name.length > 0)) {
+      throw new Error('Controllers must have a name.');
+    }
+
+    if (!(controller.accessor && controller.accessor.length > 0)) {
+      throw new Error('Controllers must have an accessor.');
+    }
+
+    if (this[controller.accessor]) {
+      throw new Error(`There is already a controller with the accessor '${controller.accessor}'. Please use another one.`);
+    }
+
+    controller.kuzzle = this;
+    this[controller.accessor] = controller;
+
     return this;
   }
 

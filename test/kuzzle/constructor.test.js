@@ -14,7 +14,7 @@ const
   ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle constructor', () => {
-  const protocolMock = new ProtocolMock({host: 'somewhere'});
+  const protocolMock = new ProtocolMock('somewhere');
 
   it('should throw an error if no protocol wrapper is provided', () => {
     should(function () {

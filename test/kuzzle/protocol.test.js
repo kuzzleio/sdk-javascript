@@ -8,7 +8,7 @@ describe('Kuzzle protocol methods', () => {
   let kuzzle;
 
   beforeEach(() => {
-    const protocol = new ProtocolMock({host: 'somewhere'});
+    const protocol = new ProtocolMock('somewhere');
 
     protocol.close = sinon.stub();
     kuzzle = new Kuzzle(protocol);
