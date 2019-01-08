@@ -170,9 +170,6 @@ const
  * @param {Object} [data] - The content of the query response
  */
 
-
-const _kuzzle = Symbol();
-
 /**
  * Kuzzle's memory storage is a separate data store from the database layer.
  * It is internaly based on Redis. You can access most of Redis functions (all
@@ -193,11 +190,11 @@ const _kuzzle = Symbol();
 class MemoryStorageController {
 
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 }
 

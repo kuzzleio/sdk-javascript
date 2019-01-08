@@ -1,12 +1,10 @@
-const _kuzzle = Symbol();
-
 class BulkController {
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   import (data, options) {

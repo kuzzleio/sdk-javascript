@@ -1,6 +1,4 @@
-const
-  Room = require('./room'),
-  _kuzzle = Symbol();
+const Room = require('./room');
 
 class RealTimeController {
 
@@ -8,7 +6,7 @@ class RealTimeController {
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
 
     this.subscriptions = {
       filters: {},
@@ -17,7 +15,7 @@ class RealTimeController {
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   count (roomId, options = {}) {
