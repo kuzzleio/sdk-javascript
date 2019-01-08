@@ -102,9 +102,9 @@ But you'll still need to pick the built version (which ships with the package).
 
 ```javascript
 // with the classic require...
-const { Kuzzle } = require('kuzzle-sdk/dist/kuzzle.js')
+const { Kuzzle } = require('kuzzle-sdk')
 // ... or with the new import directive.
-import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
+import { Kuzzle } from 'kuzzle-sdk'
 ```
 
 ## Available protocols
