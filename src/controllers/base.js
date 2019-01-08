@@ -1,5 +1,3 @@
-const _kuzzle = Symbol();
-
 class BaseController {
 
   /**
@@ -12,11 +10,11 @@ class BaseController {
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   set kuzzle (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   /**

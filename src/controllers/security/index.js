@@ -4,20 +4,18 @@ const
   Profile = require('./profile'),
   ProfileSearchResult = require('../searchResult/profile'),
   User = require('./user'),
-  UserSearchResult = require('../searchResult/user'),
-  _kuzzle = Symbol();
-
+  UserSearchResult = require('../searchResult/user');
 
 class SecurityController {
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   createCredentials (strategy, _id, body, options = {}) {

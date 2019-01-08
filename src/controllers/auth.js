@@ -1,7 +1,5 @@
 const User = require('./security/user');
 
-const _kuzzle = Symbol();
-
 /**
  * Auth controller
  *
@@ -15,11 +13,11 @@ class AuthController {
    * @param kuzzle
    */
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   /**
