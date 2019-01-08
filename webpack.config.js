@@ -1,6 +1,5 @@
 const
   webpack = require('webpack'),
-  path = require('path'),
   version = require('./package.json').version;
 
 module.exports = {
@@ -12,6 +11,7 @@ module.exports = {
     library: 'KuzzleSDK',
     libraryTarget: 'umd'
   },
+  target: 'node',
   watch: false,
   devtool: 'source-map',
   node: {
@@ -26,22 +26,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          only: [/^src/],
-          presets: [
-            ['env', {
-              debug: true,
-              modules: false
-            }]]
-        }
-      },
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        include: path.resolve(__dirname, './src/'),
-        exclude: /node_modules/
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: ['babel-loader', 'eslint-loader']
       }
     ]
   },
