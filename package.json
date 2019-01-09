@@ -27,13 +27,14 @@
     "build": "node build.js"
   },
   "browser": "dist/kuzzle.js",
-  "main": "dist/kuzzle.node.js",
+  "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
     "babel-loader": "^8.0.4",
     "min-req-promise": "^1.0.1",
+    "ora": "^3.0.0",
     "webpack": "^4.27.1",
     "ws": "^6.1.2"
   },

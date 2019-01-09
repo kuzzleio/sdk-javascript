@@ -1,10 +1,15 @@
 const
+  ora = require('ora'),
   webpack = require('webpack'),
-  webpackConfig = require('./webpack.config.js');
+  webpackConfig = require('./webpack.config.js'),
+  spinner = ora('Building SDK...');
 
 process.env.NODE_ENV = 'production';
 
-function webpackcb(err, stats) {
+spinner.start();
+
+webpack(webpackConfig, function (err, stats) {
+  spinner.stop();
   if (err) {
     throw err;
   }
@@ -15,8 +20,4 @@ function webpackcb(err, stats) {
     chunks: false,
     chunkModules: false
   }) + '\n');
-}
-
-for (const target of webpackConfig) {
-  webpack(target, webpackcb);
-}
+});
