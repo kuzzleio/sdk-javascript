@@ -1,14 +1,12 @@
-{
-  "presets": [
-    ["@babel/env", {
-        "targets": {
-          "browsers": ["last 2 versions"],
-          "node":"6"
+module.exports = {
+  presets: [
+    [
+      '@babel/env',
+      {
+        targets: {
+          browsers: ['last 2 versions']
         }
       }
     ]
-  ],
-  "plugins": [
-    ["@babel/plugin-transform-for-of", {"assumeArray": true}]
   ]
-}
+};
