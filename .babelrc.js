@@ -8,5 +8,8 @@ module.exports = {
         }
       }
     ]
+  ],
+  plugins: [
+    ['@babel/plugin-transform-for-of', {'assumeArray': true}]
   ]
 };
