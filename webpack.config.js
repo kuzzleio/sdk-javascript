@@ -1,5 +1,4 @@
 const
-  path = require('path'),
   webpack = require('webpack'),
   version = require('./package.json').version;
 
@@ -22,14 +21,7 @@ module.exports = {
       {
         test: /\.m?js$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader'
-        }
-      },
-      {
-        test: /\.m?js$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader'
+        loader: ['babel-loader', 'eslint-loader']
       }
     ]
   },
