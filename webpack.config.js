@@ -13,7 +13,7 @@ module.exports = {
       root: 'KuzzleSDK',
       amd: 'kuzzle-sdk',
       commonjs: 'kuzzle-sdk'
-    }
+    },
     libraryTarget: 'umd'
   },
   target: 'web',
