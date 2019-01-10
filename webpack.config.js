@@ -1,52 +1,42 @@
 const
   webpack = require('webpack'),
-  path = require('path'),
   version = require('./package.json').version;
 
 module.exports = {
+  name: 'browser',
   mode: 'production',
   entry: './index.js',
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
-    library: 'KuzzleSDK',
+    library: {
+      root: 'KuzzleSDK',
+      amd: 'kuzzle-sdk',
+      commonjs: 'kuzzle-sdk'
+    },
     libraryTarget: 'umd'
   },
+  target: 'web',
   watch: false,
   devtool: 'source-map',
-  node: {
-    console: false,
-    global: false,
-    process: false,
-    Buffer: false,
-    __filename: false,
-    __dirname: false,
-    setImmediate: false
-  },
+  node: false,
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          only: [/^src/],
-          presets: [
-            ['env', {
-              debug: true,
-              modules: false
-            }]]
+        test: /\.?js$/,
+        use: {
+          loader: 'babel-loader'
         }
       },
       {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        include: path.resolve(__dirname, './src/'),
-        exclude: /node_modules/
+        test: /\.?js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader'
       }
     ]
   },
   plugins: [
-    new webpack.IgnorePlugin(/^(http|min-req-promise|package|uws)$/),
+    new webpack.IgnorePlugin(/^(http|min-req-promise|package|ws)$/),
     new webpack.DefinePlugin({
       SDKVERSION: JSON.stringify(version),
       BUILT: true
