@@ -9,7 +9,11 @@ module.exports = {
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
-    library: 'kuzzle-sdk',
+    library: {
+      root: 'KuzzleSDK',
+      amd: 'kuzzle-sdk',
+      commonjs: 'kuzzle-sdk'
+    }
     libraryTarget: 'umd'
   },
   target: 'web',
