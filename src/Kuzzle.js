@@ -275,7 +275,7 @@ class Kuzzle extends KuzzleEventEmitter {
       }
 
       if (this.jwt) {
-        this.checkToken(this.jwt, (err, res) => {
+        this.auth.checkToken(this.jwt).then((err, res) => {
           // shouldn't obtain an error but let's invalidate the token anyway
           if (err || !res.valid) {
             this.jwt = undefined;
