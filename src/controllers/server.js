@@ -1,5 +1,3 @@
-const _kuzzle = Symbol();
-
 /**
  * @class ServerController
  * @property {Kuzzle} kuzzle - The Kuzzle SDK Instance
@@ -10,11 +8,11 @@ class ServerController {
    * @param {Kuzzle} kuzzle - The Kuzzle SDK Instance
    */
   constructor (kuzzle) {
-    this[_kuzzle] = kuzzle;
+    this._kuzzle = kuzzle;
   }
 
   get kuzzle () {
-    return this[_kuzzle];
+    return this._kuzzle;
   }
 
   /**

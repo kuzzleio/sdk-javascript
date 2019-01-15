@@ -14,7 +14,7 @@ class WSNode extends RTWrapper {
       throw new Error('host is required');
     }
 
-    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('uws');
+    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
     this.client = null;
     this.lasturl = null;
   }

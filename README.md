@@ -53,7 +53,7 @@ try {
 
 This SDK can be used either in NodeJS or in a browser.
 
-### NodeJS
+### Node.js 
 
 ```
 # Beta v6
@@ -102,18 +102,19 @@ But you'll still need to pick the built version (which ships with the package).
 
 ```javascript
 // with the classic require...
-const { Kuzzle } = require('kuzzle-sdk/dist/kuzzle.js')
+const { Kuzzle } = require('kuzzle-sdk')
 // ... or with the new import directive.
-import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
+import { Kuzzle } from 'kuzzle-sdk'
 ```
 
 ## Available protocols
- Currently, the SDK provides 3 protocols: `Http`, `WebSocket` and `SocketIO`.  
+
+Currently, the SDK provides 3 protocols: `Http`, `WebSocket` and `SocketIO`.  
 
 WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
-#### NodeJS
+#### Node.js
 
 We recommend using the `WebSocket` protocol, but you can still use `Http`, `SocketIO` or even a custom protocol if you want.  
 
