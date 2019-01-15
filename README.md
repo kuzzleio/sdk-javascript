@@ -57,7 +57,7 @@ This SDK can be used either in NodeJS or in a browser.
 
 ```
 # Beta v6
-npm install git://github.com/kuzzleio/sdk-javascript.git#6-beta
+npm install kuzzle-sdk@beta
 ```
 
 ### Browser
