@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "6.0.0-beta-5",
+  "version": "6.0.0-beta-6",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -26,24 +26,24 @@
     "lint": "eslint --max-warnings=0 ./src ./test",
     "build": "node build.js"
   },
-  "browser": "src/Kuzzle.js",
+  "browser": "dist/kuzzle.js",
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
     "babel-loader": "^8.0.4",
-    "babel-preset-env": "^1.7.0",
     "min-req-promise": "^1.0.1",
     "ora": "^3.0.0",
-    "uws": "10.148.0",
-    "webpack": "^4.27.1"
+    "webpack": "^4.28.1",
+    "ws": "^6.1.2"
   },
   "devDependencies": {
     "codecov": "^3.1.0",
     "cucumber": "^5.0.2",
-    "eslint": "^5.5.0",
+    "eslint": "^5.12.0",
     "eslint-friendly-formatter": "^4.0.1",
-    "eslint-loader": "^2.1.0",
+    "eslint-loader": "^2.1.1",
     "mocha": "5.2.0",
     "mock-require": "^3.0.2",
     "nyc": "^13.0.1",

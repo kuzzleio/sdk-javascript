@@ -53,11 +53,11 @@ try {
 
 This SDK can be used either in NodeJS or in a browser.
 
-### NodeJS
+### Node.js 
 
 ```
 # Beta v6
-npm install git://github.com/kuzzleio/sdk-javascript.git#6-beta
+npm install kuzzle-sdk@beta
 ```
 
 ### Browser
@@ -102,18 +102,19 @@ But you'll still need to pick the built version (which ships with the package).
 
 ```javascript
 // with the classic require...
-const { Kuzzle } = require('kuzzle-sdk/dist/kuzzle.js')
+const { Kuzzle } = require('kuzzle-sdk')
 // ... or with the new import directive.
-import { Kuzzle } from 'kuzzle-sdk/dist/kuzzle.js'
+import { Kuzzle } from 'kuzzle-sdk'
 ```
 
 ## Available protocols
- Currently, the SDK provides 3 protocols: `Http`, `WebSocket` and `SocketIO`.  
+
+Currently, the SDK provides 3 protocols: `Http`, `WebSocket` and `SocketIO`.  
 
 WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the **HTTP protocol does not implement realtime features** (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
-#### NodeJS
+#### Node.js
 
 We recommend using the `WebSocket` protocol, but you can still use `Http`, `SocketIO` or even a custom protocol if you want.  
 
@@ -225,8 +226,8 @@ Each controller is accessible from the Kuzzle object. The controller's actions a
 For example, for the `create` action of the `document` controller ([document:create](https://docs-v2.kuzzle.io/api/1/controller-document/create)):
 ```js
 const options = { refresh: 'wait_for' };
-const documentBody = { hello: 'world' };
-kuzzle.document.create('my-index', 'my-collection', documentBody, 'my-uniq-id', options)
+const document = { hello: 'world' };
+kuzzle.document.create('my-index', 'my-collection', document, 'my-uniq-id', options)
 ```
 
 The parameters of each method differ according to the parameters expected in the API.  
