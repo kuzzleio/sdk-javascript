@@ -62,7 +62,7 @@ declare module "kuzzle-sdk" {
             sslConnection?: boolean;
         })
     }
-    export class Websocket implements KuzzleAbstractProtocol {
+    export class WebSocket implements KuzzleAbstractProtocol {
         public readonly name: string;
         public readonly autoReconnect: boolean
         public readonly reconnectionDelay: number
