@@ -1,6 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
+  NodeWS = require('ws'),
   WS = require('../../src/protocols/websocket');
 
 describe('WebSocket networking module', () => {
@@ -33,7 +34,7 @@ describe('WebSocket networking module', () => {
   afterEach(() => {
     clock.restore();
     WebSocket = undefined; // eslint-disable-line
-    window = undefined; // eslint-disable-line
+    window = undefined;    // eslint-disable-line
   });
 
   it('should expose an unique identifier', () => {
@@ -338,6 +339,70 @@ describe('WebSocket networking module', () => {
     should(websocket.client).be.null();
     should(clientStub.close.called).be.true();
     should(websocket.wasConnected).be.false();
+  });
+
+  describe('#constructor', () => {
+    it('should throw if an invalid host is provided', () => {
+      const invalidHosts = [undefined, null, 123, false, true, [], {}, ''];
+
+      for (const host of invalidHosts) {
+        should(() => new WS(host))
+          .throw(Error, {message: 'host is required'});
+      }
+    });
+
+    it('should fallback to the ws module if there is no global WebSocket API', () => {
+      WebSocket = undefined; // eslint-disable-line
+      window = undefined;    // eslint-disable-line
+
+      const client = new WS('foobar');
+
+      should(client.WebSocketClient).be.equal(NodeWS);
+    });
+
+    it('should have null options when using the browsers WebSocket API', () => {
+      let client = new WS('foobar');
+
+      should(client.WebSocketClient).equal(WebSocket);
+      should(client.options).be.null();
+
+      client = new WS('foobar', {headers: { 'X-foo': 'bar' }});
+      should(client.WebSocketClient).equal(WebSocket);
+      should(client.options).be.null();
+    });
+
+    it('should initialize pass allowed options to the ws ctor when using it', () => {
+      WebSocket = undefined; // eslint-disable-line
+      window = undefined;    // eslint-disable-line
+
+      let client = new WS('foobar');
+
+      should(client.WebSocketClient).equal(NodeWS);
+      should(client.options).match({
+        perMessageDeflate: false,
+        headers: null
+      });
+
+      client = new WS('foobar', {headers: { 'X-foo': 'bar' }});
+      should(client.WebSocketClient).equal(NodeWS);
+      should(client.options).match({
+        perMessageDeflate: false,
+        headers: {
+          'X-foo': 'bar'
+        }
+      });
+    });
+
+    it('should throw if invalid options are provided', () => {
+      WebSocket = undefined; // eslint-disable-line
+      window = undefined;    // eslint-disable-line
+
+      const invalidHeaders = ['foo', 'false', 'true', 123, []];
+
+      for (const headers of invalidHeaders) {
+        should(() => new WS('foobar', {headers})).throw(Error, {message: 'Invalid "headers" option: expected an object'});
+      }
+    });
   });
 
   describe('#isReady', function() {
