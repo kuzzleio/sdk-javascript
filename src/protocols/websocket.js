@@ -3,8 +3,6 @@
 const
   RTWrapper = require('./abstract/realtime');
 
-let WebSocketClient;
-
 class WSNode extends RTWrapper {
 
   constructor(host, options = {}) {
@@ -14,7 +12,25 @@ class WSNode extends RTWrapper {
       throw new Error('host is required');
     }
 
-    WebSocketClient = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
+    // Browsers WebSocket API
+    if (typeof WebSocket !== 'undefined') {
+      this.WebSocketClient = WebSocket;
+      // There are no options allowed in the browsers WebSocket API
+      this.options = null;
+    } else {
+      this.WebSocketClient = require('ws');
+      this.options = {
+        perMessageDeflate: false,
+        headers: options.headers || null
+      };
+
+      if (this.options.headers !== null &&
+          (Array.isArray(this.options.headers) ||
+          typeof this.options.headers !== 'object')) {
+        throw new Error('Invalid "headers" option: expected an object');
+      }
+    }
+
     this.client = null;
     this.lasturl = null;
   }
@@ -24,9 +40,7 @@ class WSNode extends RTWrapper {
    */
   connect () {
     return new Promise((resolve, reject) => {
-      const
-        url = (this.ssl ? 'wss://' : 'ws://') + this.host + ':' + this.port,
-        opts = typeof window !== 'undefined' ? undefined : {perMessageDeflate: false};
+      const url = `${this.ssl ? 'wss' : 'ws'}://${this.host}:${this.port}`;
 
       super.connect();
 
@@ -35,7 +49,7 @@ class WSNode extends RTWrapper {
         this.lasturl = url;
       }
 
-      this.client = new WebSocketClient(url, opts);
+      this.client = new this.WebSocketClient(url, this.options);
 
       this.client.onopen = () => {
         this.clientConnected();
