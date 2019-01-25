@@ -50,12 +50,8 @@
     "vars-on-top": 2,
     "yoda": [2, "never"]
   },
-  "env": {
-    "es6": true,
-    "browser": true
-  },
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 2017
   },
   "extends": "eslint:recommended"
 }
