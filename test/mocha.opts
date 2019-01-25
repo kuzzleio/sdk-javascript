@@ -1,4 +1,4 @@
 --bail
 --require should-sinon
---reporter spec
+--reporter dot
 --recursive
