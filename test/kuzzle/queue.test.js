@@ -87,5 +87,26 @@ describe('Kuzzle queue', () => {
         done();
       }, 100);
     });
+
+    it('should play an additional queue returned by an asynchronous offlineQueueLoader', done => {
+      const query2 = { request: { requestId: 'plum', action: 'action', controller: 'controller' } };
+
+      kuzzle.offlineQueue.push(query);
+      kuzzle.offlineQueueLoader = () => {
+        return new Promise(resolve => {
+          setImmediate(() => resolve([query2]));
+        });
+      };
+
+      kuzzle.playQueue();
+
+      // Wait queries to be dequeued
+      setTimeout(() => {
+        should(kuzzle.protocol.query).be.calledTwice();
+        should(kuzzle.protocol.query.getCall(0).args[0]).be.eql(query2.request);
+        should(kuzzle.protocol.query.getCall(1).args[0]).be.eql(query.request);
+        done();
+      }, 100);
+    });
   });
 });
