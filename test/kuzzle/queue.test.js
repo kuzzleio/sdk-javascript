@@ -85,7 +85,7 @@ describe('Kuzzle queue', () => {
         should(kuzzle.protocol.query.getCall(0).args[0]).be.eql(query2.request);
         should(kuzzle.protocol.query.getCall(1).args[0]).be.eql(query.request);
         done();
-      }, 10);
+      }, 100);
     });
   });
 });
