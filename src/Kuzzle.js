@@ -265,7 +265,7 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('disconnected');
     });
 
-    this.protocol.addListener('reconnect', () => {
+    this.protocol.addListener('reconnect', async () => {
       if (this.autoQueue) {
         this.stopQueuing();
       }
@@ -275,20 +275,19 @@ class Kuzzle extends KuzzleEventEmitter {
       }
 
       if (this.jwt) {
-        this.auth.checkToken(this.jwt).then(res => {
+        try {
+          const res = await this.auth.checkToken(this.jwt);
+
           // shouldn't obtain an error but let's invalidate the token anyway
           if (!res.valid) {
             this.jwt = undefined;
           }
-
-          this.emit('reconnected');
-        }).catch(() => {
+        } catch (err) {
           this.jwt = undefined;
-          this.emit('reconnected');
-        });
-      } else {
-        this.emit('reconnected');
+        }
       }
+
+      this.emit('reconnected');
     });
 
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
@@ -512,7 +511,7 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Play all queued requests, in order.
    */
-  _dequeue () {
+  async _dequeue() {
     const
       uniqueQueue = {},
       dequeuingProcess = () => {
@@ -533,7 +532,8 @@ Discarded request: ${JSON.stringify(request)}`));
         throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof this.offlineQueueLoader);
       }
 
-      const additionalQueue = this.offlineQueueLoader();
+      const additionalQueue = await this.offlineQueueLoader();
+
       if (Array.isArray(additionalQueue)) {
         this._offlineQueue = additionalQueue
           .concat(this.offlineQueue)
