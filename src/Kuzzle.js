@@ -12,20 +12,6 @@ const
   BaseController = require('./controllers/base'),
   uuidv4 = require('./uuidv4');
 
-const
-  events = [
-    'connected',
-    'discarded',
-    'disconnected',
-    'loginAttempt',
-    'networkError',
-    'offlineQueuePush',
-    'offlineQueuePop',
-    'queryError',
-    'reconnected',
-    'tokenExpired'
-  ];
-
 class Kuzzle extends KuzzleEventEmitter {
 
   /**
@@ -46,6 +32,19 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     }
     this.protocol = protocol;
+
+    this._eventList = [
+      'connected',
+      'discarded',
+      'disconnected',
+      'loginAttempt',
+      'networkError',
+      'offlineQueuePush',
+      'offlineQueuePop',
+      'queryError',
+      'reconnected',
+      'tokenExpired'
+    ];
 
     this._protectedEvents = {
       connected: {},
@@ -121,6 +120,10 @@ class Kuzzle extends KuzzleEventEmitter {
   set autoReplay (value) {
     this._checkPropertyType('_autoReplay', 'boolean', value);
     this._autoReplay = value;
+  }
+
+  get eventList () {
+    return this._eventList;
   }
 
   get jwt () {
@@ -303,8 +306,8 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {function} listener - callback to invoke each time an event is fired
    */
   addListener (event, listener) {
-    if (events.indexOf(event) === -1) {
-      throw new Error(`[${event}] is not a known event. Known events: ${events.toString()}`);
+    if (this._eventList.indexOf(event) === -1) {
+      throw new Error(`[${event}] is not a known event. Known events: ${this._eventList.toString()}`);
     }
 
     return super.addListener(event, listener);
