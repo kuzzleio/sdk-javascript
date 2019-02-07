@@ -268,7 +268,7 @@ class Kuzzle extends KuzzleEventEmitter {
       this.emit('disconnected');
     });
 
-    this.protocol.addListener('reconnect', async () => {
+    this.protocol.addListener('reconnect', () => {
       if (this.autoQueue) {
         this.stopQueuing();
       }
@@ -278,16 +278,17 @@ class Kuzzle extends KuzzleEventEmitter {
       }
 
       if (this.jwt) {
-        try {
-          const res = await this.auth.checkToken(this.jwt);
-
-          // shouldn't obtain an error but let's invalidate the token anyway
-          if (!res.valid) {
+        return this.auth.checkToken(this.jwt)
+          .then(res => {
+            // shouldn't obtain an error but let's invalidate the token anyway
+            if (!res.valid) {
+              this.jwt = undefined;
+            }
+          })
+          .catch(() => {
             this.jwt = undefined;
-          }
-        } catch (err) {
-          this.jwt = undefined;
-        }
+          })
+          .then(() => this.emit('reconnected'));
       }
 
       this.emit('reconnected');
@@ -514,7 +515,7 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Play all queued requests, in order.
    */
-  async _dequeue() {
+  _dequeue() {
     const
       uniqueQueue = {},
       dequeuingProcess = () => {
@@ -535,22 +536,26 @@ Discarded request: ${JSON.stringify(request)}`));
         throw new Error('Invalid value for offlineQueueLoader property. Expected: function. Got: ' + typeof this.offlineQueueLoader);
       }
 
-      const additionalQueue = await this.offlineQueueLoader();
+      return Promise.resolve()
+        .then(() => this.offlineQueueLoader())
+        .then(additionalQueue => {
+          if (Array.isArray(additionalQueue)) {
+            this._offlineQueue = additionalQueue
+              .concat(this.offlineQueue)
+              .filter(query => {
+                // throws if the request does not contain required attributes
+                if (!query.request || query.request.requestId === undefined || !query.request.action || !query.request.controller) {
+                  throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
+                }
 
-      if (Array.isArray(additionalQueue)) {
-        this._offlineQueue = additionalQueue
-          .concat(this.offlineQueue)
-          .filter(query => {
-            // throws if the request does not contain required attributes
-            if (!query.request || query.request.requestId === undefined || !query.request.action || !query.request.controller) {
-              throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
-            }
+                return uniqueQueue.hasOwnProperty(query.request.requestId) ? false : (uniqueQueue[query.request.requestId] = true);
+              });
 
-            return uniqueQueue.hasOwnProperty(query.request.requestId) ? false : (uniqueQueue[query.request.requestId] = true);
-          });
-      } else {
-        throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
-      }
+            dequeuingProcess();
+          } else {
+            throw new Error('Invalid value returned by the offlineQueueLoader function. Expected: array. Got: ' + typeof additionalQueue);
+          }
+        });
     }
 
     dequeuingProcess();
