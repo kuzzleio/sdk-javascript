@@ -17,6 +17,7 @@ describe('Kuzzle protocol methods', () => {
   describe('#disconnect', () => {
     it('should close protocol connection', () => {
       kuzzle.disconnect();
+
       should(kuzzle.protocol.close).be.calledOnce();
     });
   });
@@ -27,8 +28,9 @@ describe('Kuzzle protocol methods', () => {
         eventStub = sinon.stub(),
         error = {message: 'foo-bar'},
         query = {foo: 'bar'};
-
+      kuzzle.connect();
       kuzzle.addListener('queryError', eventStub);
+
       kuzzle.protocol.emit('queryError', error, query);
 
       should(eventStub).be.calledOnce();
@@ -37,8 +39,9 @@ describe('Kuzzle protocol methods', () => {
 
     it('should propagate protocol "tokenExpired" events', () => {
       const eventStub = sinon.stub();
-
+      kuzzle.connect();
       kuzzle.addListener('tokenExpired', eventStub);
+
       kuzzle.protocol.emit('tokenExpired');
 
       should(eventStub).be.calledOnce();
@@ -46,6 +49,8 @@ describe('Kuzzle protocol methods', () => {
 
     it('should empty the jwt when a "tokenExpired" events is triggered', () => {
       kuzzle.jwt = 'foobar';
+      kuzzle.connect();
+
       kuzzle.protocol.emit('tokenExpired');
 
       should(kuzzle.jwt).be.undefined();
