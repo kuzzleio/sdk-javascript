@@ -139,22 +139,4 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.autoQueue).be.true();
     should(kuzzle.autoReplay).be.true();
   });
-
-  it('should initialize kuzzle with SocketIO', () => {
-    new Kuzzle(
-      new SocketIO('localhost')
-    );
-  });
-
-  it('should initialize kuzzle with WebSocket', () => {
-    new Kuzzle(
-      new WebSocket('localhost')
-    );
-  });
-
-  it('should initialize kuzzle with Http', () => {
-    new Kuzzle(
-      new Http('localhost')
-    );
-  });
 });
