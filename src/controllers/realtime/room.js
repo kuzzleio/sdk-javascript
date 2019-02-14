@@ -1,15 +1,16 @@
 class Room {
 
   /**
-   * @param {Kuzzle} kuzzle
+   * @param {RealTimeController} controller
    * @param {string} index
    * @param {string} collection
    * @param {object} body
    * @param {function} callback
    * @param {object} options
    */
-  constructor (kuzzle, index, collection, body, callback, options = {}) {
-    this.kuzzle = kuzzle;
+  constructor (controller, index, collection, body, callback, options = {}) {
+    this.controller = controller;
+    this.kuzzle = controller.kuzzle;
     this.index = index;
     this.collection = collection;
     this.callback = callback;
@@ -33,7 +34,7 @@ class Room {
 
     this.autoResubscribe = typeof options.autoResubscribe === 'boolean'
       ? options.autoResubscribe
-      : kuzzle.autoResubscribe;
+      : this.kuzzle.autoResubscribe;
     this.subscribeToSelf = typeof options.subscribeToSelf === 'boolean'
       ? options.subscribeToSelf
       : true;
@@ -71,7 +72,15 @@ class Room {
   }
 
   _channelListener (data) {
-    const fromSelf = data.volatile && data.volatile.sdkInstanceId === this.kuzzle.protocol.id;
+    // intercept token expiration messages and relay them to the parent
+    // controller
+    if (data.type === 'TokenExpired') {
+      return this.controller.tokenExpired();
+    }
+
+    const fromSelf =
+      data.volatile && data.volatile.sdkInstanceId === this.kuzzle.protocol.id;
+
     if (this.subscribeToSelf || !fromSelf) {
       this.callback(data);
     }

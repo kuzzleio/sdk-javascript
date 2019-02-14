@@ -377,7 +377,7 @@ class Kuzzle extends KuzzleEventEmitter {
      */
     if (this.jwt !== undefined
       && !(request.controller === 'auth'
-      && request.action === 'checkToken')
+      && (request.action === 'checkToken' || request.action === 'login'))
     ) {
       request.jwt = this.jwt;
     }

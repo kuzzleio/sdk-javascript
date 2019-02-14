@@ -9,21 +9,24 @@ describe('Room', () => {
     eventEmitter = new KuzzleEventEmitter(),
     options = {opt: 'in'};
 
-  let kuzzle;
+  let controller;
 
   beforeEach(() => {
-    kuzzle = {
-      query: sinon.stub().resolves(),
-      addListener: (evt, listener) => {
-        eventEmitter.addListener(evt, listener);
+    controller = {
+      kuzzle: {
+        query: sinon.stub().resolves(),
+        addListener: (evt, listener) => {
+          eventEmitter.addListener(evt, listener);
+        },
+        removeListener: (evt, listener) => {
+          eventEmitter.removeListener(evt, listener);
+        },
+        protocol: new KuzzleEventEmitter()
       },
-      removeListener: (evt, listener) => {
-        eventEmitter.removeListener(evt, listener);
-      },
-      protocol: new KuzzleEventEmitter()
+      tokenExpired: sinon.stub()
     };
 
-    kuzzle.protocol.id = 'kuz-protocol-id';
+    controller.kuzzle.protocol.id = 'kuz-protocol-id';
   });
 
   describe('constructor', () => {
@@ -32,11 +35,13 @@ describe('Room', () => {
         body = {foo: 'bar'},
         cb = sinon.stub();
 
-      kuzzle.autoResubscribe = 'default';
+      controller.kuzzle.autoResubscribe = 'default';
 
-      const room = new Room(kuzzle, 'index', 'collection', body, cb, options);
+      const room = new Room(
+        controller, 'index', 'collection', body, cb, options);
 
-      should(room.kuzzle).be.equal(kuzzle);
+      should(room.controller).be.equal(controller);
+      should(room.kuzzle).be.equal(controller.kuzzle);
       should(room.index).be.equal('index');
       should(room.collection).be.equal('collection');
 
@@ -71,7 +76,7 @@ describe('Room', () => {
         body = {foo: 'bar'},
         cb = sinon.stub();
 
-      const room = new Room(kuzzle, 'index', 'collection', body, cb, opts);
+      const room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       should(room.options).be.empty();
 
@@ -86,12 +91,17 @@ describe('Room', () => {
         body = {foo: 'bar'},
         cb = sinon.stub();
 
-      kuzzle.autoResubscribe = 'default';
+      controller.kuzzle.autoResubscribe = 'default';
 
       const
-        room1 = new Room(kuzzle, 'index', 'collection', body, cb, {autoResubscribe: true}),
-        room2 = new Room(kuzzle, 'index', 'collection', body, cb, {autoResubscribe: false}),
-        room3 = new Room(kuzzle, 'index', 'collection', body, cb, {autoResubscribe: 'foobar'});
+        room1 = new Room(
+          controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
+        room2 = new Room(
+          controller, 'index', 'collection', body, cb,
+          {autoResubscribe: false}),
+        room3 = new Room(
+          controller, 'index', 'collection', body, cb,
+          {autoResubscribe: 'foobar'});
 
       should(room1.options).be.empty();
       should(room2.options).be.empty();
@@ -108,9 +118,14 @@ describe('Room', () => {
         cb = sinon.stub();
 
       const
-        room1 = new Room(kuzzle, 'index', 'collection', body, cb, {subscribeToSelf: true}),
-        room2 = new Room(kuzzle, 'index', 'collection', body, cb, {subscribeToSelf: false}),
-        room3 = new Room(kuzzle, 'index', 'collection', body, cb, {subscribeToSelf: 'foobar'});
+        room1 = new Room(
+          controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
+        room2 = new Room(
+          controller, 'index', 'collection', body, cb,
+          {subscribeToSelf: false}),
+        room3 = new Room(
+          controller, 'index', 'collection', body, cb,
+          {subscribeToSelf: 'foobar'});
 
       should(room1.options).be.empty();
       should(room2.options).be.empty();
@@ -123,22 +138,33 @@ describe('Room', () => {
   });
 
   describe('subscribe', () => {
-    const response = {result: {roomId: 'my-room-id', channel: 'subscription-channel'}};
+    const response = {
+      result: {
+        roomId: 'my-room-id',
+        channel: 'subscription-channel'
+      }
+    };
 
     beforeEach(() => {
-      kuzzle.query.resolves(response);
+      controller.kuzzle.query.resolves(response);
     });
 
     it('should call realtime/subscribe action with subscribe filters and return a promise that resolve the roomId and channel', () => {
       const
-        opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
-        room = new Room(kuzzle, 'index', 'collection', body, cb, opts);
+        room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       return room.subscribe()
         .then(res => {
-          should(kuzzle.query)
+          should(controller.kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
               controller: 'realtime',
@@ -158,10 +184,16 @@ describe('Room', () => {
 
     it('should set "id" and "channel" properties', () => {
       const
-        opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
-        room = new Room(kuzzle, 'index', 'collection', body, cb, opts);
+        room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       return room.subscribe()
         .then(() => {
@@ -172,18 +204,24 @@ describe('Room', () => {
 
     it('should call _channelListener while receiving data on the current channel', () => {
       const
-        opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
-        room = new Room(kuzzle, 'index', 'collection', body, cb, opts);
+        room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       room._channelListener = sinon.stub();
 
       return room.subscribe()
         .then(() => {
-          kuzzle.protocol.emit('my-room-id', 'message 1');
-          kuzzle.protocol.emit('subscription-channel', 'message 2');
-          kuzzle.protocol.emit('subscription-channel', 'message 3');
+          controller.kuzzle.protocol.emit('my-room-id', 'message 1');
+          controller.kuzzle.protocol.emit('subscription-channel', 'message 2');
+          controller.kuzzle.protocol.emit('subscription-channel', 'message 3');
           should(room._channelListener).be.calledTwice();
           should(room._channelListener.firstCall).be.calledWith('message 2');
           should(room._channelListener.secondCall).be.calledWith('message 3');
@@ -192,10 +230,16 @@ describe('Room', () => {
 
     it('should call _reSubscribeListener once reconnected', () => {
       const
-        opts = {opt: 'in', scope: 'in', state: 'done', users: 'all', volatile: {bar: 'foo'}},
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
-        room = new Room(kuzzle, 'index', 'collection', body, cb, opts);
+        room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       room._reSubscribeListener = sinon.stub();
 
@@ -212,28 +256,30 @@ describe('Room', () => {
     let room;
 
     beforeEach(() => {
-      room = new Room(kuzzle, 'index', 'collection', {foo: 'bar'}, sinon.stub(), options);
+      room = new Room(
+        controller, 'index', 'collection', {foo: 'bar'}, sinon.stub(), options);
       room.id = 'my-room-id';
       room.channel = 'subscription-channel';
     });
 
     it('should not listen to channel messages anymore', () => {
       room._channelListener = sinon.stub();
-      kuzzle.protocol.on('subscription-channel', room._channelListener);
+      controller.kuzzle.protocol.on(
+        'subscription-channel', room._channelListener);
 
       should(room._channelListener).not.be.called();
-      kuzzle.protocol.emit('subscription-channel', 'message');
+      controller.kuzzle.protocol.emit('subscription-channel', 'message');
       should(room._channelListener).be.calledOnce();
 
       room._channelListener.reset();
       room.removeListeners();
-      kuzzle.protocol.emit('subscription-channel', 'message');
+      controller.kuzzle.protocol.emit('subscription-channel', 'message');
       should(room._channelListener).not.be.called();
     });
 
     it('should not listen to "reconnected" event anymore', () => {
       room._reSubscribeListener = sinon.stub();
-      kuzzle.addListener('reconnected', room._reSubscribeListener);
+      controller.kuzzle.addListener('reconnected', room._reSubscribeListener);
 
       should(room._reSubscribeListener).not.be.called();
       eventEmitter.emit('reconnected');
@@ -253,7 +299,8 @@ describe('Room', () => {
 
     beforeEach(() => {
       cb = sinon.stub();
-      room = new Room(kuzzle, 'index', 'collection', {foo: 'bar'}, cb, options);
+      room = new Room(
+        controller, 'index', 'collection', {foo: 'bar'}, cb, options);
       room.id = 'my-room-id';
       room.channel = 'subscription-channel';
     });
@@ -319,6 +366,18 @@ describe('Room', () => {
       room._channelListener(data);
       should(cb).not.be.called();
     });
+
+    it('should redirect a tokenExpired notification to the parent controller', () => {
+      const data = {
+        type: 'TokenExpired',
+        foo: 'bar'
+      };
+
+      room._channelListener(data);
+
+      should(cb).not.be.called();
+      should(controller.tokenExpired).be.called();
+    });
   });
 
   describe('_reSubscribeListener', () => {
@@ -326,7 +385,8 @@ describe('Room', () => {
       room;
 
     beforeEach(() => {
-      room = new Room(kuzzle, 'index', 'collection', {foo: 'bar'}, sinon.stub(), options);
+      room = new Room(
+        controller, 'index', 'collection', {foo: 'bar'}, sinon.stub(), options);
       room.subscribe = sinon.stub();
     });
 
