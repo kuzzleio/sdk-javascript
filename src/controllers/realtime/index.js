@@ -1,16 +1,16 @@
 const Room = require('./room');
 
-class RealTimeController {
+const expirationThrottleDelay = 1000;
 
+class RealTimeController {
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
     this._kuzzle = kuzzle;
+    this.lastExpirationTimestamp = 0;
 
     this.subscriptions = {
-      filters: {},
-      channels: {}
     };
   }
 
@@ -68,7 +68,7 @@ class RealTimeController {
       throw new Error('Kuzzle.realtime.subscribe: a callback function is required');
     }
 
-    const room = new Room(this.kuzzle, index, collection, filters, callback, options);
+    const room = new Room(this, index, collection, filters, callback, options);
 
     return room.subscribe()
       .then(() => {
@@ -104,6 +104,25 @@ class RealTimeController {
       .then(response => {
         return response.result;
       });
+  }
+
+  /**
+   * Removes all subscriptions, and emit a "tokenExpired" event
+   * (tries to prevent event duplication by throttling it)
+   */
+  tokenExpired() {
+    for (const roomId of Object.keys(this.subscriptions)) {
+      this.subscriptions[roomId].forEach(room => room.removeListeners());
+    }
+
+    this.subscriptions = {};
+    this.kuzzle.jwt = undefined;
+
+    const now = Date.now();
+    if ((now - this.lastExpirationTimestamp) > expirationThrottleDelay) {
+      this.lastExpirationTimestamp = now;
+      this.kuzzle.emit('tokenExpired');
+    }
   }
 }
 

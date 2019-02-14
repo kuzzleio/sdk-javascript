@@ -11,7 +11,8 @@ describe('Realtime Controller', () => {
 
   beforeEach(() => {
     kuzzle = {
-      query: sinon.stub().resolves()
+      query: sinon.stub().resolves(),
+      emit: sinon.stub()
     };
     kuzzle.realtime = new RealtimeController(kuzzle);
   });
@@ -96,22 +97,27 @@ describe('Realtime Controller', () => {
     beforeEach(() => {
       room = null;
 
-      mockrequire('../../src/controllers/realtime/room', function (kuz, index, collection, body, callback, opts = {}) {
-        room = {
-          kuzzle: kuz,
-          index,
-          collection,
-          body,
-          callback,
-          options: opts,
-          id: roomId,
-          subscribe: sinon.stub().resolves(subscribeResponse)
-        };
+      mockrequire(
+        '../../src/controllers/realtime/room',
+        function (controller, index, collection, body, callback, opts = {}) {
+          room = {
+            controller,
+            index,
+            collection,
+            body,
+            callback,
+            kuzzle: controller.kuzzle,
+            options: opts,
+            id: roomId,
+            subscribe: sinon.stub().resolves(subscribeResponse)
+          };
 
-        return room;
-      });
+          return room;
+        });
 
-      kuzzle.realtime = new (mockrequire.reRequire('../../src/controllers/realtime/index'))(kuzzle);
+      const MockRealtimeController =
+        mockrequire.reRequire('../../src/controllers/realtime/index');
+      kuzzle.realtime = new MockRealtimeController(kuzzle);
     });
 
     it('should throw an error if the "index" argument is not provided', () => {
@@ -245,7 +251,7 @@ describe('Realtime Controller', () => {
         });
     });
 
-    it('should call realtime/unsubiscribe query with the roomId and return a Promise which resolves the roomId', () => {
+    it('should call realtime/unsubscribe query with the roomId and return a Promise which resolves the roomId', () => {
       return kuzzle.realtime.unsubscribe(roomId, options)
         .then(res => {
           should(kuzzle.query)
@@ -258,6 +264,40 @@ describe('Realtime Controller', () => {
 
           should(res).be.equal(roomId);
         });
+    });
+  });
+
+  describe('#tokenExpired', () => {
+    it('should clear all subscriptions and emit a "tokenExpired" event', () => {
+      const stub = sinon.stub();
+
+      kuzzle.jwt = 'foobar';
+
+      for (let i = 0; i < 10; i++) {
+        kuzzle.realtime.subscriptions[uuidv4()] = [{removeListeners: stub}];
+      }
+
+      kuzzle.realtime.tokenExpired();
+
+      should(kuzzle.realtime.subscriptions).be.empty();
+      should(stub.callCount).be.eql(10);
+      should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
+      should(kuzzle.jwt).be.undefined();
+    });
+
+    it('should throttle to prevent emitting duplicate occurrences of the same event', () => {
+      const stub = sinon.stub();
+
+      for (let i = 0; i < 10; i++) {
+        kuzzle.realtime.subscriptions[uuidv4()] = [{removeListeners: stub}];
+
+        kuzzle.realtime.tokenExpired();
+
+        should(kuzzle.realtime.subscriptions).be.empty();
+        should(stub.callCount).be.eql(i+1);
+      }
+
+      should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
     });
   });
 });
