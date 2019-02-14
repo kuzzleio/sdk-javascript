@@ -116,6 +116,7 @@ class RealTimeController {
     }
 
     this.subscriptions = {};
+    this.kuzzle.jwt = undefined;
 
     const now = Date.now();
     if ((now - this.lastExpirationTimestamp) > expirationThrottleDelay) {

@@ -271,6 +271,8 @@ describe('Realtime Controller', () => {
     it('should clear all subscriptions and emit a "tokenExpired" event', () => {
       const stub = sinon.stub();
 
+      kuzzle.jwt = 'foobar';
+
       for (let i = 0; i < 10; i++) {
         kuzzle.realtime.subscriptions[uuidv4()] = [{removeListeners: stub}];
       }
@@ -280,6 +282,7 @@ describe('Realtime Controller', () => {
       should(kuzzle.realtime.subscriptions).be.empty();
       should(stub.callCount).be.eql(10);
       should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
+      should(kuzzle.jwt).be.undefined();
     });
 
     it('should throttle to prevent emitting duplicate occurrences of the same event', () => {
