@@ -1,45 +1,8 @@
 'use strict';
 
 const
-  KuzzleAbstractProtocol = require('./abstract/common');
-
-const
-  _routes = {
-    routes: {
-      auth: {
-        login: {
-          verb: 'POST',
-          url: '/_login/:strategy'
-        }
-      },
-      bulk: {
-        import: {
-          verb: 'POST',
-          url: '/:index/:collection/_bulk'
-        }
-      },
-      document: {
-        create: {
-          verb: 'POST',
-          url: '/:index/:collection/_create'
-        }
-      },
-      security: {
-        createFirstAdmin: {
-          verb: 'POST',
-          url: '/_createFirstAdmin'
-        },
-        createRestrictedUser: {
-          verb: 'POST',
-          url: '/users/_createRestricted'
-        },
-        createUser: {
-          verb: 'POST',
-          url: '/users/_create'
-        }
-      }
-    }
-  };
+  KuzzleAbstractProtocol = require('./abstract/common'),
+  _routes = require('./routes.json');
 
 
 class HttpWrapper extends KuzzleAbstractProtocol {
@@ -78,25 +41,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
     }
 
     return this._sendHttpRequest('GET', '/')
-      .then(res => {
-        // Get HTTP Routes from Kuzzle serverInfo
-        // (if more than 1 available route for a given action, get the first one):
-        const routes = res.result.serverInfo.kuzzle.api.routes;
-        for (const controller of Object.keys(routes)) {
-          if (this.http.routes[controller] === undefined) {
-            this.http.routes[controller] = {};
-          }
-
-          for (const action of Object.keys(routes[controller])) {
-            if (this.http.routes[controller][action] === undefined
-              && Array.isArray(routes[controller][action].http)
-              && routes[controller][action].http.length > 0) {
-
-              this.http.routes[controller][action] = routes[controller][action].http[0];
-            }
-          }
-        }
-
+      .then(() => {
         // Client is ready
         this.clientConnected();
       })
