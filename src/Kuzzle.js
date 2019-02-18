@@ -87,13 +87,6 @@ class Kuzzle extends KuzzleEventEmitter {
     }
     this.queuing = false;
     this.replayInterval = 10;
-
-    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
-
-    this.protocol.addListener('tokenExpired', () => {
-      this.jwt = undefined;
-      this.emit('tokenExpired');
-    });
   }
 
   get autoQueue () {
@@ -242,6 +235,13 @@ class Kuzzle extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
+    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+
+    this.protocol.addListener('tokenExpired', () => {
+      this.jwt = undefined;
+      this.emit('tokenExpired');
+    });
+
     this.protocol.addListener('connect', () => {
       if (this.autoQueue) {
         this.stopQueuing();
@@ -377,7 +377,7 @@ class Kuzzle extends KuzzleEventEmitter {
      */
     if (this.jwt !== undefined
       && !(request.controller === 'auth'
-      && request.action === 'checkToken')
+      && (request.action === 'checkToken' || request.action === 'login'))
     ) {
       request.jwt = this.jwt;
     }
