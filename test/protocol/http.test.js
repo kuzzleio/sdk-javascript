@@ -124,7 +124,6 @@ describe('HTTP networking module', () => {
 
         should(protocol.http.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
         should(protocol.http.routes.foo.empty).be.undefined();
-        should(protocol.http.routes.baz).be.an.Object().and.be.empty();
       });
     });
 
