@@ -1,6 +1,7 @@
-var
+const
   should = require('should'),
   sinon = require('sinon'),
+  KuzzleError = require('../../src/KuzzleError'),
   AbstractWrapper = require('../../src/protocols/abstract/common');
 
 describe('Protocol query management', () => {
@@ -69,6 +70,7 @@ describe('Protocol query management', () => {
         .then(() => Promise.reject({message: 'No error'}))
         .catch(error => {
           should(eventStub).be.calledOnce();
+          should(error).be.instanceOf(KuzzleError);
           should(error.message).be.exactly('foo-bar');
         });
     });
@@ -101,6 +103,25 @@ describe('Protocol query management', () => {
           should(res.error).be.null();
           should(res.result).be.exactly(response.result);
           should(res.status).be.exactly(42);
+        });
+    });
+
+    it('should throw a KuzzleError on error', () => {
+      const response = {
+        error: {
+          message: 'foo-bar',
+          status: 442,
+          stack: 'you are the bug'
+        }
+      };
+
+      return protocol.query({ requestId: 'foobar', response: response })
+        .then(() => Promise.reject({message: 'No error'}))
+        .catch(error => {
+          should(error).be.instanceOf(KuzzleError);
+          should(error.message).be.eql('foo-bar');
+          should(error.status).be.eql(442);
+          should(error.stack).be.eql('you are the bug');
         });
     });
   });
