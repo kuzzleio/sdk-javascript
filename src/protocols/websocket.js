@@ -86,7 +86,12 @@ class WSNode extends RTWrapper {
       };
 
       this.client.onerror = error => {
-        const err = (error instanceof Error) && error || new Error(error);
+        let err = error;
+
+        if (!(error instanceof Error)) {
+          err = error ?
+            new Error(error.message || error) : new Error('Unexpected error');
+        }
 
         this.clientNetworkError(err);
 
