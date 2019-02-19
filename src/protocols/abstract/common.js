@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  KuzzleError = require('../../KuzzleError'),
   uuidv4 = require('../../uuidv4'),
   KuzzleEventEmitter = require('../../eventEmitter');
 
@@ -83,10 +84,8 @@ Discarded request: ${JSON.stringify(request)}`));
     return new Promise((resolve, reject) => {
       this.once(request.requestId, response => {
         if (response.error) {
-          const error = new Error(response.error.message);
-          Object.assign(error, response.error);
-          error.status = response.status;
-          response.error = error;
+          const error = new KuzzleError(response.error);
+
           this.emit('queryError', error, request);
 
           if (request.action !== 'logout' && error.message === 'Token expired') {
