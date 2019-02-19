@@ -20,7 +20,6 @@ install:
 - npm install
 script:
 - npm run build && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
-after_success:
 - chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
 deploy:
   provider: npm
@@ -30,7 +29,8 @@ deploy:
     secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
   on:
     repo: kuzzleio/sdk-javascript
-    branch: master
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^master|6-beta$
 notifications:
   webhooks:
     urls:
