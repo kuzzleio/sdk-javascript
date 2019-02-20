@@ -1,62 +1,103 @@
-sudo: false
-language: node_js
-node_js:
-- 8
-env:
-  global:
-    secure: ATb4QFGG6sPkfquAoye6BeN7u4uQ4abP8qatVK8XG3Qof+pECZwRkFPVoopO1Gb/4bQSPfapc1aGPzGuKi409v633vpDnpcgM7cHX9CPT+YQYcTePMFtq/m+5YY3WIYWM1zCFmJ+bBwQO/MtsubfGfA9EmSAAxtnJV+1JDD3Y6+NQRkQN7K+gxQozec0u1W0Oe1sJXLSKlW3JPL8iRtKcLvmIDysKtBK6X/Wg1qP2Me4reb449a0yGej3QvZDbDYJbdlh7vuFLjXJAz3yExfED8QAm8wf0p9F8emILHnkLxjumTTnGUUqDJLLu8WgkahFiyFo4jMtryhNQ0+p6WhXmEbpNIO+yMGSZPsCGbnpkhWJ1aMAT6ZhgpHf4jDZQd4ZJi02+n9tOpe+Lm2Jk2LXY8SwMk3xGtqm5sk03weTc019TUGj/NLoHNjO/vfNz3xOImD5Gck3bXWNxdrX3bjiyVsr/u77enoWu9drPCEl3JOTIwVP3mTF8R3axSFOQ8M4SI1orCMChkGMB5qExl+Gfx+MHa/jL7QKO1SFRgl1O3DbhsyFE6xiabYzwLcdbI50ypy6VJjmDd5RxK7BkDa8RumlHT1uY1FK9yRXu4XFrrw9FjF2s+xjWbliRZqXRReXk0W1Hz4zj5au3Y9YH5a/UPtB72TY+AUUWHTUPQl3SU=
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-4.9
-    - g++-4.9
+jobs:
+  include:
+    - stage: Tests
+      sudo: false
+      language: node_js
+      node_js: 8
 
-before_install:
-- export CC="gcc-4.9" CXX="g++-4.9"
-- sudo sysctl -w vm.max_map_count=262144
-- "./.ci/start_kuzzle.sh"
+      env:
+        # Codecov token
+        secure: ATb4QFGG6sPkfquAoye6BeN7u4uQ4abP8qatVK8XG3Qof+pECZwRkFPVoopO1Gb/4bQSPfapc1aGPzGuKi409v633vpDnpcgM7cHX9CPT+YQYcTePMFtq/m+5YY3WIYWM1zCFmJ+bBwQO/MtsubfGfA9EmSAAxtnJV+1JDD3Y6+NQRkQN7K+gxQozec0u1W0Oe1sJXLSKlW3JPL8iRtKcLvmIDysKtBK6X/Wg1qP2Me4reb449a0yGej3QvZDbDYJbdlh7vuFLjXJAz3yExfED8QAm8wf0p9F8emILHnkLxjumTTnGUUqDJLLu8WgkahFiyFo4jMtryhNQ0+p6WhXmEbpNIO+yMGSZPsCGbnpkhWJ1aMAT6ZhgpHf4jDZQd4ZJi02+n9tOpe+Lm2Jk2LXY8SwMk3xGtqm5sk03weTc019TUGj/NLoHNjO/vfNz3xOImD5Gck3bXWNxdrX3bjiyVsr/u77enoWu9drPCEl3JOTIwVP3mTF8R3axSFOQ8M4SI1orCMChkGMB5qExl+Gfx+MHa/jL7QKO1SFRgl1O3DbhsyFE6xiabYzwLcdbI50ypy6VJjmDd5RxK7BkDa8RumlHT1uY1FK9yRXu4XFrrw9FjF2s+xjWbliRZqXRReXk0W1Hz4zj5au3Y9YH5a/UPtB72TY+AUUWHTUPQl3SU=
 
-install:
-- npm install
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
 
-script:
-- npm run build && npm test && cat ./coverage/lcov.info | ./node_modules/.bin/codecov
-- chmod 755 ${TRAVIS_BUILD_DIR}/deploy.sh && sh -c "${TRAVIS_BUILD_DIR}/deploy.sh"
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
+        - sudo sysctl -w vm.max_map_count=262144
+        - "./.ci/start_kuzzle.sh"
 
-deploy:
-  - provider: npm
-    skip_cleanup: true
-    email: support@kuzzle.io
-    tag: beta
-    api_key:
-      secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
-    on:
-      repo: kuzzleio/sdk-javascript
-      all_branches: true
-      condition: $TRAVIS_BRANCH = 6-beta
+      install:
+        - npm install
 
-  - provider: npm
-    skip_cleanup: true
-    email: support@kuzzle.io
-    api_key:
-      secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
-    on:
-      repo: kuzzleio/sdk-javascript
-      all_branches: true
-      condition: $TRAVIS_BRANCH = master
+      script:
+        - npm run build
+        - npm test
+        
+      after_success:  
+        - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 
-notifications:
-  webhooks:
-    urls:
-    - https://webhooks.gitter.im/e/8e145155fbaaf37cffea
-    on_success: change
-    on_failure: always
-    on_start: never
-  email: false
-  slack:
-    secure: m0BEda/eXxYkil0zDZ1uNpK13kiNbb5/80I5OqDBz6X7/WH3uhWIV6q38lI929tQKz04eHAfVDaRSoPk1XwZBnb70MgcRmSG/m4/moR7BCnx7D9hHFqhNf0EfdzwEg44dCCVtD2vUvChtYV+jK74sNd4yqeq86YXi33qS7SYLS6kYnRloX0D7sQXDy14FWU2a5+hsrPX8yBoWuPjBergvK6W1dZAG+SfDywaqsrUDs+q64yEHiYV9VlvVZ/oKXZiDnVcB2hi0uulIZ8+iZaMJFEU30uCQiK6w3HG587yx3sVJmprr64ZYHKaFJD2ZAG1td6wJ1ccJsU/ruGkj4+0CeoZUYYBYXYQ4qhQl8F2QT0m+8dWqPwzYpxEoqyvGS9ioZG/YI18V2CE1pEyc72JzEv6c3AgDbtwrLH5s3ViNts7kulk3wwCzuAww+DapSV9ggezo+Bs7OGRpXwh/saeKWUCLqTkLQTjuq2dFVdo85HsC2RrLcSsZLMTOuV/A//FNBDJBlNnuneGP84zGkWGPEja0FFXvm2TS95gh1hd2PMe+QxjygOAvIMLmDmfdlWSLayUeWbqp20EdF7TUHV0dvBucga8s3UvFhIMnnGLS9vcNEIRtVornXznwdYSLbYD0mLXNtitneXTnSAxilThKtGDPOWQFkYkyoFV9FEwKO8=
-    on_success: never
-    on_failure: always
-    on_start: never
+    - stage: "Deploy Stable release on NPM"
+      if: type != pull_request && branch = master
+      sudo: false
+      language: node_js
+      node_js: 8
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
+
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
+
+      install:
+        - npm install
+
+      script:
+        - npm run build
+
+      deploy:
+        provider: npm
+        skip_cleanup: true
+        email: support@kuzzle.io
+        api_key:
+          secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+        on:
+          repo: kuzzleio/sdk-javascript
+          all_branches: true
+          condition: $TRAVIS_BRANCH = master
+
+    - stage: "Deploy Beta release on NPM"
+      if: type != pull_request && branch =~ ^[0-9]+-beta$
+      sudo: false
+      language: node_js
+      node_js: 8
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
+
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
+
+      install:
+        - npm install
+
+      script:
+        - npm run build
+
+      deploy:
+        - provider: npm
+          skip_cleanup: true
+          email: support@kuzzle.io
+          tag: beta
+          api_key:
+            secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+          on:
+            repo: kuzzleio/sdk-javascript
+            all_branches: true
+            condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
+
