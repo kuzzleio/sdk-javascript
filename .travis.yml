@@ -67,7 +67,7 @@ jobs:
           condition: $TRAVIS_BRANCH = master
 
     - stage: "Deploy Beta release on NPM"
-      if: type != pull_request && branch =~ ^[1-9]-beta$
+      if: type != pull_request && branch =~ ^[0-9]+-beta$
       sudo: false
       language: node_js
       node_js: 8
@@ -99,5 +99,5 @@ jobs:
           on:
             repo: kuzzleio/sdk-javascript
             all_branches: true
-            condition: $TRAVIS_BRANCH =~ ^[1-9]{1}-beta$
+            condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
 
