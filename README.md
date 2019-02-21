@@ -1,18 +1,19 @@
 [![Build Status](https://travis-ci.org/kuzzleio/sdk-javascript.svg?branch=master)](https://travis-ci.org/kuzzleio/sdk-javascript) [![codecov.io](http://codecov.io/github/kuzzleio/sdk-javascript/coverage.svg?branch=master)](http://codecov.io/github/kuzzleio/sdk-javascript?branch=master) [![Dependency Status](https://david-dm.org/kuzzleio/sdk-javascript.svg)](https://david-dm.org/kuzzleio/sdk-javascript)
 
-
 Official Kuzzle Javascript SDK
 ======
 
 ## About Kuzzle
 
-A backend software, self-hostable and ready to use to power modern apps.
+Kuzzle is backend software, self-hostable and ready to use to power modern mobile, IoT and web applications.
 
-You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
+You can access Kuzzle repository on [Github](https://github.com/kuzzleio/kuzzle)
 
-This is the documentation for the beta-6 SDK. We are currently refactoring in deep our documentation to support many versions of each SDK. You can see it [here](https://docs-v2.kuzzle.io/sdk-reference/kuzzle/constructor/) but notice that this is a beta version of the documentation.  
+## About Kuzzle JS SDK
 
-This new documentation will be available soon. In the meantime, you can still use the SDK 5 and the old documentation at https://docs.kuzzle.io/sdk-reference/essentials/.
+This is the SDK to develop JavaScript applications using Kuzzle as backend.
+
+Complete documentation is available on [docs-v2.kuzzle.io](https://docs-v2.kuzzle.io)
 
 * [Basic usage](#basic-usage)
 * [Installation](#installation)
@@ -28,8 +29,9 @@ This new documentation will be available soon. In the meantime, you can still us
 The SDK supports different protocols. When instantiating, you must choose the protocol to use and fill in the different options needed to connect to Kuzzle.  
 
 Example:
-```js
-const { 
+
+``` js
+const {
   Kuzzle,
   WebSocket,
   Http,
@@ -57,7 +59,7 @@ This SDK can be used either in NodeJS or in a browser.
 
 ```
 # Beta v6
-npm install kuzzle-sdk@beta
+npm install kuzzle-sdk
 ```
 
 ### Browser
