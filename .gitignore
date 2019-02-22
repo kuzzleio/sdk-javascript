@@ -4,8 +4,13 @@
 # Node
 *.log
 node_modules/
-.nyc_output/
+examples/node_modules/
+.nyc_output
+
+# Other
+.DS_STORE
+*#
+*~
 
 # Compiled files
 coverage/
-
