@@ -25,13 +25,13 @@ This is the official Javascript SDK for the free and open-source backend Kuzzle.
 #### Multiprotocols
 
 Currently, the SDK provides 3 protocols: __Http, WebSocket and SocketIO.__
-WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).
+WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).  
 While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
 
 #### Promises based
 
-All SDK methods return a promise resolving the result part of Kuzzle API responses. If an error occurs, the promise is rejected with an Error object embedding the error part of the API response.
-For example, for the action create of the controller collection (_collection:create_), the property result contains `{ "acknowledged": true }` . This is therefore what will be returned by the SDK method if successful.
+All SDK methods return a promise resolving the result part of Kuzzle API responses. If an error occurs, the promise is rejected with an Error object embedding the error part of the API response.  
+For example, for the action create of the controller collection (_collection:create_), the property result contains `{ "acknowledged": true }` . This is therefore what will be returned by the SDK method if successful.  
 Any error must be caught either at the end of the `Promise` chain, or by using `async/await` and a `try...catch`.
 
 <p align="center">
