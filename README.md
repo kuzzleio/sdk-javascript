@@ -35,7 +35,7 @@ For example, for the action create of the controller collection (_collection:cre
 Any error must be caught either at the end of the `Promise` chain, or by using `async/await` and a `try...catch`.
 
 <p align="center">
-  :books: <b><a href="https://docs-v2.kuzzle.io/sdk-references/js/6/">Documentation</a></b>
+  :books: <b><a href="https://docs-v2.kuzzle.io/sdk-reference/js/6/">Documentation</a></b>
 </p>
 
 ### Kuzzle
