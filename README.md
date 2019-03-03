@@ -126,6 +126,7 @@ const kuzzle = new Kuzzle(
 );
 
 try {
+  await kuzzle.connect();
   const serverTime = await kuzzle.server.now();
   console.log(serverTime);
 } catch (error) {
