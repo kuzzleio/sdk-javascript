@@ -1,5 +1,3 @@
-let _kuzzle;
-
 class SearchResultBase {
 
   /**
@@ -10,7 +8,7 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    _kuzzle = kuzzle;
+    this.kuzzle = kuzzle;
     this._request = request;
     this._response = response;
     this._options = options;
@@ -31,7 +29,8 @@ class SearchResultBase {
     }
 
     if (this._request.scroll) {
-      return _kuzzle.query({
+      console.log('HELLO')
+      return this.kuzzle.query({
         controller: this._request.controller,
         action: this._scrollAction,
         scrollId: this._response.scrollId
@@ -46,6 +45,7 @@ class SearchResultBase {
         });
     }
     else if (this._request.size && this._request.sort) {
+      console.log('HELO')
       const
         request = Object.assign({}, this._request, {
           action: this._searchAction,
@@ -64,7 +64,7 @@ class SearchResultBase {
         request.search_after.push(value);
       }
 
-      return _kuzzle.query(request, this._options)
+      return this.kuzzle.query(request, this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
@@ -79,7 +79,7 @@ class SearchResultBase {
         return Promise.resolve(null);
       }
 
-      return _kuzzle.query(Object.assign({}, this._request, {
+      return this.kuzzle.query(Object.assign({}, this._request, {
         action: this._searchAction,
         from: this.fetched
       }), this._options)
@@ -94,6 +94,31 @@ class SearchResultBase {
     }
 
     throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+  }
+
+  forEachHits(callback) {
+    const run = async function (cb, results) {
+      for (const hit of results.hits) {
+        cb(hit);
+      }
+      console.log('OK');
+      console.log(results.next)
+      await results.next();
+      console.log('OK');
+    };
+
+    run(callback, this);
+
+
+
+
+    // while (results) {
+    //   for (const hit of results.hits) {
+    //     callback(hit);
+    //   }
+
+    //   results = await results.next();
+    // }
   }
 
   _get (object, path) {
