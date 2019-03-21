@@ -66,3 +66,11 @@ Then(/^the JWT is (in)?valid$/, async function (not) {
     should(response.valid).be.true();
   }
 });
+
+Given('I get my rights', async function () {
+  this.rights = await this.kuzzle.auth.getMyRights();
+});
+
+Then('I have a vector with {int} rights', function (nbRights) {
+  should(this.rights).have.length(nbRights);
+});
