@@ -14,6 +14,8 @@ class World {
     this.ids = [];
     this.user = null;
     this.jwt = null;
+    this.rights = null;
+    this.previousJwt = null;
 
     this.content = null;
     this.error = null;
