@@ -124,5 +124,33 @@ describe('Protocol query management', () => {
           should(error.stack).be.eql('you are the bug');
         });
     });
+
+    it('should keep internal errors on PartialErrors', () => {
+      const response = {
+        error: {
+          message: 'foo-bar',
+          status: 206,
+          stack: 'you are the bug',
+          errors: [
+            'some',
+            'error'
+          ],
+          count: 42
+        }
+      };
+
+      return protocol.query({ requestId: 'foobar', response: response })
+        .then(() => Promise.reject({message: 'No error'}))
+        .catch(error => {
+          should(error).be.instanceOf(KuzzleError);
+          should(error.message).be.eql('foo-bar');
+          should(error.status).be.eql(206);
+          should(error.stack).be.eql('you are the bug');
+          should(error.errors).be.an.Array();
+          should(error.errors.length).eql(2);
+          should(error.count).eql(42);
+        });
+    });
+
   });
 });

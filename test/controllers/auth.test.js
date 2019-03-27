@@ -365,4 +365,45 @@ describe('Auth Controller', () => {
         });
     });
   });
+
+  describe('refreshToken', () => {
+    const tokenResponse = { _id: 'foo', jwt: 'newToken' };
+
+    beforeEach(() => {
+      kuzzle.jwt = 'jwt';
+      kuzzle.query.resolves({result: tokenResponse});
+    });
+
+    it('should call auth/refreshToken query', () => {
+      return kuzzle.auth.refreshToken()
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'refreshToken',
+              expiresIn: undefined
+            });
+
+          should(res).be.eql(tokenResponse);
+          should(kuzzle.jwt).be.eql('newToken');
+        });
+    });
+
+    it('should set the expiresIn option if one is provided', () => {
+      return kuzzle.auth.refreshToken({expiresIn: 'foobar'})
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'refreshToken',
+              expiresIn: 'foobar'
+            });
+
+          should(res).be.eql(tokenResponse);
+          should(kuzzle.jwt).be.eql('newToken');
+        });
+    });
+  });
 });
