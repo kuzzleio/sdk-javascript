@@ -19,7 +19,7 @@ describe('ProfileSearchResult', () => {
     };
 
     request = {
-      body: {foo: 'bar'},
+      body: { query: { foo: 'bar'} },
       controller: 'security',
       action: 'searchProfiles',
     };
@@ -172,12 +172,28 @@ describe('ProfileSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['foo', {bar: 'asc'}];
+        request.body.sort = ['foo', {bar: 'asc'}];
 
         response = {
           hits: [
-            {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar'], foo: 'bar', bar: 1234}},
-            {_id: 'profile2', _version: 3, _source: {policies: ['foo', 'baz'], foo: 'baz', bar: 3456}}
+            {
+              _id: 'profile1',
+              _version: 1,
+              _source: {
+                policies: ['foo', 'bar'],
+                foo: 'bar',
+                bar: 1234
+              }
+            },
+            {
+              _id: 'profile2',
+              _version: 3,
+              _source: {
+                policies: ['foo', 'baz'],
+                foo: 'baz',
+                bar: 3456
+              }
+            }
           ],
           total: 30
         };
@@ -186,18 +202,21 @@ describe('ProfileSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call security/searchProfiles action with search_after parameter and resolve the current object', () => {
+      it('should call security/searchProfiles action with search_after \
+          parameter and resolve the current object', () => {
         return searchResult.next()
           .then(res => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: {
+                  sort: ['foo', {bar: 'asc'}],
+                  search_after: ['baz', 3456],
+                  query: { foo: 'bar' }
+                },
                 controller: 'security',
                 action: 'searchProfiles',
-                size: 2,
-                sort: ['foo', {bar: 'asc'}],
-                search_after: ['baz', 3456]
+                size: 2
               }, options);
             should(res).be.equal(searchResult);
           });
@@ -268,7 +287,7 @@ describe('ProfileSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'security',
                 action: 'searchProfiles',
                 size: 2,

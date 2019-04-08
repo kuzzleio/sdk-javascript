@@ -1,5 +1,6 @@
 const
-  SpecificationsSearchResult = require('../../../src/controllers/searchResult/specifications'),
+  SpecificationsSearchResult = require(
+    '../../../src/controllers/searchResult/specifications'),
   sinon = require('sinon'),
   should = require('should');
 
@@ -18,7 +19,7 @@ describe('SpecificationsSearchResult', () => {
     };
 
     request = {
-      body: {foo: 'bar'},
+      body: { query: { foo: 'bar' } },
       controller: 'collection',
       action: 'searchSpecifications',
     };
@@ -151,7 +152,7 @@ describe('SpecificationsSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['index', {collection: 'asc'}];
+        request.body.sort = ['index', {collection: 'asc'}];
 
         response = {
           hits: [
@@ -171,12 +172,14 @@ describe('SpecificationsSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: {
+                  query: { foo: 'bar' },
+                  sort: ['index', {collection: 'asc'}],
+                  search_after: ['index', 'collection2']
+                },
                 controller: 'collection',
                 action: 'searchSpecifications',
-                size: 2,
-                sort: ['index', {collection: 'asc'}],
-                search_after: ['index', 'collection2']
+                size: 2
               }, options);
             should(res).be.equal(searchResult);
           });
@@ -237,7 +240,7 @@ describe('SpecificationsSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'collection',
                 action: 'searchSpecifications',
                 size: 2,
