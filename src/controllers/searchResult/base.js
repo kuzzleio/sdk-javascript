@@ -45,15 +45,16 @@ class SearchResultBase {
           return this;
         });
     }
-    else if (this._request.size && this._request.sort) {
+    else if (this._request.size && this._request.body.sort) {
       const
         request = Object.assign({}, this._request, {
-          action: this._searchAction,
-          search_after: []
+          action: this._searchAction
         }),
-        hit = this._response.hits && this._response.hits[this._response.hits.length -1];
+        hit = this._response.hits[this._response.hits.length -1];
 
-      for (const sort of this._request.sort) {
+      request.body.search_after = [];
+
+      for (const sort of this._request.body.sort) {
         const key = typeof sort === 'string'
           ? sort
           : Object.keys(sort)[0];
@@ -61,7 +62,7 @@ class SearchResultBase {
           ? this._request.collection + '#' + hit._id
           : this._get(hit._source, key.split('.'));
 
-        request.search_after.push(value);
+        request.body.search_after.push(value);
       }
 
       return _kuzzle.query(request, this._options)

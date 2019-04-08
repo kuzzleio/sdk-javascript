@@ -20,7 +20,11 @@ describe('DocumentSearchResult', () => {
     request = {
       index: 'index',
       collection: 'collection',
-      body: {foo: 'bar'},
+      body: {
+        query: {
+          foo: 'bar'
+        }
+      },
       controller: 'document',
       action: 'search',
     };
@@ -158,7 +162,7 @@ describe('DocumentSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
+        request.body.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
 
         response = {
           hits: [
@@ -181,12 +185,16 @@ describe('DocumentSearchResult', () => {
               .be.calledWith({
                 index: 'index',
                 collection: 'collection',
-                body: {foo: 'bar'},
+                body: {
+                  query: {
+                    foo: 'bar'
+                  },
+                  sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
+                  search_after: ['barbar', 2345, 'collection#document2']
+                },
                 controller: 'document',
                 action: 'search',
-                size: 2,
-                sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
-                search_after: ['barbar', 2345, 'collection#document2']
+                size: 2
               }, options);
             should(res).be.equal(searchResult);
           });
@@ -253,7 +261,7 @@ describe('DocumentSearchResult', () => {
               .be.calledWith({
                 index: 'index',
                 collection: 'collection',
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'document',
                 action: 'search',
                 size: 2,

@@ -19,7 +19,7 @@ describe('UserSearchResult', () => {
     };
 
     request = {
-      body: {foo: 'bar'},
+      body: { query: { foo: 'bar' } },
       controller: 'security',
       action: 'searchUsers',
     };
@@ -176,7 +176,7 @@ describe('UserSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['name', {bar: 'asc'}];
+        request.body.sort = ['name', {bar: 'asc'}];
 
         response = {
           hits: [
@@ -196,12 +196,14 @@ describe('UserSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: {
+                  query: { foo: 'bar' },
+                  sort: ['name', {bar: 'asc'}],
+                  search_after: ['Jane Doe', 3456]
+                },
                 controller: 'security',
                 action: 'searchUsers',
-                size: 2,
-                sort: ['name', {bar: 'asc'}],
-                search_after: ['Jane Doe', 3456]
+                size: 2
               }, options);
             should(res).be.equal(searchResult);
           });
@@ -274,7 +276,7 @@ describe('UserSearchResult', () => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'security',
                 action: 'searchUsers',
                 size: 2,
