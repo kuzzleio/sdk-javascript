@@ -149,7 +149,7 @@ class AuthController {
    * @param expiresIn
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  login (strategy, credentials, expiresIn) {
+  login (strategy, credentials = {}, expiresIn = null) {
     if (typeof strategy !== 'string' || strategy === '') {
       throw new Error('Kuzzle.auth.login: strategy is required');
     }
@@ -158,7 +158,7 @@ class AuthController {
       request = {
         strategy,
         expiresIn,
-        body: credentials || {},
+        body: credentials,
         controller: 'auth',
         action: 'login'
       };
@@ -247,6 +247,26 @@ class AuthController {
       .then(response => response.result);
   }
 
+  /**
+   * Refresh an authentication token
+   *
+   * @param {Object} options
+   * @returns {Promise.<Object>}
+   */
+  refreshToken(options = {}) {
+    const query = {
+      controller: 'auth',
+      action: 'refreshToken',
+      expiresIn: options.expiresIn
+    };
+
+    return this.kuzzle.query(query, options)
+      .then(response => {
+        this.kuzzle.jwt = response.result.jwt;
+
+        return response.result;
+      });
+  }
 }
 
 module.exports = AuthController;
