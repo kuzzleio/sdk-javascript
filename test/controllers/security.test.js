@@ -545,26 +545,21 @@ describe('Security Controller', () => {
   });
 
   describe('createRestrictedUser', () => {
-    it('should throw an error if "content" is not provided', () => {
-      should(function () {
-        kuzzle.security.createRestrictedUser();
-      }).throw('Kuzzle.security.createRestrictedUser: content is required');
-    });
-
-    it('should throw an error if "credentials" is not provided', () => {
+    it('should throw an error if "body.credentials" is not provided', () => {
       const content = {foo: 'bar'};
 
       should(function () {
         kuzzle.security.createRestrictedUser(content);
-      }).throw('Kuzzle.security.createRestrictedUser: credentials is required');
+      }).throw('Kuzzle.security.createRestrictedUser: body.credentials is required');
     });
 
     it('should call security/createRestrictedUser query with the user content and credentials and return a Promise which resolves a User object', () => {
-      const
-        content = {foo: 'bar'},
-        credentials = {
+      const body = {
+        content: {foo: 'bar'},
+        credentials: {
           strategy: {foo: 'bar'}
-        };
+        }
+      };
 
       kuzzle.query.resolves({
         result: {
@@ -577,16 +572,13 @@ describe('Security Controller', () => {
         }
       });
 
-      return kuzzle.security.createRestrictedUser(content, credentials, 'userId', options)
+      return kuzzle.security.createRestrictedUser(body, 'userId', options)
         .then(user => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
+              body,
               _id: 'userId',
-              body: {
-                content,
-                credentials
-              },
               controller: 'security',
               action: 'createRestrictedUser',
               refresh: undefined
@@ -600,11 +592,12 @@ describe('Security Controller', () => {
     });
 
     it('should inject the "refresh" option into the request', () => {
-      const
-        content = {foo: 'bar'},
-        credentials = {
+      const body = {
+        content: {foo: 'bar'},
+        credentials: {
           strategy: {foo: 'bar'}
-        };
+        }
+      };
 
       kuzzle.query.resolves({
         result: {
@@ -617,16 +610,13 @@ describe('Security Controller', () => {
         }
       });
 
-      return kuzzle.security.createRestrictedUser(content, credentials, null, {refresh: true})
+      return kuzzle.security.createRestrictedUser(body, null, {refresh: true})
         .then(user => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
+              body,
               _id: null,
-              body: {
-                content,
-                credentials
-              },
               controller: 'security',
               action: 'createRestrictedUser',
               refresh: true
