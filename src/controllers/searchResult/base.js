@@ -105,23 +105,34 @@ class SearchResultBase {
    * @param {Function} action - Action to execute for each hit
    * @returns {Promise}
    */
-  async forEachHit(action) {
-    const promises = [];
-    let results = new this.constructor(this._kuzzle, this._request, this._options, this._response);
+  async forEachHit(action, firstCall = true) {
+    let results;
 
-    while (results) {
-      for (const hit of results.hits) {
-        const ret = action(hit);
-
-        if (ret && typeof ret.then === 'function') {
-          promises.push(ret);
-        }
-      }
-
-      results = await results.next();
+    if (firstCall) {
+      results = new this.constructor(this._kuzzle, this._request, this._options, this._response);
+    } else {
+      results = this;
     }
 
-    return Promise.all(promises);
+    const promises = [];
+
+    for (const hit of results.hits) {
+      const ret = action(hit);
+
+      if (ret && typeof ret.then === 'function') {
+        promises.push(ret);
+      }
+    }
+
+    return Promise.all(promises)
+      .then(() => results.next())
+      .then(nextResults => {
+        if (nextResults === null) {
+          return null;
+        }
+
+        return nextResults.forEachHit(action, false);
+      });
   }
 
   _get (object, path) {

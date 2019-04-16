@@ -287,6 +287,16 @@ describe('DocumentSearchResult', () => {
   });
 
   describe('forEachHit', () => {
+    let documentSearchResultNext;
+
+    beforeEach(() => {
+      documentSearchResultNext = DocumentSearchResult.prototype.next;
+    });
+
+    afterEach(() => {
+      DocumentSearchResult.prototype.next = documentSearchResultNext;
+    });
+
     it('call the callback for each hit of the SearchResult', async () => {
       response = {
         hits: [
@@ -307,6 +317,7 @@ describe('DocumentSearchResult', () => {
 
     it('should fetch the next page of results', async () => {
       response = {
+        scrollId: 'scroll-id',
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
           {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
@@ -314,7 +325,7 @@ describe('DocumentSearchResult', () => {
         total: 3
       };
       searchResult = new DocumentSearchResult(kuzzle, request, options, response);
-      searchResult.next = sinon.stub()
+      DocumentSearchResult.prototype.next = sinon.stub()
         .onFirstCall().resolves(searchResult)
         .onSecondCall().resolves(null);
       const spy = sinon.spy();
