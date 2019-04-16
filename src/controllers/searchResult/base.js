@@ -8,7 +8,7 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    this.kuzzle = kuzzle;
+    this._kuzzle = kuzzle;
     this._request = request;
     this._response = response;
     this._options = options;
@@ -29,7 +29,7 @@ class SearchResultBase {
     }
 
     if (this._request.scroll) {
-      return this.kuzzle.query({
+      return this._kuzzle.query({
         controller: this._request.controller,
         action: this._scrollAction,
         scrollId: this._response.scrollId
@@ -62,7 +62,7 @@ class SearchResultBase {
         request.search_after.push(value);
       }
 
-      return this.kuzzle.query(request, this._options)
+      return this._kuzzle.query(request, this._options)
         .then(response => {
           const result = response.result;
           this.fetched += result.hits.length;
@@ -77,7 +77,7 @@ class SearchResultBase {
         return Promise.resolve(null);
       }
 
-      return this.kuzzle.query(Object.assign({}, this._request, {
+      return this._kuzzle.query(Object.assign({}, this._request, {
         action: this._searchAction,
         from: this.fetched
       }), this._options)
@@ -106,7 +106,7 @@ class SearchResultBase {
    */
   async forEachHit(action) {
     const promises = [];
-    let results = this;
+    let results = new this.constructor(this._kuzzle, this._request, this._options, this._response);
 
     while (results) {
       for (const hit of results.hits) {

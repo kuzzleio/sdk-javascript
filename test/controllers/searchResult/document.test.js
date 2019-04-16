@@ -317,7 +317,7 @@ describe('DocumentSearchResult', () => {
       should(spy.callCount).be.eql(4);
     });
 
-    it.only('should wait for promises resolution if the action returns a promise', async () => {
+    it('should wait for promises resolution if the action returns a promise', async () => {
       response = {
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
