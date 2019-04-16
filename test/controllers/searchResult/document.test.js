@@ -277,4 +277,69 @@ describe('DocumentSearchResult', () => {
       });
     });
   });
+
+  describe('forEachHit', () => {
+    it('call the callback for each hit of the SearchResult', async () => {
+      response = {
+        hits: [
+          {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
+          {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
+        ],
+        total: 2
+      };
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      const spy = sinon.spy();
+
+      await searchResult.forEachHit(spy);
+
+      should(spy).be.calledTwice();
+      should(spy.getCall(0).args).be.eql([{_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}}]);
+      should(spy.getCall(1).args).be.eql([{_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}]);
+    });
+
+    it('should fetch the next page of results', async () => {
+      response = {
+        hits: [
+          {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
+          {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
+        ],
+        total: 3
+      };
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult.next = sinon.stub()
+        .onFirstCall().resolves(searchResult)
+        .onSecondCall().resolves(null);
+      const spy = sinon.spy();
+
+      await searchResult.forEachHit(spy);
+
+      should(searchResult.next).be.calledTwice();
+      should(spy.callCount).be.eql(4);
+    });
+
+    it.only('should wait for promises resolution if the action returns a promise', async () => {
+      response = {
+        hits: [
+          {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
+          {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
+        ],
+        total: 2
+      };
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      const
+        spy = sinon.spy(),
+        asyncAction = () => {
+          return new Promise(resolve => {
+            setTimeout(() => {
+              spy();
+              resolve();
+            }, 100);
+          });
+        };
+
+      await searchResult.forEachHit(asyncAction);
+
+      should(spy.callCount).be.eql(2);
+    });
+  });
 });

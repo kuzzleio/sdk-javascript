@@ -29,7 +29,6 @@ class SearchResultBase {
     }
 
     if (this._request.scroll) {
-      console.log('HELLO')
       return this.kuzzle.query({
         controller: this._request.controller,
         action: this._scrollAction,
@@ -45,7 +44,6 @@ class SearchResultBase {
         });
     }
     else if (this._request.size && this._request.sort) {
-      console.log('HELO')
       const
         request = Object.assign({}, this._request, {
           action: this._searchAction,
@@ -96,29 +94,33 @@ class SearchResultBase {
     throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
   }
 
-  forEachHits(callback) {
-    const run = async function (cb, results) {
+  /**
+   * Automatically fetch each page of results and execute the provided action
+   * on each hit.
+   *
+   * If the action return a promise, this function will wait for all promise to
+   * be resolved.
+   *
+   * @param {Function} action - Action to execute for each hit
+   * @returns {Promise}
+   */
+  async forEachHit(action) {
+    const promises = [];
+    let results = this;
+
+    while (results) {
       for (const hit of results.hits) {
-        cb(hit);
+        const ret = action(hit);
+
+        if (ret && typeof ret.then === 'function') {
+          promises.push(ret);
+        }
       }
-      console.log('OK');
-      console.log(results.next)
-      await results.next();
-      console.log('OK');
-    };
 
-    run(callback, this);
+      results = await results.next();
+    }
 
-
-
-
-    // while (results) {
-    //   for (const hit of results.hits) {
-    //     callback(hit);
-    //   }
-
-    //   results = await results.next();
-    // }
+    return Promise.all(promises);
   }
 
   _get (object, path) {
