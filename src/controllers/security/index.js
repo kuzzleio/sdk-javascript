@@ -123,6 +123,27 @@ class SecurityController {
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
+  createRestrictedUser (body, _id = null, options = {}) {
+    if (!body.credentials) {
+      throw new Error('Kuzzle.security.createRestrictedUser: body.credentials is required');
+    }
+    if (!body.content) {
+      body.content = {};
+    }
+
+    const request = {
+      _id,
+      body,
+      controller: 'security',
+      action: 'createRestrictedUser',
+      refresh: options.refresh
+    };
+    delete options.refresh;
+
+    return this.kuzzle.query(request, options)
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+  }
+
   createRole (_id, body, options = {}) {
     if (!_id) {
       throw new Error('Kuzzle.security.createRole: _id is required');
