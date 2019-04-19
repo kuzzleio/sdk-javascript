@@ -36,14 +36,7 @@ class SearchResultBase {
         action: this._scrollAction,
         scrollId: this._response.scrollId
       }, this._options)
-        .then(response => {
-          const result = response.result;
-          this.fetched += result.hits.length;
-          this._response = result;
-          this.aggregations = result.aggregations;
-          this.hits = result.hits;
-          return this;
-        });
+        .then(response => this._buildNextSearchResult(response));
     }
     else if (this._request.size && this._request.body.sort) {
       const
@@ -66,14 +59,7 @@ class SearchResultBase {
       }
 
       return _kuzzle.query(request, this._options)
-        .then(response => {
-          const result = response.result;
-          this.fetched += result.hits.length;
-          this._response = result;
-          this.aggregations = result.aggregations;
-          this.hits = result.hits;
-          return this;
-        });
+        .then(response => this._buildNextSearchResult(response));
     }
     else if (this._request.size) {
       if (this._request.from >= this._response.total) {
@@ -84,14 +70,7 @@ class SearchResultBase {
         action: this._searchAction,
         from: this.fetched
       }), this._options)
-        .then(response => {
-          const result = response.result;
-          this.fetched += result.hits.length;
-          this._response = result;
-          this.aggregations = result.aggregations;
-          this.hits = result.hits;
-          return this;
-        });
+        .then(response => this._buildNextSearchResult(response));
     }
 
     throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -108,6 +87,13 @@ class SearchResultBase {
 
     const key = path.shift();
     return this._get(object[key], path);
+  }
+
+  _buildNextSearchResult(response) {
+    const nextSearchResult = new this.constructor(this.kuzzle, this._request, this._options, response.result);
+    nextSearchResult.fetched = this.fetched + response.result.hits.length;
+
+    return nextSearchResult;
   }
 
 }

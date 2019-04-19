@@ -21,14 +21,14 @@ class RoleSearchResult extends SearchResultBase {
     }
 
     return super.next()
-      .then(result => {
-        if (!result) {
-          return result;
+      .then(nextSearchResult => {
+        if (! nextSearchResult) {
+          return null;
         }
 
-        this.hits = this._response.hits.map(hit => new Role(this._kuzzle, hit._id, hit._source.controllers));
+        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers));
 
-        return this;
+        return nextSearchResult;
       });
   }
 }

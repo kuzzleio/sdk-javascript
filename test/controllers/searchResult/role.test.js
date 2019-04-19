@@ -139,9 +139,9 @@ describe('RoleSearchResult', () => {
       });
 
 
-      it('should call security/searchRoles action with from/size parameters and resolve the current object', () => {
+      it('should call security/searchRoles action with from/size parameters and resolve to a new RoleSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -151,7 +151,8 @@ describe('RoleSearchResult', () => {
                 size: 2,
                 from: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(RoleSearchResult);
           });
       });
 
@@ -159,20 +160,20 @@ describe('RoleSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
 
-            should(searchResult.hits).be.an.Array();
-            should(searchResult.hits.length).be.equal(2);
+            should(nextSearchResult.hits).be.an.Array();
+            should(nextSearchResult.hits.length).be.equal(2);
 
-            should(searchResult.hits[0]).be.an.instanceOf(Role);
-            should(searchResult.hits[0]._id).be.eql('role3');
-            should(searchResult.hits[0].controllers).be.eql({foo: {actions: {baz: true}}});
+            should(nextSearchResult.hits[0]).be.an.instanceOf(Role);
+            should(nextSearchResult.hits[0]._id).be.eql('role3');
+            should(nextSearchResult.hits[0].controllers).be.eql({foo: {actions: {baz: true}}});
 
-            should(searchResult.hits[1]).be.an.instanceOf(Role);
-            should(searchResult.hits[1]._id).be.eql('role4');
-            should(searchResult.hits[1].controllers).be.eql({baz: {actions: {foo: true}}});
+            should(nextSearchResult.hits[1]).be.an.instanceOf(Role);
+            should(nextSearchResult.hits[1]._id).be.eql('role4');
+            should(nextSearchResult.hits[1].controllers).be.eql({baz: {actions: {foo: true}}});
           });
       });
     });
