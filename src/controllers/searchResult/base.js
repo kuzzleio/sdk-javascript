@@ -1,5 +1,3 @@
-let _kuzzle;
-
 class SearchResultBase {
 
   /**
@@ -10,7 +8,7 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    _kuzzle = kuzzle;
+    this._kuzzle = kuzzle;
     this._request = request;
     this._response = response;
     this._options = options;
@@ -31,7 +29,7 @@ class SearchResultBase {
     }
 
     if (this._request.scroll) {
-      return _kuzzle.query({
+      return this._kuzzle.query({
         controller: this._request.controller,
         action: this._scrollAction,
         scrollId: this._response.scrollId
@@ -43,7 +41,7 @@ class SearchResultBase {
         request = Object.assign({}, this._request, {
           action: this._searchAction
         }),
-        hit = this._response.hits[this._response.hits.length -1];
+        hit = this._response.hits[this._response.hits.length - 1];
 
       request.body.search_after = [];
 
@@ -58,7 +56,7 @@ class SearchResultBase {
         request.body.search_after.push(value);
       }
 
-      return _kuzzle.query(request, this._options)
+      return this._kuzzle.query(request, this._options)
         .then(response => this._buildNextSearchResult(response));
     }
     else if (this._request.size) {
@@ -66,7 +64,7 @@ class SearchResultBase {
         return Promise.resolve(null);
       }
 
-      return _kuzzle.query(Object.assign({}, this._request, {
+      return this._kuzzle.query(Object.assign({}, this._request, {
         action: this._searchAction,
         from: this.fetched
       }), this._options)
@@ -89,9 +87,9 @@ class SearchResultBase {
     return this._get(object[key], path);
   }
 
-  _buildNextSearchResult(response) {
-    const nextSearchResult = new this.constructor(this.kuzzle, this._request, this._options, response.result);
-    nextSearchResult.fetched = this.fetched + response.result.hits.length;
+  _buildNextSearchResult (response) {
+    const nextSearchResult = new this.constructor(this._kuzzle, this._request, this._options, response.result);
+    nextSearchResult.fetched += this.fetched;
 
     return nextSearchResult;
   }
