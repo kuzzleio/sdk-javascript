@@ -25,7 +25,7 @@ describe('Server Controller', () => {
       return kuzzle.server.adminExists()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).be.a.Boolean().and.be.true();
 
           kuzzle.query.resetHistory();
@@ -106,7 +106,7 @@ describe('Server Controller', () => {
       return kuzzle.server.getAllStats()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).match(result);
         })
         .then(() => {
@@ -159,7 +159,7 @@ describe('Server Controller', () => {
       return kuzzle.server.getConfig()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).match(result);
         })
         .then(() => {
@@ -219,7 +219,7 @@ describe('Server Controller', () => {
       return kuzzle.server.getLastStats()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).match(result);
         })
         .then(() => {
@@ -280,7 +280,7 @@ describe('Server Controller', () => {
       return kuzzle.server.getStats(1234, 9876)
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).match(result);
         })
         .then(() => {
@@ -300,7 +300,7 @@ describe('Server Controller', () => {
           should(kuzzle.query).be.calledOnce();
           should(kuzzle.query).be.calledWith(
             {controller: 'server', action: 'getStats', startTime: 1234, stopTime: null},
-            undefined
+            {}
           );
           should(res).match(result);
         })
@@ -312,7 +312,7 @@ describe('Server Controller', () => {
           should(kuzzle.query).be.calledOnce();
           should(kuzzle.query).be.calledWith(
             {controller: 'server', action: 'getStats', startTime: null, stopTime: 9876},
-            undefined
+            {}
           );
           should(res).match(result);
         })
@@ -324,7 +324,7 @@ describe('Server Controller', () => {
           should(kuzzle.query).be.calledOnce();
           should(kuzzle.query).be.calledWith(
             {controller: 'server', action: 'getStats', startTime: null, stopTime: null},
-            undefined
+            {}
           );
           should(res).match(result);
         });
@@ -379,7 +379,7 @@ describe('Server Controller', () => {
       return kuzzle.server.info()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).match(result);
         })
         .then(() => {
@@ -413,7 +413,7 @@ describe('Server Controller', () => {
       return kuzzle.server.now()
         .then(res => {
           should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectedQuery, undefined);
+          should(kuzzle.query).be.calledWith(expectedQuery, {});
           should(res).be.exactly(12345);
         })
         .then(() => {

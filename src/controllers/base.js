@@ -1,20 +1,16 @@
 class BaseController {
 
   /**
+   * @param {Kuzzle} kuzzle - Kuzzle SDK object.
    * @param {string} name - Controller full name for API request.
-   * @param {string} accessor - Controller accessor name on Kuzzle object.
    */
-  constructor (name, accessor) {
+  constructor (kuzzle, name) {
+    this._kuzzle = kuzzle;
     this.name = name;
-    this.accessor = accessor;
   }
 
   get kuzzle () {
     return this._kuzzle;
-  }
-
-  set kuzzle (kuzzle) {
-    this._kuzzle = kuzzle;
   }
 
   /**
@@ -25,7 +21,7 @@ class BaseController {
   query (request = {}, options = {}) {
     request.controller = request.controller || this.name;
 
-    return this.kuzzle.query(request, options);
+    return this._kuzzle.query(request, options);
   }
 }
 

@@ -1,3 +1,5 @@
+const BaseControler = require('./base');
+
 // Parameter mutualization
 const
   getId = {getter: true, required: ['_id']},
@@ -187,14 +189,10 @@ const
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @constructor
  */
-class MemoryStorageController {
+class MemoryStorageController extends BaseControler {
 
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'ms');
   }
 }
 
@@ -206,8 +204,7 @@ for (const action of Object.keys(commands)) {
     const
       command = commands[action],
       request = {
-        action,
-        controller: 'ms'
+        action
       },
       options = {};
 
@@ -254,7 +251,7 @@ for (const action of Object.keys(commands)) {
       command.opts(request, options);
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => {
         if (command.mapResults) {
           return command.mapResults(response.result);

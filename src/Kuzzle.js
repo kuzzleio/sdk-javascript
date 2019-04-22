@@ -62,15 +62,15 @@ class Kuzzle extends KuzzleEventEmitter {
     this.volatile = typeof options.volatile === 'object' ? options.volatile : {};
 
     // controllers
-    this.auth = new AuthController(this);
-    this.bulk = new BulkController(this);
-    this.collection = new CollectionController(this);
-    this.document = new DocumentController(this);
-    this.index = new IndexController(this);
-    this.ms = new MemoryStorageController(this);
-    this.realtime = new RealtimeController(this);
-    this.security = new SecurityController(this);
-    this.server = new ServerController(this);
+    this.useController(AuthController, 'auth');
+    this.useController(BulkController, 'bulk');
+    this.useController(CollectionController, 'collection');
+    this.useController(DocumentController, 'document');
+    this.useController(IndexController, 'index');
+    this.useController(MemoryStorageController, 'ms');
+    this.useController(RealtimeController, 'realtime');
+    this.useController(SecurityController, 'security');
+    this.useController(ServerController, 'server');
 
     // offline queue
     this._autoQueue = typeof options.autoQueue === 'boolean' ? options.autoQueue : false;
@@ -443,28 +443,30 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Adds a new controller and make it available in the SDK.
    *
-   * @param {BaseController} controller
+   * @param {BaseController} ControllerClass
+   * @param {string} accessor
    * @returns {Kuzzle}
    */
-  useController (controller) {
-    if (!(controller instanceof BaseController)) {
+  useController (ControllerClass, accessor) {
+    if (!(ControllerClass.prototype instanceof BaseController)) {
       throw new Error('Controllers must inherits from the BaseController class.');
     }
+
+    if (!(accessor && accessor.length > 0)) {
+      throw new Error('You must provide a valid accessor.');
+    }
+
+    if (this[accessor]) {
+      throw new Error(`There is already a controller with the accessor '${accessor}'. Please use another one.`);
+    }
+
+    const controller = new ControllerClass(this);
 
     if (!(controller.name && controller.name.length > 0)) {
       throw new Error('Controllers must have a name.');
     }
 
-    if (!(controller.accessor && controller.accessor.length > 0)) {
-      throw new Error('Controllers must have an accessor.');
-    }
-
-    if (this[controller.accessor]) {
-      throw new Error(`There is already a controller with the accessor '${controller.accessor}'. Please use another one.`);
-    }
-
-    controller.kuzzle = this;
-    this[controller.accessor] = controller;
+    this[accessor] = controller;
 
     return this;
   }

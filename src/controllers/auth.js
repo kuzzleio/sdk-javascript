@@ -1,4 +1,6 @@
-const User = require('./security/user');
+const
+  BaseController = require('./base'),
+  User = require('./security/user');
 
 /**
  * Auth controller
@@ -6,18 +8,14 @@ const User = require('./security/user');
  * @param kuzzle
  * @constructor
  */
-class AuthController {
+class AuthController extends BaseController {
 
   /**
    * constructor
    * @param kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'auth');
   }
 
   /**
@@ -27,8 +25,7 @@ class AuthController {
    * @return {Promise|*|PromiseLike<T>|Promise<T>}
    */
   checkToken (token) {
-    return this.kuzzle.query({
-      controller: 'auth',
+    return this.query({
       action: 'checkToken',
       body: {token}
     }, {queuable: false})
@@ -44,9 +41,8 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   createMyCredentials (strategy, credentials, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
-      controller: 'auth',
       action: 'createMyCredentials',
       body: credentials
     }, options)
@@ -60,9 +56,8 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   credentialsExist (strategy, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
-      controller: 'auth',
       action: 'credentialsExist'
     }, options)
       .then(response => response.result);
@@ -76,9 +71,8 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   deleteMyCredentials (strategy, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
-      controller: 'auth',
       action: 'deleteMyCredentials'
     }, options)
       .then(response => response.result.acknowledged);
@@ -90,8 +84,7 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   getCurrentUser (options = {}) {
-    return this.kuzzle.query({
-      controller: 'auth',
+    return this.query({
       action: 'getCurrentUser'
     }, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
@@ -104,9 +97,8 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   getMyCredentials(strategy, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
-      controller: 'auth',
       action: 'getMyCredentials'
     }, options)
       .then(response => response.result);
@@ -119,8 +111,7 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   getMyRights (options = {}) {
-    return this.kuzzle.query({
-      controller: 'auth',
+    return this.query({
       action: 'getMyRights'
     }, options)
       .then(response => response.result.hits);
@@ -133,8 +124,7 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   getStrategies (options = {}) {
-    return this.kuzzle.query({
-      controller: 'auth',
+    return this.query({
       action: 'getStrategies'
     }, options)
       .then(response => response.result);
@@ -159,11 +149,10 @@ class AuthController {
         strategy,
         expiresIn,
         body: credentials,
-        controller: 'auth',
         action: 'login'
       };
 
-    return this.kuzzle.query(request, {queuable: false})
+    return this.query(request, {queuable: false})
       .then(response => {
         try {
           this.kuzzle.jwt = response.result.jwt;
@@ -186,8 +175,7 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   logout () {
-    return this.kuzzle.query({
-      controller: 'auth',
+    return this.query({
       action: 'logout'
     }, {queuable: false})
       .then(() => {
@@ -204,10 +192,9 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   updateMyCredentials (strategy, credentials, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       body: credentials,
-      controller: 'auth',
       action: 'updateMyCredentials'
     }, options)
       .then(response => response.result);
@@ -221,9 +208,8 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   updateSelf (body, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'auth',
       action: 'updateSelf'
     }, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
@@ -238,10 +224,9 @@ class AuthController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   validateMyCredentials (strategy, credentials, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       body: credentials,
-      controller: 'auth',
       action: 'validateMyCredentials'
     }, options)
       .then(response => response.result);
@@ -255,12 +240,11 @@ class AuthController {
    */
   refreshToken(options = {}) {
     const query = {
-      controller: 'auth',
       action: 'refreshToken',
       expiresIn: options.expiresIn
     };
 
-    return this.kuzzle.query(query, options)
+    return this.query(query, options)
       .then(response => {
         this.kuzzle.jwt = response.result.jwt;
 

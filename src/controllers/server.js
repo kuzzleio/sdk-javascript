@@ -1,18 +1,16 @@
+const BaseControler = require('./base');
+
 /**
  * @class ServerController
  * @property {Kuzzle} kuzzle - The Kuzzle SDK Instance
  */
-class ServerController {
+class ServerController extends BaseControler {
 
   /**
    * @param {Kuzzle} kuzzle - The Kuzzle SDK Instance
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'server');
   }
 
   /**
@@ -22,8 +20,7 @@ class ServerController {
    * @returns {Promise<Boolean>}
    */
   adminExists (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'adminExists'
     }, options)
       .then(response => {
@@ -45,8 +42,7 @@ class ServerController {
    * @returns {Promise<Object>}
    */
   getAllStats (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'getAllStats'
     }, options)
       .then(response => response.result);
@@ -59,8 +55,7 @@ class ServerController {
    * @returns {Promise<Object>}
    */
   getConfig (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'getConfig'
     }, options)
       .then(response => response.result);
@@ -73,8 +68,7 @@ class ServerController {
    * @returns {Promise<Object>}
    */
   getLastStats (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'getLastStats'
     }, options)
       .then(response => response.result);
@@ -89,8 +83,7 @@ class ServerController {
    * @returns {Promise<Object>}
    */
   getStats(startTime, stopTime, options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'getStats',
       startTime,
       stopTime
@@ -105,8 +98,7 @@ class ServerController {
    * @returns {Promise<Object>}
    */
   info (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'info'
     }, options)
       .then(response => response.result);
@@ -119,8 +111,7 @@ class ServerController {
    * @returns {Promise<Number>}
    */
   now (options) {
-    return this.kuzzle.query({
-      controller: 'server',
+    return this.query({
       action: 'now'
     }, options)
       .then(response => {

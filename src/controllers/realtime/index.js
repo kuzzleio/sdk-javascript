@@ -1,21 +1,19 @@
-const Room = require('./room');
+const
+  BaseController = require('../base'),
+  Room = require('./room');
 
 const expirationThrottleDelay = 1000;
 
-class RealTimeController {
+class RealTimeController extends BaseController {
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
+    super(kuzzle, 'realtime');
+
     this.lastExpirationTimestamp = 0;
 
-    this.subscriptions = {
-    };
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    this.subscriptions = {};
   }
 
   count (roomId, options = {}) {
@@ -23,8 +21,7 @@ class RealTimeController {
       throw new Error('Kuzzle.realtime.count: roomId is required');
     }
 
-    return this.kuzzle.query({
-      controller: 'realtime',
+    return this.query({
       action: 'count',
       body: {roomId}
     }, options)
@@ -46,11 +43,10 @@ class RealTimeController {
       index,
       collection,
       body: message,
-      controller: 'realtime',
       action: 'publish'
     };
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result.published);
   }
 
@@ -96,8 +92,7 @@ class RealTimeController {
     }
     delete this.subscriptions[roomId];
 
-    return this.kuzzle.query({
-      controller: 'realtime',
+    return this.query({
       action: 'unsubscribe',
       body: {roomId}
     }, options)

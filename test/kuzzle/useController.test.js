@@ -6,8 +6,8 @@ const
   Kuzzle = require('../../src/Kuzzle');
 
 class CustomController extends BaseController {
-  constructor (accessor) {
-    super('custom-plugin/custom', accessor);
+  constructor (kuzzle) {
+    super(kuzzle, 'custom-plugin/custom');
   }
 
   sayHello (message) {
@@ -24,15 +24,20 @@ class CustomController extends BaseController {
 }
 
 class WrongController {
-  constructor (accessor) {
-    this.accessor = accessor;
+  constructor (kuzzle) {
+    this._kuzzle = kuzzle;
+  }
+}
+
+class UnamedController extends BaseController {
+  constructor (kuzzle) {
+    super(kuzzle);
   }
 }
 
 describe('Kuzzle custom controllers management', () => {
   describe('#useController', () => {
     let
-      customController,
       response,
       kuzzle;
 
@@ -42,26 +47,25 @@ describe('Kuzzle custom controllers management', () => {
       };
 
       const protocol = new ProtocolMock('somewhere');
-      customController = new CustomController('custom');
 
       kuzzle = new Kuzzle(protocol);
       kuzzle.protocol.query.resolves(response);
     });
 
     it('should add the controller to the controllers list', () => {
-      kuzzle.useController(customController);
+      kuzzle.useController(CustomController, 'custom');
 
-      should(kuzzle.custom).be.eql(customController);
+      should(kuzzle.custom).be.instanceOf(CustomController);
     });
 
     it('should set the kuzzle object in the controller', () => {
-      kuzzle.useController(customController);
+      kuzzle.useController(CustomController, 'custom');
 
-      should(customController.kuzzle).be.eql(kuzzle);
+      should(kuzzle.custom.kuzzle).be.eql(kuzzle);
     });
 
     it('should use the controller name by default for query()', () => {
-      kuzzle.useController(customController);
+      kuzzle.useController(CustomController, 'custom');
 
       return kuzzle.custom.sayHello('Wake up, and smell the ashes')
         .then(() => {
@@ -73,40 +77,28 @@ describe('Kuzzle custom controllers management', () => {
     });
 
     it('should throw if the controller does not inherits from BaseController', () => {
-      const wrongController = new WrongController('wrong');
-      wrongController.name = 'wrong-plugin/wrong';
-
-      should(function () {
-        kuzzle.useController(wrongController);
+      should(() => {
+        kuzzle.useController(WrongController, 'wrong');
       }).throw('Controllers must inherits from the BaseController class.');
     });
 
     it('should throw if the controller does not have a name', () => {
-      customController = new CustomController('wrong');
-      customController.name = '';
-
-      should(function () {
-        kuzzle.useController(customController);
+      should(() => {
+        kuzzle.useController(UnamedController, 'unamed');
       }).throw('Controllers must have a name.');
     });
 
     it('should throw if the controller does not have an accessor', () => {
-      customController = new CustomController('');
-
-      should(function () {
-        kuzzle.useController(customController);
-      }).throw('Controllers must have an accessor.');
+      should(() => {
+        kuzzle.useController(CustomController);
+      }).throw('You must provide a valid accessor.');
     });
 
     it('should throw if the accessor is already taken', () => {
-      const
-        customController1 = new CustomController('custom'),
-        customController2 = new CustomController('custom');
+      kuzzle.useController(CustomController, 'custom');
 
-      kuzzle.useController(customController1);
-
-      should(function () {
-        kuzzle.useController(customController2);
+      should(() => {
+        kuzzle.useController(CustomController, 'custom');
       }).throw('There is already a controller with the accessor \'custom\'. Please use another one.');
     });
   });

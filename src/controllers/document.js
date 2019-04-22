@@ -1,17 +1,14 @@
 const
+  BaseController = require('./base'),
   DocumentSearchResult = require('./searchResult/document');
 
-class DocumentController {
+class DocumentController extends BaseController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'document');
   }
 
   count (index, collection, body, options = {}) {
@@ -26,13 +23,12 @@ class DocumentController {
       index,
       collection,
       body,
-      controller: 'document',
       action: 'count',
       includeTrash: options.includeTrash
     };
     delete options.includeTrash;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result.count);
   }
 
@@ -52,13 +48,12 @@ class DocumentController {
       collection,
       _id,
       body: document,
-      controller: 'document',
       action: 'create',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -81,13 +76,12 @@ class DocumentController {
       collection,
       _id,
       body,
-      controller: 'document',
       action: 'createOrReplace',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -106,13 +100,12 @@ class DocumentController {
       index,
       collection,
       _id,
-      controller: 'document',
       action: 'delete',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result._id);
   }
 
@@ -128,13 +121,12 @@ class DocumentController {
       index,
       collection,
       body,
-      controller: 'document',
       action: 'deleteByQuery',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result.ids);
   }
 
@@ -153,11 +145,10 @@ class DocumentController {
       index,
       collection,
       _id,
-      controller: 'document',
       action: 'exists'
     };
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -176,13 +167,12 @@ class DocumentController {
       index,
       collection,
       _id,
-      controller: 'document',
       action: 'get',
       includeTrash: options.includeTrash
     };
     delete options.includeTrash;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -201,13 +191,12 @@ class DocumentController {
       index,
       collection,
       body: {documents},
-      controller: 'document',
       action: 'mCreate',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -226,13 +215,12 @@ class DocumentController {
       index,
       collection,
       body: {documents},
-      controller: 'document',
       action: 'mCreateOrReplace',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -251,13 +239,12 @@ class DocumentController {
       index,
       collection,
       body: {ids},
-      controller: 'document',
       action: 'mDelete',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -276,13 +263,12 @@ class DocumentController {
       index,
       collection,
       body: {ids},
-      controller: 'document',
       action: 'mGet',
       includeTrash: options.includeTrash
     };
     delete options.includeTrash;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -301,12 +287,11 @@ class DocumentController {
       index,
       collection,
       body: {documents},
-      controller: 'document',
       action: 'mReplace',
       refresh: options.refresh
     };
     delete options.refresh;
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -325,13 +310,12 @@ class DocumentController {
       index,
       collection,
       body: {documents},
-      controller: 'document',
       action: 'mUpdate',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -354,13 +338,12 @@ class DocumentController {
       collection,
       _id,
       body,
-      controller: 'document',
       action: 'replace',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -376,7 +359,6 @@ class DocumentController {
       index,
       collection,
       body,
-      controller: 'document',
       action: 'search',
     };
     for (const opt of ['from', 'size', 'scroll', 'includeTrash']) {
@@ -384,7 +366,7 @@ class DocumentController {
       delete options[opt];
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new DocumentSearchResult(this.kuzzle, request, options, response.result));
   }
 
@@ -407,7 +389,6 @@ class DocumentController {
       collection,
       _id,
       body,
-      controller: 'document',
       action: 'update',
       refresh: options.refresh,
       retryOnConflict: options.retryOnConflict
@@ -415,7 +396,7 @@ class DocumentController {
     delete options.refresh;
     delete options.retryOnConflict;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -430,11 +411,10 @@ class DocumentController {
       throw new Error('Kuzzle.document.validate: body is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
       body,
-      controller: 'document',
       action: 'validate'
     }, options)
       .then(response => response.result);

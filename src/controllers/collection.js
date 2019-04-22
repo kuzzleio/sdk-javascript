@@ -1,17 +1,14 @@
 const
+  BaseController = require('./base'),
   SpecificationsSearchResult = require('./searchResult/specifications');
 
-class CollectionController {
+class CollectionController extends BaseController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'collection');
   }
 
   create (index, collection, body = {}, options = {}) {
@@ -22,11 +19,10 @@ class CollectionController {
       throw new Error('Kuzzle.collection.create: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
       body,
-      controller: 'collection',
       action: 'create'
     }, options)
       .then(response => response.result);
@@ -40,10 +36,9 @@ class CollectionController {
       throw new Error('Kuzzle.collection.deleteSpecifications: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
-      controller: 'collection',
       action: 'deleteSpecifications'
     }, options)
       .then(response => response.result);
@@ -57,10 +52,9 @@ class CollectionController {
       throw new Error('Kuzzle.collection.exists: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
-      controller: 'collection',
       action: 'exists'
     }, options)
       .then(response => response.result);
@@ -74,10 +68,9 @@ class CollectionController {
       throw new Error('Kuzzle.collection.getMapping: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
-      controller: 'collection',
       action: 'getMapping'
     }, options)
       .then(response => response.result);
@@ -91,10 +84,9 @@ class CollectionController {
       throw new Error('Kuzzle.collection.getSpecifications: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
-      controller: 'collection',
       action: 'getSpecifications'
     }, options)
       .then(response => response.result);
@@ -107,7 +99,6 @@ class CollectionController {
 
     const request = {
       index,
-      controller: 'collection',
       action: 'list',
       from: options.from,
       size: options.size
@@ -115,14 +106,13 @@ class CollectionController {
     delete options.from;
     delete options.size;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   searchSpecifications (body = {}, options = {}) {
     const request = {
       body,
-      controller: 'collection',
       action: 'searchSpecifications'
     };
     for (const opt of ['from', 'size', 'scroll']) {
@@ -130,7 +120,7 @@ class CollectionController {
       delete options[opt];
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new SpecificationsSearchResult(this.kuzzle, request, options, response.result));
   }
 
@@ -142,10 +132,9 @@ class CollectionController {
       throw new Error('Kuzzle.collection.truncate: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
-      controller: 'collection',
       action: 'truncate',
       refresh: options.refresh
     }, options)
@@ -160,11 +149,10 @@ class CollectionController {
       throw new Error('Kuzzle.collection.updateMapping: collection is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
       collection,
       body,
-      controller: 'collection',
       action: 'updateMapping'
     }, options)
       .then(response => response.result);
@@ -187,9 +175,8 @@ class CollectionController {
       }
     };
 
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'collection',
       action: 'updateSpecifications'
     }, options)
       .then(response => response.result[index][collection]);
@@ -212,9 +199,8 @@ class CollectionController {
       }
     };
 
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'collection',
       action: 'validateSpecifications'
     }, options)
       .then(response => response.result);
