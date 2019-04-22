@@ -544,6 +544,92 @@ describe('Security Controller', () => {
     });
   });
 
+  describe('createRestrictedUser', () => {
+    it('should throw an error if "body.credentials" is not provided', () => {
+      const content = {foo: 'bar'};
+
+      should(function () {
+        kuzzle.security.createRestrictedUser(content);
+      }).throw('Kuzzle.security.createRestrictedUser: body.credentials is required');
+    });
+
+    it('should call security/createRestrictedUser query with the user content and credentials and return a Promise which resolves a User object', () => {
+      const body = {
+        content: {foo: 'bar'},
+        credentials: {
+          strategy: {foo: 'bar'}
+        }
+      };
+
+      kuzzle.query.resolves({
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 1,
+          created: true
+        }
+      });
+
+      return kuzzle.security.createRestrictedUser(body, 'userId', options)
+        .then(user => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              body,
+              _id: 'userId',
+              controller: 'security',
+              action: 'createRestrictedUser',
+              refresh: undefined
+            }, options);
+
+          should(user).be.an.instanceOf(User);
+          should(user._id).be.eql('kuid');
+          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
+          should(user.profileIds).be.eql(['profileId']);
+        });
+    });
+
+    it('should inject the "refresh" option into the request', () => {
+      const body = {
+        content: {foo: 'bar'},
+        credentials: {
+          strategy: {foo: 'bar'}
+        }
+      };
+
+      kuzzle.query.resolves({
+        result: {
+          _id: 'kuid',
+          _index: '%kuzzle',
+          _source: { profileIds: ['profileId'], name: 'John Doe' },
+          _type: 'users',
+          _version: 1,
+          created: true
+        }
+      });
+
+      return kuzzle.security.createRestrictedUser(body, null, {refresh: true})
+        .then(user => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              body,
+              _id: null,
+              controller: 'security',
+              action: 'createRestrictedUser',
+              refresh: true
+            }, {});
+
+          should(user).be.an.instanceOf(User);
+          should(user._id).be.eql('kuid');
+          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
+          should(user.profileIds).be.eql(['profileId']);
+        });
+    });
+  });
+
   describe('deleteCredentials', () => {
     it('should throw an error if the "_id" argument is not provided', () => {
       should(function () {
