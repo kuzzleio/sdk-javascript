@@ -466,6 +466,10 @@ Discarded request: ${JSON.stringify(request)}`));
       throw new Error('Controllers must have a name.');
     }
 
+    if (controller.kuzzle !== this) {
+      throw new Error('You must pass the Kuzzle SDK instance to the parent constructor.');
+    }
+
     this[accessor] = controller;
 
     return this;

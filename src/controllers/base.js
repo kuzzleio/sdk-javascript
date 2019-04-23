@@ -6,11 +6,15 @@ class BaseController {
    */
   constructor (kuzzle, name) {
     this._kuzzle = kuzzle;
-    this.name = name;
+    this._name = name;
   }
 
   get kuzzle () {
     return this._kuzzle;
+  }
+
+  get name () {
+    return this._name;
   }
 
   /**

@@ -23,7 +23,7 @@ class CustomController extends BaseController {
   }
 }
 
-class WrongController {
+class NotInheritingController {
   constructor (kuzzle) {
     this._kuzzle = kuzzle;
   }
@@ -32,6 +32,12 @@ class WrongController {
 class UnamedController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle);
+  }
+}
+
+class WrongConstructorController extends BaseController {
+  constructor (kuzzle) {
+    super({}, 'wrongConstructor', kuzzle);
   }
 }
 
@@ -78,7 +84,7 @@ describe('Kuzzle custom controllers management', () => {
 
     it('should throw if the controller does not inherits from BaseController', () => {
       should(() => {
-        kuzzle.useController(WrongController, 'wrong');
+        kuzzle.useController(NotInheritingController, 'wrong');
       }).throw('Controllers must inherits from the BaseController class.');
     });
 
@@ -86,6 +92,12 @@ describe('Kuzzle custom controllers management', () => {
       should(() => {
         kuzzle.useController(UnamedController, 'unamed');
       }).throw('Controllers must have a name.');
+    });
+
+    it('should throw if the controller does not call the parent with the Kuzzle sdk instance', () => {
+      should(() => {
+        kuzzle.useController(WrongConstructorController, 'unamed');
+      }).throw('You must pass the Kuzzle SDK instance to the parent constructor.');
     });
 
     it('should throw if the controller does not have an accessor', () => {
