@@ -125,9 +125,9 @@ describe('ProfileSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call security/scrollProfiles action with scrollId parameter and resolve the current object', () => {
+      it('should call security/scrollProfiles action with scrollId parameter and resolve to a new ProfileSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -135,7 +135,8 @@ describe('ProfileSearchResult', () => {
                 action: 'scrollProfiles',
                 scrollId: 'scroll-id'
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(ProfileSearchResult);
           });
       });
 
@@ -143,20 +144,20 @@ describe('ProfileSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
 
-            should(searchResult.hits).be.an.Array();
-            should(searchResult.hits.length).be.equal(2);
+            should(nextSearchResult.hits).be.an.Array();
+            should(nextSearchResult.hits.length).be.equal(2);
 
-            should(searchResult.hits[0]).be.an.instanceOf(Profile);
-            should(searchResult.hits[0]._id).be.eql('profile3');
-            should(searchResult.hits[0].policies).be.eql(['baz']);
+            should(nextSearchResult.hits[0]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[0]._id).be.eql('profile3');
+            should(nextSearchResult.hits[0].policies).be.eql(['baz']);
 
-            should(searchResult.hits[1]).be.an.instanceOf(Profile);
-            should(searchResult.hits[1]._id).be.eql('profile4');
-            should(searchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
+            should(nextSearchResult.hits[1]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[1]._id).be.eql('profile4');
+            should(nextSearchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
           });
       });
     });
@@ -203,9 +204,9 @@ describe('ProfileSearchResult', () => {
       });
 
       it('should call security/searchProfiles action with search_after \
-          parameter and resolve the current object', () => {
+          parameter and resolve to a new ProfileSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -218,7 +219,8 @@ describe('ProfileSearchResult', () => {
                 action: 'searchProfiles',
                 size: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(ProfileSearchResult);
           });
       });
 
@@ -226,20 +228,20 @@ describe('ProfileSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
 
-            should(searchResult.hits).be.an.Array();
-            should(searchResult.hits.length).be.equal(2);
+            should(nextSearchResult.hits).be.an.Array();
+            should(nextSearchResult.hits.length).be.equal(2);
 
-            should(searchResult.hits[0]).be.an.instanceOf(Profile);
-            should(searchResult.hits[0]._id).be.eql('profile3');
-            should(searchResult.hits[0].policies).be.eql(['baz']);
+            should(nextSearchResult.hits[0]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[0]._id).be.eql('profile3');
+            should(nextSearchResult.hits[0].policies).be.eql(['baz']);
 
-            should(searchResult.hits[1]).be.an.instanceOf(Profile);
-            should(searchResult.hits[1]._id).be.eql('profile4');
-            should(searchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
+            should(nextSearchResult.hits[1]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[1]._id).be.eql('profile4');
+            should(nextSearchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
           });
       });
     });
@@ -281,9 +283,9 @@ describe('ProfileSearchResult', () => {
       });
 
 
-      it('should call security/searchProfiles action with from/size parameters and resolve the current object', () => {
+      it('should call security/searchProfiles action with from/size parameters and resolve to a new ProfileSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -293,7 +295,8 @@ describe('ProfileSearchResult', () => {
                 size: 2,
                 from: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(ProfileSearchResult);
           });
       });
 
@@ -301,20 +304,20 @@ describe('ProfileSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
 
-            should(searchResult.hits).be.an.Array();
-            should(searchResult.hits.length).be.equal(2);
+            should(nextSearchResult.hits).be.an.Array();
+            should(nextSearchResult.hits.length).be.equal(2);
 
-            should(searchResult.hits[0]).be.an.instanceOf(Profile);
-            should(searchResult.hits[0]._id).be.eql('profile3');
-            should(searchResult.hits[0].policies).be.eql(['baz']);
+            should(nextSearchResult.hits[0]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[0]._id).be.eql('profile3');
+            should(nextSearchResult.hits[0].policies).be.eql(['baz']);
 
-            should(searchResult.hits[1]).be.an.instanceOf(Profile);
-            should(searchResult.hits[1]._id).be.eql('profile4');
-            should(searchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
+            should(nextSearchResult.hits[1]).be.an.instanceOf(Profile);
+            should(nextSearchResult.hits[1]._id).be.eql('profile4');
+            should(nextSearchResult.hits[1].policies).be.eql(['foo', 'bar', 'baz']);
           });
       });
     });
