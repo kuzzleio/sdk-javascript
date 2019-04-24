@@ -14,13 +14,13 @@ class UserSearchResult extends SearchResultBase {
 
   next () {
     return super.next()
-      .then(result => {
-        if (!result) {
-          return result;
+      .then(nextSearchResult => {
+        if (! nextSearchResult) {
+          return null;
         }
 
-        this.hits = this._response.hits.map(hit => new User(this._kuzzle, hit._id, hit._source, hit._meta));
-        return this;
+        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => new User(nextSearchResult._kuzzle, hit._id, hit._source, hit._meta));
+        return nextSearchResult;
       });
   }
 }
