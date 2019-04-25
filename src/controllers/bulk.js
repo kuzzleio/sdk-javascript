@@ -1,15 +1,12 @@
-class BulkController {
-  constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
+const BaseController = require('./base');
 
-  get kuzzle () {
-    return this._kuzzle;
+class BulkController extends BaseController {
+  constructor (kuzzle) {
+    super(kuzzle, 'bulk');
   }
 
   import (data, options) {
-    return this.kuzzle.query({
-      controller: 'bulk',
+    return this.query({
       action: 'import',
       body: {
         bulkData: data

@@ -1,4 +1,5 @@
 const
+  BaseController = require('../base'),
   Role = require('./role'),
   RoleSearchResult = require('../searchResult/role'),
   Profile = require('./profile'),
@@ -6,16 +7,12 @@ const
   User = require('./user'),
   UserSearchResult = require('../searchResult/user');
 
-class SecurityController {
+class SecurityController extends BaseController {
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'security');
   }
 
   createCredentials (strategy, _id, body, options = {}) {
@@ -29,11 +26,10 @@ class SecurityController {
       throw new Error('Kuzzle.security.createCredentials: body is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
       strategy,
       body,
-      controller: 'security',
       action: 'createCredentials'
     }, options)
       .then(response => response.result);
@@ -50,13 +46,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createFirstAdmin',
       reset: options.reset
     };
     delete options.reset;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
@@ -71,13 +66,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createOrReplaceProfile',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
@@ -92,13 +86,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createOrReplaceRole',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
@@ -113,13 +106,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createProfile',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
@@ -134,13 +126,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createRestrictedUser',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
@@ -155,13 +146,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createRole',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
@@ -182,13 +172,12 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'createUser',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
@@ -200,10 +189,9 @@ class SecurityController {
       throw new Error('Kuzzle.security.deleteCredentials: strategy is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       _id,
-      controller: 'security',
       action: 'deleteCredentials'
     }, options)
       .then(response => response.result);
@@ -214,9 +202,8 @@ class SecurityController {
       throw new Error('Kuzzle.security.deleteProfile: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'deleteProfile'
     }, options)
       .then(response => response.result);
@@ -227,9 +214,8 @@ class SecurityController {
       throw new Error('Kuzzle.security.deleteRole: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'deleteRole'
     }, options)
       .then(response => response.result);
@@ -240,17 +226,15 @@ class SecurityController {
       throw new Error('Kuzzle.security.deleteUser: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'deleteUser'
     }, options)
       .then(response => response.result);
   }
 
   getAllCredentialFields (options = {}) {
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'getAllCredentialFields'
     }, options)
       .then(response => response.result);
@@ -261,9 +245,8 @@ class SecurityController {
       throw new Error('Kuzzle.security.getCredentialFields: strategy is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
-      controller: 'security',
       action: 'getCredentialFields'
     }, options)
       .then(response => response.result);
@@ -277,10 +260,9 @@ class SecurityController {
       throw new Error('Kuzzle.security.getCredentials: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       _id,
-      controller: 'security',
       action: 'getCredentials'
     }, options)
       .then(response => response.result);
@@ -294,10 +276,9 @@ class SecurityController {
       throw new Error('Kuzzle.security.getCredentialsById: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       _id,
-      controller: 'security',
       action: 'getCredentialsById'
     }, options)
       .then(response => response.result);
@@ -308,17 +289,15 @@ class SecurityController {
       throw new Error('Kuzzle.security.getProfile: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'getProfile'
     }, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   getProfileMapping (options = {}) {
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'getProfileMapping'
     }, options)
       .then(response => response.result);
@@ -329,9 +308,8 @@ class SecurityController {
       throw new Error('Kuzzle.security.getProfileRights: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'getProfileRights'
     }, options)
       .then(response => response.result.hits);
@@ -342,17 +320,15 @@ class SecurityController {
       throw new Error('Kuzzle.security.getRole: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'getRole'
     }, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   getRoleMapping (options = {}) {
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'getRoleMapping'
     }, options)
       .then(response => response.result);
@@ -363,17 +339,15 @@ class SecurityController {
       throw new Error('Kuzzle.security.getUser: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'getUser'
     }, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   getUserMapping (options = {}) {
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'getUserMapping'
     }, options)
       .then(response => response.result);
@@ -384,9 +358,8 @@ class SecurityController {
       throw new Error('Kuzzle.security.getUserRights: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
-      controller: 'security',
       action: 'getUserRights'
     }, options)
       .then(response => response.result.hits);
@@ -400,10 +373,9 @@ class SecurityController {
       throw new Error('Kuzzle.security.hasCredentials: _id is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       _id,
-      controller: 'security',
       action: 'hasCredentials'
     }, options)
       .then(response => response.result);
@@ -415,14 +387,13 @@ class SecurityController {
     }
 
     const request = {
-      controller: 'security',
       action: 'mDeleteProfiles',
       body: {ids},
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -432,14 +403,13 @@ class SecurityController {
     }
 
     const request = {
-      controller: 'security',
       action: 'mDeleteRoles',
       body: {ids},
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -449,14 +419,13 @@ class SecurityController {
     }
 
     const request = {
-      controller: 'security',
       action: 'mDeleteUsers',
       body: {ids},
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -465,8 +434,7 @@ class SecurityController {
       throw new Error('Kuzzle.security.mGetProfiles: ids must be an array');
     }
 
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'mGetProfiles',
       body: {ids}
     }, options)
@@ -478,8 +446,7 @@ class SecurityController {
       throw new Error('Kuzzle.security.mGetRoles: ids must be an array');
     }
 
-    return this.kuzzle.query({
-      controller: 'security',
+    return this.query({
       action: 'mGetRoles',
       body: {ids}
     }, options)
@@ -497,20 +464,18 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'replaceUser',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   searchProfiles (body, options= {}) {
     const request = {
       body,
-      controller: 'security',
       action: 'searchProfiles'
     };
     for (const opt of ['from', 'size', 'scroll']) {
@@ -518,14 +483,13 @@ class SecurityController {
       delete options[opt];
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new ProfileSearchResult(this.kuzzle, request, options, response.result));
   }
 
   searchRoles (body, options = {}) {
     const request = {
       body,
-      controller: 'security',
       action: 'searchRoles'
     };
     for (const opt of ['from', 'size']) {
@@ -533,14 +497,13 @@ class SecurityController {
       delete options[opt];
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new RoleSearchResult(this.kuzzle, request, options, response.result));
   }
 
   searchUsers (body, options = {}) {
     const request = {
       body,
-      controller: 'security',
       action: 'searchUsers'
     };
     for (const opt of ['from', 'size', 'scroll']) {
@@ -548,7 +511,7 @@ class SecurityController {
       delete options[opt];
     }
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new UserSearchResult(this.kuzzle, request, options, response.result));
   }
 
@@ -563,11 +526,10 @@ class SecurityController {
       throw new Error('Kuzzle.security.updateCredentials: body is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       strategy,
       _id,
       body,
-      controller: 'security',
       action: 'updateCredentials'
     }, options)
       .then(response => response.result);
@@ -584,20 +546,18 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'updateProfile',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
 
   updateProfileMapping (body, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'security',
       action: 'updateProfileMapping'
     }, options)
       .then(response => response.result);
@@ -614,20 +574,18 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'updateRole',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
 
   updateRoleMapping (body, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'security',
       action: 'updateRoleMapping'
     }, options)
       .then(response => response.result);
@@ -644,20 +602,18 @@ class SecurityController {
     const request = {
       _id,
       body,
-      controller: 'security',
       action: 'updateUser',
       refresh: options.refresh
     };
     delete options.refresh;
 
-    return this.kuzzle.query(request, options)
+    return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
   }
 
   updateUserMapping (body, options = {}) {
-    return this.kuzzle.query({
+    return this.query({
       body,
-      controller: 'security',
       action: 'updateUserMapping'
     }, options)
       .then(response => response.result);
@@ -674,11 +630,10 @@ class SecurityController {
       throw new Error('Kuzzle.security.validateCredentials: body is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       _id,
       strategy,
       body,
-      controller: 'security',
       action: 'validateCredentials'
     }, options)
       .then(response => response.result);
