@@ -203,6 +203,15 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
+  isLoggued () {
+    if (!this.jwt) {
+      return false;
+    }
+
+    return this.auth.checkToken(this.jwt)
+      .then(({ valid }) => valid);
+  }
+
   /**
   * Emit an event to all registered listeners
   * An event cannot be emitted multiple times before a timeout has been reached.
