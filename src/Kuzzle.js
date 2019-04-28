@@ -208,8 +208,7 @@ class Kuzzle extends KuzzleEventEmitter {
       return false;
     }
 
-    return this.auth.checkToken(this.jwt)
-      .then(({ valid }) => valid);
+    return this.jwtExpiresAt > Date.now();
   }
 
   /**

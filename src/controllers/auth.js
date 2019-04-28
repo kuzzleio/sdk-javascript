@@ -144,18 +144,19 @@ class AuthController extends BaseController {
       throw new Error('Kuzzle.auth.login: strategy is required');
     }
 
-    const
-      request = {
-        strategy,
-        expiresIn,
-        body: credentials,
-        action: 'login'
-      };
+    const request = {
+      strategy,
+      expiresIn,
+      body: credentials,
+      action: 'login'
+    };
 
     return this.query(request, {queuable: false})
       .then(response => {
         try {
           this.kuzzle.jwt = response.result.jwt;
+          this.kuzzle.jwtExpiresAt = response.result.expiresAt;
+
           this.kuzzle.emit('loginAttempt', {success: true});
         }
         catch (err) {
@@ -180,6 +181,7 @@ class AuthController extends BaseController {
     }, {queuable: false})
       .then(() => {
         this.kuzzle.jwt = undefined;
+        this.kuzzle.jwtExpiresAt = undefined;
       });
   }
 
@@ -247,6 +249,7 @@ class AuthController extends BaseController {
     return this.query(query, options)
       .then(response => {
         this.kuzzle.jwt = response.result.jwt;
+        this.kuzzle.jwtExpiresAt = response.result.expiresAt;
 
         return response.result;
       });
