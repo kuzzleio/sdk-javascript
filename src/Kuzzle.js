@@ -247,6 +247,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
     this.protocol.addListener('tokenExpired', () => {
       this.jwt = undefined;
+      this.jwtExpiresAt = undefined;
       this.emit('tokenExpired');
     });
 
@@ -288,10 +289,12 @@ class Kuzzle extends KuzzleEventEmitter {
             // shouldn't obtain an error but let's invalidate the token anyway
             if (!res.valid) {
               this.jwt = undefined;
+              this.jwtExpiresAt = undefined;
             }
           })
           .catch(() => {
             this.jwt = undefined;
+            this.jwtExpiresAt = undefined;
           })
           .then(() => this.emit('reconnected'));
       }

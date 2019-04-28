@@ -112,6 +112,7 @@ class RealTimeController extends BaseController {
 
     this.subscriptions = {};
     this.kuzzle.jwt = undefined;
+    this.kuzzle.jwtExpiresAt = undefined;
 
     const now = Date.now();
     if ((now - this.lastExpirationTimestamp) > expirationThrottleDelay) {
