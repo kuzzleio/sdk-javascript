@@ -20,7 +20,11 @@ describe('DocumentSearchResult', () => {
     request = {
       index: 'index',
       collection: 'collection',
-      body: {foo: 'bar'},
+      body: {
+        query: {
+          foo: 'bar'
+        }
+      },
       controller: 'document',
       action: 'search',
     };
@@ -118,9 +122,9 @@ describe('DocumentSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/scroll action with scrollId parameter and resolve the current object', () => {
+      it('should call document/scroll action with scrollId parameter and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -128,7 +132,8 @@ describe('DocumentSearchResult', () => {
                 action: 'scroll',
                 scrollId: 'scroll-id'
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 
@@ -137,11 +142,11 @@ describe('DocumentSearchResult', () => {
         should(searchResult._response).be.equal(response);
         should(searchResult.aggregations).equal(response.aggregations);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
-            should(searchResult.aggregations).equal(nextResponse.aggregations);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
+            should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });
@@ -158,7 +163,7 @@ describe('DocumentSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
+        request.body.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
 
         response = {
           hits: [
@@ -173,22 +178,27 @@ describe('DocumentSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/search action with search_after parameter and resolve the current object', () => {
+      it('should call document/search action with search_after parameter and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
                 index: 'index',
                 collection: 'collection',
-                body: {foo: 'bar'},
+                body: {
+                  query: {
+                    foo: 'bar'
+                  },
+                  sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
+                  search_after: ['barbar', 2345, 'collection#document2']
+                },
                 controller: 'document',
                 action: 'search',
-                size: 2,
-                sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
-                search_after: ['barbar', 2345, 'collection#document2']
+                size: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 
@@ -197,11 +207,11 @@ describe('DocumentSearchResult', () => {
         should(searchResult._response).be.equal(response);
         should(searchResult.aggregations).equal(response.aggregations);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
-            should(searchResult.aggregations).equal(nextResponse.aggregations);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
+            should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });
@@ -245,21 +255,22 @@ describe('DocumentSearchResult', () => {
       });
 
 
-      it('should call document/search action with from/size parameters and resolve the current object', () => {
+      it('should call document/search action with from/size parameters and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
                 index: 'index',
                 collection: 'collection',
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'document',
                 action: 'search',
                 size: 2,
                 from: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 
@@ -268,11 +279,11 @@ describe('DocumentSearchResult', () => {
         should(searchResult._response).be.equal(response);
         should(searchResult.aggregations).be.equal(response.aggregations);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
-            should(searchResult.aggregations).equal(nextResponse.aggregations);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
+            should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
       });
     });

@@ -1,5 +1,6 @@
 const
-  SpecificationsSearchResult = require('../../../src/controllers/searchResult/specifications'),
+  SpecificationsSearchResult = require(
+    '../../../src/controllers/searchResult/specifications'),
   sinon = require('sinon'),
   should = require('should');
 
@@ -18,7 +19,7 @@ describe('SpecificationsSearchResult', () => {
     };
 
     request = {
-      body: {foo: 'bar'},
+      body: { query: { foo: 'bar' } },
       controller: 'collection',
       action: 'searchSpecifications',
     };
@@ -114,9 +115,9 @@ describe('SpecificationsSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call collection/scrollSpecifications action with scrollId parameter and resolve the current object', () => {
+      it('should call collection/scrollSpecifications action with scrollId parameter and resolve to a new SpecificationSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
@@ -124,7 +125,8 @@ describe('SpecificationsSearchResult', () => {
                 action: 'scrollSpecifications',
                 scrollId: 'scroll-id'
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(SpecificationsSearchResult);
           });
       });
 
@@ -132,10 +134,10 @@ describe('SpecificationsSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });
@@ -151,7 +153,7 @@ describe('SpecificationsSearchResult', () => {
 
       beforeEach(() => {
         request.size = 2;
-        request.sort = ['index', {collection: 'asc'}];
+        request.body.sort = ['index', {collection: 'asc'}];
 
         response = {
           hits: [
@@ -165,20 +167,23 @@ describe('SpecificationsSearchResult', () => {
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call collection/searchSpecifications action with search_after parameter and resolve the current object', () => {
+      it('should call collection/searchSpecifications action with search_after parameter and resolve to a new SpecificationSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: {
+                  query: { foo: 'bar' },
+                  sort: ['index', {collection: 'asc'}],
+                  search_after: ['index', 'collection2']
+                },
                 controller: 'collection',
                 action: 'searchSpecifications',
-                size: 2,
-                sort: ['index', {collection: 'asc'}],
-                search_after: ['index', 'collection2']
+                size: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(SpecificationsSearchResult);
           });
       });
 
@@ -186,10 +191,10 @@ describe('SpecificationsSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });
@@ -231,19 +236,20 @@ describe('SpecificationsSearchResult', () => {
       });
 
 
-      it('should call collection/searchSpecifications action with from/size parameters and resolve the current object', () => {
+      it('should call collection/searchSpecifications action with from/size parameters and resolve to a new SpecificationSearchResult', () => {
         return searchResult.next()
-          .then(res => {
+          .then(nextSearchResult => {
             should(kuzzle.query)
               .be.calledOnce()
               .be.calledWith({
-                body: {foo: 'bar'},
+                body: { query: { foo: 'bar' } },
                 controller: 'collection',
                 action: 'searchSpecifications',
                 size: 2,
                 from: 2
               }, options);
-            should(res).be.equal(searchResult);
+            should(nextSearchResult).not.be.equal(searchResult);
+            should(nextSearchResult).be.instanceOf(SpecificationsSearchResult);
           });
       });
 
@@ -251,10 +257,10 @@ describe('SpecificationsSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._response).be.equal(response);
         return searchResult.next()
-          .then(() => {
-            should(searchResult.fetched).be.equal(4);
-            should(searchResult._response).be.equal(nextResponse);
-            should(searchResult.hits).be.equal(nextResponse.hits);
+          .then(nextSearchResult => {
+            should(nextSearchResult.fetched).be.equal(4);
+            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });
     });

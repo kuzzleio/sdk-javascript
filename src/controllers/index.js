@@ -1,14 +1,12 @@
-class IndexController {
+const BaseController = require('./base');
+
+class IndexController extends BaseController {
 
   /**
    * @param {Kuzzle} kuzzle
    */
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-
-  get kuzzle () {
-    return this._kuzzle;
+    super(kuzzle, 'index');
   }
 
   create (index, options) {
@@ -16,9 +14,8 @@ class IndexController {
       throw new Error('Kuzzle.index.create: index is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action : 'create'
     }, options)
       .then(response => response.result);
@@ -29,9 +26,8 @@ class IndexController {
       throw new Error('Kuzzle.index.delete: index is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action : 'delete'
     }, options)
       .then(response => response.result.acknowledged);
@@ -42,9 +38,8 @@ class IndexController {
       throw new Error('Kuzzle.index.exists: index is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action : 'exists'
     }, options)
       .then(response => response.result);
@@ -55,17 +50,15 @@ class IndexController {
       throw new Error('Kuzzle.index.getAutoRefresh: index is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action: 'getAutoRefresh'
     }, options)
       .then(response => response.result);
   }
 
   list (options) {
-    return this.kuzzle.query({
-      controller: 'index',
+    return this.query({
       action: 'list'
     }, options)
       .then(response => response.result.indexes);
@@ -76,8 +69,7 @@ class IndexController {
       throw new Error('Kuzzle.index.mDelete: indexes must be an array');
     }
 
-    return this.kuzzle.query({
-      controller: 'index',
+    return this.query({
       action: 'mDelete',
       body: {
         indexes
@@ -91,17 +83,15 @@ class IndexController {
       throw new Error('Kuzzle.index.refresh: index is required');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action: 'refresh'
     }, options)
       .then(response => response.result._shards);
   }
 
   refreshInternal (options) {
-    return this.kuzzle.query({
-      controller: 'index',
+    return this.query({
       action: 'refreshInternal'
     }, options)
       .then(response => response.result.acknowledged);
@@ -116,9 +106,8 @@ class IndexController {
       throw new Error('Kuzzle.index.setAutoRefresh: autoRefresh must be a boolean');
     }
 
-    return this.kuzzle.query({
+    return this.query({
       index,
-      controller: 'index',
       action: 'setAutoRefresh',
       body: {
         autoRefresh
