@@ -87,6 +87,8 @@ class Kuzzle extends KuzzleEventEmitter {
     }
     this.queuing = false;
     this.replayInterval = 10;
+
+    this._isConnected = false;
   }
 
   get autoQueue () {
@@ -203,6 +205,10 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
+  get isConnected () {
+    return this._isConnected;
+  }
+
   /**
   * Emit an event to all registered listeners
   * An event cannot be emitted multiple times before a timeout has been reached.
@@ -251,6 +257,8 @@ class Kuzzle extends KuzzleEventEmitter {
         this.playQueue();
       }
 
+      this._isConnected = true;
+
       this.emit('connected');
     });
 
@@ -262,6 +270,8 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.protocol.addListener('disconnect', () => {
+      this._isConnected = false;
+ 
       this.emit('disconnected');
     });
 
@@ -287,6 +297,8 @@ class Kuzzle extends KuzzleEventEmitter {
           })
           .then(() => this.emit('reconnected'));
       }
+
+      this._isConnected = true;
 
       this.emit('reconnected');
     });
