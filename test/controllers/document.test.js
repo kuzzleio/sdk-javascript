@@ -1113,7 +1113,7 @@ describe('Document Controller', () => {
           const request = kuzzle.document.query.getCall(0).args[0];
           should(request.from).be.eql(0);
           should(request.size).be.eql(10);          
-        })
+        });
     });
 
     it('should not set default value for from if scroll or sort are specified', () => {
@@ -1130,7 +1130,7 @@ describe('Document Controller', () => {
           const request = kuzzle.document.query.getCall(0).args[0];
           should(request.from).be.undefined();         
 
-          return kuzzle.document.search('index', 'collection', { sort: { some: 'thing' }})
+          return kuzzle.document.search('index', 'collection', { sort: { some: 'thing' }});
         })
         .then(() => {
           should(kuzzle.document.query).be.calledTwice();
