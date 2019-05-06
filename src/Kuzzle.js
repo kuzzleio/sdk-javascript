@@ -284,11 +284,11 @@ class Kuzzle extends KuzzleEventEmitter {
             // shouldn't obtain an error but let's invalidate the token anyway
             if (!res.valid) {
               this.jwt = undefined;
-                    }
+            }
           })
           .catch(() => {
             this.jwt = undefined;
-                })
+          })
           .then(() => this.emit('reconnected'));
       }
 
