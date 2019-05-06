@@ -87,8 +87,6 @@ class Kuzzle extends KuzzleEventEmitter {
     }
     this.queuing = false;
     this.replayInterval = 10;
-
-    this._isConnected = false;
   }
 
   get autoQueue () {
@@ -205,8 +203,8 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
-  get isConnected () {
-    return this._isConnected;
+  get connected () {
+    return this.protocol.connected;
   }
 
   /**
@@ -257,8 +255,6 @@ class Kuzzle extends KuzzleEventEmitter {
         this.playQueue();
       }
 
-      this._isConnected = true;
-
       this.emit('connected');
     });
 
@@ -270,8 +266,6 @@ class Kuzzle extends KuzzleEventEmitter {
     });
 
     this.protocol.addListener('disconnect', () => {
-      this._isConnected = false;
- 
       this.emit('disconnected');
     });
 
@@ -297,8 +291,6 @@ class Kuzzle extends KuzzleEventEmitter {
           })
           .then(() => this.emit('reconnected'));
       }
-
-      this._isConnected = true;
 
       this.emit('reconnected');
     });

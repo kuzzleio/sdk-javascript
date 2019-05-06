@@ -6,7 +6,6 @@ const
 
 
 class HttpWrapper extends KuzzleAbstractProtocol {
-
   constructor(host, options = {}) {
     super(host, options);
 
@@ -30,6 +29,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
   get protocol () {
     return this.ssl ? 'https' : 'http';
+  }
+
+  get connected () {
+    return true;
   }
 
   /**
