@@ -1014,8 +1014,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               body: {foo: 'bar'},
-              from: undefined,
-              size: undefined,
+              from: 0,
+              size: 10,
               scroll: undefined,
               includeTrash: undefined
             }, options);
@@ -1050,8 +1050,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               body: {foo: 'bar'},
-              from: undefined,
-              size: undefined,
+              from: 0,
+              size: 10,
               scroll: undefined,
               includeTrash: true
             }, {});
@@ -1096,6 +1096,47 @@ describe('Document Controller', () => {
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
+        });
+    });
+
+    it('should set default value for from and size', () => {
+      const result = {
+        hits: [],
+        total: 0
+      };
+      kuzzle.document.query = sinon.stub().resolves({result});
+
+      return kuzzle.document.search('index', 'collection', {})
+        .then(() => {
+          should(kuzzle.document.query).be.calledOnce();
+
+          const request = kuzzle.document.query.getCall(0).args[0];
+          should(request.from).be.eql(0);
+          should(request.size).be.eql(10);          
+        });
+    });
+
+    it('should not set default value for from if scroll or sort are specified', () => {
+      const result = {
+        hits: [],
+        total: 0
+      };
+      kuzzle.document.query = sinon.stub().resolves({result});
+
+      return kuzzle.document.search('index', 'collection', {}, { scroll: '42s' })
+        .then(() => {
+          should(kuzzle.document.query).be.calledOnce();
+
+          const request = kuzzle.document.query.getCall(0).args[0];
+          should(request.from).be.undefined();         
+
+          return kuzzle.document.search('index', 'collection', { sort: { some: 'thing' }});
+        })
+        .then(() => {
+          should(kuzzle.document.query).be.calledTwice();
+
+          const request = kuzzle.document.query.getCall(1).args[0];
+          should(request.from).be.undefined();         
         });
     });
   });
