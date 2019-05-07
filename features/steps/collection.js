@@ -130,7 +130,6 @@ Then('the specifications of {string} must not exist', async function (collection
   catch (error) {
     should(error.status).eql(404);
   }
-
 });
 
 Then('they should be validated', function () {

@@ -42,6 +42,10 @@ class AbstractWrapper extends KuzzleEventEmitter {
     return _ssl;
   }
 
+  get connected () {
+    return this.state === 'online';
+  }
+
   /**
    * @abstract
    * @returns {Promise<any>}
