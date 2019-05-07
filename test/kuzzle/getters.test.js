@@ -1,14 +1,22 @@
 const
   should = require('should'),
   ProtocolMock = require('../mocks/protocol.mock'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle getters', () => {
-  let kuzzle;
+  let
+    jwt, 
+    kuzzle;
 
   beforeEach(() => {
     const protocol = new ProtocolMock('somewhere');
+
     kuzzle = new Kuzzle(protocol);
+
+    jwt = generateJwt();
+
+    kuzzle.auth.authenticationToken = jwt;
   });
 
   it('should get "autoQueue" property from private _autoQueue one', () => {
@@ -26,9 +34,11 @@ describe('Kuzzle getters', () => {
     should(kuzzle.autoReplay).be.equal('foo-bar');
   });
 
-  it('should get "jwt" property from private _jwt one', () => {
-    kuzzle._jwt = 'foo-bar';
-    should(kuzzle.jwt).be.equal('foo-bar');
+  it('should get "jwt" property from auth authenticationToken', () => {
+    should(kuzzle.jwt).be.equal(kuzzle.auth.authenticationToken.encodedJwt);
+
+    kuzzle.jwt = null;
+    should(kuzzle.jwt).be.equal(null);
   });
 
   it('should get "host" property from protocol instance', () => {

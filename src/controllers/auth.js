@@ -1,4 +1,5 @@
 const
+  Jwt = require('../core/Jwt'),
   BaseController = require('./base'),
   User = require('./security/user');
 
@@ -16,6 +17,39 @@ class AuthController extends BaseController {
    */
   constructor (kuzzle) {
     super(kuzzle, 'auth');
+
+    this._authenticationToken = null;
+  }
+
+  get authenticationToken () {
+    return this._authenticationToken;
+  }
+
+  set authenticationToken (encodedJwt) {
+    if (encodedJwt === undefined || encodedJwt === null) {
+      this._authenticationToken = null;
+    } else if (typeof encodedJwt === 'string') {
+      this._authenticationToken = new Jwt(encodedJwt);
+    } else {
+      throw new Error(`Invalid token argument: ${encodedJwt}`);
+    }
+  }
+
+  /**
+   * Do not add the token for the checkToken route, to avoid getting a token error when
+   * a developer simply wish to verify his token
+   * 
+   * @param {object} request 
+   */
+  authenticateRequest (request) {
+    if (!this.authenticationToken
+      || (request.controller === 'auth'
+      && (request.action === 'checkToken' || request.action === 'login'))
+    ) {
+      return;
+    }
+
+    request.jwt = this.authenticationToken.encodedJwt;
   }
 
   /**
@@ -24,11 +58,15 @@ class AuthController extends BaseController {
    * @param  {string}   token     The jwt token to check
    * @return {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  checkToken (token) {
+  checkToken (token = undefined) {
+    if (token === undefined && this.authenticationToken) {
+      token = this.authenticationToken.encodedJwt;
+    }
+
     return this.query({
       action: 'checkToken',
-      body: {token}
-    }, {queuable: false})
+      body: { token }
+    }, { queuable: false })
       .then(response => response.result);
   }
 
@@ -154,14 +192,14 @@ class AuthController extends BaseController {
     return this.query(request, {queuable: false})
       .then(response => {
         try {
-          this.kuzzle.jwt = response.result.jwt;
-          this.kuzzle.jwtExpiresAt = response.result.expiresAt;
+          this._authenticationToken = new Jwt(response.result.jwt);
 
           this.kuzzle.emit('loginAttempt', {success: true});
         }
         catch (err) {
           return Promise.reject(err);
         }
+
         return response.result.jwt;
       })
       .catch(err => {
@@ -180,8 +218,7 @@ class AuthController extends BaseController {
       action: 'logout'
     }, {queuable: false})
       .then(() => {
-        this.kuzzle.jwt = undefined;
-        this.kuzzle.jwtExpiresAt = undefined;
+        this._authenticationToken = null;
       });
   }
 
@@ -248,8 +285,7 @@ class AuthController extends BaseController {
 
     return this.query(query, options)
       .then(response => {
-        this.kuzzle.jwt = response.result.jwt;
-        this.kuzzle.jwtExpiresAt = response.result.expiresAt;
+        this._authenticationToken = new Jwt(response.result.jwt);
 
         return response.result;
       });

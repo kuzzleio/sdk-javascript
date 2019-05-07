@@ -2,6 +2,8 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
+  generateJwt = require('../mocks/generateJwt.mock'),
+  Jwt = require('../../src/core/Jwt'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle setters', () => {
@@ -67,38 +69,9 @@ describe('Kuzzle setters', () => {
   });
 
   describe('#jwt', () => {
-    it('should unset the _jwt property if parameter is null', () => {
-      kuzzle._jwt = 'foo-bar';
-      kuzzle.jwt = null;
-      should(kuzzle._jwt).be.undefined();
-    });
-
-    it('should set the _jwt property if parameter is a string', () => {
-      kuzzle.jwt = 'foo-bar';
-      should(kuzzle._jwt).be.equal('foo-bar');
-    });
-
-    it('should set the _jwt property if parameter is an well formated object', () => {
-      kuzzle.jwt = {result: {jwt: 'foo-bar'}};
-      should(kuzzle._jwt).be.equal('foo-bar');
-    });
-
-    it('should throw if parameter is an bad formated object', () => {
-      kuzzle._jwt = 'old-jwt';
-
-      should(function() {
-        kuzzle.jwt = {foo: 'bar'};
-      }).throw();
-      should(kuzzle._jwt).be.equal('old-jwt');
-    });
-
-    it('should throw if parameter is not a string', () => {
-      kuzzle._jwt = 'old-jwt';
-
-      should(function() {
-        kuzzle.jwt = 1234;
-      }).throw();
-      should(kuzzle._jwt).be.equal('old-jwt');
+    it('should set the auth controller authenticationToken property', () => {
+      kuzzle.jwt = generateJwt();
+      should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
     });
   });
 
