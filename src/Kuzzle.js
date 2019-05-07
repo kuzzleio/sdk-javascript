@@ -196,6 +196,10 @@ class Kuzzle extends KuzzleEventEmitter {
   set jwt (encodedJwt) {
     this.auth.authenticationToken = encodedJwt;
   }
+  
+  get connected () {
+    return this.protocol.connected;
+  }
 
   /**
   * Emit an event to all registered listeners
