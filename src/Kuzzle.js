@@ -203,6 +203,10 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
+  get connected () {
+    return this.protocol.connected;
+  }
+
   /**
   * Emit an event to all registered listeners
   * An event cannot be emitted multiple times before a timeout has been reached.
