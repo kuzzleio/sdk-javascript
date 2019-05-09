@@ -111,10 +111,10 @@ class RealTimeController extends BaseController {
     }
 
     this.subscriptions = {};
-    this.kuzzle.jwt = undefined;
-    this.kuzzle.jwtExpiresAt = undefined;
+    this.kuzzle.auth.authenticationToken = null;
 
     const now = Date.now();
+    
     if ((now - this.lastExpirationTimestamp) > expirationThrottleDelay) {
       this.lastExpirationTimestamp = now;
       this.kuzzle.emit('tokenExpired');
