@@ -21,7 +21,7 @@ const
 describe('Kuzzle proxy', () => {
   const protocolMock = new ProtocolMock('somewhere');
 
-  it('should throw an error if one tries to set unvalid properties', () => {
+  it('should throw an error if one tries to set invalid properties', () => {
     const kuzzle = new Kuzzle(protocolMock);
     should.throws(() => {
       kuzzle.jvt = 'foobar';
