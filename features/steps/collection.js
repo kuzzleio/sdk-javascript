@@ -108,8 +108,11 @@ Then(/^the collection(?: '(.*?)')? should exist$/, async function (collection) {
 Then('the mapping of {string} should be updated', async function (collection) {
   const mapping = await this.kuzzle.collection.getMapping(this.index, collection);
 
-  should(mapping[this.index].mappings[collection].properties).eql({
-    gordon: { type: 'keyword' }
+  should(mapping[this.index].mappings[collection]).eql({
+    dynamic: 'true',
+    properties: {
+      gordon: {type: 'keyword'}
+    }
   });
 });
 

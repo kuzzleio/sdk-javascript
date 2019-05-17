@@ -1,22 +1,17 @@
-let
-  _kuzzle;
-
 class User {
   /**
    *
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle, _id = null, content = {}, meta = {}) {
-    _kuzzle = kuzzle;
-
+  constructor (kuzzle, _id = null, content = {}) {
+    this._kuzzle = kuzzle;
     this._id = _id;
     this.content = content;
-    this.meta = meta;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return this._kuzzle;
   }
 
   get profileIds () {
