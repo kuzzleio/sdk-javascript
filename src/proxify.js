@@ -1,5 +1,5 @@
 /*
-Helper that can throw error when get/set undeclared properties.
+Class wrapper throwing errors when getting/setting undeclared properties.
 
 ```javascript
 const obj = proxify({ foo: 42 });
