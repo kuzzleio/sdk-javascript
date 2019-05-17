@@ -22,7 +22,7 @@ proxify({ foo: 42 }, {
 ```
 
 - `name` : the name of the proxified object for warnings
-- `seal`: does `proxify` throw error on set undeclared properties?
+- `seal`: does `proxify` throw an error when setting undeclared properties?
 - `sealGet`: does `proxify` throw error on get undeclared properties? this options is separated from `seal` because getting undefined properties can be usefull for type checking for example
 - `deprecated`: array of property names which produce a deprecate warning on get/set
 - `warnDepreciationOnce`: only warn once per deprecated property
