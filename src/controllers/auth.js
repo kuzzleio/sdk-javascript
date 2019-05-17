@@ -58,7 +58,7 @@ class AuthController extends BaseController {
    * @param  {string}   token     The jwt token to check
    * @return {Promise|*|PromiseLike<T>|Promise<T>}
    */
-  checkToken (token = undefined) {
+  checkToken (token) {
     if (token === undefined && this.authenticationToken) {
       token = this.authenticationToken.encodedJwt;
     }

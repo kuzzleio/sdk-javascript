@@ -20,6 +20,18 @@ describe('Jwt', () => {
       should(authenticationToken.expiresAt).be.eql(expiresAt);
       should(authenticationToken.expired).be.eql(false);
     });
+
+    it('should throw with an invalid JWT format', () => {
+      should(() => {
+        new Jwt('this-is-invalid')
+      }).throwError('Invalid JWT format');
+    });
+
+    it('should throw with an invalid JSON payload', () => {
+      should(() => {
+        new Jwt('this-is.not-json-payload.for-sure')
+      }).throwError('Invalid JSON payload for JWT');
+    });
   });
 
   describe('#get expired', () => {

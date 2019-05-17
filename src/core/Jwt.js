@@ -27,9 +27,18 @@ class Jwt {
   }
 
   _decode () {
-    const 
-      [, payloadRaw, ] = this._encodedJwt.split('.'),
+    const  [, payloadRaw, ] = this._encodedJwt.split('.');
+
+    if (!payloadRaw) {
+      throw new Error('Invalid JWT format');
+    }
+    
+    let payload;
+    try {
       payload = JSON.parse(new Buffer(payloadRaw, 'base64').toString());
+    } catch (error) {
+      throw new Error('Invalid JSON payload for JWT');
+    }
     
     this._userId = payload._id;
     this._expiresAt = payload.exp;
