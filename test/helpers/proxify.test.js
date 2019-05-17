@@ -122,4 +122,23 @@ describe('proxify', () => {
     should(res).be.eql(false);
   });
 
+  it('should warn deprecation once', () => {
+    const obj = proxify(srcObj, {
+      deprecated: ['prop']
+    });
+    obj.prop = 42;
+    obj.prop = 42;
+    should(console.warn).have.callCount(1);
+  });
+
+  it('should warn deprecation several times', () => {
+    const obj = proxify(srcObj, {
+      deprecated: ['prop'],
+      warnDepreciationOnce: false
+    });
+    obj.prop = 42;
+    obj.prop = 42;
+    should(console.warn).have.callCount(2);
+  });
+
 });
