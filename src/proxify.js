@@ -24,7 +24,7 @@ proxify({ foo: 42 }, {
 - `name` : the name of the proxified object for warnings
 - `seal`: does `proxify` throw an error when setting undeclared properties?
 - `sealGet`: does `proxify` throw an error when getting undeclared properties? This options is separated from `seal` because getting undefined properties can be useful for type checking for example
-- `deprecated`: array of property names which produce a deprecate warning on get/set
+- `deprecated`: array of property names producing a deprecation warning when accessed
 - `warnDepreciationOnce`: only warn once per deprecated property
 - `exposeApi`: expose an api in the object to manipulate properties (described below)
 - `apiNamespace`: in which namespace api is exposed
