@@ -2,7 +2,7 @@ function generateJwt (userId = 'test-user', expiresAt = null) {
   const 
     header = { alg: 'HS256', typ: 'JWT' },
     payload = { _id: userId, iat: Date.now(), exp: expiresAt },
-    signature = 'who care ?';
+    signature = 'who cares?';
 
   expiresAt = expiresAt || Date.now() + 3600 * 1000;
 
