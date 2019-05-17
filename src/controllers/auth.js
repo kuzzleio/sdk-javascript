@@ -125,7 +125,7 @@ class AuthController extends BaseController {
     return this.query({
       action: 'getCurrentUser'
     }, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   /**
@@ -251,7 +251,7 @@ class AuthController extends BaseController {
       body,
       action: 'updateSelf'
     }, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   /**
