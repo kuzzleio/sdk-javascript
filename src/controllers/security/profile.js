@@ -1,5 +1,3 @@
-let _kuzzle;
-
 class Profile {
   /**
    *
@@ -7,16 +5,14 @@ class Profile {
    * @param {Object} data
    */
   constructor (kuzzle, _id = null, policies = []) {
-    _kuzzle = kuzzle;
-
+    this._kuzzle = kuzzle;
     this._id = _id;
     this.policies = policies;
   }
 
   get kuzzle () {
-    return _kuzzle;
+    return this._kuzzle;
   }
-
 
   /**
    * @returns {Promise<[Role]>}
