@@ -484,7 +484,7 @@ Discarded request: ${JSON.stringify(request)}`));
     }
     
     if (this.__proxy__) {
-      this.__proxy__.registerProps(accessor);
+      this.__proxy__.registerProp(accessor);
     }
     this[accessor] = controller;
 

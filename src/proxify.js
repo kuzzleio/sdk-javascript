@@ -96,12 +96,12 @@ const proxify = (obj, opts = {}) => {
   
   if (options.exposeApi) {
     obj[options.apiNamespace] = {
-      registerProps: name => {
+      registerProp: name => {
         if (!properties.includes(name)) {
           properties.push(name);
         }
       },
-      unregisterProps: name => {
+      unregisterProp: name => {
         const index = properties.indexOf(name);
         if (index !== -1) {
           properties.splice(index, 1);

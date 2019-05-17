@@ -39,9 +39,9 @@ describe('proxify', () => {
 
   it('should throw if use object unvalid property', () => {
     const obj = proxify(srcObj);
-    should.throws(() => {
+    should(() => {
       obj.prop2 = 42;
-    });
+    }).throwError('setting a not defined \'prop2\' properties in \'object\' object');    
   });
 
   it('should not warn if use non-deprecated property', () => {
@@ -66,8 +66,8 @@ describe('proxify', () => {
     });
     should.doesNotThrow(() => {
       should(obj.__proxy__).be.Object();
-      should(obj.__proxy__.registerProps).be.Function();
-      should(obj.__proxy__.unregisterProps).be.Function();
+      should(obj.__proxy__.registerProp).be.Function();
+      should(obj.__proxy__.unregisterProp).be.Function();
       should(obj.__proxy__.hasProp).be.Function();
     });
   });
@@ -79,8 +79,8 @@ describe('proxify', () => {
     });
     should.doesNotThrow(() => {
       should(obj.custom).be.Object();
-      should(obj.custom.registerProps).be.Function();
-      should(obj.custom.unregisterProps).be.Function();
+      should(obj.custom.registerProp).be.Function();
+      should(obj.custom.unregisterProp).be.Function();
       should(obj.custom.hasProp).be.Function();
     });
   });
@@ -89,10 +89,10 @@ describe('proxify', () => {
     const obj = proxify(srcObj, {
       exposeApi: true,
     });
-    should.throws(() => {
+    should(() => {
       obj.foo = 42;
-    });
-    obj.__proxy__.registerProps('foo');
+    }).throwError('setting a not defined \'foo\' properties in \'object\' object');    
+    obj.__proxy__.registerProp('foo');
     should.doesNotThrow(() => {
       obj.foo += 1;
     });
@@ -105,10 +105,10 @@ describe('proxify', () => {
     should.doesNotThrow(() => {
       obj.prop = 42;
     });
-    obj.__proxy__.unregisterProps('prop');
-    should.throws(() => {
-      obj.prop += 1;
-    });
+    obj.__proxy__.unregisterProp('prop');
+    should(() => {
+      obj.prop = 42;
+    }).throwError('setting a not defined \'prop\' properties in \'object\' object');    
   });
 
   it('should check has props without warn', () => {
