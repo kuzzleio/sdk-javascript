@@ -10,7 +10,8 @@ const
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
   BaseController = require('./controllers/base'),
-  uuidv4 = require('./uuidv4');
+  uuidv4 = require('./uuidv4'),
+  proxify = require('./proxify');
 
 const
   events = [
@@ -87,6 +88,14 @@ class Kuzzle extends KuzzleEventEmitter {
     }
     this.queuing = false;
     this.replayInterval = 10;
+
+    this._jwt = undefined;
+
+    return proxify(this, {
+      seal: true,
+      name: 'kuzzle',
+      exposeApi: true
+    });
   }
 
   get autoQueue () {
@@ -460,20 +469,23 @@ Discarded request: ${JSON.stringify(request)}`));
       throw new Error('You must provide a valid accessor.');
     }
 
-    if (this[accessor]) {
+    if (this.__proxy__ ? this.__proxy__.hasProp(accessor) : this[accessor]) {
       throw new Error(`There is already a controller with the accessor '${accessor}'. Please use another one.`);
     }
 
     const controller = new ControllerClass(this);
-
+    
     if (!(controller.name && controller.name.length > 0)) {
       throw new Error('Controllers must have a name.');
     }
-
+    
     if (controller.kuzzle !== this) {
       throw new Error('You must pass the Kuzzle SDK instance to the parent constructor.');
     }
-
+    
+    if (this.__proxy__) {
+      this.__proxy__.registerProps(accessor);
+    }
     this[accessor] = controller;
 
     return this;
