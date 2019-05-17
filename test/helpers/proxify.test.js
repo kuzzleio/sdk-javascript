@@ -23,22 +23,25 @@ describe('proxify', () => {
     console.warn = warn;
   });
 
-  it('should not warn if use object valid property', () => {
+  it('should not throw if use object valid property', () => {
     const obj = proxify(srcObj);
-    obj.prop += 1;
-    should(console.warn).have.callCount(0);
+    should.doesNotThrow(() => {
+      obj.prop += 1;
+    });
   });
 
-  it('should not warn if use object unvalid property without seal', () => {
+  it('should not throw if use object unvalid property without seal', () => {
     const obj = proxify(srcObj, { seal: false });
-    obj.prop2 = 42;
-    should(console.warn).have.callCount(0);
+    should.doesNotThrow(() => {
+      obj.prop2 = 42;
+    });
   });
 
-  it('should warn if use object unvalid property', () => {
+  it('should throw if use object unvalid property', () => {
     const obj = proxify(srcObj);
-    obj.prop2 = 42;
-    should(console.warn).have.callCount(1);
+    should.throws(() => {
+      obj.prop2 = 42;
+    });
   });
 
   it('should not warn if use non-deprecated property', () => {
@@ -61,11 +64,12 @@ describe('proxify', () => {
     const obj = proxify(srcObj, {
       exposeApi: true,
     });
-    should(obj.__proxy__).be.Object();
-    should(obj.__proxy__.registerProps).be.Function();
-    should(obj.__proxy__.unregisterProps).be.Function();
-    should(obj.__proxy__.hasProp).be.Function();
-    should(console.warn).have.callCount(0);
+    should.doesNotThrow(() => {
+      should(obj.__proxy__).be.Object();
+      should(obj.__proxy__.registerProps).be.Function();
+      should(obj.__proxy__.unregisterProps).be.Function();
+      should(obj.__proxy__.hasProp).be.Function();
+    });
   });
 
   it('should expose api under custom namespace', () => {
@@ -73,41 +77,48 @@ describe('proxify', () => {
       exposeApi: true,
       apiNamespace: 'custom'
     });
-    should(obj.custom).be.Object();
-    should(obj.custom.registerProps).be.Function();
-    should(obj.custom.unregisterProps).be.Function();
-    should(obj.custom.hasProp).be.Function();
-    should(console.warn).have.callCount(0);
+    should.doesNotThrow(() => {
+      should(obj.custom).be.Object();
+      should(obj.custom.registerProps).be.Function();
+      should(obj.custom.unregisterProps).be.Function();
+      should(obj.custom.hasProp).be.Function();
+    });
   });
 
   it('should register new props', () => {
     const obj = proxify(srcObj, {
       exposeApi: true,
     });
-    obj.foo = 42;
-    should(console.warn).have.callCount(1);
+    should.throws(() => {
+      obj.foo = 42;
+    });
     obj.__proxy__.registerProps('foo');
-    obj.foo += 1;
-    should(console.warn).have.callCount(1);
+    should.doesNotThrow(() => {
+      obj.foo += 1;
+    });
   });
 
   it('should unregister props', () => {
     const obj = proxify(srcObj, {
       exposeApi: true,
     });
-    obj.prop += 1;
-    should(console.warn).have.callCount(0);
+    should.doesNotThrow(() => {
+      obj.prop = 42;
+    });
     obj.__proxy__.unregisterProps('prop');
-    obj.prop += 1;
-    should(console.warn).have.callCount(1);
+    should.throws(() => {
+      obj.prop += 1;
+    });
   });
 
   it('should check has props without warn', () => {
     const obj = proxify(srcObj, {
       exposeApi: true,
     });
-    const res = obj.__proxy__.hasProp('foo');
-    should(console.warn).have.callCount(0);
+    let res;
+    should.doesNotThrow(() => {
+      res = obj.__proxy__.hasProp('foo');
+    });
     should(res).be.eql(false);
   });
 

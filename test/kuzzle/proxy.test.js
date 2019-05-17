@@ -19,23 +19,13 @@ const
   ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle proxy', () => {
-  let warn;
-
-  before(() => {
-    warn = console.warn;
-    console.warn = sinon.stub();
-  });
-
-  after(() => {
-    console.warn = warn;
-  });
-
   const protocolMock = new ProtocolMock('somewhere');
 
   it('should throw an error if one tries to set unvalid properties', () => {
     const kuzzle = new Kuzzle(protocolMock);
-    kuzzle.jvt = 'foobar';
-    should(console.warn).be.calledOnce();
+    should.throws(() => {
+      kuzzle.jvt = 'foobar';
+    });
   });
 
 });

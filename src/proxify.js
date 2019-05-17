@@ -56,7 +56,7 @@ const proxify = (obj, opts = {}) => {
   const handler = {
     get: (target, name) => {
       if (options.sealGet && typeof name === 'string' && !properties.includes(name)) {
-        console.warn(`Warning: ${options.name}.${name} is not defined`);
+        throw new Error(`${options.name}.${name} is not defined`);
       }
       if (options.deprecated.includes(name)) {
         console.warn(`Warning: ${options.name}.${name} is deprecated`);
@@ -65,7 +65,7 @@ const proxify = (obj, opts = {}) => {
     },
     set: (target, name, value) => {
       if (options.seal && !properties.includes(name)) {
-        console.warn(`Warning: setting a not defined '${name}' properties in '${options.name}' object`)
+        throw new Error(`setting a not defined '${name}' properties in '${options.name}' object`)
       }
       if (options.deprecated.includes(name)) {
         console.warn(`Warning: ${options.name}.${name} is deprecated`);
