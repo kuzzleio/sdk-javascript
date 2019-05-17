@@ -2,6 +2,7 @@
 const getOptions = options => ({
   name: 'object',
   seal: true,
+  sealGet: false,
   deprecated: [],
   exposeApi: false,
   apiNamespace: '__proxy__',
@@ -54,8 +55,8 @@ const proxify = (obj, opts = {}) => {
 
   const handler = {
     get: (target, name) => {
-      if (options.seal && typeof name === 'string' && !properties.includes(name)) {
-        // console.warn(`Warning: ${options.name}.${name} is not defined`);
+      if (options.sealGet && typeof name === 'string' && !properties.includes(name)) {
+        console.warn(`Warning: ${options.name}.${name} is not defined`);
       }
       if (options.deprecated.includes(name)) {
         console.warn(`Warning: ${options.name}.${name} is deprecated`);
