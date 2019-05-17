@@ -9,7 +9,7 @@ class UserSearchResult extends SearchResultBase {
 
     this._searchAction = 'searchUsers';
     this._scrollAction = 'scrollUsers';
-    this.hits = this._response.hits.map(hit => new User(this._kuzzle, hit._id, hit._source, hit._meta));
+    this.hits = this._response.hits.map(hit => new User(this._kuzzle, hit._id, hit._source));
   }
 
   next () {
@@ -19,7 +19,7 @@ class UserSearchResult extends SearchResultBase {
           return null;
         }
 
-        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => new User(nextSearchResult._kuzzle, hit._id, hit._source, hit._meta));
+        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => new User(nextSearchResult._kuzzle, hit._id, hit._source));
         return nextSearchResult;
       });
   }
