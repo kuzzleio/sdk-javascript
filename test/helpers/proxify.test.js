@@ -134,7 +134,7 @@ describe('proxify', () => {
   it('should warn deprecation several times', () => {
     const obj = proxify(srcObj, {
       deprecated: ['prop'],
-      warnDepreciationOnce: false
+      warnDeprecationOnce: false
     });
     obj.prop = 42;
     obj.prop = 42;
