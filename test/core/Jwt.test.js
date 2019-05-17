@@ -23,13 +23,13 @@ describe('Jwt', () => {
 
     it('should throw with an invalid JWT format', () => {
       should(() => {
-        new Jwt('this-is-invalid')
+        new Jwt('this-is-invalid');
       }).throwError('Invalid JWT format');
     });
 
     it('should throw with an invalid JSON payload', () => {
       should(() => {
-        new Jwt('this-is.not-json-payload.for-sure')
+        new Jwt('this-is.not-json-payload.for-sure');
       }).throwError('Invalid JSON payload for JWT');
     });
   });

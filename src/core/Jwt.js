@@ -1,5 +1,13 @@
 'use strict';
 
+const decodeBase64 = base64 => {
+  if (Buffer) {
+    return Buffer.from(base64, 'base64').toString();
+  } 
+
+  return atob(base64);
+};
+
 class Jwt {
   constructor (encodedJwt) {
     this._encodedJwt = encodedJwt;
@@ -27,7 +35,7 @@ class Jwt {
   }
 
   _decode () {
-    const  [, payloadRaw, ] = this._encodedJwt.split('.');
+    const [, payloadRaw, ] = this._encodedJwt.split('.');
 
     if (!payloadRaw) {
       throw new Error('Invalid JWT format');
@@ -35,7 +43,7 @@ class Jwt {
     
     let payload;
     try {
-      payload = JSON.parse(new Buffer(payloadRaw, 'base64').toString());
+      payload = JSON.parse(decodeBase64(payloadRaw));
     } catch (error) {
       throw new Error('Invalid JSON payload for JWT');
     }
