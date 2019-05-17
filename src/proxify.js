@@ -1,5 +1,5 @@
 /*
-Helper that can throw error when get/set undeclared properties.
+Class wrapper throwing errors when getting/setting undeclared properties.
 
 ```javascript
 const obj = proxify({ foo: 42 });
@@ -29,7 +29,7 @@ proxify({ foo: 42 }, {
 - `exposeApi`: expose an api in the object to manipulate properties (described below)
 - `apiNamespace`: in which namespace api is exposed
 
-##### proxyfy API
+##### proxify API
 
 ```javascript
 const obj = proxify({ foo: 42 }, { exposeApi: true });
