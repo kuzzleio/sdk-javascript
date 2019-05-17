@@ -25,6 +25,7 @@ proxify({ foo: 42 }, {
 - `seal`: does `proxify` throw error on set undeclared properties?
 - `sealGet`: does `proxify` throw error on get undeclared properties? this options is separated from `seal` because getting undefined properties can be usefull for type checking for example
 - `deprecated`: array of property names which produce a deprecate warning on get/set
+- `warnDepreciationOnce`: only warn once per deprecated property
 - `exposeApi`: expose an api in the object to manipulate properties (described below)
 - `apiNamespace`: in which namespace api is exposed
 
@@ -89,6 +90,7 @@ const proxify = (obj, opts = {}) => {
       return;
     }
     warnedDepreciation[hash] = true;
+    // eslint-disable-next-line no-console
     console.warn(`Warning: ${hash} is deprecated`);
   };
   
@@ -126,7 +128,7 @@ const proxify = (obj, opts = {}) => {
     },
     set: (target, name, value) => {
       if (options.seal && !properties.includes(name)) {
-        throw new Error(`setting a not defined '${name}' properties in '${options.name}' object`)
+        throw new Error(`setting a not defined '${name}' properties in '${options.name}' object`);
       }
       if (options.deprecated.includes(name)) {
         warnDeprecation(name);
