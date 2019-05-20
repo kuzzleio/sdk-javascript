@@ -80,57 +80,49 @@ const proxify = (obj, opts = {}) => {
   }
 
   const options = getOptions(opts);
-  const properties = ['inspect'];
+  const properties = new Set(['inspect']);
+  const deprecated = new Set(options.deprecated);
 
-  const warnedDepreciation = new Set();
+  const warnedDeprecation = new Set();
 
   const warnDeprecation = name => {
     const hash = `${options.name}.${name}`;
-    if (options.warnDeprecationOnce && warnedDepreciation.has(hash)) {
+    if (options.warnDeprecationOnce && warnedDeprecation.has(hash)) {
       return;
     }
-    warnedDepreciation.add(hash);
+    warnedDeprecation.add(hash);
     // eslint-disable-next-line no-console
     console.warn(`Warning: ${hash} is deprecated`);
   };
   
   if (options.exposeApi) {
     obj[options.apiNamespace] = {
-      registerProp: name => {
-        if (!properties.includes(name)) {
-          properties.push(name);
-        }
-      },
-      unregisterProp: name => {
-        const index = properties.indexOf(name);
-        if (index !== -1) {
-          properties.splice(index, 1);
-        }
-      },
-      hasProp: name => properties.includes(name)
+      registerProp: name => properties.add(name),
+      unregisterProp: name => properties.delete(name),
+      hasProp: name => properties.has(name)
     };
   }
   
-  properties.push(...deleteDuplicates([
+  [
     ...Object.getOwnPropertyNames(obj),
     ...getPropertyNames(obj)
-  ]));
+  ].forEach(prop => properties.add(prop));
 
   const handler = {
     get: (target, name) => {
-      if (options.sealGet && !properties.includes(name)) {
+      if (options.sealGet && !properties.has(name)) {
         throw new Error(`${options.name}.${name} is not defined`);
       }
-      if (options.deprecated.includes(name)) {
+      if (deprecated.has(name)) {
         warnDeprecation(name);
       }
       return target[name];
     },
     set: (target, name, value) => {
-      if (options.seal && !properties.includes(name)) {
+      if (options.seal && !properties.has(name)) {
         throw new Error(`setting a not defined '${name}' properties in '${options.name}' object`);
       }
-      if (options.deprecated.includes(name)) {
+      if (deprecated.has(name)) {
         warnDeprecation(name);
       }
       target[name] = value;
