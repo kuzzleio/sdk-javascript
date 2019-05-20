@@ -120,7 +120,7 @@ const proxify = (obj, opts = {}) => {
     },
     set: (target, name, value) => {
       if (options.seal && !properties.has(name)) {
-        throw new Error(`setting a not defined '${name}' properties in '${options.name}' object`);
+        throw new Error(`Cannot set a value to the undefined '${name}' property in '${options.name}'`);
       }
       if (deprecated.has(name)) {
         warnDeprecation(name);

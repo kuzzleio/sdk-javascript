@@ -41,7 +41,7 @@ describe('proxify', () => {
     const obj = proxify(srcObj);
     should(() => {
       obj.prop2 = 42;
-    }).throwError('setting a not defined \'prop2\' properties in \'object\' object');    
+    }).throwError('Cannot set a value to the undefined \'prop2\' property in \'object\'');    
   });
 
   it('should not warn if use non-deprecated property', () => {
@@ -91,7 +91,7 @@ describe('proxify', () => {
     });
     should(() => {
       obj.foo = 42;
-    }).throwError('setting a not defined \'foo\' properties in \'object\' object');    
+    }).throwError('Cannot set a value to the undefined \'foo\' property in \'object\'');    
     obj.__proxy__.registerProp('foo');
     should.doesNotThrow(() => {
       obj.foo += 1;
@@ -108,7 +108,7 @@ describe('proxify', () => {
     obj.__proxy__.unregisterProp('prop');
     should(() => {
       obj.prop = 42;
-    }).throwError('setting a not defined \'prop\' properties in \'object\' object');    
+    }).throwError('Cannot set a value to the undefined \'prop\' property in \'object\'');    
   });
 
   it('should check has props without warn', () => {

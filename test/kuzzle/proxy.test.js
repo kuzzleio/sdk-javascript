@@ -10,7 +10,7 @@ describe('Kuzzle proxy', () => {
     const kuzzle = new Kuzzle(protocolMock);
     should(() => {
       kuzzle.jvt = 'foobar';
-    }).throwError('setting a not defined \'jvt\' properties in \'kuzzle\' object');    
+    }).throwError('Cannot set a value to the undefined \'jvt\' property in \'kuzzle\'');    
   });
 
 });
