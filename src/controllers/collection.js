@@ -169,15 +169,11 @@ class CollectionController extends BaseController {
       throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
     }
 
-    const body = {
-      [index]: {
-        [collection]: specifications
-      }
-    };
-
     return this.query({
-      body,
-      action: 'updateSpecifications'
+      action: 'updateSpecifications',
+      index,
+      collection,
+      body: specifications
     }, options)
       .then(response => response.result[index][collection]);
   }
@@ -193,15 +189,11 @@ class CollectionController extends BaseController {
       throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
     }
 
-    const body = {
-      [index]: {
-        [collection]: specifications
-      }
-    };
-
     return this.query({
-      body,
-      action: 'validateSpecifications'
+      action: 'validateSpecifications',
+      index,
+      collection,
+      body: specifications
     }, options)
       .then(response => response.result);
   }
