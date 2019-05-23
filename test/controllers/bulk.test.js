@@ -17,27 +17,33 @@ describe('Bulk Controller', () => {
 
   describe('import', () => {
     it('should call bulk/import query with the bulk data and return a Promise which resolves json object', () => {
-      kuzzle.query.resolves({result: {items: [
-        {create: {_id: 'foo'}, status: 200},
-        {update: {_id: 'bar'}, status: 200}
-      ]}});
+      kuzzle.query.resolves({
+        result: {
+          items: [
+            { create: { _id: 'foo' }, status: 200 },
+            { update: { _id: 'bar' }, status: 200 }
+          ],
+          errors: false
+        }
+      });
 
-      const data = {foo: 'bar'};
+      const bulkData = {foo: 'bar'};
 
-      return kuzzle.bulk.import(data, options)
+      return kuzzle.bulk.import(bulkData, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
-              body: {bulkData: data},
+              body: { bulkData },
               controller: 'bulk',
               action: 'import'
             }, options);
 
-          should(res).match([
-            {create: {_id: 'foo'}, status: 200},
-            {update: {_id: 'bar'}, status: 200}
+          should(res.items).match([
+            { create: { _id: 'foo' }, status: 200 },
+            { update: { _id: 'bar' }, status: 200 }
           ]);
+          should(res.errors).be.eql(false);
         });
     });
   });
