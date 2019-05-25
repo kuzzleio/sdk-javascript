@@ -1,5 +1,7 @@
 const
+  AuthController = require('../../src/controllers/auth'),
   RealtimeController = require('../../src/controllers/realtime'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   mockrequire = require('mock-require'),
   sinon = require('sinon'),
   should = require('should'),
@@ -15,6 +17,8 @@ describe('Realtime Controller', () => {
       emit: sinon.stub()
     };
     kuzzle.realtime = new RealtimeController(kuzzle);
+    kuzzle.auth = new AuthController(kuzzle);
+    kuzzle.auth.authenticationToken = generateJwt();
   });
 
   after(() => {
@@ -282,7 +286,7 @@ describe('Realtime Controller', () => {
       should(kuzzle.realtime.subscriptions).be.empty();
       should(stub.callCount).be.eql(10);
       should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
-      should(kuzzle.jwt).be.undefined();
+      should(kuzzle.auth.authenticationToken).be.null();
     });
 
     it('should throttle to prevent emitting duplicate occurrences of the same event', () => {

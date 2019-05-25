@@ -1,12 +1,16 @@
 const
+  Jwt = require('../../src/core/Jwt'),
   AuthController = require('../../src/controllers/auth'),
   User = require('../../src/controllers/security/user'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   sinon = require('sinon'),
   should = require('should');
 
 describe('Auth Controller', () => {
   const options = {opt: 'in'};
-  let kuzzle;
+  let
+    jwt, 
+    kuzzle;
 
   beforeEach(() => {
     kuzzle = {
@@ -16,7 +20,7 @@ describe('Auth Controller', () => {
     kuzzle.auth = new AuthController(kuzzle);
   });
 
-  describe('checkToken', () => {
+  describe('#checkToken', () => {
     it('should call auth/checkToken query with the token and return a Promise which resolves the token validity', () => {
       kuzzle.query.resolves({
         result: {
@@ -46,7 +50,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('createMyCredentials', () => {
+  describe('#createMyCredentials', () => {
     it('should call auth/createMyCredentials query with the user credentials and return a Promise which resolves a json object', () => {
       const credentials = {foo: 'bar'};
 
@@ -73,7 +77,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('credentialsExist', () => {
+  describe('#credentialsExist', () => {
     it('should call auth/credentialExists query with the strategy name and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
 
@@ -92,7 +96,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('deleteMyCredentials', () => {
+  describe('#deleteMyCredentials', () => {
     it('should call auth/deleteMyCredentials query with the strategy name and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
@@ -111,7 +115,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('getCurrentUser', () => {
+  describe('#getCurrentUser', () => {
     it('should call auth/getCurrentUser query and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
         result: {
@@ -136,7 +140,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('getMyCredentials', () => {
+  describe('#getMyCredentials', () => {
     it('should call auth/getMyCredentials query with the strategy name and return a Promise which resolves the user credentials', () => {
       kuzzle.query.resolves({
         result: {
@@ -160,7 +164,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('getMyRights', () => {
+  describe('#getMyRights', () => {
     it('should call auth/getMyCredentials query with the strategy name and return a Promise which resolves the user permissions as an array', () => {
       kuzzle.query.resolves({result: {hits: [
         {controller: 'foo', action: 'bar', index: 'foobar', collection: '*', value: 'allowed'}
@@ -181,7 +185,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('getStrategies', () => {
+  describe('#getStrategies', () => {
     it('should call auth/getStrategies query and return a Promise which resolves the list of strategies as an array', () => {
       kuzzle.query.resolves({result: ['local', 'github', 'foo', 'bar']});
 
@@ -203,14 +207,16 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('login', () => {
+  describe('#login', () => {
     const credentials = {foo: 'bar'};
 
     beforeEach(() => {
+      jwt = generateJwt();
+
       kuzzle.query.resolves({
         result: {
-          _id: 'kuid',
-          jwt: 'jwt'
+          jwt,
+          _id: 'kuid'
         }
       });
     });
@@ -240,7 +246,7 @@ describe('Auth Controller', () => {
               body: credentials
             }, {queuable: false});
 
-          should(res).be.equal('jwt');
+          should(res).be.equal(jwt);
         });
     });
 
@@ -253,17 +259,18 @@ describe('Auth Controller', () => {
         });
     });
 
-    it('should set the received JWT as kuzzle property', () => {
+    it('should construct a new Jwt', () => {
       return kuzzle.auth.login('strategy', credentials, 'expiresIn')
         .then(() => {
-          should(kuzzle.jwt).be.equal('jwt');
+          should(kuzzle.auth.authenticationToken).not.be.null();
+          should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
         });
     });
   });
 
-  describe('logout', () => {
+  describe('#logout', () => {
     beforeEach(() => {
-      kuzzle.jwt = 'jwt';
+      kuzzle.auth.authenticationToken = generateJwt();
       kuzzle.query.resolves({result: {aknowledged: true}});
     });
 
@@ -281,15 +288,15 @@ describe('Auth Controller', () => {
         });
     });
 
-    it('should unset the kuzzle.jwt property', () => {
+    it('should unset the authenticationToken property', () => {
       return kuzzle.auth.logout()
         .then(() => {
-          should(kuzzle.jwt).be.undefined();
+          should(kuzzle.auth.authenticationToken).be.null();
         });
     });
   });
 
-  describe('updateMyCredentials', () => {
+  describe('#updateMyCredentials', () => {
     it('should call auth/updateMyCredentials query with the user credentials and return a Promise which resolves a json object', () => {
       const credentials = {foo: 'bar'};
 
@@ -316,7 +323,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('updateSelf', () => {
+  describe('#updateSelf', () => {
     it('should call auth/updateSelf query with the user content and return a Promise which resolves a User object', () => {
       const body = {foo: 'bar'};
 
@@ -344,7 +351,7 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('validateMyCredentials', () => {
+  describe('#validateMyCredentials', () => {
     it('should call auth/validateMyCredentials query with the strategy and its credentials and return a Promise which resolves a boolean', () => {
       const body = {foo: 'bar'};
 
@@ -366,11 +373,11 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('refreshToken', () => {
-    const tokenResponse = { _id: 'foo', jwt: 'newToken' };
+  describe('#refreshToken', () => {
+    const tokenResponse = { _id: 'foo', jwt: generateJwt() };
 
     beforeEach(() => {
-      kuzzle.jwt = 'jwt';
+      kuzzle.auth.jwt = generateJwt();
       kuzzle.query.resolves({result: tokenResponse});
     });
 
@@ -386,7 +393,8 @@ describe('Auth Controller', () => {
             });
 
           should(res).be.eql(tokenResponse);
-          should(kuzzle.jwt).be.eql('newToken');
+          should(kuzzle.auth.authenticationToken).not.be.null();
+          should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
         });
     });
 
@@ -402,8 +410,41 @@ describe('Auth Controller', () => {
             });
 
           should(res).be.eql(tokenResponse);
-          should(kuzzle.jwt).be.eql('newToken');
+          should(kuzzle.auth.authenticationToken).not.be.null();
+          should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
         });
     });
   });
+
+  describe('#set authenticationToken', () => {
+    beforeEach(() => {
+      jwt = generateJwt();
+    }); 
+
+    it('should unset the authenticationToken property if parameter is null', () => {
+      kuzzle.auth.authenticationToken = jwt;
+      kuzzle.auth.authenticationToken = null;
+
+      should(kuzzle.auth.authenticationToken).be.null();
+    });
+
+    it('should set the authenticationToken property if parameter is a string', () => {
+      kuzzle.auth.authenticationToken = generateJwt();
+
+      should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
+      should(kuzzle.auth.authenticationToken.encodedJwt).be.eql(jwt);
+    });
+
+    it('should throw if parameter is not a string', () => {
+      kuzzle.auth.authenticationToken = jwt;
+
+      should(function() {
+        kuzzle.auth.authenticationToken = 1234;
+      }).throw();
+
+      should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
+      should(kuzzle.auth.authenticationToken.encodedJwt).be.eql(jwt);
+    });
+  });
+
 });

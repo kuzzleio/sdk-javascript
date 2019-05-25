@@ -2,6 +2,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle connect', () => {
@@ -85,36 +86,38 @@ describe('Kuzzle connect', () => {
     });
 
     it('should keep a valid JWT at reconnection', () => {
-      const kuzzle = new Kuzzle(protocols.somewhereagain);
+      const
+        jwt = generateJwt(), 
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.auth.checkToken = sinon.stub().resolves({
         valid: true
       });
-      kuzzle.jwt = 'foobar';
+      kuzzle.jwt = jwt;
 
       return kuzzle.connect()
         .then(() => {
           should(kuzzle.auth.checkToken).be.calledOnce();
-          should(kuzzle.auth.checkToken).be.calledWith('foobar');
 
-          should(kuzzle.jwt).be.eql('foobar');
+          should(kuzzle.jwt).be.eql(jwt);
         });
     });
 
     it('should empty the JWT at reconnection if it has expired', () => {
-      const kuzzle = new Kuzzle(protocols.somewhereagain);
+      const
+        jwt = generateJwt(), 
+        kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.auth.checkToken = sinon.stub().resolves({
         valid: false
       });
-      kuzzle.jwt = 'foobar';
+      kuzzle.jwt = jwt;
 
       return kuzzle.connect()
         .then(() => {
           should(kuzzle.auth.checkToken).be.calledOnce();
-          should(kuzzle.auth.checkToken).be.calledWith('foobar');
 
-          should(kuzzle.jwt).be.undefined();
+          should(kuzzle.jwt).be.null();
         });
     });
 

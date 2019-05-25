@@ -125,28 +125,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this._autoReplay = value;
   }
 
-  get jwt () {
-    return this._jwt;
-  }
-
-  set jwt (token) {
-    if (token === undefined || token === null) {
-      this._jwt = undefined;
-    }
-    else if (typeof token === 'string') {
-      this._jwt = token;
-    }
-    else if (typeof token === 'object'
-      && token.result
-      && token.result.jwt
-      && typeof token.result.jwt === 'string'
-    ) {
-      this._jwt = token.result.jwt;
-    } else {
-      throw new Error(`Invalid token argument: ${token}`);
-    }
-  }
-
   get host () {
     return this.protocol.host;
   }
@@ -212,6 +190,22 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
+  get authenticated () {
+    return this.auth.authenticationToken && !this.auth.authenticationToken.expired;
+  }
+
+  get jwt () {
+    if (!this.auth.authenticationToken) {
+      return null;
+    }
+
+    return this.auth.authenticationToken.encodedJwt;
+  }
+
+  set jwt (encodedJwt) {
+    this.auth.authenticationToken = encodedJwt;
+  }
+  
   get connected () {
     return this.protocol.connected;
   }
@@ -251,7 +245,7 @@ class Kuzzle extends KuzzleEventEmitter {
     this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
 
     this.protocol.addListener('tokenExpired', () => {
-      this.jwt = undefined;
+      this.auth.authenticationToken = null;
       this.emit('tokenExpired');
     });
 
@@ -287,16 +281,17 @@ class Kuzzle extends KuzzleEventEmitter {
         this.playQueue();
       }
 
-      if (this.jwt) {
-        return this.auth.checkToken(this.jwt)
+      if (this.auth.authenticationToken) {
+        return this.auth.checkToken()
           .then(res => {
+
             // shouldn't obtain an error but let's invalidate the token anyway
             if (!res.valid) {
-              this.jwt = undefined;
+              this.auth.authenticationToken = null;
             }
           })
           .catch(() => {
-            this.jwt = undefined;
+            this.auth.authenticationToken = null;
           })
           .then(() => this.emit('reconnected'));
       }
@@ -384,16 +379,7 @@ class Kuzzle extends KuzzleEventEmitter {
     request.volatile.sdkInstanceId = this.protocol.id;
     request.volatile.sdkVersion = this.sdkVersion;
 
-    /*
-     * Do not add the token for the checkToken route, to avoid getting a token error when
-     * a developer simply wish to verify his token
-     */
-    if (this.jwt !== undefined
-      && !(request.controller === 'auth'
-      && (request.action === 'checkToken' || request.action === 'login'))
-    ) {
-      request.jwt = this.jwt;
-    }
+    this.auth.authenticateRequest(request);
 
     let queuable = true;
     if (options && options.queuable === false) {
