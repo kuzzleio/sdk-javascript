@@ -1,0 +1,9 @@
+name: kuzzleEventEmitter#add-once-listener
+description: Adds new once listener for the given event
+hooks:
+  before:
+  after:
+template: eventemitter
+expected: Caught event "myEvent"!
+sdk: js
+version: 6

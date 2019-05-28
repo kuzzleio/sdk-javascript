@@ -1,0 +1,9 @@
+name: ms#zrevrangebylex
+description: Returns elements within a provided interval, using lexicographical ordering
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ 'baz', 'bar' ]"
+sdk: js
+version: 6

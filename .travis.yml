@@ -32,6 +32,14 @@ jobs:
       after_success:  
         - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 
+    - name: Documentation tests
+      stage: Tests
+      language: node_js
+      node_js: 8
+
+      script:
+        - docker-compose .ci/docker-compose doc-tests node index
+
     - stage: "Deploy Stable release on NPM"
       if: type != pull_request && branch = master
       sudo: false

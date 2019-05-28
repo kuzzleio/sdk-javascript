@@ -1,0 +1,11 @@
+name: ms#pexpire
+description: Sets a timeout (in milliseconds) on a key
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - ^-1$
+  - ^[0-9]{1,2}$
+sdk: js
+version: 6

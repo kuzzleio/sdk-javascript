@@ -1,0 +1,12 @@
+name: ms#setnx
+description: Sets a value on a key, only if it does not already exist
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - ^true$
+  - ^false$
+  - ^bar$
+sdk: js
+version: 6

@@ -1,0 +1,9 @@
+name: ms#hmset
+description: Sets multiple fields at once in a hash
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: { key1: 'val1', key2: 'val2', key3: 'val3' }
+sdk: js
+version: 6

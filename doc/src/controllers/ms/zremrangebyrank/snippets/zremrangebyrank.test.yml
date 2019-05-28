@@ -1,0 +1,9 @@
+name: ms#zremrangebyrank
+description: Removes members from a sorted setn by position
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ { member: 'baz', score: -272.15 } ]"
+sdk: js
+version: 6

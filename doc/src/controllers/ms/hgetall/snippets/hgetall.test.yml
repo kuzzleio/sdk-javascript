@@ -1,0 +1,9 @@
+name: ms#hgetall
+description: Returns all fields and values of a hash
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "{ field1: 'val1', field2: 'val2' }"
+sdk: js
+version: 6

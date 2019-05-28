@@ -1,0 +1,13 @@
+name: gettingstarted#webpackcreate
+description: Creates a document
+hooks:
+  before: |
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: doIt
+expected: New document successfully created!
+
+runner: webpack
+sdk: js
+version: 6
