@@ -1,6 +1,7 @@
 jobs:
   include:
-    - stage: Tests
+    - name: Sdk tests
+      stage: Tests
       sudo: false
       language: node_js
       node_js: 8
@@ -38,7 +39,7 @@ jobs:
       node_js: 8
 
       script:
-        - docker-compose .ci/docker-compose.yml run doc-tests node index
+        - docker-compose -f .ci/docker-compose.yml run doc-tests node index
 
     - stage: "Deploy Stable release on NPM"
       if: type != pull_request && branch = master
