@@ -2,7 +2,7 @@
 set -e
 # Download and launch custom Kuzzle stack
 
-docker-compose -f .ci/docker-compose.yml run -d kuzzle
+docker-compose -f .ci/docker-compose.yml up -d
 
 printf 'Waiting for Kuzzle stack to be up and running'
 
