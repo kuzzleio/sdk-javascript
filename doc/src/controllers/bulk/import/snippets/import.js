@@ -24,7 +24,7 @@ try {
         status: 200 } } ] }
   */
 
-  console.log(`Successfully imported ${response.length} documents`);
+  console.log(`Successfully imported ${response.items.length} documents`);
 } catch (error) {
   console.error(error.message);
 }
