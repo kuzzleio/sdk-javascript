@@ -45,9 +45,9 @@ services:
 
   doc-runner-node:
     image: node:8-alpine
-    working_dir: /var/snippets/node
     command: >
       ash -c '
+        mkdir -p /var/snippets/node;
         apk add --no-cache curl;
         npm install -g \
           eslint \
@@ -57,6 +57,7 @@ services:
           eslint-plugin-promise \
           eslint-plugin-standard;
         touch /tmp/runner_ready_to_lint;
+        cd /var/snippets/node;
         npm install \
           bluebird \
           /mnt/;
@@ -69,9 +70,9 @@ services:
 
   doc-runner-web:
     image: buildkite/puppeteer:latest
-    working_dir: /var/snippets/web
     command: >
       bash -c '
+        mkdir -p /var/snippets/web;
         apt-get update;
         apt-get install -y curl;
         npm install -g \
@@ -82,6 +83,7 @@ services:
           eslint-plugin-promise \
           eslint-plugin-standard;
         touch /tmp/runner_ready_to_lint;
+        cd /var/snippets/web;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
         npm install \
           /mnt/ \
@@ -95,9 +97,9 @@ services:
 
   doc-runner-webpack:
     image: buildkite/puppeteer:latest
-    working_dir: /var/snippets/webpack
     command: >
       bash -c '
+        mkdir -p /var/snippets/webpack;
         apt-get update;
         apt-get install -y curl;
         npm install -g \
@@ -108,6 +110,7 @@ services:
           eslint-plugin-promise \
           eslint-plugin-standard;
         touch /tmp/runner_ready_to_lint;
+        cd /var/snippets/webpack;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
         cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
         npm install \
