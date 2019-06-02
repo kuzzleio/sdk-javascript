@@ -32,6 +32,7 @@ class SearchResultBase {
       return this._kuzzle.query({
         controller: this._request.controller,
         action: this._scrollAction,
+        scroll: this._request.scroll,
         scrollId: this._response.scrollId
       }, this._options)
         .then(response => this._buildNextSearchResult(response));
