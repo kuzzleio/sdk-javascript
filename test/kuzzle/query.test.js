@@ -2,6 +2,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle query management', () => {
@@ -164,13 +165,14 @@ describe('Kuzzle query management', () => {
     });
 
     it('should set jwt except for auth/checkToken', () => {
-      kuzzle.jwt = 'fake-token';
+      const jwt = generateJwt();
+      kuzzle.jwt = jwt;
 
       kuzzle.query({controller: 'foo', action: 'bar'}, {});
       kuzzle.query({controller: 'auth', action: 'checkToken'}, {});
 
       should(kuzzle.protocol.query).be.calledTwice();
-      should(kuzzle.protocol.query.firstCall.args[0].jwt).be.exactly('fake-token');
+      should(kuzzle.protocol.query.firstCall.args[0].jwt).be.exactly(jwt);
       should(kuzzle.protocol.query.secondCall.args[0].jwt).be.undefined();
     });
 

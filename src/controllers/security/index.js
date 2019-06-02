@@ -52,7 +52,7 @@ class SecurityController extends BaseController {
     delete options.reset;
 
     return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   createOrReplaceProfile (_id, body, options = {}) {
@@ -132,7 +132,7 @@ class SecurityController extends BaseController {
     delete options.refresh;
 
     return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   createRole (_id, body, options = {}) {
@@ -178,7 +178,7 @@ class SecurityController extends BaseController {
     delete options.refresh;
 
     return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   deleteCredentials (strategy, _id, options = {}) {
@@ -343,7 +343,7 @@ class SecurityController extends BaseController {
       _id,
       action: 'getUser'
     }, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   getUserMapping (options = {}) {
@@ -470,7 +470,7 @@ class SecurityController extends BaseController {
     delete options.refresh;
 
     return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   searchProfiles (body, options= {}) {
@@ -608,7 +608,7 @@ class SecurityController extends BaseController {
     delete options.refresh;
 
     return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source, response.result._meta));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
   updateUserMapping (body, options = {}) {

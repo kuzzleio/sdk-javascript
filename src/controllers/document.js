@@ -361,9 +361,15 @@ class DocumentController extends BaseController {
       body,
       action: 'search',
     };
+
     for (const opt of ['from', 'size', 'scroll', 'includeTrash']) {
       request[opt] = options[opt];
       delete options[opt];
+    }
+
+    request.size = request.size || 10;
+    if (!request.scroll && !request.body.sort && !request.from) {
+      request.from = 0;
     }
 
     return this.query(request, options)
