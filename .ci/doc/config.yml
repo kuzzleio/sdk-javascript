@@ -2,7 +2,7 @@
 
 snippets:
   mount: /mnt
-  path: doc/src/**/snippets/*.test.yml
+  path: doc/**/snippets/*.test.yml
   templates: /mnt/.ci/doc/templates
 
 runners:
