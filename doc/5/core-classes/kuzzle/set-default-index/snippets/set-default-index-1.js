@@ -1,0 +1,1 @@
+kuzzle.setDefaultIndex('index');

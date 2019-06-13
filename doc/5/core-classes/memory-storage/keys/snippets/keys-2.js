@@ -1,0 +1,6 @@
+on
+[
+  "foo",
+  "foobar",
+  "foofighters"
+]
