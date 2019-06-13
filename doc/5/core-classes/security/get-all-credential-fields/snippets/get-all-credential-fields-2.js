@@ -1,7 +1,0 @@
-on
-{
-  "local": [
-    "kuid",
-    "username"
-  ]
-}

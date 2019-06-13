@@ -1,6 +1,0 @@
-on
-[
-  "foo",
-  "foobar",
-  "foofighters"
-]

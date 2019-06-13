@@ -1,5 +1,0 @@
-on
-[
-  "kuid",
-  "username"
-]

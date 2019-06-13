@@ -1,1 +1,0 @@
-var jwtToken = kuzzle.getJwtToken();

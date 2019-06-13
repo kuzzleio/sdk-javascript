@@ -1,2 +1,0 @@
-on
-[ "index", "another index", "..."]
