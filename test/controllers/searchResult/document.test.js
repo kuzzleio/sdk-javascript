@@ -130,6 +130,7 @@ describe('DocumentSearchResult', () => {
               .be.calledWith({
                 controller: 'document',
                 action: 'scroll',
+                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);

@@ -126,7 +126,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.realtime).be.an.instanceof(RealTimeController);
     should(kuzzle.protocol).be.an.instanceof(ProtocolMock);
     should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
-    should(kuzzle.jwt).be.undefined();
+    should(kuzzle.jwt).be.null();
   });
 
   it('should set autoQueue and autoReplay if offlineMode is set to auto', () => {

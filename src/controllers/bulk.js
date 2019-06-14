@@ -12,7 +12,7 @@ class BulkController extends BaseController {
         bulkData: data
       }
     }, options)
-      .then(response => response.result.items);
+      .then(response => response.result);
   }
 
 }

@@ -2,6 +2,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
+  generateJwt = require('../mocks/generateJwt.mock'),
   Kuzzle = require('../../src/Kuzzle');
 
 describe('Kuzzle protocol methods', () => {
@@ -48,12 +49,12 @@ describe('Kuzzle protocol methods', () => {
     });
 
     it('should empty the jwt when a "tokenExpired" events is triggered', () => {
-      kuzzle.jwt = 'foobar';
+      kuzzle.jwt = generateJwt();
       kuzzle.connect();
 
       kuzzle.protocol.emit('tokenExpired');
 
-      should(kuzzle.jwt).be.undefined();
+      should(kuzzle.jwt).be.null();
     });
   });
 });

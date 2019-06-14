@@ -109,6 +109,7 @@ Then('the mapping of {string} should be updated', async function (collection) {
   const mapping = await this.kuzzle.collection.getMapping(this.index, collection);
 
   should(mapping[this.index].mappings[collection]).eql({
+    dynamic: 'true',
     properties: {
       gordon: {type: 'keyword'}
     }
@@ -129,7 +130,6 @@ Then('the specifications of {string} must not exist', async function (collection
   catch (error) {
     should(error.status).eql(404);
   }
-
 });
 
 Then('they should be validated', function () {
