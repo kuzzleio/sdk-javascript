@@ -1,0 +1,7 @@
+on
+{
+  "local": [
+    "kuid",
+    "username"
+  ]
+}
