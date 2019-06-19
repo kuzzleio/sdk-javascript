@@ -17,7 +17,7 @@ The provided callback will be called everytime a [notification](/sdk/js/5/essent
 
 | Arguments  | Type        | Description                                                                 |
 | ---------- | ----------- | --------------------------------------------------------------------------- |
-| `filters`  | JSON Object | [Koncorde Filters](/core/1/cookbooks/realtime-api/introduction/)            |
+| `filters`  | JSON Object | [Koncorde Filters](/core/1/guides/cookbooks/realtime-api/introduction/)     |
 | `options`  | object      | (Optional) Subscription configuration. Passed to the Room constructor.      |
 | `callback` | function    | Callback to call every time a notification is received on this subscription |
 
