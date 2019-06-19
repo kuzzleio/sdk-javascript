@@ -17,7 +17,7 @@ The provided callback will be called everytime a [notification](/sdk/js/5/essent
 
 | Arguments  | Type        | Description                                                                 |
 | ---------- | ----------- | --------------------------------------------------------------------------- |
-| `filters`  | JSON Object | [Koncorde Filters](/core/1/koncorde)                                        |
+| `filters`  | JSON Object | [Koncorde Filters](/core/1/cookbooks/realtime-api/introduction/)            |
 | `options`  | object      | (Optional) Subscription configuration. Passed to the Room constructor.      |
 | `callback` | function    | Callback to call every time a notification is received on this subscription |
 
@@ -41,7 +41,7 @@ See the [Room object](/sdk/js/5/core-classes/room/) documentation for more infor
 ## Return Value
 
 Returns an object exposing the following method:
- `onDone(callback)`
+`onDone(callback)`
 
 The `callback` argument is called when the subscription ends, either successfully or with an error.
 
