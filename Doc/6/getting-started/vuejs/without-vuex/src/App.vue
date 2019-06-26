@@ -7,7 +7,7 @@
         v-on:keyup.enter="valid"
         type="text"
         v-model="username"
-        placeholder="Enter your pseudo"
+        placeholder="Enter your nickname"
       >
       <button @click="valid">Valid</button>
     </div>
