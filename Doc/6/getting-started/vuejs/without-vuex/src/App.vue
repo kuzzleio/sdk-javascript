@@ -25,7 +25,7 @@
     <div
       v-for="message in messages"
       :key="message._id"
-      :class="`messages ${message.username === username? 'fromMe': 'fromOthers'}`"
+      :class="`messages ${message.username === username ? 'fromMe' : 'fromOthers'}`"
     >
       <span class="username">{{ message.username }}</span>
       <span>({{ getDate(message.createdAt) }})</span>
