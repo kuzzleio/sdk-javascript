@@ -13,7 +13,7 @@ When the validation specification is not formatted correctly, a detailed error m
 
 <br/>
 
-```javascript
+```js
 updateSpecifications(index, collection, specifications, [options]);
 ```
 
@@ -30,7 +30,7 @@ updateSpecifications(index, collection, specifications, [options]);
 
 An object representing the specifications.
 
-This object must follow the [Specification Structure](/core/1/guide/guides/essentials/data-validation/):
+This object must follow the [Specification Structure](/core/1/guides/essentials/data-validation/):
 
 ```js
 {

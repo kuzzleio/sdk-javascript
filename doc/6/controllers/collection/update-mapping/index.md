@@ -7,11 +7,15 @@ description: Update the collection mapping
 
 # updateMapping
 
-Updates a data collection mapping.
+<SinceBadge version="1.7.1" />
+
+You can define the collection [dynamic mapping policy](/core/1/guides/essentials/database-mappings/#dynamic-mapping-policy) by setting the `dynamic` field to the desired value.
+
+You can define [collection additional metadata](/core/1/guides/essentials/database-mappings/#collection-metadata) within the `_meta` root field.
 
 <br/>
 
-```javascript
+```js
 updateMapping(index, collection, mapping, [options]);
 ```
 
@@ -21,7 +25,7 @@ updateMapping(index, collection, mapping, [options]);
 | ------------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `index`      | <pre>string</pre> | Index name                                                                                                                                                                    |
 | `collection` | <pre>string</pre> | Collection name                                                                                                                                                               |
-| `mapping`    | <pre>object</pre> | Describes the data mapping to associate to the new collection, using Elasticsearch [mapping format](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/mapping.html) |
+| `mapping`    | <pre>object</pre> | Describes the collection mapping  |
 | `options`    | <pre>object</pre> | Query options                                                                                                                                                                 |
 
 ### mapping
@@ -30,7 +34,7 @@ An object representing the collection data mapping.
 
 This object must have a root field `properties` that contain the mapping definition:
 
-```javascript
+```js
 const mapping = {
   properties: {
     field1: { type: 'text' },
@@ -43,7 +47,7 @@ const mapping = {
 };
 ```
 
-You can see the full list of Elasticsearch mapping types [here](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/mapping-types.html).
+More informations about database mappings [here](/core/1/guides/essentials/database-mappings).
 
 ### options
 

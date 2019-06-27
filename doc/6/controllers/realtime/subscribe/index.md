@@ -11,7 +11,7 @@ Subscribes by providing a set of filters: messages, document changes and, option
 
 <br/>
 
-```javascript
+```js
 subscribe(index, collection, filters, callback, [options]);
 ```
 
@@ -21,7 +21,7 @@ subscribe(index, collection, filters, callback, [options]);
 | ------------ | ------------------- | ------------------------------------------------------------- |
 | `index`      | <pre>string</pre>   | Index name                                                    |
 | `collection` | <pre>string</pre>   | Collection name                                               |
-| `filters`    | <pre>object</pre>   | Set of filters following [Koncorde syntax](/core/1/koncorde/) |
+| `filters`    | <pre>object</pre>   | Set of filters following [Koncorde syntax](/core/1/guides/cookbooks/realtime-api/) |
 | `callback`   | <pre>function</pre> | Callback function to handle notifications                     |
 | `options`    | <pre>object</pre>   | Query options                                                 |
 

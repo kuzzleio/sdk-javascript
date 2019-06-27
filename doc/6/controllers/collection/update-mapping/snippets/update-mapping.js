@@ -1,4 +1,8 @@
 const mapping = {
+  dynamic: 'false',
+  _meta: {
+    area: 'Panipokhari'
+  },
   properties: {
     plate: { type: 'keyword' }
   }

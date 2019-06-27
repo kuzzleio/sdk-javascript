@@ -11,7 +11,7 @@ Empties the offline request queue without playing it.
 
 ## Arguments
 
-```javascript
+```js
 flushQueue();
 ```
 

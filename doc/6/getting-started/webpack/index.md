@@ -23,11 +23,11 @@ Before going through this tutorial, you should have a Kuzzle server running. Ple
 
 It's time to play with the [Kuzzle Javscript SDK](/sdk/js/6). In this section, we will store a document and subscribe to notifications in Kuzzle using the Javascript SDK in your browser.
 
-Before proceeding, please make sure your system has **Node.js** version 8 or higher ([download page](https://nodejs.org/en/download/)) installed.
+Before proceeding, please make sure your system has **Node.js** version 8 or higher ([instructions here](https://nodejs.org/en/download/)) installed.
 
 ## Including the Kuzzle SDK in a Webpack project
 
-:::info
+::: info
 This section explains how to use the Kuzzle SDK within an existing Webpack project.
 If you don't have your project up and running yet and want to learn how to leverage Webpack to build it, please refer to
 the [official Webpack Getting Started page](https://webpack.js.org/guides/getting-started/).
@@ -45,23 +45,15 @@ If you are performing a clean install you might see some `UNMET PEER DEPENDENCY`
 
 Then, create a `init-kuzzle.js` file and start by adding the code below. This will load the Kuzzle Javascript SDK:
 
-```js
-import { Kuzzle, WebSocket } from 'kuzzle-sdk';
-```
+<<< ./snippets/init-kuzzle.js:1
 
 Next, we instantiate a client that will connect to Kuzzle via WebSocket. If Kuzzle is not running on localhost, replace it with the corresponding server name or IP address.
 
-```js
-const kuzzle = new Kuzzle(new WebSocket('localhost'));
-```
+<<< ./snippets/init-kuzzle.js:2
 
 Next we add a listener to be notified in case of a connection error:
 
-```js
-kuzzle.on('networkError', error => {
-  console.error(`Network Error: ${error}`);
-});
-```
+<<< ./snippets/init-kuzzle.js:3
 
 Then we have to connect our web app to the Kuzzle server with the `connect()` method.
 
@@ -70,7 +62,6 @@ const run = async () => {
   try {
     // Connect to Kuzzle server
     await kuzzle.connect();
-
     // Some more things will go here...
   } catch (error) {
     console.error(error.message);
@@ -83,24 +74,7 @@ const run = async () => {
 Finally, we will create a new index `nyc-open-data` and a new collection
 `yellow-taxi` that we will use to store data later on.
 
-```js
-const run = async () => {
-  try {
-    // Connect to Kuzzle server
-    await kuzzle.connect();
-
-    // Create an index
-    await kuzzle.index.create('nyc-open-data');
-    // Create a collection
-    await kuzzle.collection.create('nyc-open-data', 'yellow-taxi');
-    console.log('nyc-open-data/yellow-taxi ready!');
-  } catch (error) {
-    console.error(error.message);
-  } finally {
-    kuzzle.disconnect();
-  }
-};
-```
+<<< ./snippets/init-kuzzle.js:4
 
 Your `kuzzle-init.js` file should now look like this:
 
@@ -128,8 +102,12 @@ Your console should output the following message:
 nyc-open-data/yellow-taxi ready!
 ```
 
-:::success
+::: success
 Congratulations! You are now ready to say Hello to the World!
+:::
+
+::: info
+Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
 :::
 
 ## Create your first document
@@ -172,8 +150,15 @@ Now, click the button and check your console for a message like the following:
 New document successfully created!
 ```
 
-:::success
-You have now successfully stored your first document into Kuzzle. You can now open an [Admin Console](http://console.kuzzle.io) to browse your collection and confirm that your document was saved.
+::: success
+You have now successfully stored your first document into Kuzzle. Click
+[here](/core/1/guides/essentials/admin-console/) to see how you can use the
+[**Kuzzle Admin Console**](http://console.kuzzle.io/) to browse your collection and
+confirm that your document was saved.
+:::
+
+::: info
+Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
 :::
 
 ## Subscribe to realtime document notifications (pub/sub)
@@ -209,8 +194,12 @@ New driver Sirkis with id <driver-id> has B license.
 
 In place of `<driver-id>` you'll see the ID that Kuzzle automatically generated for the document.
 
-:::success
+::: success
 Congratulations! You have just choreographed your first pub/sub pattern!
+:::
+
+::: info
+Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
 :::
 
 ## Where do we go from here?
@@ -218,6 +207,6 @@ Congratulations! You have just choreographed your first pub/sub pattern!
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - take a look at the [SDK Reference](/sdk/js/6)
-- learn how to use [Koncorde](/core/1/koncorde) to create incredibly fine-grained and blazing-fast subscriptions
+- learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
 - follow our guide to learn how to implement [basic authentication](/core/1/guides/essentials/user-authentication/#local-strategy)
 - follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/1/guides/essentials/security/)

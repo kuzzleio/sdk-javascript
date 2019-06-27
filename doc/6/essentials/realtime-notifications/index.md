@@ -12,7 +12,7 @@ The [realtime.subscribe](/sdk/js/6/controllers/realtime/) method takes a callbac
 
 ## Document & messages
 
-These notifications represent [documents changes & messages](/core/1/api/essentials/notifications#documents-changes-messages-default).
+These notifications represent [documents changes & messages](/core/1/api/essentials/notifications#documents-changes-messages).
 
 | Property     | Type              | Description                                                                                           |
 | ------------ | ----------------- | ----------------------------------------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ The `result` object is the notification content, and it has the following struct
 
 ## User
 
-These notifications represent [user events](/core/1/api/essentials/notifications#user-events-default).
+These notifications represent [user events](/core/1/api/essentials/notifications#user-notification).
 
 | Property     | Type              | Description                                                                                           |
 | ------------ | ----------------- | ----------------------------------------------------------------------------------------------------- |
@@ -61,7 +61,7 @@ The `result` object is the notification content, and it has the following struct
 
 ## Server
 
-These notifications represent [server events](/core/1/api/essentials/notifications#server-events-default).
+These notifications represent [server events](/core/1/api/essentials/notifications#server-notification).
 
 | Property  | Type              | Value                                                              |
 | --------- | ----------------- | ------------------------------------------------------------------ |

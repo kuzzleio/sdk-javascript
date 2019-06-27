@@ -13,7 +13,7 @@ This route neither creates nor modifies credentials.
 
 <br/>
 
-```javascript
+```js
 validateMyCredentials(strategy, [credentials], [options]);
 ```
 

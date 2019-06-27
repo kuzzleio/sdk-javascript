@@ -11,7 +11,7 @@ Checks that an administrator account exists.
 
 <br/>
 
-```javascript
+```js
 adminExists([options]);
 ```
 

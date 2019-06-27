@@ -11,7 +11,7 @@ Gets a document.
 
 <br/>
 
-```javascript
+```js
 get(index, collection, id, [options]);
 ```
 

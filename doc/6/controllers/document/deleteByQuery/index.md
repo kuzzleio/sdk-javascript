@@ -15,7 +15,7 @@ An empty or null query will match all documents in the collection.
 
 <br/>
 
-```javascript
+```js
 deleteByQuery(index, collection, [query], [options]);
 ```
 

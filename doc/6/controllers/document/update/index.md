@@ -14,7 +14,7 @@ You can set the `retryOnConflict` optional argument (with a retry count), to tel
 
 <br/>
 
-```javascript
+```js
 update(index, collection, id, document, [options]);
 ```
 

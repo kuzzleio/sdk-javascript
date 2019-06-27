@@ -1,0 +1,15 @@
+---
+name: auth#login
+description: Authenticate a user
+hooks:
+  before: curl -X POST kuzzle:7512/users/foo/_create -H "Content-Type:application/json" --data '{"content":{"profileIds":["default"]},"credentials":{"local":{"username":"foo","password":"bar"}}}'
+  after: curl -X DELETE kuzzle:7512/users/foo
+template: default
+expected:
+  - ^.*\..*$
+  - "{ _id: 'foo',"
+  - ^\s*jwt: '.*\..*'
+  - ^\s*expiresAt: \d+
+  - ^\s*ttl: \d+ }
+sdk: js
+version: 6

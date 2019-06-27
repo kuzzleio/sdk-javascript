@@ -1,7 +1,7 @@
 ---
 code: true
 type: page
-title: Constructor
+title: constructor
 description: Creates a new Http protocol
 order: 50
 ---
@@ -12,7 +12,7 @@ Use this constructor to create a new instance of the `Http` protocol with specif
 
 ## Arguments
 
-```javascript
+```js
 Http(host, [options]);
 ```
 

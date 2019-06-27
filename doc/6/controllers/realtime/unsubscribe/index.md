@@ -11,7 +11,7 @@ Removes a subscription.
 
 <br/>
 
-```javascript
+```js
 unsubscribe(roomId, [options]);
 ```
 

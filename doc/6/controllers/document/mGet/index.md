@@ -13,7 +13,7 @@ Throws a partial error (error code 206) if one or more document can not be retri
 
 <br/>
 
-```javascript
+```js
 mGet(index, collection, ids, [options]);
 ```
 

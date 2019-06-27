@@ -13,18 +13,28 @@ try {
   /*
     { errors: false,
       items:
-      [ { create: create: {
-        _id: "1",
-        status: 200 } },
-        { create: create: {
-        _id: "2",
-        status: 200 } },
-        { create: create: {
-        _id: "3",
-        status: 200 } } ] }
+      [ {
+          create: {
+            _id: "uniq-id-1",
+            status: 201
+          }
+        },
+        {
+          create: {
+            _id: "uniq-id-2",
+            status: 201
+          }
+        },
+        {
+          create: {
+            _id: "uniq-id-3",
+            status: 206
+          }
+        } ] }
   */
+  const successfulImport = response.items.filter(item => item.create.status === 201);
 
-  console.log(`Successfully imported ${response.items.length} documents`);
+  console.log(`Successfully imported ${successfulImport.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

@@ -9,13 +9,13 @@ description: Base method to send API query to Kuzzle
 
 Base method used to send queries to Kuzzle, following the [API Documentation](/core/1/api).
 
-<div class="alert alert-warning">
+:::warning
 This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
-</div>
+:::
 
 ## Arguments
 
-```javascript
+```js
 query(request, [options]);
 ```
 
@@ -23,7 +23,7 @@ query(request, [options]);
 
 | Argument  | Type              | Description            |
 | --------- | ----------------- | ---------------------- |
-| `request` | <pre>object</pre> | API request options    |
+| `request` | <pre>object</pre> | API request    |
 | `options` | <pre>object</pre> | Optional query options |
 
 ### request

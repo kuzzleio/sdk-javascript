@@ -20,7 +20,7 @@ These statistics include:
 
 <br/>
 
-```javascript
+```js
 getLastStats([options]);
 ```
 
