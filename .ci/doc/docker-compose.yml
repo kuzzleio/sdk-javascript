@@ -31,6 +31,8 @@ services:
   doc-tests:
     image: kuzzleio/snippets-tests
     privileged: true
+    ports:
+      - "9229:9229"
     depends_on:
       - kuzzle
       - doc-runner-node
@@ -44,12 +46,19 @@ services:
       - CONFIG_FILE=/mnt/.ci/doc/config.yml
 
   doc-runner-node:
-    image: node:8-alpine
+    image: node:10-alpine
+    volumes:
+      - ../..:/mnt
+      - snippets:/var/snippets
     command: >
       ash -c '
         mkdir -p /var/snippets/node;
         apk add --no-cache curl;
-        npm install -g \
+        npm install -g eslint;
+        cd /var/snippets/node;
+        npm install \
+          bluebird \
+          /mnt/ \
           eslint \
           eslint-plugin-html \
           eslint-plugin-import \
@@ -57,16 +66,9 @@ services:
           eslint-plugin-promise \
           eslint-plugin-standard;
         touch /tmp/runner_ready_to_lint;
-        cd /var/snippets/node;
-        npm install \
-          bluebird \
-          /mnt/;
         touch /tmp/runner_is_ready;
         tail -f /dev/null
       '
-    volumes:
-      - ../..:/mnt
-      - snippets:/var/snippets
 
   doc-runner-web:
     image: buildkite/puppeteer:latest
@@ -76,6 +78,12 @@ services:
         apt-get update;
         apt-get install -y curl;
         npm install -g \
+          eslint;
+        cd /var/snippets/web;
+        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
+        npm install \
+          /mnt/ \
+          puppeteer \
           eslint \
           eslint-plugin-html \
           eslint-plugin-import \
@@ -83,11 +91,6 @@ services:
           eslint-plugin-promise \
           eslint-plugin-standard;
         touch /tmp/runner_ready_to_lint;
-        cd /var/snippets/web;
-        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
-        npm install \
-          /mnt/ \
-          puppeteer;
         touch /tmp/runner_is_ready;
         tail -f /dev/null
       '
@@ -103,13 +106,7 @@ services:
         apt-get update;
         apt-get install -y curl;
         npm install -g \
-          eslint \
-          eslint-plugin-html \
-          eslint-plugin-import \
-          eslint-plugin-node \
-          eslint-plugin-promise \
-          eslint-plugin-standard;
-        touch /tmp/runner_ready_to_lint;
+          eslint;
         cd /var/snippets/webpack;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
         cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
@@ -120,7 +117,14 @@ services:
           puppeteer \
           html-webpack-plugin \
           webpack \
-          webpack-cli;
+          webpack-cli \
+          eslint \
+          eslint-plugin-html \
+          eslint-plugin-import \
+          eslint-plugin-node \
+          eslint-plugin-promise \
+          eslint-plugin-standard;
+        touch /tmp/runner_ready_to_lint;
         touch /tmp/runner_is_ready;
         tail -f /dev/null
       '
