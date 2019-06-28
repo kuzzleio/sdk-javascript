@@ -4,7 +4,7 @@ services:
   kuzzle:
     image: kuzzleio/kuzzle
     ports:
-      - "7512:7512"
+      - '7512:7512'
     cap_add:
       - SYS_PTRACE
     depends_on:
@@ -26,13 +26,13 @@ services:
       nofile: 65536
     environment:
       - cluster.name=kuzzle
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
 
   doc-tests:
     image: kuzzleio/snippets-tests
     privileged: true
     ports:
-      - "9229:9229"
+      - '9229:9229'
     depends_on:
       - kuzzle
       - doc-runner-node
@@ -79,6 +79,8 @@ services:
         apt-get install -y curl;
         npm install -g \
           eslint;
+        cd /mnt;
+        npm install;
         cd /var/snippets/web;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
         npm install \
@@ -134,4 +136,3 @@ services:
 
 volumes:
   snippets:
-
