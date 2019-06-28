@@ -1,0 +1,9 @@
+name: ms#rename
+description: Renames a key
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^World$
+sdk: js
+version: 6

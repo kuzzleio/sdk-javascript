@@ -1,0 +1,9 @@
+name: ms#smembers
+description: Returns the members of a set of unique values
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ '(foo|bar|baz)', '(foo|bar|baz)', '(foo|bar|baz)' ]"
+sdk: js
+version: 6

@@ -1,0 +1,29 @@
+<script>
+  var kuzzle = new KuzzleSDK.Kuzzle(
+    new KuzzleSDK.WebSocket('kuzzle')
+  );
+
+  kuzzle.on('networkError', error => {
+    console.error('Network Error: ', error);
+  });
+  kuzzle.on('connected', () => {
+    console.log('Successfully connected to Kuzzle');
+  });
+
+  kuzzle.connect()
+    .then(() => {
+      return kuzzle.index.create('nyc-open-data');
+    })
+    .then(() => {
+      return kuzzle.collection.create('nyc-open-data', 'yellow-taxi');
+    })
+    .then(() => {
+      console.log('nyc-open-data/yellow-taxi ready!');
+    })
+    .catch(error => {
+      console.error('Ooops! An error occurred: ', error);
+    })
+    .then(() => {
+      return kuzzle.disconnect();
+    });
+</script>

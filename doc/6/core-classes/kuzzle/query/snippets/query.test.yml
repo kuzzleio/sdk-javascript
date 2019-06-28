@@ -1,0 +1,14 @@
+---
+name: kuzzle#query
+description: Sends a request to Kuzzle API
+hooks:
+  before: |
+    curl -X POST kuzzle:7512/nyc-open-data/_create
+    curl -X PUT kuzzle:7512/nyc-open-data/yellow-taxi
+    curl -X DELETE kuzzle:7512/nyc-open-data/yellow-taxi/my-custom-document-id
+  after:
+template: default
+expected: Document created
+
+sdk: js
+version: 6

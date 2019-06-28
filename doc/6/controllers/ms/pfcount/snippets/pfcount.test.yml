@@ -1,0 +1,9 @@
+name: ms#pfcount
+description: Returns the probabilistic cardinality of a HyperLogLog data structure
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^5$
+sdk: js
+version: 6

@@ -1,0 +1,12 @@
+name: ms#zincrby
+description: Increments the score of a sorted set member by the provided value
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - "\\[ { member: 'baz', score: -272.15 },"
+  - "\\{ member: 'foo', score: 42 },"
+  - "\\{ member: 'bar', score: 1337 } ]"
+sdk: js
+version: 6

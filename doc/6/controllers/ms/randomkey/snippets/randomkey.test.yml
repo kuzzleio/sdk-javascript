@@ -1,0 +1,9 @@
+name: ms#randomkey
+description: Returns a key identifier from the memory storage, at random
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^(foo|bar|baz)$
+sdk: js
+version: 6

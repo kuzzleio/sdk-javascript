@@ -1,0 +1,9 @@
+name: ms#del
+description: Deletes a list of keys
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: 0
+sdk: js
+version: 6

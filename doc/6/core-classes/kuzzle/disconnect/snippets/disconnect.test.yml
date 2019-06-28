@@ -1,0 +1,11 @@
+---
+name: kuzzle#disconnect
+description: Disconnects the SDK
+hooks:
+  before:
+  after:
+template: without-connect
+expected: Successfully disconnected
+
+sdk: js
+version: 6
