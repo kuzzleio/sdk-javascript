@@ -133,6 +133,7 @@ describe('ProfileSearchResult', () => {
               .be.calledWith({
                 controller: 'security',
                 action: 'scrollProfiles',
+                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
