@@ -11,7 +11,7 @@ Returns information about the currently logged in user.
 
 <br/>
 
-```javascript
+```js
 getCurrentUser([options]);
 ```
 
@@ -31,7 +31,7 @@ Additional query options
 
 ## Resolves
 
-A [User](/sdk/js/6/user) representing the current user logged with the SDK.
+A [User](/sdk/js/6/core-classes/user) representing the current user logged with the SDK.
 
 ## Usage
 

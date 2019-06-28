@@ -11,7 +11,7 @@ Replaces the content of an existing document.
 
 <br/>
 
-```javascript
+```js
 replace(index, collection, id, document, [options]);
 ```
 

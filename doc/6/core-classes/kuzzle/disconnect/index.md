@@ -13,7 +13,7 @@ A call to `disconnect()` will not trigger a `disconnected` event. This event is 
 
 ## Arguments
 
-```javascript
+```js
 disconnect();
 ```
 

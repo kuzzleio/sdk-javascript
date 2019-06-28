@@ -13,7 +13,7 @@ Throws a partial error (error code 206) if one or more documents can not be repl
 
 <br/>
 
-```javascript
+```js
 mReplace(index, collection, documents, [options]);
 ```
 

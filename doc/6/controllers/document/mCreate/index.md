@@ -13,7 +13,7 @@ Throws a partial error (error code 206) if one or more documents creations fail.
 
 <br/>
 
-```javascript
+```js
 mCreate(index, collection, documents, [options]);
 ```
 

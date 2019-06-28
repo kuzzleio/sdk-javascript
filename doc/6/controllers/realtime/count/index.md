@@ -11,7 +11,7 @@ Returns the number of other connections sharing the same subscription.
 
 ## Arguments
 
-```javascript
+```js
 count(roomId, [options]);
 ```
 

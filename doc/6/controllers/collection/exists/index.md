@@ -11,7 +11,7 @@ Check if a collection exists in Kuzzle.
 
 <br/>
 
-```javascript
+```js
 exists(index, collection, [options]);
 ```
 

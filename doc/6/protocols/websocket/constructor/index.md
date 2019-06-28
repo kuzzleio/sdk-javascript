@@ -1,7 +1,7 @@
 ---
 code: true
 type: page
-title: Constructor
+title: constructor
 description: Creates a new WebSocket protocol
 order: 50
 ---
@@ -12,7 +12,7 @@ This constructor creates a new WebSocket connection, using the specified options
 
 ## Arguments
 
-```javascript
+```js
 WebSocket(host, [options]);
 ```
 

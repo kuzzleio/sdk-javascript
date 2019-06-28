@@ -15,7 +15,7 @@ If the credentials that generated the current JWT are removed, the user will rem
 
 <br/>
 
-```javascript
+```js
 deleteMyCredentials(strategy, [options]);
 ```
 

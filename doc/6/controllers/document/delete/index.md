@@ -13,7 +13,7 @@ The optional parameter `refresh` can be used with the value `wait_for` in order 
 
 <br/>
 
-```javascript
+```js
 delete (index, collection, id, [options]);
 ```
 

@@ -11,7 +11,7 @@ Updates the credentials of the currently logged in user for the specified strate
 
 <br/>
 
-```javascript
+```js
 updateMyCredentials(strategy, credentials, [options]);
 ```
 

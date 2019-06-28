@@ -1,7 +1,7 @@
 ---
 code: true
 type: page
-title: Constructor
+title: constructor
 description: Creates a new SocketIO protocol
 order: 50
 ---
@@ -12,7 +12,7 @@ Use this constructor to create a new instance of the `SocketIO` protocol with sp
 
 ## Arguments
 
-```javascript
+```js
 SocketIO(host, [options]);
 ```
 

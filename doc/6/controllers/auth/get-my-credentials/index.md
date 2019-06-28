@@ -15,7 +15,7 @@ The result can be an empty object.
 
 <br/>
 
-```javascript
+```js
 getMyCredentials(strategy, [options]);
 ```
 

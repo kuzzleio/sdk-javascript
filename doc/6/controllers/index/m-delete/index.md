@@ -7,11 +7,11 @@ description: Deletes multiple indexes
 
 # mDelete
 
-Deletes multiple data indexes.
+Deletes multiple indexes.
 
 <br/>
 
-```javascript
+```js
 mDelete(indexes, [options]);
 ```
 

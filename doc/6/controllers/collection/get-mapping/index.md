@@ -7,11 +7,11 @@ description: Return collection mapping
 
 # getMapping
 
-Returns a data collection mapping.
+Returns the collection mapping.
 
 <br/>
 
-```javascript
+```js
 getMapping(index, collection, [options]);
 ```
 

@@ -5,7 +5,7 @@ await kuzzle.auth.login('local', credentials);
 const response = await kuzzle.auth.createMyCredentials('other', credentials);
 console.log(response);
 /*
-  { username: 'foo', password: 'bar' }
+  { username: 'foo', kuid: 'AVkDBl3YsT6qHI7MxLz0' }
 */
 
 console.log('Credentials successfully created');

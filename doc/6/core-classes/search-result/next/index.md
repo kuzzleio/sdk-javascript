@@ -3,6 +3,7 @@ code: true
 type: page
 title: next
 description: SearchResult next method
+order: 200
 ---
 
 # SearchResult
@@ -23,14 +24,11 @@ Depending on the arguments given to the initial search, thhe `next` method will 
 
 If no policy is applicable, the `next` method will throw an exception.
 
-<div class="alert alert-info">
-  <p>
-  When processing a large number of documents (i.e. more than 1000), it is advised to use a <code>scroll</code> cursor.
-  </p>
-  <p>
-  It is also the only method that garantees all matching documents will be retrieved and no duplicates will be included.
-  </p>
-</div>
+:::info
+When processing a large number of documents (i.e. more than 1000), it is advised to use a scroll cursor.
+
+It is also the only method guaranteeing that all matching documents will be retrieved and no duplicates will be included.
+:::
 
 ## Usage with scroll
 
@@ -58,10 +56,8 @@ If the initial search is given some `from` and `size` parameters, the `next` met
 
 Because this method does not freeze the research between two calls, if some updates are applied to the database between two calls, it is possible to miss some documents and/or to get some duplicates between search pages.
 
-<div class="alert alert-info">
-  <p>
-    NB: It is not possible to retrieve more than 10000 items using this method. Above that limit, any call to <code>next</code> will throw an Exception.
-  </p>
-</div>
+:::info
+It is not possible to retrieve more than 10000 items using this method. Above that limit, any call to `next` will throw an Exception.
+:::
 
 <<< ./snippets/fromsize.js

@@ -15,7 +15,7 @@ The index and collection are indicative and serve only to distinguish the rooms.
 
 <br/>
 
-```javascript
+```js
 publish(index, collection, message, [options]);
 ```
 

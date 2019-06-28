@@ -15,7 +15,7 @@ The optional parameter `refresh` can be used with the value `wait_for` in order 
 
 <br/>
 
-```javascript
+```js
 create(index, collection, document, [id], [options]);
 ```
 
