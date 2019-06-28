@@ -104,13 +104,18 @@ CollectionMapping.prototype.refresh = function (options, cb) {
   }
 
   this.kuzzle.query(this.collection.buildQueryArgs('collection', 'getMapping'), data, options, function (err, res) {
+    var index;
+
     if (err) {
       return cb ? cb(err) : false;
     }
 
-    if (res.result[self.collection.index]) {
-      if (res.result[self.collection.index].mappings[self.collection.collection]) {
-        self.mapping = res.result[self.collection.index].mappings[self.collection.collection].properties;
+    // this collection index can be an alias
+    index = Object.keys(res.result)[0];
+
+    if (index) {
+      if (res.result[index].mappings[self.collection.collection]) {
+        self.mapping = res.result[index].mappings[self.collection.collection].properties;
 
         // Mappings can be empty. The mapping property should never be "undefined"
         if (self.mapping === undefined) {
