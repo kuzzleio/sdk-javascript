@@ -9,7 +9,7 @@ order: 0
 
 # Getting Started with Kuzzle and VueJS
 
-This section deals with **Kuzzle** (+ **Javascript SDK**) and **VueJS**. We will create some **documents** in Kuzzle and subscribe to **notifications** about document creations by creating a realtime tchat.
+This section deals with **Kuzzle** (+ **Javascript SDK**) and **VueJS**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/6/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 ## Requirements
 
