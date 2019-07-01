@@ -1,0 +1,10 @@
+name: collection#validateSpecifications
+description: Validate specifications format
+hooks:
+  before: curl -X POST kuzzle:7512/nyc-open-data/_create && curl -X PUT kuzzle:7512/nyc-open-data/green-taxi
+  after:
+template: default
+expected: Some errors with provided specifications.
+
+sdk: js
+version: 6

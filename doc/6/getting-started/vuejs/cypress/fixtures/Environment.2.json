@@ -1,0 +1,26 @@
+{
+    "username": "Legolas",
+    "messages": [
+        {
+            "_id": "1",
+            "payload": {
+                "value": "It still only counts as one!",
+                "username": "Gimli"
+            }
+        },
+        {
+            "_id": "2",
+            "payload": {
+                "value": "What do your elf eyes see?",
+                "username": "Aragorn"
+            }
+        },
+        {
+            "_id": "3",
+            "payload": {
+                "value": "What about side by side with a friend?",
+                "username": "Legolas"
+            }
+        }
+    ]
+}

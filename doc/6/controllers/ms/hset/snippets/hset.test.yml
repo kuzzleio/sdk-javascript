@@ -1,0 +1,9 @@
+name: ms#hset
+description: Sets a field and its value in a hash
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "{ foo: 'bar' }"
+sdk: js
+version: 6

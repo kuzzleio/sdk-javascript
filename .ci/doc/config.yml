@@ -1,0 +1,47 @@
+---
+
+snippets:
+  mount: /mnt
+  path: doc/**/snippets/*.test.yml
+  templates: /mnt/.ci/doc/templates
+
+runners:
+  default: node
+
+  node:
+    service: doc-runner-node
+    path: /var/snippets/node
+    lint:
+      global: true
+      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
+      before: timeout -t 600 ash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
+    run:
+      cmd: node {{ snippet.source }}
+      before: timeout -t 600 ash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
+
+  web:
+    service: doc-runner-web
+    path: /var/snippets/web
+    lint:
+      global: true
+      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}/*.html
+      before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
+    run:
+      cmd: node puppeteer.js {{ snippet.dir }}/{{ snippet.source }}
+      before: timeout 600 bash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
+
+  webpack:
+    service: doc-runner-webpack
+    path: /var/snippets/webpack
+    lint:
+      global: true
+      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
+      before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
+    build:
+      cmd: node webpackBuild.js {{ snippet.dir }}/{{ snippet.source }}
+      before: timeout 600 bash -c 'until stat /tmp/runner_is_ready; do sleep 1; done'
+    run:
+      cmd: node puppeteer.js /tmp/{{ snippet.name }}/index.html
+      before: timeout 600 bash -c 'until curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
+
+

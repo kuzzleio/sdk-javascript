@@ -1,0 +1,11 @@
+name: ms#geopos
+description: Returns the positions of the provided key's members
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - "\\[ \\[ 3.910904824733734, 43.607392252329916 ],"
+  - "\\[ 3.8971075415611267, 43.600221526170145 ] ]"
+sdk: js
+version: 6

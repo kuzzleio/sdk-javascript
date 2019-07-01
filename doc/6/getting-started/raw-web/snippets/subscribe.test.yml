@@ -1,0 +1,12 @@
+name: gettingstarted#browservanillasubscribe
+description: Subscribe to notifications
+hooks:
+  before: |
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: default
+expected: Successfully subscribed to document notifications
+sdk: js
+version: 6
+runner: web

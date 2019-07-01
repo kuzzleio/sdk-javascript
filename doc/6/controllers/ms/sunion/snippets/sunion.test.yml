@@ -1,0 +1,9 @@
+name: ms#sunion
+description: Returns the union of sets of unique values
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ ('[a-i]', ){8}'[a-i]' ]"
+sdk: js
+version: 6

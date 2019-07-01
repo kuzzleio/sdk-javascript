@@ -1,0 +1,9 @@
+name: ms#get
+description: Gets the value of a key
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: bar
+sdk: js
+version: 6

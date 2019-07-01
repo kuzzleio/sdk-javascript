@@ -1,0 +1,9 @@
+name: ms#strlen
+description: Returns the length of a value
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^6$
+sdk: js
+version: 6

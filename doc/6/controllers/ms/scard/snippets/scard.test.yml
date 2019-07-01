@@ -1,0 +1,9 @@
+name: ms#scard
+description: Returns the number of members stored in a set of unique values
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^3$
+sdk: js
+version: 6

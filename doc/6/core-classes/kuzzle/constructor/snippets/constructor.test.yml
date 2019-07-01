@@ -1,0 +1,10 @@
+---
+name: kuzzle#constructor
+description: Creates a new Kuzzle instance connected to kuzzle
+hooks:
+  before:
+  after:
+template: empty
+expected: Success
+sdk: js
+version: 6

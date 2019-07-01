@@ -1,0 +1,9 @@
+name: ms#ltrim
+description: Trims an existing list
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ 'd', 'e' ]"
+sdk: js
+version: 6

@@ -1,0 +1,12 @@
+name: user#getRoles
+description: Loads informations about user roles
+hooks:
+  before: |
+    curl -X DELETE kuzzle:7512/users/foo
+    curl -X POST kuzzle:7512/users/foo/_create -H "Content-Type:application/json" --data '{"content":{"profileIds":["default"]},"credentials":{"local":{"username":"foo","password":"bar"}}}'
+  after:
+template: default
+expected:
+  - Profile { _id: \'default\'
+sdk: js
+version: 6

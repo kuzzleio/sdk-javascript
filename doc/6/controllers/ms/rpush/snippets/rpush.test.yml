@@ -1,0 +1,9 @@
+name: ms#rpush
+description: Appends values at the end of a list
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ 'foo', 'bar', 'baz' ]"
+sdk: js
+version: 6

@@ -1,0 +1,11 @@
+name: ms#rpoplpush
+description: Removes the last element of a list, and pushes it back at the start of another list
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - ^never$
+  - "\\[ 'never', 'gonna', 'give', 'you', 'up' ]"
+sdk: js
+version: 6

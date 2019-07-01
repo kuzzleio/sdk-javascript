@@ -1,0 +1,10 @@
+---
+name: http#constructor
+description: Creates a new Http instance
+hooks:
+  before:
+  after:
+template: empty
+expected: Success
+sdk: js
+version: 6
