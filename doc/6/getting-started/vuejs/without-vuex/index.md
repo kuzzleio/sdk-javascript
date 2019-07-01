@@ -33,7 +33,7 @@ yarn add kuzzle-sdk
 
 In the _App.vue_ file, you should remove the tag, the import and the component registration of the `HelloWorld` component, we won't use it.
 
-## Instancing Kuzzle SDK
+## Instanciating Kuzzle SDK
 
 We have to connect the server so that our client can interact with it.
 
