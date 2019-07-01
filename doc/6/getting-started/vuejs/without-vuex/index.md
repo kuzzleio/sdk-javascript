@@ -96,7 +96,7 @@ So let's create our `subscribe_messages()` action. It will call the realtime con
 
 <<< ./src/App.vue:11[js]
 
-To finish, just add an input binded with the `message` property and a button wich call our `sendMessage()` function:
+To finish, just add an input field, bond to the `message` property and a button which calls our `sendMessage()` function:
 
 <<< ./src/App.vue:12[html]
 
