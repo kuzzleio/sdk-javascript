@@ -53,7 +53,7 @@ export default {
       messages: [], // Array containing our messages
       roomID: "", // Id of the realtime subscription
       username: "", // The pseudo of the current user
-      validate: false // The value that will change the display (false => Pseudo input; true => Message input)
+      validate: false // Value that will change the display (false => Pseudo input; true => Message input)
     };
   },
   /* snippet:end */
