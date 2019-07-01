@@ -14,7 +14,7 @@ describe('test realtime chat', () => {
       .then(() => cy.loadEnvironment(env));
     cy.wait(2000);
   });
-
+  
   afterEach(() => {
     currentIt++;
   });
