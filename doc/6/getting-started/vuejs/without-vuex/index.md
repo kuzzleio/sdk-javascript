@@ -51,7 +51,7 @@ Add the following `valid()` method in the export of the `<script>` tag of your _
 <<< ./src/App.vue:2[js]
 
 ## Get the username
-First of all, we need to know the user pseudo. Let's start by adding the following html code in the `<template>` tag to allow the client type his pseudo:
+First of all, we need to know the user nickname. Let's start by adding the following html code in the `<template>` tag to allow the client type his nickname:
 
 <<< ./src/App.vue:1[html]
 
