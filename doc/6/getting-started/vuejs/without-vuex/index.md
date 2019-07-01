@@ -100,7 +100,7 @@ To finish, just add an input field, bond to the `message` property and a button 
 
 <<< ./src/App.vue:12[html]
 
-And the following css classe: 
+And the following CSS class: 
 
 <<< ./src/App.vue:13[css]
 
