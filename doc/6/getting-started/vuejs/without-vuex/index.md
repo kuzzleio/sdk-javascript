@@ -70,7 +70,7 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./src/App.vue:6[js]
 
-The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for hundred newest existing messages and store them in our array before subscribe to notification about `messages` collection. We called it in the `valid()` function we created before.
+The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest  messages and store them in our array before subscribe to notification about `messages` collection. We called it in the `valid()` function we created before.
 
 <<< ./src/App.vue:7[js]
 
@@ -86,25 +86,25 @@ We can now display the messages stored in Kuzzle. Cool but we need to create som
 
 ## Send messages
 
-We must make a simple method that will [create](/sdk/js/6/controllers/document/create/) a new message document in Kuzzle.
+We need to write a simple method that will [create](/sdk/js/6/controllers/document/create/) a new message document in Kuzzle.
 
 <<< ./src/App.vue:10[js]
 
-As you can see we doesn't push the new message in our array on message creation.
-Actually, We'll subscribe to the collection that store our messages.
+As you can see we don't push the new message in our array on message creation.
+Actually, We'll subscribe to the collection that contains our messages.
 So let's create our `subscribe_messages()` action. It will call the realtime controller of Kuzzle to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creation:
 
 <<< ./src/App.vue:11[js]
 
-To finish, just add an input binded with the `message` property and a button wich call our `sendMessage()` function:
+To finish, just add an input field, bond to the `message` property and a button which calls our `sendMessage()` function:
 
 <<< ./src/App.vue:12[html]
 
-And the following css classe: 
+And the following CSS class: 
 
 <<< ./src/App.vue:13[css]
 
-You can now add new messages to Kuzzle, and receive the notification of the creation to update your store and display the new messages, enjoy :)
+You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages, enjoy :)
 
 ## Where do we go from here?
 
