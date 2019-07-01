@@ -1,4 +1,4 @@
-describe('test realtime tchat', () => {
+describe('test realtime chat', () => {
   let currentIt = 1;
   let env;
   
