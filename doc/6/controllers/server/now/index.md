@@ -11,7 +11,7 @@ Returns the current server timestamp, in Epoch-millis format.
 
 <br/>
 
-```javascript
+```js
 now([options]);
 ```
 

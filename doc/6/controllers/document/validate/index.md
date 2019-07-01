@@ -15,7 +15,7 @@ This request does **not** store or publish the document.
 
 <br/>
 
-```javascript
+```js
 validate(index, collection, document, [options]);
 ```
 

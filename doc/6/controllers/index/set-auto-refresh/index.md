@@ -7,21 +7,21 @@ description: Set the autorefresh flag
 
 # setAutoRefresh
 
-The setAutoRefresh action allows to set the autorefresh flag for a data index.
+The setAutoRefresh action allows to set the autorefresh flag for a index.
 
 Each index has an autorefresh flag.
 When set to true, each write request trigger a [refresh](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html) action on Elasticsearch.
 Without a refresh after a write request, the documents may not be immediately visible in search.
 
-<div class="alert alert-info">
+:::info
 A refresh operation comes with performance costs.
 While forcing the autoRefresh can be convenient on a development or test environment,
 we recommend that you avoid using it in production or at least carefully monitor its implications before using it.
-</div>
+:::
 
 <br/>
 
-```javascript
+```js
 setAutoRefresh(index, autoRefresh, [options]);
 ```
 

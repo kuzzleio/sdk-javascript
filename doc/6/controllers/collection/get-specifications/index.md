@@ -11,7 +11,7 @@ Returns the validation specifications associated to the given index and collecti
 
 <br/>
 
-```javascript
+```js
 getSpecifications(index, collection, [options]);
 ```
 

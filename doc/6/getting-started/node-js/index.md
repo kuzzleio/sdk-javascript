@@ -152,6 +152,6 @@ Congratulations! You have just set up your first pub/sub communication!
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn how to use [Koncorde](/core/1/koncorde) to create incredibly fine-grained and blazing-fast subscriptions
+- learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
 - learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
 - follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security/)

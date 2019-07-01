@@ -123,6 +123,7 @@ describe('SpecificationsSearchResult', () => {
               .be.calledWith({
                 controller: 'collection',
                 action: 'scrollSpecifications',
+                scroll: '1m',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);

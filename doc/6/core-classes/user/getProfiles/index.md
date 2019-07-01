@@ -17,7 +17,7 @@ getProfiles();
 
 ## Resolve
 
-Resolves to an array of [Profile](/sdk/js/6/profile).
+Resolves to an array of [Profile](/sdk/js/6/core-classes/profile).
 
 ## Usage
 

@@ -11,7 +11,7 @@ Returns the exhaustive list of granted or denied rights for the currently logged
 
 <br/>
 
-```javascript
+```js
 getMyRights([options]);
 ```
 

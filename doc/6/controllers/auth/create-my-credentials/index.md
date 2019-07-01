@@ -11,7 +11,7 @@ Creates new credentials for the specified strategy for the current user.
 
 <br/>
 
-```javascript
+```js
 createMyCredentials(strategy, credentials, [options]);
 ```
 

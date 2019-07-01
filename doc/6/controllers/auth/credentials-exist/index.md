@@ -11,7 +11,7 @@ Checks that the current authenticated user has credentials for the specified aut
 
 <br/>
 
-```javascript
+```js
 credentialsExist(strategy, [options]);
 ```
 

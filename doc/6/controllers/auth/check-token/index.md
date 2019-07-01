@@ -7,21 +7,21 @@ description: Checks a JWT's validity.
 
 # checkToken
 
-Checks a token validity.
+Checks a token validity.  
 
-This API route does not require the caller to be logged in.
+If no token is provided, the SDK checks its internal authentication token.
 
 <br/>
 
-```javascript
-checkToken(token);
+```js
+checkToken([token]);
 ```
 
 <br/>
 
 | Property | Type              | Description |
 | -------- | ----------------- | ----------- |
-| `token`  | <pre>string</pre> | JWT token   |
+| `token`  | <pre>string</pre> | Optional authentication token   |
 
 ## Resolves
 

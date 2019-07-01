@@ -11,7 +11,7 @@ Gets the exhaustive list of registered authentication strategies.
 
 <br/>
 
-```javascript
+```js
 getStrategies([options]);
 ```
 

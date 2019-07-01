@@ -11,7 +11,7 @@ Returns information about Kuzzle: available API (base + extended), plugins, exte
 
 <br/>
 
-```javascript
+```js
 info([options]);
 ```
 

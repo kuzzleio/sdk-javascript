@@ -15,7 +15,7 @@ If some documents actions fail, the client will receive a [PartialError](/core/1
 
 <br/>
 
-```javascript
+```js
 import (bulkData, [options])
 ```
 
@@ -31,7 +31,7 @@ import (bulkData, [options])
 This API takes a JSON array containing a list of objects working in pairs.
 In each pair, the first object specifies the action to perform (the most common is `create`) and the second specifies the document itself, like in the example below:
 
-```javascript
+```js
 [
   // The action object
   { create: { _id: 'id', _index: 'index', _type: 'collection' } },
@@ -71,11 +71,11 @@ An object containing information about the import status for each document.
 
 Each object has the following structure:
 
-```javascript
+```js
 {
   "<action>": {
     _id: "another-id",
-    status: 200
+    status: 201
   }
 }
 ```

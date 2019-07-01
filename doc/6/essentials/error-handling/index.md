@@ -10,7 +10,7 @@ order: 100
 
 All SDK methods return a promise, that can be rejected with a `KuzzleError` value in case of failure.
 
-[KuzzleError](/sdk/js/6/core-classes/kuzzle-errorintroduction/) objects inherit the standard `Error` object, and add the following properties to it:
+[KuzzleError](/sdk/js/6/core-classes/kuzzle-error/introduction/) objects inherit the standard `Error` object, and add the following properties to it:
 
 | Property | Type              | Description                                                                                |
 | -------- | ----------------- | ------------------------------------------------------------------------------------------ |

@@ -49,16 +49,15 @@ console.log(obj.bar); // throw error
 ```
 */
 
-const getOptions = options => ({
+const getOptions = options => (Object.assign({}, {
   name: 'object',
   seal: true,
   sealGet: false,
   deprecated: [],
   warnDeprecationOnce: true,
   exposeApi: false,
-  apiNamespace: '__proxy__',
-  ...options
-});
+  apiNamespace: '__proxy__'
+}, options));
 
 const getPropertyNames = obj => {
   if (!obj) {
@@ -94,7 +93,7 @@ const proxify = (obj, opts = {}) => {
     // eslint-disable-next-line no-console
     console.warn(`Warning: ${hash} is deprecated`);
   };
-  
+
   if (options.exposeApi) {
     obj[options.apiNamespace] = {
       registerProp: name => properties.add(name),
@@ -102,7 +101,7 @@ const proxify = (obj, opts = {}) => {
       hasProp: name => properties.has(name)
     };
   }
-  
+
   [
     ...Object.getOwnPropertyNames(obj),
     ...getPropertyNames(obj)
@@ -129,7 +128,7 @@ const proxify = (obj, opts = {}) => {
       return true;
     }
   };
-  
+
   return new Proxy(obj, handler);
 };
 

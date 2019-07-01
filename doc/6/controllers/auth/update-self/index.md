@@ -9,11 +9,11 @@ description: Updates the current user object in Kuzzle.
 
 Updates the currently logged in user content.
 
-This route cannot update the list of associated security profiles. To change a user's security profiles, the route [security:updateUser](/core/1/api/api-reference/controller-security/update-user/) must be used instead.
+This route cannot update the list of associated security profiles. To change a user's security profiles, the route [security:updateUser](/core/1/api/controllers/security/update-user/) must be used instead.
 
 <br/>
 
-```javascript
+```js
 updateSelf(content, [options]);
 ```
 
@@ -34,7 +34,7 @@ Additional query options
 
 ## Resolves
 
-A [User](/sdk/js/6/user) representing the current user logged with the SDK.
+A [User](/sdk/js/6/core-classes/user) representing the current user logged with the SDK.
 
 ## Usage
 

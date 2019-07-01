@@ -3,6 +3,10 @@ const credentials = { username: 'foo', password: 'bar' };
 try {
   const jwt = await kuzzle.auth.login('local', credentials);
 
+  // Check the internal jwt validity
+  await kuzzle.auth.checkToken();
+
+  // Check the jwt validity
   const result = await kuzzle.auth.checkToken(jwt);
   console.log(result);
   /*
