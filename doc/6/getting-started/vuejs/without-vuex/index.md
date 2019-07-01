@@ -105,3 +105,13 @@ And the following css classe:
 <<< ./src/App.vue:13[css]
 
 You can now add new messages to Kuzzle, and receive the notification of the creation to update your store and display the new messages, enjoy :)
+
+## Where do we go from here?
+
+Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
+
+- discover what this SDK has to offer by browsing other sections of this documentation
+- learn more about Kuzzle [realtime engine](/core/1/guides/essentials/real-time/)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security/)
+- lean how to use Kuzzle [Admin Console](/core/1/guides/essentials/admin-console/) to manage your users and data
+- learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
