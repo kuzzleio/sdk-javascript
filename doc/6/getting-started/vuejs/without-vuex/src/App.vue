@@ -8,7 +8,7 @@
         type="text"
         v-model="username"
         placeholder="Enter your nickname"
-      >
+      />
       <button @click="valid">Valid</button>
     </div>
     <!-- snippet:end -->
@@ -20,11 +20,10 @@
         v-model="message"
         v-on:keyup.enter="sendMessage"
         placeholder="Enter your message"
-      >
+      />
       <button @click="sendMessage">Send</button>
     </div>
     <!-- snippet:end -->
-
     <!-- snippet:start:8 -->
     <div
       v-for="message in messages"
@@ -46,77 +45,78 @@ import kuzzle from "./services/kuzzle";
 
 export default {
   name: "app",
-/* snippet:start:4 */
+  /* snippet:start:4 */
   data() {
     return {
-      message: "",    // The string containing the user input
-      messages: [],   // The array containing our messages
-      roomID: "",     // The Id of the realtime subscription
-      username: "",   // The pseudo of the current user
-      validate: false // The value that will change the display (false => Pseudo input; true => Message input)
+      message: "", // String containing the user input
+      messages: [], // Array containing our messages
+      roomID: "", // Id of the realtime subscription
+      username: "", // Nickname of the current user
+      validate: false // Value that will change the display (false => Pseudo input; true => Message input)
     };
   },
-/* snippet:end */
+  /* snippet:end */
   methods: {
-/* snippet:start:5 */
+    /* snippet:start:5 */
     // This function return the right formated date depending on the timestamp
     getDate(timestamp) {
       const date = new Date(timestamp);
-      return date.toString().split("GMT")[0];
+      return date.toLocaleString().split("GMT")[0];
     },
-/* snippet:end */
-/* snippet:start:6 */
+    /* snippet:end */
+    /* snippet:start:6 */
     // This function will create a message object containing the informations we need to display it
-    getMessage(hit) {
+    getMessage(document) {
       const message = {
         // The unique id of the document containing the message
-        _id: hit._id,
+        _id: document._id,
         // The text of the message
-        value: hit._source.value,
+        value: document._source.value,
         // The creation date
-        createdAt: hit._source._kuzzle_info.createdAt,
+        createdAt: document._source._kuzzle_info.createdAt,
         // The author name
-        username: hit._source.username
+        username: document._source.username
       };
       return message;
     },
-/* snippet:end */
-/* snippet:start:10 */
+    /* snippet:end */
+    /* snippet:start:10 */
     async sendMessage() {
       if (this.message === "") return;
-        // Call the create method of the document controller
-        await kuzzle.document.create("chat", "messages", 
+      // Call the create method of the document controller
+      await kuzzle.document.create(
+        "chat",
+        "messages",
         // Give as parameter the object that will be store in kuzzle
         {
           value: this.message,
           username: this.username
-        });
+        }
+      );
       // Clear the user input
       this.message = "";
     },
-/* snippet:end */
-/* snippet:start:11 */
-  async subscribe_messages() {
-    // Call the subscribe method of the realtime controller and receive the roomId
-    // Save the id of our subscription (we could need it to unsubscribe)
-    this.roomID = await kuzzle.realtime.subscribe(
-      "chat",     // Id of the index
-      "messages", // Id of the collection
-      {},         // Options
-      // Callback for notifications receive
-      notification => {
-      // Check if the notification interest us (only document creation)
-        if (
-          notification.type === "document" &&
-          notification.action === "create"
-        ) {
+    /* snippet:end */
+    /* snippet:start:11 */
+    async subscribe_messages() {
+      // Call the subscribe method of the realtime controller and receive the roomId
+      // Save the id of our subscription (we could need it to unsubscribe)
+      this.roomID = await kuzzle.realtime.subscribe(
+        "chat", // Id of the index
+        "messages", // Id of the collection
+        {}, // Filter
+        // Callback for notifications receive
+        notification => {
+          // Check if the notification interest us (only document creation)
+          if (notification.type !== "document") return;
+          if (notification.action !== "create") return;
           // Add the new message to our array
           this.messages = [
             this.getMessage(notification.result),
             ...this.messages
           ];
         }
-      });
+      );
     },
     /* snippet:end */
     /* snippet:start:7 */
