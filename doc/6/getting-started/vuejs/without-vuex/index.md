@@ -104,7 +104,7 @@ And the following CSS class:
 
 <<< ./src/App.vue:13[css]
 
-You can now add new messages to Kuzzle, and receive the notification of the creation to update your store and display the new messages, enjoy :)
+You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages, enjoy :)
 
 ## Where do we go from here?
 
