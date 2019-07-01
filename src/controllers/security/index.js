@@ -156,9 +156,6 @@ class SecurityController extends BaseController {
   }
 
   createUser (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createUser: _id is required');
-    }
     if (!body) {
       throw new Error('Kuzzle.security.createUser: body is required');
     }
