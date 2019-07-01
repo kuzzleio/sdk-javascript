@@ -49,7 +49,7 @@ export default {
   /* snippet:start:4 */
   data() {
     return {
-      message: "", // The string containing the user input
+      message: "", // String containing the user input
       messages: [], // The array containing our messages
       roomID: "", // The Id of the realtime subscription
       username: "", // The pseudo of the current user
