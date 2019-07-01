@@ -70,7 +70,7 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./src/App.vue:6[js]
 
-The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for hundred newest existing messages and store them in our array before subscribe to notification about `messages` collection. We called it in the `valid()` function we created before.
+The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest  messages and store them in our array before subscribe to notification about `messages` collection. We called it in the `valid()` function we created before.
 
 <<< ./src/App.vue:7[js]
 
