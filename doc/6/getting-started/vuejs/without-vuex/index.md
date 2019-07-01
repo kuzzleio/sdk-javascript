@@ -86,7 +86,7 @@ We can now display the messages stored in Kuzzle. Cool but we need to create som
 
 ## Send messages
 
-We must make a simple method that will [create](/sdk/js/6/controllers/document/create/) a new message document in Kuzzle.
+We need to write a simple method that will [create](/sdk/js/6/controllers/document/create/) a new message document in Kuzzle.
 
 <<< ./src/App.vue:10[js]
 
