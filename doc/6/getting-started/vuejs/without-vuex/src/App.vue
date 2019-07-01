@@ -14,7 +14,11 @@
     <!-- snippet:end -->
     <!-- snippet:start:12 -->
     <div class="wrapper" v-else>
-      <input autofocus type="text" v-model="message" v-on:keyup.enter="sendMessage"
+      <input
+        autofocus
+        type="text"
+        v-model="message"
+        v-on:keyup.enter="sendMessage"
         placeholder="Enter your message"
       >
       <button @click="sendMessage">Send</button>
@@ -112,26 +116,25 @@ export default {
             ...this.messages
           ];
         }
-      }
-    );
-  },
-/* snippet:end */
-/* snippet:start:7 */
+      });
+    },
+    /* snippet:end */
+    /* snippet:start:7 */
     async fetch_messages() {
-    // Call the search method of the document controller
-    const results = await kuzzle.document.search(
-      "chat", // Name of the index
-      "messages", // Name of the collection
-      { sort: ["_kuzzle_info.createdAt"] }, // Query => Sort the messages by creation date 
-      { size: 100 } // Options => get a maximum of 100 messages
-    );
+      // Call the search method of the document controller
+      const results = await kuzzle.document.search(
+        "chat", // Name of the index
+        "messages", // Name of the collection
+        { sort: ["_kuzzle_info.createdAt"] }, // Query => Sort the messages by creation date
+        { size: 100 } // Options => get a maximum of 100 messages
+      );
       // Add each message to our array
       results.hits.map(hit => {
         this.messages = [this.getMessage(hit), ...this.messages];
       });
     },
-/* snippet:end */
-/* snippet:start:2 */
+    /* snippet:end */
+    /* snippet:start:2 */
     async valid() {
       // Etablish the connection
       await kuzzle.connect();
@@ -195,5 +198,4 @@ export default {
   margin-bottom: 10px;
 }
 /* snippet:end */
-
 </style>
