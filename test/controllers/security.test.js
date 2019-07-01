@@ -429,18 +429,6 @@ describe('Security Controller', () => {
   });
 
   describe('createUser', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      const body = {
-        content: {foo: 'bar'},
-        credentials: {
-          strategy: {foo: 'bar'}
-        }
-      };
-      should(function () {
-        kuzzle.security.createUser(undefined, body, options);
-      }).throw('Kuzzle.security.createUser: _id is required');
-    });
-
     it('should throw an error if the "body" argument is not provided', () => {
       should(function () {
         kuzzle.security.createUser('userId', undefined, options);
