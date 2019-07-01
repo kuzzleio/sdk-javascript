@@ -45,7 +45,7 @@ We need to import our Kuzzle SDK instance, so just add the following line in you
 
 <<< ./src/App.vue:3[js]
 
-Then we will [etablish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exists](sdk/js/6/controllers/index/exists/), create the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our tchat. 
+Then we will [etablish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exists](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our chat. 
 Add the following `valid()` method in the export of the `<script>` tag of your _App.vue_ file:
 
 <<< ./src/App.vue:2[js]
