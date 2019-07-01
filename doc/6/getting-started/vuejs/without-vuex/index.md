@@ -90,7 +90,7 @@ We need to write a simple method that will [create](/sdk/js/6/controllers/docume
 
 <<< ./src/App.vue:10[js]
 
-As you can see we doesn't push the new message in our array on message creation.
+As you can see we don't push the new message in our array on message creation.
 Actually, We'll subscribe to the collection that store our messages.
 So let's create our `subscribe_messages()` action. It will call the realtime controller of Kuzzle to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creation:
 
