@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       message: "", // String containing the user input
-      messages: [], // The array containing our messages
+      messages: [], // Array containing our messages
       roomID: "", // The Id of the realtime subscription
       username: "", // The pseudo of the current user
       validate: false // The value that will change the display (false => Pseudo input; true => Message input)
