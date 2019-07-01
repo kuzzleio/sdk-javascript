@@ -52,7 +52,7 @@ export default {
       message: "", // String containing the user input
       messages: [], // Array containing our messages
       roomID: "", // Id of the realtime subscription
-      username: "", // The pseudo of the current user
+      username: "", // Nickname of the current user
       validate: false // Value that will change the display (false => Pseudo input; true => Message input)
     };
   },
