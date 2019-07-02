@@ -38,16 +38,16 @@ function reinitialisation() {
     });
 }
 
-Cypress.Commands.add('createMessage', (message) => {
+Cypress.Commands.add('createMessage', (body) => {
   const kuzzle = Cypress.env('kuzzle');
   return cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/${message._id}/_create`,
+    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_create`,
     method: 'POST',
-    body: message.payload,
+    body: body,
   })
     .its('body')
     .then(response => {
-      cy.log(`Create : ${message._id} status : ${response.status}`);
+      cy.log(`Create status : ${response.status}`);
       cy.wait(500);
     });
 });
@@ -98,9 +98,18 @@ Cypress.Commands.add('initialisation', () => {
 });
 
 Cypress.Commands.add('loadEnvironment', (env) => {
+  const kuzzle = Cypress.env('kuzzle');
+
   reinitialisation();
   if (!env.messages) {return;}
-  env.messages.forEach(message => {
-    cy.createMessage(message);
-  });
+  cy.request({
+    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_mCreate`,
+    method: 'POST',
+    body: {"documents": env.messages},
+  })
+    .its('body')
+    .then(response => {
+      cy.log(`mCreate status : ${response.status}`);
+      cy.wait(500);
+    });
 });
