@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     messages: [],
     roomID: '',
-    username: ''
+    nickname: ''
   },
   actions: {
     INIT: async ({ dispatch }, { kuzzle }) => {
@@ -21,7 +21,7 @@ export default new Vuex.Store({
     SEND_MESSAGE: async ({ state }, { kuzzle, message }) => {
       await kuzzle.document.create("chat", "messages", {
         value: message,
-        username: state.username
+        username: state.nickname
       });
     },
     FETCH_MESSAGES: async ({ commit, dispatch }, { kuzzle }) => {
@@ -61,8 +61,8 @@ export default new Vuex.Store({
     SET_ROOMID(state, roomID) {
       state.roomID = roomID;
     },
-    SET_USERNAME(state, username) {
-      state.username = username;
+    SET_NICKNAME(state, nickname) {
+      state.nicnkame = nickname;
     }
   }
 })

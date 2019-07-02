@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <div v-if="!validate">
+    <div v-if="!enteredNickname">
       <input
         autofocus
         v-on:keyup.enter="valid"
         type="text"
-        v-model="usernameInput"
+        v-model="nicknameInput"
         placeholder="Enter your nickname"
       />
       <button @click="valid">Valid</button>
@@ -23,9 +23,9 @@
     <div
       v-for="message in messages"
       :key="message._id"
-      :class="`messages ${message.username === username? 'fromMe': 'fromOthers'}`"
+      :class="`messages ${message.username === nicknameInput? 'fromMe': 'fromOthers'}`"
     >
-      <span class="username">{{ message.username }}</span>
+      <span class="nickname">{{ message.username }}</span>
       <span>({{ getDate(message.createdAt) }})</span>
       <p>{{ message.value }}</p>
     </div>
@@ -39,14 +39,14 @@ export default {
   name: "app",
   data() {
     return {
-      validate: false,
-      usernameInput: "", // The pseudo of the current user
+      enteredNickname: false,
+      nicknameInput: "",
       message: ""
     };
   },
   computed: {
-    username() {
-      return this.$store.state.username;
+    nickname() {
+      return this.$store.state.nickname;
     },
     messages() {
       return this.$store.state.messages;
@@ -66,9 +66,9 @@ export default {
       this.message = "";
     },
     async valid() {
-      this.$store.commit("SET_USERNAME", this.usernameInput);
+      this.$store.commit("SET_NICKNAME", this.nicknameInput);
+      this.enteredNickname = true;
       await this.$store.dispatch("INIT", { kuzzle });
-      this.validate = true;
     }
   }
 };
@@ -84,7 +84,7 @@ export default {
   margin-top: 60px;
 }
 
-.username {
+.nickname {
   font-weight: bold;
 }
 
