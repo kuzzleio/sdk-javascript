@@ -7,6 +7,10 @@
     "serve-without-vuex": "cd without-vuex && vue-cli-service serve",
     "build-without-vuex": "cd without-vuex && vue-cli-service build",
     "lint-without-vuex": "cd without-vuex && vue-cli-service lint",
+    "serve-with-vuex": "cd with-vuex && vue-cli-service serve",
+    "build-with-vuex": "cd with-vuex && vue-cli-service build",
+    "lint-with-vuex": "cd with-vuex && vue-cli-service lint",
+    "clean": "rm -rf ./node_modules ./without-vuex/node_modules ./with_vuex/node_modules ./package-lock.json",
     "test": "./node_modules/.bin/cypress run"
   },
   "dependencies": {
