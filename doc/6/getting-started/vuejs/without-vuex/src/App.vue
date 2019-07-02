@@ -153,7 +153,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* snippet:start:9 */
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;

@@ -22,7 +22,7 @@
     "prepublish": "npm run build",
     "test": "npm run --silent lint && npm run unit-testing && npm run functional-testing",
     "unit-testing": "nyc --reporter=text-summary --reporter=lcov mocha",
-    "doc-testing": "docker-compose -f .ci/doc/docker-compose.yml pull; docker-compose -f .ci/doc/docker-compose.yml run doc-tests node index",
+    "doc-testing": "bash test-docs.sh",
     "functional-testing": "cucumber-js --exit --fail-fast",
     "lint": "eslint --max-warnings=0 ./src ./test",
     "build": "node build.js"
