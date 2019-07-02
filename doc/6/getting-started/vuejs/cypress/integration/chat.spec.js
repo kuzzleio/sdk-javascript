@@ -1,87 +1,83 @@
 describe('test realtime chat', () => {
-  let currentIt = 1;
-  let env;
-  
+
   before(() => {
     cy.initialisation();
   });
 
-  beforeEach(() => {
-    cy.visit('/');
-    cy.fixture(`Environment.${currentIt}.json`)
-      .then((fixtures) => { env = fixtures; })
-      .then(() => cy.log(`Environment ${currentIt}: `, env))
-      .then(() => cy.loadEnvironment(env));
-    cy.wait(2000);
-  });
-  
-  afterEach(() => {
-    currentIt++;
-  });
-    
-  it('should enter a nickname', () => {
-    cy.get('[placeholder="Enter your message"]')
-      .should('not.exist');
+  it('should enter a nickname', function () {
+    cy.fixture(`Elrond.json`).as('fixt')
+      .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => {
+        cy.visit('/');
+        cy.get('[placeholder="Enter your message"]')
+          .should('not.exist');
 
-    cy.get('[placeholder="Enter your nickname"]')
-      .type(env.username);
-    
+        cy.get('[placeholder="Enter your nickname"]')
+          .type(this.fixt.username);
 
-    cy.contains('Valid')
-      .click();
+        cy.contains('Valid')
+          .click();
 
-    cy.get('[placeholder="Enter your message"]')
-      .should('exist');
-    cy.get('[placeholder="Enter your nickname"]')
-      .should('not.exist');
-  });
-
-  it('should fetch and display some messages', () => {
-    cy.get('[placeholder="Enter your nickname"]')
-      .type(env.username);
-    cy.contains('Valid')
-      .click();
-
-    env.messages.forEach(message => {
-      cy.get(message.payload.username === env.username ? '.fromMe': '.fromOthers')
-        .within(() => {
-          cy.contains(message.payload.value);
-          cy.contains(message.payload.username);
-        });
-    });
-  });
-
-  it('should send a message', () => {
-    cy.get('[placeholder="Enter your nickname"]')
-      .type(env.username);
-    cy.contains('Valid')
-      .click();
-    cy.createMessage({
-      _id: '1',
-      payload: env.payload
-    });
-
-    cy.get('.fromMe')
-      .within(() => {
-        cy.contains(env.payload.value);
-        cy.contains(env.username);
+        cy.get('[placeholder="Enter your message"]')
+          .should('exist');
+        cy.get('[placeholder="Enter your nickname"]')
+          .should('not.exist');
       });
   });
 
-  it('should receive a message', () => {
-    cy.get('[placeholder="Enter your nickname"]')
-      .type(env.username);
-    cy.contains('Valid')
-      .click();
-    cy.createMessage({
-      _id: '1',
-      payload: env.payload
-    });
+  it('should fetch and display some messages', function () {
+    cy.fixture(`Legolas.json`).as('fixt')
+      .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => {
+        cy.visit('/');
+        cy.get('[placeholder="Enter your nickname"]')
+          .type(this.fixt.username);
+        cy.contains('Valid')
+          .click();
+        for (const message of this.fixt.messages) {
+          cy.get(message.body.username === this.fixt.username ? '.fromMe' : '.fromOthers')
+            .within(() => {
+              cy.contains(message.body.username);
+              cy.contains(message.body.value);
+            });
+        }
+      });
+  });
 
-    cy.get('.fromOthers')
-      .within(() => {
-        cy.contains(env.payload.value);
-        cy.contains(env.payload.username);
-      });  
+  it('should send a message', function () {
+    cy.fixture(`Sam.json`).as('fixt')
+      .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => {
+        cy.visit('/');
+        cy.get('[placeholder="Enter your nickname"]')
+          .type(this.fixt.username);
+        cy.contains('Valid')
+          .click();
+        cy.createMessage(this.fixt.body);
+        cy.get('.fromMe')
+          .within(() => {
+            cy.contains(this.fixt.body.value);
+            cy.contains(this.fixt.body.username);
+          });
+      });
+  });
+
+  it('should receive a message', function () {
+    cy.fixture(`Sauron.json`).as('fixt')
+      .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => {
+        cy.visit('/');
+        cy.get('[placeholder="Enter your nickname"]')
+          .type(this.fixt.username);
+        cy.contains('Valid')
+          .click();
+        cy.createMessage(this.fixt.body);
+
+        cy.get('.fromOthers')
+          .within(() => {
+            cy.contains(this.fixt.body.value);
+            cy.contains(this.fixt.body.username);
+          });
+      });
   });
 });

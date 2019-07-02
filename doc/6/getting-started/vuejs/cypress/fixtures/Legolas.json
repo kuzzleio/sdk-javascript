@@ -2,22 +2,19 @@
     "username": "Legolas",
     "messages": [
         {
-            "_id": "1",
-            "payload": {
+            "body": {
                 "value": "It still only counts as one!",
                 "username": "Gimli"
             }
         },
         {
-            "_id": "2",
-            "payload": {
+            "body": {
                 "value": "What do your elf eyes see?",
                 "username": "Aragorn"
             }
         },
         {
-            "_id": "3",
-            "payload": {
+            "body": {
                 "value": "What about side by side with a friend?",
                 "username": "Legolas"
             }
