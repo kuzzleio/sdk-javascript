@@ -1,6 +1,7 @@
 {
   "baseUrl": "http://localhost:8080",
   "projectId": "ce9wca",
+  "videoUploadOnPasses": false,
   "viewportWidth": 1400,
   "viewportHeight": 900,
   "defaultCommandTimeout": 5000,
