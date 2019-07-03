@@ -16,4 +16,5 @@ npm ci
 npm run serve-without-vuex &
 npm run test
 
+cd ../../../../
 docker-compose -f .ci/doc/docker-compose.yml down

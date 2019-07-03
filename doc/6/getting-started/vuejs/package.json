@@ -7,7 +7,7 @@
     "serve-without-vuex": "cd without-vuex && vue-cli-service serve",
     "build-without-vuex": "cd without-vuex && vue-cli-service build",
     "lint-without-vuex": "cd without-vuex && vue-cli-service lint",
-    "test": "./node_modules/.bin/cypress run"
+    "test": "./node_modules/.bin/cypress run --record"
   },
   "dependencies": {
     "core-js": "^2.6.5",
