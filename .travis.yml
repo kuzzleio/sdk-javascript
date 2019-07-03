@@ -1,3 +1,5 @@
+sudo: true
+
 jobs:
   include:
     - name: Sdk tests
@@ -38,8 +40,10 @@ jobs:
       language: node_js
       node_js: 8
 
+      before_script:
+        - sudo apt-get install libgconf-2-4
       script:
-        - docker-compose -f .ci/doc/docker-compose.yml run doc-tests node index
+        - npm run doc-testing
 
     - stage: "Deploy Stable release on NPM"
       if: type != pull_request && branch = master
