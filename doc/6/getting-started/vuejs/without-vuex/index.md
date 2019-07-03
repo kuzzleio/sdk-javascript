@@ -30,7 +30,7 @@ vue create kuzzle-playground
 Install the kuzzle-sdk: 
 ```bash
 cd kuzzle-playground
-yarn add kuzzle-sdk
+npm install kuzzle-sdk
 ```
 
 In the _App.vue_ file, you should remove the tag, the import and the component registration of the `HelloWorld` component, we won't use it.
