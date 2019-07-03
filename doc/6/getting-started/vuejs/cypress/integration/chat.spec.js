@@ -53,7 +53,10 @@ describe('test realtime chat', () => {
           .type(this.fixt.username);
         cy.contains('Valid')
           .click();
-        cy.createMessage(this.fixt.body);
+        cy.get('[placeholder="Enter your message"]')
+        .type(this.fixt.body.value);
+        cy.contains('Send')
+        .click();
         cy.get('.fromMe')
           .within(() => {
             cy.contains(this.fixt.body.value);
