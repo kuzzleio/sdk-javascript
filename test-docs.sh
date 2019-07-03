@@ -11,6 +11,7 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:7512); d
   sleep 5
 done
 
+apt-get install libgconf-2-4
 cd doc/6/getting-started/vuejs
 npm ci
 npm run serve-without-vuex &

@@ -4,11 +4,11 @@
   "viewportHeight": 900,
   "defaultCommandTimeout": 5000,
   "env": {
-      "kuzzle": {
-          "host": "localhost",
-          "port": "7512",
-          "index": "chat", 
-          "collection": "messages"
-      }
+    "kuzzle": {
+      "host": "localhost",
+      "port": "7512",
+      "index": "chat",
+      "collection": "messages"
+    }
   }
 }
