@@ -59,6 +59,7 @@ jobs:
         
     - stage: Tests
       name: "Documentation Tests"
+      if: type = pull_request OR (type = push && branch =~ /^master|[0-9]+-(dev|stable)$/) OR type = cron
       language: node_js
       node_js: 8
 
@@ -66,7 +67,7 @@ jobs:
         - docker-compose -f .ci/doc/docker-compose.yml run doc-tests node index
 
     - stage: "Deploy Stable release on NPM"
-      if: type != pull_request && branch = master
+      if: tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8
@@ -100,7 +101,7 @@ jobs:
           condition: $TRAVIS_BRANCH = master
 
     - stage: "Deploy Beta release on NPM"
-      if: 
+      if: type = push && branch = /^[0-9]+-dev$/
       sudo: false
       language: node_js
       node_js: 8
