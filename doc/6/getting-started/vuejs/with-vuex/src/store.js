@@ -46,6 +46,9 @@ export default new Vuex.Store({
         }
       });
       commit('SET_ROOMID', roomID);
+    },
+    UNSUBSCRIBE_MESSAGES: async ({ state }, { kuzzle }) => {
+      await kuzzle.realtime.unsubscribe(state.roomID);
     }
   },
   mutations: {

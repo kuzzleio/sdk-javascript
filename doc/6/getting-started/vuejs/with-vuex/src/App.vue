@@ -70,6 +70,9 @@ export default {
       this.enteredNickname = true;
       await this.$store.dispatch("INIT", { kuzzle });
     }
+  },
+  async destroyed () {
+    await this.$store.dispatch("UNSUBSCRIBE_MESSAGES", { kuzzle });
   }
 };
 </script>
