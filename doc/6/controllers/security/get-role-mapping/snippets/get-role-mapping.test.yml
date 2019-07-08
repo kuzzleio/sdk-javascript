@@ -1,0 +1,10 @@
+name: security#getRoleMapping
+description: get roles mapping
+hooks:
+  before:
+  after:
+template: default
+expected: '^{ mapping: { controllers: { type: ''object'', enabled: false } } }$'
+
+sdk: js
+version: 6

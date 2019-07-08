@@ -1,0 +1,10 @@
+name: security#searchRoles
+description: search roles
+hooks:
+  before:
+  after:
+template: default
+expected: ^Successfully retrieved 3 roles$
+
+sdk: js
+version: 6

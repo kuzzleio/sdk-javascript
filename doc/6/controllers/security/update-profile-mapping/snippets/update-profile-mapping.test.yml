@@ -1,0 +1,10 @@
+name: security#updateProfileMapping
+description: update profile mapping
+hooks:
+  before:
+  after:
+template: default
+expected: '^{ acknowledged: true }$'
+
+sdk: js
+version: 6

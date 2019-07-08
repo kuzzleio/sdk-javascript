@@ -1,0 +1,10 @@
+name: security#getUserMapping
+description: get users mapping
+hooks:
+  before:
+  after:
+template: default
+expected: '^   { firstName: { type: ''text'', fields: \[Object\] },$'
+
+sdk: js
+version: 6

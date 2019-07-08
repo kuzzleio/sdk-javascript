@@ -1,0 +1,23 @@
+name: security#mDeleteUsers
+description: mdelete users
+hooks:
+  before: |
+    for i in 1 2 3; do
+      curl -H "Content-type: application/json" -d '{
+        "content": {
+          "profileIds": [ "default" ]
+        },
+        "credentials": {
+          "local": {
+            "username": "user'${i}'",
+            "password": "pass"
+          }
+        }
+      }' kuzzle:7512/users/user${i}/_create
+    done
+  after:
+template: default
+expected: '^\[ ''user1'', ''user2'', ''user3'' \]$'
+
+sdk: js
+version: 6

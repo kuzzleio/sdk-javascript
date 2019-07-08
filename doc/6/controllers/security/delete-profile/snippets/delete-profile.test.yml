@@ -1,0 +1,13 @@
+name: security#deleteProfile
+description: delete profile
+hooks:
+  before: >
+    curl -H "Content-type: application/json" -d '{
+      "policies": []
+    }' kuzzle:7512/profiles/myProfile/_create
+  after:
+template: default
+expected: Profile successfully deleted
+
+sdk: js
+version: 6

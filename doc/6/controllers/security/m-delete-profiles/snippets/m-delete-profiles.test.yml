@@ -1,0 +1,15 @@
+name: security#mDeleteProfiles
+description: mdelete profiles
+hooks:
+  before: |
+    for i in 1 2 3 4 5; do
+      curl -H "Content-type: application/json" -d '{
+        "policies": [{ "roleId": "default" }]
+      }' kuzzle:7512/profiles/profile${i}/_create
+    done
+  after:
+template: default
+expected: '^\[ ''profile1'', ''profile2'', ''profile3'', ''profile4'', ''profile5'' \]$'
+
+sdk: js
+version: 6

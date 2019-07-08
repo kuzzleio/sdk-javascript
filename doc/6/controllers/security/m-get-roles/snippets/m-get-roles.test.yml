@@ -1,0 +1,24 @@
+name: security#mGetRoles
+description: mget roles
+hooks:
+  before: |
+    for i in 1 2 3; do
+      curl -H "Content-type: application/json" -d '{
+        "controllers": {
+          "*": {
+            "actions": {
+              "*": true
+            }
+          }
+        }
+      }' kuzzle:7512/roles/role${i}/_create
+    done
+  after: |
+    for i in 1 2 3; do
+      curl -XDELETE kuzzle:7512/roles/role${i}
+    done
+template: default
+expected: '^    _id: ''role3'',$'
+
+sdk: js
+version: 6
