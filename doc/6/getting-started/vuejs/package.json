@@ -11,7 +11,6 @@
     "build-with-vuex": "cd with-vuex && vue-cli-service build",
     "lint-with-vuex": "cd with-vuex && vue-cli-service lint",
     "test": "./node_modules/.bin/cypress run --record"
-
   },
   "dependencies": {
     "core-js": "^2.6.5",
