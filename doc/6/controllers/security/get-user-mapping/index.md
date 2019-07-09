@@ -35,4 +35,4 @@ An object representing the internal users mapping, using [Elasticsearch mapping 
 
 ## Usage
 
-<<< ./snippets/get-role-mapping.js
+<<< ./snippets/get-user-mapping.js

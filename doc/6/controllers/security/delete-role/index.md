@@ -10,9 +10,11 @@ description: Deletes a security role
 Deletes a security role.
 
 <br />
+
 ```js
 deleteRole(id, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |

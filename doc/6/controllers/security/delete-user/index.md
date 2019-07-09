@@ -10,9 +10,11 @@ description: Deletes a user and all their associate credentials
 Deletes a user and all their associate credentials.
 
 <br />
+
 ```js
 deleteUser(kuid, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |

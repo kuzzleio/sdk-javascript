@@ -7,7 +7,7 @@ description: Deletes user credentials for the specified authentication strategy
 
 # deleteCredentials
 
-Deletes user credentials for the specified authentication strategy/
+Deletes user credentials for the specified authentication strategy.
 
 <br />
 

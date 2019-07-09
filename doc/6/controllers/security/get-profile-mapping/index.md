@@ -10,9 +10,11 @@ description: Gets the mapping of the internal security profiles collection
 Gets the mapping of the internal security profiles collection.
 
 <br />
+
 ```js
 getProfileMapping([options]);
 ```
+
 <br />
 
 | Property | Type | Description |

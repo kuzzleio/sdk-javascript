@@ -20,6 +20,8 @@ This method allows users with limited rights to create other accounts, but block
 createRestrictedUser(body, [kuid], [options]);
 ```
 
+<br />
+
 | Property | Type | Description |
 |--- |--- |--- |
 | `body` | <pre>object</pre> | User content &amp; credentials |

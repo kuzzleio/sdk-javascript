@@ -42,4 +42,4 @@ An object containing the credential information (depends on the authentication s
 
 ## Usage
 
-<<< ./snippets/get-credential-by-id.js
+<<< ./snippets/get-credentials-by-id.js

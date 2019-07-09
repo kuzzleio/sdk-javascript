@@ -10,9 +10,11 @@ description: Retrieves the list of accepted field names by the specified authent
 Retrieves the list of accepted field names by the specified authentication strategy
 
 <br />
+
 ```js
 getCredentialFields(strategy, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |

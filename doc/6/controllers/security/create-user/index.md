@@ -15,6 +15,8 @@ Creates a new user.
 createUser(kuid, body, [options]);
 ```
 
+<br />
+
 | Property | Type | Description |
 |--- |--- |--- |
 | `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid) |

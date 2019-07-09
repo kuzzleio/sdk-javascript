@@ -10,9 +10,11 @@ description: Gets a user's credential information for the specified authenticati
 Gets a user's credential information for the specified authentication strategy.
 
 <br />
+
 ```js
 getCredentials(strategy, kuid, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |
@@ -35,4 +37,4 @@ An object containing the credential information (depends on the authentication s
 
 ## Usage
 
-<<< ./snippets/get-credential.js
+<<< ./snippets/get-credentials.js

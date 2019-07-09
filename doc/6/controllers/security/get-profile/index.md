@@ -10,9 +10,11 @@ description: Gets a security profile
 Gets a security profile.
 
 <br />
+
 ```js
 getProfile(id, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |

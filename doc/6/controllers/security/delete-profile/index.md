@@ -10,9 +10,11 @@ description: Deletes a security profile
 Deletes a security profile.
 
 <br />
+
 ```js
 deleteProfile(id, [options]);
 ```
+
 <br />
 
 | Property | Type | Description |
