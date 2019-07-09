@@ -22,6 +22,3 @@ hooks:
   after: curl -XDELETE kuzzle:7512/roles/myRole
 template: default
 expected: '^   { auth: { actions: \[Object\] }, document: { actions: \[Object\] } } }$'
-
-sdk: js
-version: 6

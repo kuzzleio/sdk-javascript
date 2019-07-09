@@ -8,6 +8,3 @@ hooks:
   after: curl -XDELETE kuzzle:7512/profiles/myProfile
 template: default
 expected: '^     { roleId: ''privileged'', restrictedTo: \[Array\] } \] }$'
-
-sdk: js
-version: 6

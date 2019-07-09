@@ -1,10 +1,6 @@
 name: security#createOrReplaceProfile
 description: Create or replace a profile
 hooks:
-  before:
   after: curl -XDELETE kuzzle:7512/profiles/myProfile?refresh=wait_for
 template: default
 expected: Profile successfully updated
-
-sdk: js
-version: 6

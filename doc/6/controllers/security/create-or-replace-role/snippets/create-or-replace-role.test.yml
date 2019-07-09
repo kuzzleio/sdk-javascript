@@ -1,10 +1,6 @@
 name: security#createOrReplaceRole
 description: Create or replace role
 hooks:
-  before:
   after: curl -XDELETE kuzzle:7512/roles/read-only
 template: default
 expected: Role successfully updated
-
-sdk: js
-version: 6

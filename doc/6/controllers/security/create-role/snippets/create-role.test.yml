@@ -1,7 +1,6 @@
 name: security#createRole
 description: create a role
 hooks:
-  before:
   after: curl -XDELETE kuzzle:7512/roles/read-only?refresh=wait_for
 template: default
 expected: Role successfully created

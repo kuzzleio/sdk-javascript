@@ -17,6 +17,3 @@ hooks:
     done
 template: default
 expected: ^Successfully retrieved 3 users$
-
-sdk: js
-version: 6

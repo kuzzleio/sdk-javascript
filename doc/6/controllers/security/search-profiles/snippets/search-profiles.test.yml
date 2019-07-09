@@ -13,6 +13,3 @@ hooks:
     done
 template: default
 expected: ^Successfully retrieved 4 profiles$
-
-sdk: js
-version: 6

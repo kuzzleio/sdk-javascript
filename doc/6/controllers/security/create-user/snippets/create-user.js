@@ -23,7 +23,7 @@ try {
         _kuzzle_info:
           { author: '-1',
             createdAt: 1561379086534,
-            udpatedAt: null,
+            updatedAt: null,
             updater: null } } }
    */
 } catch (e) {

@@ -1,10 +1,4 @@
 name: security#getProfileMapping
 description: get profile mapping
-hooks:
-  before:
-  after:
 template: default
-expected: '^{ mapping: { policies: { properties: \[Object\] } } }$'
-
-sdk: js
-version: 6
+expected: '^{ mapping:'

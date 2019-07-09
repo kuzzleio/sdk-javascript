@@ -17,6 +17,3 @@ hooks:
   after: curl -XDELETE kuzzle:7512/users/john.doe
 template: default
 expected: '^     fullName: ''John Doe'',$'
-
-sdk: js
-version: 6

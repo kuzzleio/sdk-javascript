@@ -19,6 +19,3 @@ hooks:
     done
 template: default
 expected: '^    _id: ''role3'',$'
-
-sdk: js
-version: 6

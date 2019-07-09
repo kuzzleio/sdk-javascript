@@ -13,9 +13,5 @@ hooks:
         }
       }' kuzzle:7512/roles/role${i}/_create
     done
-  after:
 template: default
 expected: '^\[ ''role1'', ''role2'', ''role3'', ''role4'', ''role5'' \]$'
-
-sdk: js
-version: 6

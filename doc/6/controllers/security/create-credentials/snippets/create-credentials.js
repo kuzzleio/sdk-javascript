@@ -2,7 +2,7 @@ try {
   await kuzzle.security.createUser('foo', {
     content: {
       profileIds: ['default'],
-      fullname: 'John Doe'
+      fullName: 'John Doe'
     },
     credentials: {}
   });

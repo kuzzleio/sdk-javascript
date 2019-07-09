@@ -11,9 +11,5 @@ hooks:
         }
       }
     }' kuzzle:7512/roles/myRole/_create
-  after:
 template: default
 expected: Role successfully deleted
-
-sdk: js
-version: 6

@@ -1,10 +1,6 @@
 name: security#createRestrictedUser
 description: create a restricted user
 hooks:
-  before:
   after: curl -XDELETE http://kuzzle:7512/users/jdoe
 template: default
 expected: User successfully created
-
-sdk: js
-version: 6

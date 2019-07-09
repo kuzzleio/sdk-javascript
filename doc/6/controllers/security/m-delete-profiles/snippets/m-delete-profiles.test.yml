@@ -7,9 +7,5 @@ hooks:
         "policies": [{ "roleId": "default" }]
       }' kuzzle:7512/profiles/profile${i}/_create
     done
-  after:
 template: default
 expected: '^\[ ''profile1'', ''profile2'', ''profile3'', ''profile4'', ''profile5'' \]$'
-
-sdk: js
-version: 6

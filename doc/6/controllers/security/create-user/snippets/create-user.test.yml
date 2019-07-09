@@ -1,10 +1,6 @@
 name: security#createUser
 description: creates user
 hooks:
-  before:
   after: curl -XDELETE kuzzle:7512/users/jdoe
 template: default
-expected: User successfully created
-
-sdk: js
-version: 6
+expected: '^   { profileIds: \[ ''default'' \],$'
