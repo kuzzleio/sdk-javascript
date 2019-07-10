@@ -10,7 +10,6 @@ services:
     depends_on:
       - redis
       - elasticsearch
-    container_name: kuzzle
     environment:
       - kuzzle_services__db__client__host=http://elasticsearch:9200
       - kuzzle_services__internalCache__node__host=redis
@@ -47,9 +46,6 @@ services:
 
   doc-runner-node:
     image: node:10-alpine
-    volumes:
-      - ../..:/mnt
-      - snippets:/var/snippets
     command: >
       ash -c '
         mkdir -p /var/snippets/node;
@@ -69,6 +65,9 @@ services:
         touch /tmp/runner_is_ready;
         tail -f /dev/null
       '
+    volumes:
+      - ../..:/mnt
+      - snippets:/var/snippets
 
   doc-runner-web:
     image: buildkite/puppeteer:latest
@@ -85,7 +84,6 @@ services:
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
         npm install \
           /mnt/ \
-          puppeteer \
           eslint \
           eslint-plugin-html \
           eslint-plugin-import \
@@ -116,7 +114,6 @@ services:
           /mnt/ \
           babel-loader \
           @babel/core \
-          puppeteer \
           html-webpack-plugin \
           webpack \
           webpack-cli \
