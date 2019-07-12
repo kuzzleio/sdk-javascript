@@ -465,7 +465,8 @@ describe('HTTP networking module', () => {
       xhrStub = {
         open: sinon.stub(),
         send: sinon.stub(),
-        setRequestHeader: sinon.stub()
+        setRequestHeader: sinon.stub(),
+        onreadystatechange: sinon.stub()
       };
       // eslint-disable-next-line no-native-reassign, no-global-assign
       XMLHttpRequest = function() {
@@ -533,6 +534,16 @@ describe('HTTP networking module', () => {
           should(res.status).be.exactly(200);
           should(res.result).be.exactly('Kuzzle Result');
         });
+    });
+
+    it.only('should reject if the xhr ready state is done and the status is 0', () => {
+      xhrStub.readyState = 4;
+      xhrStub.status = 0;
+
+      setTimeout(() => xhrStub.onreadystatechange(), 20);
+
+      return should(protocol._sendHttpRequest('VERB', '/foo/bar', { body: 'foobar' }))
+        .be.rejectedWith({ message: 'Cannot send the request. Is the host online?' });
     });
   });
 
