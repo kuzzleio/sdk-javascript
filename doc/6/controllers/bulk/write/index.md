@@ -7,7 +7,7 @@ description: Create or replace a document directly into the storage engine.
 
 # write
 
-<SinceBadge version="6.1.5" />
+<SinceBadge version="6.2.0" />
 
 <SinceBadge version="Kuzzle 1.8.0" />
 
