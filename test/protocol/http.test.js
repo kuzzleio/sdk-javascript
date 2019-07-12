@@ -536,14 +536,14 @@ describe('HTTP networking module', () => {
         });
     });
 
-    it.only('should reject if the xhr ready state is done and the status is 0', () => {
+    it('should reject if the xhr ready state is done and the status is 0', () => {
       xhrStub.readyState = 4;
       xhrStub.status = 0;
 
       setTimeout(() => xhrStub.onreadystatechange(), 20);
 
       return should(protocol._sendHttpRequest('VERB', '/foo/bar', { body: 'foobar' }))
-        .be.rejectedWith({ message: 'Cannot send the request. Is the host online?' });
+        .be.rejectedWith({ message: 'Cannot connect to host. Is the host online?' });
     });
   });
 

@@ -173,7 +173,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 0) {
-          reject(new Error('Cannot send the request. Is the host online?'));
+          reject(new Error('Cannot connect to host. Is the host online?'));
         }
       };
 
