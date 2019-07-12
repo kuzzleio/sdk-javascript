@@ -36,7 +36,7 @@ mWrite (index, collection, documents, [options])
 ### documents
 
 An array of object. Each object describes a document to create or replace, by exposing the following properties:
-  - `_id`: optional document unique identifier
+  - `_id`: document unique identifier (optional)
   - `body`: document content
 
 ### options
