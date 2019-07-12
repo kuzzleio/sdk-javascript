@@ -5,12 +5,62 @@ class BulkController extends BaseController {
     super(kuzzle, 'bulk');
   }
 
-  import (data, options) {
+  /**
+   * Creates, updates or deletes large amounts of documents as fast as possible.
+   * https://docs.kuzzle.io/core/1/api/controllers/bulk/import/
+   *
+   * @param {Object[]} data - Array of documents detailing the bulk operations to perform, following ElasticSearch Bulk API
+   * @param {Object} [options] - Additional options
+   * @returns {Promise}
+   */
+  import (data, options = {}) {
     return this.query({
       action: 'import',
       body: {
         bulkData: data
       }
+    }, options)
+      .then(response => response.result);
+  }
+
+  /**
+   * Create or replace a document directly into the storage engine.
+   * https://docs.kuzzle.io/core/1/api/controllers/bulk/write/
+   *
+   * @param {String} index - Index name
+   * @param {String} collection - Collection name
+   * @param {Object} document - Document body
+   * @param {String} [id=null] - Document ID
+   * @param {Object} [options] - Additional options (notify, refresh)
+   * @returns {Promise}
+   */
+  write (index, collection, document, id = null, options = {}) {
+    return this.query({
+      index,
+      collection,
+      _id: id,
+      action: 'write',
+      body: document
+    }, options)
+      .then(response => response.result);
+  }
+
+  /**
+   * Create or replace multiple documents directly into the storage engine.
+   * https://docs.kuzzle.io/core/1/api/controllers/bulk/m-write/
+   *
+   * @param {String} index - Index name
+   * @param {String} collection - Collection name
+   * @param {Object[]} documents - Array of objects describing the documents with '_id' and '_source' properties
+   * @param {Object} [options] - Additional options (notify, refresh)
+   * @returns {Promise}
+   */
+  mWrite (index, collection, documents, options = {}) {
+    return this.query({
+      index,
+      collection,
+      action: 'mWrite',
+      body: { documents }
     }, options)
       .then(response => response.result);
   }
