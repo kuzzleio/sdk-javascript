@@ -7,4 +7,4 @@ hooks:
     curl -X POST kuzzle:7512/nyc-open-data/_create
     curl -X PUT kuzzle:7512/nyc-open-data/yellow-taxi
 template: default
-expected: Document creators is dahi
+expected: Document creator is dahi

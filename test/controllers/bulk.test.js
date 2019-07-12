@@ -4,8 +4,6 @@ const
   should = require('should');
 
 describe('Bulk Controller', () => {
-  const options = {opt: 'in'};
-
   let kuzzle;
 
   beforeEach(() => {
@@ -27,7 +25,9 @@ describe('Bulk Controller', () => {
         }
       });
 
-      const bulkData = {foo: 'bar'};
+      const
+        bulkData = { foo: 'bar' },
+        options = { opt: 'in' };
 
       return kuzzle.bulk.import(bulkData, options)
         .then(res => {
@@ -61,9 +61,9 @@ describe('Bulk Controller', () => {
 
       const
         document = { school: 'lfiduras' },
-        opts = { notify: true };
+        options = { notify: true };
 
-      return kuzzle.bulk.write('vietnam', 'hochiminh', document, 'liia', opts)
+      return kuzzle.bulk.write('vietnam', 'hochiminh', document, 'liia', options)
         .then(result => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -105,9 +105,9 @@ describe('Bulk Controller', () => {
             _source: { school: 'lfiduras' }
           }
         ],
-        opts = { notify: true };
+        options = { notify: true };
 
-      return kuzzle.bulk.mWrite('vietnam', 'hochiminh', documents, opts)
+      return kuzzle.bulk.mWrite('vietnam', 'hochiminh', documents, options)
         .then(result => {
           should(kuzzle.query)
             .be.calledOnce()
