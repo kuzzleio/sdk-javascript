@@ -41,7 +41,7 @@ try {
     total: 2 }
   */
 
-  console.log(`Document creator is ${result.hits[0]._source._kuzzle_info.creator}`);
+  console.log(`Document creator is ${result.hits[1]._source._kuzzle_info.creator}`);
 } catch (error) {
   console.error(error.message);
 }

@@ -61,9 +61,9 @@ describe('Bulk Controller', () => {
 
       const
         document = { school: 'lfiduras' },
-        options = { notify: true };
+        opts = { notify: true };
 
-      return kuzzle.bulk.write('vietnam', 'hochiminh', document, 'liia', options)
+      return kuzzle.bulk.write('vietnam', 'hochiminh', document, 'liia', opts)
         .then(result => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -76,10 +76,10 @@ describe('Bulk Controller', () => {
               action: 'write'
             }, options);
 
-            should(result).match({
-              _id: 'liia',
-              _source: { school: 'lfiduras' }
-            });
+          should(result).match({
+            _id: 'liia',
+            _source: { school: 'lfiduras' }
+          });
         });
     });
   });
@@ -105,9 +105,9 @@ describe('Bulk Controller', () => {
             _source: { school: 'lfiduras' }
           }
         ],
-        options = { notify: true };
+        opts = { notify: true };
 
-      return kuzzle.bulk.mWrite('vietnam', 'hochiminh', documents, options)
+      return kuzzle.bulk.mWrite('vietnam', 'hochiminh', documents, opts)
         .then(result => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -119,11 +119,11 @@ describe('Bulk Controller', () => {
               action: 'mWrite'
             }, options);
 
-            should(result.hits[0]).match({
-              _id: 'liia',
-              _source: { school: 'lfiduras' },
-              created: true
-            });
+          should(result.hits[0]).match({
+            _id: 'liia',
+            _source: { school: 'lfiduras' },
+            created: true
+          });
         });
     });
   });
