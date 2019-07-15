@@ -3,8 +3,8 @@ sudo: true
 jobs:
   include:
     - stage: Tests
-      name: "Unit Tests"
-      if: type = pull_request OR (type = push && branch =~ /^master|[0-9]+-(dev|stable)$/) OR type = cron
+      name: Unit Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
@@ -34,8 +34,8 @@ jobs:
         - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 
     - stage: Tests
-      name: "Integration Tests"
-      if: type = pull_request OR (type = push && branch =~ /^master|[0-9]+-(dev|stable)$/) OR type = cron
+      name: Integration Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
@@ -60,8 +60,8 @@ jobs:
         - npm run functional-testing
         
     - stage: Tests
-      name: "Documentation Tests"
-      if: type = pull_request OR (type = push && branch =~ /^master|[0-9]+-(dev|stable)$/) OR type = cron
+      name: Documentation Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
@@ -70,8 +70,8 @@ jobs:
       script:
         - npm run doc-testing
 
-    - stage: "Deploy Stable release on NPM"
-      if: tag IS present AND type != cron
+    - stage: Deploy Stable release on NPM
+      if: branch = master AND tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8
@@ -104,7 +104,7 @@ jobs:
           all_branches: true
           condition: $TRAVIS_BRANCH = master
 
-    - stage: "Deploy Beta release on NPM"
+    - stage: Deploy Beta release on NPM
       if: type = push && branch = /^[0-9]+-dev$/
       sudo: false
       language: node_js
