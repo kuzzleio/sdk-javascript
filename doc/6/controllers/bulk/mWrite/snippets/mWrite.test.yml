@@ -1,6 +1,6 @@
 ---
 name: bulk#mWrite
-description: Create or replace multiple documents directly into the storage engine.
+description: Creates or replaces multiple documents directly into the storage engine.
 hooks:
   before: |
     curl -X DELETE kuzzle:7512/nyc-open-data

@@ -2,7 +2,7 @@
 code: true
 type: page
 title: write
-description: Create or replace a document directly into the storage engine.
+description: Creates or replaces a document directly into the storage engine.
 ---
 
 # write
@@ -11,7 +11,7 @@ description: Create or replace a document directly into the storage engine.
 
 <SinceBadge version="Kuzzle 1.8.0" />
 
-Create or replace a document directly into the storage engine.
+Creates or replaces a document directly into the storage engine.
 
 This is a low level route intended to bypass Kuzzle actions on document creation, notably:
   - check [document validity](/core/1/guides/essentials/data-validation),

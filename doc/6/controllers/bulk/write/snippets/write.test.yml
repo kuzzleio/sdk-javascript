@@ -1,6 +1,6 @@
 ---
 name: bulk#write
-description: Create or replace a document directly into the storage engine.
+description: Creates or replaces a document directly into the storage engine.
 hooks:
   before: |
     curl -X DELETE kuzzle:7512/nyc-open-data

@@ -2,7 +2,7 @@
 code: true
 type: page
 title: mWrite
-description: Create or replace multiple documents directly into the storage engine.
+description: Creates or replaces multiple documents directly into the storage engine.
 ---
 
 # mWrite
@@ -11,7 +11,7 @@ description: Create or replace multiple documents directly into the storage engi
 
 <SinceBadge version="Kuzzle 1.8.0" />
 
-Create or replace multiple documents directly into the storage engine.
+Creates or replaces multiple documents directly into the storage engine.
 
 This is a low level route intended to bypass Kuzzle actions on document creation, notably:
   - check [document validity](/core/1/guides/essentials/data-validation),
@@ -35,7 +35,7 @@ mWrite (index, collection, documents, [options])
 
 ### documents
 
-An array of object. Each object describes a document to create or replace, by exposing the following properties:
+An array of objects. Each object describes a document to create or replace, by exposing the following properties:
   - `_id`: document unique identifier (optional)
   - `body`: document content
 
