@@ -7,7 +7,7 @@ description: Deletes a user and all their associate credentials
 
 # deleteUser
 
-Deletes a user and all their associate credentials.
+Deletes a user and all their associated credentials.
 
 <br />
 
