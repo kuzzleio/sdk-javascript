@@ -80,7 +80,7 @@ describe('HTTP networking module', () => {
       return protocol.connect()
         .then(() => {
           should(protocol.routes).match(staticHttpRoutes);
-          should(protocol._warn.callCount).be.eql(4);
+          should(protocol._warn.callCount).be.eql(3);
         });
     });
 
@@ -108,7 +108,7 @@ describe('HTTP networking module', () => {
       return protocol.connect()
         .then(() => {
           should(protocol.routes).match(staticHttpRoutes);
-          should(protocol._warn.callCount).be.eql(4);
+          should(protocol._warn.callCount).be.eql(3);
         });
     });
 

@@ -62,9 +62,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       .catch(error => {
         if (error.status === 401 || error.status === 403) {
           this._warn('"server:publicApi" route is restricted for anonymous user.');
-          this._warn('This route is used by the HTTP protocol to build API routes.');
-          this._warn('Some API routes may be missing and plugin custom routes will not be available.');
-          this._warn('Fallback to static routes, some API routes may be missing and plugin custom routes will not be available.');
+          this._warn('This route is used by the HTTP protocol to build API URLs.');
+          this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
 
           // fallback to static http routes
           this._routes = staticHttpRoutes;
@@ -84,9 +83,9 @@ class HttpWrapper extends KuzzleAbstractProtocol {
               }
 
               this._warn('"server:info" route is restricted for anonymous user.');
-              this._warn('This route is used by the HTTP protocol to build API routes.');
+              this._warn('This route is used by the HTTP protocol to build API URLs.');
               this._warn('If you want to expose your API routes without disclosing server information you can use "server:publicApi" (available in Kuzzle 1.9.0).');
-              this._warn('Fallback to static routes, some API routes may be missing and plugin custom routes will not be available.');
+              this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
 
               // fallback to static http routes
               this._routes = staticHttpRoutes;
