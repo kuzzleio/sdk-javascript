@@ -2,6 +2,7 @@ const
   proxyquire = require('proxyquire'),
   should = require('should'),
   sinon = require('sinon'),
+  staticHttpRoutes = require('../../src/protocols/routes.json'),
   HttpWrapper = require('../../src/protocols/http');
 
 describe('HTTP networking module', () => {
@@ -17,92 +18,36 @@ describe('HTTP networking module', () => {
     it('should expose an unique identifier', () => {
       should(protocol.id).be.a.String();
     });
-
-    it('should initialize http protocol with default routes', () => {
-      should(protocol.http.routes).match({
-        auth: {
-          login: {
-            verb: 'POST',
-            url: '/_login/:strategy'
-          }
-        },
-        bulk: {
-          import: {
-            verb: 'POST',
-            url: '/:index/:collection/_bulk'
-          }
-        },
-        document: {
-          create: {
-            verb: 'POST',
-            url: '/:index/:collection/_create'
-          }
-        },
-        security: {
-          createFirstAdmin: {
-            verb: 'POST',
-            url: '/_createFirstAdmin'
-          },
-          createRestrictedUser: {
-            verb: 'POST',
-            url: '/users/_createRestricted'
-          },
-          createUser: {
-            verb: 'POST',
-            url: '/users/_create'
-          }
-        }
-      });
-    });
-
-    it('should initialize http protocol with custom routes', () => {
-      const customProtocol = new HttpWrapper('address', {
-        port: 1234,
-        http: {
-          customRoutes: {
-            foo: {
-              bar: {verb: 'VERB', url: '/foo/bar'}
-            },
-            document: {
-              create: {verb: 'VERB', url: '/:index/:collection/_custom/_create'}
-            }
-          }
-        }
-      });
-
-      should(customProtocol.http.routes).match({
-        document: {
-          create: {
-            verb: 'VERB',
-            url: '/:index/:collection/_custom/_create'
-          }
-        },
-        foo: {
-          bar: {
-            verb: 'VERB',
-            url: '/foo/bar'
-          }
-        }
-      });
-    });
   });
 
   describe('#connect', () => {
-    const connectHttpResult = {
+    const serverPublicApiResult = {
+      result: {
+        foo: {
+          bar: {
+            http: [{ verb: 'VERB', url: '/foo/bar' }]
+          },
+          empty: {
+            http: []
+          }
+        }
+      }
+    };
+
+    const serverInfoResponse = {
       result: {
         serverInfo: {
           kuzzle: {
             api: {
               routes: {
-                foo: {
-                  bar: {
-                    http: [{verb: 'VERB', url: '/foo/bar'}]
+                gordon: {
+                  freeman: {
+                    http: [{ verb: 'VERB', url: '/gordon/freeman' }]
                   },
-                  empty: {
+                  vance: {
                     http: []
                   }
-                },
-                baz: {}
+                }
               }
             }
           }
@@ -111,19 +56,73 @@ describe('HTTP networking module', () => {
     };
 
     beforeEach(() => {
-      protocol._sendHttpRequest = sinon.stub().resolves(connectHttpResult);
+      protocol._sendHttpRequest = sinon.stub();
+      protocol._warn = sinon.stub();
+
+      protocol._sendHttpRequest.resolves(serverPublicApiResult);
+    });
+
+    it('should get routes from server:publicApi', () => {
+      return protocol.connect()
+        .then(() => {
+          should(protocol.routes).match({
+            foo: {
+              bar: { verb: 'VERB', url: '/foo/bar' }
+            }
+          });
+          should(protocol._warn).not.be.called();
+        });
+    });
+
+    it('should fallback to static routes if server:publicApi is restricted', () => {
+      protocol._sendHttpRequest.onCall(0).rejects({ status: 401 });
+
+      return protocol.connect()
+        .then(() => {
+          should(protocol.routes).match(staticHttpRoutes);
+          should(protocol._warn.callCount).be.eql(4);
+        });
+    });
+
+    it('should fallback to server:info if server:publicApi is not available', () => {
+      protocol._sendHttpRequest
+        .onCall(0).rejects({ status: 404 })
+        .onCall(1).resolves(serverInfoResponse);
+
+      return protocol.connect()
+        .then(() => {
+          should(protocol.routes).match({
+            gordon: {
+              freeman: { verb: 'VERB', url: '/gordon/freeman' }
+            }
+          });
+          should(protocol._warn).not.be.called();
+        });
+    });
+
+    it('should fallback to static routes if server:info is restricted', () => {
+      protocol._sendHttpRequest
+        .onCall(0).rejects({ status: 404 })
+        .onCall(1).rejects({ status: 403 });
+
+      return protocol.connect()
+        .then(() => {
+          should(protocol.routes).match(staticHttpRoutes);
+          should(protocol._warn.callCount).be.eql(4);
+        });
     });
 
 
     it('should initialize protocol status and route list', () => {
       const promise = protocol.connect();
+
       should(protocol.state).be.eql('offline');
 
       return promise.then(() => {
         should(protocol.state).be.eql('ready');
 
-        should(protocol.http.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
-        should(protocol.http.routes.foo.empty).be.undefined();
+        should(protocol.routes.foo.bar).match({verb: 'VERB', url: '/foo/bar'});
+        should(protocol.routes.foo.empty).be.undefined();
       });
     });
 
@@ -545,6 +544,69 @@ describe('HTTP networking module', () => {
     it('should not be ready if the instance is offline', () => {
       protocol.state = 'offline';
       should(protocol.isReady()).be.false();
+    });
+  });
+
+  describe('_constructRoutes', () => {
+    it('should construct http routes from server:publicApi', () => {
+      const publicApi = {
+        foo: {
+          login: {
+            http: [
+              { verb: 'GET', url: '/_login/:strategy' },
+              { verb: 'POST', url: '/_login/:strategy' },
+            ]
+          },
+          create: {
+            http: [
+              { verb: 'POST', url: '/:index/:collection/_create' },
+              { verb: 'POST', url: '/:index/:collection/:_id/_create' }
+            ]
+          },
+          subscribe: {},
+          list: {
+            http: [ { verb: 'GET', url: '/:index/_list' } ]
+          }
+        },
+      };
+
+
+      const routes = protocol._constructRoutes(publicApi);
+
+      should(routes.foo.list.url).be.eql('/:index/_list');
+      should(routes.foo.list.verb).be.eql('GET');
+
+      // with same URL size, we keep the POST route
+      should(routes.foo.login.url).be.eql('/_login/:strategy');
+      should(routes.foo.login.verb).be.eql('POST');
+
+      // with differents URL sizes, we keep the shortest because URL params
+      // will be in the query string
+      should(routes.foo.create.url).be.eql('/:index/:collection/_create');
+
+      should(routes.foo.subscribe).be.undefined();
+
+    });
+
+    it('should overwrite kuzzle routes with custom routes', () => {
+      const publicApi = {
+        foo: {
+          list: {
+            http: [ { verb: 'GET', url: '/:index/_list' } ]
+          }
+        },
+      };
+
+      protocol.customRoutes = {
+        foo: {
+          list: { verb: 'GET', url: '/overwrite/me/master' }
+        }
+      };
+
+      const routes = protocol._constructRoutes(publicApi);
+
+      should(routes.foo.list.url).be.eql('/overwrite/me/master');
+      should(routes.foo.list.verb).be.eql('GET');
     });
   });
 });
