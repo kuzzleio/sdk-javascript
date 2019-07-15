@@ -47,7 +47,7 @@ class BulkController extends BaseController {
 
   /**
    * Creates or replaces multiple documents directly into the storage engine.
-   * https://docs.kuzzle.io/core/1/api/controllers/bulk/m-write/
+   * {@link https://docs.kuzzle.io/core/1/api/controllers/bulk/m-write/|Official documentation}
    *
    * @param {String} index - Index name
    * @param {String} collection - Collection name

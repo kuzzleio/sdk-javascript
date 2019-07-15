@@ -52,9 +52,9 @@ Resolves to an object containing the document creation result.
 
 | Name      | Type              | Description                                            |
 | --------- | ----------------- | ------------------------------------------------------ |
-| \_id      | <pre>string</pre> | ID of the newly created document                       |
-| \_version | <pre>number</pre> | Version of the document in the persistent data storage |
-| \_source  | <pre>object</pre> | Created document                         
+| `\_id`      | <pre>string</pre> | ID of the newly created document                       |
+| `\_version` | <pre>number</pre> | Version of the document in the persistent data storage |
+| `\_source`  | <pre>object</pre> | Created document                         
 
 ## Usage
 
