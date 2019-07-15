@@ -35,8 +35,7 @@ Http protocol connection options.
 
 **Note:**
 
-`customRoutes` are used to define private API routes.  
-They can also overwrite existing API routes.
+`customRoutes` are used to define private API routes or to overwrite existing API routes.  
 They must have the following format:
 ```js
 {
