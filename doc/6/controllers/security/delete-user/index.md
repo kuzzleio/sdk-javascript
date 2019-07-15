@@ -33,7 +33,7 @@ Additional query options
 
 ## Resolves
 
-An object containing the `kuid` of the deletedUser in its `_id` property.
+An object containing the `kuid` of the deleted user in its `_id` property.
 
 ## Usage
 
