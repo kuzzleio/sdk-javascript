@@ -51,12 +51,24 @@
     "getMyCredentials": {
       "url": "/credentials/:strategy/_me",
       "verb": "GET"
+    },
+    "refreshToken": {
+      "url": "/_refreshToken",
+      "verb": "POST"
     }
   },
   "bulk": {
     "import": {
       "verb": "POST",
       "url": "/_bulk"
+    },
+    "write": {
+      "verb": "POST",
+      "url": "/:index/:collection/_write"
+    },
+    "mWrite": {
+      "verb": "POST",
+      "url": "/:index/:collection/_mWrite"
     }
   },
   "document": {
@@ -1406,6 +1418,18 @@
     },
     "shutdown": {
       "url": "/admin/_shutdown/",
+      "verb": "POST"
+    },
+    "loadFixtures": {
+      "url": "/admin/_loadFixtures/",
+      "verb": "POST"
+    },
+    "loadMappings": {
+      "url": "/admin/_loadMappings/",
+      "verb": "POST"
+    },
+    "loadSecurities": {
+      "url": "/admin/_loadSecurities/",
       "verb": "POST"
     }
   }

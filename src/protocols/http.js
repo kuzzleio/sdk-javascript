@@ -68,6 +68,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
           // fallback to static http routes
           this._routes = staticHttpRoutes;
+          this._staticRoutes = true;
 
           return;
         } else if (error.status === 404) {
@@ -89,6 +90,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
               // fallback to static http routes
               this._routes = staticHttpRoutes;
+              this._staticRoutes = true;
             });
         }
         throw error;
@@ -114,6 +116,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @returns {Promise<any>}
    */
   send (data) {
+    if (data.controller.indexOf('/') !== -1) {
+      throw new Error(`Cannot execute request to plugin controller ${data.controller}. You have to authorize anonymous user to access either "server:publicApi" or "server:info" route`);
+    }
+
     const
       payload = {
         action: undefined,

@@ -182,6 +182,15 @@ describe('HTTP networking module', () => {
       };
     });
 
+    it('should throw an error for plugin requests if the protocol use static route file', () => {
+      const request = {
+        controller: 'example-plugin/foo',
+        action: 'bar'
+      };
+
+      should(() => protocol.send(request)).throwError({ message: /"server:publicApi" or "server:info"/ });
+    });
+
     it('should send an HTTP request to the backend', done => {
       const data = {
         requestId: 'requestId',
