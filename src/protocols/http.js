@@ -94,7 +94,6 @@ class HttpWrapper extends KuzzleAbstractProtocol {
             });
         }
         throw error;
-
       })
       .then(() => {
         // Client is ready
