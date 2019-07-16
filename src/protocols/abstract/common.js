@@ -28,15 +28,15 @@ class AbstractWrapper extends KuzzleEventEmitter {
   }
 
   get host () {
-    return _host;
+    return this._host;
   }
 
   get port () {
-    return _port;
+    return this._port;
   }
 
   get ssl () {
-    return _ssl;
+    return this._ssl;
   }
 
   get connected () {
