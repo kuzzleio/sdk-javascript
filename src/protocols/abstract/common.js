@@ -23,6 +23,8 @@ class AbstractWrapper extends KuzzleEventEmitter {
         this[opt] = options[opt];
       }
     });
+
+    this.on('disconnected', () => this.clear());
   }
 
   get host () {
