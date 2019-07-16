@@ -5,20 +5,15 @@ const
   uuidv4 = require('../../uuidv4'),
   KuzzleEventEmitter = require('../../eventEmitter');
 
-// read-only properties
-let
-  _host,
-  _port,
-  _ssl;
-
 class AbstractWrapper extends KuzzleEventEmitter {
 
   constructor (host, options = {}) {
     super();
 
-    _host = host;
-    _port = typeof options.port === 'number' ? options.port : 7512;
-    _ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
+    this._pendingRequests = new Map();
+    this._host = host;
+    this._port = typeof options.port === 'number' ? options.port : 7512;
+    this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
     this.id = uuidv4();
     this.state = 'offline';
@@ -44,6 +39,10 @@ class AbstractWrapper extends KuzzleEventEmitter {
 
   get connected () {
     return this.state === 'online';
+  }
+
+  get pendingRequests () {
+    return this._pendingRequests;
   }
 
   /**
@@ -76,6 +75,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
    */
   close () {
     this.state = 'offline';
+    this.clear();
   }
 
   query (request) {
@@ -85,8 +85,12 @@ class AbstractWrapper extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
+    this._pendingRequests.set(request.requestId, request);
+
     return new Promise((resolve, reject) => {
       this.once(request.requestId, response => {
+        this._pendingRequests.delete(request.requestId);
+
         if (response.error) {
           const error = new KuzzleError(response.error);
 
@@ -108,6 +112,18 @@ Discarded request: ${JSON.stringify(request)}`));
 
   isReady () {
     return this.state === 'ready';
+  }
+
+  /**
+   * Clear pendings requests.
+   * Emits an event for each discarded pending request.
+   */
+  clear () {
+    for (const request of this._pendingRequests.values()) {
+      this.emit('discarded', request);
+    }
+
+    this._pendingRequests.clear();
   }
 
 }
