@@ -23,8 +23,6 @@ class AbstractWrapper extends KuzzleEventEmitter {
         this[opt] = options[opt];
       }
     });
-
-    this.on('disconnected', () => this.clear());
   }
 
   get host () {
@@ -68,6 +66,8 @@ class AbstractWrapper extends KuzzleEventEmitter {
    * Called when the client's connection is established
    */
   clientConnected (state, wasConnected) {
+    this.on('disconnected', () => this.clear());
+
     this.state = state || 'ready';
     this.emit(wasConnected && 'reconnect' || 'connect');
   }

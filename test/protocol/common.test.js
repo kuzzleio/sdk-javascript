@@ -6,6 +6,7 @@ const
 
 describe('Common Protocol', () => {
   let
+    sendSpy,
     protocol;
 
   beforeEach(function () {
@@ -17,17 +18,9 @@ describe('Common Protocol', () => {
   });
 
   describe('#query', () => {
-    let
-      sendSpy,
-      protocol;
 
     beforeEach(() => {
-      protocol = new AbstractWrapper('somewhere');
       protocol.isReady = sinon.stub().returns(true);
-      protocol.send = function(request) {
-        protocol.emit(request.requestId, request.response);
-      };
-      sendSpy = sinon.spy(protocol, 'send');
       protocol._emitRequest = sinon.stub().resolves();
     });
 
@@ -54,7 +47,7 @@ describe('Common Protocol', () => {
     });
 
     it('should adds the requests to pending requests', () => {
-      protocol.send = () => {}
+      protocol.send = () => {};
       const request = {requestId: 'bar', response: {}};
 
       protocol.query(request);
@@ -175,7 +168,6 @@ describe('Common Protocol', () => {
 
       protocol.clear();
 
-
       should(listener).be.calledTwice();
       should(listener.getCall(0).args).be.eql([request1]);
       should(listener.getCall(1).args).be.eql([request2]);
@@ -190,6 +182,6 @@ describe('Common Protocol', () => {
 
       should(protocol.state).be.eql('offline');
       should(protocol.clear).be.calledOnce();
-    })
+    });
   });
 });
