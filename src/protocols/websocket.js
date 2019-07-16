@@ -109,6 +109,7 @@ class WSNode extends RTWrapper {
         }
         else {
           this.emit('discarded', data);
+          this.emit('discardedResponse', data);
         }
       };
 

@@ -247,9 +247,12 @@ describe('WebSocket networking module', () => {
   });
 
   it('should send the message on room "discarded" if no room specified', () => {
-    const cb = sinon.stub();
+    const
+      cb = sinon.stub(),
+      cb2 = sinon.stub();
 
     websocket.on('discarded', cb);
+    websocket.on('discardedResponse', cb2);
     websocket.connect();
 
     const payload = {};
@@ -258,6 +261,8 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(cb.alwaysCalledWithMatch(payload)).be.true();
+    should(cb2).be.calledOnce();
+    should(cb2.alwaysCalledWithMatch(payload)).be.true();
   });
 
   it('should be able to unregister a callback on an event', () => {
