@@ -1,11 +1,15 @@
 'use strict';
 
+// used for unit tests
+const browserAtob = base64 => atob(base64);
+const bufferAvailable = () => typeof Buffer !== 'undefined';
+
 const decodeBase64 = base64 => {
-  if (typeof Buffer !== 'undefined') {
+  if (bufferAvailable()) {
     return Buffer.from(base64, 'base64').toString();
   }
 
-  return atob(base64);
+  return browserAtob(base64);
 };
 
 class Jwt {
