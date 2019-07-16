@@ -59,12 +59,11 @@ Each created document is an object with the following properties:
 
 | Name      | Type              | Description  |
 | --------- | ----------------- | ------------------- |
-| `\_id`      | <pre>string</pre> | ID of the newly created document                       |
-| `\_version` | <pre>number</pre> | Version of the document in the persistent data storage |
-| `\_source`  | <pre>object</pre> | Created document                         
+| `_id`      | <pre>string</pre> | ID of the newly created document                       |
+| `_version` | <pre>number</pre> | Version of the document in the persistent data storage |
+| `_source`  | <pre>object</pre> | Created document   |
 
 If one or more document creations fail, the promise is rejected and the `error` object contains a [partial error](/core/1/api/essentials/errors/#partialerror) error.
-
 
 ## Usage
 
