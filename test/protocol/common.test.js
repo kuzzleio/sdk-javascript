@@ -46,7 +46,7 @@ describe('Common Protocol', () => {
         .be.calledWith(request);
     });
 
-    it('should adds the requests to pending requests', () => {
+    it('should add the requests to pending requests', () => {
       protocol.send = () => {};
       const request = {requestId: 'bar', response: {}};
 
