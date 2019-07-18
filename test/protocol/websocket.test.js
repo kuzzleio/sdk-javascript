@@ -251,18 +251,25 @@ describe('WebSocket networking module', () => {
       cb = sinon.stub(),
       cb2 = sinon.stub();
 
+    let expectedError;
     websocket.on('discarded', cb);
-    websocket.on('discardedResponse', cb2);
+    websocket.on('queryError', (error, data) => {
+      expectedError = error;
+      cb2(error, data);
+    });
     websocket.connect();
 
-    const payload = {};
-    clientStub.onmessage({data: JSON.stringify(payload)});
+    const payload = { result: null, error: { message: 'Malformed request' } };
 
+    clientStub.onmessage({data: JSON.stringify(payload)});
     clock.tick(10);
-    should(cb).be.calledOnce();
-    should(cb.alwaysCalledWithMatch(payload)).be.true();
-    should(cb2).be.calledOnce();
-    should(cb2.alwaysCalledWithMatch(payload)).be.true();
+
+    should(cb)
+      .be.calledOnce()
+      .be.calledWithMatch(payload);
+    should(cb2)
+      .be.calledOnce()
+      .be.calledWithMatch(expectedError, payload);
   });
 
   it('should be able to unregister a callback on an event', () => {

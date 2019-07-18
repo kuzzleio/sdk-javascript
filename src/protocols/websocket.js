@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  KuzzleError = require('../KuzzleError'),
   RTWrapper = require('./abstract/realtime');
 
 class WSNode extends RTWrapper {
@@ -108,8 +109,11 @@ class WSNode extends RTWrapper {
           this.emit(data.room, data);
         }
         else {
+          // @deprecated
           this.emit('discarded', data);
-          this.emit('discardedResponse', data);
+
+          const error = new KuzzleError(data.error);
+          this.emit('queryError', error, data);
         }
       };
 
