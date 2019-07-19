@@ -1,11 +1,9 @@
-const root = '../..';
-
 const
   should = require('should'),
   sinon = require('sinon'),
-  KuzzleError = require(`${root}/src/KuzzleError`),
-  AbstractWrapper = require(`${root}/src/protocols/abstract/common`),
-  PendingRequest = require(`${root}/src/protocols/abstract/pendingRequest`);
+  KuzzleError = require('../../src/KuzzleError'),
+  AbstractWrapper = require('../../src/protocols/abstract/common'),
+  PendingRequest = require('../../src/protocols/abstract/pendingRequest');
 
 describe('Common Protocol', () => {
   let
