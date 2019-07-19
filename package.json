@@ -25,7 +25,9 @@
     "doc-testing": "bash test-docs.sh",
     "functional-testing": "cucumber-js --exit --fail-fast",
     "lint": "eslint --max-warnings=0 ./src ./test",
-    "build": "node build.js"
+    "build": "node build.js",
+    "prepare-doc": "bash doc/prepare-doc.sh",
+    "doc": "npm --prefix doc/framework run dev"
   },
   "browser": "dist/kuzzle.js",
   "main": "index.js",
