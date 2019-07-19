@@ -1,0 +1,18 @@
+FROM buildkite/puppeteer:latest
+
+RUN apt-get update -y && apt-get install --no-install-recommends -y -q \
+  curl \
+  build-essential \
+  ca-certificates \
+  git
+
+RUN mkdir /nodejs && curl http://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+
+ENV PATH $PATH:/nodejs/bin
+
+RUN npm i -g eslint eslint-plugin-import@latest eslint-plugin-node@latest eslint-plugin-promise@latest eslint-plugin-standard@latest
+RUN npm i -g puppeteer webpack@4.29.5 webpack-cli@3.2.3 html-webpack-plugin@3.2.0 --unsafe-perm=true
+
+WORKDIR /app
+
+ENTRYPOINT ["sh", "docker/entrypoint.sh"]

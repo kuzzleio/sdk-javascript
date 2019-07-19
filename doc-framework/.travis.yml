@@ -1,0 +1,120 @@
+language: node_js
+node_js:
+  - '10'
+
+services:
+  - docker
+
+env:
+  global:
+    - NODE_ENV=production
+    - AWS_S3_BUCKET_PROD=docs.kuzzle.io
+    - AWS_S3_BUCKET_NEXT=docs-next.kuzzle.io
+    - AWS_CLOUDFRONT_DISTRIBUTION_ID_PROD=E3D6RP0POLCJMM
+    - AWS_CLOUDFRONT_DISTRIBUTION_ID_NEXT=E2ZCCEK9GRB49U
+    - AWS_DEFAULT_REGION=us-west-2
+    # ALGOLIA_WRITE_KEY
+    - secure: mwbfknkwzXmtGObr9pclB9z930GSuLydJiac1/o/m53oNkL1YqUOFmCsfZ8XFmQCIpqWVWMnKmoXgTXvSOx551IBYakGDkil/O988pmX7/Z2r4n6ONvWbj1oCciCsH6zsZ4u28R0cZ6ELiZXdiSjz+bjRtbS70lOxVHZAp9HFPBXymIa6ala683l1uMejDfDFtCc0zi7Qi69TLxj+x7ggroUhWbzg5P2J0RfnpYy+KifMcbz1hmhqNTJpvGRmYBHf6GFgcOCc78z14Aay8IVQjdVMBA3AgnqhquS97PQis+gsHRpKn5rCSj4jncTz+Xa3xfz52tZ5ElsyZSi9Qio4k3GOK/SCocjS+gbr3qdVc1BOPBkhYmwkgYVFnzKx+T+87zqnZ809SdhQa1K3pXblMenjYVPGLxt242yPwNlQfdLAbmTaahmzWTfEgSzCoqjy6EcdwFHwUC/pqCBBfSlNKKfqLIfwgR/4b5j4o2F+GjKk64qnii3uVkGShuT15tB6vAvqbLrUr2/dWQC4ORXgyZqYxuGvQVmgJ8zVqQFcC16U+eVQQYqshfInwLVcU9RFrLj37ekiEgFkklV2dggVr3gVTEEPZPlkpMHn1kP/69VkMcEyP48DBHJ8Qi26EFaH7bviuXehnK9f9HzhqC3t/q8NLr/w07izHu9yzlS9V8=
+    # AWS_ACCESS_KEY_ID
+    - secure: 'SjFK79g6LMKIllQ+mV/Rs8H/sO5yrnVxurxUJZgol+o5xuWWgCbFScvvQ2gz4yjRpg2Esl6LtbQNaXsdhReIyfl5PNkcxQ7Ij8PDGYvvWVo0vUNgRFulp725feeZqwE03edUP9OEDe70UWSD9UZyXdeCIaXOUgNLEl0tg3iOk/AOn76J5n57cnx8VOuHyIftCA2L0qQUb7smBC3eVEL3upHz8y4eePWO3wgIZLnYSAqI5XZaL4ZHeXQmkQsjL4KcC4X2zHnphe2Y/u9JLalGB1R7WKqGY9LbN6KiF6Lx1Lo+jJ844IIH1LQ4geGrqEhQvz93eNI6mE0DacmToGKwL8l0Wbz4GZsTtgVQ1SJ9g0/38u9QPBmqbd9bwSGE35G+wfJ1CUFpkxWbzwX/5QmWLEMl6ActlfjebqJ7UqRNGGyIi8I+vOMAsb2VHnWXnlmP4WBkUmbOO4UH01VTDRNz49k7iaeRlkW/oY+qtD/w4osb5+FCqUAvxifoOPc82FLOYb/0EOCFICt02c5wWJxRRIS4i2pPT2ABsdO1oRe1uS/zMI2n4ZMtpMUMnMNFpALBDwle16g7sLhzVgqWDS3HWodMlDUjtup9CXeeFuAS783qjtu53TGj4/tWXLZdp6Jv+5AE0cs0G0qzpuGiFh5Hh+bZf1VYRoix4wa05jek95Y='
+    # AWS_SECRET_ACCESS_KEY
+    - secure: 'K1Hf0b0hgRRkIbudmJZCz96ZeObzRJsC4hUZ7N1aolAKkqRcb1HeKkWwD6Ql/kp2shnQ+QQhPVDlvJSDORJ1D+vZlDiYn8fYSjgcXLC1yfkzXkbezLQGZdyTGjpRyyv2vRt1JHtvLIXLrAg4INWyR2mQR/vW8lMdJkVcXnGu+CIdvncnQfYD6axVqWmqCgElEtCOZ3RUxxm2CHSqy7Caf9hF217lxAHORW6QEtfu86WvRoiIX08W9BQpNKvbdafiu0myVTnZUkn+w0ZhTGaS+nTd7AmIbPw8wQsRbm7ex9BTR4PpZMQOE/Aqtm5T7kEbpMK+oXRKIv2Y40YKTDaC27NQl12fZ0ORR6Gttm9DqXXACW8G5F87FkYJUSC8vo8UJFJSJhAKtzsqJRY5rIAr/tSFGwtxhhE4XV2eFC25zaNJsRXhzTyDB+OF9O0EUS2YgEZVfr3cxmUIDimKOsKP918zbjvBtLrZ1KJEs/1yR05J423CZ64T0RzLJ7HATzLt7Wo/nlzij73UglntxZlXWkhmZUGkT/UeNvTE+aPbfam+BWI2Y5v3qrxvtZ9IyOhSIVAsxi+/siRjv256pJnFLgpoGX8hH6rRP0TC3ri+8Sv/xV9ZxiUgUHhOhkUB57Uv1zHEOLR23vMRU1o8y4oA16bckc2SJ3SWrFXKT4qujgI='
+
+stages:
+  - name: Lint
+  - name: Tests
+    if: type = pull_request OR (type = push AND branch =~ /^master|[0-9]+-dev$/)
+  - name: Deployment
+    if: type != pull_request AND branch =~ /^master|3-dev$/
+
+jobs:
+  include:
+    - stage: Lint
+      if: type = pull_request OR (type = push AND branch =~ /^master|[0-9]+-dev$/)
+      name: Lint and check for dead links
+      language: ruby
+      script:
+        - git submodule update --init
+        - gem install typhoeus
+        - HYDRA_MAX_CONCURRENCY=50 ruby check_link.rb -p src/
+
+    # -------------------------------------------------------------------------
+    # Snippets tests
+    # -------------------------------------------------------------------------
+    - stage: Tests
+      name: Kuzzle SDK JS - v6
+
+      before_install:
+        - sysctl -w vm.max_map_count=262144
+
+      script:
+        - bash ./run-snippet-tests.sh -n -p src -s javascript -v 6
+
+    - stage: Tests
+      name: Kuzzle SDK Go - v1
+
+      before_install:
+        - sysctl -w vm.max_map_count=262144
+
+      script:
+        - bash ./run-snippet-tests.sh -p src -s go -v 1
+
+    # -------------------------------------------------------------------------
+    # Deployment - next
+    # -------------------------------------------------------------------------
+    - stage: Deployment
+      name: Deploy to next-docs.kuzzle.io
+      if: branch = 3-dev
+
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
+
+      install:
+        - pip install awscli --upgrade --user
+
+      script:
+        - npm install
+        - ALGOLIA_INDEX=kuzzle-documentation-next npm run build
+
+      deploy:
+        provider: script
+        script: aws s3 sync src/.vuepress/dist s3://$AWS_S3_BUCKET_NEXT --delete
+        skip_cleanup: true
+        on:
+          branch: 3-dev
+
+      after_deploy:
+        - aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID_NEXT --paths '/*'
+
+    # -------------------------------------------------------------------------
+    # Deployment - production
+    # -------------------------------------------------------------------------
+    - stage: Deployment
+      name: Deploy to docs.kuzzle.io
+      if: branch = master
+
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
+
+      install:
+        - pip install awscli --upgrade --user
+
+      script:
+        - npm install
+        - npm run build
+
+      deploy:
+        provider: script
+        script: aws s3 sync src/.vuepress/dist s3://$AWS_S3_BUCKET_PROD --delete
+        skip_cleanup: true
+        on:
+          branch: master
+
+      after_deploy:
+        - aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID_PROD --paths '/*'

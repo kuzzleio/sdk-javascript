@@ -1,0 +1,11 @@
+name: ms#rpop
+description: Removes the last element of a list and returns it
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - ^baz$
+  - "\\[ 'foo', 'bar' ]"
+sdk: js
+version: 6

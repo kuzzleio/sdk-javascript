@@ -1,0 +1,11 @@
+---
+name: kuzzle#useController
+description: Adds a new controller to the SDK
+hooks:
+  before:
+  after:
+template: controller
+expected: Success
+
+sdk: js
+version: 6

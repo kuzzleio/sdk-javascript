@@ -1,0 +1,23 @@
+# This file contain the list of supported sdk and versions info to download them.
+
+js:
+  5: master
+  6: 6-dev
+
+cpp:
+  1: 1-dev
+
+java:
+  1: 1-dev
+
+go:
+  1: 1-dev
+
+php:
+  3: master
+
+android:
+  3: master
+
+csharp:
+  1: 1-dev

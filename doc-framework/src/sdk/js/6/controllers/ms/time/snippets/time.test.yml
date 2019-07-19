@@ -1,0 +1,10 @@
+name: ms#time
+description: Returns the current server time
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - "\\[ \\d{10}, \\d+ ]$"
+sdk: js
+version: 6

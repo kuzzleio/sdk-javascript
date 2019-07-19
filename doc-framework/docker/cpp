@@ -1,0 +1,23 @@
+FROM amd64/debian:stretch-slim
+
+RUN apt-get update && apt-get install -y \
+  g++ \
+  gcc \
+  libc6-dev \
+  make \
+  pkg-config \
+  build-essential \
+  git \
+  python3-pip \
+  python3-dev \
+  curl && \
+  apt-get clean && \
+  pip3 install cpplint
+
+RUN mkdir /nodejs && curl http://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+
+ENV PATH $PATH:/nodejs/bin
+
+WORKDIR /app
+
+ENTRYPOINT ["sh", "docker/entrypoint.sh"]

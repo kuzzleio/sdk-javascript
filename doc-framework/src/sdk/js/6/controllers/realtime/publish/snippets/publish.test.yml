@@ -1,0 +1,10 @@
+name: realtime#publish
+description: Publish a realtime message
+hooks:
+  before:
+  after:
+template: default
+expected: Success
+
+sdk: js
+version: 6

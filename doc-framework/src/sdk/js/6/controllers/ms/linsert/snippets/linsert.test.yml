@@ -1,0 +1,9 @@
+name: ms#linsert
+description: Inserts a value in a list, either before or after a pivot value
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ 'foo', 'qux', 'bar', 'baz' ]"
+sdk: js
+version: 6

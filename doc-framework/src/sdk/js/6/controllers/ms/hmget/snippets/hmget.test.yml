@@ -1,0 +1,9 @@
+name: ms#hmget
+description: Returns the values of the specified hash's fields
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: \[ 'val3', 'val1' ]
+sdk: js
+version: 6

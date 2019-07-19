@@ -1,0 +1,602 @@
+---
+redirections:
+  # API
+  - from: api/1/controller-admin
+    to: core/1/api/controllers/admin
+
+  - from: api/1/controller-auth
+    to: core/1/api/controllers/auth
+
+  - from: api/1/controller-bulk
+    to: core/1/api/controllers/bulk
+
+  - from: api/1/controller-collection
+    to: core/1/api/controllers/collection
+
+  - from: api/1/controller-document
+    to: core/1/api/controllers/document
+
+  - from: api/1/controller-index
+    to: core/1/api/controllers/index
+
+  - from: api/1/controller-memory-storage
+    to: core/1/api/controllers/memory-storage
+
+  - from: api/1/controller-realtime
+    to: core/1/api/controllers/realtime
+
+  - from: api/1/controller-security
+    to: core/1/api/controllers/security
+
+  - from: api/1/controller-server
+    to: core/1/api/controllers/server
+
+  - from: api/1/essentials
+    to: core/1/api/essentials
+
+  # Guides
+  - from: guide/1/datavalidation
+    to: core/1/guides/cookbooks/datavalidation
+
+  - from: guide/1/dbsearch
+    to: core/1/guides/code-examples/dbsearch
+
+  - from: guide/1/elasticsearch
+    to: core/1/guides/cookbooks/elasticsearch
+
+  - from: guide/1/essentials
+    to: core/1/guides/essentials
+
+  - from: guide/1/geofencing
+    to: core/1/guides/code-examples/geofencing
+
+  - from: guide/1/getting-started
+    to: core/1/guides/getting-started
+
+  - from: guide/1/iot
+    to: core/1/guides/code-examples/iot
+
+  - from: guide/1/kuzzle-depth
+    to: core/1/guides/kuzzle-depth
+
+  - from: guide/1/pubsub
+    to: core/1/guides/code-examples/pubsub
+
+  - from: core/1/guides/essentials/persisted
+    to: core/1/guides/essentials/store-access-data
+
+  # Koncorde
+  - from: koncorde
+    to: core/1/guides/cookboks/realtime-api
+
+  - from: core/1/koncorde/essentials
+    to: core/1/guides/cookboks/realtime-api
+
+  # Plugin essentials
+  - from: plugins/1/essentials/available-plugins
+    to: officials-plugins
+
+  - from: core/1/plugins/essentials/available-plugins
+    to: officials-plugins
+
+  - from: plugins/1/essentials/getting-started
+    to: core/1/plugins/essentials/getting-started
+
+  - from: plugins/1/essentials/introduction
+    to: core/1/plugins/essentials/introduction
+
+  # Plugin guides
+  - from: plugins/1/controllers
+    to: core/1/plugins/guides/controllers
+
+  - from: plugins/1/events
+    to: core/1/plugins/guides/events
+
+  - from: plugins/1/hooks
+    to: core/1/plugins/guides/hooks
+
+  - from: plugins/1/manual-setup
+    to: core/1/plugins/guides/manual-setup
+
+  - from: plugins/1/pipes
+    to: core/1/plugins/guides/pipes
+
+  - from: plugins/1/strategies
+    to: core/1/plugins/guides/strategies
+
+  - from: core/1/plugins/essentials/getting-started/adding-authentication-strategy
+    to: core/1/plugins/guides/strategies
+
+  # Plugin context
+  - from: plugins/1/accessors
+    to: core/1/plugins/plugin-context/accessors
+
+  - from: plugins/1/constructors
+    to: core/1/plugins/plugin-context/constructors
+
+  - from: plugins/1/errors
+    to: core/1/plugins/plugin-context/errors
+
+  - from: plugins/1/log
+    to: core/1/plugins/plugin-context/log
+
+  # Protocols essentials
+  - from: protocols/1/essentials/getting-started
+    to: core/1/protocols/essentials/getting-started
+
+  # Protocols api
+  - from: protocols/1/context
+    to: core/1/protocols/api/context
+
+  - from: protocols/1/entrypoint
+    to: core/1/protocols/api/entrypoint
+
+  - from: protocols/1/methods
+    to: core/1/protocols/api/methods
+
+  # Protocols native protocols
+  - from: protocols/1/native-protocols
+    to: core/1/protocols/native-protocols
+
+  # JS 6 essentials
+  - from: sdk-reference/js/6/getting-started
+    to: sdk/js/6/getting-started
+
+  - from: sdk-reference/js/6/error-handling
+    to: sdk/js/6/essentials/error-handling
+
+  - from: sdk-reference/js/6/events
+    to: sdk/js/6/essentials/events
+
+  - from: sdk-reference/js/6/realtime-notifications
+    to: sdk/js/6/essentials/realtime-notifications
+
+  - from: sdk-reference/js/6/offline-tools
+    to: sdk/js/6/essentials/offline-tools
+
+  - from: sdk-reference/js/6/extend-sdk
+    to: sdk/js/6/essentials/extend-sdk
+
+  # JS 6 core classes
+  - from: sdk-reference/js/6/base-controller
+    to: sdk/js/6/core-classes/base-controller
+
+  - from: sdk-reference/js/6/kuzzle
+    to: sdk/js/6/core-classes/kuzzle
+
+  - from: sdk-reference/js/6/kuzzle-error
+    to: sdk/js/6/core-classes/kuzzle-error
+
+  - from: sdk-reference/js/6/kuzzle-event-emitter
+    to: sdk/js/6/core-classes/kuzzle-event-emitter
+
+  - from: sdk-reference/js/6/profile
+    to: sdk/js/6/core-classes/profile
+
+  - from: sdk-reference/js/6/role
+    to: sdk/js/6/core-classes/role
+
+  - from: sdk-reference/js/6/search-result
+    to: sdk/js/6/core-classes/search-result
+
+  - from: sdk-reference/js/6/user
+    to: sdk/js/6/core-classes/user
+
+  # JS 6 protocols
+  - from: sdk-reference/js/6/http
+    to: sdk/js/6/protocols/http
+
+  - from: sdk-reference/js/6/websocket
+    to: sdk/js/6/protocols/websocket
+
+  - from: sdk-reference/js/6/socketio
+    to: sdk/js/6/protocols/socketio
+
+  # JS 6 Controllers
+  - from: sdk-reference/js/6/auth
+    to: sdk/js/6/controllers/auth
+
+  - from: sdk-reference/js/6/bulk
+    to: sdk/js/6/controllers/bulk
+
+  - from: sdk-reference/js/6/collection
+    to: sdk/js/6/controllers/collection
+
+  - from: sdk-reference/js/6/document
+    to: sdk/js/6/controllers/document
+
+  - from: sdk-reference/js/6/index
+    to: sdk/js/6/controllers/index
+
+  - from: sdk-reference/js/6/ms
+    to: sdk/js/6/controllers/ms
+
+  - from: sdk-reference/js/6/realtime
+    to: sdk/js/6/controllers/realtime
+
+  - from: sdk-reference/js/6/server
+    to: sdk/js/6/controllers/server
+
+  # JS 5 essentials
+  - from: sdk-reference/js/5/handling-errors
+    to: sdk/js/5/essentials/error-handling
+
+  - from: sdk-reference/js/5/events
+    to: sdk/js/5/essentials/events
+
+  - from: sdk-reference/js/5/offline-first
+    to: sdk/js/5/essentials/offline-tools
+
+  - from: sdk-reference/js/5/notifications
+    to: sdk/js/5/essentials/realtime-notifications
+
+  # JS 5 core classes
+  - from: sdk-reference/js/5/collection
+    to: sdk/js/5/core-classes/collection
+
+  - from: sdk-reference/js/5/collection-mapping
+    to: sdk/js/5/core-classes/collection-mapping
+
+  - from: sdk-reference/js/5/document
+    to: sdk/js/5/core-classes/document
+
+  - from: sdk-reference/js/5/kuzzle
+    to: sdk/js/5/core-classes/kuzzle
+
+  - from: sdk-reference/js/5/memory-storage
+    to: sdk/js/5/core-classes/memory-storage
+
+  - from: sdk-reference/js/5/profile
+    to: sdk/js/5/core-classes/profile
+
+  - from: sdk-reference/js/5/role
+    to: sdk/js/5/core-classes/role
+
+  - from: sdk-reference/js/5/room
+    to: sdk/js/5/core-classes/room
+
+  - from: sdk-reference/js/5/search-result
+    to: sdk/js/5/core-classes/search-result
+
+  - from: sdk-reference/js/5/security
+    to: sdk/js/5/core-classes/security
+
+  - from: sdk-reference/js/5/user
+    to: sdk/js/5/core-classes/user
+
+  # Java 1 essentials
+  - from: sdk-reference/java/1/error-handling
+    to: sdk/java/1/essentials/error-handling
+
+  - from: sdk-reference/java/1/events
+    to: sdk/java/1/essentials/events
+
+  - from: sdk-reference/java/1/getting-started
+    to: sdk/java/1/essentials/getting-started
+
+  - from: sdk-reference/java/1/offline-tools
+    to: sdk/java/1/essentials/offline-tools
+
+  - from: sdk-reference/java/1/realtime-notifications
+    to: sdk/java/1/essentials/realtime-notifications
+
+  # Java 1 core classes
+  - from: sdk-reference/java/1/kuzzle
+    to: sdk/java/1/core-classes/kuzzle
+
+  - from: sdk-reference/java/1/search-result
+    to: sdk/java/1/core-classes/search-result
+
+  # Java 1 protocols
+  - from: sdk-reference/java/1/protocol/websocket
+    to: sdk/java/1/protocols/websocket
+
+  # Java 1 controllers
+  - from: sdk-reference/java/1/auth
+    to: sdk/java/1/controllers/auth
+
+  - from: sdk-reference/java/1/collection
+    to: sdk/java/1/controllers/collection
+
+  - from: sdk-reference/java/1/document
+    to: sdk/java/1/controllers/document
+
+  - from: sdk-reference/java/1/index
+    to: sdk/java/1/controllers/index
+
+  - from: sdk-reference/java/1/realtime
+    to: sdk/java/1/controllers/realtime
+
+  - from: sdk-reference/java/1/server
+    to: sdk/java/1/controllers/server
+
+  # Go 1 essentials
+  - from: sdk-reference/go/1/error-handling
+    to: sdk/go/1/essentials/error-handling
+
+  - from: sdk-reference/go/1/events
+    to: sdk/go/1/essentials/events
+
+  - from: sdk-reference/go/1/getting-started
+    to: sdk/go/1/essentials/getting-started
+
+  - from: sdk-reference/go/1/offline-tools
+    to: sdk/go/1/essentials/offline-tools
+
+  - from: sdk-reference/go/1/realtime-notifications
+    to: sdk/go/1/essentials/realtime-notifications
+
+  # Go 1 core structs
+  - from: sdk-reference/go/1/kuzzle
+    to: sdk/go/1/core-structs/kuzzle
+
+  - from: sdk-reference/go/1/search-result
+    to: sdk/go/1/core-structs/search-result
+
+  - from: sdk-reference/go/1/kuzzle-event-emitter
+    to: sdk/go/1/core-structs/kuzzle-event-emitter
+
+  # Go 1 protocols
+  - from: sdk-reference/go/1/protocols/websocket
+    to: sdk/go/1/protocols/websocket
+
+  # Go 1 controllers
+  - from: sdk-reference/go/1/auth
+    to: sdk/go/1/controllers/auth
+
+  - from: sdk-reference/go/1/collection
+    to: sdk/go/1/controllers/collection
+
+  - from: sdk-reference/go/1/document
+    to: sdk/go/1/controllers/document
+
+  - from: sdk-reference/go/1/index
+    to: sdk/go/1/controllers/index
+
+  - from: sdk-reference/go/1/realtime
+    to: sdk/go/1/controllers/realtime
+
+  - from: sdk-reference/go/1/server
+    to: sdk/go/1/controllers/server
+
+  # Cpp 1 essentials
+  - from: sdk-reference/cpp/1/error-handling
+    to: sdk/cpp/1/essentials/error-handling
+
+  - from: sdk-reference/cpp/1/events
+    to: sdk/cpp/1/essentials/events
+
+  - from: sdk-reference/cpp/1/getting-started
+    to: sdk/cpp/1/essentials/getting-started
+
+  - from: sdk-reference/cpp/1/offline-tools
+    to: sdk/cpp/1/essentials/offline-tools
+
+  - from: sdk-reference/cpp/1/realtime-notifications
+    to: sdk/cpp/1/essentials/realtime-notifications
+
+  # Cpp 1 core classes
+  - from: sdk-reference/cpp/1/kuzzle
+    to: sdk/cpp/1/core-classes/kuzzle
+
+  - from: sdk-reference/cpp/1/search-result
+    to: sdk/cpp/1/core-classes/search-result
+
+  - from: sdk-reference/cpp/1/user
+    to: sdk/cpp/1/core-classes/user
+
+  - from: sdk-reference/cpp/1/user-right
+    to: sdk/cpp/1/core-classes/user-right
+
+  # Cpp 1 virtual classes
+  - from: sdk-reference/cpp/1/protocol
+    to: sdk/cpp/1/virtual-classes/protocol
+
+  # Cpp 1 protocols
+  - from: sdk-reference/cpp/1/websocket
+    to: sdk/cpp/1/protocols/websocket
+
+  # Cpp 1 controllers
+  - from: sdk-reference/cpp/1/auth
+    to: sdk/cpp/1/controllers/auth
+
+  - from: sdk-reference/cpp/1/collection
+    to: sdk/cpp/1/controllers/collection
+
+  - from: sdk-reference/cpp/1/document
+    to: sdk/cpp/1/controllers/document
+
+  - from: sdk-reference/cpp/1/index
+    to: sdk/cpp/1/controllers/index
+
+  - from: sdk-reference/cpp/1/realtime
+    to: sdk/cpp/1/controllers/realtime
+
+  - from: sdk-reference/cpp/1/server
+    to: sdk/cpp/1/controllers/server
+
+  # Android 3 essentials
+  - from: sdk-reference/android/3/handling-errors
+    to: sdk/android/3/essentials/error-handling
+
+  - from: sdk-reference/android/3/events
+    to: sdk/android/3/essentials/events
+
+  - from: sdk-reference/android/3/offline-first
+    to: sdk/android/3/essentials/offline-tools
+
+  - from: sdk-reference/android/3/notifications
+    to: sdk/android/3/essentials/realtime-notifications
+
+  # Android 3 core classes
+  - from: sdk-reference/android/3/collection
+    to: sdk/android/3/core-classes/collection
+
+  - from: sdk-reference/android/3/collection-mapping
+    to: sdk/android/3/core-classes/collection-mapping
+
+  - from: sdk-reference/android/3/document
+    to: sdk/android/3/core-classes/document
+
+  - from: sdk-reference/android/3/kuzzle
+    to: sdk/android/3/core-classes/kuzzle
+
+  - from: sdk-reference/android/3/memory-storage
+    to: sdk/android/3/core-classes/memory-storage
+
+  - from: sdk-reference/android/3/profile
+    to: sdk/android/3/core-classes/profile
+
+  - from: sdk-reference/android/3/role
+    to: sdk/android/3/core-classes/role
+
+  - from: sdk-reference/android/3/room
+    to: sdk/android/3/core-classes/room
+
+  - from: sdk-reference/android/3/search-result
+    to: sdk/android/3/core-classes/search-result
+
+  - from: sdk-reference/android/3/security
+    to: sdk/android/3/core-classes/security
+
+  - from: sdk-reference/android/3/user
+    to: sdk/android/3/core-classes/user
+
+  # PHP 3 essentials
+  - from: sdk-reference/php/3/handling-errors
+    to: sdk/php/3/essentials/error-handling
+
+  - from: sdk-reference/php/3/events
+    to: sdk/php/3/essentials/events
+
+  # PHP 3 core classes
+  - from: sdk-reference/php/3/collection
+    to: sdk/php/3/core-classes/collection
+
+  - from: sdk-reference/php/3/collection-mapping
+    to: sdk/php/3/core-classes/collection-mapping
+
+  - from: sdk-reference/php/3/document
+    to: sdk/php/3/core-classes/document
+
+  - from: sdk-reference/php/3/kuzzle
+    to: sdk/php/3/core-classes/kuzzle
+
+  - from: sdk-reference/php/3/memory-storage
+    to: sdk/php/3/core-classes/memory-storage
+
+  - from: sdk-reference/php/3/profile
+    to: sdk/php/3/core-classes/profile
+
+  - from: sdk-reference/php/3/role
+    to: sdk/php/3/core-classes/role
+
+  - from: sdk-reference/php/3/search-result
+    to: sdk/php/3/core-classes/search-result
+
+  - from: sdk-reference/php/3/security
+    to: sdk/php/3/core-classes/security
+
+  - from: sdk-reference/php/3/user
+    to: sdk/php/3/core-classes/user
+
+  # Legacy (doc v1)
+  - from: api-documentation
+    to: core/1/api
+
+  - from: sdk-reference/essentials
+    to: sdk
+
+  - from: elasticsearch-cookbook/bool-query
+    to: core/1/guides/cookbooks/elasticsearch/bool-query
+
+  - from: guide/getting-started
+    to: core/1/guides/getting-started
+
+  - from: guide/essentials/installing-kuzzle
+    to: core/1/guides/essentials/installing-kuzzle
+
+  - from: guide/essentials/installing-console
+    to: core/1/guides/essentials/admin-console
+
+  - from: guide/code-examples/geofencing/javascript
+    to: core/1/guides/code-examples/geofencing/javascript
+
+  - from: guide/essentials
+    to: core/1/guides/essentials
+
+  - from: sdk-reference/collection
+    to: sdk
+
+  - from: elasticsearch-cookbook/useful-commands
+    to: core/1/guides/cookbooks/elasticsearch/useful-commands
+
+  - from: guide/code-examples/dbsearch/javascript
+    to: core/1/guides/code-examples/dbsearch/javascript
+
+  - from: guide/essentials/plugins
+    to: core/1/plugins/essentials/
+
+  - from: guide/kuzzle-depth
+    to: core/1/guides/kuzzle-depth
+
+  - from: plugins-reference/plugins-features
+    to: core/1/plugins/essentials/getting-started
+
+  - from: sdk-reference/essentials/events
+    to: sdk/js/6/essentials/events
+
+  - from: sdk-reference/essentials/notifications
+    to: sdk/js/6/essentials/realtime-notifications
+
+  - from: elasticsearch-cookbook/basic-queries
+    to: core/1/guides/cookbooks/elasticsearch/basic-queries
+
+  - from: guide/essentials/real-time
+    to: core/1/guides/essentials/real-time
+
+  - from: sdk-reference/collection/search
+    to: sdk
+
+  - from: sdk-reference/kuzzle
+    to: sdk
+
+  - from: sdk-reference
+    to: sdk
+
+  - from: api-documentation/query-syntax
+    to: core/1/api/essentials/query-syntax
+
+  - from: kuzzle-events/plugin-events
+    to: core/1/plugins/guides/events
+
+  - from: sdk-reference/kuzzle/login
+    to: sdk/js/6/controllers/auth/login
+
+  - from: sdk-reference/memory-storage/pfadd
+    to: sdk/js/6/controllers/ms/pfadd
+
+# Not auto generated by check_link.rb
+  - from: plugins/1/essentials/strategies
+    to: core/1/guides/kuzzle-depth/authentication/#additional-authentication-strategies
+
+  - from: plugins-reference/protocols/
+  - to: core/1/protocols/essentials/getting-started/
+
+  - from: api/1/controller-collection/create/
+  - to: core/1/api/controllers/collection/create/
+
+  - from: guide/1/essentials/introduction/plugins/
+  - to: core/1/plugins/essentials/introduction/
+
+  - from: plugins/1/essentials/getting-started/adding-authentication-strategy/
+  - to: core/1/plugins/guides/strategies/overview/
+
+  - from: plugins/1/essentials/getting-started/adding-controllers/
+  - to: core/1/plugins/guides/controllers/
+
+  - from: plugins/1/essentials/pipes
+  - to: core/1/plugins/guides/pipes/
+
+  - from: plugins/1/plugin-layout/init-function/
+  - to: core/1/plugins/essentials/getting-started/#init-function

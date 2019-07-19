@@ -1,0 +1,9 @@
+name: ms#append
+description: Appends a value to a key. If the key does not exist, it is created
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: Hello World
+sdk: js
+version: 6

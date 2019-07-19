@@ -1,0 +1,9 @@
+name: ms#hincrby
+description: Increments the number stored in a hash field by the provided integer value
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: ^42$
+sdk: js
+version: 6

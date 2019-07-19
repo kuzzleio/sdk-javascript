@@ -1,0 +1,11 @@
+name: ms#smove
+description: Moves a member from a set of unique values to another
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - "\\[ '(bar|baz)', '(bar|baz)' ]"
+  - "\\[ '(foo|qux)', '(foo|qux)' ]"
+sdk: js
+version: 6

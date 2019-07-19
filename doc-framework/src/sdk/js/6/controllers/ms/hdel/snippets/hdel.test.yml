@@ -1,0 +1,11 @@
+name: ms#hdel
+description: Removes fields from a hash
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected:
+  - ^2$
+  - ^1$
+sdk: js
+version: 6

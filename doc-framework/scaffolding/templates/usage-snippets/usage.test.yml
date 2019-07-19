@@ -1,0 +1,7 @@
+name: <%= _.camelCase(controller) %>#<%= _.camelCase(action) %>
+description:
+hooks:
+  before:
+  after:
+template: default
+expected: Success

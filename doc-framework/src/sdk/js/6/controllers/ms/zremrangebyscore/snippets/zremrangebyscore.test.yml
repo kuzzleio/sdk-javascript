@@ -1,0 +1,9 @@
+name: ms#zremrangebyscore
+description: Removes members from a sorted set, by score
+hooks:
+  before: curl -X POST kuzzle:7512/ms/_flushdb
+  after:
+template: default
+expected: "\\[ { member: 'baz', score: -272.15 } ]"
+sdk: js
+version: 6
