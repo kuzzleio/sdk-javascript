@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/ag-grid/dist/styles/ag-grid.css">
+  <link rel="stylesheet" href="https://unpkg.com/ag-grid/dist/styles/ag-theme-material.css">
+  <link rel="stylesheet" href="prism.css">
+</head>
+
+<body>
+  <script src="prism.js"></script>
+  <style>
+    h1{
+      font: 600 42px "Roboto", sans-serif;
+    }
+    p{
+      font: 400 14px "Roboto", sans-serif;
+    }
+    .ag-theme-material .bg-success {
+      background-color: lightgreen !important;
+    }
+    .ag-theme-material .bg-fail {
+      background-color: lightcoral !important;
+    }
+    .modal {
+      max-width: 800px;
+      background-color: #2d2d2d;
+    }
+    .modal-error {
+      background-color: lightcoral;
+    }
+  </style>
+
+  <h1>TESTS REPORT : <span id="language"></span></h1>
+  <p>
+    <span id="number"></span> tests launched at <span id="datetime"></span>
+  </p>
+
+  <canvas id="pie-chart" width="250" height="250"></canvas>
+  <br>
+  <div id="myGrid" style="width:auto;" class="ag-theme-material"></div>
+  <div id="ex1" class="modal">
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/ag-grid/dist/ag-grid.min.noStyle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.min.js"></script>
+  <script src="./main.js"></script>
+</body>
+
+</html>

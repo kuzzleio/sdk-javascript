@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+const
+  program = require('commander');
+
+program
+  .command('generate <path>')
+  .description('generate a full scaffold for a controller action')
+  .action(require('./lib/generateCommand.js'));
+
+program
+  .command('copy <src> <dest>')
+  .description('generate a scaffold for a controller action based an existing sdk')
+  .action(require('./lib/copyCommand.js'));
+
+program.parse(process.argv);

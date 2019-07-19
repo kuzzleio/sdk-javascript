@@ -1,0 +1,18 @@
+[submodule ".sdk-repos/sdk-javascript-v5"]
+	path = .sdk-repos/sdk-javascript-v5
+	url = https://github.com/kuzzleio/sdk-javascript.git
+[submodule ".plugin-repos/kuzzle-plugin-s3-v1"]
+	path = .plugin-repos/kuzzle-plugin-s3-v1
+	url = https://github.com/kuzzleio/kuzzle-plugin-s3.git
+[submodule ".sdk-repos/sdk-android-v3"]
+	path = .sdk-repos/sdk-android-v3
+	url = https://github.com/kuzzleio/sdk-android.git
+[submodule ".sdk-repos/sdk-javascript-v6"]
+	path = .sdk-repos/sdk-javascript-v6
+	url = https://github.com/kuzzleio/sdk-javascript.git
+[submodule ".sdk-repos/sdk-php-v3"]
+	path = .sdk-repos/sdk-php-v3
+	url = https://github.com/kuzzleio/sdk-php.git
+[submodule ".plugin-repos/kuzzle-plugin-cloudinary-v1"]
+  path = .plugin-repos/kuzzle-plugin-cloudinary-v1
+  url = https://github.com/kuzzleio/kuzzle-plugin-cloudinary.git

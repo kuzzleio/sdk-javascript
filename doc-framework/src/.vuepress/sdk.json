@@ -1,0 +1,62 @@
+[
+  {
+    "language": "api",
+    "name": "API 1.x",
+    "version": "1",
+    "icon": "/logo-57x57.png"
+  },
+  {
+    "language": "js",
+    "name": "Javascript 6.x",
+    "version": "6",
+    "icon": "/logos/js.svg"
+  },
+  {
+    "language": "js",
+    "name": "Javascript 5.x",
+    "version": "5",
+    "icon": "/logos/js.svg"
+  },
+  {
+    "language": "cpp",
+    "name": "C++ 1.x",
+    "version": "1",
+    "icon": "/logos/cpp.svg"
+  },
+  {
+    "language": "go",
+    "name": "Golang 1.x",
+    "version": "1",
+    "icon": "/logos/go.svg"
+  },
+  {
+    "language": "go",
+    "name": "Golang 2.x",
+    "version": "2",
+    "icon": "/logos/go.svg"
+  },
+  {
+    "language": "java",
+    "name": "Java 1.x",
+    "version": "1",
+    "icon": "/logos/java.svg"
+  },
+  {
+    "language": "java",
+    "name": "Java 2.x",
+    "version": "2",
+    "icon": "/logos/java.svg"
+  },
+  {
+    "language": "android",
+    "name": "Android 3.x",
+    "version": "3",
+    "icon": "/logos/android.svg"
+  },
+  {
+    "language": "php",
+    "name": "PHP 3.x",
+    "version": "3",
+    "icon": "/logos/php.svg"
+  }
+]

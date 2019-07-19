@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+
+const
+  TestManager = require('./lib/testManager');
+
+function help () {
+  console.log('Usage: snippet-testing <sdk> <version> <path>');
+  process.exit(1);
+}
+
+if (process.argv.length !== 5) {
+  help();
+}
+
+const
+  sdk = process.argv[2],
+  version = process.argv[3],
+  path = process.argv[4];
+
+if (!sdk || !version || !path) {
+  help();
+}
+
+(async () => {
+  try {
+    const
+      manager = new TestManager(sdk, version, path);
+
+    await manager.downloadSdk();
+
+    manager.crawlSnippets();
+
+    await manager.runSnippets();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+})();
