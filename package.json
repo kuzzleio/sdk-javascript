@@ -59,6 +59,7 @@
     "should-sinon": "0.0.6",
     "sinon": "^7.3.0"
   },
+
   "engines": {
     "node": ">= 6.9.1"
   }
