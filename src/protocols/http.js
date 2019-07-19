@@ -171,6 +171,12 @@ class HttpWrapper extends KuzzleAbstractProtocol {
         xhr = new XMLHttpRequest(),
         url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 0) {
+          reject(new Error('Cannot connect to host. Is the host online?'));
+        }
+      };
+
       xhr.open(method, url);
 
       for (const header of Object.keys(payload.headers || {})) {
