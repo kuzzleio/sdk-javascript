@@ -205,7 +205,7 @@ class Kuzzle extends KuzzleEventEmitter {
   set jwt (encodedJwt) {
     this.auth.authenticationToken = encodedJwt;
   }
-  
+
   get connected () {
     return this.protocol.connected;
   }
@@ -368,9 +368,13 @@ class Kuzzle extends KuzzleEventEmitter {
 
     if (!request.volatile) {
       request.volatile = this.volatile;
-    } else if (typeof request.volatile !== 'object' || Array.isArray(request.volatile)) {
+    } else if (
+      typeof request.volatile !== 'object'
+      || Array.isArray(request.volatile)
+    ) {
       throw new Error(`Kuzzle.query: Invalid volatile argument received: ${JSON.stringify(request.volatile)}`);
     }
+
     for (const item of Object.keys(this.volatile)) {
       if (request.volatile[item] === undefined) {
         request.volatile[item] = this.volatile[item];
@@ -460,15 +464,15 @@ Discarded request: ${JSON.stringify(request)}`));
     }
 
     const controller = new ControllerClass(this);
-    
+
     if (!(controller.name && controller.name.length > 0)) {
       throw new Error('Controllers must have a name.');
     }
-    
+
     if (controller.kuzzle !== this) {
       throw new Error('You must pass the Kuzzle SDK instance to the parent constructor.');
     }
-    
+
     if (this.__proxy__) {
       this.__proxy__.registerProp(accessor);
     }

@@ -1,8 +1,11 @@
+const root = '../..';
+
 const
   should = require('should'),
   sinon = require('sinon'),
-  KuzzleError = require('../../src/KuzzleError'),
-  AbstractWrapper = require('../../src/protocols/abstract/common');
+  KuzzleError = require(`${root}/src/KuzzleError`),
+  AbstractWrapper = require(`${root}/src/protocols/abstract/common`),
+  PendingRequest = require(`${root}/src/protocols/abstract/pendingRequest`);
 
 describe('Common Protocol', () => {
   let
@@ -52,7 +55,9 @@ describe('Common Protocol', () => {
 
       protocol.query(request);
 
-      should(protocol.pendingRequests.get('bar')).be.eql(request);
+      const pending = protocol.pendingRequests.get('bar');
+
+      pending.should.be.an.instanceOf(PendingRequest).and.match({request});
     });
 
     it('should fire a "queryError" event and reject if an error occurred', () => {
@@ -103,7 +108,7 @@ describe('Common Protocol', () => {
           should(res.error).be.null();
           should(res.result).be.exactly(response.result);
           should(res.status).be.exactly(42);
-          should(protocol.pendingRequests.get('bar')).be.undefined();
+          should(protocol.pendingRequests.has('bar')).be.false();
         });
     });
 
@@ -155,13 +160,23 @@ describe('Common Protocol', () => {
   });
 
   describe('#clear', () => {
-    it('should send "discarded" event for each pending request', () => {
+    it('should discard and reject cleared requests', () => {
       const
         request1 = { requestId: '12345', body: 'foobar' },
         request2 = { requestId: '54321', body: 'barfoo' };
 
-      protocol._pendingRequests.set(request1, request1);
-      protocol._pendingRequests.set(request2, request2);
+      protocol.state = 'ready';
+      protocol.send = () => {};
+
+      protocol.query(request1);
+      protocol.query(request2);
+
+      protocol.listenerCount(request1.requestId).should.be.eql(1);
+      protocol.listenerCount(request2.requestId).should.be.eql(1);
+
+      const
+        pending1 = protocol._pendingRequests.get(request1.requestId),
+        pending2 = protocol._pendingRequests.get(request2.requestId);
 
       const listener = sinon.stub();
       protocol.on('discarded', listener);
@@ -171,6 +186,14 @@ describe('Common Protocol', () => {
       should(listener).be.calledTwice();
       should(listener.getCall(0).args).be.eql([request1]);
       should(listener.getCall(1).args).be.eql([request2]);
+
+      should(protocol._pendingRequests).be.empty();
+
+      protocol.listenerCount(request1.requestId).should.be.eql(0);
+      protocol.listenerCount(request2.requestId).should.be.eql(0);
+
+      return pending1.promise.should.be.rejectedWith({message: 'Network error: request was sent but no response has been received'})
+        .then(() => pending2.promise.should.be.rejectedWith({message: 'Network error: request was sent but no response has been received'}));
     });
   });
 

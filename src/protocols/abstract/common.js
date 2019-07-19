@@ -3,10 +3,10 @@
 const
   KuzzleError = require('../../KuzzleError'),
   uuidv4 = require('../../uuidv4'),
-  KuzzleEventEmitter = require('../../eventEmitter');
+  KuzzleEventEmitter = require('../../eventEmitter'),
+  PendingRequest = require('./pendingRequest');
 
 class AbstractWrapper extends KuzzleEventEmitter {
-
   constructor (host, options = {}) {
     super();
 
@@ -66,8 +66,6 @@ class AbstractWrapper extends KuzzleEventEmitter {
    * Called when the client's connection is established
    */
   clientConnected (state, wasConnected) {
-    this.on('disconnected', () => this.clear());
-
     this.state = state || 'ready';
     this.emit(wasConnected && 'reconnect' || 'connect');
   }
@@ -87,29 +85,30 @@ class AbstractWrapper extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    this._pendingRequests.set(request.requestId, request);
+    const pending = new PendingRequest(request);
+    this._pendingRequests.set(request.requestId, pending);
 
-    return new Promise((resolve, reject) => {
-      this.once(request.requestId, response => {
-        this._pendingRequests.delete(request.requestId);
+    this.once(request.requestId, response => {
+      this._pendingRequests.delete(request.requestId);
 
-        if (response.error) {
-          const error = new KuzzleError(response.error);
+      if (response.error) {
+        const error = new KuzzleError(response.error);
 
-          this.emit('queryError', error, request);
+        this.emit('queryError', error, request);
 
-          if (request.action !== 'logout' && error.message === 'Token expired') {
-            this.emit('tokenExpired');
-          }
-
-          return reject(error);
+        if (request.action !== 'logout' && error.message === 'Token expired') {
+          this.emit('tokenExpired');
         }
 
-        return resolve(response);
-      });
+        return pending.reject(error);
+      }
 
-      this.send(request);
+      pending.resolve(response);
     });
+
+    this.send(request);
+
+    return pending.promise;
   }
 
   isReady () {
@@ -121,8 +120,11 @@ Discarded request: ${JSON.stringify(request)}`));
    * Emits an event for each discarded pending request.
    */
   clear () {
-    for (const request of this._pendingRequests.values()) {
-      this.emit('discarded', request);
+    const rejectedError = new Error('Network error: request was sent but no response has been received');
+    for (const pending of this._pendingRequests.values()) {
+      pending.reject(rejectedError);
+      this.removeAllListeners(pending.request.requestId);
+      this.emit('discarded', pending.request);
     }
 
     this._pendingRequests.clear();
