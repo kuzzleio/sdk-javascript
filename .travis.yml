@@ -22,6 +22,33 @@ jobs:
 
       before_install:
         - export CC="gcc-4.9" CXX="g++-4.9"
+
+      install:
+        - npm install
+
+      script:
+        - npm run lint
+        - npm run unit-testing
+
+      after_success:
+        - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+
+    - stage: Tests
+      name: Integration Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      language: node_js
+      node_js: 8
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
+
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
         - sudo sysctl -w vm.max_map_count=262144
         - "./.ci/start_kuzzle.sh"
 
@@ -30,13 +57,11 @@ jobs:
 
       script:
         - npm run build
-        - npm test
-        
-      after_success:  
-        - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+        - npm run functional-testing
 
-    - name: Documentation tests
-      stage: Tests
+    - stage: Tests
+      name: Documentation Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
@@ -45,8 +70,19 @@ jobs:
       script:
         - npm run doc-testing
 
-    - stage: "Deploy Stable release on NPM"
-      if: type != pull_request && branch = master
+    - stage: Tests
+      name: Dead link check
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+
+      before_script:
+        - npm run doc-prepare
+        - npm run --prefix doc/framework clone-repos
+      script:
+        - npm run --prefix doc/framework dead-links
+
+
+    - stage: Deploy Stable release on NPM
+      if: branch = master AND tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8
@@ -113,4 +149,3 @@ jobs:
             repo: kuzzleio/sdk-javascript
             all_branches: true
             condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
-
