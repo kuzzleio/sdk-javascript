@@ -159,6 +159,7 @@ describe('WebSocket networking module', () => {
   it('should call listeners on a "disconnect" event', () => {
     const cb = sinon.stub();
 
+    sinon.spy(websocket, 'clear');
     websocket.retrying = false;
     websocket.addListener('disconnect', cb);
     should(websocket.listeners('disconnect').length).be.eql(1);
@@ -169,11 +170,13 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(websocket.listeners('disconnect').length).be.eql(1);
+    websocket.clear.should.be.calledOnce();
   });
 
   it('should call error listeners on a "disconnect" event with an abnormal websocket code', () => {
     const cb = sinon.stub();
 
+    sinon.spy(websocket, 'clear');
     websocket.retrying = false;
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
@@ -188,8 +191,10 @@ describe('WebSocket networking module', () => {
     should(cb.firstCall.args[0].internal.status).be.equal(4666);
     should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
+    websocket.clear.should.be.calledOnce();
 
     cb.reset();
+    websocket.clear.resetHistory();
     websocket.connect();
     clientStub.onclose({code: 4666, reason: 'foobar'});
 
@@ -199,6 +204,7 @@ describe('WebSocket networking module', () => {
     should(cb.firstCall.args[0].internal.status).be.equal(4666);
     should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
+    websocket.clear.should.be.calledOnce();
   });
 
   it('should be able to register ephemeral callbacks on an event', () => {

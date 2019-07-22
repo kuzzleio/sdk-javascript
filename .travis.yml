@@ -29,8 +29,8 @@ jobs:
       script:
         - npm run lint
         - npm run unit-testing
-        
-      after_success:  
+
+      after_success:
         - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
 
     - stage: Tests
@@ -58,7 +58,7 @@ jobs:
       script:
         - npm run build
         - npm run functional-testing
-        
+
     - stage: Tests
       name: Documentation Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
@@ -67,6 +67,17 @@ jobs:
 
       script:
         - npm run doc-testing
+
+    - stage: Tests
+      name: Dead link check
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+
+      before_script:
+        - npm run doc-prepare
+        - npm run --prefix doc/framework clone-repos
+      script:
+        - npm run --prefix doc/framework dead-links
+
 
     - stage: Deploy Stable release on NPM
       if: branch = master AND tag IS present AND type != cron
@@ -136,4 +147,3 @@ jobs:
             repo: kuzzleio/sdk-javascript
             all_branches: true
             condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
-
