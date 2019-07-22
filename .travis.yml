@@ -65,6 +65,8 @@ jobs:
       language: node_js
       node_js: 8
 
+      before_script:
+        - sudo apt-get install libgconf-2-4
       script:
         - npm run doc-testing
 
@@ -78,6 +80,18 @@ jobs:
         - gem install typhoeus
       script:
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
+
+    - stage: Deploy documentation
+      if: branch = master AND type != cron
+      sudo: false
+      language: node_js
+      node_js: 10
+      end:
+        - NODE_ENV=production
+        - AWS_BUCKET=doctest.kuzzle.io
+
+      before_script:
+        - npm run --prefix doc/framework clone-repos
 
 
     - stage: Deploy Stable release on NPM
