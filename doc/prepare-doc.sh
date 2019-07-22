@@ -2,9 +2,9 @@
 
 set -e
 
-echo "Init documentation framework submodule"
-git submodule init framework/
-git submodule update framework/
+echo "Clone documentation framework"
+rm -rf framework
+git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
 
 echo "Link local documentation"
 mkdir framework/.repos/sdk/sdk-javascript-6/doc/
