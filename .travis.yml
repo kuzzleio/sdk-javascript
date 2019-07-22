@@ -75,6 +75,7 @@ jobs:
       before_script:
         - npm run doc-prepare
         - npm run --prefix doc/framework clone-repos
+        - gem install typhoeus
       script:
         - npm run --prefix doc/framework dead-links
 
