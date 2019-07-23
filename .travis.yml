@@ -110,13 +110,13 @@ jobs:
       deploy:
         provider: script
         script:
-          - npm run upload
+          - npm run doc-upload
         skip_cleanup: true
         on:
           branch: 6-dev
 
       after_deploy:
-        - npm run cloudfront
+        - npm run doc-cloudfront
 
     - stage: Deployment Prod
       name: Deploy docs.kuzzle.io
@@ -146,13 +146,13 @@ jobs:
       deploy:
         provider: script
         script:
-          - npm run upload
+          - npm run doc-upload
         skip_cleanup: true
         on:
           branch: master
 
       after_deploy:
-        - npm run cloudfront
+        - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
       if: branch = master AND tag IS present AND type != cron
