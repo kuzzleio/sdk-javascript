@@ -82,7 +82,7 @@ jobs:
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
 
 
-    - stage: Deployment Dev
+    - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
       if: branch = 6-dev
       language: node_js
@@ -121,7 +121,7 @@ jobs:
       after_deploy:
         - npm run doc-cloudfront
 
-    - stage: Deployment Prod
+    - stage: Deployment Doc Prod
       name: Deploy docs.kuzzle.io
       if: branch = master
       language: node_js
