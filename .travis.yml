@@ -112,6 +112,8 @@ jobs:
         script:
           - npm run upload
         skip_cleanup: true
+        on:
+          branch: 6-dev
 
       after_deploy:
         - npm run cloudfront
@@ -147,7 +149,7 @@ jobs:
           - npm run upload
         skip_cleanup: true
         on:
-          branch: 6-dev
+          branch: master
 
       after_deploy:
         - npm run cloudfront

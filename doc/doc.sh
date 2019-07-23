@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 export DOC_DIR=6
 export SITE_BASE=/sdk/js/6/
 
@@ -28,22 +30,10 @@ case $1 in
   ;;
 
   upload)
-    if [ -z "$AWS_BUCKET" ]
-    then
-      echo "Missing AWS_BUCKET."
-      exit 1
-    fi
-
     aws s3 sync doc/$DOC_DIR/.vuepress/dist s3://$AWS_BUCKET$SITE_BASE
   ;;
 
   cloudfront)
-    if [ -z "$CLOUDFRONT_DISTRIBUTION_ID" ]
-    then
-      echo "Missing CLOUDFRONT_DISTRIBUTION_ID."
-      exit 1
-    fi
-
     aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'
   ;;
 
