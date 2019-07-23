@@ -3,7 +3,7 @@
 export DOC_DIR=6
 export SITE_BASE=/sdk/js/6/
 
-if [ ! -d "./$DOC_DIR"]
+if [ ! -d "./$DOC_DIR" ]
 then
   echo "Cannot find $DOC_DIR/. You must run this script from doc/ directory."
   exit 1
