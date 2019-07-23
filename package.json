@@ -21,9 +21,10 @@
     "unit-testing": "nyc --reporter=text-summary --reporter=lcov mocha",
     "lint": "eslint --max-warnings=0 ./src ./test",
     "build": "node build.js",
-    "doc-prepare": "cd doc && bash prepare-doc.sh",
-    "doc-dev": "npm --prefix doc/framework run dev",
-    "doc-build": "npm --prefix doc/framework run build"
+    "doc-prepare": "cd doc && bash doc.sh prepare",
+    "doc-dev": "cd doc && bash doc.sh dev",
+    "doc-build": "cd doc && bash doc.sh build",
+    "doc-deploy": "cd doc && bash doc.sh deploy"
   },
   "browser": "src/Kuzzle.js",
   "main": "index.js",
