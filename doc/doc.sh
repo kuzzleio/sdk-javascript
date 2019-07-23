@@ -5,6 +5,9 @@ set -eu
 export DOC_DIR=6
 export SITE_BASE=/sdk/js/6/
 
+# Used to specify --no-cache for example
+ARGS=${2:-""}
+
 if [ ! -d "./$DOC_DIR" ]
 then
   echo "Cannot find $DOC_DIR/. You must run this script from doc/ directory."
@@ -22,11 +25,11 @@ case $1 in
   ;;
 
   dev)
-    ./framework/node_modules/.bin/vuepress dev $DOC_DIR/ $2
+    ./framework/node_modules/.bin/vuepress dev $DOC_DIR/ $ARGS
   ;;
 
   build)
-    ./framework/node_modules/.bin/vuepress build $DOC_DIR/ $2
+    ./framework/node_modules/.bin/vuepress build $DOC_DIR/ $ARGS
   ;;
 
   upload)
