@@ -12,7 +12,7 @@ order: 410
 
 It is possible to extend the SDK's API by adding new controllers.
 
-These controllers correspond to [custom controllers created in a plugin](/core/1/plugins/guides/controllers). Thus, it is possible to use the actions of a core plugin in the SDK in the same way as the other actions of the Kuzzle API.
+These controllers correspond to [custom controllers created in a plugin](/core/1/plugins/gu/controllers). Thus, it is possible to use the actions of a core plugin in the SDK in the same way as the other actions of the Kuzzle API.
 
 ## Define a custom SDK controller
 
