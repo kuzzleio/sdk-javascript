@@ -18,10 +18,13 @@
     "bulk"
   ],
   "scripts": {
-    "test": "npm run --silent lint && npm run unit-testing",
     "unit-testing": "nyc --reporter=text-summary --reporter=lcov mocha",
     "lint": "eslint --max-warnings=0 ./src ./test",
-    "build": "node build.js"
+    "build": "node build.js",
+    "doc-prepare": "cd doc && bash doc.sh prepare",
+    "doc-dev": "cd doc && bash doc.sh dev",
+    "doc-build": "cd doc && bash doc.sh build",
+    "doc-deploy": "cd doc && bash doc.sh deploy"
   },
   "browser": "src/Kuzzle.js",
   "main": "index.js",
