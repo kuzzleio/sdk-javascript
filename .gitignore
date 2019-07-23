@@ -16,3 +16,4 @@ examples/node_modules/
 coverage/
 
 doc/framework
+dead_links.json
