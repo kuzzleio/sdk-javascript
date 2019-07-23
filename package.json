@@ -24,7 +24,9 @@
     "doc-prepare": "cd doc && bash doc.sh prepare",
     "doc-dev": "cd doc && bash doc.sh dev",
     "doc-build": "cd doc && bash doc.sh build",
-    "doc-deploy": "cd doc && bash doc.sh deploy"
+    "doc-upload": "cd doc && bash doc.sh upload",
+    "doc-cloudfront": "cd doc && bash doc.sh cloudfront",
+    "doc-deploy": "npm run doc-upload && npm run doc-cloudfront"
   },
   "browser": "src/Kuzzle.js",
   "main": "index.js",
