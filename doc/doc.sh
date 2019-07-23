@@ -30,7 +30,7 @@ case $1 in
   ;;
 
   upload)
-    aws s3 sync doc/$DOC_DIR/.vuepress/dist s3://$AWS_BUCKET$SITE_BASE
+    aws s3 sync doc/$DOC_DIR/.vuepress/dist s3://$S3_BUCKET$SITE_BASE
   ;;
 
   cloudfront)
