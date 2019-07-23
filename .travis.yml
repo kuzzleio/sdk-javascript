@@ -104,8 +104,8 @@ jobs:
         - pip install awscli --upgrade --user
 
       script:
-        - npm install
-        - npm run build
+        - npm run doc-prepare
+        - npm run doc-build
 
       deploy:
         provider: script
@@ -140,8 +140,8 @@ jobs:
         - pip install awscli --upgrade --user
 
       script:
-        - npm install
-        - npm run build
+        - npm run doc-prepare
+        - npm run doc-build
 
       deploy:
         provider: script
