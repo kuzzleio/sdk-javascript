@@ -19,6 +19,6 @@ If you need real-time features, then you have to use either [WebSocket](/sdk/js/
 <SinceBadge version="Kuzzle 1.9.0">
 
 ::: warning
-This protocol use the `server:publicApi` route to construct URLs to Kuzzle API.  
-You must allow this route for anonymous users otherwise plugin routes will not be available.
+This protocol needs [server:publicApi](/core/1/api/controllers/server/public-api) to build URLs for requests to the Kuzzle API.
+You must allow this route for the anonymous user otherwise the plugin routes will not be available
 :::
