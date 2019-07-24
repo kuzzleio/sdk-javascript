@@ -86,7 +86,7 @@ Triggered whenever Kuzzle responds with an error
 **Callback arguments:**
 
 `@param {KuzzleError} error - Error details`
-`@param {object} request - Request that causing an error`
+`@param {object} request - Request that caused the error`
 
 ## reconnected
 
