@@ -59,7 +59,7 @@ Example:
 
 ## Resolves
 
-An [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the newly created administrator.
+A [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the newly created administrator.
 
 ## Usage
 
