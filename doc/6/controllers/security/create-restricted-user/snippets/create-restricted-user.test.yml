@@ -1,5 +1,5 @@
 name: security#createRestrictedUser
-description: create a restricted user
+description: creates a restricted user
 hooks:
   after: curl -XDELETE http://kuzzle:7512/users/jdoe
 template: default
