@@ -1,16 +1,49 @@
 sudo: true
 
+env:
+  global:
+    - AWS_ACCESS_KEY_ID=AKIAIYAXFUAHXOWP2MJA
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "HU48VGBdv/GyVAm6g8eiA3DbKoAPL98AeORbF7UhKLQenxmQRGb1gfdMPNLdop35+95SlxcFC9ogoHcqLBSPLLcTSX57faWpNacD/7j69Z03avgdmfaFOGMOwGd5tOdq4pYmis34xyGJW1kpwAl2U6jp/pcBXABDnCLfRS5kJUsXvrwdE75UACoXQ1tXEtqq9y5LcFo/dGYrhuVvqYQmAUA+ExrfXaIKtUSf2tN5CvYL0cSxLyoQlnbbIQvouyNRyfuGFqNHc3jyBOc/nZWHS0ES91+6ddwZs/i9Fs98TfB3JS9x+gKYWrhDmxek/fOy22+qYUHQ81txk4SQ3GILWiWTfWOTdsBU+Y0FYnC5syLAqpdIstBhmMUUS8NWs5HdYmBv4q0zkTiwBGL/wrLwXkAcLLKUNOrUeMAL1fjQuVRC3hzql15s/A2LwPOR6xwyCu1mH8GKogYulGVWOEHQuk8bC3MaKgDr/4ZoUlCC9Q+mYP/WT+t/NA/0OQIvZVhVVilXk1MTbQMkvrBSuiuxACsyFGVNrkLaC8x2Pjyd2kgZaIv4c2JiiWfvW5IZd7xeyLLKESOfHP8rIf60jmvE7hxD9Yje7JXjo0uvnpEGx2PuMSq5zeUynoLaa8AIMAJ9an3fgdfKKcZ/XPOCAgpmxnKH+leAQx86qwxdAAIkgPY="
+
 jobs:
   include:
-    - name: Sdk tests
-      stage: Tests
-      sudo: false
+    - stage: Tests
+      name: Unit Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
       env:
         # Codecov token
         secure: ATb4QFGG6sPkfquAoye6BeN7u4uQ4abP8qatVK8XG3Qof+pECZwRkFPVoopO1Gb/4bQSPfapc1aGPzGuKi409v633vpDnpcgM7cHX9CPT+YQYcTePMFtq/m+5YY3WIYWM1zCFmJ+bBwQO/MtsubfGfA9EmSAAxtnJV+1JDD3Y6+NQRkQN7K+gxQozec0u1W0Oe1sJXLSKlW3JPL8iRtKcLvmIDysKtBK6X/Wg1qP2Me4reb449a0yGej3QvZDbDYJbdlh7vuFLjXJAz3yExfED8QAm8wf0p9F8emILHnkLxjumTTnGUUqDJLLu8WgkahFiyFo4jMtryhNQ0+p6WhXmEbpNIO+yMGSZPsCGbnpkhWJ1aMAT6ZhgpHf4jDZQd4ZJi02+n9tOpe+Lm2Jk2LXY8SwMk3xGtqm5sk03weTc019TUGj/NLoHNjO/vfNz3xOImD5Gck3bXWNxdrX3bjiyVsr/u77enoWu9drPCEl3JOTIwVP3mTF8R3axSFOQ8M4SI1orCMChkGMB5qExl+Gfx+MHa/jL7QKO1SFRgl1O3DbhsyFE6xiabYzwLcdbI50ypy6VJjmDd5RxK7BkDa8RumlHT1uY1FK9yRXu4XFrrw9FjF2s+xjWbliRZqXRReXk0W1Hz4zj5au3Y9YH5a/UPtB72TY+AUUWHTUPQl3SU=
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
+
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
+
+      install:
+        - npm install
+
+      script:
+        - npm run lint
+        - npm run unit-testing
+
+      after_success:
+        - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+
+    - stage: Tests
+      name: Integration Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      language: node_js
+      node_js: 8
 
       addons:
         apt:
@@ -30,13 +63,11 @@ jobs:
 
       script:
         - npm run build
-        - npm test
-        
-      after_success:  
-        - cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+        - npm run functional-testing
 
-    - name: Documentation tests
-      stage: Tests
+    - stage: Tests
+      name: Documentation Tests
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
       node_js: 8
 
@@ -45,8 +76,90 @@ jobs:
       script:
         - npm run doc-testing
 
-    - stage: "Deploy Stable release on NPM"
-      if: type != pull_request && branch = master
+    - stage: Tests
+      name: Dead link check
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+
+      before_script:
+        - npm run doc-prepare
+        - npm run --prefix doc/framework clone-repos
+      script:
+        - gem install typhoeus
+        - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
+
+
+    - stage: Deployment Doc Dev
+      name: Deploy next-docs.kuzzle.io
+      if: branch = 6-dev
+      language: node_js
+      node_js: 10
+      env:
+        - NODE_ENV=production
+        - S3_BUCKET=docs-next.kuzzle.io
+        - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
+        - AWS_DEFAULT_REGION=us-west-2
+
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
+
+      install:
+        - pip install awscli --upgrade --user
+
+      script:
+        - npm run doc-prepare
+        - npm run doc-build
+
+      deploy:
+        provider: script
+        script:
+          - npm run doc-upload
+        skip_cleanup: true
+        on:
+          branch: 6-dev
+
+      after_deploy:
+        - npm run doc-cloudfront
+
+    - stage: Deployment Doc Prod
+      name: Deploy docs.kuzzle.io
+      if: branch = master
+      language: node_js
+      node_js: 10
+      env:
+        - NODE_ENV=production
+        - S3_BUCKET=docs.kuzzle.io
+        - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
+        - AWS_DEFAULT_REGION=us-west-2
+
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
+
+      install:
+        - pip install awscli --upgrade --user
+
+      script:
+        - npm run doc-prepare
+        - npm run doc-build
+
+      deploy:
+        provider: script
+        script:
+          - npm run doc-upload
+        skip_cleanup: true
+        on:
+          branch: master
+
+      after_deploy:
+        - npm run doc-cloudfront
+
+    - stage: Deploy Stable release on NPM
+      if: branch = master AND tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8
@@ -79,8 +192,8 @@ jobs:
           all_branches: true
           condition: $TRAVIS_BRANCH = master
 
-    - stage: "Deploy Beta release on NPM"
-      if: type != pull_request && branch =~ ^[0-9]+-beta$
+    - stage: Deploy Beta release on NPM
+      if: type = push && branch = /^[0-9]+-dev$/
       sudo: false
       language: node_js
       node_js: 8
@@ -113,4 +226,3 @@ jobs:
             repo: kuzzleio/sdk-javascript
             all_branches: true
             condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
-

@@ -43,6 +43,7 @@ class RTWrapper extends KuzzleAbstractProtocol {
    * Called when the client's connection is closed
    */
   clientDisconnected() {
+    this.clear();
     this.emit('disconnect');
   }
 
@@ -53,6 +54,7 @@ class RTWrapper extends KuzzleAbstractProtocol {
    */
   clientNetworkError(error) {
     this.state = 'offline';
+    this.clear();
 
     const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
     connectionError.internal = error;

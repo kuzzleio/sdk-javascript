@@ -1,11 +1,15 @@
 'use strict';
 
-const decodeBase64 = base64 => {
-  if (Buffer) {
-    return Buffer.from(base64, 'base64').toString();
-  } 
+// used for unit tests
+const browserAtob = base64 => atob(base64);
+const bufferAvailable = () => typeof Buffer !== 'undefined';
 
-  return atob(base64);
+const decodeBase64 = base64 => {
+  if (bufferAvailable()) {
+    return Buffer.from(base64, 'base64').toString();
+  }
+
+  return browserAtob(base64);
 };
 
 class Jwt {
@@ -35,19 +39,19 @@ class Jwt {
   }
 
   _decode () {
-    const [, payloadRaw, ] = this._encodedJwt.split('.');
+    const payloadRaw = this._encodedJwt.split('.')[1];
 
     if (!payloadRaw) {
       throw new Error('Invalid JWT format');
     }
-    
+
     let payload;
     try {
       payload = JSON.parse(decodeBase64(payloadRaw));
     } catch (error) {
       throw new Error('Invalid JSON payload for JWT');
     }
-    
+
     this._userId = payload._id;
     this._expiresAt = payload.exp;
   }
