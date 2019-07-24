@@ -1,5 +1,5 @@
 name: security#deleteUser
-description: delete user
+description: Deletes a user
 hooks:
   before: >
     curl -H "Content-type: application/json" -d '{
