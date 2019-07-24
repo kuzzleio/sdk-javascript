@@ -36,7 +36,7 @@ An array of objects. Each object is a security right described by the security p
 - `action`: impacted controller action
 - `index`: index name
 - `collection`: collection name
-- `value`: tell if access if `allowed` or `denied`. If closures have been configured on the detailed scope, the value is `conditional`.
+- `value`: tells if access if `allowed` or `denied`. If closures have been configured on the detailed scope, the value is `conditional`.
 
 ## Usage
 
