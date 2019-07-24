@@ -1,5 +1,5 @@
 name: security#deleteProfile
-description: delete profile
+description: deletes profile
 hooks:
   before: >
     curl -H "Content-type: application/json" -d '{
