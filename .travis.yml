@@ -1,5 +1,11 @@
 sudo: true
 
+env:
+  global:
+    - AWS_ACCESS_KEY_ID=AKIAIYAXFUAHXOWP2MJA
+    # AWS_SECRET_ACCESS_KEY
+    - secure: "HU48VGBdv/GyVAm6g8eiA3DbKoAPL98AeORbF7UhKLQenxmQRGb1gfdMPNLdop35+95SlxcFC9ogoHcqLBSPLLcTSX57faWpNacD/7j69Z03avgdmfaFOGMOwGd5tOdq4pYmis34xyGJW1kpwAl2U6jp/pcBXABDnCLfRS5kJUsXvrwdE75UACoXQ1tXEtqq9y5LcFo/dGYrhuVvqYQmAUA+ExrfXaIKtUSf2tN5CvYL0cSxLyoQlnbbIQvouyNRyfuGFqNHc3jyBOc/nZWHS0ES91+6ddwZs/i9Fs98TfB3JS9x+gKYWrhDmxek/fOy22+qYUHQ81txk4SQ3GILWiWTfWOTdsBU+Y0FYnC5syLAqpdIstBhmMUUS8NWs5HdYmBv4q0zkTiwBGL/wrLwXkAcLLKUNOrUeMAL1fjQuVRC3hzql15s/A2LwPOR6xwyCu1mH8GKogYulGVWOEHQuk8bC3MaKgDr/4ZoUlCC9Q+mYP/WT+t/NA/0OQIvZVhVVilXk1MTbQMkvrBSuiuxACsyFGVNrkLaC8x2Pjyd2kgZaIv4c2JiiWfvW5IZd7xeyLLKESOfHP8rIf60jmvE7hxD9Yje7JXjo0uvnpEGx2PuMSq5zeUynoLaa8AIMAJ9an3fgdfKKcZ/XPOCAgpmxnKH+leAQx86qwxdAAIkgPY="
+
 jobs:
   include:
     - stage: Tests
@@ -92,9 +98,6 @@ jobs:
         - S3_BUCKET=docs-next.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
         - AWS_DEFAULT_REGION=us-west-2
-        - AWS_ACCESS_KEY_ID=AKIAIYAXFUAHXOWP2MJA
-        # AWS_SECRET_ACCESS_KEY
-        - secure: "HU48VGBdv/GyVAm6g8eiA3DbKoAPL98AeORbF7UhKLQenxmQRGb1gfdMPNLdop35+95SlxcFC9ogoHcqLBSPLLcTSX57faWpNacD/7j69Z03avgdmfaFOGMOwGd5tOdq4pYmis34xyGJW1kpwAl2U6jp/pcBXABDnCLfRS5kJUsXvrwdE75UACoXQ1tXEtqq9y5LcFo/dGYrhuVvqYQmAUA+ExrfXaIKtUSf2tN5CvYL0cSxLyoQlnbbIQvouyNRyfuGFqNHc3jyBOc/nZWHS0ES91+6ddwZs/i9Fs98TfB3JS9x+gKYWrhDmxek/fOy22+qYUHQ81txk4SQ3GILWiWTfWOTdsBU+Y0FYnC5syLAqpdIstBhmMUUS8NWs5HdYmBv4q0zkTiwBGL/wrLwXkAcLLKUNOrUeMAL1fjQuVRC3hzql15s/A2LwPOR6xwyCu1mH8GKogYulGVWOEHQuk8bC3MaKgDr/4ZoUlCC9Q+mYP/WT+t/NA/0OQIvZVhVVilXk1MTbQMkvrBSuiuxACsyFGVNrkLaC8x2Pjyd2kgZaIv4c2JiiWfvW5IZd7xeyLLKESOfHP8rIf60jmvE7hxD9Yje7JXjo0uvnpEGx2PuMSq5zeUynoLaa8AIMAJ9an3fgdfKKcZ/XPOCAgpmxnKH+leAQx86qwxdAAIkgPY="
 
       addons:
         apt:
@@ -120,43 +123,40 @@ jobs:
       after_deploy:
         - npm run doc-cloudfront
 
-    # - stage: Deployment Doc Prod
-    #   name: Deploy docs.kuzzle.io
-    #   if: branch = master
-    #   language: node_js
-    #   node_js: 10
-    #   env:
-    #     - NODE_ENV=production
-    #     - S3_BUCKET=docs.kuzzle.io
-    #     - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
-    #     - AWS_DEFAULT_REGION=us-west-2
-        # - AWS_ACCESS_KEY_ID=AKIAIYAXFUAHXOWP2MJA
-    #     # AWS_SECRET_ACCESS_KEY
-    #     - secure: "HU48VGBdv/GyVAm6g8eiA3DbKoAPL98AeORbF7UhKLQenxmQRGb1gfdMPNLdop35+95SlxcFC9ogoHcqLBSPLLcTSX57faWpNacD/7j69Z03avgdmfaFOGMOwGd5tOdq4pYmis34xyGJW1kpwAl2U6jp/pcBXABDnCLfRS5kJUsXvrwdE75UACoXQ1tXEtqq9y5LcFo/dGYrhuVvqYQmAUA+ExrfXaIKtUSf2tN5CvYL0cSxLyoQlnbbIQvouyNRyfuGFqNHc3jyBOc/nZWHS0ES91+6ddwZs/i9Fs98TfB3JS9x+gKYWrhDmxek/fOy22+qYUHQ81txk4SQ3GILWiWTfWOTdsBU+Y0FYnC5syLAqpdIstBhmMUUS8NWs5HdYmBv4q0zkTiwBGL/wrLwXkAcLLKUNOrUeMAL1fjQuVRC3hzql15s/A2LwPOR6xwyCu1mH8GKogYulGVWOEHQuk8bC3MaKgDr/4ZoUlCC9Q+mYP/WT+t/NA/0OQIvZVhVVilXk1MTbQMkvrBSuiuxACsyFGVNrkLaC8x2Pjyd2kgZaIv4c2JiiWfvW5IZd7xeyLLKESOfHP8rIf60jmvE7hxD9Yje7JXjo0uvnpEGx2PuMSq5zeUynoLaa8AIMAJ9an3fgdfKKcZ/XPOCAgpmxnKH+leAQx86qwxdAAIkgPY="
+    - stage: Deployment Doc Prod
+      name: Deploy docs.kuzzle.io
+      if: branch = master
+      language: node_js
+      node_js: 10
+      env:
+        - NODE_ENV=production
+        - S3_BUCKET=docs.kuzzle.io
+        - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
+        - AWS_DEFAULT_REGION=us-west-2
 
-    #   addons:
-    #     apt:
-    #       packages:
-    #         - python
-    #         - python-pip
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
 
-    #   install:
-    #     - pip install awscli --upgrade --user
+      install:
+        - pip install awscli --upgrade --user
 
-    #   script:
-    #     - npm run doc-prepare
-    #     - npm run doc-build
+      script:
+        - npm run doc-prepare
+        - npm run doc-build
 
-    #   deploy:
-    #     provider: script
-    #     script:
-    #       - npm run doc-upload
-    #     skip_cleanup: true
-    #     on:
-    #       branch: master
+      deploy:
+        provider: script
+        script:
+          - npm run doc-upload
+        skip_cleanup: true
+        on:
+          branch: master
 
-    #   after_deploy:
-    #     - npm run doc-cloudfront
+      after_deploy:
+        - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
       if: branch = master AND tag IS present AND type != cron
