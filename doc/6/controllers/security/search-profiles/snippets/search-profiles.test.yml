@@ -1,0 +1,15 @@
+name: security#searchProfiles
+description: search profiles
+hooks:
+  before: |
+    for i in 1 2 3; do
+      curl -H "Content-type: application/json" -d '{
+        "policies": [{ "roleId": "default" }]
+      }' kuzzle:7512/profiles/profile${i}/_create?refresh=wait_for
+    done
+  after: |
+    for i in 1 2 3; do
+      curl -XDELETE kuzzle:7512/profiles/profile${i}
+    done
+template: default
+expected: ^Successfully retrieved 4 profiles$

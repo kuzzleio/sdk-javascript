@@ -1,0 +1,40 @@
+---
+code: true
+type: page
+title: createProfile
+description: Creates a new profile
+---
+
+# createProfile
+
+Creates a new profile.
+
+<br />
+
+```js
+createProfile(id, profile, [options]);
+```
+
+<br />
+
+| Property | Type | Description |
+|--- |--- |--- |
+| `id` | <pre>string</pre> | Profile identifier |
+| `profile` | <pre>object</pre> | [Profile definition content](/core/1/guides/essentials/security/#defining-profiles) |
+| `options` | <pre>object</pre> | Query options |
+
+### options
+
+| Property | Type<br />(default) | Description |
+| --- | --- | --- |
+| `queuable` | <pre>boolean</pre><br />(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
+| `refresh` | <pre>boolean</pre><br />(`false`) | If set to `wait_for`, Kuzzle will not respond until the created profile is indexed |
+
+## Resolves
+
+A [`Profile`](/sdk/js/6/core-classes/profile/introduction) object representing the created profile.
+
+## Usage
+
+<<< ./snippets/create-profile.js
+

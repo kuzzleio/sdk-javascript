@@ -1,0 +1,10 @@
+name: security#updateProfile
+description: update profile
+hooks:
+  before: >
+    curl -H "Content-type: application/json" -d '{
+      "policies": []
+    }' kuzzle:7512/profiles/myProfile/_create
+  after: curl -XDELETE kuzzle:7512/profiles/myProfile
+template: default
+expected: '^     { roleId: ''privileged'', restrictedTo: \[Array\] } \] }$'
