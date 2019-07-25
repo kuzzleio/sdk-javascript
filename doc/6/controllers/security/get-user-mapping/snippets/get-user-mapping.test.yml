@@ -1,0 +1,4 @@
+name: security#getUserMapping
+description: get users mapping
+template: default
+expected: '^{ mapping:'

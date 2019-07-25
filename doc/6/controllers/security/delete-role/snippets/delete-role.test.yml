@@ -1,0 +1,15 @@
+name: security#deleteRole
+description: deletes role
+hooks:
+  before: >
+    curl -H "Content-type: application/json" -d '{
+      "controllers": {
+        "*": {
+          "actions": {
+            "*": true
+          }
+        }
+      }
+    }' kuzzle:7512/roles/myRole/_create
+template: default
+expected: Role successfully deleted

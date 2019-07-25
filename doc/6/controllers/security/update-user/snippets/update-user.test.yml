@@ -1,0 +1,13 @@
+name: security#updateUser
+description: update user
+hooks:
+  before: >
+    curl -f -H "Content-type: application/json" -d '{
+      "content": {
+        "profileIds": ["default"]
+      },
+      "credentials": {  }
+    }' kuzzle:7512/users/john.doe/_create
+  after: curl -f -XDELETE kuzzle:7512/users/john.doe
+template: default
+expected: '^     firstName: ''John'',$'
