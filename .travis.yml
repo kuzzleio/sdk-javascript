@@ -82,7 +82,8 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - npm run --prefix doc/framework clone-repos
+        - if [[ $TRAVIS_BRANCH =~ ^master|[0-9]+-stable$ ]]; then BRANCH=stable; else BRANCH=dev; fi
+        - npm run --prefix doc/framework repositories -- clone $BRANCH
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
