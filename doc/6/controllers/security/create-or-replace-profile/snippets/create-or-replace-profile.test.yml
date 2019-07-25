@@ -1,0 +1,6 @@
+name: security#createOrReplaceProfile
+description: Creates or replaces a profile
+hooks:
+  after: curl -XDELETE kuzzle:7512/profiles/myProfile?refresh=wait_for
+template: default
+expected: Profile successfully updated
