@@ -23,6 +23,10 @@ case $1 in
     echo "Clone documentation framework"
     git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
 
+    echo "Link getting-started"
+    ln -s ../../../../../../getting-started/vuejs/without-vuex/src/App.vue ./$DOC_VERSION/getting-started/vuejs/without-vuex/snippets/App.vue.snippet
+    ln -s ../../../../../../getting-started/vuejs/without-vuex/src/services/kuzzle.js ./$DOC_VERSION/getting-started/vuejs/without-vuex/snippets/kuzzle.js.snippet
+
     echo "Link local doc for dead links checking"
     rm framework/src$DOC_PATH
     ln -s ../../../../$DOC_VERSION framework/src$DOC_PATH
