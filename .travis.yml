@@ -65,6 +65,7 @@ jobs:
         - npm run build
         - npm run functional-testing
 
+
     - stage: Tests
       name: Documentation Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
