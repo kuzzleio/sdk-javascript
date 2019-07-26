@@ -11,7 +11,6 @@ order: 0
 
 This section deals with **Kuzzle** (+ **Javascript SDK**) and **VueJS**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/6/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
-You can find the full code of this guide [here](https://github.com/kuzzleio/sdk-javascript/tree/6-dev/doc/6/getting-started/vuejs/standalone).
 
 ## Requirements
 
