@@ -20,10 +20,10 @@ fi
 
 case $1 in
   prepare)
-    if [ -d framework/ ]
+    if [ -d "framework" ];
     then
       echo "Update documentation framework"
-      git -C framework/ pull
+      git -C framework/ pull origin master
     else
       echo "Clone documentation framework"
       git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
@@ -46,11 +46,11 @@ case $1 in
   ;;
 
   upload)
-    aws s3 sync $DOC_VERSION/.vuepress/dist s3://$S3_BUCKET$SITE_BASE
+    aws s3 sync $DOC_VERSION/.vuepress/dist s3://$S3_BUCKET$SITE_BASE --delete
   ;;
 
   cloudfront)
-    aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths '/*'
+    aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths $SITE_BASE
   ;;
 
   *)
