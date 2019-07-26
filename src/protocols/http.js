@@ -17,7 +17,9 @@ class HttpWrapper extends KuzzleAbstractProtocol {
     if (options.http && options.http.customRoutes) {
       for (const controller in options.http.customRoutes) {
         if (options.http.customRoutes.hasOwnProperty(controller)) {
-          this.http.routes[controller] = Object.assign(this.http.routes[controller] || {}, options.http.customRoutes[controller]);
+          this.http.routes[controller] = Object.assign(
+            this.http.routes[controller] || {},
+            options.http.customRoutes[controller]);
         }
       }
     }
@@ -129,6 +131,15 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       if (Array.isArray(value)) {
         queryString.push(...value.map(v => `${key}=${v}`));
 
+      }
+      else if (typeof value === 'boolean') {
+        // In Kuzzle, an optional boolean option is set to true if present in
+        // the querystring, and false if absent.
+        // As there is no boolean type in querystrings, encoding a boolean
+        // option "foo=false" in it will make Kuzzle consider it as truthy.
+        if (value === true) {
+          queryString.push(key);
+        }
       }
       else {
         queryString.push(`${key}=${value}`);

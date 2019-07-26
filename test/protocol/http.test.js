@@ -387,6 +387,58 @@ describe('HTTP networking module', () => {
       protocol.send(data);
     });
 
+    it('should properly encode arrays into the querystring', done => {
+      const data = {
+        requestId: 'requestId',
+        action: 'bar',
+        controller: 'foo',
+        foo: ['bar', 'baz', 'qux'],
+        qux: 123
+      };
+
+      protocol.on('requestId', () => {
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(protocol._sendHttpRequest.firstCall.args[1])
+            .be.equal('/foo/bar?foo=bar&foo=baz&foo=qux&qux=123');
+        }
+        catch (error) {
+          return done(error);
+        }
+
+        done();
+      });
+
+      protocol.send(data);
+    });
+
+    it('should properly encode boolean flags in the querystring', done => {
+      const data = {
+        requestId: 'requestId',
+        action: 'bar',
+        controller: 'foo',
+        foo: false,
+        bar: true,
+        qux: 123
+      };
+
+      protocol.on('requestId', () => {
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(protocol._sendHttpRequest.firstCall.args[1])
+            .be.equal('/foo/bar?bar&qux=123');
+        }
+        catch (error) {
+          return done(error);
+        }
+
+        done();
+      });
+
+      protocol.send(data);
+    });
   });
 
   describe('#sendHttpRequest NodeJS', () => {
