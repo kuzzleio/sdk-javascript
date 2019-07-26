@@ -15,8 +15,18 @@
         try {
           await window.kuzzle.connect()
 
-          const jwt = await window.kuzzle.auth.login('local', { username: 'admin', password: 'admin' })
-          console.log(jwt)
+          console.log('connected')
+          setTimeout(async () => {
+
+          console.log('go')
+          try {
+            await kuzzle.document.create('index', 'collection', { foo: 'bar' }, 42)
+          } catch (error) {
+            console.log("Catched by try ... catch timeout")
+            console.error(error)
+          }
+        }, 7000);
+
         } catch (error) {
           console.log("Catched by try ... catch")
           console.log(error)

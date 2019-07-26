@@ -184,6 +184,15 @@ class HttpWrapper extends KuzzleAbstractProtocol {
         queryString.push(...value.map(v => `${key}=${v}`));
 
       }
+      else if (typeof value === 'boolean') {
+        // In Kuzzle, an optional boolean option is set to true if present in
+        // the querystring, and false if absent.
+        // As there is no boolean type in querystrings, encoding a boolean
+        // option "foo=false" in it will make Kuzzle consider it as truthy.
+        if (value === true) {
+          queryString.push(key);
+        }
+      }
       else {
         queryString.push(`${key}=${value}`);
       }
