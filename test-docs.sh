@@ -21,7 +21,7 @@ npm ci
 npm run serve-standalone &
 npm run test
 
-cd ../../
+cd -
 docker-compose -f .ci/doc/docker-compose.yml down
 
 exit $EXIT
