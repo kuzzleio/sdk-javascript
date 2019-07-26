@@ -18,7 +18,7 @@ done
 
 cd getting-started/vuejs
 npm ci
-npm run serve-without-vuex &
+npm run serve-standalone &
 npm run test
 
 cd ../../
