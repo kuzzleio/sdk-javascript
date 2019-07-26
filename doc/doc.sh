@@ -20,8 +20,14 @@ fi
 
 case $1 in
   prepare)
-    echo "Clone documentation framework"
-    git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
+    if [ -d framework/ ]
+    then
+      echo "Update documentation framework"
+      git -C framework/ pull
+    else
+      echo "Clone documentation framework"
+      git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
+    fi
 
     echo "Link getting-started"
     ln -s ../../../../../../getting-started/vuejs/without-vuex/src/App.vue ./$DOC_VERSION/getting-started/vuejs/without-vuex/snippets/App.vue.snippet
