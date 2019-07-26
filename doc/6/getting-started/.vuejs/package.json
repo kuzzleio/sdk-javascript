@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "if [ ! -f  ../../dist/kuzzle.js ]; then npm run build --prefix ../../;fi && rm -rf ./node_modules/kuzzle-sdk/* && rsync -r --exclude 'getting-started' ../../ ./node_modules/kuzzle-sdk",
+    "postinstall": "if [ ! -f  ../../../../dist/kuzzle.js ]; then npm run build --prefix ../../../../;fi && rm -rf ./node_modules/kuzzle-sdk/* && rsync -r --exclude 'getting-started' ../../../../ ./node_modules/kuzzle-sdk",
     "serve-standalone": "cd standalone && vue-cli-service serve",
     "build-standalone": "cd standalone && vue-cli-service build",
     "lint-standalone": "cd standalone && vue-cli-service lint",

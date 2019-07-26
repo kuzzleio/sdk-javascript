@@ -1,7 +1,7 @@
 ---
 type: page
 code: false
-title: Without Vuex
+title: Standalone
 description: Getting started with Kuzzle and VueJS
 order: 0
 ---
