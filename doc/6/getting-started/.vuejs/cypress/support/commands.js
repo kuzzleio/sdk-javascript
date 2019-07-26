@@ -47,7 +47,7 @@ Cypress.Commands.add('createMessage', (body) => {
   })
     .its('body')
     .then(response => {
-      cy.log(`Create status : ${response.status}`);
+      cy.log(`Create status : ${response.status} {${body.username} / ${body.value}}`);
       cy.wait(500);
     });
 });

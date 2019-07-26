@@ -17,5 +17,5 @@ coverage/
 
 doc/framework
 dead_links.json
-getting-started/vuejs/cypress/screenshots/
-getting-started/vuejs/cypress/videos/
+doc/6/getting-started/.vuejs/cypress/screenshots/
+doc/6/getting-started/.vuejs/cypress/videos/
