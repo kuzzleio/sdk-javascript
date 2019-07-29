@@ -16,7 +16,7 @@ try {
     }
   ];
 
-  const response = await kuzzle.document.mReplace(
+  const response = await kuzzle.document.mUpdate(
     'nyc-open-data',
     'yellow-taxi',
     documents
