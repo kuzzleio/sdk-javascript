@@ -24,10 +24,10 @@ case $1 in
     then
       echo "Update documentation framework"
       git -C framework/ pull origin master
+      rm doc/framework/package-lock.json
     else
       echo "Clone documentation framework"
       git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
-      rm doc/framework/package-lock.json
     fi
 
     echo "Link local doc for dead links checking"
