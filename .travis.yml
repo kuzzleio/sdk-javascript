@@ -83,7 +83,12 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - if [[ $TRAVIS_BRANCH =~ "^master|[0-9]+-stable$" ]]; then export BRANCH=stable; else export BRANCH=dev; fi
+        - |
+        if [[ $TRAVIS_BRANCH =~ "^master|[0-9]+-stable$" ]] then 
+          export BRANCH=stable
+        else 
+          export BRANCH=dev
+        fi
         - npm run --prefix doc/framework repositories -- clone $BRANCH
       script:
         - gem install typhoeus
