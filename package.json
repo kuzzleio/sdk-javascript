@@ -33,7 +33,7 @@
     "doc-upload": "cd doc && bash doc.sh upload",
     "doc-cloudfront": "cd doc && bash doc.sh cloudfront",
     "doc-deploy": "npm run doc-upload && npm run doc-cloudfront",
-    "netlify": "npm run doc-prepare && cd doc && bash doc.sh build-netlify"
+    "doc-netlify": "npm run doc-prepare && cd doc && bash doc.sh build-netlify"
   },
   "browser": "dist/kuzzle.js",
   "main": "index.js",
