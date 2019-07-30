@@ -2,17 +2,12 @@
 
 set -eu
 
-<<<<<<< HEAD
 DOC_VERSION=5
 DOC_PATH=/sdk/js/5
 
 # Used by vuepress
 export DOC_DIR=$DOC_VERSION
 export SITE_BASE=$DOC_PATH/
-=======
-export DOC_DIR=5
-export SITE_BASE=/sdk/js/5/
->>>>>>> 5-stable
 
 # Used to specify --no-cache for example
 ARGS=${2:-""}
