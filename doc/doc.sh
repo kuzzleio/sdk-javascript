@@ -23,7 +23,7 @@ case $1 in
     if [ -d "framework" ]
     then
       echo "Pulling latest framework version"
-      bash -c "cd framework && git reset --hard HEAD~ && git checkout master && git pull"
+      bash -c "cd framework && git checkout master && git reset --hard HEAD~ && git pull"
     else
       echo "Clone documentation framework"
       git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
