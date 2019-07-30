@@ -65,7 +65,6 @@ jobs:
         - npm run build
         - npm run functional-testing
 
-
     - stage: Tests
       name: Documentation Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
@@ -83,13 +82,7 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - |
-        if [[ $TRAVIS_BRANCH =~ "^master|[0-9]+-stable$" ]] then 
-          export BRANCH=stable
-        else 
-          export BRANCH=dev
-        fi
-        - npm run --prefix doc/framework repositories -- clone $BRANCH
+        - npm run --prefix doc/framework repositories -- clone
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
