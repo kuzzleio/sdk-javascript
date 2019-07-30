@@ -26,4 +26,4 @@ This protocol needs to build routes from the name of the controller and the acti
 For confidentiality reasons, it is preferable to expose only the `server:publicApi` route to the anonymous user.  
 If this route is not available, the SDK will use the static definition of API routes that does not include routes developed in plugins.  
 
-Finally, it is also possible to manually define the routes to the actions of its plugins using the `customRoutes` option with the Http protocol builder  
+Finally, it is also possible to manually define the routes to the actions of its plugins using the `customRoutes` option with the [Http protocol constructor](/sdk/js/6/protocols/http/constructor).
