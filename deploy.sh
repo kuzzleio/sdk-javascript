@@ -11,7 +11,7 @@ then
   ln -s  ${TRAVIS_BUILD_DIR}/node_modules
   npm run build
   git add dist/
-  git commit -am "Travis CI - [ci skip] - automatic dist folder" > /dev/null 2>&1
+  git commit -am "Travis CI - [ci skip] - automatic dist folder" > /dev/null 2>&1 || true
   git push origin ${TRAVIS_BRANCH}
 fi
 

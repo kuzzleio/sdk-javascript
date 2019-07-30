@@ -2,12 +2,17 @@
 
 set -eu
 
+<<<<<<< HEAD
 DOC_VERSION=5
 DOC_PATH=/sdk/js/5
 
 # Used by vuepress
 export DOC_DIR=$DOC_VERSION
 export SITE_BASE=$DOC_PATH/
+=======
+export DOC_DIR=5
+export SITE_BASE=/sdk/js/5/
+>>>>>>> 5-stable
 
 # Used to specify --no-cache for example
 ARGS=${2:-""}
@@ -20,8 +25,14 @@ fi
 
 case $1 in
   prepare)
-    echo "Clone documentation framework"
-    git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
+    if [ -d "framework" ]
+    then
+      echo "Pulling latest framework version"
+      bash -c "cd framework && git reset --hard HEAD~ && git pull"
+    else
+      echo "Clone documentation framework"
+      git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
+    fi
 
     echo "Link local doc for dead links checking"
     rm framework/src$DOC_PATH
