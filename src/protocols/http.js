@@ -17,7 +17,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
     this.customRoutes = options.customRoutes || {};
 
     for (const [controller, definition] of Object.entries(this.customRoutes)) {
-      for (const [action, route] of definition) {
+      for (const [action, route] of Object.entries(definition)) {
         if (!(typeof route.url === 'string' && route.url.length > 0)) {
           throw new Error(
             `Incorrect URL for custom route ${controller}:${action}.`);
@@ -48,7 +48,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   }
 
   /**
-   * Connect to the websocket server
+   * Connect to the server
    */
   connect () {
     if (this.state === 'ready') {
@@ -56,10 +56,13 @@ class HttpWrapper extends KuzzleAbstractProtocol {
     }
 
     return this._sendHttpRequest('GET', '/_publicApi')
-      .then(({ result }) => {
-        this._routes = this._constructRoutes(result);
-      })
-      .catch(error => {
+      .then(({ result, error }) => {
+        if (! error) {
+          this._routes = this._constructRoutes(result);
+
+          return;
+        }
+
         if (error.status === 401 || error.status === 403) {
           this._warn('"server:publicApi" route is restricted for anonymous user.');
           this._warn('This route is used by the HTTP protocol to build API URLs.');
@@ -67,17 +70,20 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
           // fallback to static http routes
           this._routes = staticHttpRoutes;
-          this._staticRoutes = true;
 
           return;
         } else if (error.status === 404) {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
           return this._sendHttpRequest('GET', '/')
-            .then(({ result }) => {
-              this._routes = this._constructRoutes(result.serverInfo.kuzzle.api.routes);
-            })
-            .catch(err => {
+            .then(({ result: res, error: err }) => {
+              if (! err) {
+                this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
+                this._staticRoutes = false;
+
+                return;
+              }
+
               if (err.status !== 401 && err.status !== 403) {
                 throw err;
               }
@@ -89,12 +95,14 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
               // fallback to static http routes
               this._routes = staticHttpRoutes;
-              this._staticRoutes = true;
             });
         }
+
         throw error;
       })
       .then(() => {
+        this._routes = Object.assign(this._routes, this.customRoutes);
+
         // Client is ready
         this.clientConnected();
       })
@@ -114,10 +122,6 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @returns {Promise<any>}
    */
   send (data) {
-    if (data.controller.indexOf('/') !== -1) {
-      throw new Error(`Cannot execute request to plugin controller ${data.controller}. You have to authorize anonymous user to access either "server:publicApi" or "server:info" route`);
-    }
-
     const
       payload = {
         action: undefined,
@@ -153,12 +157,15 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       }
     }
 
-    const
-      route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
+    const route = this.routes[payload.controller]
+        && this.routes[payload.controller][payload.action];
 
-    if (route === undefined) {
-      const error = new Error(`No route found for ${payload.controller}/${payload.action}`);
+    if (! route) {
+      const error =
+        new Error(`No URL found for "${payload.controller}:${payload.action}".`);
       this.emit(payload.requestId, {status: 400, error});
+
+      return;
     }
 
     const

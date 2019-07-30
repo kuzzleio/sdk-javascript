@@ -1,10 +1,16 @@
 const {
   Kuzzle,
   Http
-} = require('kuzzle-sdk');
+} = require('./index');
+
+// const customRoutes = {
+//   'plugin-test/example': {
+//     liia: { verb: 'GET', url: '_plugin/plugin-test/example'}
+//   }
+// }
 
 const kuzzle = new Kuzzle(
-  new Http('kuzzle')
+  new Http('kuzzle', {  })
 );
 
 
@@ -15,15 +21,21 @@ kuzzle.on('networkError', error => {
 (async () => {
   try {
     await kuzzle.connect();
-    console.log('connected')
-    setTimeout(async () => {
-      console.log('go')
-      try {
-        await kuzzle.document.create('index', 'collection', { foo: 'bar' }, 42)
-      } catch (error) {
-        console.error(error)
+    await kuzzle.auth.login('local', { username: 'admin', password: 'admin'})
+    await kuzzle.security.updateRole('anonymous', {
+      "controllers": {
+        "auth": {
+          "actions": {
+            "*": true
+          }
+        }
       }
-    }, 7000);
+    })
+    await kuzzle.query({
+      controller: 'plugin-test/example',
+      action: 'liia'
+    })
+    // await kuzzle.server.now()
   } catch (error) {
     console.error(error)
   }

@@ -3,13 +3,13 @@ const
   should = require('should'),
   sinon = require('sinon'),
   staticHttpRoutes = require('../../src/protocols/routes.json'),
-  HttpWrapper = require('../../src/protocols/http');
+  Http = require('../../src/protocols/http');
 
 describe('HTTP networking module', () => {
   let protocol;
 
   beforeEach(() => {
-    protocol = new HttpWrapper('address', {
+    protocol = new Http('address', {
       port: 1234
     });
   });
@@ -22,31 +22,27 @@ describe('HTTP networking module', () => {
 
   describe('#connect', () => {
     const serverPublicApiResult = {
-      result: {
-        foo: {
-          bar: {
-            http: [{ verb: 'VERB', url: '/foo/bar' }]
-          },
-          empty: {
-            http: []
-          }
+      foo: {
+        bar: {
+          http: [{ verb: 'VERB', url: '/foo/bar' }]
+        },
+        empty: {
+          http: []
         }
       }
     };
 
     const serverInfoResponse = {
-      result: {
-        serverInfo: {
-          kuzzle: {
-            api: {
-              routes: {
-                gordon: {
-                  freeman: {
-                    http: [{ verb: 'VERB', url: '/gordon/freeman' }]
-                  },
-                  vance: {
-                    http: []
-                  }
+      serverInfo: {
+        kuzzle: {
+          api: {
+            routes: {
+              gordon: {
+                freeman: {
+                  http: [{ verb: 'VERB', url: '/gordon/freeman' }]
+                },
+                vance: {
+                  http: []
                 }
               }
             }
@@ -59,7 +55,7 @@ describe('HTTP networking module', () => {
       protocol._sendHttpRequest = sinon.stub();
       protocol._warn = sinon.stub();
 
-      protocol._sendHttpRequest.resolves(serverPublicApiResult);
+      protocol._sendHttpRequest.resolves({ result: serverPublicApiResult });
     });
 
     it('should get routes from server:publicApi', () => {
@@ -75,7 +71,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should fallback to static routes if server:publicApi is restricted', () => {
-      protocol._sendHttpRequest.onCall(0).rejects({ status: 401 });
+      protocol._sendHttpRequest.onCall(0).resolves({ error: { status: 401 } });
 
       return protocol.connect()
         .then(() => {
@@ -86,8 +82,8 @@ describe('HTTP networking module', () => {
 
     it('should fallback to server:info if server:publicApi is not available', () => {
       protocol._sendHttpRequest
-        .onCall(0).rejects({ status: 404 })
-        .onCall(1).resolves(serverInfoResponse);
+        .onCall(0).resolves({ error: { status: 404 } })
+        .onCall(1).resolves({ result: serverInfoResponse });
 
       return protocol.connect()
         .then(() => {
@@ -102,8 +98,8 @@ describe('HTTP networking module', () => {
 
     it('should fallback to static routes if server:info is restricted', () => {
       protocol._sendHttpRequest
-        .onCall(0).rejects({ status: 404 })
-        .onCall(1).rejects({ status: 403 });
+        .onCall(0).resolves({ error: { status: 404 } })
+        .onCall(1).resolves({ error: { status: 403 } });
 
       return protocol.connect()
         .then(() => {
@@ -112,6 +108,29 @@ describe('HTTP networking module', () => {
         });
     });
 
+    it('should inject customRoutes', () => {
+      const customRoutes = {
+        'gordon' : {
+          freeman: { verb: 'POST', url: '/gordon/freeman'}
+        },
+        'plugin-test/example': {
+          liia: { verb: 'GET', url: '/_plugin/plugin-test/example'}
+        }
+      };
+      protocol = new Http('kuzzle', { customRoutes });
+      protocol._warn = sinon.stub();
+
+      return protocol.connect()
+        .then(() => {
+          should(protocol.routes.gordon).match({
+            freeman: { verb: 'POST', url: '/gordon/freeman'}
+          });
+
+          should(protocol.routes['plugin-test/example']).match({
+            liia: { verb: 'GET', url: '/_plugin/plugin-test/example'}
+          });
+        });
+    });
 
     it('should initialize protocol status and route list', () => {
       const promise = protocol.connect();
@@ -177,18 +196,9 @@ describe('HTTP networking module', () => {
       protocol._sendHttpRequest = sinon.stub().resolves();
 
       protocol.status = 'ready';
-      protocol.http.routes = {
+      protocol._routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar'}}
       };
-    });
-
-    it('should throw an error for plugin requests if the protocol use static route file', () => {
-      const request = {
-        controller: 'example-plugin/foo',
-        action: 'bar'
-      };
-
-      should(() => protocol.send(request)).throwError({ message: /"server:publicApi" or "server:info"/ });
     });
 
     it('should send an HTTP request to the backend', done => {
@@ -311,7 +321,7 @@ describe('HTTP networking module', () => {
         action: 'bar',
         foo: 'baz'
       };
-      protocol.http.routes = {
+      protocol._routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar/:foo'}}
       };
 
@@ -327,7 +337,7 @@ describe('HTTP networking module', () => {
       protocol.send(data);
     });
 
-    it('should not send any HTTP request and emit a "No route found" event if no route is defined', done => {
+    it('should not send any HTTP request and emit a "No URL found" event if no route is defined', done => {
       const data = {
         requestId: 'requestId',
         controller: 'bar',
@@ -338,7 +348,7 @@ describe('HTTP networking module', () => {
         should(protocol._sendHttpRequest).not.be.called();
 
         should(status).be.equal(400);
-        should(error.message).be.equal('No route found for bar/foo');
+        should(error.message).be.equal('No URL found for "bar:foo".');
 
         done();
       });
@@ -461,11 +471,11 @@ describe('HTTP networking module', () => {
     beforeEach(() => {
       httpRequestStub = sinon.stub().resolves({body: JSON.stringify(mockResponseBody)});
 
-      const MockHttpWrapper = proxyquire('../../src/protocols/http', {
+      const MockHttp = proxyquire('../../src/protocols/http', {
         'min-req-promise': {request: httpRequestStub}
       });
 
-      protocol = new MockHttpWrapper('address', { port: 1234 });
+      protocol = new MockHttp('address', { port: 1234 });
     });
 
     it('should call http.request with empty body', () => {
@@ -533,7 +543,7 @@ describe('HTTP networking module', () => {
         return xhrStub;
       };
 
-      protocol = new HttpWrapper('address', {
+      protocol = new Http('address', {
         port: 1234
       });
     });
