@@ -35,11 +35,11 @@ Http protocol connection options.
 
 **Note:**
 
-`customRoutes` are used to define private API routes or to overwrite existing API routes.  
+`customRoutes` are used to define plugins API routes or to overwrite existing API routes.  
 They must have the following format:
 ```js
 {
-  controller: {
+  'my-plugin/my-controller': {
     action: { verb: 'GET', url: '/some/url' },
     action2: { verb: 'GET', url: '/some/url/with/:parameter' }
   }

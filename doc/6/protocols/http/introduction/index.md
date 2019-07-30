@@ -16,9 +16,14 @@ This protocol does not allow to use the [real-time notifications](/sdk/js/6/esse
 If you need real-time features, then you have to use either [WebSocket](/sdk/js/6/protocols/websocket) or [SocketIO](/sdk/js/6/protocols/socketio) protocols.
 :::
 
+## About HTTP routing
+
+<SinceBadge version="6.2.0">
 <SinceBadge version="Kuzzle 1.9.0">
 
-::: warning
-This protocol needs [server:publicApi](/core/1/api/controllers/server/public-api) to build URLs for requests to the Kuzzle API.
-You must allow this route for the anonymous user otherwise the plugin routes will not be available
-:::
+This protocol needs to build routes from the name of the controller and the action used. These routes are made available by Kuzzle via the [server:publicApi](/core/1/api/controllers/server/public-api) method or the [server:info](/core/1/api/controllers/server/info) method.  
+
+For confidentiality reasons, it is preferable to expose only the `server:publicApi` route to the anonymous user.  
+If this route is not available, the SDK will use the static definition of API routes that does not include routes developed in plugins.  
+
+Finally, it is also possible to manually define the routes to the actions of its plugins using the `customRoutes` option with the Http protocol builder  
