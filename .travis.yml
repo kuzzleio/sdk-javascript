@@ -82,7 +82,7 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - npm run --prefix doc/framework clone-repos
+        - npm run --prefix doc/framework repositories -- clone
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links

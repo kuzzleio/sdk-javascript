@@ -1,9 +1,8 @@
 'use strict';
 
 const
-  KuzzleAbstractProtocol = require('./abstract/common'),
-  _routes = require('./routes.json');
-
+  staticHttpRoutes = require('./routes.json'),
+  KuzzleAbstractProtocol = require('./abstract/common');
 
 class HttpWrapper extends KuzzleAbstractProtocol {
   constructor(host, options = {}) {
@@ -13,20 +12,31 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       throw new Error('host is required');
     }
 
-    // Application-side HTTP route overrides:
-    if (options.http && options.http.customRoutes) {
-      for (const controller in options.http.customRoutes) {
-        if (options.http.customRoutes.hasOwnProperty(controller)) {
-          this.http.routes[controller] = Object.assign(
-            this.http.routes[controller] || {},
-            options.http.customRoutes[controller]);
+    this._routes = {};
+
+    this.customRoutes = options.customRoutes || {};
+
+    for (const [controller, definition] of Object.entries(this.customRoutes)) {
+      for (const [action, route] of Object.entries(definition)) {
+        if (!(typeof route.url === 'string' && route.url.length > 0)) {
+          throw new Error(
+            `Incorrect URL for custom route ${controller}:${action}.`);
+        }
+        if (!(typeof route.verb === 'string' && route.verb.length > 0)) {
+          throw new Error(
+            `Incorrect VERB for custom route ${controller}:${action}.`);
         }
       }
     }
   }
 
+  // @deprecated
   get http () {
-    return _routes;
+    return this.routes;
+  }
+
+  get routes () {
+    return this._routes;
   }
 
   get protocol () {
@@ -38,15 +48,61 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   }
 
   /**
-   * Connect to the websocket server
+   * Connect to the server
    */
   connect () {
     if (this.state === 'ready') {
       return Promise.resolve();
     }
 
-    return this._sendHttpRequest('GET', '/')
+    return this._sendHttpRequest('GET', '/_publicApi')
+      .then(({ result, error }) => {
+        if (! error) {
+          this._routes = this._constructRoutes(result);
+
+          return;
+        }
+
+        if (error.status === 401 || error.status === 403) {
+          this._warn('"server:publicApi" route is restricted for anonymous user.');
+          this._warn('This route is used by the HTTP protocol to build API URLs.');
+          this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
+
+          // fallback to static http routes
+          this._routes = staticHttpRoutes;
+
+          return;
+        } else if (error.status === 404) {
+          // fallback to server:info route
+          // server:publicApi is only available since Kuzzle 1.9.0
+          return this._sendHttpRequest('GET', '/')
+            .then(({ result: res, error: err }) => {
+              if (! err) {
+                this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
+                this._staticRoutes = false;
+
+                return;
+              }
+
+              if (err.status !== 401 && err.status !== 403) {
+                throw err;
+              }
+
+              this._warn('"server:info" route is restricted for anonymous user.');
+              this._warn('This route is used by the HTTP protocol to build API URLs.');
+              this._warn('If you want to expose your API routes without disclosing server information you can use "server:publicApi" (available in Kuzzle 1.9.0).');
+              this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
+
+              // fallback to static http routes
+              this._routes = staticHttpRoutes;
+            });
+        }
+
+        throw error;
+      })
       .then(() => {
+        this._routes = Object.assign(this._routes, this.customRoutes);
+
         // Client is ready
         this.clientConnected();
       })
@@ -101,12 +157,15 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       }
     }
 
-    const
-      route = this.http.routes[payload.controller] && this.http.routes[payload.controller][payload.action];
+    const route = this.routes[payload.controller]
+        && this.routes[payload.controller][payload.action];
 
-    if (route === undefined) {
-      const error = new Error(`No route found for ${payload.controller}/${payload.action}`);
+    if (! route) {
+      const error =
+        new Error(`No URL found for "${payload.controller}:${payload.action}".`);
       this.emit(payload.requestId, {status: 400, error});
+
+      return;
     }
 
     const
@@ -208,6 +267,65 @@ class HttpWrapper extends KuzzleAbstractProtocol {
     });
   }
 
+  _constructRoutes (publicApi) {
+    const apiRoutes = Object.entries(publicApi)
+      .reduce((routes, [controller, definition]) => {
+        routes[controller] = {};
+
+        for (const [action, { http }] of Object.entries(definition)) {
+          if (http && http.length === 1) {
+            routes[controller][action] = http[0];
+          } else if (http && http.length > 1) {
+            routes[controller][action] = getCorrectRoute(http);
+          }
+        }
+
+        return routes;
+      }, {});
+
+    for (const [controller, definition] of Object.entries(this.customRoutes)) {
+      apiRoutes[controller] = definition;
+    }
+
+    return apiRoutes;
+  }
+
+  _warn (message) {
+    console.warn(message); // eslint-disable-line no-console
+  }
+
+}
+
+function getCorrectRoute (routes) {
+  let
+    shortestRoute = routes[0],
+    postRoute,
+    minLength = routes[0].url.length,
+    sameLength = true;
+
+  for (const route of routes) {
+    if (route.url.length !== minLength) {
+      sameLength = false;
+    }
+
+    if (route.url.length < minLength) {
+      shortestRoute = route;
+      minLength = route.url.length;
+    }
+
+    if (route.verb === 'POST') {
+      postRoute = route;
+    }
+  }
+
+  if (sameLength) {
+    // with same URL size, we keep the POST route
+    return postRoute;
+  }
+
+  // with differents URL sizes, we keep the shortest because URL params
+  // will be in the query string
+  return shortestRoute;
 }
 
 module.exports = HttpWrapper;
