@@ -119,6 +119,7 @@ describe('HTTP networking module', () => {
       };
       protocol = new Http('kuzzle', { customRoutes });
       protocol._warn = sinon.stub();
+      protocol._sendHttpRequest = sinon.stub().resolves({ result: serverPublicApiResult });
 
       return protocol.connect()
         .then(() => {
