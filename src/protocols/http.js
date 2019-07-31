@@ -149,7 +149,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       else if (key === 'volatile') {
         payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
       }
-      else if (payload.hasOwnProperty(key)) {
+      else if (Object.prototype.hasOwnProperty.call(payload, key)) {
         payload[key] = value;
       }
       else if (value !== undefined && value !== null) {
