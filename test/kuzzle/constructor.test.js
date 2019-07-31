@@ -13,7 +13,7 @@ const
   RealTimeController = require('../../src/controllers/realtime'),
   {
     SocketIO,
-    WebSocket,
+    WebSocket, // eslint-disable-line no-redeclare
     Http
   } = require('../../src/protocols'),
   ProtocolMock = require('../mocks/protocol.mock');

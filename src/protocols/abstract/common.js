@@ -3,47 +3,48 @@
 const
   KuzzleError = require('../../KuzzleError'),
   uuidv4 = require('../../uuidv4'),
-  KuzzleEventEmitter = require('../../eventEmitter');
-
-// read-only properties
-let
-  _host,
-  _port,
-  _ssl;
+  KuzzleEventEmitter = require('../../eventEmitter'),
+  PendingRequest = require('./pendingRequest');
 
 class AbstractWrapper extends KuzzleEventEmitter {
-
   constructor (host, options = {}) {
     super();
 
-    _host = host;
-    _port = typeof options.port === 'number' ? options.port : 7512;
-    _ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
+    this._pendingRequests = new Map();
+    this._host = host;
+    this._port = typeof options.port === 'number' ? options.port : 7512;
+    this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
     this.id = uuidv4();
     this.state = 'offline';
 
     Object.keys(options).forEach(opt => {
-      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
+      if ( Object.prototype.hasOwnProperty.call(this, opt)
+        && Object.getOwnPropertyDescriptor(this, opt).writable
+      ) {
         this[opt] = options[opt];
       }
     });
   }
 
   get host () {
-    return _host;
+    return this._host;
   }
 
   get port () {
-    return _port;
+    return this._port;
   }
 
   get ssl () {
-    return _ssl;
+    return this._ssl;
   }
 
   get connected () {
     return this.state === 'online';
+  }
+
+  get pendingRequests () {
+    return this._pendingRequests;
   }
 
   /**
@@ -76,6 +77,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
    */
   close () {
     this.state = 'offline';
+    this.clear();
   }
 
   query (request) {
@@ -85,29 +87,49 @@ class AbstractWrapper extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return new Promise((resolve, reject) => {
-      this.once(request.requestId, response => {
-        if (response.error) {
-          const error = new KuzzleError(response.error);
+    const pending = new PendingRequest(request);
+    this._pendingRequests.set(request.requestId, pending);
 
-          this.emit('queryError', error, request);
+    this.once(request.requestId, response => {
+      this._pendingRequests.delete(request.requestId);
 
-          if (request.action !== 'logout' && error.message === 'Token expired') {
-            this.emit('tokenExpired');
-          }
+      if (response.error) {
+        const error = new KuzzleError(response.error);
 
-          return reject(error);
+        this.emit('queryError', error, request);
+
+        if (request.action !== 'logout' && error.message === 'Token expired') {
+          this.emit('tokenExpired');
         }
 
-        return resolve(response);
-      });
+        return pending.reject(error);
+      }
 
-      this.send(request);
+      pending.resolve(response);
     });
+
+    this.send(request);
+
+    return pending.promise;
   }
 
   isReady () {
     return this.state === 'ready';
+  }
+
+  /**
+   * Clear pendings requests.
+   * Emits an event for each discarded pending request.
+   */
+  clear () {
+    const rejectedError = new Error('Network error: request was sent but no response has been received');
+    for (const pending of this._pendingRequests.values()) {
+      pending.reject(rejectedError);
+      this.removeAllListeners(pending.request.requestId);
+      this.emit('discarded', pending.request);
+    }
+
+    this._pendingRequests.clear();
   }
 
 }

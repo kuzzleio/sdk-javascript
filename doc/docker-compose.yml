@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  doc:
+    image: kuzzleio/documentation:dev
+    ports:
+      - 8080:8080
+    tty: true
+    volumes:
+      - cache:/var/app/node_modules/@vuepress/core/node_modules/.cache
+      - ./6:/var/app/src/sdk/js/6
+
+volumes:
+  cache:

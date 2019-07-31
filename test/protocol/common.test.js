@@ -2,35 +2,26 @@ const
   should = require('should'),
   sinon = require('sinon'),
   KuzzleError = require('../../src/KuzzleError'),
-  AbstractWrapper = require('../../src/protocols/abstract/common');
+  AbstractWrapper = require('../../src/protocols/abstract/common'),
+  PendingRequest = require('../../src/protocols/abstract/pendingRequest');
 
-describe('Protocol query management', () => {
-  describe('#query', () => {
-    let
-      protocol;
+describe('Common Protocol', () => {
+  let
+    sendSpy,
+    protocol;
 
-    beforeEach(function () {
-      protocol = new AbstractWrapper('somewhere');
-      protocol.send = function(request) {
-        protocol.emit(request.requestId, request.response);
-      };
-      sendSpy = sinon.spy(protocol, 'send');
-    });
-
+  beforeEach(function () {
+    protocol = new AbstractWrapper('somewhere');
+    protocol.send = function(request) {
+      protocol.emit(request.requestId, request.response);
+    };
+    sendSpy = sinon.spy(protocol, 'send');
   });
 
   describe('#query', () => {
-    let
-      sendSpy,
-      protocol;
 
     beforeEach(() => {
-      protocol = new AbstractWrapper('somewhere');
       protocol.isReady = sinon.stub().returns(true);
-      protocol.send = function(request) {
-        protocol.emit(request.requestId, request.response);
-      };
-      sendSpy = sinon.spy(protocol, 'send');
       protocol._emitRequest = sinon.stub().resolves();
     });
 
@@ -50,9 +41,21 @@ describe('Protocol query management', () => {
       const request = {requestId: 'bar', response: {}};
 
       protocol.query(request);
+
       should(sendSpy)
         .be.calledOnce()
         .be.calledWith(request);
+    });
+
+    it('should add the requests to pending requests', () => {
+      protocol.send = () => {};
+      const request = {requestId: 'bar', response: {}};
+
+      protocol.query(request);
+
+      const pending = protocol.pendingRequests.get('bar');
+
+      pending.should.be.an.instanceOf(PendingRequest).and.match({request});
     });
 
     it('should fire a "queryError" event and reject if an error occurred', () => {
@@ -103,6 +106,7 @@ describe('Protocol query management', () => {
           should(res.error).be.null();
           should(res.result).be.exactly(response.result);
           should(res.status).be.exactly(42);
+          should(protocol.pendingRequests.has('bar')).be.false();
         });
     });
 
@@ -151,6 +155,54 @@ describe('Protocol query management', () => {
           should(error.count).eql(42);
         });
     });
+  });
 
+  describe('#clear', () => {
+    it('should discard and reject cleared requests', () => {
+      const
+        request1 = { requestId: '12345', body: 'foobar' },
+        request2 = { requestId: '54321', body: 'barfoo' };
+
+      protocol.state = 'ready';
+      protocol.send = () => {};
+
+      protocol.query(request1);
+      protocol.query(request2);
+
+      protocol.listenerCount(request1.requestId).should.be.eql(1);
+      protocol.listenerCount(request2.requestId).should.be.eql(1);
+
+      const
+        pending1 = protocol._pendingRequests.get(request1.requestId),
+        pending2 = protocol._pendingRequests.get(request2.requestId);
+
+      const listener = sinon.stub();
+      protocol.on('discarded', listener);
+
+      protocol.clear();
+
+      should(listener).be.calledTwice();
+      should(listener.getCall(0).args).be.eql([request1]);
+      should(listener.getCall(1).args).be.eql([request2]);
+
+      should(protocol._pendingRequests).be.empty();
+
+      protocol.listenerCount(request1.requestId).should.be.eql(0);
+      protocol.listenerCount(request2.requestId).should.be.eql(0);
+
+      return pending1.promise.should.be.rejectedWith({message: 'Network error: request was sent but no response has been received'})
+        .then(() => pending2.promise.should.be.rejectedWith({message: 'Network error: request was sent but no response has been received'}));
+    });
+  });
+
+  describe('#close', () => {
+    it('should set state to "offline" and clear pending requests', () => {
+      protocol.clear = sinon.stub();
+
+      protocol.close();
+
+      should(protocol.state).be.eql('offline');
+      should(protocol.clear).be.calledOnce();
+    });
   });
 });
