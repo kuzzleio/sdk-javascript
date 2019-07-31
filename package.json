@@ -41,7 +41,9 @@
   "dependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "audit": "0.0.6",
     "babel-loader": "^8.0.6",
+    "fix": "0.0.6",
     "min-req-promise": "^1.0.1",
     "ora": "^3.4.0",
     "webpack": "^4.38.0",
