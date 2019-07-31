@@ -155,7 +155,7 @@ jobs:
     #     - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: branch =~ /^master|[0-9]+-stable$/ AND tag IS present AND type != cron
+      if: tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8
