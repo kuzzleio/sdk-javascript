@@ -111,5 +111,15 @@ Cypress.Commands.add('loadEnvironment', (env) => {
     .then(response => {
       cy.log(`mCreate status : ${response.status}`);
       cy.wait(500);
+    })
+    .then(() => {
+      cy.request({
+        url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+        method: 'POST',
+      })
+        .then((response) => {
+          cy.log(`refresh status : ${response.status}`);
+          cy.wait(500);
+        });
     });
 });
