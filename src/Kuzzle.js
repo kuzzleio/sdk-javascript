@@ -557,7 +557,11 @@ Discarded request: ${JSON.stringify(request)}`));
                   throw new Error('Invalid offline queue request. One or more missing properties: requestId, action, controller.');
                 }
 
-                return uniqueQueue.hasOwnProperty(query.request.requestId) ? false : (uniqueQueue[query.request.requestId] = true);
+                return Object.prototype.hasOwnProperty.call(
+                  uniqueQueue,
+                  query.request.requestId)
+                  ? false
+                  : (uniqueQueue[query.request.requestId] = true);
               });
 
             dequeuingProcess();
