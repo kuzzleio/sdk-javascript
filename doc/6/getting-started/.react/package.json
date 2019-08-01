@@ -1,0 +1,37 @@
+{
+  "name": "kuzzle-playground",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "cypress": "^3.4.1",
+    "kuzzle-sdk": "^6.1.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.1.0",
+    "react-scripts": "3.0.1",
+    "redux-saga": "^1.0.5",
+    "webpack": "4.29.6"
+  },
+  "scripts": {
+    "postinstall": "if [ ! -f  ../../../../dist/kuzzle.js ]; then npm run build --prefix ../../../../;fi && rm -rf ./node_modules/kuzzle-sdk/* && rsync -r --exclude 'getting-started' ../../../../ ./node_modules/kuzzle-sdk",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "./node_modules/.bin/cypress run",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
