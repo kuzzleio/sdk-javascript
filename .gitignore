@@ -17,3 +17,7 @@ coverage/
 
 doc/framework
 dead_links.json
+
+# Cypress debug
+doc/6/getting-started/.react/cypress/screenshots
+doc/6/getting-started/.react/cypress/videos
