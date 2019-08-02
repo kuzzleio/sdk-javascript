@@ -264,7 +264,7 @@ When('I update the documents [{string}, {string}]', async function (id1, id2) {
 
 Then('I get an error with message {string}', function (message) {
   should(this.error).not.be.null();
-  should(this.error.message).startWith(message);
+  should(this.error.message).eql(message);
 });
 
 Then('I must have {int} documents in the collection', async function (number) {
