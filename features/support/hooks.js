@@ -1,4 +1,4 @@
-const {Before, AfterAll, BeforeAll} = require('cucumber');
+const { Before, AfterAll, BeforeAll } = require('cucumber');
 
 let _world;
 

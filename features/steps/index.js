@@ -1,4 +1,4 @@
-const {Given, When, Then} = require('cucumber');
+const { Given, When, Then } = require('cucumber');
 const should = require('should');
 
 Given('there is an index {string}', async function (index) {
@@ -22,9 +22,10 @@ Given('there is no index called {string}', async function (index) {
 
 Given('there is the indexes {string} and {string}', async function (index1, index2) {
   for (const index of [index1, index2]) {
-    let exists = await this.kuzzle.index.exists(index);
+    const exists = await this.kuzzle.index.exists(index);
+
     if (!exists) {
-      await this.kuzzle.index.create(index)
+      await this.kuzzle.index.create(index);
     }
   }
 });
@@ -65,6 +66,3 @@ Then('indexes {string} and {string} don\'t exist', async function (index1, index
     should(exists).be.false();
   }
 });
-
-
-

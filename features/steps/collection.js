@@ -1,4 +1,4 @@
-const {Given, When, Then} = require('cucumber');
+const { Given, When, Then } = require('cucumber');
 const should = require('should');
 
 Given('has specifications', async function () {
@@ -25,7 +25,7 @@ When('I check if the collection {string} exists', async function (collection) {
 });
 
 When(/^I create a collection '(.*?)'( with a mapping)?$/, async function (collection, withMapping) {
-  try  {
+  try {
     const mapping = {
       properties: {
         gordon: {type: 'keyword'}
