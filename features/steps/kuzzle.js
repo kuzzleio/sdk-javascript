@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('cucumber');
+const { Given, Then } = require('cucumber');
 const should = require('should');
 
 Given('Kuzzle Server is running', function () {
@@ -59,6 +59,3 @@ Then(/^I shall receive (.*?)$/, function (what) {
 Then('the result contains {int} hits', function (hits) {
   should(this.total).eql(hits);
 });
-
-
-

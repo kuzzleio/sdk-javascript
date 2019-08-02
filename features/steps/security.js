@@ -22,16 +22,16 @@ Given('there is an user with id {string}', async function (id) {
 
 Given('the user has {string} credentials with name {string} and password {string}', async function (strategy, username, password) {
   try {
-    await this.kuzzle.security.createCredentials(strategy, this.user, {
-      username,
-      password
-    })
+    await this.kuzzle.security.createCredentials(
+      strategy,
+      this.user,
+      { username,password });
   }
   catch (error) {
-    await this.kuzzle.security.updateCredentials(strategy, this.user, {
-      username,
-      password
-    });
+    await this.kuzzle.security.updateCredentials(
+      strategy,
+      this.user,
+      { username, password });
   }
 });
 
