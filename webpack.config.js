@@ -18,7 +18,7 @@ module.exports = {
   },
   target: 'web',
   watch: false,
-  devtool: 'source-map',
+  devtool: 'cheap-module-source-map',
   node: false,
   module: {
     rules: [
