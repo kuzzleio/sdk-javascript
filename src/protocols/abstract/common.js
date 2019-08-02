@@ -19,7 +19,9 @@ class AbstractWrapper extends KuzzleEventEmitter {
     this.state = 'offline';
 
     Object.keys(options).forEach(opt => {
-      if (this.hasOwnProperty(opt) && Object.getOwnPropertyDescriptor(this, opt).writable) {
+      if ( Object.prototype.hasOwnProperty.call(this, opt)
+        && Object.getOwnPropertyDescriptor(this, opt).writable
+      ) {
         this[opt] = options[opt];
       }
     });

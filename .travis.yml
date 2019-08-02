@@ -82,7 +82,7 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - npm run --prefix doc/framework clone-repos
+        - npm run --prefix doc/framework repositories -- clone
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
@@ -155,7 +155,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: branch =~ /^master|[0-9]+-stable$/ AND tag IS present AND type != cron
+      if: tag IS present AND type != cron
       sudo: false
       language: node_js
       node_js: 8

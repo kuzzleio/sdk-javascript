@@ -5,7 +5,15 @@ const
     Http
   } = require('kuzzle-sdk');
 
+const customRoutes = {
+  'nyc-open-data-plugin/driver': {
+    enroll: { verb: 'POST', url: '/_plugin/nyc-open-data-plugin/drivers' },
+    remove: { verb: 'DELETE', url: '/_plugin/nyc-open-data-plugin/drivers/:driverId' }
+  }
+};
+
 const options = {
+  customRoutes,
   sslConnection: false
 };
 
