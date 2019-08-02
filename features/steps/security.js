@@ -25,7 +25,7 @@ Given('the user has {string} credentials with name {string} and password {string
     await this.kuzzle.security.createCredentials(
       strategy,
       this.user,
-      { username,password });
+      { username, password });
   }
   catch (error) {
     await this.kuzzle.security.updateCredentials(
