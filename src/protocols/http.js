@@ -14,6 +14,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
     this._routes = {};
 
+    this._timeout = options.timeout || 0;
+
     this.customRoutes = options.customRoutes || {};
 
     for (const [controller, definition] of Object.entries(this.customRoutes)) {
@@ -45,6 +47,14 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
   get connected () {
     return true;
+  }
+
+  get timeout () {
+    return this._timeout;
+  }
+
+  set timeout (timeout) {
+    this._timeout = timeout;
   }
 
   /**
@@ -230,7 +240,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
       return httpClient.request(url, method, {
         headers,
-        body: payload.body
+        body: payload.body,
+        timeout: this._timeout
       })
         .then(response => JSON.parse(response.body));
     }
@@ -240,6 +251,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       const
         xhr = new XMLHttpRequest(),
         url = `${this.protocol}://${this.host}:${this.port}${path}`;
+
+      xhr.timeout = this._timeout;
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 0) {

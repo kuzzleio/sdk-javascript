@@ -32,6 +32,7 @@ Http protocol connection options.
 | `port`          | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                  |
 | `sslConnection` | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server |
 | `customRoutes` | <pre>object</pre><br/>(`{}`) | Add custom routes <SinceBadge version="6.2.0"/> |
+| `timeout` | <pre>number</pre><br/>(`0`) | Connection timeout <SinceBadge version="6.2.1"/> |
 
 **Note:**
 
