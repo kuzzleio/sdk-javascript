@@ -1,4 +1,4 @@
-const {Given, When, Then} = require('cucumber');
+const { Given, When, Then } = require('cucumber');
 const should = require('should');
 
 Given(/^the collection doesn't have a document with id '(.*?)'$/, async function (id) {
@@ -32,7 +32,7 @@ When('I count how many documents there is in the collection', async function () 
 When('I create a document in {string}', async function (collection) {
   this.content = await this.kuzzle.document.create(
     this.index,
-    this.collection,
+    collection,
     {a: 'document'},
     'some-id',
     {refresh: true}
@@ -48,10 +48,9 @@ When('I create a document with id {string}', async function (id) {
       this.collection,
       {a: 'document'},
       id,
-      {refresh: true}
-    );
+      {refresh: true});
   }
-  catch(error) {
+  catch (error) {
     this.error = error;
   }
 });
@@ -195,8 +194,7 @@ When('I search a document with id {string}', async function (id) {
             _id: id
           }
         }
-      }
-    )
+      });
   }
   catch (error) {
     this.error = error;
@@ -265,10 +263,8 @@ When('I update the documents [{string}, {string}]', async function (id1, id2) {
 
 
 Then('I get an error with message {string}', function (message) {
-  should(this.error)
-    .not.be.null();
-  should(this.error.message)
-    .eql(message);
+  should(this.error).not.be.null();
+  should(this.error.message).eql(message);
 });
 
 Then('I must have {int} documents in the collection', async function (number) {
