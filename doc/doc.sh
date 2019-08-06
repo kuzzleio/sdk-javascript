@@ -2,8 +2,12 @@
 
 set -eu
 
-export DOC_DIR=5
-export SITE_BASE=/sdk/js/5/
+DOC_VERSION=5
+DOC_PATH=/sdk/js/5
+
+# Used by vuepress
+export DOC_DIR=$DOC_VERSION
+export SITE_BASE=$DOC_PATH/
 
 # Used to specify --no-cache for example
 ARGS=${2:-""}
@@ -17,23 +21,32 @@ fi
 case $1 in
   prepare)
     echo "Clone documentation framework"
+    rm -rf framework/
     git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
-    git -C framework/ pull origin master
+
+    echo "Link local doc for dead links checking"
+    rm framework/src$DOC_PATH
+    ln -s ../../../../$DOC_VERSION framework/src$DOC_PATH
 
     echo "Install dependencies"
     npm --prefix framework/ install
   ;;
 
   dev)
-    ./framework/node_modules/.bin/vuepress dev $DOC_DIR/ $ARGS
+    ./framework/node_modules/.bin/vuepress dev $DOC_VERSION/ $ARGS
   ;;
 
   build)
-    ./framework/node_modules/.bin/vuepress build $DOC_DIR/ $ARGS
+    ./framework/node_modules/.bin/vuepress build $DOC_VERSION/ $ARGS
+  ;;
+
+  build-netlify)
+    export SITE_BASE="/"
+    ./framework/node_modules/.bin/vuepress build $DOC_VERSION/ $ARGS
   ;;
 
   upload)
-    aws s3 sync $DOC_DIR/.vuepress/dist s3://$S3_BUCKET$SITE_BASE
+    aws s3 sync $DOC_VERSION/.vuepress/dist s3://$S3_BUCKET$SITE_BASE --delete
   ;;
 
   cloudfront)
