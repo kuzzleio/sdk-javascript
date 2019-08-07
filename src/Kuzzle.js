@@ -81,21 +81,26 @@ class Kuzzle extends KuzzleEventEmitter {
     this._queueFilter = typeof options.queueFilter === 'function' ? options.queueFilter : null;
     this._queueMaxSize = typeof options.queueMaxSize === 'number' ? options.queueMaxSize : 500;
     this._queueTTL = typeof options.queueTTL === 'number' ? options.queueTTL : 120000;
+    this._replayInterval = typeof options.replayInterval === 'number' ? options.replayInterval : 10;
+    this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number' ? options.tokenExpiredInterval : 1000;
 
     if (options.offlineMode === 'auto') {
       this._autoQueue = true;
       this._autoReplay = true;
     }
     this.queuing = false;
-    this.replayInterval = 10;
 
-    this._jwt = undefined;
+    this._lastTokenExpired = null;
 
     return proxify(this, {
       seal: true,
       name: 'kuzzle',
       exposeApi: true
     });
+  }
+
+  get authenticated () {
+    return this.auth.authenticationToken && !this.auth.authenticationToken.expired;
   }
 
   get autoQueue () {
@@ -125,8 +130,24 @@ class Kuzzle extends KuzzleEventEmitter {
     this._autoReplay = value;
   }
 
+  get connected () {
+    return this.protocol.connected;
+  }
+
   get host () {
     return this.protocol.host;
+  }
+
+  get jwt () {
+    if (!this.auth.authenticationToken) {
+      return null;
+    }
+
+    return this.auth.authenticationToken.encodedJwt;
+  }
+
+  set jwt (encodedJwt) {
+    this.auth.authenticationToken = encodedJwt;
   }
 
   get offlineQueue () {
@@ -190,25 +211,15 @@ class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.sslConnection;
   }
 
-  get authenticated () {
-    return this.auth.authenticationToken && !this.auth.authenticationToken.expired;
+  get tokenExpiredInterval () {
+    return this._tokenExpiredInterval;
   }
 
-  get jwt () {
-    if (!this.auth.authenticationToken) {
-      return null;
-    }
-
-    return this.auth.authenticationToken.encodedJwt;
+  set tokenExpiredInterval (value) {
+    this._checkPropertyType('_tokenExpiredInterval', 'number', value);
+    this._tokenExpiredInterval = value;
   }
 
-  set jwt (encodedJwt) {
-    this.auth.authenticationToken = encodedJwt;
-  }
-
-  get connected () {
-    return this.protocol.connected;
-  }
 
   /**
   * Emit an event to all registered listeners
@@ -244,10 +255,7 @@ class Kuzzle extends KuzzleEventEmitter {
 
     this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
 
-    this.protocol.addListener('tokenExpired', () => {
-      this.auth.authenticationToken = null;
-      this.emit('tokenExpired');
-    });
+    this.protocol.addListener('tokenExpired', () => this.tokenExpired());
 
     this.protocol.addListener('connect', () => {
       if (this.autoQueue) {
@@ -265,10 +273,15 @@ class Kuzzle extends KuzzleEventEmitter {
       if (this.autoQueue) {
         this.startQueuing();
       }
+
+      this.realtime.disconnected();
+
       this.emit('networkError', error);
     });
 
     this.protocol.addListener('disconnect', () => {
+      this.realtime.disconnected();
+
       this.emit('disconnected');
     });
 
@@ -281,10 +294,11 @@ class Kuzzle extends KuzzleEventEmitter {
         this.playQueue();
       }
 
+      this.realtime.reconnected();
+
       if (this.auth.authenticationToken) {
         return this.auth.checkToken()
           .then(res => {
-
             // shouldn't obtain an error but let's invalidate the token anyway
             if (!res.valid) {
               this.auth.authenticationToken = null;
@@ -444,6 +458,26 @@ Discarded request: ${JSON.stringify(request)}`));
   }
 
   /**
+   * On token expiration, reset jwt and unsubscribe all rooms.
+   * Throttles to avoid duplicate event triggers.
+   */
+  tokenExpired() {
+    const now = Date.now();
+
+    if ((now - this._lastTokenExpired) < this.tokenExpiredInterval) {
+      // event was recently already fired
+      return;
+    }
+
+    this._lastTokenExpired = now;
+
+    this.auth.authenticationToken = null;
+    this.realtime.tokenExpired();
+
+    this.emit('tokenExpired');
+  }
+
+  /**
    * Adds a new controller and make it available in the SDK.
    *
    * @param {BaseController} ControllerClass
@@ -573,6 +607,7 @@ Discarded request: ${JSON.stringify(request)}`));
 
     dequeuingProcess();
   }
+
 }
 
 module.exports = Kuzzle;
