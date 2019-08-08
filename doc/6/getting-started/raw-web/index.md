@@ -10,7 +10,7 @@ order: 100
 
 This tutorial explains how to use **Kuzzle** with the **Javascript SDK** in a **browser**.
 
-To follow this tutorial, you must have a Kuzzle Server up and running (you'll need to know the hostname of the machine running it). If this is not already the case, take a look at [how to run Kuzzle](/core/1/guides/getting-started/running-kuzzle/).
+To follow this tutorial, you must have a Kuzzle Server up and running (you'll need to know the hostname of the machine running it). If this is not already the case, take a look at [how to run Kuzzle](/core/1/guides/getting-started/running-kuzzle).
 
 Before proceeding, make sure your system has **Node.js** version 8 or higher ([download page](https://nodejs.org/en/download/)) installed.
 
@@ -124,7 +124,7 @@ New document successfully created!
 ```
 
 :::success
-You have now successfully stored your first document into Kuzzle. Check our [Admin Console Guide](/core/1/guides/essentials/admin-console/) to see how to browse your collection and confirm that your document was saved.
+You have now successfully stored your first document into Kuzzle. Check our [Admin Console Guide](/core/1/guides/essentials/admin-console) to see how to browse your collection and confirm that your document was saved.
 :::
 
 
@@ -165,4 +165,4 @@ Now that you're more familiar with Kuzzle, dive even deeper to learn how to leve
 - discover what this SDK has to offer by browsing other sections of this documentation
 - learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
 - learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security/)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security)

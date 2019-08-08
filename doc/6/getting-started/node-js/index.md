@@ -13,7 +13,7 @@ It will walk you through creating scripts that can **store** documents in Kuzzle
 
 You are going to write an application that **stores** documents in Kuzzle Server and subscribe to **real time notifications** for each created document.
 
-To follow this tutorial, you must have a Kuzzle Server up and running. Follow these instructions if this is not already the case: [Running Kuzzle](/core/1/guides/getting-started/running-kuzzle/).
+To follow this tutorial, you must have a Kuzzle Server up and running. Follow these instructions if this is not already the case: [Running Kuzzle](/core/1/guides/getting-started/running-kuzzle).
 
 
 :::info
@@ -154,4 +154,4 @@ Now that you're more familiar with Kuzzle, dive even deeper to learn how to leve
 - discover what this SDK has to offer by browsing other sections of this documentation
 - learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
 - learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security/)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security)

@@ -10,7 +10,7 @@ order: 0
 
 This class represents a Kuzzle User.
 
-Refer to the [Security guide](/core/1/guides/essentials/security/) for more information about users.
+Refer to the [Security guide](/core/1/guides/essentials/security) for more information about users.
 
 The following methods return a `User` object:
 
