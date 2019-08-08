@@ -40,7 +40,7 @@ Additional query options
 
 ### expiresIn
 
-The default value for the `expiresIn` option is defined at server level, in Kuzzle's [configuration file](/core/1/guides/essentials/configuration/).
+The default value for the `expiresIn` option is defined at server level, in Kuzzle's [configuration file](/core/1/guides/essentials/configuration).
 
 ## Resolves
 
