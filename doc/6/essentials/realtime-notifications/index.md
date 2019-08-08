@@ -8,7 +8,7 @@ order: 300
 
 # Notifications
 
-The [realtime.subscribe](/sdk/js/6/controllers/realtime/) method takes a callback argument, called with a notification object, whose properties depends on the type of notification received.
+The [realtime.subscribe](/sdk/js/6/controllers/realtime) method takes a callback argument, called with a notification object, whose properties depends on the type of notification received.
 
 ## Document & messages
 
@@ -26,7 +26,7 @@ These notifications represent [documents changes & messages](/core/1/api/essenti
 | `scope`      | <pre>string</pre> | `in`: document enters (or stays) in the scope<br/out`: document leaves the scope                      |
 | `timestamp`  | <pre>number</pre> | Timestamp of the event, in Epoch-millis format                                                        |
 | `type`       | <pre>string</pre> | `document`: Notification type                                                                         |
-| `volatile`   | <pre>object</pre> | Request [volatile data](/core/1/api/essentials/volatile-data/)                                        |
+| `volatile`   | <pre>object</pre> | Request [volatile data](/core/1/api/essentials/volatile-data)                                        |
 
 The `result` object is the notification content, and it has the following structure:
 
@@ -51,7 +51,7 @@ These notifications represent [user events](/core/1/api/essentials/notifications
 | `timestamp`  | <pre>number</pre> | Timestamp of the event, in Epoch-millis format                                                        |
 | `type`       | <pre>string</pre> | `user`: Notification type                                                                             |
 | `user`       | <pre>string</pre> | `in`: a new user has subscribed to the same filters<br/out`: a user cancelled a shared subscription   |
-| `volatile`   | <pre>object</pre> | Request [volatile data](/core/1/api/essentials/volatile-data/)                                        |
+| `volatile`   | <pre>object</pre> | Request [volatile data](/core/1/api/essentials/volatile-data)                                        |
 
 The `result` object is the notification content, and it has the following structure:
 

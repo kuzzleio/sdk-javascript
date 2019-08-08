@@ -17,7 +17,7 @@ Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzz
 
 ## Running Kuzzle
 
-Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/1/guides/getting-started/running-kuzzle/) if you don't have one yet.
+Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/1/guides/getting-started/running-kuzzle) if you don't have one yet.
 
 ## Fun with the SDK
 
@@ -30,7 +30,7 @@ Before proceeding, please make sure your system has **Node.js** version 8 or hig
 ::: info
 This section explains how to use the Kuzzle SDK within an existing Webpack project.
 If you don't have your project up and running yet and want to learn how to leverage Webpack to build it, please refer to
-the [official Webpack Getting Started page](https://webpack.js.org/guides/getting-started/).
+the [official Webpack Getting Started page](https://webpack.js.org/guides/getting-started).
 :::
 
 In your terminal, go to the root of your front-end project using Webpack and type
@@ -152,8 +152,8 @@ New document successfully created!
 
 ::: success
 You have now successfully stored your first document into Kuzzle. Click
-[here](/core/1/guides/essentials/admin-console/) to see how you can use the
-[**Kuzzle Admin Console**](http://console.kuzzle.io/) to browse your collection and
+[here](/core/1/guides/essentials/admin-console) to see how you can use the
+[**Kuzzle Admin Console**](http://console.kuzzle.io) to browse your collection and
 confirm that your document was saved.
 :::
 
@@ -209,4 +209,4 @@ Now that you're more familiar with Kuzzle, dive even deeper to learn how to leve
 - take a look at the [SDK Reference](/sdk/js/6)
 - learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
 - follow our guide to learn how to implement [basic authentication](/core/1/guides/essentials/user-authentication/#local-strategy)
-- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/1/guides/essentials/security/)
+- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/1/guides/essentials/security)

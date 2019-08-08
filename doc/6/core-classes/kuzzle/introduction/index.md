@@ -32,6 +32,6 @@ The following protocols are available in the SDK JS 6:
 
 ## Volatile data
 
-You can tell the Kuzzle SDK to attach a set of "volatile" data to each request. You can set it as an object contained in the `volatile` field of the Kuzzle constructor. The response to a request containing volatile data will contain the same data in its `volatile` field. This can be useful, for example, in real-time notifications for [user join/leave notifications](/core/1/api/essentials/volatile-data/) to provide additional informations about the client who sent the request.
+You can tell the Kuzzle SDK to attach a set of "volatile" data to each request. You can set it as an object contained in the `volatile` field of the Kuzzle constructor. The response to a request containing volatile data will contain the same data in its `volatile` field. This can be useful, for example, in real-time notifications for [user join/leave notifications](/core/1/api/essentials/volatile-data) to provide additional informations about the client who sent the request.
 
 Note that you can also set volatile data on a per-request basis (on requests that accept a `volatile` field in their `options` argument). In this case, per-request volatile data will be merged with the global `volatile` object set in the constructor. Per-request fields will override global ones.
