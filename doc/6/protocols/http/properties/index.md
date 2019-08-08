@@ -18,4 +18,8 @@ order: 10
 | `port`  | <pre>number</pre>  | Kuzzle server port | Get |
 | `protocol`  | <pre>string</pre>  | `https` or `http` | Get |
 | `ssl`  | <pre>boolean</pre>  | `true` if ssl is active | Get |
-| `timeout`  | <pre>number</pre>  | Connection timeout <SinceBadge version="6.2.1"/>| Get/Set |
+| `timeout`  | <pre>number</pre>  | Connection timeout in milliseconds <SinceBadge version="6.2.1"/>| Get/Set |
+
+**Note:**
+
+A `timeout` of 0 mean that the connection will never timeout.
