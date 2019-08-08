@@ -17,7 +17,7 @@ Unsubscribes first if this `Room` object was already listening to events.
 
 | Arguments              | Type        | Description                                                                                         |
 | ---------------------- | ----------- | --------------------------------------------------------------------------------------------------- |
-| `filters`              | JSON Object | [Filters](/core/1/guides/cookbooks/realtime-api/introduction/)                                      |
+| `filters`              | JSON Object | [Filters](/core/1/guides/cookbooks/realtime-api/introduction)                                      |
 | `notificationCallback` | function    | Function called each time a [notification](/sdk/js/5/essentials/realtime-notifications) is received |
 | `subscriptionCallback` | function    | Function called with the subscription result                                                        |
 

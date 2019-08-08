@@ -7,7 +7,7 @@ description: Collection:mgetDocument
 
 # mGetDocument
 
-Get multiple [Documents](/sdk/js/5/core-classes/document/) according to the input document IDs.
+Get multiple [Documents](/sdk/js/5/core-classes/document) according to the input document IDs.
 
 ---
 

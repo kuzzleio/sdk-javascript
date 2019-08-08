@@ -8,7 +8,7 @@ order: 300
 # Realtime Notifications
 
 With Kuzzle, you don't [subscribe](/sdk/js/5/core-classes/collection/subscribe) to a room or a topic but, instead, you subscribe to documents.
-This means, that when you want to subscribe you must provide a set of filter definitions, using [Koncorde](/core/1/guides/cookbooks/realtime-api/introduction/), that tell Kuzzle what documents should trigger a notification. Then, any time a document matches the defined filters, Kuzzle will send a notification to the subscriber.
+This means, that when you want to subscribe you must provide a set of filter definitions, using [Koncorde](/core/1/guides/cookbooks/realtime-api/introduction), that tell Kuzzle what documents should trigger a notification. Then, any time a document matches the defined filters, Kuzzle will send a notification to the subscriber.
 
 You can also provide an empty set of filters, which will tell Kuzzle that you want to listen to any change occurring on a collection, emulating the behavior of a traditional topic.
 
@@ -35,7 +35,7 @@ You may subscribe multiple times to the same room, with identical or different s
 
 | Notification field | Type                                         | Description                                                                                                | Possible values   |
 | ------------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------- |
-| `document`         | [Document](/sdk/js/5/core-classes/document/) | Content of the document or real-time message that generated the notification                               |                   |
+| `document`         | [Document](/sdk/js/5/core-classes/document) | Content of the document or real-time message that generated the notification                               |                   |
 | `scope`            | string                                       | Indicates if the document enters or exits the subscription scope                                           | `in`, `out`       |
 | `state`            | string                                       | <DeprecatedBadge version="1.5.0" /> Shows if the document is about to be changed, or if the change is done | `pending`, `done` |
 | `type`             | string                                       | Notification type                                                                                          | `document`        |

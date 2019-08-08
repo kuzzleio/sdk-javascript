@@ -7,7 +7,7 @@ description: Collection:mdeleteDocument
 
 # mDeleteDocument
 
-Delete multiple [Documents](/sdk/js/5/core-classes/document/) according to the input IDs.
+Delete multiple [Documents](/sdk/js/5/core-classes/document) according to the input IDs.
 
 ---
 

@@ -7,7 +7,7 @@ description: Collection:createDocument
 
 # createDocument
 
-Create a new document in Kuzzle and instantiate a [Document](/sdk/js/5/core-classes/document/) object.
+Create a new document in Kuzzle and instantiate a [Document](/sdk/js/5/core-classes/document) object.
 
 ---
 
@@ -15,7 +15,7 @@ Create a new document in Kuzzle and instantiate a [Document](/sdk/js/5/core-clas
 
 | Arguments  | Type        | Description                            |
 | ---------- | ----------- | -------------------------------------- |
-| `Document` | object      | [Document](/sdk/js/5/core-classes/document/) object |
+| `Document` | object      | [Document](/sdk/js/5/core-classes/document) object |
 | `options`  | JSON object | Optional parameters                    |
 | `callback` | function    | Optional callback                      |
 
@@ -51,7 +51,7 @@ Returns the `Collection` object to allow chaining.
 
 ## Callback Response
 
-Returns a [Document](/sdk/js/5/core-classes/document/) object containing the newly created document.
+Returns a [Document](/sdk/js/5/core-classes/document) object containing the newly created document.
 
 ## Usage
 

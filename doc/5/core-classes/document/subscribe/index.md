@@ -25,7 +25,7 @@ The provided callback will be called everytime a [notification](/sdk/js/5/essent
 
 ## Options
 
-Options are directly passed to the [Room](/sdk/js/5/core-classes/room/) object constructor.
+Options are directly passed to the [Room](/sdk/js/5/core-classes/room) object constructor.
 
 ---
 

@@ -7,7 +7,7 @@ description: Collection:mreplaceDocument
 
 # mReplaceDocument
 
-Replace the provided [Documents](/sdk/js/5/core-classes/document/).
+Replace the provided [Documents](/sdk/js/5/core-classes/document).
 
 ---
 
@@ -15,7 +15,7 @@ Replace the provided [Documents](/sdk/js/5/core-classes/document/).
 
 | Arguments   | Type        | Description                                         |
 | ----------- | ----------- | --------------------------------------------------- |
-| `documents` | Document[]  | Array of [Document](/sdk/js/5/core-classes/document/) to replace |
+| `documents` | Document[]  | Array of [Document](/sdk/js/5/core-classes/document) to replace |
 | `options`   | JSON Object | Optional parameters                                 |
 | `callback`  | function    | Optional callback                                   |
 

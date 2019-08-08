@@ -7,7 +7,7 @@ description: Collection:getMapping
 
 # getMapping
 
-Retrieves the current mapping of this collection as a [CollectionMapping](/sdk/js/5/core-classes/collection-mapping/) object.
+Retrieves the current mapping of this collection as a [CollectionMapping](/sdk/js/5/core-classes/collection-mapping) object.
 
 ---
 
@@ -30,7 +30,7 @@ Retrieves the current mapping of this collection as a [CollectionMapping](/sdk/j
 
 ## Callback Response
 
-Returns a [CollectionMapping](/sdk/js/5/core-classes/collection-mapping/) object.
+Returns a [CollectionMapping](/sdk/js/5/core-classes/collection-mapping) object.
 
 ## Usage
 

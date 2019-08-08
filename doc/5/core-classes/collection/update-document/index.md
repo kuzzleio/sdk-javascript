@@ -42,7 +42,7 @@ Returns the `Collection` object to allow chaining.
 
 ## Callback Response
 
-Returns an up-to-date [Document](/sdk/js/5/core-classes/document/) object.
+Returns an up-to-date [Document](/sdk/js/5/core-classes/document) object.
 
 ## Usage
 

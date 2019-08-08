@@ -7,7 +7,7 @@ description: Collection:mcreateOrReplaceDocument
 
 # mCreateOrReplaceDocument
 
-Create or replace the input [Documents](/sdk/js/5/core-classes/document/).
+Create or replace the input [Documents](/sdk/js/5/core-classes/document).
 
 ---
 
@@ -15,7 +15,7 @@ Create or replace the input [Documents](/sdk/js/5/core-classes/document/).
 
 | Arguments   | Type        | Description                                                   |
 | ----------- | ----------- | ------------------------------------------------------------- |
-| `documents` | Document[]  | Array of [Document](/sdk/js/5/core-classes/document/) to create or replace |
+| `documents` | Document[]  | Array of [Document](/sdk/js/5/core-classes/document) to create or replace |
 | `options`   | JSON Object | Optional parameters                                           |
 | `callback`  | function    | Optional callback                                             |
 
