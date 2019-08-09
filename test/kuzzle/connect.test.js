@@ -53,10 +53,18 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.nowhere),
         eventStub = sinon.stub();
 
+      kuzzle.realtime.disconnected = sinon.stub();
+
       kuzzle.addListener('networkError', eventStub);
 
       return kuzzle.connect()
-        .catch(() => should(eventStub).be.calledOnce());
+        .then(() => {
+          throw new Error('should not happen');
+        })
+        .catch(() => {
+          should(kuzzle.realtime.disconnected).be.calledOnce();
+          should(eventStub).be.calledOnce();
+        });
     });
 
     it('should register listeners upon receiving a "connect" event', () => {
@@ -77,10 +85,13 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.somewhereagain),
         eventStub = sinon.stub();
 
+      kuzzle.realtime.reconnected = sinon.stub();
+
       kuzzle.addListener('reconnected', eventStub);
 
       return kuzzle.connect()
         .then(() => {
+          should(kuzzle.realtime.reconnected).be.calledOnce();
           should(eventStub).be.calledOnce();
         });
     });
@@ -126,11 +137,14 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.somewhere),
         eventStub = sinon.stub();
 
+      kuzzle.realtime.disconnected = sinon.stub();
+
       kuzzle.addListener('disconnected', eventStub);
 
       return kuzzle.connect()
         .then(() => kuzzle.protocol.disconnect())
         .then(() => {
+          should(kuzzle.realtime.disconnected).be.calledOnce();
           should(eventStub).be.calledOnce();
         });
     });

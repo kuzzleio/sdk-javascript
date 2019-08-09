@@ -155,4 +155,17 @@ describe('Kuzzle setters', () => {
       should(kuzzle._offlineQueue).be.empty();
     });
   });
+
+  describe('#tokenExpiredInterval', () => {
+    it('should throw if not a number', () => {
+      should(() => {
+        kuzzle.tokenExpiredInterval = 'foo-bar';
+      }).throw();
+    });
+
+    it('should set private _tokenExpiredInterval', () => {
+      kuzzle.tokenExpiredInterval = 42;
+      should(kuzzle._tokenExpiredInterval).eql(42);
+    });
+  });
 });
