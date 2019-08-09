@@ -36,7 +36,7 @@ this.controllers = {
 }
 ```
 
-Then the constructor of the custom SDK controller must specify its name as follows (see [how to query a custom API route](/core/1/plugins/guides/controllers/#querying-plugins-controllers) documentation):
+Then the constructor of the custom SDK controller must specify its name as follows (see [how to query a custom API route](/core/1/plugins/guides/controllers#querying-plugins-controllers) documentation):
 
 ```js
 const { BaseController } = require('kuzzle-sdk');

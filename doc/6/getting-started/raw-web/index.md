@@ -130,7 +130,7 @@ You have now successfully stored your first document into Kuzzle. Check our [Adm
 
 ## Subscribe to realtime document notifications (pub/sub)
 
-Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/6/essentials/realtime-notifications/) documentation).
+Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/6/essentials/realtime-notifications) documentation).
 
 Let's get started. Create a `subscribe.html` file (same structure as above) with the following code in the `body` tag:
 
@@ -148,7 +148,7 @@ The code in the `subscribe.html` page is now running endlessly, waiting for noti
 
 Now go back to the other tab and reload `create.html`.
 
-This creates a new document in Kuzzle which, in turn, triggers a [document notification](/core/1/api/essentials/notifications/#documents-changes-messages) sent to the `subscribe.html` tab. Check the `subscribe.html` tab: a new message is printed everytime a document is created using the `create.html` code.
+This creates a new document in Kuzzle which, in turn, triggers a [document notification](/core/1/api/essentials/notifications#documents-changes-messages) sent to the `subscribe.html` tab. Check the `subscribe.html` tab: a new message is printed everytime a document is created using the `create.html` code.
 
 ```
 New driver Sirkis with id AWccRe3-DfukVhSzMdUo has B license.

@@ -21,7 +21,7 @@ mDeleteUsers(kuids, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuids` | <pre>array&lt;string&gt;</pre> | Array of user [kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid) |
+| `kuids` | <pre>array&lt;string&gt;</pre> | Array of user [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
