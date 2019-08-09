@@ -10,7 +10,7 @@ order: 1
 
 The Security component lets you handle user permissions in Kuzzle.
 
-Please refer to our [permissions guide](/core/1/guides/essentials/security/#user-permissions) for more information.
+Please refer to our [permissions guide](/core/1/guides/essentials/security#user-permissions) for more information.
 
 ---
 

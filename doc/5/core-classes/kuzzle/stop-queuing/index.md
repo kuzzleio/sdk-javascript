@@ -7,7 +7,7 @@ description: Kuzzle:stopQueuing
 
 # stopQueuing
 
-Stops the requests queuing. Works only in offline mode, and if the [autoQueue](/sdk/js/5/core-classes/kuzzle/#properties) option is set to `false`.
+Stops the requests queuing. Works only in offline mode, and if the [autoQueue](/sdk/js/5/core-classes/kuzzle#properties) option is set to `false`.
 
 ---
 
