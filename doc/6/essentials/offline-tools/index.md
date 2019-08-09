@@ -13,7 +13,7 @@ during its lifespan.
 
 ## Contructor options and properties
 
-These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/6/core-classes/kuzzle/constructor/#arguments).
+These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/6/core-classes/kuzzle/constructor#arguments).
 
 Some of them are also [writable properties](/sdk/js/6/core-classes/kuzzle/properties) available after SDK instantiation.
 

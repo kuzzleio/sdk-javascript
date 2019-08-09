@@ -19,7 +19,7 @@ createFirstAdmin(kuid, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `kuid` | <pre>string</pre> | Administrator [kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | Administrator [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | Administrator content &amp; credentials |
 | `options` | <pre>object</pre> | Query options |
 
