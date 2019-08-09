@@ -19,7 +19,7 @@ Updates the role object in Kuzzle.
   </p>
 </div>
 
-To get more information about Kuzzle permissions, please refer to our [permissions guide](/core/1/guides/essentials/security/#user-permissions).
+To get more information about Kuzzle permissions, please refer to our [permissions guide](/core/1/guides/essentials/security#user-permissions).
 
 ---
 

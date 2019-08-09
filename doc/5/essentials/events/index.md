@@ -7,7 +7,7 @@ order: 200
 
 # Events
 
-The [Kuzzle instance](/sdk/js/5/core-classes/kuzzle/) periodically emits named events that provide useful updates about the state of the Kuzzle client. To subscribe to these events, use the [addListener](/sdk/js/5/core-classes/kuzzle/add-listener) function and specify the event name and the callback function that will be executed when the event is emitted. To unsubscribe to an event, use the [removeListener](/sdk/js/5/core-classes/kuzzle/remove-listener) function, specifying the name of the event to remove.
+The [Kuzzle instance](/sdk/js/5/core-classes/kuzzle) periodically emits named events that provide useful updates about the state of the Kuzzle client. To subscribe to these events, use the [addListener](/sdk/js/5/core-classes/kuzzle/add-listener) function and specify the event name and the callback function that will be executed when the event is emitted. To unsubscribe to an event, use the [removeListener](/sdk/js/5/core-classes/kuzzle/remove-listener) function, specifying the name of the event to remove.
 
 ---
 

@@ -7,7 +7,7 @@ description: Kuzzle:getMyCredentials
 
 # getMyCredentials
 
-Get [credential information](/core/1/guides/essentials/user-authentication/#user-credentials) for the current user.
+Get [credential information](/core/1/guides/essentials/user-authentication#user-credentials) for the current user.
 
 ---
 

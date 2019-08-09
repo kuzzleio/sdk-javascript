@@ -19,7 +19,7 @@ If the login attempt fails, the `loginAttempt` event is fired with the following
 `{ success: false, error: 'error message' }`
 
 <div class="alert alert-info">
-This method is non-queuable, meaning that during offline mode, it will be discarded and the callback will be called with an error. [Learn more.](/core/1/guides/essentials/user-authentication/#local-strategy)
+This method is non-queuable, meaning that during offline mode, it will be discarded and the callback will be called with an error. [Learn more.](/core/1/guides/essentials/user-authentication#local-strategy)
 </div>
 
 ---
