@@ -37,23 +37,6 @@ describe('Jwt', () => {
         new Jwt('this-is.not-json-payload.for-sure');
       }).throwError('Invalid JSON payload for JWT');
     });
-
-    it('should be able to decode the payload when Buffer is not available (browser)', () => {
-      Jwt.__set__('browserAtob', base64 => Buffer.from(base64, 'base64').toString());
-      Jwt.__set__('bufferAvailable', () => false);
-
-      const
-        expiresAt = Date.now() + 3600 * 1000,
-        encodedJwt = generateJwt('user-gordon', expiresAt);
-
-
-      authenticationToken = new Jwt(encodedJwt);
-
-      should(authenticationToken.encodedJwt).be.eql(encodedJwt);
-      should(authenticationToken.userId).be.eql('user-gordon');
-      should(authenticationToken.expiresAt).be.eql(expiresAt);
-      should(authenticationToken.expired).be.eql(false);
-    });
   });
 
   describe('#get expired', () => {
