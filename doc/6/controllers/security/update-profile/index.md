@@ -20,7 +20,7 @@ updateProfile(id, profile, [options]);
 | Property | Type | Description |
 |--- |--- |--- |
 | `id` | <pre>string</pre> | Profile identifier |
-| `profile` | <pre>object</pre> | [Profile definition content](/core/1/guides/essentials/security/#defining-profiles) |
+| `profile` | <pre>object</pre> | [Profile definition content](/core/1/guides/essentials/security#defining-profiles) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

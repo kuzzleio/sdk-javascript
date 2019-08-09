@@ -19,7 +19,7 @@ getUserRights(kui, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

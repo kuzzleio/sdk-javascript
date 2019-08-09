@@ -27,7 +27,7 @@ createOrReplaceProfile(id, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `policies` | <pre>object</pre> | [Profile content](/core/1/guides/essentials/security/#defining-profiles) |
+| `policies` | <pre>object</pre> | [Profile content](/core/1/guides/essentials/security#defining-profiles) |
 
 ### options
 

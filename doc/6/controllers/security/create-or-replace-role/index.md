@@ -27,7 +27,7 @@ createOrReplaceRole(id, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `controllers` | <pre>object</pre> | [Role definition](/core/1/guides/essentials/security/#defining-roles) |
+| `controllers` | <pre>object</pre> | [Role definition](/core/1/guides/essentials/security#defining-roles) |
 
 ### options
 
