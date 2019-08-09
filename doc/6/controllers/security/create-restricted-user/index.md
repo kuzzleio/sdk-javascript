@@ -25,7 +25,7 @@ createRestrictedUser(body, [kuid], [options]);
 | Property | Type | Description |
 |--- |--- |--- |
 | `body` | <pre>object</pre> | User content &amp; credentials |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid). If not provided, a random kuid is automatically generated |
+| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid). If not provided, a random kuid is automatically generated |
 | `options` | <pre>object</pre> | Query options |
 
 
