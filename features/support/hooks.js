@@ -36,7 +36,6 @@ async function clean () {
   }
   catch (error) {
     // rethrow to get a readable error
-    console.error(error);
     throw error;
   }
 
