@@ -22,4 +22,4 @@ order: 10
 
 **Note:**
 
-A `timeout` of 0 mean that the connection will never timeout.
+A `timeout` of 0 means that the connection will never timeout.
