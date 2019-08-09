@@ -10,7 +10,7 @@ const decodeBase64 = input => {
   let output = '';
 
   if (str.length % 4 === 1) {
-    throw new Error('Malformated base64 string.');
+    throw new Error('Malformed base64 string.');
   }
 
   for (let bc = 0, bs = 0, buffer, i = 0;
