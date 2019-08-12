@@ -1,15 +1,29 @@
 'use strict';
 
-// used for unit tests
-const browserAtob = base64 => atob(base64);
-const bufferAvailable = () => typeof Buffer !== 'undefined';
+// atob is not available in React Native
+// https://stackoverflow.com/questions/42829838/react-native-atob-btoa-not-working-without-remote-js-debugging
 
-const decodeBase64 = base64 => {
-  if (bufferAvailable()) {
-    return Buffer.from(base64, 'base64').toString();
+const base64Charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+const decodeBase64 = input => {
+  const str = input.replace(/=+$/, '');
+  let output = '';
+
+  if (str.length % 4 === 1) {
+    throw new Error('Malformed base64 string.');
   }
 
-  return browserAtob(base64);
+  for (let bc = 0, bs = 0, buffer, i = 0;
+    buffer = str.charAt(i++); // eslint-disable-line no-cond-assign
+
+    ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer, bc++ % 4)
+      ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6))
+      : 0
+  ) {
+    buffer = base64Charset.indexOf(buffer);
+  }
+
+  return output;
 };
 
 class Jwt {
