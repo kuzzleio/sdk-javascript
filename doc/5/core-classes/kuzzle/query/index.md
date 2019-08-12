@@ -80,4 +80,3 @@ Returns a `JSON object` containing the raw Kuzzle response.
   }
 }
 ```
-
