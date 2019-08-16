@@ -34,7 +34,7 @@ npm install kuzzle-sdk
 
 In the _App.vue_ file, you should remove the tag, the import and the component registration of the `HelloWorld` component, we won't use it.
 
-## Instanciating Kuzzle SDK
+## Instantiating Kuzzle SDK
 
 We have to connect the server so that our client can interact with it.
 
