@@ -98,7 +98,7 @@ export default {
     },
     /* snippet:end */
     /* snippet:start:11 */
-    async subscribe_messages() {
+    async subscribeMessages() {
       // Call the subscribe method of the realtime controller and receive the roomId
       // Save the id of our subscription (we could need it to unsubscribe)
       this.roomID = await kuzzle.realtime.subscribe(
@@ -120,7 +120,7 @@ export default {
     },
     /* snippet:end */
     /* snippet:start:7 */
-    async fetch_messages() {
+    async fetchMessages() {
       // Call the search method of the document controller
       const results = await kuzzle.document.search(
         "chat", // Name of the index
@@ -144,8 +144,8 @@ export default {
         await kuzzle.index.create("chat");
         await kuzzle.collection.create("chat", "messages");
       }
-      await this.fetch_messages();
-      await this.subscribe_messages();
+      await this.fetchMessages();
+      await this.subscribeMessages();
       this.validate = true;
     }
     /* snippet:end */

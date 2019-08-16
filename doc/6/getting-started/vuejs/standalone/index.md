@@ -71,7 +71,7 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./snippets/App.vue.snippet:6[js]
 
-The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest messages and store them in our array, before subscribing to changes in the `messages` collection. We called it in the `valid()` function we created above.
+The function `fetchMessage()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest messages and store them in our array, before subscribing to changes in the `messages` collection. We called it in the `valid()` function we created above.
 
 <<< ./snippets/App.vue.snippet:7[js]
 
@@ -96,7 +96,7 @@ As you can see we don't push the new message in our array on message creation.
 Indeed, we will receive notifications from Kuzzle each time we modify our message collection (even if it is a message creation on our part) that we will use to add the messages in our array.
 
 Actually, we need to subscribe to the collection that contains our messages.
-So let's create our `subscribe_messages()` action. It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creations:
+So let's create our `subscribeMessages()` action. It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creations:
 
 <<< ./snippets/App.vue.snippet:11[js]
 
