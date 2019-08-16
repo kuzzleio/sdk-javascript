@@ -52,7 +52,7 @@ Add the following `valid()` method in the export of the `<script>` tag of your _
 <<< ./snippets/App.vue.snippet:2[js]
 
 ## Get the username
-First of all, we need to know the user nickname. Let's start by adding the following html code in the `<template>` tag to allow the client type his nickname:
+First of all, we need to know the user's name. Let's start by adding the following HTML code in the `<template>` tag, allowing one to enter their name:
 
 <<< ./snippets/App.vue.snippet:1[html]
 
