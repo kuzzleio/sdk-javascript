@@ -26,7 +26,7 @@ just add Babel, Linter and select the default options for the other features.
 vue create kuzzle-playground
 ```
 
-Install the kuzzle-sdk: 
+Install Kuzzle's Javascript SDK: 
 ```bash
 cd kuzzle-playground
 npm install kuzzle-sdk
