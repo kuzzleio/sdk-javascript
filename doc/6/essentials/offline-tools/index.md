@@ -13,7 +13,7 @@ during its lifespan.
 
 ## Contructor options and properties
 
-These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/6/core-classes/kuzzle/constructor/#arguments).
+These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/6/core-classes/kuzzle/constructor#arguments).
 
 Some of them are also [writable properties](/sdk/js/6/core-classes/kuzzle/properties) available after SDK instantiation.
 
@@ -86,7 +86,7 @@ Empties the `offlineQueue` without sending the requests to Kuzzle.
 Sends to Kuzzle all the requests in the `offlineQueue`. Works only if the SDK is not in a `offline` state, and if the
 `autoReplay` option is set to false.
 
-### [startQueuing()](/sdk/js/6/core-classes/kuzzle/start-queuing/)
+### [startQueuing()](/sdk/js/6/core-classes/kuzzle/start-queuing)
 
 Starts queuing requests when in `offline` state. Requests will be put in the `offlineQueue` array instead of being discarded, until `stopQueuing` is called.
 Works only in `offline` state when the `autoQueue` option is set to `false`. Call `playQueue` to send to Kuzzle the

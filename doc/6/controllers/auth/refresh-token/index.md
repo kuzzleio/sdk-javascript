@@ -40,7 +40,7 @@ Additional query options
 
 ### expiresIn
 
-The default value for the `expiresIn` option is defined at server level, in Kuzzle's [configuration file](/core/1/guides/essentials/configuration/).
+The default value for the `expiresIn` option is defined at server level, in Kuzzle's [configuration file](/core/1/guides/essentials/configuration).
 
 ## Resolves
 
@@ -48,7 +48,7 @@ The `refreshToken` action resolves to a token object with the following properti
 
 | Property   | Type    | Description  |
 |--------------|---------|-------------|
-| `_id` | <pre>string</pre> | User unique identifier ([kuid](/core/1/guides/essentials/user-authentication/#kuzzle-user-identifier-kuid)) |
+| `_id` | <pre>string</pre> | User unique identifier ([kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid)) |
 | `expiresAt` | <pre>number</pre> | Expiration timestamp in Epoch-millis format (UTC) |
 | `jwt` | <pre>string</pre> | Authentication token |
 | `ttl` | <pre>number</pre> | Time to live of the authentication token, in milliseconds |

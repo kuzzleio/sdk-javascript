@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -25,7 +25,7 @@
     "doc": "docker-compose -f doc/docker-compose.yml up",
     "doc-testing": "bash test-docs.sh",
     "functional-testing": "cucumber-js --exit --fail-fast",
-    "lint": "eslint --max-warnings=0 ./src ./test",
+    "lint": "eslint --max-warnings=0 ./src ./test ./features",
     "build": "node build.js",
     "doc-prepare": "cd doc && bash doc.sh prepare",
     "doc-dev": "cd doc && bash doc.sh dev",

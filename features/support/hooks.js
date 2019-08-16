@@ -1,4 +1,4 @@
-const {Before, AfterAll, BeforeAll} = require('cucumber');
+const { Before, AfterAll, BeforeAll } = require('cucumber');
 
 let _world;
 
@@ -36,7 +36,7 @@ async function clean () {
   }
   catch (error) {
     // rethrow to get a readable error
-    console.error(error);
+    console.error(error); // eslint-disable-line no-console
     throw error;
   }
 

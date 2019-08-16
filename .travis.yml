@@ -121,38 +121,38 @@ jobs:
       after_deploy:
         - npm run doc-cloudfront
 
-    # - stage: Deployment Doc Prod
-    #   name: Deploy docs.kuzzle.io
-    #   if: type = push AND branch =~ /^master|[0-9]+-stable$/
-    #   language: node_js
-    #   node_js: 10
-    #   env:
-    #     - NODE_ENV=production
-    #     - S3_BUCKET=docs.kuzzle.io
-    #     - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
-    #     - AWS_DEFAULT_REGION=us-west-2
+    - stage: Deployment Doc Prod
+      name: Deploy docs.kuzzle.io
+      if: type = push AND branch =~ /^master|[0-9]+-stable$/
+      language: node_js
+      node_js: 10
+      env:
+        - NODE_ENV=production
+        - S3_BUCKET=docs.kuzzle.io
+        - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
+        - AWS_DEFAULT_REGION=us-west-2
 
-    #   addons:
-    #     apt:
-    #       packages:
-    #         - python
-    #         - python-pip
+      addons:
+        apt:
+          packages:
+            - python
+            - python-pip
 
-    #   install:
-    #     - pip install awscli --upgrade --user
+      install:
+        - pip install awscli --upgrade --user
 
-    #   script:
-    #     - npm run doc-prepare
-    #     - npm run doc-build
+      script:
+        - npm run doc-prepare
+        - npm run doc-build
 
-    #   deploy:
-    #     provider: script
-    #     script:
-    #       - npm run doc-upload
-    #     skip_cleanup: true
+      deploy:
+        provider: script
+        script:
+          - npm run doc-upload
+        skip_cleanup: true
 
-    #   after_deploy:
-    #     - npm run doc-cloudfront
+      after_deploy:
+        - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
       if: tag IS present AND type != cron
@@ -183,6 +183,9 @@ jobs:
         email: support@kuzzle.io
         api_key:
           secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+        on:
+          branch: master
+          tags: true
 
     - stage: Deploy Beta release on NPM
       if: type = push && branch =~ /^[0-9]+-dev$/
