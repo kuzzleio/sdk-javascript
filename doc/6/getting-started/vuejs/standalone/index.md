@@ -71,19 +71,19 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./snippets/App.vue.snippet:6[js]
 
-The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest messages and store them in our array before subscribe to notification about `messages` collection. We called it in the `valid()` function we created before.
+The function `fetch_message()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest messages and store them in our array, before subscribing to changes in the `messages` collection. We called it in the `valid()` function we created above.
 
 <<< ./snippets/App.vue.snippet:7[js]
 
-Now, just add the following html code to display the messages:
+Now, add the following HTML code to display the messages:
 
 <<< ./snippets/App.vue.snippet:8[html]
 
-To finish this part, just add the following css classes:
+To finish this part, add the following CSS classes:
 
 <<< ./snippets/App.vue.snippet:9[css]
 
-We can now display the messages stored in Kuzzle. Cool but we need to create some right ?
+We can now display the messages stored in Kuzzle. All there is to do is to create some.
 
 ## Send messages
 
@@ -92,12 +92,12 @@ We need to write a simple method that will [create](/sdk/js/6/controllers/docume
 <<< ./snippets/App.vue.snippet:10[js]
 
 As you can see we don't push the new message in our array on message creation.
-Actually, We'll subscribe to the collection that contains our messages.
-So let's create our `subscribe_messages()` action. It will call the realtime controller of Kuzzle to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creation:
+Actually, we need to subscribe to the collection that contains our messages.
+So let's create our `subscribe_messages()` action. It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creations:
 
 <<< ./snippets/App.vue.snippet:11[js]
 
-To finish, just add an input field, bond to the `message` property and a button which calls our `sendMessage()` function:
+To finish, just add an input field bound to the `message` property, and a button which calls our `sendMessage()` function:
 
 <<< ./snippets/App.vue.snippet:12[html]
 
@@ -105,7 +105,7 @@ And the following CSS class:
 
 <<< ./snippets/App.vue.snippet:13[css]
 
-You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages, enjoy :)
+You can now add new messages to Kuzzle and receive the creation notification to update your state and display the new messages.
 
 ## Where do we go from here?
 
