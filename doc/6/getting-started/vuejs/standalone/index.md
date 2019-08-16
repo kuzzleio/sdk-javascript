@@ -38,7 +38,7 @@ In the _App.vue_ file, you should remove the tag, the import and the component r
 
 We have to connect the server so that our client can interact with it.
 
-To do this, we have to create _src/services/kuzzle.js_ file to put our kuzzle instance, a bit like a singleton:
+To do this, we have to create a _src/services/kuzzle.js_ file to put our kuzzle instance declaration:
 
 <<< ./snippets/kuzzle.js.snippet[js]
 
