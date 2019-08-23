@@ -87,7 +87,7 @@ export default {
       await kuzzle.document.create(
         "chat",
         "messages",
-        // Give as parameter the object that will be store in kuzzle
+        // Pass the document to be stored in Kuzzle as a parameter
         {
           value: this.message,
           username: this.username
@@ -105,7 +105,7 @@ export default {
         "chat", // Id of the index
         "messages", // Id of the collection
         {}, // Filter
-        // Callback for notifications receive
+        // Callback to receive notifications
         notification => {
           // Check if the notification interest us (only document creation)
           if (notification.type !== "document") return;
@@ -139,7 +139,7 @@ export default {
       // Etablish the connection
       await kuzzle.connect();
       // Check if 'chat' index exists
-      if (!(await kuzzle.index.exists("chat"))) {
+      if (! await kuzzle.index.exists("chat")) {
         // If not, create 'chat' index and 'messages' collection
         await kuzzle.index.create("chat");
         await kuzzle.collection.create("chat", "messages");
