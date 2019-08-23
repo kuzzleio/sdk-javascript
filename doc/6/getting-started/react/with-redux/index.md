@@ -7,9 +7,9 @@ order: 0
 ---
 
 
-# Getting Started with Kuzzle and React
+# Getting Started with Kuzzle and React with Redux Saga
 
-This section deals with **Kuzzle** (+ **Javascript SDK**) and **React** (with **Redux**). We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/6/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle** (+ **Javascript SDK**) and **React** (with **Redux** and **Redux Saga**). We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/6/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 ## Requirements
 
@@ -165,7 +165,7 @@ Now that you're more familiar with Kuzzle with React, you can:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
 - learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api/introduction/) to create incredibly fine-grained and blazing-fast subscriptions
-- learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login/)
+- learn more about Kuzzle [realtime engine](/core/1/guides/essentials/real-time/)
 - follow our guide to learn how to [manage users, and how to set up fine-grained access control](/guide/1/essentials/security/)
 
 To help you starting a new project with Kuzzle and React, you can start with the [**Kuzzle, React and Redux boilerplate**](https://github.com/kuzzleio/kuzzle-react-redux-boilerplate).
