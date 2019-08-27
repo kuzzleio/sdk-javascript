@@ -20,14 +20,9 @@ fi
 
 case $1 in
   prepare)
-    if [ -d "framework" ];
-    then
-      echo "Update documentation framework"
-      git -C framework/ pull origin master
-    else
-      echo "Clone documentation framework"
-      git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
-    fi
+    echo "Clone documentation framework"
+    rm -rf framework
+    git clone --depth 10 --single-branch --branch master https://github.com/kuzzleio/documentation.git framework/
 
     echo "Link local doc for dead links checking"
     rm framework/src$DOC_PATH
