@@ -54,7 +54,7 @@ After that, create that function with the connection to Kuzzle:
 
 <<< ./snippets/App.js.snippet:2[js]
 
-Then we will [etablish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exists](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our chat. 
+Then we will [establish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) for our chat. 
 
 Add the following lines to the `_initialize` function:
 
@@ -103,7 +103,7 @@ Add the following lines to the `_initialize()` function of the `app` class in th
 
 <<< ./snippets/App.js.snippet:7[js]
 
-Then, add the following constants in the `render()` function of the `app class:
+Then, add the following constants in the `render()` function of the `app` class:
 
 <<< ./snippets/App.js.snippet:11[js]
 
