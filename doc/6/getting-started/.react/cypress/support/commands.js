@@ -76,27 +76,6 @@ Cypress.Commands.add('createMessage', (body) => {
 
 Cypress.Commands.add('initialisation', () => {
   const kuzzle = Cypress.env('kuzzle');
-
-  // Delete index if exists
-  // const status = cy
-  //   .request({
-  //     url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_exists`,
-  //     method: 'GET',
-  //   })
-  //   .then(existsResponse => {
-  //     cy.log(`Request : exists ${kuzzle.index} status : ${existsResponse.status}`);
-  //     // return Promise.resolve(existsResponse.status);
-  //     cy.log(`STATUUUUUUUUUUUUUUUUUUUUS: ${JSON.stringify(existsResponse.status)}`)
-  //     if (existsResponse.status !== 200) {
-  //       return Promise.resolve(existsResponse.status);
-  //     } else {
-  //       return Promise.reject(existsResponse.status);
-  //     }
-  //   });
-  //   cy.log(`STATUUUUUUUUUUUUUUUUUUUUS: ${JSON.stringify(status)}`)
-  // if (status) {
-  //   return;
-  // }
   return cy
     .request({
       url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}`,
