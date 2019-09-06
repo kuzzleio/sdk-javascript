@@ -1,7 +1,7 @@
 ---
 type: page
 code: false
-title: React
+title: React with Redux
 description: Getting started with Kuzzle and React with Redux
 order: 0
 ---
