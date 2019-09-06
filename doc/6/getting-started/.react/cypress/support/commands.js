@@ -24,101 +24,136 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-function reinitialisation() {
+async function reinitialisation() {
   const kuzzle = Cypress.env('kuzzle');
-    
+
   // Clear collection
-  return cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_truncate`,
-    method: 'DELETE',
-  })
+  return cy
+    .request({
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_truncate`,
+      method: 'DELETE',
+    })
     .then(searchResponse => {
       cy.log(`Request : truncate ${kuzzle.collection} status : ${searchResponse.status}`);
-      cy.wait(500);
+      cy.wait(1000);
+      return cy
+        .request({
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          method: 'POST',
+        })
+    })
+    .then(refreshResponse => {
+      cy.log(`Request : refresh ; status : ${refreshResponse.status}`);
+      cy.wait(1000);
+      cy.log('REINIT END')
     });
 }
-  
+
 Cypress.Commands.add('createMessage', (body) => {
   const kuzzle = Cypress.env('kuzzle');
-  return cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_create`,
-    method: 'POST',
-    body: body,
-  })
+  return cy
+    .request({
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_create`,
+      method: 'POST',
+      body: body,
+    })
     .its('body')
     .then(response => {
       cy.log(`Create status : ${response.status} {${body.text}}`);
       cy.wait(500);
+      return cy
+        .request({
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          method: 'POST',
+        })
+    })
+    .then(refreshResponse => {
+      cy.log(`Request : refresh ; status : ${refreshResponse.status}`);
+      cy.wait(1000);
     });
 });
-  
-  
+
+
 Cypress.Commands.add('initialisation', () => {
   const kuzzle = Cypress.env('kuzzle');
-  
+
   // Delete index if exists
-  cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_exists`,
-    method: 'GET',
-  })
-    .then(existsResponse => {
-      cy.log(`Request : exists ${kuzzle.index} status : ${existsResponse.status}`);
-      if (existsResponse.body.result) {
-        cy.request({
-          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}`,
-          method: 'DELETE',
-        })
-          .then(deleteResponse => {
-            cy.log(`Request : delete ${kuzzle.index} status : ${deleteResponse.status}`);
-          });
-      }
-    }).then(() => {
+  // const status = cy
+  //   .request({
+  //     url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_exists`,
+  //     method: 'GET',
+  //   })
+  //   .then(existsResponse => {
+  //     cy.log(`Request : exists ${kuzzle.index} status : ${existsResponse.status}`);
+  //     // return Promise.resolve(existsResponse.status);
+  //     cy.log(`STATUUUUUUUUUUUUUUUUUUUUS: ${JSON.stringify(existsResponse.status)}`)
+  //     if (existsResponse.status !== 200) {
+  //       return Promise.resolve(existsResponse.status);
+  //     } else {
+  //       return Promise.reject(existsResponse.status);
+  //     }
+  //   });
+  //   cy.log(`STATUUUUUUUUUUUUUUUUUUUUS: ${JSON.stringify(status)}`)
+  // if (status) {
+  //   return;
+  // }
+  return cy
+    .request({
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}`,
+      method: 'DELETE',
+      failOnStatusCode: false
+    })
+    .then(deleteResponse => {
+      cy.log(`Request : delete ${kuzzle.index} status : ${deleteResponse.status}`);
       // Create index
-      cy.request({
+      return cy.request({
         url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_create`,
         method: 'POST',
       })
-        .then(createResponse => {
-          cy.log(`Request : create ${kuzzle.index} status : ${createResponse.status}`);
-          cy.wait(500);
-        });
     })
-    .then(() => {
+    .then(createResponse => {
+      cy.log(`Request : create ${kuzzle.index} status : ${createResponse.status}`);
+      cy.wait(500);
       // Create collection
-      cy.request({
+      return cy.request({
         url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}`,
         method: 'PUT',
         body: {}
       })
-        .then(createResponse => {
-          cy.log(`Request : create ${kuzzle.collection} status : ${createResponse.status}`);
-          cy.wait(500);
-        });
-    });
+    })
+    .then(createResponse => {
+      cy.log(`Request : create ${kuzzle.collection} status : ${createResponse.status}`);
+      cy.wait(500);
+    })
 });
-  
+
 Cypress.Commands.add('loadEnvironment', (env) => {
   const kuzzle = Cypress.env('kuzzle');
-  
-  reinitialisation();
-  if (!env.messages) {return;}
-  cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_mCreate`,
-    method: 'POST',
-    body: {'documents': env.messages},
-  })
-    .its('body')
-    .then(response => {
-      cy.log(`mCreate status : ${response.status}`);
-    })
-    .then(() => {
-      cy.request({
-        url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
-        method: 'POST',
+  if (!env.messages) {
+    cy.log('Not creating message')
+    reinitialisation();
+    return;
+  } else {
+    reinitialisation()
+      .then(() => {
+        return cy
+          .request({
+            url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_mCreate`,
+            method: 'POST',
+            body: { 'documents': env.messages },
+          })
+          .its('body')
+          .then(response => {
+            cy.log(`mCreate status : ${response.status}`);
+            return cy.request({
+              url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+              method: 'POST',
+            })
+          })
+          .then((response) => {
+            cy.log(`refresh status : ${response.status}`);
+            cy.wait(500);
+          });
       })
-        .then((response) => {
-          cy.log(`refresh status : ${response.status}`);
-          cy.wait(500);
-        });
-    });
+  }
 });
