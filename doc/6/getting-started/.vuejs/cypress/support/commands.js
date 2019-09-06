@@ -30,22 +30,11 @@ Cypress.Commands.add('createMessage', (body) => {
 Cypress.Commands.add('initialisation', () => {
   const kuzzle = Cypress.env('kuzzle');
   // Delete index if exists
-  const status = cy
-    .request({
-      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_exists`,
-      method: 'GET',
-    })
-    .then(existsResponse => {
-      cy.log(`Request : exists ${kuzzle.index} status : ${existsResponse.status}`);
-      return Promise.resolve(existsResponse.status);
-    });
-  if (status) {
-    return;
-  }
   return cy
     .request({
       url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}`,
       method: 'DELETE',
+      failOnStatusCode: false
     })
     .then(deleteResponse => {
       cy.log(`Request : delete ${kuzzle.index} status : ${deleteResponse.status}`);
