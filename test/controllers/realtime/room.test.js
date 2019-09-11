@@ -21,6 +21,7 @@ describe('Room', () => {
         removeListener: (evt, listener) => {
           eventEmitter.removeListener(evt, listener);
         },
+        tokenExpired: sinon.stub(),
         protocol: new KuzzleEventEmitter()
       },
       tokenExpired: sinon.stub()
@@ -228,28 +229,6 @@ describe('Room', () => {
         });
     });
 
-    it('should call _reSubscribeListener once reconnected', () => {
-      const
-        opts = {
-          opt: 'in',
-          scope: 'in',
-          state: 'done',
-          users: 'all',
-          volatile: {bar: 'foo'}
-        },
-        body = {foo: 'bar'},
-        cb = sinon.stub(),
-        room = new Room(controller, 'index', 'collection', body, cb, opts);
-
-      room._reSubscribeListener = sinon.stub();
-
-      return room.subscribe()
-        .then(() => {
-          should(room._reSubscribeListener).not.be.called();
-          eventEmitter.emit('reconnected');
-          should(room._reSubscribeListener).be.calledOnce();
-        });
-    });
   });
 
   describe('removeListeners', () => {
@@ -277,19 +256,6 @@ describe('Room', () => {
       should(room._channelListener).not.be.called();
     });
 
-    it('should not listen to "reconnected" event anymore', () => {
-      room._reSubscribeListener = sinon.stub();
-      controller.kuzzle.addListener('reconnected', room._reSubscribeListener);
-
-      should(room._reSubscribeListener).not.be.called();
-      eventEmitter.emit('reconnected');
-      should(room._reSubscribeListener).be.calledOnce();
-
-      room._reSubscribeListener.reset();
-      room.removeListeners();
-      eventEmitter.emit('reconnected');
-      should(room._reSubscribeListener).not.be.called();
-    });
   });
 
   describe('_channelListener', () => {
@@ -367,7 +333,7 @@ describe('Room', () => {
       should(cb).not.be.called();
     });
 
-    it('should redirect a tokenExpired notification to the parent controller', () => {
+    it('should redirect a tokenExpired notification to kuzzle', () => {
       const data = {
         type: 'TokenExpired',
         foo: 'bar'
@@ -376,30 +342,8 @@ describe('Room', () => {
       room._channelListener(data);
 
       should(cb).not.be.called();
-      should(controller.tokenExpired).be.called();
+      should(controller.kuzzle.tokenExpired).be.called();
     });
   });
 
-  describe('_reSubscribeListener', () => {
-    let
-      room;
-
-    beforeEach(() => {
-      room = new Room(
-        controller, 'index', 'collection', {foo: 'bar'}, sinon.stub(), options);
-      room.subscribe = sinon.stub();
-    });
-
-    it('should resubscribe is autoResubscibe option is TRUE', () => {
-      room.autoResubscribe = true;
-      room._reSubscribeListener();
-      should(room.subscribe).be.calledOnce();
-    });
-
-    it('should NOT resubscribe is autoResubscibe option is FALSE', () => {
-      room.autoResubscribe = false;
-      room._reSubscribeListener();
-      should(room.subscribe).not.be.called();
-    });
-  });
 });

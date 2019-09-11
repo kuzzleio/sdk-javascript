@@ -36,7 +36,8 @@ async function clean () {
   }
   catch (error) {
     // rethrow to get a readable error
-    console.error(error); // eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.error(error);
     throw error;
   }
 

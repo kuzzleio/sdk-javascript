@@ -483,7 +483,14 @@ describe('HTTP networking module', () => {
       protocol._sendHttpRequest('VERB', '/foo/bar');
 
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', { body: undefined, headers: {'Content-Length': 0} });
+      should(httpRequestStub).be.calledWith(
+        'http://address:1234/foo/bar',
+        'VERB',
+        {
+          body: undefined,
+          headers: { 'Content-Length': 0 },
+          timeout: 0
+        });
     });
 
     it('should call http.request with a body', () => {
@@ -491,7 +498,29 @@ describe('HTTP networking module', () => {
       protocol._sendHttpRequest('VERB', '/foo/bar', {body});
 
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {body: 'http request body', headers: {'Content-Length': body.length}});
+      should(httpRequestStub).be.calledWith(
+        'http://address:1234/foo/bar',
+        'VERB',
+        {
+          body: 'http request body',
+          headers: { 'Content-Length': body.length },
+          timeout: 0
+        });
+    });
+
+    it('should call http.request with configured timeout', () => {
+      protocol.timeout = 42000;
+      protocol._sendHttpRequest('VERB', '/foo/bar');
+
+      should(httpRequestStub).be.calledOnce();
+      should(httpRequestStub).be.calledWith(
+        'http://address:1234/foo/bar',
+        'VERB',
+        {
+          body: undefined,
+          headers: { 'Content-Length': 0 },
+          timeout: 42000
+        });
     });
 
     it('should call http.request with a body and some headers', () => {
@@ -499,10 +528,14 @@ describe('HTTP networking module', () => {
       protocol._sendHttpRequest('VERB', '/foo/bar', {body, headers: {foo: 'bar'}});
 
       should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith('http://address:1234/foo/bar', 'VERB', {
-        body: 'http request body',
-        headers: {'Content-Length': body.length, foo: 'bar'}
-      });
+      should(httpRequestStub).be.calledWith(
+        'http://address:1234/foo/bar',
+        'VERB',
+        {
+          body: 'http request body',
+          headers: { 'Content-Length': body.length, foo: 'bar' },
+          timeout: 0
+        });
     });
 
     it('should reject the request in case of error', () => {
@@ -537,7 +570,8 @@ describe('HTTP networking module', () => {
         open: sinon.stub(),
         send: sinon.stub(),
         setRequestHeader: sinon.stub(),
-        onreadystatechange: sinon.stub()
+        onreadystatechange: sinon.stub(),
+        timeout: 0
       };
       // eslint-disable-next-line no-native-reassign, no-global-assign
       XMLHttpRequest = function() {
@@ -565,6 +599,16 @@ describe('HTTP networking module', () => {
 
       should(xhrStub.setRequestHeader).not.be.called();
     });
+
+    it('should call XMLHttpRequest with configured timeout', () => {
+      protocol.timeout = 42000;
+
+      protocol._sendHttpRequest('VERB', '/foo/bar');
+
+      should(xhrStub.open).be.calledOnce();
+      should(xhrStub.timeout).be.eql(42000);
+    });
+
 
     it('should call XMLHttpRequest with a body', () => {
       const body = 'http request body';

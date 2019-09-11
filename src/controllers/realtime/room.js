@@ -45,7 +45,6 @@ class Room {
 
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
-    this._reSubscribeListener = this._reSubscribeListener.bind(this);
   }
 
   subscribe () {
@@ -57,25 +56,20 @@ class Room {
         // we rely on kuzzle event emitter to not duplicate the listeners here
         this.kuzzle.protocol.on(this.channel, this._channelListener);
 
-        this.kuzzle.addListener('reconnected', this._reSubscribeListener);
-
         return response;
       });
   }
 
   removeListeners () {
-    this.kuzzle.removeListener('reconnected', this._reSubscribeListener);
-
     if (this.channel) {
       this.kuzzle.protocol.removeListener(this.channel, this._channelListener);
     }
   }
 
   _channelListener (data) {
-    // intercept token expiration messages and relay them to the parent
-    // controller
+    // intercept token expiration messages and relay them to kuzzle
     if (data.type === 'TokenExpired') {
-      return this.controller.tokenExpired();
+      return this.kuzzle.tokenExpired();
     }
 
     const fromSelf =
@@ -83,12 +77,6 @@ class Room {
 
     if (this.subscribeToSelf || !fromSelf) {
       this.callback(data);
-    }
-  }
-
-  _reSubscribeListener () {
-    if (this.autoResubscribe) {
-      return this.subscribe();
     }
   }
 }
