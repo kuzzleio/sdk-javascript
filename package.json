@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "6.2.2",
+  "version": "6.2.3",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -46,7 +46,7 @@
     "min-req-promise": "^1.0.1",
     "ora": "^3.4.0",
     "webpack": "^4.39.3",
-    "ws": "^7.1.2"
+    "ws": "^6.2.1"
   },
   "devDependencies": {
     "codecov": "^3.5.0",
