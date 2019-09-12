@@ -43,8 +43,6 @@
     "@babel/preset-env": "^7.6.0",
     "audit": "0.0.6",
     "babel-loader": "^8.0.6",
-    "eslint": "^5.16.0",
-    "eslint-loader": "^2.2.1",
     "min-req-promise": "^1.0.1",
     "ora": "^3.4.0",
     "webpack": "^4.39.3",
@@ -53,7 +51,9 @@
   "devDependencies": {
     "codecov": "^3.5.0",
     "cucumber": "^5.1.0",
+    "eslint": "^5.16.0",
     "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.2.1",
     "mocha": "6.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^14.1.1",
