@@ -1,135 +1,148 @@
 const { Given, When, Then } = require('cucumber');
 const should = require('should');
 
-Given('has specifications', async function () {
-  await this.kuzzle.collection.updateSpecifications(this.index, this.collection, {strict: true});
+Given('has specifications', function () {
+  return this.kuzzle.collection.updateSpecifications(
+    this.index,
+    this.collection,
+    { strict: true });
 });
 
-Given('it has a collection {string}', async function (collection) {
-  await this.kuzzle.collection.create(this.index, collection);
-  this.collection = collection;
+Given('it has a collection {string}', function (collection) {
+  return this.kuzzle.collection.create(this.index, collection)
+    .then(() => {
+      this.collection = collection;
+    });
 });
 
-Given('I truncate the collection {string}', async function (collection) {
-  await this.kuzzle.collection.truncate(this.index, collection, {refresh: 'wait_for'});
+Given('I truncate the collection {string}', function (collection) {
+  return this.kuzzle.collection.truncate(
+    this.index,
+    collection,
+    { refresh: 'wait_for' });
 });
 
 
-When('I check if the collection {string} exists', async function (collection) {
-  try {
-    this.content = await this.kuzzle.collection.exist(this.index, collection);
-  }
-  catch (error) {
-    this.error = error;
-  }
+When('I check if the collection {string} exists', function (collection) {
+  return this.kuzzle.collection.exists(this.index, collection)
+    .then(content => {
+      this.content = content;
+    })
+    .catch(error => {
+      this.error = error;
+    });
 });
 
-When(/^I create a collection '(.*?)'( with a mapping)?$/, async function (collection, withMapping) {
-  try {
-    const mapping = {
+When(/^I create a collection '(.*?)'( with a mapping)?$/, function (collection, withMapping) {
+  const mapping = withMapping
+    ? { properties: { gordon: {type: 'keyword'} } }
+    : undefined;
+
+  return this.kuzzle.collection.create(this.index, collection, mapping)
+    .then(content => {
+      this.content = content;
+    })
+    .catch (error => {
+      this.error = error;
+    });
+});
+
+When('I delete the specifications of {string}', function (collection) {
+  return this.kuzzle.collection.deleteSpecifications(this.index, collection)
+    .catch(error => {
+      this.error = error;
+    });
+});
+
+When('I list the collections of {string}', function (index) {
+  return this.kuzzle.collection.list(index)
+    .then(content => {
+      this.content = content;
+      this.total = this.content.collections.length;
+    })
+    .catch(error => {
+      this.error = error;
+    });
+});
+
+When('I update the mapping of collection {string}', function (collection) {
+  return this.kuzzle.collection
+    .updateMapping(this.index, collection, {
       properties: {
         gordon: {type: 'keyword'}
       }
-    };
-
-    this.content = await this.kuzzle.collection.create(
-      this.index,
-      collection,
-      withMapping ? mapping : undefined
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
-
+    })
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I delete the specifications of {string}', async function (collection) {
-  try {
-    await this.kuzzle.collection.deleteSpecifications(this.index, collection);
-  }
-  catch (error) {
-    this.error = error;
-  }
-
+When('I update the specifications of the collection {string}', function (collection) {
+  return this.kuzzle.collection
+    .updateSpecifications(this.index, collection, {strict: false})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I list the collections of {string}', async function (index) {
-  try {
-    this.content = await this.kuzzle.collection.list(index);
-    this.total = this.content.collections.length;
-  }
-  catch (error) {
-    this.error = error;
-  }
+When('I validate the specifications of {string}', function (collection) {
+  return this.kuzzle.collection
+    .validateSpecifications(this.index, collection, {strict: true})
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I update the mapping of collection {string}', async function (collection) {
-  try {
-    this.content = await this.kuzzle.collection.updateMapping(this.index, collection, {
-      properties: {
-        gordon: {type: 'keyword'}
+
+Then('the collection {string} should be empty', function (collection) {
+  return this.kuzzle.document.search(this.index, collection, {})
+    .then(result => should(result.total).eql(0));
+});
+
+Then(/^the collection(?: '(.*?)')? should exist$/, function (collection) {
+  const c = collection || this.collection;
+
+  return this.kuzzle.collection.exists(this.index, c)
+    .then(exists => should(exists).be.true());
+});
+
+Then('the mapping of {string} should be updated', function (collection) {
+  return this.kuzzle.collection.getMapping(this.index, collection)
+    .then(mapping => {
+      should(mapping[this.index].mappings[collection]).eql({
+        dynamic: 'true',
+        properties: {
+          gordon: {type: 'keyword'}
+        }
+      });
+    });
+});
+
+Then('the specifications of {string} should be updated', function (collection) {
+  return this.kuzzle.collection.getSpecifications(this.index, collection)
+    .then(specifications => {
+      should(specifications.validation).eql({strict: false});
+    });
+});
+
+Then('the specifications of {string} must not exist', function (collection, cb) {
+  this.kuzzle.collection.getSpecifications(this.index, collection)
+    .then(() => cb(new Error('Expected promise to be rejected')))
+    .catch(error => {
+      try {
+        should(error.status).eql(404);
+        cb();
+      }
+      catch (e) {
+        cb(e);
       }
     });
-  }
-  catch (error) {
-    this.error = error;
-  }
-
-});
-
-When('I update the specifications of the collection {string}', async function (collection) {
-  try {
-    this.content = await this.kuzzle.collection.updateSpecifications(this.index, collection, {strict: false});
-  }
-  catch (error) {
-    this.error = error;
-  }
-});
-
-When('I validate the specifications of {string}', async function (collection) {
-  this.content = await this.kuzzle.collection.validateSpecifications(this.index, collection, {strict: true});
-});
-
-
-Then('the collection {string} should be empty', async function (collection) {
-  const result = await this.kuzzle.document.search(this.index, collection, {});
-  should(result.total).eql(0);
-});
-
-Then(/^the collection(?: '(.*?)')? should exist$/, async function (collection) {
-  if (!collection) {
-    collection = this.collection;
-  }
-  const exists = await this.kuzzle.collection.exists(this.index, collection);
-  should(exists).be.true();
-});
-
-Then('the mapping of {string} should be updated', async function (collection) {
-  const mapping = await this.kuzzle.collection.getMapping(this.index, collection);
-
-  should(mapping[this.index].mappings[collection]).eql({
-    dynamic: 'true',
-    properties: {
-      gordon: {type: 'keyword'}
-    }
-  });
-});
-
-Then('the specifications of {string} should be updated', async function (collection) {
-  const specifications = await this.kuzzle.collection.getSpecifications(this.index, collection);
-
-  should(specifications.validation).eql({strict: false});
-});
-
-Then('the specifications of {string} must not exist', async function (collection) {
-  try {
-    await this.kuzzle.collection.getSpecifications(this.index, collection);
-    should(true).be.false();
-  }
-  catch (error) {
-    should(error.status).eql(404);
-  }
 });
 
 Then('they should be validated', function () {

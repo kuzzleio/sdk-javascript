@@ -2,9 +2,9 @@ const { Before, AfterAll, BeforeAll } = require('cucumber');
 
 let _world;
 
-Before(async function () {
+Before(function () {
   _world = this;
-  await clean();
+  return clean();
 });
 
 BeforeAll(function () {
@@ -19,26 +19,21 @@ BeforeAll(function () {
   this.notifications = [];
 });
 
-AfterAll(async function () {
-  await clean();
+AfterAll(function () {
+  return clean();
 });
 
-async function clean () {
+function clean () {
   const kuzzle = _world.kuzzle;
 
-  try {
-    await kuzzle.connect();
-    const indices = await kuzzle.index.list();
-
-    for (const index of indices) {
-      await kuzzle.index.delete(index);
-    }
-  }
-  catch (error) {
-    // rethrow to get a readable error
-    // eslint-disable-next-line no-console
-    console.error(error);
-    throw error;
-  }
+  return kuzzle.connect()
+    .then(() => kuzzle.index.list())
+    .then(indices => Promise.all(indices.map(i => kuzzle.index.delete(i))))
+    .catch(error => {
+      // rethrow to get a readable error
+      // eslint-disable-next-line no-console
+      console.error(error);
+      throw error;
+    });
 
 }

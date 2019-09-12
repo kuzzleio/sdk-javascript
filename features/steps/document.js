@@ -1,65 +1,80 @@
 const { Given, When, Then } = require('cucumber');
 const should = require('should');
 
-Given(/^the collection doesn't have a document with id '(.*?)'$/, async function (id) {
-  try {
-    this.content = await this.kuzzle.document.delete(this.index, this.collection, id);
-  }
-  catch (error) {
-    this.error = error;
-  }
+Given(/^the collection doesn't have a document with id '(.*?)'$/, function (id) {
+  return this.kuzzle.document.delete(this.index, this.collection, id)
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-Given('the collection has a document with id {string}', async function (id) {
-  this.content = await this.kuzzle.document.create(
-    this.index,
-    this.collection,
-    { a: 'document' },
-    id,
-    { refresh: 'wait_for'}
-  );
+Given('the collection has a document with id {string}', function (id) {
+  return this.kuzzle.document
+    .create(
+      this.index,
+      this.collection,
+      { a: 'document' },
+      id,
+      { refresh: 'wait_for'})
+    .then(content => {
+      this.content = content;
+    });
 });
 
 
-When('I check if {string} exists', async function (id) {
-  this.content = await this.kuzzle.document.exists(this.index, this.collection, id);
+When('I check if {string} exists', function (id) {
+  return this.kuzzle.document.exists(this.index, this.collection, id)
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I count how many documents there is in the collection', async function () {
-  this.content = await this.kuzzle.document.count(this.index, this.collection, {});
+When('I count how many documents there is in the collection', function () {
+  return this.kuzzle.document.count(this.index, this.collection, {})
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I create a document in {string}', async function (collection) {
-  this.content = await this.kuzzle.document.create(
-    this.index,
-    collection,
-    {a: 'document'},
-    'some-id',
-    {refresh: true}
-  );
+When('I create a document in {string}', function (collection) {
+  return this.kuzzle.document
+    .create(
+      this.index,
+      collection,
+      {a: 'document'},
+      'some-id',
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I create a document with id {string}', async function (id) {
+When('I create a document with id {string}', function (id) {
   this.ids = [id];
 
-  try {
-    this.content = await this.kuzzle.document.create(
+  return this.kuzzle.document
+    .create(
       this.index,
       this.collection,
       {a: 'document'},
       id,
-      {refresh: true});
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I create the documents [{string}, {string}]', async function (id1, id2) {
+When('I create the documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
 
-  try {
-    this.content = await this.kuzzle.document.mCreate(
+  return this.kuzzle.document
+    .mCreate(
       this.index,
       this.collection,
       [
@@ -68,37 +83,38 @@ When('I create the documents [{string}, {string}]', async function (id1, id2) {
       ],
       {
         refresh: 'wait_for'
-      }
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
-
+      })
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I createOrReplace a document with id {string}', async function (id) {
+When('I createOrReplace a document with id {string}', function (id) {
   this.ids = [id];
 
-  try {
-    this.content = await this.kuzzle.document.createOrReplace(
+  return this.kuzzle.document
+    .createOrReplace(
       this.index,
       this.collection,
       id,
       {a: 'replaced document'},
-      {refresh: true}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I createOrReplace the documents [{string}, {string}]', async function (id1, id2) {
+When('I createOrReplace the documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
 
-  try {
-    this.content = await this.kuzzle.document.mCreateOrReplace(
+  return this.kuzzle.document
+    .mCreateOrReplace(
       this.index,
       this.collection,
       [
@@ -107,85 +123,93 @@ When('I createOrReplace the documents [{string}, {string}]', async function (id1
       ],
       {
         refresh: 'wait_for'
-      }
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      })
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I delete the document with id {string}', async function (id) {
+When('I delete the document with id {string}', function (id) {
   this.ids = [id];
 
-  try {
-    this.content = await this.kuzzle.document.delete(this.index, this.collection, id);
-  }
-  catch (error) {
-    this.error = error;
-  }
+  return this.kuzzle.document.delete(this.index, this.collection, id)
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I delete the documents [{string}, {string}]', async function (id1, id2) {
+When('I delete the documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
 
-  try {
-    this.content = await this.kuzzle.document.mDelete(
+  return this.kuzzle.document
+    .mDelete(
       this.index,
       this.collection,
       [id1, id2],
-      {refresh: true}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(error => {
+      this.error = error;
+    });
 });
 
-When('I replace a document with id {string}', async function (id) {
+When('I replace a document with id {string}', function (id) {
   this.ids = [id];
 
-  try {
-    this.content = await this.kuzzle.document.replace(
+  return this.kuzzle.document
+    .replace(
       this.index,
       this.collection,
       id,
       {a: 'replaced document'},
-      {refresh: true}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I replace the documents [{string}, {string}]', async function (id1, id2) {
+When('I replace the documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
 
-  try {
-    this.content = await this.kuzzle.document.mReplace(
+  return this.kuzzle.document
+    .mReplace(
       this.index,
       this.collection,
       [
         {_id: id1, body: {a: 'replaced document'}},
         {_id: id2, body: {a: 'replaced document'}}
       ],
-      {refresh: true}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {refresh: true})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I get documents [{string}, {string}]', async function (id1, id2) {
+When('I get documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
-  this.content = await this.kuzzle.document.mGet(this.index, this.collection, [id1, id2]);
+  return this.kuzzle.document.mGet(this.index, this.collection, [id1, id2])
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I search a document with id {string}', async function (id) {
-  try {
-    this.content = await this.kuzzle.document.search(
+When('I search a document with id {string}', function (id) {
+  return this.kuzzle.document
+    .search(
       this.index,
       this.collection,
       {
@@ -194,71 +218,81 @@ When('I search a document with id {string}', async function (id) {
             _id: id
           }
         }
-      });
-  }
-  catch (error) {
-    this.error = error;
-  }
+      })
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I search documents matching {string} with from {int} and size {int}', async function (query, from, size) {
-  this.content = await this.kuzzle.document.search(
-    this.index,
-    this.collection,
-    JSON.parse(query),
-    {
-      from,
-      size
-    }
-  );
+When('I search documents matching {string} with from {int} and size {int}', function (query, from, size) {
+  return this.kuzzle.document
+    .search(
+      this.index,
+      this.collection,
+      JSON.parse(query),
+      { from, size })
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I search the next documents', async function () {
-  this.content = await this.content.next();
+When('I search the next documents', function () {
+  return this.content.next()
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I update a document with id {string}', async function (id) {
+When('I update a document with id {string}', function (id) {
   this.ids = [id];
 
-  try {
-    this.content = await this.kuzzle.document.update(
+  return this.kuzzle.document
+    .update(
       this.index,
       this.collection,
       id,
-      {some: 'update'}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      {some: 'update'})
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
-When('I update the document with id {string} and content {string} = {string}', async function (id, key, val) {
-  this.content = await this.kuzzle.document.update(
-    this.index,
-    this.collection,
-    id,
-    {[key]: val}
-  );
+When('I update the document with id {string} and content {string} = {string}', function (id, key, val) {
+  return this.kuzzle.document
+    .update(
+      this.index,
+      this.collection,
+      id,
+      { [key]: val })
+    .then(content => {
+      this.content = content;
+    });
 });
 
-When('I update the documents [{string}, {string}]', async function (id1, id2) {
+When('I update the documents [{string}, {string}]', function (id1, id2) {
   this.ids = [id1, id2];
 
-  try {
-    this.content = await this.kuzzle.document.mUpdate(
+  return this.kuzzle.document
+    .mUpdate(
       this.index,
       this.collection,
       [
         {_id: id1, body: {a: 'replaced document', some: 'update'}},
         {_id: id2, body: {a: 'replaced document', some: 'update'}}
       ],
-      {refresh: true}
-    );
-  }
-  catch (error) {
-    this.error = error;
-  }
+      { refresh: true })
+    .then(content => {
+      this.content = content;
+    })
+    .catch(err => {
+      this.error = err;
+    });
 });
 
 
@@ -267,26 +301,28 @@ Then('I get an error with message {string}', function (message) {
   should(this.error.message).eql(message);
 });
 
-Then('I must have {int} documents in the collection', async function (number) {
-  const count = await this.kuzzle.document.count(this.index, this.collection, {});
-  should(count).eql(number);
+Then('I must have {int} documents in the collection', function (number) {
+  return this.kuzzle.document.count(this.index, this.collection, {})
+    .then(count => should(count).eql(number));
 });
 
-Then('the document is successfully created', async function () {
-  const document = await this.kuzzle.document.get(this.index, this.collection, this.ids[0]);
-  should(document)
-    .be.an.Object();
+Then('the document is successfully created', function () {
+  return this.kuzzle.document.get(this.index, this.collection, this.ids[0])
+    .then(document => should(document).be.an.Object());
 });
 
-Then('the document is successfully deleted', async function () {
-  try {
-    await this.kuzzle.document.get(this.index, this.collection, this.ids[0]);
-    // should fail
-    should(true).be.false();
-  }
-  catch (error) {
-    should(error.status).eql(404);
-  }
+Then('the document is successfully deleted', function (cb) {
+  this.kuzzle.document.get(this.index, this.collection, this.ids[0])
+    .then(() => cb(new Error('Expected promise to be rejected')))
+    .catch(error => {
+      try {
+        should(error.status).eql(404);
+        cb();
+      }
+      catch (e) {
+        cb(e);
+      }
+    });
 });
 
 Then(/^the document is (successfully|not) found$/, function (yesno) {
@@ -295,36 +331,29 @@ Then(/^the document is (successfully|not) found$/, function (yesno) {
   should(this.content.total).eql(yesno === 'successfully' ? 1 : 0);
 });
 
-Then('the document is successfully replaced', async function () {
-  const document = await this.kuzzle.document.get(this.index, this.collection, this.ids[0]);
-  should(document._source.a).eql('replaced document');
+Then('the document is successfully replaced', function () {
+  return this.kuzzle.document.get(this.index, this.collection, this.ids[0])
+    .then(document => should(document._source.a).eql('replaced document'));
 });
 
-Then('the document is successfully updated', async function () {
-  const document = await this.kuzzle.document.get(this.index, this.collection, this.ids[0]);
-
-  should(document._source.some).eql('update');
+Then('the document is successfully updated', function () {
+  return this.kuzzle.document.get(this.index, this.collection, this.ids[0])
+    .then(document => should(document._source.some).eql('update'));
 });
 
-Then('the document {string} should be created', async function (id) {
-  const document = await this.kuzzle.document.get(this.index, this.collection, id);
-
-  should(document)
-    .not.be.null();
+Then('the document {string} should be created', function (id) {
+  return this.kuzzle.document.get(this.index, this.collection, id)
+    .then(document => should(document).not.be.null());
 });
 
-Then('the document {string} should be replaced', async function (id) {
-  const document = await this.kuzzle.document.get(this.index, this.collection, id);
-
-  should(document._source.a)
-    .eql('replaced document');
+Then('the document {string} should be replaced', function (id) {
+  return this.kuzzle.document.get(this.index, this.collection, id)
+    .then(document => should(document._source.a).eql('replaced document'));
 });
 
-Then('the document {string} should be updated', async function (id) {
-  const document = await this.kuzzle.document.get(this.index, this.collection, id);
-
-  should(document._source.some)
-    .eql('update');
+Then('the document {string} should be updated', function (id) {
+  return this.kuzzle.document.get(this.index, this.collection, id)
+    .then(document => should(document._source.some).eql('update'));
 });
 
 Then(/^the document should (not )?exist$/, function (not) {
