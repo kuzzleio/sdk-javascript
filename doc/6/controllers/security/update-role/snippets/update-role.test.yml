@@ -4,9 +4,9 @@ hooks:
   before: >
     curl -f -H "Content-type: application/json" -d '{
       "controllers": {
-        "*": {
+        "auth": {
           "actions": {
-            "*": false
+            "login": true
           }
         }
       }
