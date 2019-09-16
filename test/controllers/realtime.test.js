@@ -13,6 +13,7 @@ describe('Realtime Controller', () => {
 
   beforeEach(() => {
     kuzzle = {
+      addListener: sinon.stub(),
       query: sinon.stub().resolves(),
       emit: sinon.stub()
     };
@@ -271,6 +272,64 @@ describe('Realtime Controller', () => {
     });
   });
 
+  describe('#disconnected', () => {
+    it('should disable current subscriptions', () => {
+      const roomA = {
+        autoResubscribe: true,
+        removeListeners: sinon.stub()
+      };
+      const roomB = {
+        autoResubscribe: false,
+        removeListeners: sinon.stub()
+      };
+      const roomC = {
+        autoResubscribe: false,
+        removeListeners: sinon.stub()
+      };
+
+      kuzzle.realtime.subscriptions = {
+        foo: [roomA, roomB],
+        bar: [roomC]
+      };
+
+      kuzzle.realtime.disconnected();
+
+      should(kuzzle.realtime.subscriptions).be.empty();
+      should(kuzzle.realtime.subscriptionsOff).eql({
+        foo: [roomA]
+      });
+      for (const room of [roomA, roomB, roomC]) {
+        should(room.removeListeners).be.calledOnce();
+      }
+    });
+  });
+
+  describe('#reconnected', () => {
+    it('should resubmit pending subcriptions', () => {
+      const roomA = { subscribe: sinon.stub().resolves() };
+      const roomB = { subscribe: sinon.stub().resolves() };
+      const roomC = { subscribe: sinon.stub().resolves() };
+
+      kuzzle.realtime.subscriptionsOff = {
+        foo: [roomA, roomB],
+        bar: [roomC]
+      };
+
+      kuzzle.realtime.reconnected();
+
+      should(kuzzle.realtime.subscriptionsOff).be.empty();
+      should(kuzzle.realtime.subscriptions).eql({
+        foo: [roomA, roomB],
+        bar: [roomC]
+      });
+
+      for (const room of [roomA, roomB, roomC]) {
+        should(room.subscribe).be.calledOnce();
+      }
+
+    });
+  });
+
   describe('#tokenExpired', () => {
     it('should clear all subscriptions and emit a "tokenExpired" event', () => {
       const stub = sinon.stub();
@@ -285,23 +344,7 @@ describe('Realtime Controller', () => {
 
       should(kuzzle.realtime.subscriptions).be.empty();
       should(stub.callCount).be.eql(10);
-      should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
-      should(kuzzle.auth.authenticationToken).be.null();
-    });
-
-    it('should throttle to prevent emitting duplicate occurrences of the same event', () => {
-      const stub = sinon.stub();
-
-      for (let i = 0; i < 10; i++) {
-        kuzzle.realtime.subscriptions[uuidv4()] = [{removeListeners: stub}];
-
-        kuzzle.realtime.tokenExpired();
-
-        should(kuzzle.realtime.subscriptions).be.empty();
-        should(stub.callCount).be.eql(i+1);
-      }
-
-      should(kuzzle.emit).calledOnce().calledWith('tokenExpired');
     });
   });
+
 });
