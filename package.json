@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.0.0-beta",
+  "version": "7.0.0-beta.1",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -65,6 +65,6 @@
     "sinon": "^7.4.2"
   },
   "engines": {
-    "node": ">= 6.9.1"
+    "node": ">= 10.13.0"
   }
 }
