@@ -8,7 +8,7 @@ services:
     tty: true
     volumes:
       - cache:/var/app/node_modules/@vuepress/core/node_modules/.cache
-      - ./6:/var/app/src/sdk/js/6
+      - ./7:/var/app/src/sdk/js/7
 
 volumes:
   cache:
