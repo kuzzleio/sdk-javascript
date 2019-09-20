@@ -60,6 +60,23 @@ class CollectionController extends BaseController {
       .then(response => response.result);
   }
 
+  refresh (index, collection, options = {}) {
+    if (!index) {
+      throw new Error('Kuzzle.collection.refresh: index is required');
+    }
+
+    if (!collection) {
+      throw new Error('Kuzzle.collection.refresh: collection is required');
+    }
+
+    return this.query({
+      index,
+      collection,
+      action: 'refresh'
+    }, options)
+      .then(response => response.result);
+  }
+
   getMapping (index, collection, options = {}) {
     if (!index) {
       throw new Error('Kuzzle.collection.getMapping: index is required');

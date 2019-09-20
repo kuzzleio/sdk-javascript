@@ -9,15 +9,19 @@ class BulkController extends BaseController {
    * Creates, updates or deletes large amounts of documents as fast as possible.
    * {@link https://docs.kuzzle.io/core/1/api/controllers/bulk/import/|Official documentation}
    *
-   * @param {Object[]} data - Array of documents detailing the bulk operations to perform, following ElasticSearch Bulk API
+   * @param {String} index - Index name
+   * @param {String} collection - Collection name
+   * @param {Object[]} bulkData - Array of documents detailing the bulk operations to perform, following ElasticSearch Bulk API
    * @param {Object} [options] - Additional options
    * @returns {Promise}
    */
-  import (data, options = {}) {
+  import (index, collection, bulkData, options = {}) {
     return this.query({
+      index,
+      collection,
       action: 'import',
       body: {
-        bulkData: data
+        bulkData
       }
     }, options)
       .then(response => response.result);

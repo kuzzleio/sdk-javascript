@@ -131,6 +131,38 @@ describe('Collection Controller', () => {
     });
   });
 
+  describe('refresh', () => {
+    it('should throw an error if the "index" argument is not provided', () => {
+      should(function () {
+        kuzzle.collection.refresh(undefined, 'collection', options);
+      }).throw('Kuzzle.collection.refresh: index is required');
+    });
+
+    it('should throw an error if the "collection" argument is not provided', () => {
+      should(function () {
+        kuzzle.collection.refresh('index', undefined, options);
+      }).throw('Kuzzle.collection.refresh: collection is required');
+    });
+
+    it('should call collection/refresh query names and return a Promise which resolves a boolean', () => {
+      kuzzle.query.resolves({result: null});
+
+      return kuzzle.collection.refresh('index', 'collection', options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'collection',
+              action: 'refresh',
+              index: 'index',
+              collection: 'collection'
+            }, options);
+
+          should(res).be.Null();
+        });
+    });
+  });
+
   describe('getMapping', () => {
     it('should throw an error if the "index" argument is not provided', () => {
       should(function () {
