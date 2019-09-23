@@ -32,7 +32,7 @@ Additional query options
 
 ## Resolves
 
-Resolves to a `boolean` that indicate whether the index exists or not.
+Resolves to a | <pre>boolean</pre> that indicate whether the index exists or not.
 
 ## Usage
 

@@ -20,6 +20,10 @@ try {
     "hits": [
       {
         "_id": "some-id",
+        "_version": 1,
+        "result": "created",
+        "created": true,
+        "status": 200,
         "_source": {
           "_kuzzle_info": {
             "active": true,
@@ -30,21 +34,14 @@ try {
             "createdAt": 1542036563677
           },
           "capacity": 4
-        },
-        "_index": "nyc-open-data",
-        "_type": "yellow-taxi",
-        "_version": 1,
-        "result": "created",
-        "_shards": {
-          "total": 2,
-          "successful": 1,
-          "failed": 0
-        },
-        "created": true,
-        "status": 201
+        }
       },
       {
         "_id": "AWcIiqbeBiYFF8kkRLKg",
+        "_version": 1,
+        "result": "created",
+        "created": true,
+        "status": 200,
         "_source": {
           "_kuzzle_info": {
             "active": true,
@@ -55,21 +52,10 @@ try {
             "createdAt": 1542036563677
           },
           "this": "document id is auto-computed"
-        },
-        "_index": "nyc-open-data",
-        "_type": "yellow-taxi",
-        "_version": 1,
-        "result": "created",
-        "_shards": {
-          "total": 2,
-          "successful": 1,
-          "failed": 0
-        },
-        "created": true,
-        "status": 201
+        }
       }
     ],
-    "total": 2
+    "errors": []
   }
   */
   console.log(`Successfully created ${response.total} documents`);

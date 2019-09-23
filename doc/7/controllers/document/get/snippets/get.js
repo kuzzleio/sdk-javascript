@@ -7,12 +7,11 @@ try {
   );
 
   const response = await kuzzle.document.get('nyc-open-data', 'yellow-taxi', 'some-id');
+
+  console.log(response);
   /*
-  { _index: 'nyc-open-data',
-    _type: 'yellow-taxi',
-    _id: 'some-id',
+  { _id: 'some-id',
     _version: 1,
-    found: true,
     _source:
     { capacity: 4,
       _kuzzle_info:

@@ -32,8 +32,6 @@ try {
       "aggregations": undefined,
       "hits": [
         {
-          "_index": "nyc-open-data",
-          "_type": "yellow-taxi",
           "_id": "AWgi6A1POQUM6ucJ3q06",
           "_score": 0.046520017,
           "_source": {

@@ -36,7 +36,7 @@ Additional query options
 
 ## Resolves
 
-A `boolean` indicating if the credentials are being deleted.
+A | <pre>boolean</pre> indicating if the credentials are being deleted.
 
 ## Usage
 

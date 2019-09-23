@@ -1,6 +1,6 @@
 ---
 name: document#count
-description: Count documents matching the given query
+description: Counts documents matching the given query
 hooks:
   before: |
     curl -XDELETE kuzzle:7512/nyc-open-data
@@ -12,11 +12,7 @@ hooks:
     for i in 1 2 3 4 5; do
       curl -H "Content-type: application/json" -d '{}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
     done
-    curl -XPOST kuzzle:7512/nyc-open-data/_refresh
-  after: |
-    curl -XDELETE kuzzle:7512/nyc-open-data
+    curl -XPOST kuzzle:7512/nyc-open-data/yellow-taxi/_refresh
+  after:
 template: default
 expected: Found 5 documents matching license:valid
-
-sdk: js
-version: 6

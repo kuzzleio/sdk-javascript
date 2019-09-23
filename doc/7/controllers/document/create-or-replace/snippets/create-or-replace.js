@@ -6,17 +6,11 @@ try {
     { lastName: 'McHan' }
   );
 
-  if (response._id === 'some-id') {
-    console.log('Success');
-  }
+  console.log(response);
   /*
     response =
-    { _index: 'nyc-open-data',
-      _type: 'yellow-taxi',
-      _id: 'some-id',
+    { _id: 'some-id',
       _version: 1,
-      result: 'created',
-      _shards: { total: 2, successful: 1, failed: 0 },
       created: true,
       _source:
        { lastName: 'McHan',

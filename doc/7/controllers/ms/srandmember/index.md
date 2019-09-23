@@ -20,8 +20,8 @@ srandmember(key, [options]);
 
 | Arguments | Type     | Description              |
 | --------- | -------- | ------------------------ |
-| `key`     | `string` | Set key                  |
-| `options` | `object` | Optional query arguments |
+| `key`     | <pre>string</pre> | Set key                  |
+| `options` | <pre>object</pre> | Optional query arguments |
 
 ### options
 

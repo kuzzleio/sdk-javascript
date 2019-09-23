@@ -5,10 +5,6 @@ hooks:
     curl -XDELETE kuzzle:7512/nyc-open-data
     curl -XPOST kuzzle:7512/nyc-open-data/_create
     curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
-  after: |
-    curl -XDELETE kuzzle:7512/nyc-open-data
+  after:
 template: default
 expected: Successfully deleted 2 documents
-
-sdk: js
-version: 6

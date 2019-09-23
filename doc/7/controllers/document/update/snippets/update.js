@@ -15,12 +15,10 @@ try {
 
   console.log(response);
   /*
-  { _index: 'nyc-open-data',
-    _type: 'yellow-taxi',
-    _id: 'some-id',
-    _version: 2,
-    result: 'updated',
-    _shards: { total: 2, successful: 1, failed: 0 } }
+  {
+    id: 'some-id',
+    _version: 2
+  }
   */
 } catch (error) {
   console.error(error.message);

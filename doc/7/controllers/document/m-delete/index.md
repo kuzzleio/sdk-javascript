@@ -21,10 +21,10 @@ mDelete(index, collection, ids, [options]);
 
 | Argument     | Type            | Description                    |
 | ------------ | --------------- | ------------------------------ |
-| `index`      | `string`        | Index name                     |
-| `collection` | `string`        | Collection name                |
-| `ids`        | `array<string>` | IDs of the documents to delete |
-| `options`    | `object`        | Query options                  |
+| `index`      | <pre>string</pre>        | Index name                     |
+| `collection` | <pre>string</pre>        | Collection name                |
+| `ids`        | <pre>array<string></pre> | IDs of the documents to delete |
+| `options`    | <pre>object</pre>        | Query options                  |
 
 ### Options
 
@@ -32,7 +32,7 @@ Additional query options
 
 | Options    | Type<br/>(default)     | Description                                                                        |
 | ---------- | ---------------------- | ---------------------------------------------------------------------------------- |
-| `queuable` | `boolean`<br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again       |
+| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again       |
 | `refresh`  | `string`<br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
 
 ## Resolves

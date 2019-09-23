@@ -47,9 +47,8 @@ Additional query options
 
 ## Resolves
 
-A `boolean` telling whether credentials are valid.
+A | <pre>boolean</pre> telling whether credentials are valid.
 
 ## Usage
 
 <<< ./snippets/validate-credentials.js
-

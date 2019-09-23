@@ -15,10 +15,7 @@ try {
   /*
     {
       "hits": [
-        {
-          "_index": "nyc-open-data",
-          "_type": "yellow-taxi",
-          "_id": "some-id",
+        { "_id": "some-id",
           "_version": 1,
           "found": true,
           "_source": {
@@ -33,10 +30,7 @@ try {
             }
           }
         },
-        {
-          "_index": "nyc-open-data",
-          "_type": "yellow-taxi",
-          "_id": "some-other-id",
+        { "_id": "some-other-id",
           "_version": 1,
           "found": true,
           "_source": {

@@ -31,7 +31,7 @@ Additional query options
 
 ## Resolve
 
-Resolves to a `boolean` set to `true` if an admin exists and `false` if it does not.
+Resolves to a | <pre>boolean</pre> set to `true` if an admin exists and `false` if it does not.
 
 ## Usage
 

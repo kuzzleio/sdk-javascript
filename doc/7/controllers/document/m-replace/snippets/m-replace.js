@@ -21,42 +21,33 @@ try {
 
   console.log(response);
   /*
-  {  hits:
+  { hits:
      [ { _id: 'some-id',
-       _source:
-        { _kuzzle_info:
-           { active: true,
-             author: '-1',
+         _version: 2,
+         result: 'updated',
+         created: false,
+         status: 200,
+         _source: {
+           _kuzzle_info:
+           { author: '-1',
              updater: null,
              updatedAt: null,
-             deletedAt: null,
              createdAt: 1538639586995 },
-          capacity: 4 },
-       _index: 'nyc-open-data',
-       _type: 'yellow-taxi',
-       _version: 2,
-       result: 'updated',
-       _shards: { total: 2, successful: 1, failed: 0 },
-       created: false,
-       status: 200 },
-     { _id: 'some-other-id',
-       _source:
-        { _kuzzle_info:
-           { active: true,
-             author: '-1',
+          capacity: 4 }
+     },
+     [ { _id: 'some-other-id',
+         _version: 2,
+         result: 'updated',
+         created: false,
+         status: 200,
+         _source: {
+           _kuzzle_info:
+           { author: '-1',
              updater: null,
              updatedAt: null,
-             deletedAt: null,
              createdAt: 1538639586995 },
-          capacity: 4 },
-       _index: 'nyc-open-data',
-       _type: 'yellow-taxi',
-       _version: 2,
-       result: 'updated',
-       _shards: { total: 2, successful: 1, failed: 0 },
-       created: false,
-       status: 200 } ],
-  total: 2 }
+          capacity: 4 } ],
+    errors: [] }
   */
   console.log('Success');
 } catch (error) {
