@@ -9,6 +9,12 @@ description: Creates an index
 
 Creates a new index.
 
+::: info
+Indexes are only virtual container for collections.  
+They can be listed only if they contain at least one collection.
+:::
+
+
 <br/>
 
 ```js
@@ -32,12 +38,7 @@ Additional query options
 
 ## Resolves
 
-Resolves to an `object` containing the index creation status
-
-| Name                  | Type               | Description                                                                                                       |
-| --------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `acknowledged`        | <pre>boolean</pre> | Indicates whether the index was successfully created in the Elastic cluster                                       |
-| `shards_acknowledged` | <pre>boolean</pre> | Indicates whether the requisite number of shard copies were started for each shard in the index before timing out |
+Resolves if the index does not already exists
 
 ## Usage
 

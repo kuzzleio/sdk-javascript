@@ -1,38 +1,44 @@
+import { Http2ServerResponse } from "http2";
+
 const bulkData = [
-  { create: { _id: '1' } },
+  { index: { } },
   { a: 'document', with: 'any', number: 'of fields' },
-  { create: { _id: '2' } },
+
+  { create: { _id: 'uniq-id-2' } },
   { another: 'document' },
-  { create: { _id: '3' } },
+
+  { create: { _id: 'uniq-id-3' } },
   { and: { another: 'one' } }
 ];
 
 try {
-  const response = await kuzzle.bulk.import(bulkData);
+  const response = await kuzzle.bulk.import('nyc-open-data', 'yellow-taxi', bulkData);
   console.log(response);
   /*
     { errors: false,
       items:
       [ {
-          create: {
-            _id: "uniq-id-1",
-            status: 200
+          index: {
+            _id: "hQ10_GwBB2Y5786Pu_NO",
+            status: 201
           }
         },
         {
           create: {
             _id: "uniq-id-2",
-            status: 200
+            status: 201
           }
         },
         {
           create: {
             _id: "uniq-id-3",
-            status: 200
+            status: 201
           }
         } ] }
   */
-  const successfulImport = response.items.filter(item => item.create.status === 200);
+  const successfulImport = response.items.filter(item => {
+    return Object.values(item)[0].status < 400;
+  });
 
   console.log(`Successfully imported ${successfulImport.length} documents`);
 } catch (error) {

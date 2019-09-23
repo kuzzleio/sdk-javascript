@@ -33,10 +33,11 @@ In each pair, the first object specifies the action to perform (the most common 
 
 ```js
 [
-  // The action object
+  // Action object
   { create: { _id: 'id' } },
-  // The document object
+  // Document object
   { myField: 'myValue', myOtherField: 'myOtherValue' },
+
   // Another action object
   { create: { _id: 'another-id' } },
   // Another document object
@@ -72,7 +73,7 @@ Resolves to an object containing 2 properties:
 | `errors` | <pre>boolean</pre>  | `true` if there is some errors with the import      |
 | `items`  | <pre>object[]</pre> | Array of object containing document import statuses |
 
-Each item contains the following properties:
+Each item is an object containing the action name as key and the corresponding object contain the following properties:
 
 | Property | Type                | Description                                         |
 | -------- | ------------------- | --------------------------------------------------- |
@@ -87,15 +88,6 @@ Each error object contain the following properties:
 | `type`  | <pre>String</pre> | Elasticsearch client error type |
 | `reason`  | <pre>String</pre> | human readable error message |
 
-Each object has the following structure:
-
-```js
-{
-  "<action>": {
-    _id: "another-id",
-    status: 200
-  }
-}
 ```
 
 ## Usage

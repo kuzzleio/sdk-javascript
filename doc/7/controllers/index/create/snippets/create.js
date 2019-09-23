@@ -1,10 +1,5 @@
 try {
-  const response = await kuzzle.index.create('nyc-open-data');
-  console.log(response);
-  /*
-    { acknowledged: true,
-      shards_acknowledged: true }
-  */
+  await kuzzle.index.create('nyc-open-data');
 
   console.log('Index created');
 } catch (error) {

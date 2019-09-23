@@ -1,5 +1,9 @@
 try {
-  const specifications = await kuzzle.collection.getSpecifications('nyc-open-data', 'yellow-taxi');
+  const specifications = await kuzzle.collection.getSpecifications(
+    'nyc-open-data',
+    'yellow-taxi'
+  );
+
   console.log(specifications);
   /*
     {

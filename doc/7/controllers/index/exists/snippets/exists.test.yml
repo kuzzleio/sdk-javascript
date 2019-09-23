@@ -2,10 +2,9 @@
 name: index#exists
 description: Tests if an index exists
 hooks:
-  before: curl -X POST kuzzle:7512/nyc-open-data/_create
+  before: |
+    curl -X POST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
   after:
 template: default
 expected: Index exists
-
-sdk: js
-version: 6
