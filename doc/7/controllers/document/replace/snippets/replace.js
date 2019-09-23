@@ -26,9 +26,7 @@ try {
       { author: '-1',
         createdAt: 1538654776456,
         updatedAt: 1538654776456,
-        updater: '-1',
-        active: true,
-        deletedAt: null } } }
+        updater: '-1' } } }
   */
   console.log('Success');
 } catch (error) {

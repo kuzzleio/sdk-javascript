@@ -12,7 +12,7 @@ try {
   }
   await Promise.all(requests);
 
-  await kuzzle.index.refresh('nyc-open-data');
+  await kuzzle.collection.refresh('nyc-open-data', 'yellow-taxi');
 
   const results = await kuzzle.document.search(
     'nyc-open-data',
@@ -42,9 +42,7 @@ try {
               "author": "-1",
               "createdAt": 1546773859655,
               "updatedAt": null,
-              "updater": null,
-              "active": true,
-              "deletedAt": null
+              "updater": null
             }
           }
         },

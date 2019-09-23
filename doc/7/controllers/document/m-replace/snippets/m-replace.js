@@ -25,11 +25,9 @@ try {
      [ { _id: 'some-id',
        _source:
         { _kuzzle_info:
-           { active: true,
-             author: '-1',
+           { author: '-1',
              updater: null,
              updatedAt: null,
-             deletedAt: null,
              createdAt: 1538639586995 },
           capacity: 4 },
        _index: 'nyc-open-data',
@@ -42,11 +40,9 @@ try {
      { _id: 'some-other-id',
        _source:
         { _kuzzle_info:
-           { active: true,
-             author: '-1',
+           { author: '-1',
              updater: null,
              updatedAt: null,
-             deletedAt: null,
              createdAt: 1538639586995 },
           capacity: 4 },
        _index: 'nyc-open-data',

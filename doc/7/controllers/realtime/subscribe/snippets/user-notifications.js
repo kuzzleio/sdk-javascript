@@ -2,7 +2,7 @@ function callback (notification) {
   if (notification.type === 'user') {
     console.log(notification.volatile);
     /*
-      { sdkVersion: '<current SDK version>', username: 'nina vkote' },
+      { sdkName: '<current SDK name and version>', username: 'nina vkote' },
     */
     console.log(`Currently ${notification.result.count} users in the room`);
   }

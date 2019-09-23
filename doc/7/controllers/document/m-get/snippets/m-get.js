@@ -27,9 +27,7 @@ try {
               "author": "-1",
               "createdAt": 1542036871353,
               "updatedAt": null,
-              "updater": null,
-              "active": true,
-              "deletedAt": null
+              "updater": null
             }
           }
         },
@@ -45,9 +43,7 @@ try {
               "author": "-1",
               "createdAt": 1542036871374,
               "updatedAt": null,
-              "updater": null,
-              "active": true,
-              "deletedAt": null
+              "updater": null
             }
           }
         }

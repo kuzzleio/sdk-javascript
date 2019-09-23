@@ -1,34 +1,34 @@
 version: '3'
 
 services:
-  kuzzle:
-    image: kuzzleio/kuzzle
-    ports:
-      - '7512:7512'
-    cap_add:
-      - SYS_PTRACE
-    depends_on:
-      - redis
-      - elasticsearch
-    environment:
-      - kuzzle_services__storageEngine__client__node=http://elasticsearch:9200
-      - kuzzle_services__internalCache__node__host=redis
-      - kuzzle_services__memoryStorage__node__host=redis
-      - kuzzle_services__storageEngine__commonMapping__dynamic=true
-      - NODE_ENV=production
+  # kuzzle:
+  #   image: kuzzleio/kuzzle
+  #   ports:
+  #     - '7512:7512'
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   depends_on:
+  #     - redis
+  #     - elasticsearch
+  #   environment:
+  #     - kuzzle_services__storageEngine__client__node=http://elasticsearch:9200
+  #     - kuzzle_services__internalCache__node__host=redis
+  #     - kuzzle_services__memoryStorage__node__host=redis
+  #     - kuzzle_services__storageEngine__commonMapping__dynamic=true
+  #     - NODE_ENV=production
 
-  redis:
-    image: redis:5
+  # redis:
+  #   image: redis:5
 
-  elasticsearch:
-    image: kuzzleio/elasticsearch:7.3
-    ulimits:
-      nofile: 65536
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - node.name=alyx
-      - cluster.name=kuzzle
-      - discovery.type=single-node
+  # elasticsearch:
+  #   image: kuzzleio/elasticsearch:7.3.0
+  #   ulimits:
+  #     nofile: 65536
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - node.name=alyx
+  #     - cluster.name=kuzzle
+  #     - discovery.type=single-node
 
   doc-tests:
     image: kuzzleio/snippets-tests
@@ -36,14 +36,14 @@ services:
     ports:
       - '9229:9229'
     depends_on:
-      - kuzzle
+      # - kuzzle
       - doc-runner-node
-      - doc-runner-web
-      - doc-runner-webpack
+      # - doc-runner-web
+      # - doc-runner-webpack
     volumes:
       - ../..:/mnt
       - /var/run/docker.sock:/var/run/docker.sock
-      - snippets:/var/snippets
+      - ./snippets:/var/snippets
     environment:
       - CONFIG_FILE=/mnt/.ci/doc/config.yml
 
@@ -70,69 +70,69 @@ services:
       '
     volumes:
       - ../..:/mnt
-      - snippets:/var/snippets
+      - ./snippets:/var/snippets
 
-  doc-runner-web:
-    image: buildkite/puppeteer:latest
-    command: >
-      bash -c '
-        mkdir -p /var/snippets/web;
-        apt-get update;
-        apt-get install -y curl;
-        npm install -g \
-          eslint;
-        cd /mnt;
-        npm install;
-        cd /var/snippets/web;
-        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
-        npm install \
-          /mnt/ \
-          eslint \
-          eslint-plugin-html \
-          eslint-plugin-import \
-          eslint-plugin-node \
-          eslint-plugin-promise \
-          eslint-plugin-standard;
-        touch /tmp/runner_ready_to_lint;
-        touch /tmp/runner_is_ready;
-        tail -f /dev/null
-      '
-    volumes:
-      - ../..:/mnt
-      - snippets:/var/snippets
+  # doc-runner-web:
+  #   image: buildkite/puppeteer:latest
+  #   command: >
+  #     bash -c '
+  #       mkdir -p /var/snippets/web;
+  #       apt-get update;
+  #       apt-get install -y curl;
+  #       npm install -g \
+  #         eslint;
+  #       cd /mnt;
+  #       npm install;
+  #       cd /var/snippets/web;
+  #       cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
+  #       npm install \
+  #         /mnt/ \
+  #         eslint \
+  #         eslint-plugin-html \
+  #         eslint-plugin-import \
+  #         eslint-plugin-node \
+  #         eslint-plugin-promise \
+  #         eslint-plugin-standard;
+  #       touch /tmp/runner_ready_to_lint;
+  #       touch /tmp/runner_is_ready;
+  #       tail -f /dev/null
+  #     '
+  #   volumes:
+  #     - ../..:/mnt
+  #     - ./snippets:/var/snippets
 
-  doc-runner-webpack:
-    image: buildkite/puppeteer:latest
-    command: >
-      bash -c '
-        mkdir -p /var/snippets/webpack;
-        apt-get update;
-        apt-get install -y curl;
-        npm install -g \
-          eslint;
-        cd /var/snippets/webpack;
-        cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
-        cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
-        npm install \
-          /mnt/ \
-          babel-loader \
-          @babel/core \
-          html-webpack-plugin \
-          webpack \
-          webpack-cli \
-          eslint \
-          eslint-plugin-html \
-          eslint-plugin-import \
-          eslint-plugin-node \
-          eslint-plugin-promise \
-          eslint-plugin-standard;
-        touch /tmp/runner_ready_to_lint;
-        touch /tmp/runner_is_ready;
-        tail -f /dev/null
-      '
-    volumes:
-      - ../..:/mnt
-      - snippets:/var/snippets
+  # doc-runner-webpack:
+  #   image: buildkite/puppeteer:latest
+  #   command: >
+  #     bash -c '
+  #       mkdir -p /var/snippets/webpack;
+  #       apt-get update;
+  #       apt-get install -y curl;
+  #       npm install -g \
+  #         eslint;
+  #       cd /var/snippets/webpack;
+  #       cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
+  #       cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
+  #       npm install \
+  #         /mnt/ \
+  #         babel-loader \
+  #         @babel/core \
+  #         html-webpack-plugin \
+  #         webpack \
+  #         webpack-cli \
+  #         eslint \
+  #         eslint-plugin-html \
+  #         eslint-plugin-import \
+  #         eslint-plugin-node \
+  #         eslint-plugin-promise \
+  #         eslint-plugin-standard;
+  #       touch /tmp/runner_ready_to_lint;
+  #       touch /tmp/runner_is_ready;
+  #       tail -f /dev/null
+  #     '
+  #   volumes:
+  #     - ../..:/mnt
+  #     - ./snippets:/var/snippets
 
 volumes:
   snippets:
