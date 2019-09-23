@@ -57,10 +57,23 @@ class Kuzzle extends KuzzleEventEmitter {
       loginAttempt: {}
     };
 
-    this.autoResubscribe = typeof options.autoResubscribe === 'boolean' ? options.autoResubscribe : true;
-    this.eventTimeout = typeof options.eventTimeout === 'number' ? options.eventTimeout : 200;
-    this.sdkVersion = typeof SDKVERSION === 'undefined' ? require('../package').version : SDKVERSION;
-    this.volatile = typeof options.volatile === 'object' ? options.volatile : {};
+    this.autoResubscribe = typeof options.autoResubscribe === 'boolean'
+      ? options.autoResubscribe
+      : true;
+
+    this.eventTimeout = typeof options.eventTimeout === 'number'
+      ? options.eventTimeout
+      : 200;
+
+    this.sdkVersion = typeof SDKVERSION === 'undefined'
+      ? require('../package').version
+      : SDKVERSION;
+
+    this.sdkName = `js@${this.sdkVersion}`;
+
+    this.volatile = typeof options.volatile === 'object'
+      ? options.volatile
+      : {};
 
     // controllers
     this.useController(AuthController, 'auth');
@@ -395,7 +408,7 @@ class Kuzzle extends KuzzleEventEmitter {
       }
     }
     request.volatile.sdkInstanceId = this.protocol.id;
-    request.volatile.sdkVersion = this.sdkVersion;
+    request.volatile.sdkName = this.sdkName;
 
     this.auth.authenticateRequest(request);
 
