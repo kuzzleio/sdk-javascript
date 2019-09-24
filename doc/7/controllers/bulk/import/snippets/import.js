@@ -14,7 +14,7 @@ try {
   console.log(response);
   /*
     { errors: false,
-      items:
+      successes:
       [ {
           index: {
             _id: "hQ10_GwBB2Y5786Pu_NO",
@@ -34,7 +34,7 @@ try {
           }
         } ] }
   */
-  const successfulImport = response.items.filter(item => {
+  const successfulImport = response.successes.filter(item => {
     return Object.values(item)[0].status < 400;
   });
 

@@ -17,7 +17,7 @@ try {
   console.log(response);
   /*
   {
-    "hits": [
+    "successes": [
       {
         "_id": "some-id",
         "_version": 1,
@@ -54,7 +54,7 @@ try {
     "errors": []
   }
   */
-  console.log(`Successfully created ${response.hits.length} documents`);
+  console.log(`Successfully created ${response.successes.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

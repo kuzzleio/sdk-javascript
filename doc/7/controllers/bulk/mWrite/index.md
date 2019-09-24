@@ -53,17 +53,24 @@ Additional query options
 
 ## Resolves
 
-Returns a `hits` array, containing the list of created documents, in the same order than the one provided in the query.
+Returns an object containing 2 arrays: `successes` and `errors`
 
-Each created document is an object with the following properties:
+Each created or replaced document is an object of the `successes` array with the following properties:
 
-| Name      | Type              | Description  |
-| --------- | ----------------- | ------------------- |
-| `_id`      | <pre>string</pre> | ID of the newly created document                       |
+| Name      | Type              | Description                                            |
+| --------- | ----------------- | ------------------------------------------------------ |
+| `_id`      | <pre>string</pre> | Document ID                     |
 | `_version` | <pre>number</pre> | Version of the document in the persistent data storage |
-| `_source`  | <pre>object</pre> | Created document   |
+| `_source`  | <pre>object</pre> | Document content                                       |
+| `created`  | <pre>boolean</pre> | True if the document was created |
 
-If one or more document creations fail, the promise is rejected and the `error` object contains a [partial error](/core/1/api/essentials/errors#partialerror) error.
+Each errored document is an object of the `errors` array with the following properties:
+
+| Name      | Type              | Description                                            |
+| --------- | ----------------- | ------------------------------------------------------ |
+| `document`  | <pre>object</pre> | Document that cause the error                                       |
+| `status` | <pre>number</pre> | HTTP error status |
+| `reason`  | <pre>string</pre> | Human readable reason |
 
 ## Usage
 

@@ -21,7 +21,7 @@ try {
 
   console.log(response);
   /*
-  { hits:
+  { successes:
      [ { _id: 'some-id',
          _version: 2,
          _source: {

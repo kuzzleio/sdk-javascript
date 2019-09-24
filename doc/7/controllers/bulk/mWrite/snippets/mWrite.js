@@ -23,7 +23,7 @@ try {
 
   console.log(result);
   /*
-  { hits:
+  { successes:
     [ { _id: 'panipokari',
         _source: {
           "licence": "B",
@@ -41,7 +41,7 @@ try {
     total: 2 }
   */
 
-  console.log(`Document creator is ${result.hits[1]._source._kuzzle_info.creator}`);
+  console.log(`Document creator is ${result.successes[1]._source._kuzzle_info.creator}`);
 } catch (error) {
   console.error(error.message);
 }

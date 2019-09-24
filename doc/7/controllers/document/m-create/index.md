@@ -33,9 +33,9 @@ Additional query options
 
 ## Resolves
 
-Returns an object containing 2 arrays: `hits` and `errors`
+Returns an object containing 2 arrays: `successes` and `errors`
 
-Each created document is an object of the `hits` array with the following properties:
+Each created document is an object of the `successes` array with the following properties:
 
 | Name      | Type              | Description                                            |
 | --------- | ----------------- | ------------------------------------------------------ |

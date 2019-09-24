@@ -11,8 +11,6 @@ Create, update or delete large amount of documents as fast as possible.
 
 This route is faster than the `document:m*` routes family (e.g. [document:mCreate](/sdk/js/6/controllers/document/m-create)), but no real-time notifications will be generated, even if some of the documents in the import match subscription filters.
 
-If some documents actions fail, the client will receive a [PartialError](/core/1/api/essentials/errors#partialerror) error.
-
 <br/>
 
 ```js
@@ -70,16 +68,23 @@ Resolves to an object containing 2 properties:
 
 | Property | Type                | Description                                         |
 | -------- | ------------------- | --------------------------------------------------- |
-| `errors` | <pre>boolean</pre>  | `true` if there is some errors with the import      |
-| `items`  | <pre>object[]</pre> | Array of object containing document import statuses |
+| `successes`  | <pre>object[]</pre> | Array of object containing successful document import |
+| `errors` | <pre>object[]</pre>  | Array of object containing failed document import     |
 
-Each item is an object containing the action name as key and the corresponding object contain the following properties:
+Each item of the `successes` array is an object containing the action name as key and the corresponding object contain the following properties:
 
 | Property | Type                | Description                                         |
 | -------- | ------------------- | --------------------------------------------------- |
 | `_id`   | <pre>String</pre>   | Document unique identifier      |
 | `status`   | <pre>String</pre>   | HTTP status code for that query      |
-| `error`   | <pre>Object</pre>   | Error object if `status` >= `400`      |
+
+Each item of the `successes` array is an object containing the action name as key and the corresponding object contain the following properties:
+
+| Property | Type                | Description                                         |
+| -------- | ------------------- | --------------------------------------------------- |
+| `_id`   | <pre>String</pre>   | Document unique identifier      |
+| `status`   | <pre>String</pre>   | HTTP status code for that query      |
+| `error`   | <pre>Object</pre>   | Error object      |
 
 Each error object contain the following properties:
 

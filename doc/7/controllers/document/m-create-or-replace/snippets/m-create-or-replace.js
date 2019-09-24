@@ -19,7 +19,7 @@ try {
   console.log(response);
   /*
     {
-      "hits": [
+      "successes": [
         {
           "_id": "some-id",
           "_version": 1,
@@ -54,7 +54,7 @@ try {
       "errors": []
     }
   */
-  console.log(`Successfully createOrReplace ${response.hits.length} documents`);
+  console.log(`Successfully createOrReplace ${response.successes.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

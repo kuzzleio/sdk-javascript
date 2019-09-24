@@ -24,20 +24,20 @@ try {
 
   console.log(response);
   /*
-    { hits:
-    [ { _id: 'some-id',
-        _source: { _kuzzle_info: [Object], category: 'sedan' },
-        _version: 2,
-        result: 'updated',
-        created: false,
-        status: 200 },
-      { _id: 'some-other-id',
-        _source: { _kuzzle_info: [Object], category: 'limousine' },
-        _version: 2,
-        result: 'updated',
-        created: false,
-        status: 200 } ],
-    total: 2 }
+    { successes:
+      [ { _id: 'some-id',
+          _source: { _kuzzle_info: [Object], category: 'sedan' },
+          _version: 2,
+          result: 'updated',
+          created: false,
+          status: 200 },
+        { _id: 'some-other-id',
+          _source: { _kuzzle_info: [Object], category: 'limousine' },
+          _version: 2,
+          result: 'updated',
+          created: false,
+          status: 200 } ],
+    errors: [] }
   */
   console.log('Success');
 } catch (error) {
