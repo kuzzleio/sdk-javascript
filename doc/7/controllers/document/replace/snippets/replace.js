@@ -14,8 +14,6 @@ try {
   /*
   { _id: 'some-id',
     _version: 2,
-    result: 'updated',
-    created: false,
     _source:
     { capacity: 4,
       category: 'sedan',

@@ -4,7 +4,7 @@ function callback (notification) {
   { status: 200,
     requestId: 'e114c5d0-8ad1-4751-9236-772f9fea1b19',
     timestamp: 1539783948258,
-    volatile: { sdkVersion: '6.0.0-beta-2' },
+    volatile: { sdkName: 'javascript@7.0.0' },
     index: 'nyc-open-data',
     collection: 'yellow-taxi',
     controller: 'document',

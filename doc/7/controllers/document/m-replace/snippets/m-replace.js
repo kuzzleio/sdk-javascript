@@ -24,9 +24,6 @@ try {
   { hits:
      [ { _id: 'some-id',
          _version: 2,
-         result: 'updated',
-         created: false,
-         status: 200,
          _source: {
            _kuzzle_info:
            { author: '-1',
@@ -37,9 +34,6 @@ try {
      },
      [ { _id: 'some-other-id',
          _version: 2,
-         result: 'updated',
-         created: false,
-         status: 200,
          _source: {
            _kuzzle_info:
            { author: '-1',

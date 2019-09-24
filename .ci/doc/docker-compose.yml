@@ -36,14 +36,14 @@ services:
     ports:
       - '9229:9229'
     depends_on:
-      # - kuzzle
+      - kuzzle
       - doc-runner-node
-      # - doc-runner-web
-      # - doc-runner-webpack
+      - doc-runner-web
+      - doc-runner-webpack
     volumes:
       - ../..:/mnt
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./snippets:/var/snippets
+      - snippets:/var/snippets
     environment:
       - CONFIG_FILE=/mnt/.ci/doc/config.yml
 
@@ -70,69 +70,69 @@ services:
       '
     volumes:
       - ../..:/mnt
-      - ./snippets:/var/snippets
+      - snippets:/var/snippets
 
-  # doc-runner-web:
-  #   image: buildkite/puppeteer:latest
-  #   command: >
-  #     bash -c '
-  #       mkdir -p /var/snippets/web;
-  #       apt-get update;
-  #       apt-get install -y curl;
-  #       npm install -g \
-  #         eslint;
-  #       cd /mnt;
-  #       npm install;
-  #       cd /var/snippets/web;
-  #       cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
-  #       npm install \
-  #         /mnt/ \
-  #         eslint \
-  #         eslint-plugin-html \
-  #         eslint-plugin-import \
-  #         eslint-plugin-node \
-  #         eslint-plugin-promise \
-  #         eslint-plugin-standard;
-  #       touch /tmp/runner_ready_to_lint;
-  #       touch /tmp/runner_is_ready;
-  #       tail -f /dev/null
-  #     '
-  #   volumes:
-  #     - ../..:/mnt
-  #     - snippets:/var/snippets
+  doc-runner-web:
+    image: buildkite/puppeteer:latest
+    command: >
+      bash -c '
+        mkdir -p /var/snippets/web;
+        apt-get update;
+        apt-get install -y curl;
+        npm install -g \
+          eslint;
+        cd /mnt;
+        npm install;
+        cd /var/snippets/web;
+        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
+        npm install \
+          /mnt/ \
+          eslint \
+          eslint-plugin-html \
+          eslint-plugin-import \
+          eslint-plugin-node \
+          eslint-plugin-promise \
+          eslint-plugin-standard;
+        touch /tmp/runner_ready_to_lint;
+        touch /tmp/runner_is_ready;
+        tail -f /dev/null
+      '
+    volumes:
+      - ../..:/mnt
+      - snippets:/var/snippets
 
-  # doc-runner-webpack:
-  #   image: buildkite/puppeteer:latest
-  #   command: >
-  #     bash -c '
-  #       mkdir -p /var/snippets/webpack;
-  #       apt-get update;
-  #       apt-get install -y curl;
-  #       npm install -g \
-  #         eslint;
-  #       cd /var/snippets/webpack;
-  #       cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
-  #       cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
-  #       npm install \
-  #         /mnt/ \
-  #         babel-loader \
-  #         @babel/core \
-  #         html-webpack-plugin \
-  #         webpack \
-  #         webpack-cli \
-  #         eslint \
-  #         eslint-plugin-html \
-  #         eslint-plugin-import \
-  #         eslint-plugin-node \
-  #         eslint-plugin-promise \
-  #         eslint-plugin-standard;
-  #       touch /tmp/runner_ready_to_lint;
-  #       touch /tmp/runner_is_ready;
-  #       tail -f /dev/null
-  #     '
-  #   volumes:
-  #     - ../..:/mnt
-  #     - snippets:/var/snippets
+  doc-runner-webpack:
+    image: buildkite/puppeteer:latest
+    command: >
+      bash -c '
+        mkdir -p /var/snippets/webpack;
+        apt-get update;
+        apt-get install -y curl;
+        npm install -g \
+          eslint;
+        cd /var/snippets/webpack;
+        cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
+        cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
+        npm install \
+          /mnt/ \
+          babel-loader \
+          @babel/core \
+          html-webpack-plugin \
+          webpack \
+          webpack-cli \
+          eslint \
+          eslint-plugin-html \
+          eslint-plugin-import \
+          eslint-plugin-node \
+          eslint-plugin-promise \
+          eslint-plugin-standard;
+        touch /tmp/runner_ready_to_lint;
+        touch /tmp/runner_is_ready;
+        tail -f /dev/null
+      '
+    volumes:
+      - ../..:/mnt
+      - snippets:/var/snippets
 
 volumes:
   snippets:

@@ -22,7 +22,7 @@ try {
       action: 'create',
       collection: 'yellow-taxi',
       index: 'nyc-open-data',
-      volatile: { sdkVersion: '6.0.0-beta-2' },
+      volatile: { sdkName: 'javascript@7.0.0' },
       room: '49ffb6db-bdff-45b9-b3f6-00442f472393',
       result:
        { _index: 'nyc-open-data',
@@ -39,9 +39,7 @@ try {
              { author: '-1',
                createdAt: 1532529302225,
                updatedAt: null,
-               updater: null,
-               active: true,
-               deletedAt: null } } } }
+               updater: null } } } }
   */
 
   console.log('Document created');

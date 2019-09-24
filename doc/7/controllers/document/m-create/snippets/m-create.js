@@ -26,11 +26,9 @@ try {
         "status": 200,
         "_source": {
           "_kuzzle_info": {
-            "active": true,
             "author": "-1",
             "updater": null,
             "updatedAt": null,
-            "deletedAt": null,
             "createdAt": 1542036563677
           },
           "capacity": 4
@@ -44,11 +42,9 @@ try {
         "status": 200,
         "_source": {
           "_kuzzle_info": {
-            "active": true,
             "author": "-1",
             "updater": null,
             "updatedAt": null,
-            "deletedAt": null,
             "createdAt": 1542036563677
           },
           "this": "document id is auto-computed"

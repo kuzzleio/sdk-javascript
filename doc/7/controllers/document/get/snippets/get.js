@@ -18,9 +18,7 @@ try {
         { author: '-1',
           createdAt: 1538409095673,
           updatedAt: null,
-          updater: null,
-          active: true,
-          deletedAt: null } } }
+          updater: null } } }
   */
 
   console.log('Success');

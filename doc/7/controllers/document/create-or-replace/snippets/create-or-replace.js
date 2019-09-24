@@ -18,9 +18,7 @@ try {
           { author: '-1',
             createdAt: 1537443212089,
             updatedAt: null,
-            updater: null,
-            active: true,
-            deletedAt: null } } }
+            updater: null } } }
    */
 } catch (error) {
   console.error(error.message);
