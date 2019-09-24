@@ -11,9 +11,6 @@ hooks:
         "credentials": {}
       }' kuzzle:7512/users/user${i}/_create?refresh=wait_for
     done
-  after: |
-    for i in 1 2 3; do
-      curl -XDELETE kuzzle:7512/users/user${i}
-    done
+  after:
 template: default
 expected: ^Successfully retrieved 3 users$

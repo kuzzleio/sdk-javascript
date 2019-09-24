@@ -54,7 +54,7 @@ try {
       "errors": []
     }
   */
-  console.log(`Successfully createOrReplace ${response.total} documents`);
+  console.log(`Successfully createOrReplace ${response.hits.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

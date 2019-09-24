@@ -37,7 +37,16 @@ Additional query options
 
 ## Resolves
 
-Resolves to an array of objects representing the deleted documents.
+Returns an object containing 2 arrays: `deleted` and `errors`
+
+The `deleted` array contain the successfuly deleted document IDs.
+
+Each deletion error is an object of the `errors` array with the following properties:
+
+| Name      | Type              | Description                                            |
+| --------- | ----------------- | ------------------------------------------------------ |
+| `id`  | <pre>object</pre> | Document ID                                      |
+| `reason`  | <pre>string</pre> | Human readable reason |
 
 ## Usage
 

@@ -14,24 +14,12 @@ Then(/^I get an error(?: with status (.*))?$/, function (status) {
   }
 });
 
-Then('I get a partial error', function () {
-  console.log(this.content)
-  should(this.content.errors).be.Array().not.be.empty();
-});
-
 Then('I get {string} and {string}', function (string1, string2) {
   should(this.content).be.an.Array();
   should(this.content.length).eql(2);
 
   for (const val of [string1, string2]) {
     should(this.content.indexOf(val)).be.greaterThanOrEqual(0);
-  }
-});
-
-Then('I should have no partial error', function () {
-  if (this.error) {
-    should(this.error.status)
-      .not.equal(206);
   }
 });
 

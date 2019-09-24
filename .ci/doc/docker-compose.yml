@@ -2,7 +2,7 @@ version: '3'
 
 services:
   # kuzzle:
-  #   image: kuzzleio/kuzzle
+  #   image: kuzzleio/kuzzle:2
   #   ports:
   #     - '7512:7512'
   #   cap_add:
@@ -36,7 +36,7 @@ services:
     ports:
       - '9229:9229'
     depends_on:
-      - kuzzle
+      # - kuzzle
       - doc-runner-node
       - doc-runner-web
       - doc-runner-webpack

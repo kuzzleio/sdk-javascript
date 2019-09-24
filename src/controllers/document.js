@@ -246,7 +246,7 @@ class DocumentController extends BaseController {
 
     return this.query(request, options)
       .then(response => {
-        console.log(JSON.stringify(response, null, 2))
+        console.log(response.result)
         return response.result
       });
   }
@@ -294,6 +294,7 @@ class DocumentController extends BaseController {
       refresh: options.refresh
     };
     delete options.refresh;
+
     return this.query(request, options)
       .then(response => response.result);
   }

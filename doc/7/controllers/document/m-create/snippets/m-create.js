@@ -54,7 +54,7 @@ try {
     "errors": []
   }
   */
-  console.log(`Successfully created ${response.total} documents`);
+  console.log(`Successfully created ${response.hits.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

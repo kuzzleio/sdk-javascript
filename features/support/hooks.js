@@ -20,15 +20,17 @@ BeforeAll(function () {
 });
 
 AfterAll(function () {
-  return clean();
+  // return clean();
 });
 
 function clean () {
   const kuzzle = _world.kuzzle;
 
   return kuzzle.connect()
-    .then(() => kuzzle.index.list())
-    .then(indices => Promise.all(indices.map(i => kuzzle.index.delete(i))))
+    .then(() => kuzzle.query({
+      controller: 'admin',
+      action: 'resetDatabase'
+    }))
     .catch(error => {
       // rethrow to get a readable error
       // eslint-disable-next-line no-console

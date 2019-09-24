@@ -1,10 +1,8 @@
 try {
   const results = await kuzzle.security.searchUsers({
-    query: {
       term: {
         status: 'student'
       }
-    }
   });
 
   console.log(results);
