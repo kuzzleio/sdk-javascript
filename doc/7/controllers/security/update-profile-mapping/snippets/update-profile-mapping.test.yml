@@ -1,4 +1,4 @@
 name: security#updateProfileMapping
 description: update profile mapping
 template: default
-expected: '^{ acknowledged: true }$'
+expected: 'description: {'

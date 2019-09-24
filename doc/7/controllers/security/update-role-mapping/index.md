@@ -30,7 +30,7 @@ updateRoleMapping(mapping, [options]);
 
 ## Resolves
 
-An acknowledgment message. 
+Resolves an object representing the new mapping.
 
 ## Usage
 

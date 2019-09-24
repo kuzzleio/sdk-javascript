@@ -154,6 +154,7 @@ When('I delete the documents [{string}, {string}]', function (id1, id2) {
       [id1, id2],
       {refresh: true})
     .then(content => {
+      console.log(content)
       this.content = content;
     })
     .catch(error => {

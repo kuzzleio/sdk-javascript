@@ -1,10 +1,10 @@
 name: essentials#errorHandlingAsync
 description: How to handle errors with the SDK
 hooks:
-  before: curl -X POST kuzzle:7512/nyc-open-data/_create
+  before: |
+    curl -X DELETE kuzzle:7512/nyc-open-data
+    curl -X POST kuzzle:7512/nyc-open-data/_create
+    curl -X PUT kuzzle:7512/nyc-open-data/yellow-taxi
   after:
 template: default
 expected: Try with another name!
-
-sdk: js
-version: 6

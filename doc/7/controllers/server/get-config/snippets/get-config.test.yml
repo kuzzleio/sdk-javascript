@@ -4,6 +4,4 @@ hooks:
   before:
   after:
 template: default
-expected: ^(Kuzzle Server configuration:) {("dump":{.*}),("limits":{.*}),("plugins":{.*}),("queues":{.*}),("repositories":{.*}),("server":{.*}),("services":{.*}),("stats":{.*}),("validation":{.*}),("_":.*),("internal":{.*}),("version":"[0-9]+\.[0-9]+\.[0-9]+")}$
-sdk: js
-version: 6
+expected: '^Kuzzle Server configuration:'

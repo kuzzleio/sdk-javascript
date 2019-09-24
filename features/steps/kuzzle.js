@@ -15,7 +15,8 @@ Then(/^I get an error(?: with status (.*))?$/, function (status) {
 });
 
 Then('I get a partial error', function () {
-  should(this.error.status).eql(206);
+  console.log(this.content)
+  should(this.content.errors).be.Array().not.be.empty();
 });
 
 Then('I get {string} and {string}', function (string1, string2) {

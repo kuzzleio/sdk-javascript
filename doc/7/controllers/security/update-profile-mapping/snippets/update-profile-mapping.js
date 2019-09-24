@@ -1,14 +1,18 @@
 try {
-  const response = await kuzzle.security.updateProfileMapping({
+  const updatedMapping = await kuzzle.security.updateProfileMapping({
     properties: {
       description: { type: 'text' }
     }
   });
 
-  console.log(response);
+  console.log(updatedMapping);
   /*
-  { acknowledged: true }
-   */
+    {
+      properties: {
+        description: { type: 'text' }
+      }
+    }
+  */
 } catch (e) {
   console.error(e);
 }

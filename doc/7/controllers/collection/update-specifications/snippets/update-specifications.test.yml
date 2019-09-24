@@ -6,9 +6,6 @@ hooks:
     curl -X POST kuzzle:7512/nyc-open-data/_create
     curl -X PUT kuzzle:7512/nyc-open-data/green-taxi
     curl -X DELETE kuzzle:7512/nyc-open-data/yellow-taxi/_specifications
-  after:
+  after: curl -X DELETE kuzzle:7512/nyc-open-data/yellow-taxi/_specifications
 template: default
 expected: Success
-
-sdk: js
-version: 6

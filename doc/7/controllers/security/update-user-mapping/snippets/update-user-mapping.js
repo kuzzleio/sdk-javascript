@@ -1,5 +1,5 @@
 try {
-  const response = await kuzzle.security.updateUserMapping({
+  const updatedMapping = await kuzzle.security.updateUserMapping({
     properties: {
       firstName: { type: 'text' },
       lastName: { type: 'text' },
@@ -10,10 +10,19 @@ try {
     }
   });
 
-  console.log(response);
+  console.log(updatedMapping);
   /*
-  { acknowledged: true }
-   */
+    {
+      properties: {
+        firstName: { type: 'text' },
+        lastName: { type: 'text' },
+        birthDate: {
+          type: 'date',
+          format: 'yyyy-mm-dd'
+        }
+      }
+    }
+  */
 
 } catch (e) {
   console.error(e);

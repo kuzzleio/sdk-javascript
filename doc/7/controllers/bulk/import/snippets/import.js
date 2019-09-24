@@ -1,5 +1,3 @@
-import { Http2ServerResponse } from "http2";
-
 const bulkData = [
   { index: { } },
   { a: 'document', with: 'any', number: 'of fields' },

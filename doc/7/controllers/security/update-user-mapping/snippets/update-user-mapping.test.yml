@@ -1,4 +1,4 @@
 name: security#updateUserMapping
 description: update user mapping
 template: default
-expected: '^{ acknowledged: true }$'
+expected: 'firstName: '

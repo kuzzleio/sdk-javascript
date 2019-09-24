@@ -30,9 +30,8 @@ updateUserMapping(mapping, [options]);
 
 ## Resolves
 
-An acknowledgment message. 
+Resolves an object representing the new mapping.
 
 ## Usage
 
 <<< ./snippets/update-user-mapping.js
-
