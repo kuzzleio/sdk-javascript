@@ -37,7 +37,7 @@ describe('Kuzzle query management', () => {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: { sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -51,7 +51,7 @@ describe('Kuzzle query management', () => {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -70,7 +70,7 @@ describe('Kuzzle query management', () => {
         collection: 'collection',
         controller: 'controller',
         index: 'index',
-        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkVersion: kuzzle.sdkVersion},
+        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
         requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       });
     });
@@ -133,13 +133,13 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
     });
 
-    it('should not override "sdkInstanceId" and "sdkVersion" volatile data', () => {
+    it('should not override "sdkInstanceId" and "sdkName" volatile data', () => {
       kuzzle.protocol.id = 'kuz-sdk-instance-id';
-      kuzzle.sdkVersion = 'kuz-sdk-version';
+      kuzzle.sdkName = 'kuz-sdk-version';
 
       const volatile = {
         sdkInstanceId: 'req-sdk-instance-id',
-        sdkVersion: 'req-sdk-version'
+        sdkName: 'req-sdk-version'
       };
       kuzzle.query({body: {some: 'query'}, volatile});
 
@@ -147,7 +147,7 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query).be.calledWithMatch({
         volatile: {
           sdkInstanceId: 'kuz-sdk-instance-id',
-          sdkVersion: 'kuz-sdk-version'
+          sdkName: 'kuz-sdk-version'
         }
       });
     });

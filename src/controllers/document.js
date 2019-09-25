@@ -291,6 +291,7 @@ class DocumentController extends BaseController {
       refresh: options.refresh
     };
     delete options.refresh;
+
     return this.query(request, options)
       .then(response => response.result);
   }

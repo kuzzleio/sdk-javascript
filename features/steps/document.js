@@ -24,6 +24,13 @@ Given('the collection has a document with id {string}', function (id) {
     });
 });
 
+Then('I get an error in the errors array', function () {
+  should(this.content.errors).be.Array().not.be.empty();
+});
+
+Then('I should have no errors in the errors array', function () {
+  should(this.content.errors).be.empty();
+});
 
 When('I check if {string} exists', function (id) {
   return this.kuzzle.document.exists(this.index, this.collection, id)

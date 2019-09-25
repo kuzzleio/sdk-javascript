@@ -24,12 +24,11 @@ Given('there is no index called {string}', function (index) {
 });
 
 Given('there is the indexes {string} and {string}', function (index1, index2) {
-  const createIndex = (index, exists) => {
+  const createIndex = async (index, exists) => {
     if (!exists) {
-      return this.kuzzle.index.create(index);
+      await this.kuzzle.index.create(index);
+      await this.kuzzle.collection.create(index, 'a-collection');
     }
-
-    return null;
   };
 
   return this.kuzzle.index.exists(index1)

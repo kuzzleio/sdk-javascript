@@ -45,18 +45,6 @@ class IndexController extends BaseController {
       .then(response => response.result);
   }
 
-  getAutoRefresh (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.getAutoRefresh: index is required');
-    }
-
-    return this.query({
-      index,
-      action: 'getAutoRefresh'
-    }, options)
-      .then(response => response.result);
-  }
-
   list (options) {
     return this.query({
       action: 'list'
@@ -76,44 +64,6 @@ class IndexController extends BaseController {
       }
     }, options)
       .then(response => response.result.deleted);
-  }
-
-  refresh (index, options) {
-    if (!index || index === '') {
-      throw new Error('Kuzzle.index.refresh: index is required');
-    }
-
-    return this.query({
-      index,
-      action: 'refresh'
-    }, options)
-      .then(response => response.result._shards);
-  }
-
-  refreshInternal (options) {
-    return this.query({
-      action: 'refreshInternal'
-    }, options)
-      .then(response => response.result.acknowledged);
-  }
-
-  setAutoRefresh (index, autoRefresh, options) {
-    if (!index || index === '') {
-      throw new Error('Kuzzle.index.setAutoRefresh: index is required');
-    }
-
-    if (typeof autoRefresh !== 'boolean') {
-      throw new Error('Kuzzle.index.setAutoRefresh: autoRefresh must be a boolean');
-    }
-
-    return this.query({
-      index,
-      action: 'setAutoRefresh',
-      body: {
-        autoRefresh
-      }
-    }, options)
-      .then(response => response.result.response);
   }
 }
 

@@ -1,9 +1,0 @@
-name: collection#getSpecifications
-description: Returns the validation specifications
-hooks:
-  before: "curl -X POST kuzzle:7512/nyc-open-data/_create && curl -X PUT kuzzle:7512/nyc-open-data/yellow-taxi && curl -X PUT -H \"Content-Type: application/json\" -d '{\"nyc-open-data\": {\"yellow-taxi\": {\"strict\": false,\"fields\": {\"license\": {\"type\": \"string\"}}}}}' kuzzle:7512/_specifications"
-  after:
-template: default
-expected: Success
-sdk: js
-version: 6

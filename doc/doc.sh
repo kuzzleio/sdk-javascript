@@ -2,8 +2,8 @@
 
 set -eu
 
-DOC_VERSION=6
-DOC_PATH=/sdk/js/6
+DOC_VERSION=7
+DOC_PATH=/sdk/js/7
 
 # Used by vuepress
 export DOC_DIR=$DOC_VERSION

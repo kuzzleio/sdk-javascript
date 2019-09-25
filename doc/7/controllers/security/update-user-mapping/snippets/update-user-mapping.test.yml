@@ -1,0 +1,4 @@
+name: security#updateUserMapping
+description: update user mapping
+template: default
+expected: 'firstName: '

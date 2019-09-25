@@ -78,6 +78,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.eventTimeout).be.a.Number().and.be.equal(200);
     should(kuzzle.protocol).be.an.instanceof(ProtocolMock);
     should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
+    should(kuzzle.sdkName).be.a.String().and.be.equal(`js@${version}`);
     should(kuzzle.volatile).be.an.Object().and.be.empty();
   });
 
