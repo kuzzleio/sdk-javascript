@@ -9,8 +9,6 @@ description: Get multiple documents
 
 Gets multiple documents.
 
-Throws a partial error (error code 206) if one or more document can not be retrieved.
-
 <br/>
 
 ```js
@@ -34,20 +32,19 @@ Additional query options
 
 ## Resolves
 
-Resolves to an object containing the retrieved documents.
+Returns an object containing 2 arrays: `successes` and `errors`
 
-| Property | Type            | Description               |
-| -------- | --------------- | ------------------------- |
-| `hits`   | <pre>array<object></pre> | Retrieved documents       |
-| `total`  | <pre>number</pre>       | Total retrieved documents |
+The `successes` array contain the list of retrieved documents.
 
-Each document of the `hits` array have with the following properties:
+Each document have with following properties:
 
 | Name      | Type              | Description                                            |
 | --------- | ----------------- | ------------------------------------------------------ |
 | `_id`      | <pre>string</pre> | Document ID                    |
 | `_version` | <pre>number</pre> | Version of the document in the persistent data storage |
 | `_source`  | <pre>object</pre> | Document content                                       |
+
+The `errors` array contain the IDs of not found documents.
 
 ## Usage
 

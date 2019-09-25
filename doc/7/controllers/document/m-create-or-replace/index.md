@@ -9,8 +9,6 @@ description: Create or replace documents
 
 Creates or replaces multiple documents.
 
-Throws a partial error (error code 206) if one or more document creations/replacements fail.
-
 <br/>
 
 ```js

@@ -9,8 +9,6 @@ description: Replace documents
 
 Replaces multiple documents.
 
-Throws a partial error (error code 206) if one or more documents can not be replaced.
-
 <br/>
 
 ```js

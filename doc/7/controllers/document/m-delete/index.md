@@ -9,8 +9,6 @@ description: Delete documents
 
 Deletes multiple documents.
 
-Throws a partial error (error code 206) if one or more document deletions fail.
-
 The optional parameter `refresh` can be used with the value `wait_for` in order to wait for the document indexation (indexed documents are available for `search`).
 
 <br/>
@@ -37,9 +35,9 @@ Additional query options
 
 ## Resolves
 
-Returns an object containing 2 arrays: `deleted` and `errors`
+Returns an object containing 2 arrays: `successes` and `errors`
 
-The `deleted` array contain the successfuly deleted document IDs.
+The `successes` array contain the successfuly deleted document IDs.
 
 Each deletion error is an object of the `errors` array with the following properties:
 

@@ -14,7 +14,7 @@ try {
   console.log(response);
   /*
     {
-      "hits": [
+      "successes": [
         { "_id": "some-id",
           "_version": 1,
           "found": true,
@@ -42,10 +42,10 @@ try {
           }
         }
       ],
-      "total": 2
+      "errors": []
     }
   */
-  console.log(`Successfully get ${response.total} documents`);
+  console.log(`Successfully get ${response.successes.length} documents`);
 } catch (error) {
   console.error(error.message);
 }
