@@ -245,10 +245,7 @@ class DocumentController extends BaseController {
     delete options.refresh;
 
     return this.query(request, options)
-      .then(response => {
-        console.log(response.result)
-        return response.result
-      });
+      .then(response => response.result);
   }
 
   mGet (index, collection, ids, options = {}) {
