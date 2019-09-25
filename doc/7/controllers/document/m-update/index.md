@@ -23,7 +23,7 @@ mUpdate(index, collection, documents, [options]);
 | ------------ | --------------- | ---------------------------- |
 | `index`      | <pre>string</pre>        | Index name                   |
 | `collection` | <pre>string</pre>        | Collection name              |
-| `documents`  | <pre>array<object></pre> | Array of documents to update |
+| `documents`  | <pre>object[]</pre> | Array of documents to update |
 | `options`    | <pre>object</pre>        | Query options                |
 
 ### Options

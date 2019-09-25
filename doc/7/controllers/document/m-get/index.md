@@ -19,7 +19,7 @@ mGet(index, collection, ids, [options]);
 | ------------ | --------------- | --------------- |
 | `index`      | <pre>string</pre>        | Index name      |
 | `collection` | <pre>string</pre>        | Collection name |
-| `ids`        | <pre>array<string></pre> | Document ids    |
+| `ids`        | <pre>string[]</pre> | Document ids    |
 | `options`    | <pre>object</pre>        | Query options   |
 
 ### Options

@@ -21,7 +21,7 @@ mDelete(index, collection, ids, [options]);
 | ------------ | --------------- | ------------------------------ |
 | `index`      | <pre>string</pre>        | Index name                     |
 | `collection` | <pre>string</pre>        | Collection name                |
-| `ids`        | <pre>array<string></pre> | IDs of the documents to delete |
+| `ids`        | <pre>string[]</pre> | IDs of the documents to delete |
 | `options`    | <pre>object</pre>        | Query options                  |
 
 ### Options
