@@ -7,6 +7,7 @@ describe('test realtime chat', () => {
   it('should fetch and display some messages', function () {
     cy.fixture('Legolas.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.log(this.fixt);
         cy.visit('/');
@@ -19,6 +20,7 @@ describe('test realtime chat', () => {
   it('should send a message', function () {
     cy.fixture('Sam.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.get('#message')
@@ -32,6 +34,7 @@ describe('test realtime chat', () => {
   it('should receive a message', function () {
     cy.fixture('Sauron.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.createMessage(this.fixt.body);
