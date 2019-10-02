@@ -1,7 +1,7 @@
 ---
 type: page
 code: false
-title: React
+title: React with Redux
 description: Getting started with Kuzzle and React with Redux
 order: 0
 ---
@@ -29,7 +29,7 @@ yarn add kuzzle-sdk redux redux-saga react-redux
 
 We'll rewrite the _src/App.js_ so you can remove everything inside.
 
-## Instanciating Kuzzle SDK
+## Instantiating Kuzzle SDK
 
 We have to connect the server so that our client can interact with it.
 
@@ -54,7 +54,7 @@ After that, create that function with the connection to Kuzzle:
 
 <<< ./snippets/App.js.snippet:2[js]
 
-Then we will [etablish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exists](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our chat. 
+Then we will [establish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) for our chat. 
 
 Add the following lines to the `_initialize` function:
 
@@ -103,7 +103,7 @@ Add the following lines to the `_initialize()` function of the `app` class in th
 
 <<< ./snippets/App.js.snippet:7[js]
 
-Then, add the following constants in the `render()` function of the `app class:
+Then, add the following constants in the `render()` function of the `app` class:
 
 <<< ./snippets/App.js.snippet:11[js]
 
@@ -112,7 +112,7 @@ And the loop in the return of the `render()` function to display the messages st
 <<< ./snippets/App.js.snippet:13[html]
 
 
-We can now display the messages stored in Kuzzle. Cool but we need to create some right ?
+We can now display the messages stored in Kuzzle. In the next part, we'll see how to create new messages.
 
 ## Send messages
 
@@ -129,16 +129,16 @@ Let's add it in the _src/state/sagas.js_ file:
 <<< ./snippets/sagas.js.snippet[js]
 
 As you can see we don't push the new message in our state on message creation.
-Actually, We'll subscribe to the collection that contains our messages.
-So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call the realtime controller of Kuzzle to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creation:
+Now, we need to subscribe to changes made on the collection containing our messages.
+So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creations:
 
 <<< ./snippets/App.js.snippet:8[js]
 
-Then, just add an input field, bond to the `message` property and a button which calls our `sendMessage()` function:
+Then, just add an input field bound to the `message` property, and a button calling our `sendMessage()` function:
 
 <<< ./snippets/App.js.snippet:12[html]
 
-We need to update our `message` state property when this input change, as you can see, the `onChange` event is binded to an `handleChange()` method.
+We need to update our `message` state property when this input changes. To do that, the `onChange` event is bound to an `handleChange()` method.
 Let's create in the `app` class:
 
 <<< ./snippets/App.js.snippet:9[js]
@@ -157,7 +157,7 @@ To launch this app, just type the following command:
 yarn start
 ```
 
-You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages, enjoy :)
+You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages.
 
 ## Going further
 

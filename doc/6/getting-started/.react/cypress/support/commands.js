@@ -24,31 +24,52 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-function reinitialisation() {
+async function reinitialisation() {
   const kuzzle = Cypress.env('kuzzle');
 
   // Clear collection
-  return cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_truncate`,
-    method: 'DELETE',
-  })
+  return cy
+    .request({
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_truncate`,
+      method: 'DELETE',
+    })
     .then(searchResponse => {
       cy.log(`Request : truncate ${kuzzle.collection} status : ${searchResponse.status}`);
-      cy.wait(500);
+      cy.wait(1000);
+      return cy
+        .request({
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          method: 'POST',
+        })
+    })
+    .then(refreshResponse => {
+      cy.log(`Request : refresh ; status : ${refreshResponse.status}`);
+      cy.wait(1000);
+      cy.log('REINIT END')
     });
 }
 
 Cypress.Commands.add('createMessage', (body) => {
   const kuzzle = Cypress.env('kuzzle');
-  return cy.request({
-    url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_create`,
-    method: 'POST',
-    body: body,
-  })
+  return cy
+    .request({
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_create`,
+      method: 'POST',
+      body: body,
+    })
     .its('body')
     .then(response => {
       cy.log(`Create status : ${response.status} {${body.text}}`);
       cy.wait(500);
+      return cy
+        .request({
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          method: 'POST',
+        })
+    })
+    .then(refreshResponse => {
+      cy.log(`Request : refresh ; status : ${refreshResponse.status}`);
+      cy.wait(1000);
     });
 });
 
