@@ -3,22 +3,19 @@ const
   should = require('should'),
   retry = require('retry');
 
-Given('I log in as {string}:{string}', async function (username, password) {
-  try {
-    this.jwt = await this.kuzzle.auth.login('local', {
-      username,
-      password
+Given('I log in as {string}:{string}', function (username, password) {
+  return this.kuzzle.auth.login('local', { username, password })
+    .then(jwt => {
+      this.jwt = jwt;
+    })
+    .catch(error => {
+      this.jwt = 'invalid';
+      this.error = error;
     });
-    this.error = null;
-  }
-  catch (error) {
-    this.jwt = 'invalid';
-    this.error = error;
-  }
 });
 
-When('I logout', async function () {
-  await this.kuzzle.auth.logout();
+When('I logout', function () {
+  return this.kuzzle.auth.logout();
 });
 
 When('I refresh the JWT', function (cb) {
@@ -27,11 +24,16 @@ When('I refresh the JWT', function (cb) {
   // we have to wait for at least 1s: if we ask Kuzzle to refresh a JWT that
   // has been generated during the same second, then the new JWT will be
   // identical to the one being refreshed
-  setTimeout(async () => {
-    const token = await this.kuzzle.auth.refreshToken();
-    this.jwt = token.jwt;
-    cb();
-  }, 1000);
+  setTimeout(
+    () => {
+      this.kuzzle.auth.refreshToken()
+        .then(token => {
+          this.jwt = token.jwt;
+          cb();
+        })
+        .catch(err => cb(err));
+    },
+    1000);
 });
 
 Then('the previous JWT is now invalid', function (cb) {
@@ -56,19 +58,23 @@ Then('the previous JWT is now invalid', function (cb) {
   });
 });
 
-Then(/^the JWT is (in)?valid$/, async function (not) {
-  const response = await this.kuzzle.auth.checkToken(this.jwt);
-
-  if (not) {
-    should(response.valid).be.false();
-  }
-  else {
-    should(response.valid).be.true();
-  }
+Then(/^the JWT is (in)?valid$/, function (not) {
+  return this.kuzzle.auth.checkToken(this.jwt)
+    .then(response => {
+      if (not) {
+        should(response.valid).be.false();
+      }
+      else {
+        should(response.valid).be.true();
+      }
+    });
 });
 
-Given('I get my rights', async function () {
-  this.rights = await this.kuzzle.auth.getMyRights();
+Given('I get my rights', function () {
+  return this.kuzzle.auth.getMyRights()
+    .then(rights => {
+      this.rights = rights;
+    });
 });
 
 Then('I have a vector with {int} rights', function (nbRights) {

@@ -14,10 +14,16 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
     this._routes = {};
 
+    this._timeout = options.timeout || 0;
+
     this.customRoutes = options.customRoutes || {};
 
-    for (const [controller, definition] of Object.entries(this.customRoutes)) {
-      for (const [action, route] of Object.entries(definition)) {
+    for (const controller of Object.keys(this.customRoutes)) {
+      const definition = this.customRoutes[controller];
+
+      for (const action of Object.keys(definition)) {
+        const route = definition[action];
+
         if (!(typeof route.url === 'string' && route.url.length > 0)) {
           throw new Error(
             `Incorrect URL for custom route ${controller}:${action}.`);
@@ -45,6 +51,14 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
   get connected () {
     return true;
+  }
+
+  get timeout () {
+    return this._timeout;
+  }
+
+  set timeout (timeout) {
+    this._timeout = timeout;
   }
 
   /**
@@ -230,7 +244,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
       return httpClient.request(url, method, {
         headers,
-        body: payload.body
+        body: payload.body,
+        timeout: this._timeout
       })
         .then(response => JSON.parse(response.body));
     }
@@ -240,6 +255,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       const
         xhr = new XMLHttpRequest(),
         url = `${this.protocol}://${this.host}:${this.port}${path}`;
+
+      xhr.timeout = this._timeout;
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 0) {
@@ -268,11 +285,14 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   }
 
   _constructRoutes (publicApi) {
-    const apiRoutes = Object.entries(publicApi)
+    const apiRoutes = Object.keys(publicApi)
+      .map(key => [key, publicApi[key]])
       .reduce((routes, [controller, definition]) => {
         routes[controller] = {};
 
-        for (const [action, { http }] of Object.entries(definition)) {
+        for (const action of Object.keys(definition)) {
+          const { http } = definition[action];
+
           if (http && http.length === 1) {
             routes[controller][action] = http[0];
           } else if (http && http.length > 1) {
@@ -283,8 +303,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
         return routes;
       }, {});
 
-    for (const [controller, definition] of Object.entries(this.customRoutes)) {
-      apiRoutes[controller] = definition;
+    for (const controller of Object.keys(this.customRoutes)) {
+      apiRoutes[controller] = this.customRoutes[controller];
     }
 
     return apiRoutes;

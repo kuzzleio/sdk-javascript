@@ -90,4 +90,9 @@ describe('Kuzzle getters', () => {
     kuzzle.protocol.sslConnection = 'foo-bar';
     should(kuzzle.sslConnection).be.equal('foo-bar');
   });
+
+  it('should get "tokenExpiredInterval" from private _tokenExpiredInterval', () => {
+    kuzzle._tokenExpiredInterval = 'foo-bar';
+    should(kuzzle._tokenExpiredInterval).eql('foo-bar');
+  });
 });

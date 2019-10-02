@@ -429,21 +429,16 @@ describe('Auth Controller', () => {
     });
 
     it('should set the authenticationToken property if parameter is a string', () => {
-      kuzzle.auth.authenticationToken = generateJwt();
+      kuzzle.auth.authenticationToken = jwt;
 
       should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
       should(kuzzle.auth.authenticationToken.encodedJwt).be.eql(jwt);
     });
 
     it('should throw if parameter is not a string', () => {
-      kuzzle.auth.authenticationToken = jwt;
-
       should(function() {
         kuzzle.auth.authenticationToken = 1234;
       }).throw();
-
-      should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
-      should(kuzzle.auth.authenticationToken.encodedJwt).be.eql(jwt);
     });
   });
 

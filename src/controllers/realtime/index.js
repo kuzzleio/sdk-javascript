@@ -2,7 +2,6 @@ const
   BaseController = require('../base'),
   Room = require('./room');
 
-const expirationThrottleDelay = 1000;
 
 class RealTimeController extends BaseController {
   /**
@@ -11,9 +10,8 @@ class RealTimeController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle, 'realtime');
 
-    this.lastExpirationTimestamp = 0;
-
     this.subscriptions = {};
+    this.subscriptionsOff = {};
   }
 
   count (roomId, options = {}) {
@@ -101,9 +99,46 @@ class RealTimeController extends BaseController {
       });
   }
 
+  // called on network error or disconnection
+  disconnected () {
+    for (const roomId of Object.keys(this.subscriptions)) {
+      for (const room of this.subscriptions[roomId]) {
+        room.removeListeners();
+
+        if (room.autoResubscribe) {
+          if (!this.subscriptionsOff[roomId]) {
+            this.subscriptionsOff[roomId] = [];
+          }
+          this.subscriptionsOff[roomId].push(room);
+        }
+      }
+
+      delete this.subscriptions[roomId];
+    }
+  }
+
   /**
-   * Removes all subscriptions, and emit a "tokenExpired" event
-   * (tries to prevent event duplication by throttling it)
+   * Called on kuzzle reconnection.
+   * Resubscribe to eligible disabled rooms.
+   */
+  reconnected () {
+    for (const roomId of Object.keys(this.subscriptionsOff)) {
+      for (const room of this.subscriptionsOff[roomId]) {
+        if (!this.subscriptions[roomId]) {
+          this.subscriptions[roomId] = [];
+        }
+        this.subscriptions[roomId].push(room);
+
+        room.subscribe()
+          .catch(() => this.kuzzle.emit('discarded', {request: room.request}));
+      }
+
+      delete this.subscriptionsOff[roomId];
+    }
+  }
+
+  /**
+   * Removes all subscriptions.
    */
   tokenExpired() {
     for (const roomId of Object.keys(this.subscriptions)) {
@@ -111,15 +146,9 @@ class RealTimeController extends BaseController {
     }
 
     this.subscriptions = {};
-    this.kuzzle.auth.authenticationToken = null;
-
-    const now = Date.now();
-    
-    if ((now - this.lastExpirationTimestamp) > expirationThrottleDelay) {
-      this.lastExpirationTimestamp = now;
-      this.kuzzle.emit('tokenExpired');
-    }
+    this.subscriptionsOff = {};
   }
+
 }
 
 module.exports = RealTimeController;
