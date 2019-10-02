@@ -12,7 +12,7 @@ jobs:
       name: Unit Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
-      node_js: 8
+      node_js: 6
 
       env:
         # Codecov token
@@ -43,7 +43,7 @@ jobs:
       name: Integration Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
-      node_js: 8
+      node_js: 6
 
       addons:
         apt:
@@ -69,7 +69,7 @@ jobs:
       name: Documentation Tests
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
       language: node_js
-      node_js: 8
+      node_js: 10
 
       before_script:
         - sudo apt-get install libgconf-2-4
@@ -158,7 +158,7 @@ jobs:
       if: tag IS present AND type != cron
       sudo: false
       language: node_js
-      node_js: 8
+      node_js: 6
 
       addons:
         apt:
@@ -191,7 +191,7 @@ jobs:
       if: type = push && branch =~ /^[0-9]+-dev$/
       sudo: false
       language: node_js
-      node_js: 8
+      node_js: 6
 
       addons:
         apt:
