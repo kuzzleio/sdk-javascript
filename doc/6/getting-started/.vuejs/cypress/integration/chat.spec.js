@@ -7,6 +7,7 @@ describe('test realtime chat', () => {
   it('should enter a nickname', function () {
     cy.fixture(`Elrond.json`).as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.get('[placeholder="Enter your message"]')
@@ -28,6 +29,7 @@ describe('test realtime chat', () => {
   it('should fetch and display some messages', function () {
     cy.fixture(`Legolas.json`).as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.get('[placeholder="Enter your nickname"]')
@@ -47,6 +49,7 @@ describe('test realtime chat', () => {
   it('should send a message', function () {
     cy.fixture(`Sam.json`).as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.get('[placeholder="Enter your nickname"]')
@@ -54,9 +57,9 @@ describe('test realtime chat', () => {
         cy.contains('Valid')
           .click();
         cy.get('[placeholder="Enter your message"]')
-        .type(this.fixt.body.value);
+          .type(this.fixt.body.value);
         cy.contains('Send')
-        .click();
+          .click();
         cy.get('.fromMe')
           .within(() => {
             cy.contains(this.fixt.body.value);
@@ -68,6 +71,7 @@ describe('test realtime chat', () => {
   it('should receive a message', function () {
     cy.fixture(`Sauron.json`).as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
+      .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
         cy.get('[placeholder="Enter your nickname"]')
