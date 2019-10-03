@@ -3,12 +3,14 @@ function reinitialisation() {
   // Clear collection
   return cy
     .request({
-      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_truncate`,
+      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}`,
       method: 'DELETE',
+      failOnStatusCode: false
     })
-    .then(searchResponse => {
-      cy.log(`Request : truncate ${kuzzle.collection} status : ${searchResponse.status}`);
-      cy.wait(500);
+    .then(deleteResponse => {
+      cy.log(`Request : delete ${kuzzle.index} status : ${deleteResponse.status}`);
+      cy.wait(2000);
+      // Create index
     });
 }
 
@@ -64,26 +66,31 @@ Cypress.Commands.add('initialisation', () => {
 
 Cypress.Commands.add('loadEnvironment', (env) => {
   const kuzzle = Cypress.env('kuzzle');
-  reinitialisation();
-  if (!env.messages) { return; }
-  return cy
-    .request({
-      url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_mCreate`,
-      method: 'POST',
-      body: { "documents": env.messages },
-    })
-    .its('body')
-    .then(response => {
-      cy.log(`mCreate status : ${response.status}`);
-      cy.wait(500);
-      return cy
-        .request({
-          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
-          method: 'POST',
-        })
-    })
-    .then((response) => {
-      cy.log(`refresh status : ${response.status}`);
-      cy.wait(500);
-    });
+  if (!env.messages) {
+    return reinitialisation();
+  } else {
+    return cy
+      .initialisation()
+      .then(() => {
+        return cy
+          .request({
+            url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_mCreate`,
+            method: 'POST',
+            body: { "documents": env.messages },
+          })
+      })
+      .then(response => {
+        cy.log(`mCreate status : ${response.status}`);
+        cy.wait(500);
+        return cy
+          .request({
+            url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+            method: 'POST',
+          })
+      })
+      .then((response) => {
+        cy.log(`refresh status : ${response.status}`);
+        cy.wait(500);
+      });
+  }
 });

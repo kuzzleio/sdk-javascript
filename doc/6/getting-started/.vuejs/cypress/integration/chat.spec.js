@@ -1,9 +1,5 @@
 describe('test realtime chat', () => {
 
-  before(() => {
-    cy.initialisation();
-  });
-
   it('should enter a nickname', function () {
     cy.fixture(`Elrond.json`).as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
@@ -78,8 +74,8 @@ describe('test realtime chat', () => {
           .type(this.fixt.username);
         cy.contains('Valid')
           .click();
+        cy.wait(2000)
         cy.createMessage(this.fixt.body);
-
         cy.get('.fromOthers')
           .within(() => {
             cy.contains(this.fixt.body.value);
