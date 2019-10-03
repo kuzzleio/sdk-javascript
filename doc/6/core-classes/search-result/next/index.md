@@ -50,7 +50,7 @@ To avoid too many duplicates, it is advised to provide a sort combination that w
 
 Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
 
-This method efficiently mitigates the costs of scroll searches, but returns less consistent results: it's a middle-ground, ideal for real-time search requests.
+This method efficiently mitigates the costs of scroll searches, but returns less consistent results: it's a middle ground, ideal for real-time search requests.
 
 ### Strategy: from / size
 
