@@ -1,69 +1,43 @@
-const suv = { category: 'suv' };
-
 try {
-  const requests = [];
+  const documents = [];
 
-  for (let i = 0; i < 10; i++) {
-    requests.push(kuzzle.document.create('nyc-open-data', 'yellow-taxi', suv));
+  for (let i = 0; i < 100; i++) {
+    documents.push({ _id: `suv_no${i}`, body: { category: 'suv' } });
   }
 
-  await Promise.all(requests);
+  await kuzzle.document.mCreate('nyc-open-data', 'yellow-taxi', documents, {
+    refresh: 'wait_for'
+  });
 
-  // Waits documents to be indexed
-  await kuzzle.index.refresh('nyc-open-data');
-
-  const searchOptions = {
-    from: 1,
-    size: 5
-  };
-
-  const results = await kuzzle.document.search(
+  let results = await kuzzle.document.search(
     'nyc-open-data',
     'yellow-taxi',
-    {
-      query: {
-        match: {
-          category: 'suv'
-        }
-      }
-    },
-    searchOptions
-  );
+    { query: { match: { category: 'suv' } } },
+    { from: 1, size: 5 });
 
-  const nextResults = await results.next();
+  // Fetch the matched items by advancing through the result pages
+  const matched = [];
 
-  console.log(`Successfully retrieved ${nextResults.fetched} documents`);
-  console.log(nextResults);
+  while (results) {
+    matched.push(...results.hits);
+    results = await results.next();
+  }
+
+  console.log(matched[0]);
   /*
-    {
-      "aggregations": undefined,
-      "hits": [
-        {
-          "_index": "nyc-open-data",
-          "_type": "yellow-taxi",
-          "_id": "AWgi6A1POQUM6ucJ3q06",
-          "_score": 0.046520017,
-          "_source": {
-            "category": "suv",
-            "_kuzzle_info": {
-              "author": "-1",
-              "createdAt": 1546773859655,
-              "updatedAt": null,
-              "updater": null,
-              "active": true,
-              "deletedAt": null
-            }
-          }
-        },
-        ...
-      ]
-    },
-    "total": 10,
-    "fetched": 10,
-    "scroll_id": undefined,
-    "from": 1,
-    "size": 5
+    { _id: 'suv_no1',
+      _score: 0.03390155,
+      _source:
+       { _kuzzle_info:
+          { active: true,
+            author: '-1',
+            updater: null,
+            updatedAt: null,
+            deletedAt: null,
+            createdAt: 1570093133057 },
+         category: 'suv' } }
   */
+  console.log(`Successfully retrieved ${matched.length} documents`);
 } catch (error) {
   console.error(error.message);
 }
