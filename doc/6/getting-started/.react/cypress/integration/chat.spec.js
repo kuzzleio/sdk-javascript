@@ -1,9 +1,9 @@
 describe('test realtime chat', () => {
 
-  before(() => {
-    cy.initialisation();
-  });
-  
+  // beforeEach(() => {
+  //   cy.initialisation();
+  // });
+
   it('should fetch and display some messages', function () {
     cy.fixture('Legolas.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
@@ -16,13 +16,14 @@ describe('test realtime chat', () => {
         }
       });
   });
-  
+
   it('should send a message', function () {
     cy.fixture('Sam.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
+        cy.wait(2000);
         cy.get('#message')
           .type(this.fixt.body.text);
         cy.contains('Envoyer')
@@ -30,14 +31,16 @@ describe('test realtime chat', () => {
         cy.contains(this.fixt.body.text);
       });
   });
-  
+
   it('should receive a message', function () {
     cy.fixture('Sauron.json').as('fixt')
       .then(() => cy.loadEnvironment(this.fixt))
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
+        cy.wait(2000);
         cy.createMessage(this.fixt.body);
+        cy.wait(2000)
         cy.contains(this.fixt.body.text);
       });
   });
