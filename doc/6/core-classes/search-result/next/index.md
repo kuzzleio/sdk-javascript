@@ -6,9 +6,9 @@ description: SearchResult next method
 order: 200
 ---
 
-# SearchResult
+# next
 
-Returns a new `SearchResult` object which contain the subsequent results of the search.
+Advances through the search results and returns the next page of items.
 
 ## Arguments
 
@@ -16,48 +16,49 @@ Returns a new `SearchResult` object which contain the subsequent results of the 
 next();
 ```
 
-## Behaviour of the next method
+## Resolve
 
-In order to be able to compute the next search page, some initial conditions must be met.
+Resolves to a `SearchResult` object, or to `null` if no more pages are available.
 
-Depending on the arguments given to the initial search, thhe `next` method will pick one of the following policies, by decreasing order of priority (i.e. a search including a `scroll`, `sort` and `size` will use the `scroll` policy).
+## Throw
 
-If no policy is applicable, the `next` method will throw an exception.
+This method throws an exception if:
 
-:::info
-When processing a large number of documents (i.e. more than 1000), it is advised to use a scroll cursor.
+- No pagination strategy can be applied (see below)
+- If invoking it would lead to more than 10 000 items being retrieved with the `from/size` strategy
 
-It is also the only method guaranteeing that all matching documents will be retrieved and no duplicates will be included.
-:::
+## Pagination strategies
 
-## Usage with scroll
+Depending on the arguments given to the initial search, the `next` method will pick one of the following strategies, by decreasing order of priority.
 
-**This is the preferred way to get some paginated results**.
+### Strategy: scroll cursor
 
-If the original search is given a `scroll` parameter, the `next` method will use a cursor to paginate results.
+If the original search query is given a `scroll` parameter, the `next` method uses a cursor to paginate results.
 
-The results that are returned from a scroll request reflect the state of the index at the time the initial `search` request was performed, like a snapshot in time.
+The results from a scroll request are frozen, and reflect the state of the index at the time the initial `search` request.  
+For that reason, this method is guaranteed to return consistent results, even if documents are updated or deleted in the database between two pages retrieval.
 
-As such, even if some documents are added or deleted from the database between two calls to `next`, the result is garanteed to include all items matching the query at the time the initial `search` was sent and to not get any duplicate between two search pages.
+This is the most consistent way to paginate results, however, this comes at a higher computing cost for the server.
 
 <<< ./snippets/scroll.js
 
-## Usage with sort / size
+### Strategy: sort / size
 
-If the initial search is given some `sort` and `size` parameters, the `next` method will retrieve the next items matching the sort.
+If the initial search contains `sort` and `size` parameters, the `next` method retrieves the next page of results following the sort order, the last item of the current page acting as a live cursor.
 
 To avoid too many duplicates, it is advised to provide a sort combination that will always identify one item only. The recommended way is to use the field `_uid` which is certain to contain one unique value for each document.
 
-Because this method does not freeze the research between two calls, if some updates are applied to the database between two calls, it is still possible to miss some documents and/or to get some duplicates between search pages.
+Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
 
-## Usage with from / size
+This method efficiently mitigates the costs of scroll searches, but returns less consistent results: it's a middle ground, ideal for real-time search requests.
 
-If the initial search is given some `from` and `size` parameters, the `next` method will increment the `from` parameter to retrieved the next results.
+### Strategy: from / size
 
-Because this method does not freeze the research between two calls, if some updates are applied to the database between two calls, it is possible to miss some documents and/or to get some duplicates between search pages.
+If the initial search contains `from` and `size` parameters, the `next` method retrieves the next page of result by incrementing the `from` offset.
 
-:::info
-It is not possible to retrieve more than 10000 items using this method. Above that limit, any call to `next` will throw an Exception.
-:::
+Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
+
+It's the fastest pagination method available, but also the less consistent, and it is not possible to retrieve more than 10000 items using it.  
+Above that limit, any call to `next` throws an Exception.
 
 <<< ./snippets/fromsize.js
