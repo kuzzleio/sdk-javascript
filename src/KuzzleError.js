@@ -6,6 +6,8 @@ class KuzzleError extends Error {
 
     this.status = apiError.status;
     this.stack = apiError.stack;
+    this.id = apiError.id;
+    this.code = apiError.code;
 
     // PartialError
     if (this.status === 206) {
