@@ -15,10 +15,6 @@ class RealTimeController extends BaseController {
   }
 
   count (roomId, options = {}) {
-    if (!roomId) {
-      throw new Error('Kuzzle.realtime.count: roomId is required');
-    }
-
     return this.query({
       action: 'count',
       body: {roomId}
@@ -27,16 +23,6 @@ class RealTimeController extends BaseController {
   }
 
   publish (index, collection, message, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.realtime.publish: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.realtime.publish: collection is required');
-    }
-    if (!message) {
-      throw new Error('Kuzzle.realtime.publish: message is required');
-    }
-
     const request = {
       index,
       collection,
@@ -49,19 +35,6 @@ class RealTimeController extends BaseController {
   }
 
   subscribe (index, collection, filters, callback, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.realtime.subscribe: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.realtime.subscribe: collection is required');
-    }
-    if (!filters) {
-      throw new Error('Kuzzle.realtime.subscribe: filters is required');
-    }
-    if (!callback || typeof callback !== 'function') {
-      throw new Error('Kuzzle.realtime.subscribe: a callback function is required');
-    }
-
     const room = new Room(this, index, collection, filters, callback, options);
 
     return room.subscribe()
@@ -75,10 +48,6 @@ class RealTimeController extends BaseController {
   }
 
   unsubscribe (roomId, options = {}) {
-    if (!roomId) {
-      throw new Error('Kuzzle.realtime.unsubscribe: roomId is required');
-    }
-
     const rooms = this.subscriptions[roomId];
 
     if (!rooms) {

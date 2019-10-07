@@ -27,12 +27,6 @@ describe('Realtime Controller', () => {
   });
 
   describe('#count', () => {
-    it('should throw an error if the "roomId" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.count(undefined, options);
-      }).throw('Kuzzle.realtime.count: roomId is required');
-    });
-
     it('should call realtime/count query with the roomId and return a Promise which resolves a number', () => {
       kuzzle.query.resolves({result: {roomId: 'roomId', count: 1234}});
 
@@ -52,24 +46,6 @@ describe('Realtime Controller', () => {
   });
 
   describe('#publish', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.publish(undefined, 'collection', {}, options);
-      }).throw('Kuzzle.realtime.publish: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.publish('index', undefined, {}, options);
-      }).throw('Kuzzle.realtime.publish: collection is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.publish('index', 'collection', undefined, options);
-      }).throw('Kuzzle.realtime.publish: message is required');
-    });
-
     it('should call realtime/publish query with the index, collection and body and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {published: true}});
 
@@ -123,36 +99,6 @@ describe('Realtime Controller', () => {
       const MockRealtimeController =
         mockrequire.reRequire('../../src/controllers/realtime/index');
       kuzzle.realtime = new MockRealtimeController(kuzzle);
-    });
-
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.subscribe(undefined, 'collection', {}, sinon.stub(), options);
-      }).throw('Kuzzle.realtime.subscribe: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.subscribe('index', undefined, {}, sinon.stub(), options);
-      }).throw('Kuzzle.realtime.subscribe: collection is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.subscribe('index', 'collection', undefined, sinon.stub(), options);
-      }).throw('Kuzzle.realtime.subscribe: filters is required');
-    });
-
-    it('should throw an error if the "callback" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.subscribe('index', 'collection', {}, undefined, options);
-      }).throw('Kuzzle.realtime.subscribe: a callback function is required');
-    });
-
-    it('should throw an error if the "callback" argument is not a function', () => {
-      should(function () {
-        kuzzle.realtime.subscribe('index', 'collection', {}, 'foobar', options);
-      }).throw('Kuzzle.realtime.subscribe: a callback function is required');
     });
 
     it('should create a Room object with the propataged arguments and bind subscribe() method to it', () => {
@@ -217,12 +163,6 @@ describe('Realtime Controller', () => {
       kuzzle.realtime.subscriptions.foo = [room3];
 
       kuzzle.query.resolves({result: roomId});
-    });
-
-    it('should throw an error if the "roomId" argument is not provided', () => {
-      should(function () {
-        kuzzle.realtime.unsubscribe(undefined, options);
-      }).throw('Kuzzle.realtime.unsubscribe: roomId is required');
     });
 
     it('should reject the promise if the room is not found', () => {

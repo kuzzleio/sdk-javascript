@@ -38,11 +38,11 @@ class AuthController extends BaseController {
   /**
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wish to verify his token
-   * 
-   * @param {object} request 
+   *
+   * @param {object} request
    */
   authenticateRequest (request) {
-    if (!this.authenticationToken
+    if ( !this.authenticationToken
       || (request.controller === 'auth'
       && (request.action === 'checkToken' || request.action === 'login'))
     ) {
@@ -178,10 +178,6 @@ class AuthController extends BaseController {
    * @returns {Promise|*|PromiseLike<T>|Promise<T>}
    */
   login (strategy, credentials = {}, expiresIn = null) {
-    if (typeof strategy !== 'string' || strategy === '') {
-      throw new Error('Kuzzle.auth.login: strategy is required');
-    }
-
     const request = {
       strategy,
       expiresIn,
