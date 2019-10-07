@@ -8,6 +8,6 @@ hooks:
   after: |
     curl -XDELETE kuzzle:7512/nyc-open-data
 template: default
-expected: Successfully retrieved 10 documents
+expected: Successfully retrieved 100 documents
 sdk: js
 version: 6

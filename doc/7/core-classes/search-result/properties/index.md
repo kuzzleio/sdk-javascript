@@ -10,11 +10,10 @@ order: 100
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `aggregations` | <pre>object</pre> | Search aggregations if any |
-| `hits` | <pre>object[]</pre> | Array containing the retrieved items for the current page |
-| `total` | <pre>number</pre> |  Total number of items matching the given query in Kuzzle database |
+| `aggregations` | <pre>object</pre> | Search aggregations (can be undefined) |
+| `hits` | <pre>object[]</pre> | Page results |
+| `total` | <pre>number</pre> |  Total number of items that _can_ be retrieved |
 | `fetched` | <pre>number</pre> | Number of retrieved items so far |
-| `scroll_id` | <pre>string</pre> | Scroll identifier if the search was given a `scroll` parameter |
 
 ### hits
 
