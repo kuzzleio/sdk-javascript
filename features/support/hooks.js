@@ -19,10 +19,6 @@ BeforeAll(function () {
   this.notifications = [];
 });
 
-AfterAll(function () {
-  // return clean();
-});
-
 function clean () {
   const kuzzle = _world.kuzzle;
 
