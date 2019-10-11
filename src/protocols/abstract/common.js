@@ -40,7 +40,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
   }
 
   get connected () {
-    return this.state === 'online';
+    return this.state === 'connected';
   }
 
   get pendingRequests () {
