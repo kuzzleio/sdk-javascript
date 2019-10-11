@@ -22,24 +22,6 @@ describe('Security Controller', () => {
   });
 
   describe('createCredentials', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createCredentials('strategy', undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createCredentials: _id is required');
-    });
-
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createCredentials(undefined, 'kuid', {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createCredentials: strategy is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createCredentials('strategy', 'kuid', undefined, options);
-      }).throw('Kuzzle.security.createCredentials: body is required');
-    });
-
     it('should call security/createCredentials query with the user credentials and return a Promise which resolves a json object', () => {
       const result = {
         username: 'foo',
@@ -65,18 +47,6 @@ describe('Security Controller', () => {
   });
 
   describe('createFirstAdmin', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createFirstAdmin(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createFirstAdmin: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createFirstAdmin('kuid', undefined, options);
-      }).throw('Kuzzle.security.createFirstAdmin: body is required');
-    });
-
     it('should call security/createFirstAdmin query with the first admin content and credentials and return a Promise which resolves the created user object', () => {
       kuzzle.query.resolves({
         result: {
@@ -133,18 +103,6 @@ describe('Security Controller', () => {
   });
 
   describe('createOrReplaceProfile', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createOrReplaceProfile(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createOrReplaceProfile: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createOrReplaceProfile('profileId', undefined, options);
-      }).throw('Kuzzle.security.createOrReplaceProfile: body is required');
-    });
-
     it('should call security/createOrReplaceProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
         result: {
@@ -207,18 +165,6 @@ describe('Security Controller', () => {
   });
 
   describe('createOrReplaceRole', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createOrReplaceRole(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createOrReplaceRole: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createOrReplaceRole('roleId', undefined, options);
-      }).throw('Kuzzle.security.createOrReplaceRole: body is required');
-    });
-
     it('should call security/createOrReplaceRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
         result: {
@@ -281,18 +227,6 @@ describe('Security Controller', () => {
   });
 
   describe('createProfile', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createProfile(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createProfile: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createProfile('profileId', undefined, options);
-      }).throw('Kuzzle.security.createProfile: body is required');
-    });
-
     it('should call security/createProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
         result: {
@@ -355,18 +289,6 @@ describe('Security Controller', () => {
   });
 
   describe('createRole', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createRole(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.createRole: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createRole('roleId', undefined, options);
-      }).throw('Kuzzle.security.createRole: body is required');
-    });
-
     it('should call security/createRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
         result: {
@@ -429,32 +351,6 @@ describe('Security Controller', () => {
   });
 
   describe('createUser', () => {
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.createUser('userId', undefined, options);
-      }).throw('Kuzzle.security.createUser: body is required');
-    });
-
-    it('should throw an error if "body.content" is not provided', () => {
-      const body = {
-        credentials: {
-          strategy: {foo: 'bar'}
-        }
-      };
-      should(function () {
-        kuzzle.security.createUser('userId', body, options);
-      }).throw('Kuzzle.security.createUser: body.content is required');
-    });
-
-    it('should throw an error if "body.credentials" is not provided', () => {
-      const body = {
-        content: {foo: 'bar'}
-      };
-      should(function () {
-        kuzzle.security.createUser('userId', body, options);
-      }).throw('Kuzzle.security.createUser: body.credentials is required');
-    });
-
     it('should call security/createUser query with the user content and credentials and return a Promise which resolves a User object', () => {
       const body = {
         content: {foo: 'bar'},
@@ -533,14 +429,6 @@ describe('Security Controller', () => {
   });
 
   describe('createRestrictedUser', () => {
-    it('should throw an error if "body.credentials" is not provided', () => {
-      const content = {foo: 'bar'};
-
-      should(function () {
-        kuzzle.security.createRestrictedUser(content);
-      }).throw('Kuzzle.security.createRestrictedUser: body.credentials is required');
-    });
-
     it('should call security/createRestrictedUser query with the user content and credentials and return a Promise which resolves a User object', () => {
       const body = {
         content: {foo: 'bar'},
@@ -619,18 +507,6 @@ describe('Security Controller', () => {
   });
 
   describe('deleteCredentials', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.deleteCredentials('strategy', undefined, options);
-      }).throw('Kuzzle.security.deleteCredentials: _id is required');
-    });
-
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.deleteCredentials(undefined, 'kuid', {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.deleteCredentials: strategy is required');
-    });
-
     it('should call security/deleteCredentials query and return a Promise which resolves an acknowledgement', () => {
       const result = {
         acknowledged: true
@@ -654,12 +530,6 @@ describe('Security Controller', () => {
   });
 
   describe('deleteProfile', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.deleteProfile(undefined, options);
-      }).throw('Kuzzle.security.deleteProfile: _id is required');
-    });
-
     it('should call security/deleteProfile query and return a Promise which resolves the deleted profile id', () => {
       const result = {
         _id: 'profileId'
@@ -682,12 +552,6 @@ describe('Security Controller', () => {
   });
 
   describe('deleteRole', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.deleteRole(undefined, options);
-      }).throw('Kuzzle.security.deleteRole: _id is required');
-    });
-
     it('should call security/deleteRole query and return a Promise which resolves the deleted role id', () => {
       const result = {
         _id: 'roleId'
@@ -710,12 +574,6 @@ describe('Security Controller', () => {
   });
 
   describe('deleteUser', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.deleteUser(undefined, options);
-      }).throw('Kuzzle.security.deleteUser: _id is required');
-    });
-
     it('should call security/deleteUser query and return a Promise which resolves the deleted user id', () => {
       const result = {
         _id: 'kuid'
@@ -760,12 +618,6 @@ describe('Security Controller', () => {
   });
 
   describe('getCredentialFields', () => {
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getCredentialFields(undefined, options);
-      }).throw('Kuzzle.security.getCredentialFields: strategy is required');
-    });
-
     it('should call security/getCredentialFields query and return a Promise which resolves the list of credendial fields', () => {
       const result = ['username', 'password'];
       kuzzle.query.resolves({result});
@@ -786,18 +638,6 @@ describe('Security Controller', () => {
   });
 
   describe('getCredentials', () => {
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getCredentials(undefined, 'kuid', options);
-      }).throw('Kuzzle.security.getCredentials: strategy is required');
-    });
-
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getCredentials('strategy', undefined, options);
-      }).throw('Kuzzle.security.getCredentials: _id is required');
-    });
-
     it('should call security/getCredentials query and return a Promise which resolves the user credentials', () => {
       const result = {
         username: 'foo',
@@ -822,18 +662,6 @@ describe('Security Controller', () => {
   });
 
   describe('getCredentialsById', () => {
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getCredentialsById(undefined, 'kuid', options);
-      }).throw('Kuzzle.security.getCredentialsById: strategy is required');
-    });
-
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getCredentialsById('strategy', undefined, options);
-      }).throw('Kuzzle.security.getCredentialsById: _id is required');
-    });
-
     it('should call security/getCredentialsById query and return a Promise which resolves the user credentials', () => {
       const result = {
         username: 'foo',
@@ -858,12 +686,6 @@ describe('Security Controller', () => {
   });
 
   describe('getProfile', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getProfile(undefined, options);
-      }).throw('Kuzzle.security.getProfile: _id is required');
-    });
-
     it('should call security/getProfile query with the profile id a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
         result: {
@@ -914,12 +736,6 @@ describe('Security Controller', () => {
   });
 
   describe('getProfileRights', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getProfileRights(undefined, options);
-      }).throw('Kuzzle.security.getProfileRights: _id is required');
-    });
-
     it('should call security/getProfileRights query with the profile id return a Promise which resolves the list of rights', () => {
       const result = {
         hits: [
@@ -945,12 +761,6 @@ describe('Security Controller', () => {
   });
 
   describe('getRole', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getRole(undefined, options);
-      }).throw('Kuzzle.security.getRole: _id is required');
-    });
-
     it('should call security/getRole query with the role id a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1001,12 +811,6 @@ describe('Security Controller', () => {
   });
 
   describe('getUser', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getUser(undefined, options);
-      }).throw('Kuzzle.security.getUser: _id is required');
-    });
-
     it('should call security/getUser query with the user id a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1058,12 +862,6 @@ describe('Security Controller', () => {
   });
 
   describe('getUserRights', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.getUserRights(undefined, options);
-      }).throw('Kuzzle.security.getUserRights: _id is required');
-    });
-
     it('should call security/getUserRights query with the user id return a Promise which resolves the list of rights', () => {
       const result = {
         hits: [
@@ -1089,18 +887,6 @@ describe('Security Controller', () => {
   });
 
   describe('hasCredentials', () => {
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.hasCredentials(undefined, 'kuid', options);
-      }).throw('Kuzzle.security.hasCredentials: strategy is required');
-    });
-
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.hasCredentials('strategy', undefined, options);
-      }).throw('Kuzzle.security.hasCredentials: _id is required');
-    });
-
     it('should call security/hasCredentials query and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
 
@@ -1121,18 +907,6 @@ describe('Security Controller', () => {
   });
 
   describe('mDeleteProfiles', () => {
-    it('should throw an error if the "ids" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.mDeleteProfiles(undefined, options);
-      }).throw('Kuzzle.security.mDeleteProfiles: ids must be an array');
-    });
-
-    it('should throw an error if the "ids" argument is not an array', () => {
-      should(function () {
-        kuzzle.security.mDeleteProfiles('profile1', options);
-      }).throw('Kuzzle.security.mDeleteProfiles: ids must be an array');
-    });
-
     it('should call security/mDeleteProfiles query and return a Promise which resolves the list of deleted profiles ids', () => {
       const result = ['profile1', 'profile2'];
       kuzzle.query.resolves({result});
@@ -1173,18 +947,6 @@ describe('Security Controller', () => {
   });
 
   describe('mDeleteRoles', () => {
-    it('should throw an error if the "ids" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.mDeleteRoles(undefined, options);
-      }).throw('Kuzzle.security.mDeleteRoles: ids must be an array');
-    });
-
-    it('should throw an error if the "ids" argument is not an array', () => {
-      should(function () {
-        kuzzle.security.mDeleteRoles('role1', options);
-      }).throw('Kuzzle.security.mDeleteRoles: ids must be an array');
-    });
-
     it('should call security/mDeleteRoles query and return a Promise which resolves the list of deleted roles ids', () => {
       const result = ['role1', 'role2'];
       kuzzle.query.resolves({result});
@@ -1225,18 +987,6 @@ describe('Security Controller', () => {
   });
 
   describe('mDeleteUsers', () => {
-    it('should throw an error if the "ids" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.mDeleteUsers(undefined, options);
-      }).throw('Kuzzle.security.mDeleteUsers: ids must be an array');
-    });
-
-    it('should throw an error if the "ids" argument is not an array', () => {
-      should(function () {
-        kuzzle.security.mDeleteUsers('user1', options);
-      }).throw('Kuzzle.security.mDeleteUsers: ids must be an array');
-    });
-
     it('should call security/mDeleteUsers query and return a Promise which resolves the list of deleted users ids', () => {
       const result = ['user1', 'user2'];
       kuzzle.query.resolves({result});
@@ -1277,18 +1027,6 @@ describe('Security Controller', () => {
   });
 
   describe('mGetProfiles', () => {
-    it('should throw an error if the "ids" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.mGetProfiles(undefined, options);
-      }).throw('Kuzzle.security.mGetProfiles: ids must be an array');
-    });
-
-    it('should throw an error if the "ids" argument is not an array', () => {
-      should(function () {
-        kuzzle.security.mGetProfiles('profile1', options);
-      }).throw('Kuzzle.security.mGetProfiles: ids must be an array');
-    });
-
     it('should call security/mGetProfiles query and return a Promise which resolves the list of profiles', () => {
       const result = {
         hits: [
@@ -1324,18 +1062,6 @@ describe('Security Controller', () => {
   });
 
   describe('mGetRoles', () => {
-    it('should throw an error if the "ids" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.mGetRoles(undefined, options);
-      }).throw('Kuzzle.security.mGetRoles: ids must be an array');
-    });
-
-    it('should throw an error if the "ids" argument is not an array', () => {
-      should(function () {
-        kuzzle.security.mGetRoles('role1', options);
-      }).throw('Kuzzle.security.mGetRoles: ids must be an array');
-    });
-
     it('should call security/mGetRoles query and return a Promise which resolves the list of roles', () => {
       const result = {
         hits: [
@@ -1371,18 +1097,6 @@ describe('Security Controller', () => {
   });
 
   describe('replaceUser', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.replaceUser(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.replaceUser: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.replaceUser('userId', undefined, options);
-      }).throw('Kuzzle.security.replaceUser: body is required');
-    });
-
     it('should call security/replaceUser query with the user content and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1640,24 +1354,6 @@ describe('Security Controller', () => {
   });
 
   describe('updateCredentials', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateCredentials('strategy', undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.updateCredentials: _id is required');
-    });
-
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateCredentials(undefined, 'kuid', {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.updateCredentials: strategy is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateCredentials('strategy', 'kuid', undefined, options);
-      }).throw('Kuzzle.security.updateCredentials: body is required');
-    });
-
     it('should call security/updateCredentials query with the user credentials and return a Promise which resolves a json object', () => {
       const result = {
         username: 'foo',
@@ -1683,18 +1379,6 @@ describe('Security Controller', () => {
   });
 
   describe('updateProfile', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateProfile(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.updateProfile: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateProfile('profileId', undefined, options);
-      }).throw('Kuzzle.security.updateProfile: body is required');
-    });
-
     it('should call security/updateProfile query with the profile content and return a Promise which resolves a Profile object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1776,18 +1460,6 @@ describe('Security Controller', () => {
   });
 
   describe('updateRole', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateRole(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.updateRole: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateRole('roleId', undefined, options);
-      }).throw('Kuzzle.security.updateRole: body is required');
-    });
-
     it('should call security/updateRole query with the role content and return a Promise which resolves a Role object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1869,18 +1541,6 @@ describe('Security Controller', () => {
   });
 
   describe('updateUser', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateUser(undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.updateUser: _id is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.updateUser('userId', undefined, options);
-      }).throw('Kuzzle.security.updateUser: body is required');
-    });
-
     it('should call security/updateUser query with the user content to update and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
         result: {
@@ -1964,24 +1624,6 @@ describe('Security Controller', () => {
   });
 
   describe('validateCredentials', () => {
-    it('should throw an error if the "_id" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.validateCredentials('strategy', undefined, {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.validateCredentials: _id is required');
-    });
-
-    it('should throw an error if the "strategy" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.validateCredentials(undefined, 'kuid', {foo: 'bar'}, options);
-      }).throw('Kuzzle.security.validateCredentials: strategy is required');
-    });
-
-    it('should throw an error if the "body" argument is not provided', () => {
-      should(function () {
-        kuzzle.security.validateCredentials('strategy', 'kuid', undefined, options);
-      }).throw('Kuzzle.security.validateCredentials: body is required');
-    });
-
     it('should call security/validateCredentials query with the user credentials and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
 

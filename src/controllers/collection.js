@@ -11,31 +11,17 @@ class CollectionController extends BaseController {
     super(kuzzle, 'collection');
   }
 
-  create (index, collection, body = {}, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.create: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.create: collection is required');
-    }
-
+  create (index, collection, mappings = {}, options = {}) {
     return this.query({
       index,
       collection,
-      body,
+      body: mappings,
       action: 'create'
     }, options)
       .then(response => response.result);
   }
 
   deleteSpecifications (index, collection, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.deleteSpecifications: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.deleteSpecifications: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -45,13 +31,6 @@ class CollectionController extends BaseController {
   }
 
   exists (index, collection, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.exists: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.exists: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -61,13 +40,6 @@ class CollectionController extends BaseController {
   }
 
   getMapping (index, collection, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.getMapping: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.getMapping: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -77,13 +49,6 @@ class CollectionController extends BaseController {
   }
 
   getSpecifications (index, collection, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.getSpecifications: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.getSpecifications: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -93,10 +58,6 @@ class CollectionController extends BaseController {
   }
 
   list (index, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.list: index is required');
-    }
-
     const request = {
       index,
       action: 'list',
@@ -115,8 +76,10 @@ class CollectionController extends BaseController {
       body,
       action: 'searchSpecifications'
     };
+
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
+
       delete options[opt];
     }
 
@@ -125,13 +88,6 @@ class CollectionController extends BaseController {
   }
 
   truncate (index, collection, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.truncate: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.truncate: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -142,13 +98,6 @@ class CollectionController extends BaseController {
   }
 
   updateMapping (index, collection, body, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.updateMapping: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.updateMapping: collection is required');
-    }
-
     return this.query({
       index,
       collection,
@@ -159,16 +108,6 @@ class CollectionController extends BaseController {
   }
 
   updateSpecifications (index, collection, specifications, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.updateSpecifications: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.updateSpecifications: collection is required');
-    }
-    if (!specifications) {
-      throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
-    }
-
     const body = {
       [index]: {
         [collection]: specifications
@@ -183,16 +122,6 @@ class CollectionController extends BaseController {
   }
 
   validateSpecifications (index, collection, specifications, options = {}) {
-    if (!index) {
-      throw new Error('Kuzzle.collection.validateSpecifications: index is required');
-    }
-    if (!collection) {
-      throw new Error('Kuzzle.collection.validateSpecifications: collection is required');
-    }
-    if (!specifications) {
-      throw new Error('Kuzzle.collection.updateSpecifications: specifications are required');
-    }
-
     const body = {
       [index]: {
         [collection]: specifications

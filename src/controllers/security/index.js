@@ -16,16 +16,6 @@ class SecurityController extends BaseController {
   }
 
   createCredentials (strategy, _id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createCredentials: _id is required');
-    }
-    if (!strategy) {
-      throw new Error('Kuzzle.security.createCredentials: strategy is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createCredentials: body is required');
-    }
-
     return this.query({
       _id,
       strategy,
@@ -36,13 +26,6 @@ class SecurityController extends BaseController {
   }
 
   createFirstAdmin (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createFirstAdmin: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createFirstAdmin: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -56,13 +39,6 @@ class SecurityController extends BaseController {
   }
 
   createOrReplaceProfile (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createOrReplaceProfile: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createOrReplaceProfile: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -76,13 +52,6 @@ class SecurityController extends BaseController {
   }
 
   createOrReplaceRole (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createOrReplaceRole: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createOrReplaceRole: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -96,13 +65,6 @@ class SecurityController extends BaseController {
   }
 
   createProfile (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createProfile: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createProfile: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -116,9 +78,6 @@ class SecurityController extends BaseController {
   }
 
   createRestrictedUser (body, _id = null, options = {}) {
-    if (!body.credentials) {
-      throw new Error('Kuzzle.security.createRestrictedUser: body.credentials is required');
-    }
     if (!body.content) {
       body.content = {};
     }
@@ -136,13 +95,6 @@ class SecurityController extends BaseController {
   }
 
   createRole (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.createRole: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.createRole: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -156,16 +108,6 @@ class SecurityController extends BaseController {
   }
 
   createUser (_id, body, options = {}) {
-    if (!body) {
-      throw new Error('Kuzzle.security.createUser: body is required');
-    }
-    if (!body.content) {
-      throw new Error('Kuzzle.security.createUser: body.content is required');
-    }
-    if (!body.credentials) {
-      throw new Error('Kuzzle.security.createUser: body.credentials is required');
-    }
-
     const request = {
       _id,
       body,
@@ -179,13 +121,6 @@ class SecurityController extends BaseController {
   }
 
   deleteCredentials (strategy, _id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.deleteCredentials: _id is required');
-    }
-    if (!strategy) {
-      throw new Error('Kuzzle.security.deleteCredentials: strategy is required');
-    }
-
     return this.query({
       strategy,
       _id,
@@ -195,10 +130,6 @@ class SecurityController extends BaseController {
   }
 
   deleteProfile (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.deleteProfile: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'deleteProfile'
@@ -207,10 +138,6 @@ class SecurityController extends BaseController {
   }
 
   deleteRole (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.deleteRole: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'deleteRole'
@@ -219,10 +146,6 @@ class SecurityController extends BaseController {
   }
 
   deleteUser (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.deleteUser: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'deleteUser'
@@ -238,10 +161,6 @@ class SecurityController extends BaseController {
   }
 
   getCredentialFields (strategy, options = {}) {
-    if (!strategy) {
-      throw new Error('Kuzzle.security.getCredentialFields: strategy is required');
-    }
-
     return this.query({
       strategy,
       action: 'getCredentialFields'
@@ -250,13 +169,6 @@ class SecurityController extends BaseController {
   }
 
   getCredentials (strategy, _id, options = {}) {
-    if (!strategy) {
-      throw new Error('Kuzzle.security.getCredentials: strategy is required');
-    }
-    if (!_id) {
-      throw new Error('Kuzzle.security.getCredentials: _id is required');
-    }
-
     return this.query({
       strategy,
       _id,
@@ -266,13 +178,6 @@ class SecurityController extends BaseController {
   }
 
   getCredentialsById (strategy, _id, options = {}) {
-    if (!strategy) {
-      throw new Error('Kuzzle.security.getCredentialsById: strategy is required');
-    }
-    if (!_id) {
-      throw new Error('Kuzzle.security.getCredentialsById: _id is required');
-    }
-
     return this.query({
       strategy,
       _id,
@@ -282,10 +187,6 @@ class SecurityController extends BaseController {
   }
 
   getProfile (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.getProfile: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'getProfile'
@@ -301,10 +202,6 @@ class SecurityController extends BaseController {
   }
 
   getProfileRights (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.getProfileRights: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'getProfileRights'
@@ -313,10 +210,6 @@ class SecurityController extends BaseController {
   }
 
   getRole (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.getRole: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'getRole'
@@ -332,10 +225,6 @@ class SecurityController extends BaseController {
   }
 
   getUser (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.getUser: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'getUser'
@@ -351,10 +240,6 @@ class SecurityController extends BaseController {
   }
 
   getUserRights (_id, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.getUserRights: _id is required');
-    }
-
     return this.query({
       _id,
       action: 'getUserRights'
@@ -363,13 +248,6 @@ class SecurityController extends BaseController {
   }
 
   hasCredentials (strategy, _id, options = {}) {
-    if (!strategy) {
-      throw new Error('Kuzzle.security.hasCredentials: strategy is required');
-    }
-    if (!_id) {
-      throw new Error('Kuzzle.security.hasCredentials: _id is required');
-    }
-
     return this.query({
       strategy,
       _id,
@@ -379,10 +257,6 @@ class SecurityController extends BaseController {
   }
 
   mDeleteProfiles (ids, options = {}) {
-    if (!Array.isArray(ids)) {
-      throw new Error('Kuzzle.security.mDeleteProfiles: ids must be an array');
-    }
-
     const request = {
       action: 'mDeleteProfiles',
       body: {ids},
@@ -395,10 +269,6 @@ class SecurityController extends BaseController {
   }
 
   mDeleteRoles (ids, options = {}) {
-    if (!Array.isArray(ids)) {
-      throw new Error('Kuzzle.security.mDeleteRoles: ids must be an array');
-    }
-
     const request = {
       action: 'mDeleteRoles',
       body: {ids},
@@ -411,10 +281,6 @@ class SecurityController extends BaseController {
   }
 
   mDeleteUsers (ids, options = {}) {
-    if (!Array.isArray(ids)) {
-      throw new Error('Kuzzle.security.mDeleteUsers: ids must be an array');
-    }
-
     const request = {
       action: 'mDeleteUsers',
       body: {ids},
@@ -427,10 +293,6 @@ class SecurityController extends BaseController {
   }
 
   mGetProfiles (ids, options = {}) {
-    if (!Array.isArray(ids)) {
-      throw new Error('Kuzzle.security.mGetProfiles: ids must be an array');
-    }
-
     return this.query({
       action: 'mGetProfiles',
       body: {ids}
@@ -439,10 +301,6 @@ class SecurityController extends BaseController {
   }
 
   mGetRoles (ids, options = {}) {
-    if (!Array.isArray(ids)) {
-      throw new Error('Kuzzle.security.mGetRoles: ids must be an array');
-    }
-
     return this.query({
       action: 'mGetRoles',
       body: {ids}
@@ -451,13 +309,6 @@ class SecurityController extends BaseController {
   }
 
   replaceUser (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.replaceUser: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.replaceUser: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -513,16 +364,6 @@ class SecurityController extends BaseController {
   }
 
   updateCredentials (strategy, _id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.updateCredentials: _id is required');
-    }
-    if (!strategy) {
-      throw new Error('Kuzzle.security.updateCredentials: strategy is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.updateCredentials: body is required');
-    }
-
     return this.query({
       strategy,
       _id,
@@ -533,13 +374,6 @@ class SecurityController extends BaseController {
   }
 
   updateProfile (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.updateProfile: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.updateProfile: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -561,13 +395,6 @@ class SecurityController extends BaseController {
   }
 
   updateRole (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.updateRole: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.updateRole: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -589,13 +416,6 @@ class SecurityController extends BaseController {
   }
 
   updateUser (_id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.updateUser: _id is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.updateUser: body is required');
-    }
-
     const request = {
       _id,
       body,
@@ -617,16 +437,6 @@ class SecurityController extends BaseController {
   }
 
   validateCredentials (strategy, _id, body, options = {}) {
-    if (!_id) {
-      throw new Error('Kuzzle.security.validateCredentials: _id is required');
-    }
-    if (!strategy) {
-      throw new Error('Kuzzle.security.validateCredentials: strategy is required');
-    }
-    if (!body) {
-      throw new Error('Kuzzle.security.validateCredentials: body is required');
-    }
-
     return this.query({
       _id,
       strategy,

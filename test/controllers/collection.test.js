@@ -16,18 +16,6 @@ describe('Collection Controller', () => {
   });
 
   describe('create', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.create(null, 'collection', null, options);
-      }).throw('Kuzzle.collection.create: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.create('index', null, null, options);
-      }).throw('Kuzzle.collection.create: collection is required');
-    });
-
     it('should call collection/create query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
@@ -67,19 +55,7 @@ describe('Collection Controller', () => {
     });
   });
 
-  describe('deleteSpecificationss', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.deleteSpecifications(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.deleteSpecifications: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.deleteSpecifications('index', undefined, options);
-      }).throw('Kuzzle.collection.deleteSpecifications: collection is required');
-    });
-
+  describe('deleteSpecifications', () => {
     it('should call collection/deleteSpecifications query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
@@ -100,18 +76,6 @@ describe('Collection Controller', () => {
   });
 
   describe('exists', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.exists(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.exists: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.exists('index', undefined, options);
-      }).throw('Kuzzle.collection.exists: collection is required');
-    });
-
     it('should call collection/exists query names and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
 
@@ -132,18 +96,6 @@ describe('Collection Controller', () => {
   });
 
   describe('getMapping', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.getMapping(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.getMapping: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.getMapping('index', undefined, options);
-      }).throw('Kuzzle.collection.getMapping: collection is required');
-    });
-
     it('should call collection/getMapping query and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
         result: {
@@ -188,18 +140,6 @@ describe('Collection Controller', () => {
   });
 
   describe('getSpecifications', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.getSpecifications(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.getSpecifications: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.getSpecifications('index', undefined, options);
-      }).throw('Kuzzle.collection.getSpecifications: collection is required');
-    });
-
     it('should call collection/getSpecifications query and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
         result: {
@@ -240,12 +180,6 @@ describe('Collection Controller', () => {
   });
 
   describe('list', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.list(undefined, options);
-      }).throw('Kuzzle.collection.list: index is required');
-    });
-
     it('should call collection/list query and return a Promise which resolves collection list', () => {
       kuzzle.query.resolves({
         result: {
@@ -330,18 +264,6 @@ describe('Collection Controller', () => {
   });
 
   describe('truncate', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.truncate(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.truncate: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.truncate('index', undefined, options);
-      }).throw('Kuzzle.collection.truncate: collection is required');
-    });
-
     it('should call collection/truncate query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
@@ -363,18 +285,6 @@ describe('Collection Controller', () => {
   });
 
   describe('updateMapping', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.updateMapping(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.updateMapping: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.updateMapping('index', undefined, options);
-      }).throw('Kuzzle.collection.updateMapping: collection is required');
-    });
-
     it('should call collection/updateMapping query with the new mapping and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({result: {foo: 'bar'}});
 
@@ -397,18 +307,6 @@ describe('Collection Controller', () => {
   });
 
   describe('updateSpecifications', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.updateSpecifications(undefined, 'collection', options);
-      }).throw('Kuzzle.collection.updateSpecifications: index is required');
-    });
-
-    it('should throw an error if the "collection" argument is not provided', () => {
-      should(function () {
-        kuzzle.collection.updateSpecifications('index', undefined, options);
-      }).throw('Kuzzle.collection.updateSpecifications: collection is required');
-    });
-
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({result: { index: { collection: {foo: 'bar'}}}});
 
