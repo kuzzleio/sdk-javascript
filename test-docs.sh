@@ -16,12 +16,17 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:7512); d
   sleep 5
 done
 
-cd doc/6/getting-started/.vuejs
+cd ${here}/doc/6/getting-started/.react
+yarn install
+SKIP_PREFLIGHT_CHECK=true yarn start &
+npm run test
+
+cd ${here}/doc/6/getting-started/.vuejs
 npm ci
 npm run serve-standalone &
 npm run test
 
-cd -
+cd ${here}
 docker-compose -f .ci/doc/docker-compose.yml down
 
 exit $EXIT
