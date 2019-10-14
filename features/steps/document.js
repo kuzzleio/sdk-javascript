@@ -375,10 +375,9 @@ Then(/^the document should (not )?exist$/, function (not) {
 });
 
 Then('the documents should be retrieved', function () {
-  should(this.content.hits.length).eql(this.ids.length);
-  should(this.content.total).eql(this.ids.length);
+  should(this.content.successes.length).eql(this.ids.length);
 
-  const found = this.content.hits.map(r => r._id);
+  const found = this.content.successes.map(r => r._id);
 
   for (const id of this.ids) {
     should(found.indexOf(id)).be.greaterThan(-1);
