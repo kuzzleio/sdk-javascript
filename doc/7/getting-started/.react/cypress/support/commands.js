@@ -53,7 +53,7 @@ Cypress.Commands.add('createMessage', (body) => {
       cy.wait(500);
       return cy
         .request({
-          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_refresh`,
           method: 'POST',
         });
     })
@@ -115,7 +115,7 @@ Cypress.Commands.add('loadEnvironment', (env) => {
         cy.log(`mCreate status : ${response.status}`);
         cy.wait(500);
         return cy.request({
-          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/_refresh`,
+          url: `http://${kuzzle.host}:${kuzzle.port}/${kuzzle.index}/${kuzzle.collection}/_refresh`,
           method: 'POST',
         });
       })

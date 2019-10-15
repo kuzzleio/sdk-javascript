@@ -376,6 +376,7 @@ Then(/^the document should (not )?exist$/, function (not) {
 
 Then('the documents should be retrieved', function () {
   should(this.content.successes.length).eql(this.ids.length);
+  should(this.content.errors).be.empty();
 
   const found = this.content.successes.map(r => r._id);
 
