@@ -29,6 +29,3 @@ services:
       - node.name=alyx
       - cluster.name=kuzzle
       - discovery.type=single-node
-
-volumes:
-  snippets:

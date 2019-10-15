@@ -425,8 +425,8 @@ class Kuzzle extends KuzzleEventEmitter {
         request.volatile[item] = this.volatile[item];
       }
     }
-    request.volatile.sdkInstanceId = this.protocol.id;
-    request.volatile.sdkName = this.sdkName;
+    request.volatile.sdkInstanceId = request.volatile.sdkInstanceId || this.protocol.id;
+    request.volatile.sdkName = request.volatile.sdkName || this.sdkName;
 
     this.auth.authenticateRequest(request);
 
