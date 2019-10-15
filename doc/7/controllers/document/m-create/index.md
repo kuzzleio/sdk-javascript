@@ -37,7 +37,19 @@ Returns an object containing 2 arrays: `successes` and `errors`
 
 Each created document is an object of the `successes` array with the following properties:
 
+| Name      | Type              | Description                                            |
+| --------- | ----------------- | ------------------------------------------------------ |
+| `_id`      | <pre>string</pre> | Document ID                     |
+| `_version` | <pre>number</pre> | Version of the document in the persistent data storage |
+| `_source`  | <pre>object</pre> | Document content                                       |
 
+Each errored document is an object of the `errors` array with the following properties:
+
+| Name      | Type              | Description                                            |
+| --------- | ----------------- | ------------------------------------------------------ |
+| `document`  | <pre>object</pre> | Document that cause the error                                       |
+| `status` | <pre>number</pre> | HTTP error status |
+| `reason`  | <pre>string</pre> | Human readable reason |
 
 ## Usage
 
