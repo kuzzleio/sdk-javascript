@@ -133,7 +133,7 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
     });
 
-    it('should not override "sdkInstanceId" and "sdkName" volatile data', () => {
+    it('should allow to override "sdkInstanceId" and "sdkName" volatile data', () => {
       kuzzle.protocol.id = 'kuz-sdk-instance-id';
       kuzzle.sdkName = 'kuz-sdk-version';
 
@@ -146,8 +146,8 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query).be.calledOnce();
       should(kuzzle.protocol.query).be.calledWithMatch({
         volatile: {
-          sdkInstanceId: 'kuz-sdk-instance-id',
-          sdkName: 'kuz-sdk-version'
+          sdkInstanceId: 'req-sdk-instance-id',
+          sdkName: 'req-sdk-version'
         }
       });
     });
