@@ -71,7 +71,7 @@ class RTWrapper extends KuzzleAbstractProtocol {
           'online',
           () => {
             this.retrying = false;
-            this.connect(this.host).catch(err => this.clientNetworkError(err));
+            this.connect().catch(err => this.clientNetworkError(err));
           },
           { once: true });
         return;
