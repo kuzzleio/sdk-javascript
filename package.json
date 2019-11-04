@@ -54,6 +54,7 @@
     "eslint": "^5.16.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.2.1",
+    "lolex": "^5.1.1",
     "mocha": "6.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^14.1.1",

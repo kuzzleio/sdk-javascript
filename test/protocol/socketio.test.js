@@ -1,11 +1,8 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  SocketIO = require('../../src/protocols/socketio');
-
-/**
- * @global window
- */
+  SocketIO = require('../../src/protocols/socketio'),
+  windowMock = require('../mocks/window.mock');
 
 describe('SocketIO networking module', () => {
   let
@@ -15,6 +12,7 @@ describe('SocketIO networking module', () => {
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
+
     socketStub = {
       events: {},
       eventOnce: {},
@@ -74,11 +72,13 @@ describe('SocketIO networking module', () => {
     });
     socketIO.socket = socketStub;
 
-    window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
+    windowMock.inject();
+    window.io = sinon.stub().returns(socketStub);
   });
 
   afterEach(() => {
     clock.restore();
+    windowMock.restore();
   });
 
   it('should expose an unique identifier', () => {
@@ -225,8 +225,6 @@ describe('SocketIO exposed methods', () => {
 
     socketIO = new SocketIO('address');
     socketIO.socket = socketStub;
-
-    window = {io: sinon.stub().returns(socketStub)}; // eslint-disable-line
   });
 
   it('should be able to listen to an event just once', () => {
