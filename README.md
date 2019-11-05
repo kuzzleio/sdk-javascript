@@ -57,6 +57,14 @@ Our teams will be able to meet your needs in terms of expertise and multi-techno
 
 ## Usage
 
+## Compatibility matrice
+
+| Kuzzle Version | SDK Version    |
+| -------------- | -------------- |
+| 1.x.x          | 5.x.x          | 
+| 1.x.x          | 6.x.x          | 
+| 2.x.x          | 7.x.x          | 
+
 ### Installation
 
 This SDK can be used either in NodeJS or in a browser.
@@ -140,4 +148,3 @@ try {
   console.error(error);
 }
 ```
-
