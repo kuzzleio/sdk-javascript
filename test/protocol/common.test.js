@@ -18,6 +18,18 @@ describe('Common Protocol', () => {
     sendSpy = sinon.spy(protocol, 'send');
   });
 
+  describe('#connected', () => {
+    it('should return true if the protocol state is "connected"', () => {
+      protocol.state = 'connected';
+
+      should(protocol.connected).be.True();
+
+      protocol.state = 'disconnected';
+
+      should(protocol.connected).be.False();
+    });
+  });
+
   describe('#query', () => {
 
     beforeEach(() => {
