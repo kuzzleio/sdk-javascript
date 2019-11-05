@@ -1,8 +1,10 @@
 const
   should = require('should'),
   sinon = require('sinon'),
+  lolex = require('lolex'),
   NodeWS = require('ws'),
-  WS = require('../../src/protocols/websocket');
+  WS = require('../../src/protocols/websocket'),
+  windowMock = require('../mocks/window.mock');
 
 describe('WebSocket networking module', () => {
   let
@@ -12,13 +14,13 @@ describe('WebSocket networking module', () => {
     clientStub;
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers();
+    clock = lolex.install();
     clientStub = {
       send: sinon.stub(),
       close: sinon.stub()
     };
 
-    window = 'foobar'; // eslint-disable-line
+    windowMock.inject();
     WebSocket = function (...args) { // eslint-disable-line
       wsargs = args;
       return clientStub;
@@ -32,9 +34,9 @@ describe('WebSocket networking module', () => {
   });
 
   afterEach(() => {
-    clock.restore();
+    clock.uninstall();
     WebSocket = undefined; // eslint-disable-line
-    window = undefined;    // eslint-disable-line
+    windowMock.restore();
   });
 
   it('should expose an unique identifier', () => {
@@ -154,6 +156,59 @@ describe('WebSocket networking module', () => {
     should(websocket.connect).not.be.called();
 
     return should(promise).be.rejectedWith('foobar');
+  });
+
+  it('should stop reconnecting if the browser goes offline', () => {
+    const cb = sinon.stub();
+
+    websocket.retrying = false;
+    websocket.addListener('networkError', cb);
+    should(websocket.listeners('networkError').length).be.eql(1);
+
+    websocket.connect();
+    websocket.connect = sinon.stub().rejects();
+    clientStub.onopen();
+    clientStub.onerror();
+
+    should(websocket.retrying).be.true();
+    should(cb).be.calledOnce();
+    should(websocket.connect).not.be.called();
+
+    window.navigator.onLine = false;
+
+    return clock.tickAsync(100)
+      .then(() => {
+        should(websocket.retrying).be.true();
+        should(cb).be.calledTwice();
+        should(websocket.connect).be.calledOnce();
+
+        should(window.addEventListener).calledWith(
+          'online',
+          sinon.match.func,
+          { once: true });
+
+        return clock.tickAsync(100);
+      })
+      .then(() => {
+        // the important bit is there: cb hasn't been called since the last
+        // tick because the SDK does not try to connect if the browser is
+        // marked offline
+        should(cb).be.calledTwice();
+
+        should(websocket.retrying).be.true();
+        should(websocket.connect).be.calledOnce();
+
+        window.emit('online');
+        return clock.tickAsync(100);
+      })
+      .then(() => {
+        // And it started retrying to connect again now that the browser is
+        // "online"
+        should(cb).be.calledThrice();
+
+        should(websocket.retrying).be.true();
+        should(websocket.connect).be.calledTwice();
+      });
   });
 
   it('should call listeners on a "disconnect" event', () => {
@@ -371,7 +426,7 @@ describe('WebSocket networking module', () => {
 
     it('should fallback to the ws module if there is no global WebSocket API', () => {
       WebSocket = undefined; // eslint-disable-line
-      window = undefined;    // eslint-disable-line
+      windowMock.restore();
 
       const client = new WS('foobar');
 
@@ -391,7 +446,7 @@ describe('WebSocket networking module', () => {
 
     it('should initialize pass allowed options to the ws ctor when using it', () => {
       WebSocket = undefined; // eslint-disable-line
-      window = undefined;    // eslint-disable-line
+      windowMock.restore();
 
       let client = new WS('foobar');
 
@@ -413,7 +468,7 @@ describe('WebSocket networking module', () => {
 
     it('should throw if invalid options are provided', () => {
       WebSocket = undefined; // eslint-disable-line
-      window = undefined;    // eslint-disable-line
+      windowMock.restore();
 
       const invalidHeaders = ['foo', 'false', 'true', 123, []];
 

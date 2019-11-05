@@ -10,10 +10,6 @@ class IndexController extends BaseController {
   }
 
   create (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.create: index is required');
-    }
-
     return this.query({
       index,
       action : 'create'
@@ -22,10 +18,6 @@ class IndexController extends BaseController {
   }
 
   delete (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.delete: index is required');
-    }
-
     return this.query({
       index,
       action : 'delete'
@@ -34,10 +26,6 @@ class IndexController extends BaseController {
   }
 
   exists (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.exists: index is required');
-    }
-
     return this.query({
       index,
       action : 'exists'
@@ -46,10 +34,6 @@ class IndexController extends BaseController {
   }
 
   getAutoRefresh (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.getAutoRefresh: index is required');
-    }
-
     return this.query({
       index,
       action: 'getAutoRefresh'
@@ -65,10 +49,6 @@ class IndexController extends BaseController {
   }
 
   mDelete (indexes, options) {
-    if (!Array.isArray(indexes)) {
-      throw new Error('Kuzzle.index.mDelete: indexes must be an array');
-    }
-
     return this.query({
       action: 'mDelete',
       body: {
@@ -79,10 +59,6 @@ class IndexController extends BaseController {
   }
 
   refresh (index, options) {
-    if (!index || index === '') {
-      throw new Error('Kuzzle.index.refresh: index is required');
-    }
-
     return this.query({
       index,
       action: 'refresh'
@@ -98,14 +74,6 @@ class IndexController extends BaseController {
   }
 
   setAutoRefresh (index, autoRefresh, options) {
-    if (!index || index === '') {
-      throw new Error('Kuzzle.index.setAutoRefresh: index is required');
-    }
-
-    if (typeof autoRefresh !== 'boolean') {
-      throw new Error('Kuzzle.index.setAutoRefresh: autoRefresh must be a boolean');
-    }
-
     return this.query({
       index,
       action: 'setAutoRefresh',
