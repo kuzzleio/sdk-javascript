@@ -9,8 +9,6 @@ description: Update documents
 
 Updates multiple documents.
 
-Returns a partial error (error code 206) if one or more documents can not be updated.
-
 Conflicts may occur if the same document gets updated multiple times within a short timespan in a database cluster.
 
 You can set the `retryOnConflict` optional argument (with a retry count), to tell Kuzzle to retry the failing updates the specified amount of times before rejecting the request with an error.
@@ -25,7 +23,7 @@ mUpdate(index, collection, documents, [options]);
 | ------------ | --------------- | ---------------------------- |
 | `index`      | <pre>string</pre>        | Index name                   |
 | `collection` | <pre>string</pre>        | Collection name              |
-| `documents`  | <pre>array<object></pre> | Array of documents to update |
+| `documents`  | <pre>object[]</pre> | Array of documents to update |
 | `options`    | <pre>object</pre>        | Query options                |
 
 ### Options

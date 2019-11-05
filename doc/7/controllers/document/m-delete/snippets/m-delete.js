@@ -8,7 +8,7 @@ try {
     ['some-id', 'some-other-id']
   );
 
-  console.log(`Successfully deleted ${response.deleted.length} documents`);
+  console.log(`Successfully deleted ${response.successes.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

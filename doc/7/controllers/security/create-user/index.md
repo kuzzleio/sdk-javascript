@@ -23,6 +23,10 @@ createUser(kuid, body, [options]);
 | `body` | <pre>object</pre> | User content &amp; credentials |
 | `options` | <pre>object</pre> | Query options |
 
+::: info
+If the `kuid` is `null`, Kuzzle will generate an ID.
+:::
+
 ### body
 
 The `body` property must contain two objects:
@@ -67,4 +71,3 @@ A [`User`](sdk/js/6/core-classes/user/introduction) object containing informatio
 ## Usage
 
 <<< ./snippets/create-user.js
-

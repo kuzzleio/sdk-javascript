@@ -87,15 +87,31 @@ class Kuzzle extends KuzzleEventEmitter {
     this.useController(ServerController, 'server');
 
     // offline queue
-    this._autoQueue = typeof options.autoQueue === 'boolean' ? options.autoQueue : false;
-    this._autoReplay = typeof options.autoReplay === 'boolean' ? options.autoReplay : false;
     this._offlineQueue = [];
-    this._offlineQueueLoader = typeof options.offlineQueueLoader === 'function' ? options.offlineQueueLoader : null;
-    this._queueFilter = typeof options.queueFilter === 'function' ? options.queueFilter : null;
-    this._queueMaxSize = typeof options.queueMaxSize === 'number' ? options.queueMaxSize : 500;
-    this._queueTTL = typeof options.queueTTL === 'number' ? options.queueTTL : 120000;
-    this._replayInterval = typeof options.replayInterval === 'number' ? options.replayInterval : 10;
-    this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number' ? options.tokenExpiredInterval : 1000;
+    this._autoQueue = typeof options.autoQueue === 'boolean'
+      ? options.autoQueue
+      : false;
+    this._autoReplay = typeof options.autoReplay === 'boolean'
+      ? options.autoReplay
+      : false;
+    this._offlineQueueLoader = typeof options.offlineQueueLoader === 'function'
+      ? options.offlineQueueLoader
+      : null;
+    this._queueFilter = typeof options.queueFilter === 'function'
+      ? options.queueFilter
+      : null;
+    this._queueMaxSize = typeof options.queueMaxSize === 'number'
+      ? options.queueMaxSize
+      : 500;
+    this._queueTTL = typeof options.queueTTL === 'number'
+      ? options.queueTTL
+      : 120000;
+    this._replayInterval = typeof options.replayInterval === 'number'
+      ? options.replayInterval
+      : 10;
+    this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number'
+      ? options.tokenExpiredInterval
+      : 1000;
 
     if (options.offlineMode === 'auto') {
       this._autoQueue = true;
@@ -244,7 +260,9 @@ class Kuzzle extends KuzzleEventEmitter {
       protectedEvent = this._protectedEvents[eventName];
 
     if (protectedEvent) {
-      if (protectedEvent.lastEmitted && protectedEvent.lastEmitted > now - this.eventTimeout) {
+      if ( protectedEvent.lastEmitted
+        && protectedEvent.lastEmitted > now - this.eventTimeout)
+      {
         return false;
       }
       protectedEvent.lastEmitted = now;
@@ -407,8 +425,8 @@ class Kuzzle extends KuzzleEventEmitter {
         request.volatile[item] = this.volatile[item];
       }
     }
-    request.volatile.sdkInstanceId = this.protocol.id;
-    request.volatile.sdkName = this.sdkName;
+    request.volatile.sdkInstanceId = request.volatile.sdkInstanceId || this.protocol.id;
+    request.volatile.sdkName = request.volatile.sdkName || this.sdkName;
 
     this.auth.authenticateRequest(request);
 

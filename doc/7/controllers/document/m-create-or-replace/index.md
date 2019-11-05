@@ -9,8 +9,6 @@ description: Create or replace documents
 
 Creates or replaces multiple documents.
 
-Throws a partial error (error code 206) if one or more document creations/replacements fail.
-
 <br/>
 
 ```js
@@ -21,7 +19,7 @@ mCreateOrReplace(index, collection, documents, [options]);
 | ------------ | --------------- | ---------------------------- |
 | `index`      | <pre>string</pre>        | Index name                   |
 | `collection` | <pre>string</pre>        | Collection name              |
-| `documents`  | <pre>array<object></pre> | Array of documents to create |
+| `documents`  | <pre>object[]</pre> | Array of documents to create |
 | `options`    | <pre>object</pre>        | Query options                |
 
 ### Options

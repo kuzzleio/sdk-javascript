@@ -10,10 +10,6 @@ class IndexController extends BaseController {
   }
 
   create (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.create: index is required');
-    }
-
     return this.query({
       index,
       action : 'create'
@@ -22,10 +18,6 @@ class IndexController extends BaseController {
   }
 
   delete (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.delete: index is required');
-    }
-
     return this.query({
       index,
       action : 'delete'
@@ -34,10 +26,6 @@ class IndexController extends BaseController {
   }
 
   exists (index, options) {
-    if (!index) {
-      throw new Error('Kuzzle.index.exists: index is required');
-    }
-
     return this.query({
       index,
       action : 'exists'
@@ -53,10 +41,6 @@ class IndexController extends BaseController {
   }
 
   mDelete (indexes, options) {
-    if (!Array.isArray(indexes)) {
-      throw new Error('Kuzzle.index.mDelete: indexes must be an array');
-    }
-
     return this.query({
       action: 'mDelete',
       body: {

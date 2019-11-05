@@ -19,7 +19,7 @@ mCreate(index, collection, documents, [options]);
 | ------------ | --------------- | ---------------------------- |
 | `index`      | <pre>string</pre>        | Index name                   |
 | `collection` | <pre>string</pre>        | Collection name              |
-| `documents`  | <pre>array<object></pre> | Array of documents to create |
+| `documents`  | <pre>object[]</pre> | Array of documents to create |
 | `options`    | <pre>object</pre>        | Query options                |
 
 ### Options
@@ -50,7 +50,6 @@ Each errored document is an object of the `errors` array with the following prop
 | `document`  | <pre>object</pre> | Document that cause the error                                       |
 | `status` | <pre>number</pre> | HTTP error status |
 | `reason`  | <pre>string</pre> | Human readable reason |
-
 
 ## Usage
 

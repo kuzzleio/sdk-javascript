@@ -15,12 +15,6 @@ describe('Index Controller', () => {
   });
 
   describe('create', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.index.create(undefined, options);
-      }).throw('Kuzzle.index.create: index is required');
-    });
-
     it('should call index/create query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({
         result: {
@@ -46,12 +40,6 @@ describe('Index Controller', () => {
   });
 
   describe('delete', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.index.delete(undefined, options);
-      }).throw('Kuzzle.index.delete: index is required');
-    });
-
     it('should call index/delete query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({
         result: {acknowledged: true}
@@ -73,12 +61,6 @@ describe('Index Controller', () => {
   });
 
   describe('exists', () => {
-    it('should throw an error if the "index" argument is not provided', () => {
-      should(function () {
-        kuzzle.index.exists(undefined, options);
-      }).throw('Kuzzle.index.exists: index is required');
-    });
-
     it('should call index/exists query and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
 
@@ -119,18 +101,6 @@ describe('Index Controller', () => {
   });
 
   describe('mDelete', () => {
-    it('should throw an error if the "indexes" argument is not provided', () => {
-      should(function () {
-        kuzzle.index.mDelete(undefined, options);
-      }).throw('Kuzzle.index.mDelete: indexes must be an array');
-    });
-
-    it('should throw an error if the "indexes" argument is not an array', () => {
-      should(function () {
-        kuzzle.index.mDelete('foo', options);
-      }).throw('Kuzzle.index.mDelete: indexes must be an array');
-    });
-
     it('should call index/mDelete query and return a Promise which resolves the list of deleted indexes', () => {
       const result = {
         deleted: ['foo', 'bar']
