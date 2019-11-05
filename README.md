@@ -19,9 +19,18 @@ You can access the Kuzzle repository on [Github](https://github.com/kuzzleio/kuz
 * [Building manually](#building-manually)
 * [License](#license)
 
+## Compatibility matrice
+
+| Kuzzle Version | SDK Version    |
+| -------------- | -------------- |
+| 1.x.x          | 5.x.x          | 
+| 1.x.x          | 6.x.x          | 
+| 2.x.x          | 7.x.x          | 
+
 ## Basic usage
 
 Follow [Kuzzle Guide](http://docs.kuzzle.io/guide/getting-started/#sdk-play-time)
+
 
 ## SDK Documentation
 
