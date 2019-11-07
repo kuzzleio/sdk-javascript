@@ -4,7 +4,6 @@ const
   KuzzleAbstractProtocol = require('./common');
 
 class RTWrapper extends KuzzleAbstractProtocol {
-
   constructor (host, options = {}) {
     super(host, options);
 
@@ -52,7 +51,7 @@ class RTWrapper extends KuzzleAbstractProtocol {
    *
    * @param {Error} error
    */
-  clientNetworkError(error) {
+  clientNetworkError (error) {
     this.state = 'offline';
     this.clear();
 
@@ -60,19 +59,35 @@ class RTWrapper extends KuzzleAbstractProtocol {
     connectionError.internal = error;
 
     this.emit('networkError', connectionError);
+
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
       this.retrying = true;
 
+      if ( typeof window === 'object'
+        && typeof window.navigator === 'object'
+        && window.navigator.onLine === false
+      ) {
+        window.addEventListener(
+          'online',
+          () => {
+            this.retrying = false;
+            this.connect().catch(err => this.clientNetworkError(err));
+          },
+          { once: true });
+        return;
+      }
+
       setTimeout(() => {
         this.retrying = false;
-        this.connect(this.host).catch(err => this.clientNetworkError(err));
+        this.connect().catch(err => this.clientNetworkError(err));
       }, this.reconnectionDelay);
-    } else {
+    }
+    else {
       this.emit('disconnect');
     }
   }
 
-  isReady() {
+  isReady () {
     return this.state === 'connected';
   }
 }
