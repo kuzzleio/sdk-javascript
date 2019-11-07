@@ -39,17 +39,17 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "@babel/core": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
     "audit": "0.0.6",
     "babel-loader": "^8.0.6",
     "min-req-promise": "^1.0.1",
     "ora": "^3.4.0",
-    "webpack": "^4.39.3",
+    "webpack": "^4.41.2",
     "ws": "^6.2.1"
   },
   "devDependencies": {
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.1",
     "cucumber": "^5.1.0",
     "eslint": "^5.16.0",
     "eslint-friendly-formatter": "^4.0.1",
@@ -63,7 +63,7 @@
     "rewire": "^4.0.1",
     "should": "13.2.3",
     "should-sinon": "0.0.6",
-    "sinon": "^7.4.2"
+    "sinon": "^7.5.0"
   },
   "engines": {
     "node": ">= 10.13.0"
