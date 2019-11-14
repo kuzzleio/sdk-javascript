@@ -90,8 +90,10 @@ class WSNode extends RTWrapper {
         let err = error;
 
         if (!(error instanceof Error)) {
-          err = error ?
-            new Error(error.message || error) : new Error('Unexpected error');
+          // browser-side, the payload sent to this event is a generic "Event"
+          // object bearing no information about the cause of the error
+          err = error && (typeof Event === 'undefined' || !(error instanceof Event)) ?
+            new Error(error.message || error) : new Error('Connection error');
         }
 
         this.clientNetworkError(err);
