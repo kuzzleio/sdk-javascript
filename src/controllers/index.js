@@ -9,7 +9,7 @@ class IndexController extends BaseController {
     super(kuzzle, 'index');
   }
 
-  create (index, options) {
+  create (index, options = {}) {
     const request = {
       index,
       action: 'create',
@@ -20,7 +20,7 @@ class IndexController extends BaseController {
       .then(response => response.result);
   }
 
-  delete (index, options) {
+  delete (index, options = {}) {
     const request = {
       index,
       action: 'delete',
@@ -31,7 +31,7 @@ class IndexController extends BaseController {
       .then(response => response.result.acknowledged);
   }
 
-  exists (index, options) {
+  exists (index, options = {}) {
     return this.query({
       index,
       action : 'exists'
@@ -46,7 +46,7 @@ class IndexController extends BaseController {
       .then(response => response.result.indexes);
   }
 
-  mDelete (indexes, options) {
+  mDelete (indexes, options = {}) {
     const request = {
       action: 'mDelete',
       body: {
