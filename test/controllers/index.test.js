@@ -30,7 +30,8 @@ describe('Index Controller', () => {
             .be.calledWith({
               controller: 'index',
               action: 'create',
-              index: 'index'
+              index: 'index',
+              refresh: undefined
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();
@@ -52,7 +53,8 @@ describe('Index Controller', () => {
             .be.calledWith({
               controller: 'index',
               action: 'delete',
-              index: 'index'
+              index: 'index',
+              refresh: undefined
             }, options);
 
           should(res).be.a.Boolean().and.be.true();
@@ -114,7 +116,8 @@ describe('Index Controller', () => {
             .be.calledWith({
               controller: 'index',
               action: 'mDelete',
-              body: {indexes: ['foo', 'bar']}
+              body: {indexes: ['foo', 'bar']},
+              refresh: undefined
             }, options);
 
           should(res).be.equal(result.deleted);

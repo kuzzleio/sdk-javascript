@@ -28,7 +28,8 @@ describe('Collection Controller', () => {
               action: 'create',
               body: null,
               index: 'index',
-              collection: 'collection'
+              collection: 'collection',
+              refresh: undefined
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();
@@ -47,7 +48,8 @@ describe('Collection Controller', () => {
               action: 'create',
               body: {properties: true},
               index: 'index',
-              collection: 'collection'
+              collection: 'collection',
+              refresh: undefined
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();
@@ -67,7 +69,8 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'deleteSpecifications',
               index: 'index',
-              collection: 'collection'
+              collection: 'collection',
+              refresh: undefined
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();

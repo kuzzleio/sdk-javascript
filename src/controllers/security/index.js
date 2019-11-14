@@ -121,35 +121,47 @@ class SecurityController extends BaseController {
   }
 
   deleteCredentials (strategy, _id, options = {}) {
-    return this.query({
+    const request = {
       strategy,
       _id,
-      action: 'deleteCredentials'
-    }, options)
+      action: 'deleteCredentials',
+      refresh: options.refresh
+    };
+    delete options.refresh;
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   deleteProfile (_id, options = {}) {
-    return this.query({
+    const request = {
       _id,
-      action: 'deleteProfile'
-    }, options)
+      action: 'deleteProfile',
+      refresh: options.refresh
+    };
+    delete options.refresh;
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   deleteRole (_id, options = {}) {
-    return this.query({
+    const request = {
       _id,
-      action: 'deleteRole'
-    }, options)
+      action: 'deleteRole',
+      refresh: options.refresh
+    };
+    delete options.refresh;
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   deleteUser (_id, options = {}) {
-    return this.query({
+    const request = {
       _id,
-      action: 'deleteUser'
-    }, options)
+      action: 'deleteUser',
+      refresh: options.refresh
+    };
+    delete options.refresh;
+    return this.query(request, options)
       .then(response => response.result);
   }
 

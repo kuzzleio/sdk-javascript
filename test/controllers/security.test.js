@@ -521,7 +521,8 @@ describe('Security Controller', () => {
               _id: 'kuid',
               strategy: 'strategy',
               controller: 'security',
-              action: 'deleteCredentials'
+              action: 'deleteCredentials',
+              refresh: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -543,7 +544,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'profileId',
               controller: 'security',
-              action: 'deleteProfile'
+              action: 'deleteProfile',
+              refresh: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -565,7 +567,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'roleId',
               controller: 'security',
-              action: 'deleteRole'
+              action: 'deleteRole',
+              refresh: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -587,7 +590,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'kuid',
               controller: 'security',
-              action: 'deleteUser'
+              action: 'deleteUser',
+              refresh: undefined
             }, options);
 
           should(res).be.equal(result);
