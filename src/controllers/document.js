@@ -163,7 +163,7 @@ class DocumentController extends BaseController {
     if (options.verb === 'POST') {
       request.body = {ids};
     } else {
-      request._ids = ids.toString();
+      request.ids = ids.toString();
     }
     return this.query(request, options)
       .then(response => response.result);
