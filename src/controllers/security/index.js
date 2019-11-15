@@ -42,10 +42,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createOrReplaceProfile',
-      refresh: options.refresh
+      action: 'createOrReplaceProfile'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
@@ -55,10 +53,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createOrReplaceRole',
-      refresh: options.refresh
+      action: 'createOrReplaceRole'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
@@ -68,10 +64,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createProfile',
-      refresh: options.refresh
+      action: 'createProfile'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
@@ -85,10 +79,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createRestrictedUser',
-      refresh: options.refresh
+      action: 'createRestrictedUser'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
@@ -98,10 +90,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createRole',
-      refresh: options.refresh
+      action: 'createRole'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
@@ -111,10 +101,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createUser',
-      refresh: options.refresh
+      action: 'createUser'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
@@ -124,10 +112,9 @@ class SecurityController extends BaseController {
     const request = {
       strategy,
       _id,
-      action: 'deleteCredentials',
-      refresh: options.refresh
+      action: 'deleteCredentials'
     };
-    delete options.refresh;
+
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -135,10 +122,8 @@ class SecurityController extends BaseController {
   deleteProfile (_id, options = {}) {
     const request = {
       _id,
-      action: 'deleteProfile',
-      refresh: options.refresh
+      action: 'deleteProfile'
     };
-    delete options.refresh;
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -146,10 +131,8 @@ class SecurityController extends BaseController {
   deleteRole (_id, options = {}) {
     const request = {
       _id,
-      action: 'deleteRole',
-      refresh: options.refresh
+      action: 'deleteRole'
     };
-    delete options.refresh;
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -157,10 +140,8 @@ class SecurityController extends BaseController {
   deleteUser (_id, options = {}) {
     const request = {
       _id,
-      action: 'deleteUser',
-      refresh: options.refresh
+      action: 'deleteUser'
     };
-    delete options.refresh;
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -271,10 +252,8 @@ class SecurityController extends BaseController {
   mDeleteProfiles (ids, options = {}) {
     const request = {
       action: 'mDeleteProfiles',
-      body: {ids},
-      refresh: options.refresh
+      body: {ids}
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -283,10 +262,8 @@ class SecurityController extends BaseController {
   mDeleteRoles (ids, options = {}) {
     const request = {
       action: 'mDeleteRoles',
-      body: {ids},
-      refresh: options.refresh
+      body: {ids}
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -295,10 +272,8 @@ class SecurityController extends BaseController {
   mDeleteUsers (ids, options = {}) {
     const request = {
       action: 'mDeleteUsers',
-      body: {ids},
-      refresh: options.refresh
+      body: {ids}
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -324,11 +299,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'replaceUser',
-      refresh: options.refresh
+      action: 'replaceUser'
     };
-    delete options.refresh;
-
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
@@ -389,11 +361,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'updateProfile',
-      refresh: options.refresh
+      action: 'updateProfile'
     };
-    delete options.refresh;
-
     return this.query(request, options)
       .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
   }
@@ -410,10 +379,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'updateRole',
-      refresh: options.refresh
+      action: 'updateRole'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
@@ -431,11 +398,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'updateUser',
-      refresh: options.refresh
+      action: 'updateUser'
     };
-    delete options.refresh;
-
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }

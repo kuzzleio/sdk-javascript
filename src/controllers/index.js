@@ -12,10 +12,8 @@ class IndexController extends BaseController {
   create (index, options = {}) {
     const request = {
       index,
-      action: 'create',
-      refresh: options.refresh
+      action: 'create'
     };
-    delete options.refresh;
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -23,10 +21,8 @@ class IndexController extends BaseController {
   delete (index, options = {}) {
     const request = {
       index,
-      action: 'delete',
-      refresh: options.refresh
+      action: 'delete'
     };
-    delete options.refresh;
     return this.query(request, options)
       .then(response => response.result.acknowledged);
   }
@@ -51,10 +47,8 @@ class IndexController extends BaseController {
       action: 'mDelete',
       body: {
         indexes
-      },
-      refresh: options.refresh
+      }
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result.deleted);
