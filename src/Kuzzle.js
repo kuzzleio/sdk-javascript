@@ -407,7 +407,7 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     // we follow the api but allow some more logical "mistakes" (the only allowed value for refresh arg is "wait_for")
-    if (request.refresh || options.refresh) {
+    if (request.refresh) {
       request.refresh = 'wait_for';
     }
 
