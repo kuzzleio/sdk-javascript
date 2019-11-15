@@ -152,12 +152,9 @@ class DocumentController extends BaseController {
   }
 
   mGet (index, collection, ids, options = {}) {
-    const _ids = ids.toString();
     const request = {
       index,
       collection,
-      _ids,
-      //body: {ids},
       action: 'mGet',
       includeTrash: options.includeTrash
     };
@@ -165,6 +162,8 @@ class DocumentController extends BaseController {
 
     if (options.verb === 'POST') {
       request.body = {ids};
+    } else {
+      request._ids = ids.toString();
     }
     return this.query(request, options)
       .then(response => response.result);
