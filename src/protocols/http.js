@@ -186,7 +186,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       route.verb = options.verb;
     }
     const
-      method = 'GET',//route.verb,
+      method = route.verb,
       regex = /\/:([^/]*)/;
 
     let
@@ -322,7 +322,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 function getCorrectRoute (routes) {
   let
     shortestRoute = routes[0],
-    getRoute,
+    postRoute,
     minLength = routes[0].url.length,
     sameLength = true;
 
@@ -336,14 +336,14 @@ function getCorrectRoute (routes) {
       minLength = route.url.length;
     }
 
-    if (route.verb === 'GET') {
-      getRoute = route;
+    if (route.verb === 'POST') {
+      postRoute = route;
     }
   }
 
   if (sameLength) {
     // with same URL size, we keep the GET route
-    return getRoute;
+    return postRoute;
   }
 
   // with differents URL sizes, we keep the shortest because URL params
