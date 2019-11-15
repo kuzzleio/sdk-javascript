@@ -182,11 +182,11 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       return;
     }
     
-    if (options.verbOverride) {
-      route.verb = options.verbOverride;
-    }
+    // if (options.verbOverride) {
+    //   route.verb = options.verbOverride;
+    // }
     const
-      method = route.verb,
+      method = 'GET',//route.verb,
       regex = /\/:([^/]*)/;
 
     let
