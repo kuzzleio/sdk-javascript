@@ -338,15 +338,10 @@ function getCorrectRoute (routes) {
     }
   }
 
-
-  //if (sameLength) {
   // with same URL size, we keep the GET route
-  return getRoute || shortestRoute;
-  //}
-
   // with differents URL sizes, we keep the shortest because URL params
   // will be in the query string
-  //return shortestRoute;
+  return sameLength ? getRoute : shortestRoute;
 }
 
 module.exports = HttpWrapper;
