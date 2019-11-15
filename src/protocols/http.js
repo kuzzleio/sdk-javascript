@@ -135,7 +135,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (data) {
+  send (data, options) {
     const
       payload = {
         action: undefined,
@@ -181,7 +181,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
       return;
     }
-
+    
+    if (options.verbOverride) {
+      route.verb = options.verbOverride;
+    }
     const
       method = route.verb,
       regex = /\/:([^/]*)/;

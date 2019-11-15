@@ -407,7 +407,7 @@ class Kuzzle extends KuzzleEventEmitter {
     }
 
     // we follow the api but allow some more logical "mistakes" (the only allowed value for refresh arg is "wait_for")
-    if (request.refresh) {
+    if (request.refresh || options.refresh) {
       request.refresh = 'wait_for';
     }
 
@@ -458,7 +458,7 @@ class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request);
+    return this.protocol.query(request, options);
   }
 
   /**
