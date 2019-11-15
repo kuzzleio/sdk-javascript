@@ -181,12 +181,9 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
       return;
     }
-    
-    if (options.verb) {
-      route.verb = options.verb;
-    }
+
     const
-      method = route.verb,
+      method = options.verb || route.verb,
       regex = /\/:([^/]*)/;
 
     let
@@ -336,7 +333,7 @@ function getCorrectRoute (routes) {
       minLength = route.url.length;
     }
 
-    if (route.verb === 'POST') {
+    if (route.verb === 'GET') {
       postRoute = route;
     }
   }
