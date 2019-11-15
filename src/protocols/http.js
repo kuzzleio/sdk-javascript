@@ -319,7 +319,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 function getCorrectRoute (routes) {
   let
     shortestRoute = routes[0],
-    postRoute,
+    getRoute,
     minLength = routes[0].url.length,
     sameLength = true;
 
@@ -334,13 +334,14 @@ function getCorrectRoute (routes) {
     }
 
     if (route.verb === 'GET') {
-      postRoute = route;
+      getRoute = route;
+      return getRoute;
     }
   }
 
   if (sameLength) {
     // with same URL size, we keep the GET route
-    return postRoute;
+    return getRoute;
   }
 
   // with differents URL sizes, we keep the shortest because URL params
