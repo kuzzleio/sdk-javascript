@@ -335,7 +335,6 @@ function getCorrectRoute (routes) {
 
     if (route.verb === 'GET') {
       getRoute = route;
-      return getRoute;
     }
   }
 
