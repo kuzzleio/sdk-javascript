@@ -151,7 +151,8 @@ class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mGet (index, collection, _ids, options = {}) {
+  mGet (index, collection, ids, options = {}) {
+    const _ids = ids.toString();
     const request = {
       index,
       collection,
@@ -162,6 +163,9 @@ class DocumentController extends BaseController {
     };
     delete options.includeTrash;
 
+    if (options.verb === 'POST') {
+      request.body = {ids};
+    }
     return this.query(request, options)
       .then(response => response.result);
   }
