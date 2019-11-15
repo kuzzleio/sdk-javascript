@@ -151,11 +151,12 @@ class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mGet (index, collection, ids, options = {}) {
+  mGet (index, collection, _ids, options = {}) {
     const request = {
       index,
       collection,
-      body: {ids},
+      _ids,
+      //body: {ids},
       action: 'mGet',
       includeTrash: options.includeTrash
     };
