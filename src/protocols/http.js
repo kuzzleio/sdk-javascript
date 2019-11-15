@@ -182,11 +182,11 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       return;
     }
     
-    if (options.verbOverride) {
-      route.verb = options.verbOverride;
+    if (options.verb) {
+      route.verb = options.verb;
     }
     const
-      method = route.verb,
+      method = 'GET',//route.verb,
       regex = /\/:([^/]*)/;
 
     let
@@ -342,7 +342,7 @@ function getCorrectRoute (routes) {
   }
 
   if (sameLength) {
-    // with same URL size, we keep the POST route
+    // with same URL size, we keep the GET route
     return getRoute;
   }
 
