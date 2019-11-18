@@ -414,6 +414,26 @@ describe('WebSocket networking module', () => {
     should(websocket.wasConnected).be.false();
   });
 
+  it('should reject with a proper error if onerror is called with an event (browser)', () => {
+    const Event = sinon.stub();
+    Object.defineProperty(global, 'Event', {
+      value: Event,
+      enumerable: false,
+      writable: false,
+      configurable: true
+    });
+
+    const promise = websocket.connect();
+    websocket.client.onerror(new Event());
+
+    return should(promise).rejectedWith(Error, {message: 'Connection error'})
+      .then(() => delete global.Event)
+      .catch(e => {
+        delete global.Event;
+        throw e;
+      });
+  });
+
   describe('#constructor', () => {
     it('should throw if an invalid host is provided', () => {
       const invalidHosts = [undefined, null, 123, false, true, [], {}, ''];
