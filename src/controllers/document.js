@@ -16,10 +16,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body,
-      action: 'count',
-      includeTrash: options.includeTrash
+      action: 'count'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result.count);
@@ -91,10 +89,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'get',
-      includeTrash: options.includeTrash
+      action: 'get'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -141,10 +137,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {ids},
-      action: 'mGet',
-      includeTrash: options.includeTrash
+      action: 'mGet'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -195,7 +189,7 @@ class DocumentController extends BaseController {
       action: 'search',
     };
 
-    for (const opt of ['from', 'size', 'scroll', 'includeTrash']) {
+    for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
       delete options[opt];
     }

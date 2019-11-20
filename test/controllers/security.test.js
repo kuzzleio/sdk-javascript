@@ -123,39 +123,8 @@ describe('Security Controller', () => {
               _id: 'profileId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createOrReplaceProfile',
-              refresh: undefined
+              action: 'createOrReplaceProfile'
             }, options);
-
-          should(profile).be.an.instanceOf(Profile);
-          should(profile._id).be.eql('profileId');
-          should(profile.policies).be.eql(['foo', 'bar']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'profileId',
-          _index: '%kuzzle',
-          _type: 'profiles',
-          _version: 1,
-          _source: { policies: ['foo', 'bar'] },
-          created: false
-        }
-      });
-
-      return kuzzle.security.createOrReplaceProfile('profileId', {foo: 'bar'}, {refresh: true})
-        .then(profile => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'profileId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'createOrReplaceProfile',
-              refresh: true
-            }, {});
 
           should(profile).be.an.instanceOf(Profile);
           should(profile._id).be.eql('profileId');
@@ -185,39 +154,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createOrReplaceRole',
-              refresh: undefined
+              action: 'createOrReplaceRole'
             }, options);
-
-          should(role).be.an.instanceOf(Role);
-          should(role._id).be.eql('roleId');
-          should(role.controllers).be.eql({foo: {actions: {bar: true}}});
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'roleId',
-          _index: '%kuzzle',
-          _type: 'profiles',
-          _version: 1,
-          _source: { controllers: {foo: {actions: {bar: true}}} },
-          created: false
-        }
-      });
-
-      return kuzzle.security.createOrReplaceRole('roleId', {foo: 'bar'}, {refresh: true})
-        .then(role => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'roleId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'createOrReplaceRole',
-              refresh: true
-            }, {});
 
           should(role).be.an.instanceOf(Role);
           should(role._id).be.eql('roleId');
@@ -247,39 +185,8 @@ describe('Security Controller', () => {
               _id: 'profileId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createProfile',
-              refresh: undefined
+              action: 'createProfile'
             }, options);
-
-          should(profile).be.an.instanceOf(Profile);
-          should(profile._id).be.eql('profileId');
-          should(profile.policies).be.eql(['foo', 'bar']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'profileId',
-          _index: '%kuzzle',
-          _type: 'profiles',
-          _version: 1,
-          _source: { policies: ['foo', 'bar'] },
-          created: true
-        }
-      });
-
-      return kuzzle.security.createProfile('profileId', {foo: 'bar'}, {refresh: true})
-        .then(profile => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'profileId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'createProfile',
-              refresh: true
-            }, {});
 
           should(profile).be.an.instanceOf(Profile);
           should(profile._id).be.eql('profileId');
@@ -309,39 +216,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createRole',
-              refresh: undefined
+              action: 'createRole'
             }, options);
-
-          should(role).be.an.instanceOf(Role);
-          should(role._id).be.eql('roleId');
-          should(role.controllers).be.eql({foo: {actions: {bar: true}}});
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'roleId',
-          _index: '%kuzzle',
-          _type: 'profiles',
-          _version: 1,
-          _source: { controllers: {foo: {actions: {bar: true}}} },
-          created: true
-        }
-      });
-
-      return kuzzle.security.createRole('roleId', {foo: 'bar'}, {refresh: true})
-        .then(role => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'roleId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'createRole',
-              refresh: true
-            }, {});
 
           should(role).be.an.instanceOf(Role);
           should(role._id).be.eql('roleId');
@@ -378,47 +254,8 @@ describe('Security Controller', () => {
               _id: 'userId',
               body,
               controller: 'security',
-              action: 'createUser',
-              refresh: undefined
+              action: 'createUser'
             }, options);
-
-          should(user).be.an.instanceOf(User);
-          should(user._id).be.eql('kuid');
-          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
-          should(user.profileIds).be.eql(['profileId']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const body = {
-        content: {foo: 'bar'},
-        credentials: {
-          strategy: {foo: 'bar'}
-        }
-      };
-
-      kuzzle.query.resolves({
-        result: {
-          _id: 'kuid',
-          _index: '%kuzzle',
-          _source: { profileIds: ['profileId'], name: 'John Doe' },
-          _type: 'users',
-          _version: 1,
-          created: true
-        }
-      });
-
-      return kuzzle.security.createUser('userId', body, {refresh: true})
-        .then(user => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'userId',
-              body,
-              controller: 'security',
-              action: 'createUser',
-              refresh: true
-            }, {});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('kuid');
@@ -456,47 +293,8 @@ describe('Security Controller', () => {
               body,
               _id: 'userId',
               controller: 'security',
-              action: 'createRestrictedUser',
-              refresh: undefined
+              action: 'createRestrictedUser'
             }, options);
-
-          should(user).be.an.instanceOf(User);
-          should(user._id).be.eql('kuid');
-          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
-          should(user.profileIds).be.eql(['profileId']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const body = {
-        content: {foo: 'bar'},
-        credentials: {
-          strategy: {foo: 'bar'}
-        }
-      };
-
-      kuzzle.query.resolves({
-        result: {
-          _id: 'kuid',
-          _index: '%kuzzle',
-          _source: { profileIds: ['profileId'], name: 'John Doe' },
-          _type: 'users',
-          _version: 1,
-          created: true
-        }
-      });
-
-      return kuzzle.security.createRestrictedUser(body, null, {refresh: true})
-        .then(user => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              body,
-              _id: null,
-              controller: 'security',
-              action: 'createRestrictedUser',
-              refresh: true
-            }, {});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('kuid');
@@ -521,8 +319,7 @@ describe('Security Controller', () => {
               _id: 'kuid',
               strategy: 'strategy',
               controller: 'security',
-              action: 'deleteCredentials',
-              refresh: undefined
+              action: 'deleteCredentials'
             }, options);
 
           should(res).be.equal(result);
@@ -544,8 +341,7 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'profileId',
               controller: 'security',
-              action: 'deleteProfile',
-              refresh: undefined
+              action: 'deleteProfile'
             }, options);
 
           should(res).be.equal(result);
@@ -567,8 +363,7 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'roleId',
               controller: 'security',
-              action: 'deleteRole',
-              refresh: undefined
+              action: 'deleteRole'
             }, options);
 
           should(res).be.equal(result);
@@ -590,8 +385,7 @@ describe('Security Controller', () => {
             .be.calledWith({
               _id: 'kuid',
               controller: 'security',
-              action: 'deleteUser',
-              refresh: undefined
+              action: 'deleteUser'
             }, options);
 
           should(res).be.equal(result);
@@ -922,28 +716,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               controller: 'security',
               action: 'mDeleteProfiles',
-              body: {ids: ['profile1', 'profile2']},
-              refresh: undefined
+              body: {ids: ['profile1', 'profile2']}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = ['profile1', 'profile2'];
-      kuzzle.query.resolves({result});
-
-      return kuzzle.security.mDeleteProfiles(['profile1', 'profile2'], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'security',
-              action: 'mDeleteProfiles',
-              body: {ids: ['profile1', 'profile2']},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -962,28 +736,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               controller: 'security',
               action: 'mDeleteRoles',
-              body: {ids: ['role1', 'role2']},
-              refresh: undefined
+              body: {ids: ['role1', 'role2']}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = ['role1', 'role2'];
-      kuzzle.query.resolves({result});
-
-      return kuzzle.security.mDeleteRoles(['role1', 'role2'], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'security',
-              action: 'mDeleteRoles',
-              body: {ids: ['role1', 'role2']},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -1002,28 +756,8 @@ describe('Security Controller', () => {
             .be.calledWith({
               controller: 'security',
               action: 'mDeleteUsers',
-              body: {ids: ['user1', 'user2']},
-              refresh: undefined
+              body: {ids: ['user1', 'user2']}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = ['user1', 'user2'];
-      kuzzle.query.resolves({result});
-
-      return kuzzle.security.mDeleteUsers(['user1', 'user2'], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'security',
-              action: 'mDeleteUsers',
-              body: {ids: ['user1', 'user2']},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -1121,40 +855,8 @@ describe('Security Controller', () => {
               _id: 'userId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'replaceUser',
-              refresh: undefined
+              action: 'replaceUser'
             }, options);
-
-          should(user).be.an.instanceOf(User);
-          should(user._id).be.eql('kuid');
-          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
-          should(user.profileIds).be.eql(['profileId']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'kuid',
-          _index: '%kuzzle',
-          _source: { profileIds: ['profileId'], name: 'John Doe' },
-          _type: 'users',
-          _version: 1,
-          created: true
-        }
-      });
-
-      return kuzzle.security.replaceUser('userId', {foo: 'bar'}, {refresh: true})
-        .then(user => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'userId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'replaceUser',
-              refresh: true
-            }, {});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('kuid');
@@ -1403,39 +1105,8 @@ describe('Security Controller', () => {
               _id: 'profileId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'updateProfile',
-              refresh: undefined
+              action: 'updateProfile'
             }, options);
-
-          should(profile).be.an.instanceOf(Profile);
-          should(profile._id).be.eql('profileId');
-          should(profile.policies).be.eql(['foo', 'bar']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'profileId',
-          _index: '%kuzzle',
-          _type: 'profiles',
-          _version: 2,
-          _source: { policies: ['foo', 'bar'] },
-          created: false
-        }
-      });
-
-      return kuzzle.security.updateProfile('profileId', {foo: 'bar'}, {refresh: true})
-        .then(profile => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'profileId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'updateProfile',
-              refresh: true
-            }, {});
 
           should(profile).be.an.instanceOf(Profile);
           should(profile._id).be.eql('profileId');
@@ -1484,39 +1155,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'updateRole',
-              refresh: undefined
+              action: 'updateRole'
             }, options);
-
-          should(role).be.an.instanceOf(Role);
-          should(role._id).be.eql('roleId');
-          should(role.controllers).be.eql({foo: {actions: {bar: true}}});
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'roleId',
-          _index: '%kuzzle',
-          _type: 'roles',
-          _version: 2,
-          _source: { controllers: {foo: {actions: {bar: true}}} },
-          created: false
-        }
-      });
-
-      return kuzzle.security.updateRole('roleId', {foo: 'bar'}, {refresh: true})
-        .then(role => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'roleId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'updateRole',
-              refresh: true
-            }, {});
 
           should(role).be.an.instanceOf(Role);
           should(role._id).be.eql('roleId');
@@ -1565,40 +1205,8 @@ describe('Security Controller', () => {
               _id: 'userId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'updateUser',
-              refresh: undefined
+              action: 'updateUser'
             }, options);
-
-          should(user).be.an.instanceOf(User);
-          should(user._id).be.eql('kuid');
-          should(user.content).be.eql({name: 'John Doe', profileIds: ['profileId']});
-          should(user.profileIds).be.eql(['profileId']);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'kuid',
-          _index: '%kuzzle',
-          _source: { profileIds: ['profileId'], name: 'John Doe' },
-          _type: 'users',
-          _version: 2,
-          created: false
-        }
-      });
-
-      return kuzzle.security.updateUser('userId', {foo: 'bar'}, {refresh: true})
-        .then(user => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              _id: 'userId',
-              body: {foo: 'bar'},
-              controller: 'security',
-              action: 'updateUser',
-              refresh: true
-            }, {});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('kuid');
