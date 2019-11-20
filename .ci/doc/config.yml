@@ -14,10 +14,10 @@ runners:
     lint:
       global: true
       cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
-      before: timeout -t 600 ash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
+      before: timeout 600 ash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     run:
       cmd: node {{ snippet.source }}
-      before: timeout -t 600 ash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
+      before: timeout 600 ash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
 
   web:
     service: doc-runner-web
@@ -43,5 +43,3 @@ runners:
     run:
       cmd: node puppeteer.js /tmp/{{ snippet.name }}/index.html
       before: timeout 600 bash -c 'until curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
-
-

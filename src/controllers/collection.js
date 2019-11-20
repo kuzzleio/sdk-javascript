@@ -12,21 +12,23 @@ class CollectionController extends BaseController {
   }
 
   create (index, collection, mappings = {}, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
       body: mappings,
       action: 'create'
-    }, options)
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   deleteSpecifications (index, collection, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
       action: 'deleteSpecifications'
-    }, options)
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -97,12 +99,12 @@ class CollectionController extends BaseController {
   }
 
   truncate (index, collection, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
-      action: 'truncate',
-      refresh: options.refresh
-    }, options)
+      action: 'truncate'
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 

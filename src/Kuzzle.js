@@ -406,14 +406,16 @@ class Kuzzle extends KuzzleEventEmitter {
       request.requestId = uuidv4();
     }
 
-    // we follow the api but allow some more logical "mistakes" (the only allowed value for refresh arg is "wait_for")
-    if (request.refresh) {
+    // we follow the api but allow some more logical "mistakes"
+    // (the only allowed value for refresh arg is "wait_for")
+    if (request.refresh || options.refresh) {
       request.refresh = 'wait_for';
     }
 
-    if (!request.volatile) {
+    if (! request.volatile) {
       request.volatile = this.volatile;
-    } else if (
+    }
+    else if (
       typeof request.volatile !== 'object'
       || Array.isArray(request.volatile)
     ) {

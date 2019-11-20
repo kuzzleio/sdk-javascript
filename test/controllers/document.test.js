@@ -28,29 +28,8 @@ describe('Document Controller', () => {
               action: 'count',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'},
-              includeTrash: undefined
+              body: {foo: 'bar'}
             }, options);
-
-          should(res).be.a.Number().and.be.equal(1234);
-        });
-    });
-
-    it('should inject the "includeTrash" option into the request', () => {
-      kuzzle.query.resolves({result: {count: 1234}});
-
-      return kuzzle.document.count('index', 'collection', {foo: 'bar'}, {includeTrash: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'count',
-              index: 'index',
-              collection: 'collection',
-              body: {foo: 'bar'},
-              includeTrash: true
-            }, {});
 
           should(res).be.a.Number().and.be.equal(1234);
         });
@@ -76,35 +55,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: undefined
+              body: {foo: 'bar'}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        _id: 'document-id',
-        _version: 1,
-        _source: {foo: 'bar'}
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.create('index', 'collection', {foo: 'bar'}, 'document-id', {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'create',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -131,36 +83,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: undefined
+              body: {foo: 'bar'}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        _id: 'document-id',
-        _version: 1,
-        _source: {foo: 'bar'},
-        created: false
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.createOrReplace('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'createOrReplace',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -180,29 +104,8 @@ describe('Document Controller', () => {
               action: 'delete',
               index: 'index',
               collection: 'collection',
-              _id: 'document-id',
-              refresh: undefined
+              _id: 'document-id'
             }, options);
-
-          should(res).equal('document-id');
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({result: {_id: 'document-id'}});
-
-      return kuzzle.document.delete('index', 'collection', 'document-id', {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'delete',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              refresh: true
-            }, {});
 
           should(res).equal('document-id');
         });
@@ -222,33 +125,8 @@ describe('Document Controller', () => {
               action: 'deleteByQuery',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'},
-              refresh: undefined
+              body: {foo: 'bar'}
             }, options);
-
-          should(res).be.an.Array();
-          should(res.length).be.equal(3);
-          should(res[0]).be.equal('foo');
-          should(res[1]).be.equal('bar');
-          should(res[2]).be.equal('baz');
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      kuzzle.query.resolves({result: {ids: ['foo', 'bar', 'baz']}});
-
-      return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'deleteByQuery',
-              index: 'index',
-              collection: 'collection',
-              body: {foo: 'bar'},
-              refresh: true
-            }, {});
 
           should(res).be.an.Array();
           should(res.length).be.equal(3);
@@ -279,39 +157,8 @@ describe('Document Controller', () => {
               action: 'get',
               index: 'index',
               collection: 'collection',
-              _id: 'document-id',
-              includeTrash: undefined
+              _id: 'document-id'
             }, options);
-
-          should(res._id).be.equal('document-id');
-          should(res._index).be.equal('index');
-          should(res._type).be.equal('collection');
-          should(res._source.foo).be.equal('bar');
-        });
-    });
-
-    it('should inject the "includeTrash" option into the request', () => {
-      kuzzle.query.resolves({
-        result: {
-          _id: 'document-id',
-          _index: 'index',
-          _type: 'collection',
-          _source: {foo: 'bar'}
-        }
-      });
-
-      return kuzzle.document.get('index', 'collection', 'document-id', {includeTrash: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'get',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              includeTrash: true
-            }, {});
 
           should(res._id).be.equal('document-id');
           should(res._index).be.equal('index');
@@ -342,37 +189,8 @@ describe('Document Controller', () => {
               action: 'mCreate',
               index: 'index',
               collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: undefined
+              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        hits: [{
-          _id: 'document-id',
-          _version: 1,
-          _source: {foo: 'bar'}
-        }],
-        total: 1
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mCreate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mCreate',
-              index: 'index',
-              collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -400,37 +218,8 @@ describe('Document Controller', () => {
               action: 'mCreateOrReplace',
               index: 'index',
               collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: undefined
+              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        hits: [{
-          _id: 'document-id',
-          _version: 1,
-          _source: {foo: 'bar'}
-        }],
-        total: 1
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mCreateOrReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mCreateOrReplace',
-              index: 'index',
-              collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -451,30 +240,8 @@ describe('Document Controller', () => {
               action: 'mDelete',
               index: 'index',
               collection: 'collection',
-              body: {ids: ['document1', 'document2']},
-              refresh: undefined
+              body: {ids: ['document1', 'document2']}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = ['document1', 'document2'];
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mDelete('index', 'collection', ['document1', 'document2'], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mDelete',
-              index: 'index',
-              collection: 'collection',
-              body: {ids: ['document1', 'document2']},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -501,36 +268,8 @@ describe('Document Controller', () => {
               action: 'mGet',
               index: 'index',
               collection: 'collection',
-              body: {ids: ['document1', 'document2']},
-              includeTrash: undefined
+              body: {ids: ['document1', 'document2']}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "includeTrash" option into the request', () => {
-      const result = {
-        hits: [
-          {_id: 'document1', _version: 1, _source: {foo: 'bar'}},
-          {_id: 'document2', _version: 3, _source: {foo: 'baz'}},
-        ],
-        total: 2
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mGet('index', 'collection', ['document1', 'document2'], {includeTrash: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mGet',
-              index: 'index',
-              collection: 'collection',
-              body: {ids: ['document1', 'document2']},
-              includeTrash: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -558,37 +297,8 @@ describe('Document Controller', () => {
               action: 'mReplace',
               index: 'index',
               collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: undefined
+              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        hits: [{
-          _id: 'document-id',
-          _version: 1,
-          _source: {foo: 'bar'}
-        }],
-        total: 1
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mReplace',
-              index: 'index',
-              collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -616,37 +326,8 @@ describe('Document Controller', () => {
               action: 'mUpdate',
               index: 'index',
               collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: undefined
+              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        hits: [{
-          _id: 'document-id',
-          _version: 1,
-          _source: {foo: 'bar'}
-        }],
-        total: 1
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.mUpdate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'mUpdate',
-              index: 'index',
-              collection: 'collection',
-              body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -673,36 +354,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: undefined
+              body: {foo: 'bar'}
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        _id: 'document-id',
-        _version: 1,
-        _source: {foo: 'bar'},
-        created: false
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.replace('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'replace',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: true
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -734,48 +387,11 @@ describe('Document Controller', () => {
               body: {foo: 'bar'},
               from: 0,
               size: 10,
-              scroll: undefined,
-              includeTrash: undefined
+              scroll: undefined
             }, options);
 
           should(res).be.an.instanceOf(DocumentSearchResult);
           should(res._options).be.equal(options);
-          should(res._response).be.equal(result);
-          should(res.fetched).be.equal(3);
-          should(res.total).be.equal(3);
-        });
-    });
-
-    it('should inject the "includeTrash" option into the request', () => {
-      const result = {
-        scrollId: 'scroll-id',
-        hits: [
-          {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
-          {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}},
-          {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz'}}
-        ],
-        total: 3
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {includeTrash: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'search',
-              index: 'index',
-              collection: 'collection',
-              body: {foo: 'bar'},
-              from: 0,
-              size: 10,
-              scroll: undefined,
-              includeTrash: true
-            }, {});
-
-          should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
@@ -805,8 +421,7 @@ describe('Document Controller', () => {
               body: {foo: 'bar'},
               from: 1,
               size: 2,
-              scroll: '1m',
-              includeTrash: undefined
+              scroll: '1m'
             }, {});
 
           should(res).be.an.instanceOf(DocumentSearchResult);
@@ -880,37 +495,8 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              refresh: undefined,
               retryOnConflict: undefined
             }, options);
-
-          should(res).be.equal(result);
-        });
-    });
-
-    it('should inject the "refresh" option into the request', () => {
-      const result = {
-        _id: 'document-id',
-        _version: 1,
-        _source: {foo: 'bar'},
-        created: false
-      };
-      kuzzle.query.resolves({result});
-
-      return kuzzle.document.update('index', 'collection', 'document-id', {foo: 'bar'}, {refresh: true})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'document',
-              action: 'update',
-              index: 'index',
-              collection: 'collection',
-              _id: 'document-id',
-              body: {foo: 'bar'},
-              refresh: true,
-              retryOnConflict: undefined
-            }, {});
 
           should(res).be.equal(result);
         });
@@ -936,7 +522,6 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              refresh: undefined,
               retryOnConflict: true
             }, {});
 
