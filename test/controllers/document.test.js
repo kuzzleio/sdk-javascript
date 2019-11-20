@@ -494,7 +494,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
-              body: {foo: 'bar'}              ,
+              body: {foo: 'bar'},
               retryOnConflict: undefined
             }, options);
 
@@ -521,7 +521,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
-              body: {foo: 'bar'}              ,
+              body: {foo: 'bar'},
               retryOnConflict: true
             }, {});
 
