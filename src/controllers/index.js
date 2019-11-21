@@ -9,23 +9,25 @@ class IndexController extends BaseController {
     super(kuzzle, 'index');
   }
 
-  create (index, options) {
-    return this.query({
+  create (index, options = {}) {
+    const request = {
       index,
-      action : 'create'
-    }, options)
+      action: 'create'
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
-  delete (index, options) {
-    return this.query({
+  delete (index, options = {}) {
+    const request = {
       index,
-      action : 'delete'
-    }, options)
+      action: 'delete'
+    };
+    return this.query(request, options)
       .then(response => response.result.acknowledged);
   }
 
-  exists (index, options) {
+  exists (index, options = {}) {
     return this.query({
       index,
       action : 'exists'
@@ -40,13 +42,15 @@ class IndexController extends BaseController {
       .then(response => response.result.indexes);
   }
 
-  mDelete (indexes, options) {
-    return this.query({
+  mDelete (indexes, options = {}) {
+    const request = {
       action: 'mDelete',
       body: {
         indexes
       }
-    }, options)
+    };
+
+    return this.query(request, options)
       .then(response => response.result.deleted);
   }
 }

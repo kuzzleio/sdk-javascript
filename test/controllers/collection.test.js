@@ -295,8 +295,7 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'truncate',
               index: 'index',
-              collection: 'collection',
-              refresh: undefined
+              collection: 'collection'
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();
