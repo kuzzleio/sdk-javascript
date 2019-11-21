@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+
 set -e
-# Download and launch custom Kuzzle stack
 
 echo "[$(date --rfc-3339 seconds)] - Start Kuzzle stack"
 

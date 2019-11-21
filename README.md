@@ -57,13 +57,21 @@ Our teams will be able to meet your needs in terms of expertise and multi-techno
 
 ## Usage
 
-## Compatibility matrice
+## Compatibility matrix
 
 | Kuzzle Version | SDK Version    |
 | -------------- | -------------- |
 | 1.x.x          | 5.x.x          | 
 | 1.x.x          | 6.x.x          | 
 | 2.x.x          | 7.x.x          | 
+
+## Getting started :point_right:
+
+  - [Node.js](https://docs.kuzzle.io/sdk/js/7/getting-started/node-js/)
+  - [Browser](https://docs.kuzzle.io/sdk/js/7/getting-started/raw-web/)
+  - [Webpack](https://docs.kuzzle.io/sdk/js/7/getting-started/webpack/)
+  - [React/Redux](https://docs.kuzzle.io/sdk/js/7/getting-started/react/with-redux/)
+  - [Vue.js](https://docs.kuzzle.io/sdk/js/7/getting-started/vuejs/standalone/) 
 
 ### Installation
 
@@ -117,7 +125,7 @@ If you want to support older browser versions, you may load `socket.io` before K
 If you use Webpack, you'll likely use the NPM-packaged version of the SDK (like in Node)
 
 ```
-npm install kuzzle-sdk --save
+npm install kuzzle-sdk
 ```
 
 But you'll still need to pick the built version (which ships with the package).
