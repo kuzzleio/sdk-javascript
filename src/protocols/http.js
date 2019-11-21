@@ -135,7 +135,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (data, options) {
+  send (data, options = {}) {
     const
       payload = {
         action: undefined,
