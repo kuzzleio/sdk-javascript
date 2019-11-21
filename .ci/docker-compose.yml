@@ -2,7 +2,7 @@ version: '3'
 
 services:
   kuzzle:
-    image: kuzzleio/kuzzle:1
+    image: kuzzleio/kuzzle:2
     ports:
       - "7512:7512"
     cap_add:
@@ -11,21 +11,16 @@ services:
       - redis
       - elasticsearch
     environment:
-      - kuzzle_services__db__client__host=http://elasticsearch:9200
+      - kuzzle_services__storageEngine__client__node=http://elasticsearch:9200
       - kuzzle_services__internalCache__node__host=redis
       - kuzzle_services__memoryStorage__node__host=redis
+      - kuzzle_services__storageEngine__commonMapping__dynamic=true
       - NODE_ENV=production
 
   redis:
     image: redis:5
 
   elasticsearch:
-    image: kuzzleio/elasticsearch:5.6.10
+    image: kuzzleio/elasticsearch:7.4.0
     ulimits:
       nofile: 65536
-    environment:
-      - cluster.name=kuzzle
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-
-volumes:
-  snippets:

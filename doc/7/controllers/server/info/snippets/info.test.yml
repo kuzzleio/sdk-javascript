@@ -1,0 +1,7 @@
+name: server##info
+description: Retrieves information about Kuzzle plugins and active services.
+hooks:
+  before:
+  after:
+template: default
+expected: "^Kuzzle Server information:"

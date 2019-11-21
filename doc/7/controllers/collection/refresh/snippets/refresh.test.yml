@@ -1,0 +1,10 @@
+---
+name: index#refresh
+description: Forces an Elasticsearch search index update
+hooks:
+  before: |
+    curl -X POST kuzzle:7512/nyc-open-data/_create
+    curl -X PUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: default
+expected: Refresh successful

@@ -4,12 +4,20 @@ const
   should = require('should');
 
 describe('Bulk Controller', () => {
-  let kuzzle;
+  let
+    index,
+    collection,
+    kuzzle;
 
   beforeEach(() => {
+    index = 'index';
+
+    collection = 'collection';
+
     kuzzle = {
       query: sinon.stub().resolves()
     };
+
     kuzzle.bulk = new BulkController(kuzzle);
   });
 
@@ -29,11 +37,13 @@ describe('Bulk Controller', () => {
         bulkData = { foo: 'bar' },
         options = { opt: 'in' };
 
-      return kuzzle.bulk.import(bulkData, options)
+      return kuzzle.bulk.import(index, collection, bulkData, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
+              index,
+              collection,
               body: { bulkData },
               controller: 'bulk',
               action: 'import'

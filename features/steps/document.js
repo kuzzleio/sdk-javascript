@@ -24,6 +24,13 @@ Given('the collection has a document with id {string}', function (id) {
     });
 });
 
+Then('I get an error in the errors array', function () {
+  should(this.content.errors).be.Array().not.be.empty();
+});
+
+Then('I should have no errors in the errors array', function () {
+  should(this.content.errors).be.empty();
+});
 
 When('I check if {string} exists', function (id) {
   return this.kuzzle.document.exists(this.index, this.collection, id)
@@ -368,10 +375,10 @@ Then(/^the document should (not )?exist$/, function (not) {
 });
 
 Then('the documents should be retrieved', function () {
-  should(this.content.hits.length).eql(this.ids.length);
-  should(this.content.total).eql(this.ids.length);
+  should(this.content.successes.length).eql(this.ids.length);
+  should(this.content.errors).be.empty();
 
-  const found = this.content.hits.map(r => r._id);
+  const found = this.content.successes.map(r => r._id);
 
   for (const id of this.ids) {
     should(found.indexOf(id)).be.greaterThan(-1);

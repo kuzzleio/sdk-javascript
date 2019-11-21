@@ -12,21 +12,23 @@ class CollectionController extends BaseController {
   }
 
   create (index, collection, mappings = {}, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
       body: mappings,
       action: 'create'
-    }, options)
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
   deleteSpecifications (index, collection, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
       action: 'deleteSpecifications'
-    }, options)
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -35,6 +37,15 @@ class CollectionController extends BaseController {
       index,
       collection,
       action: 'exists'
+    }, options)
+      .then(response => response.result);
+  }
+
+  refresh (index, collection, options = {}) {
+    return this.query({
+      index,
+      collection,
+      action: 'refresh'
     }, options)
       .then(response => response.result);
   }
@@ -88,12 +99,12 @@ class CollectionController extends BaseController {
   }
 
   truncate (index, collection, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
-      action: 'truncate',
-      refresh: options.refresh
-    }, options)
+      action: 'truncate'
+    };
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -108,28 +119,20 @@ class CollectionController extends BaseController {
   }
 
   updateSpecifications (index, collection, specifications, options = {}) {
-    const body = {
-      [index]: {
-        [collection]: specifications
-      }
-    };
-
     return this.query({
-      body,
+      index,
+      collection,
+      body: specifications,
       action: 'updateSpecifications'
     }, options)
-      .then(response => response.result[index][collection]);
+      .then(response => response.result);
   }
 
   validateSpecifications (index, collection, specifications, options = {}) {
-    const body = {
-      [index]: {
-        [collection]: specifications
-      }
-    };
-
     return this.query({
-      body,
+      index,
+      collection,
+      body: specifications,
       action: 'validateSpecifications'
     }, options)
       .then(response => response.result);

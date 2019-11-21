@@ -95,6 +95,26 @@ describe('Collection Controller', () => {
     });
   });
 
+  describe('refresh', () => {
+    it('should call collection/refresh query names and return a Promise which resolves a boolean', () => {
+      kuzzle.query.resolves({result: null});
+
+      return kuzzle.collection.refresh('index', 'collection', options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'collection',
+              action: 'refresh',
+              index: 'index',
+              collection: 'collection'
+            }, options);
+
+          should(res).be.Null();
+        });
+    });
+  });
+
   describe('getMapping', () => {
     it('should call collection/getMapping query and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({
@@ -275,8 +295,7 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'truncate',
               index: 'index',
-              collection: 'collection',
-              refresh: undefined
+              collection: 'collection'
             }, options);
 
           should(res.acknowledged).be.a.Boolean().and.be.true();
@@ -308,7 +327,7 @@ describe('Collection Controller', () => {
 
   describe('updateSpecifications', () => {
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({result: { index: { collection: {foo: 'bar'}}}});
+      kuzzle.query.resolves({ result: { foo: 'bar' } });
 
       const specifications = {foo: 'bar'};
       return kuzzle.collection.updateSpecifications('index', 'collection', specifications, options)
@@ -316,11 +335,9 @@ describe('Collection Controller', () => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
-              body: {
-                index: {
-                  collection: specifications
-                }
-              },
+              body: specifications,
+              index: 'index',
+              collection: 'collection',
               controller: 'collection',
               action: 'updateSpecifications'
             }, options);
@@ -346,11 +363,9 @@ describe('Collection Controller', () => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
-              body: {
-                index: {
-                  collection: specifications
-                }
-              },
+              index: 'index',
+              collection: 'collection',
+              body: specifications,
               controller: 'collection',
               action: 'validateSpecifications'
             }, options);

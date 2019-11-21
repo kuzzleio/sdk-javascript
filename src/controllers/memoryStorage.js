@@ -332,7 +332,7 @@ function assignZrangeOptions (data, options) {
 }
 
 /**
- * Maps geopos results, from array<array<string>> to array<array<number>>
+ * Maps geopos results, from array<string[]> to array<array<number>>
  *
  * @param {Array.<Array.<string>>} results
  * @return {Array.<Array.<Number>>}

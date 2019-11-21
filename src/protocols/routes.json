@@ -60,7 +60,7 @@
   "bulk": {
     "import": {
       "verb": "POST",
-      "url": "/_bulk"
+      "url": "/:index/:collection/_bulk"
     },
     "write": {
       "verb": "POST",
@@ -345,7 +345,7 @@
       "verb": "GET"
     },
     "updateSpecifications": {
-      "url": "/_specifications",
+      "url": "/:index/:collection/_specifications",
       "verb": "PUT"
     },
     "deleteSpecifications": {
@@ -353,7 +353,7 @@
       "verb": "DELETE"
     },
     "validateSpecifications": {
-      "url": "/_validateSpecifications",
+      "url": "/:index/:collection/_validateSpecifications",
       "verb": "POST"
     },
     "truncate": {

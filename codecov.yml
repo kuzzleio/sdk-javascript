@@ -6,7 +6,5 @@ coverage:
       default:
         threshold: 1
 
-    patch:
-      default:
-        branches:
-          - master
+    patch: false
+    changes: false

@@ -16,10 +16,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body,
-      action: 'count',
-      includeTrash: options.includeTrash
+      action: 'count'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result.count);
@@ -31,11 +29,8 @@ class DocumentController extends BaseController {
       collection,
       _id,
       body: document,
-      action: 'create',
-      refresh: options.refresh
+      action: 'create'
     };
-    delete options.refresh;
-
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -46,10 +41,8 @@ class DocumentController extends BaseController {
       collection,
       _id,
       body,
-      action: 'createOrReplace',
-      refresh: options.refresh
+      action: 'createOrReplace'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -60,10 +53,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'delete',
-      refresh: options.refresh
+      action: 'delete'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result._id);
@@ -74,10 +65,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body,
-      action: 'deleteByQuery',
-      refresh: options.refresh
+      action: 'deleteByQuery'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result.ids);
@@ -100,10 +89,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'get',
-      includeTrash: options.includeTrash
+      action: 'get'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -114,10 +101,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {documents},
-      action: 'mCreate',
-      refresh: options.refresh
+      action: 'mCreate'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -128,10 +113,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {documents},
-      action: 'mCreateOrReplace',
-      refresh: options.refresh
+      action: 'mCreateOrReplace'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -142,10 +125,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {ids},
-      action: 'mDelete',
-      refresh: options.refresh
+      action: 'mDelete'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -156,10 +137,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {ids},
-      action: 'mGet',
-      includeTrash: options.includeTrash
+      action: 'mGet'
     };
-    delete options.includeTrash;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -170,10 +149,9 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {documents},
-      action: 'mReplace',
-      refresh: options.refresh
+      action: 'mReplace'
     };
-    delete options.refresh;
+
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -183,10 +161,8 @@ class DocumentController extends BaseController {
       index,
       collection,
       body: {documents},
-      action: 'mUpdate',
-      refresh: options.refresh
+      action: 'mUpdate'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -198,10 +174,8 @@ class DocumentController extends BaseController {
       collection,
       _id,
       body,
-      action: 'replace',
-      refresh: options.refresh
+      action: 'replace'
     };
-    delete options.refresh;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -215,7 +189,7 @@ class DocumentController extends BaseController {
       action: 'search',
     };
 
-    for (const opt of ['from', 'size', 'scroll', 'includeTrash']) {
+    for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
       delete options[opt];
     }
@@ -236,10 +210,8 @@ class DocumentController extends BaseController {
       _id,
       body,
       action: 'update',
-      refresh: options.refresh,
       retryOnConflict: options.retryOnConflict
     };
-    delete options.refresh;
     delete options.retryOnConflict;
 
     return this.query(request, options)
