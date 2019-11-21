@@ -4,6 +4,6 @@ hooks:
   before:
   after:
 template: default
-expected: "^Kuzzle Server information: {\"serverInfo\":{\"kuzzle\":{\"version\":\"[0-9]+\\.[0-9]+\\.[0-9]+\",\"api\":{.*"
+expected: Kuzzle Server information
 sdk: js
 version: 6
