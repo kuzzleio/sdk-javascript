@@ -32,7 +32,7 @@ Additional query options
 
 ## Resolves
 
-The retrieved [`Role`](/sdk/js/6/core-classes/role) object.
+The retrieved [`Role`](/sdk/js/7/core-classes/role) object.
 
 ## Usage
 

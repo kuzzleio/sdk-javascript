@@ -9,10 +9,10 @@ description: Gets credential information for the user identified by the strategy
 
 Gets credential information for the user identified by the strategy's unique user identifier `userId`.
 
-The returned object will vary depending on the strategy (see [getById plugin function](/core/1/plugins/guides/strategies#optional-getbyid)), and can be empty.
+The returned object will vary depending on the strategy (see [getById plugin function](/core/2/plugins/guides/strategies#optional-getbyid)), and can be empty.
 
 **Note**: the user identifier to use depends on the specified strategy. 
-If you wish to get credential information using a [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) identifier, use the [getCredentials](sdk/js/6/controllers/security/get-credentials) action instead.
+If you wish to get credential information using a [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) identifier, use the [getCredentials](sdk/js/6/controllers/security/get-credentials) action instead.
 
 <br />
 
@@ -25,7 +25,7 @@ getCredentialsById(strategy, id, [options]);
 | Property | Type | Description |
 | --- | --- | --- |
 | `strategy` | <pre>string</pre> | Strategy identifier |
-| `id` | <pre>string</pre> | Credential identifier (this is **not** the [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid)) |
+| `id` | <pre>string</pre> | Credential identifier (this is **not** the [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid)) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

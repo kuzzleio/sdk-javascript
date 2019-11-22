@@ -2,11 +2,9 @@
 
 const
   Http = require('./http'),
-  WebSocket = require('./websocket'),
-  SocketIO = require('./socketio');
+  WebSocket = require('./websocket');
 
 module.exports = {
   Http,
-  WebSocket,
-  SocketIO
+  WebSocket
 };

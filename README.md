@@ -24,9 +24,8 @@ This is the official Javascript SDK for the free and open-source backend Kuzzle.
 
 #### Multiprotocols
 
-Currently, the SDK provides 3 protocols: __Http, WebSocket and SocketIO.__
-WebSocket and Socket.IO protocols implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).  
-While Socket.IO offers better compatibility with older web browsers, our raw WebSocket implementation is about 20% faster.
+Currently, the SDK provides 2 protocols: __Http and WebSocket.__
+WebSocket protocol implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).  
 
 #### Promises based
 
@@ -35,7 +34,7 @@ For example, for the action create of the controller collection (_collection:cre
 Any error must be caught either at the end of the `Promise` chain, or by using `async/await` and a `try...catch`.
 
 <p align="center">
-  :books: <b><a href="https://docs-v2.kuzzle.io/sdk-reference/js/6/">Documentation</a></b>
+  :books: <b><a href="https://docs.kuzzle.io/sdk-reference/js/7">Documentation</a></b>
 </p>
 
 ### Kuzzle
@@ -45,7 +44,7 @@ an administration console and a set of plugins that provide advanced functionali
 
 * :octocat: __[Github](https://github.com/kuzzleio/kuzzle)__
 * :earth_africa: __[Website](https://kuzzle.io)__
-* :books: __[Documentation](https://docs-v2.kuzzle.io)__
+* :books: __[Documentation](https://docs.kuzzle.io)__
 * :email: __[Gitter](https://gitter.im/kuzzleio/kuzzle)__
 
 
@@ -111,13 +110,6 @@ Then the Kuzzle SDK will be available under the `KuzzleSDK` variable:
     );
     // ...
   </script>
-```
-
-If you want to support older browser versions, you may load `socket.io` before Kuzzle, making the SDK compatible with browsers without websocket support:
-
-```html
-<!-- Don't forget to include socketio before Kuzzle SDK -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
 ```
 
 #### Browser with Webpack

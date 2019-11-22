@@ -7,7 +7,7 @@ description: Base method to send API query to Kuzzle
 
 # query
 
-Base method used to send queries to Kuzzle, following the [API Documentation](/core/1/api).
+Base method used to send queries to Kuzzle, following the [API Documentation](/core/2/api).
 
 :::warning
 This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
@@ -51,7 +51,7 @@ Additional query options
 
 ## Resolves
 
-Resolve to the raw Kuzzle API response. See the [API Documentation](/core/1/api).
+Resolve to the raw Kuzzle API response. See the [API Documentation](/core/2/api).
 
 ## Usage
 

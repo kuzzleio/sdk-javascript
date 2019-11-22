@@ -6,7 +6,7 @@ title: georadiusbymember
 
 # georadiusbymember
 
-Returns the members (added with [geoadd](/sdk/js/6/controllers/ms/geoadd)) of a given key inside the provided geospatial radius, centered around one of a key's member.
+Returns the members (added with [geoadd](/sdk/js/7/controllers/ms/geoadd)) of a given key inside the provided geospatial radius, centered around one of a key's member.
 
 [[_Redis documentation_]](https://redis.io/commands/georadiusbymember)
 

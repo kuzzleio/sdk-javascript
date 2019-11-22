@@ -7,7 +7,7 @@ class BulkController extends BaseController {
 
   /**
    * Creates, updates or deletes large amounts of documents as fast as possible.
-   * {@link https://docs.kuzzle.io/core/1/api/controllers/bulk/import/|Official documentation}
+   * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/import/|Official documentation}
    *
    * @param {String} index - Index name
    * @param {String} collection - Collection name
@@ -29,7 +29,7 @@ class BulkController extends BaseController {
 
   /**
    * Creates or replaces a document directly into the storage engine.
-   * {@link https://docs.kuzzle.io/core/1/api/controllers/bulk/write/|Official documentation}
+   * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/write/|Official documentation}
    *
    * @param {String} index - Index name
    * @param {String} collection - Collection name
@@ -51,7 +51,7 @@ class BulkController extends BaseController {
 
   /**
    * Creates or replaces multiple documents directly into the storage engine.
-   * {@link https://docs.kuzzle.io/core/1/api/controllers/bulk/m-write/|Official documentation}
+   * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/m-write/|Official documentation}
    *
    * @param {String} index - Index name
    * @param {String} collection - Collection name

@@ -19,7 +19,7 @@ updateRoleMapping(mapping, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `mapping` | <pre>object</pre> | Role collection [mapping definition](/core/1/guides/essentials/database-mappings) |
+| `mapping` | <pre>object</pre> | Role collection [mapping definition](/core/2/guides/essentials/database-mappings) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

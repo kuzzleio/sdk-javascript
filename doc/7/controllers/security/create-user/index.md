@@ -19,7 +19,7 @@ createUser(kuid, body, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | User content &amp; credentials |
 | `options` | <pre>object</pre> | Query options |
 
@@ -32,7 +32,7 @@ If the `kuid` is `null`, Kuzzle will generate an ID.
 The `body` property must contain two objects:
 - `content`: Contains the list of profile ids to attach the user to and potential additional information. At least the `profileIds` must be supplied.
 Any other attribute can be added. 
-Make sure to [update the user mapping](/sdk/js/6/controllers/security/update-user-mapping) collection to match your custom attributes.
+Make sure to [update the user mapping](/sdk/js/7/controllers/security/update-user-mapping) collection to match your custom attributes.
 - `credentials`: Describes how the new administrator can be authenticated. This object must contain one or more 
 properties, named after the target authentication strategy to use. Each one of these properties are objects
 containing the credentials information, corresponding to that authentication strategy.

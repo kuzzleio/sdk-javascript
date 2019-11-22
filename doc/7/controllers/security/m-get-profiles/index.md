@@ -30,9 +30,8 @@ mGetProfiles(ids, [options]);
 
 ## Resolves
 
-An array of retrieved [`Profile`](/sdk/js/6/core-classes/profile/introduction) objects.
+An array of retrieved [`Profile`](/sdk/js/7/core-classes/profile/introduction) objects.
 
 ## Usage
 
 <<< ./snippets/m-get-profiles.js
-
