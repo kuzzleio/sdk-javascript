@@ -155,7 +155,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: type != cron AND branch =~ /^master|[0-9]+-stable$/
+      if: type = push AND branch =~ /^master|[0-9]+-stable$/
       sudo: false
       language: node_js
       node_js: 10
@@ -186,10 +186,9 @@ jobs:
         on:
           repo: kuzzleio/sdk-javascript
           all_branches: true
-          condition: $TRAVIS_BRANCH =~ /^master|[0-9]+-stable$/
 
     - stage: Deploy Beta release on NPM
-      if: type != cron AND branch =~ /^[0-9]+-beta$/
+      if: type = push AND branch =~ /^[0-9]+-beta$/
       sudo: false
       language: node_js
       node_js: 10
@@ -221,4 +220,3 @@ jobs:
           on:
             repo: kuzzleio/sdk-javascript
             all_branches: true
-            condition: $TRAVIS_BRANCH =~ /^[0-9]+-beta$/
