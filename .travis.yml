@@ -182,7 +182,7 @@ jobs:
         skip_cleanup: true
         email: support@kuzzle.io
         api_key:
-          secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+          secure: "oZG8eiOGQxH5sEvTI6sNcSL8+RnE/qOs1TMOn1eB0GvRB/pQ9Oylzunjntp7WzHpEm23+3Cfj898sgQ6uNBeKm/bEYOxN+kYbzpY0kSiwaW+dDneFzVIa+r1dF8+/oCvH720VIu+92KYK/8+A6jJGlevMezL+w5ggD6I2j0i+QBPyplvh5qjyd7OayGPCPUq22Om9U9QPux4FFYmpX6TDn/l0iVYat0T8B5+tyUKjsY7XV/Ad4ob8y52kQ1gmxtK09FXkR8im5sEmEaC3QWKQKqWc0XpZ7wwgw/cojVShQvEp25ZgVNxG0cPynIbIu0Y3yCO3c0WVq1QpmMx41ekMb61kBjQ4UYmSKcHODMt3MdP6VgFJOlAVCrP5KgIwAro2vqM+vSWEI8kNMBi/Zivve8hp4TQEAuhHjl9naQnrsoKsw9+CMatMVbDS56O+fmy8H0fnDtvW8SyZThjzhTK2Cee8KbbRF65LlXU9OpR6XOkfsTEseyVlaGm5C+engXl/YKnH8SNgzZNjE45ptYldOhKGlYrMqBv/Nivljsl3K9+yyLrTOE3qG5TxwEOPGoIOBjGGfvur91yP5pZnmefSMnryPEPlAQEzIBh21vqXvG+wYZh6U6YUPKDN3aZgBt4fjLWfcQbBZF95JixG/5CBOEExdrMfVJIbpoVeljcITw="
         on:
           repo: kuzzleio/sdk-javascript
           all_branches: true
@@ -216,7 +216,7 @@ jobs:
           email: support@kuzzle.io
           tag: beta
           api_key:
-            secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+            secure: "oZG8eiOGQxH5sEvTI6sNcSL8+RnE/qOs1TMOn1eB0GvRB/pQ9Oylzunjntp7WzHpEm23+3Cfj898sgQ6uNBeKm/bEYOxN+kYbzpY0kSiwaW+dDneFzVIa+r1dF8+/oCvH720VIu+92KYK/8+A6jJGlevMezL+w5ggD6I2j0i+QBPyplvh5qjyd7OayGPCPUq22Om9U9QPux4FFYmpX6TDn/l0iVYat0T8B5+tyUKjsY7XV/Ad4ob8y52kQ1gmxtK09FXkR8im5sEmEaC3QWKQKqWc0XpZ7wwgw/cojVShQvEp25ZgVNxG0cPynIbIu0Y3yCO3c0WVq1QpmMx41ekMb61kBjQ4UYmSKcHODMt3MdP6VgFJOlAVCrP5KgIwAro2vqM+vSWEI8kNMBi/Zivve8hp4TQEAuhHjl9naQnrsoKsw9+CMatMVbDS56O+fmy8H0fnDtvW8SyZThjzhTK2Cee8KbbRF65LlXU9OpR6XOkfsTEseyVlaGm5C+engXl/YKnH8SNgzZNjE45ptYldOhKGlYrMqBv/Nivljsl3K9+yyLrTOE3qG5TxwEOPGoIOBjGGfvur91yP5pZnmefSMnryPEPlAQEzIBh21vqXvG+wYZh6U6YUPKDN3aZgBt4fjLWfcQbBZF95JixG/5CBOEExdrMfVJIbpoVeljcITw="
           on:
             repo: kuzzleio/sdk-javascript
             all_branches: true
