@@ -155,7 +155,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: tag IS present AND type != cron AND branch =~ /^master|[0-9]+-stable$/
+      if: type != cron AND branch =~ /^master|[0-9]+-stable$/
       sudo: false
       language: node_js
       node_js: 10
@@ -189,7 +189,7 @@ jobs:
           condition: $TRAVIS_BRANCH =~ /^master|[0-9]+-stable$/
 
     - stage: Deploy Beta release on NPM
-      if: tag IS present AND type != cron AND branch =~ /^[0-9]+-beta$/
+      if: type != cron AND branch =~ /^[0-9]+-beta$/
       sudo: false
       language: node_js
       node_js: 10
