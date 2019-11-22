@@ -10,7 +10,7 @@ description: Adds a new controller to the SDK
 Adds a new controller to the SDK. 
 
 *See also:* 
-  - *[Extend the SDK](/sdk/js/6/essentials/extend-sdk)*
+  - *[Extend the SDK](/sdk/js/7/essentials/extend-sdk)*
 
 ## Arguments
 
@@ -22,7 +22,7 @@ useController (ControllerClass, accessor);
 
 | Argument  | Type   | Description            |
 | -------------- | --------- | ------------- |
-| `ControllerClass` | <pre>Class</pre> | Controller class. Must inherit from [BaseController](/sdk/js/6/core-classes/base-controller)    |
+| `ControllerClass` | <pre>Class</pre> | Controller class. Must inherit from [BaseController](/sdk/js/7/core-classes/base-controller)    |
 | `accessor` | <pre>string</pre> | Accessor name for the controller in the Kuzzle object |
 
 ## Returns

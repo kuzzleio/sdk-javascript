@@ -13,7 +13,7 @@ It will walk you through creating scripts that can **store** documents in Kuzzle
 
 You are going to write an application that **stores** documents in Kuzzle Server and subscribe to **real time notifications** for each created document.
 
-To follow this tutorial, you must have a Kuzzle Server up and running. Follow these instructions if this is not already the case: [Running Kuzzle](/core/1/guides/getting-started/running-kuzzle).
+To follow this tutorial, you must have a Kuzzle Server up and running. Follow these instructions if this is not already the case: [Running Kuzzle](/core/2/guides/getting-started/running-kuzzle).
 
 
 :::info
@@ -22,7 +22,7 @@ Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzz
 
 ## Explore the SDK
 
-It's time to get started with the [Kuzzle Javascript SDK](/sdk/js/6). This section, explains you how to store a document and subscribe to notifications in Kuzzle using the Javascript SDK.
+It's time to get started with the [Kuzzle Javascript SDK](/sdk/js/7). This section, explains you how to store a document and subscribe to notifications in Kuzzle using the Javascript SDK.
 
 Before proceeding, please make sure your system has **Node.js** version 8 or higher ([download page](https://nodejs.org/en/download/)) installed.
 
@@ -116,7 +116,7 @@ You have now successfully stored your first document into Kuzzle. You can now op
 
 ## Subscribe to realtime document notifications (pub/sub)
 
-Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/6/essentials/realtime-notifications) documentation).
+Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/7/essentials/realtime-notifications) documentation).
 
 Let's get started. Create a `subscribe.js` file with the following code:
 
@@ -136,7 +136,7 @@ Now in another terminal, launch the `create.js` file from the previous section.
 node create.js
 ```
 
-This creates a new document in Kuzzle which, in turn, triggers a [document notification](/core/1/api/essentials/notifications#documents-changes-messages) sent to the `subscribe.js` program.
+This creates a new document in Kuzzle which, in turn, triggers a [document notification](/core/2/api/essentials/notifications#documents-changes-messages) sent to the `subscribe.js` program.
 Check the `subscribe.js` terminal: a new message is printed everytime a document is created using the `create.js` code.
 
 ```bash
@@ -152,6 +152,6 @@ Congratulations! You have just set up your first pub/sub communication!
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
-- learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security)
+- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
+- learn how to perform a [basic authentication](/sdk/js/7/controllers/auth/login)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)

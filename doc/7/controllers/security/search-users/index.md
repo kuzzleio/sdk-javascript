@@ -39,7 +39,7 @@ If left empty, the result will return all available users.
 
 ## Resolves
 
-A [`SearchResult`](sdk/js/6/core-classes/search-result) object containing the retrieved [`User`](/sdk/js/6/core-classes/user) objects.
+A [`SearchResult`](sdk/js/6/core-classes/search-result) object containing the retrieved [`User`](/sdk/js/7/core-classes/user) objects.
 
 ## Usage
 

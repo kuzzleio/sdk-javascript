@@ -19,7 +19,7 @@ replaceUser(kuid, body, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | User content |
 | `options` | <pre>object</pre> | Query options |
 
@@ -34,7 +34,7 @@ replaceUser(kuid, body, [options]);
 **other properties**
 
 The body can be extended with any custom information. 
-Make sure to [update the user mapping](/sdk/js/6/controllers/security/update-user-mapping) collection to match your custom attributes.
+Make sure to [update the user mapping](/sdk/js/7/controllers/security/update-user-mapping) collection to match your custom attributes.
 
 example:
 
@@ -60,4 +60,3 @@ An [`User`](sdk/js/6/core-classes/user/introduction) object containing informati
 ## Usage
 
 <<< ./snippets/replace-user.js
-

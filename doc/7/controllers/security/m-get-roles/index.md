@@ -30,9 +30,8 @@ mGetRoles(ids, [options]);
 
 ## Resolves
 
-An array of retrieved [`Role`](/sdk/js/6/core-classes/role/introduction) objects.
+An array of retrieved [`Role`](/sdk/js/7/core-classes/role/introduction) objects.
 
 ## Usage
 
 <<< ./snippets/m-get-roles.js
-

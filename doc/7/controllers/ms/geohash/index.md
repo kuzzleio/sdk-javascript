@@ -6,7 +6,7 @@ title: geohash
 
 # geohash
 
-Converts a key's geopoints (see [geoadd](/sdk/js/6/controllers/ms/geoadd)) into [geohashes](https://en.wikipedia.org/wiki/Geohash).
+Converts a key's geopoints (see [geoadd](/sdk/js/7/controllers/ms/geoadd)) into [geohashes](https://en.wikipedia.org/wiki/Geohash).
 
 [[_Redis documentation_]](https://redis.io/commands/geohash)
 

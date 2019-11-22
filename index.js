@@ -2,8 +2,7 @@ const
   Kuzzle = require('./src/Kuzzle'),
   {
     Http,
-    WebSocket,
-    SocketIO
+    WebSocket
   } = require('./src/protocols'),
   BaseController = require('./src/controllers/base'),
   KuzzleAbstractProtocol = require('./src/protocols/abstract/common'),
@@ -20,7 +19,6 @@ module.exports = {
   Kuzzle,
   Http,
   WebSocket,
-  SocketIO,
   BaseController,
   KuzzleAbstractProtocol,
   KuzzleEventEmitter

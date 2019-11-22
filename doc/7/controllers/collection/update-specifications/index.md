@@ -30,7 +30,7 @@ updateSpecifications(index, collection, specifications, [options]);
 
 An object representing the specifications.
 
-This object must follow the [Specification Structure](/core/1/guides/essentials/data-validation):
+This object must follow the [Specification Structure](/core/2/guides/essentials/data-validation):
 
 ```js
 {

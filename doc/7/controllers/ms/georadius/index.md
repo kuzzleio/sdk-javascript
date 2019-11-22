@@ -6,7 +6,7 @@ title: georadius
 
 # georadius
 
-Returns the members (added with [geoadd](/sdk/js/6/controllers/ms/geoadd)) of a given key inside the provided geospatial radius.
+Returns the members (added with [geoadd](/sdk/js/7/controllers/ms/geoadd)) of a given key inside the provided geospatial radius.
 
 [[_Redis documentation_]](https://redis.io/commands/georadius)
 

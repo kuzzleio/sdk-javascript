@@ -19,7 +19,7 @@ getUserRights(kui, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
@@ -42,4 +42,3 @@ An array of objects. Each object is a security right granted or denied to the us
 ## Usage
 
 <<< ./snippets/get-user-rights.js
-

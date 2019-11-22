@@ -29,7 +29,7 @@ updateRole(id, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `controllers` | <pre>object</pre> | [Role definition](/core/1/guides/essentials/security#defining-roles) |
+| `controllers` | <pre>object</pre> | [Role definition](/core/2/guides/essentials/security#defining-roles) |
 
 ### options
 
@@ -40,7 +40,7 @@ updateRole(id, body, [options]);
 
 ## Resolves
 
-A [`Role`](/sdk/js/6/core-classes/role) object representing the updated role.
+A [`Role`](/sdk/js/7/core-classes/role) object representing the updated role.
 
 ## Usage
 

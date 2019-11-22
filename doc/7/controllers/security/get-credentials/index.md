@@ -20,7 +20,7 @@ getCredentials(strategy, kuid, [options]);
 | Property | Type | Description |
 | --- | --- | --- |
 | `strategy` | <pre>string</pre> | Strategy identifier |
-| `kuid` | <pre>string</pre> | User [kuid](/core/1/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
