@@ -10,7 +10,7 @@ jobs:
   include:
     - stage: Tests
       name: Unit Tests
-      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
       language: node_js
       node_js: 10
 
@@ -41,7 +41,7 @@ jobs:
 
     - stage: Tests
       name: Integration Tests
-      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
       language: node_js
       node_js: 10
 
@@ -67,7 +67,7 @@ jobs:
 
     - stage: Tests
       name: Documentation Tests
-      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
       language: node_js
       node_js: 10
 
@@ -78,7 +78,7 @@ jobs:
 
     - stage: Tests
       name: Dead link check
-      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable)$/ OR type = cron
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
 
       before_script:
         - npm run doc-prepare
@@ -90,7 +90,7 @@ jobs:
 
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
-      if: type = push AND branch =~ .*-dev
+      if: type = push AND branch =~ /^[0-9]+-dev$/
       language: node_js
       node_js: 10
       env:
@@ -155,7 +155,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: tag IS present AND type != cron
+      if: tag IS present AND type != cron AND branch =~ /^master|[0-9]+-stable$/
       sudo: false
       language: node_js
       node_js: 10
@@ -184,11 +184,12 @@ jobs:
         api_key:
           secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
         on:
-          branch: master
-          tags: true
+          repo: kuzzleio/sdk-javascript
+          all_branches: true
+          condition: $TRAVIS_BRANCH =~ /^master|[0-9]+-stable$/
 
     - stage: Deploy Beta release on NPM
-      if: type = push && branch =~ /^[0-9]+-dev$/
+      if: tag IS present AND type != cron AND branch =~ /^[0-9]+-beta$/
       sudo: false
       language: node_js
       node_js: 10
@@ -220,4 +221,4 @@ jobs:
           on:
             repo: kuzzleio/sdk-javascript
             all_branches: true
-            condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
+            condition: $TRAVIS_BRANCH =~ /^[0-9]+-beta$/
