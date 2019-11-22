@@ -136,14 +136,14 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      action: 'mGet',
-      includeTrash: options.includeTrash
+      action: 'mGet'
     };
 
     if (options.verb === 'POST') {
       request.body = {ids};
-    } else {
-      request.ids = ids.toString();
+    }
+    else {
+      request.ids = ids.join();
     }
     return this.query(request, options)
       .then(response => response.result);

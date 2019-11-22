@@ -268,7 +268,6 @@ describe('Document Controller', () => {
               action: 'mGet',
               index: 'index',
               collection: 'collection',
-              includeTrash: undefined,
               body: {ids: ['document1', 'document2']}
             }, options);
 
@@ -287,7 +286,6 @@ describe('Document Controller', () => {
               action: 'mGet',
               index: 'index',
               collection: 'collection',
-              includeTrash: undefined,
               ids: 'document1,document2'
             }, options);
 
