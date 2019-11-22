@@ -155,7 +155,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy Stable release on NPM
-      if: tag IS present AND type != cron && branch =~ /^master|[0-9]+-stable$/
+      if: type = push && branch =~ /^master|[0-9]+-stable$/
       sudo: false
       language: node_js
       node_js: 6
@@ -182,14 +182,13 @@ jobs:
         skip_cleanup: true
         email: support@kuzzle.io
         api_key:
-          secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+          secure: "VF684vTrSEMxZqkpJRAxL6PvqZgOA1qjvDhV4mscEQjyFOGD7RK3us87Jy36VeBhbwF5c0YzpnGo9nvUV+vIgUxKClYJGNcoTsZSQtbEA2+ku+DqJmdMdTGOqqRGmWNbjN36OmDMxbdvjPcIDuyJqwuKfToQ7JDDmh/dghyrlJzzESwKd7iOMigq7zcr31fQBbFEH4s8XhJvscJdC6dFJ5VgM03ji/HWQ+ledSxg/dIfzaqpCxjCuF9m3wwV5R8PwVfddfir74T/UdD9xpifUlncY5drS3W7uUMaUJNW+rWTKnZEkm85RkleaD5rO69F9CfM07K7kfsR9vWrM0BjiV+rkTPgW/XU5SSF/8oiCcfvVnbENRS0L9TuuMSmw1gJ3QYmo/JRHDBYhdU9kgQYOUOlAJuPl4+7jcbNKW48/+PrdlhZ5YwlZy0w6xwPG8EXpSOlDZOdnKlZcUpfX43988hdztqaQa8ZWb7jS4Q4Uxqbk/NfcBsQoj7Mja+vkwfn/4rHEfNnKeX4+KQf0NfcL/mBcRGzTq+VqjMi9bSzSPaS7KXJubT7X0HwwssskOmvCuO/+4Em3nX2BLYdmCcwqkUmdbyTkuMaWQ+4J7aulOk5ps78uyu8p2btcsvjOFiQs60F7bvfFBXE6BisdrCxiuBP8EIRW8BDI04TEEjYnH4="
         on:
           repo: kuzzleio/sdk-javascript
           all_branches: true
-          condition: $TRAVIS_BRANCH =~ /^master|[0-9]+-stable$/
 
     - stage: Deploy Beta release on NPM
-      if: tag IS present AND type != cron && branch =~ /^[0-9]+-beta$/
+      if: type = push && branch =~ /^[0-9]+-beta$/
       sudo: false
       language: node_js
       node_js: 6
@@ -217,8 +216,7 @@ jobs:
           email: support@kuzzle.io
           tag: beta
           api_key:
-            secure: ktfR6QVV59uCVLTfb60JSjPxzxg+UYe63pIGxU9awh1wJW89SQqQdeshHas3ojwrNoMOVybx/L6owtD8uIB4Xlau6pd7StBAA1VQ3vLa6RxU5SUr9VOz3RhZutRnYXH28Ziz/ynr6zVnwGxTzFsxBAdQ9CVS3ErBzliTgMVI+52YRNB3mBDiccSKVNGmp2APiWiaEidrmaOFkCwWQKsAxFTbBoCsDYGGAq8a8b1i2nE+BL4JWB1D2x55xzFaciDIQONXnY9YPAAbzCHBTKAne5iD6XwFj7Zg/42fHTn16LBSG+Sw+7aWyV11U6SJYKAjm/5GZEUrbvX/mwNQ7VYcvMStiP1nnt/L/s/Y7d0K3mwdsV8U8RCctElOeqLsDqoBzQYAxHTqRqJzyFNMcbcMhZgsHH5LgQDoJdKFwzP2ysYoazgm/jnr9atvlqucjWU8madRS34S8wD0zGjYf8VXH3WMUvL5mFwtb58FRCZKO3G7QJlGE8bdZ8CfJa/1tFnYY9SA0018GaXbh0RqQw0RskbmXEKTlnDBxaRd/ZjfaOjF4JcMGGZ8hsCRjxuDFY5Ki0kKDAlDV1W40fkkqPVm8k9H8Elwt0UFZvvAdjG4c+gV0zdAKHQ7P6uKvXiDlsKRHulE3Ztpo6jqGN69s7aLm6DKNVsaE4cNmmUOv3ODrM4=
+            secure: "VF684vTrSEMxZqkpJRAxL6PvqZgOA1qjvDhV4mscEQjyFOGD7RK3us87Jy36VeBhbwF5c0YzpnGo9nvUV+vIgUxKClYJGNcoTsZSQtbEA2+ku+DqJmdMdTGOqqRGmWNbjN36OmDMxbdvjPcIDuyJqwuKfToQ7JDDmh/dghyrlJzzESwKd7iOMigq7zcr31fQBbFEH4s8XhJvscJdC6dFJ5VgM03ji/HWQ+ledSxg/dIfzaqpCxjCuF9m3wwV5R8PwVfddfir74T/UdD9xpifUlncY5drS3W7uUMaUJNW+rWTKnZEkm85RkleaD5rO69F9CfM07K7kfsR9vWrM0BjiV+rkTPgW/XU5SSF/8oiCcfvVnbENRS0L9TuuMSmw1gJ3QYmo/JRHDBYhdU9kgQYOUOlAJuPl4+7jcbNKW48/+PrdlhZ5YwlZy0w6xwPG8EXpSOlDZOdnKlZcUpfX43988hdztqaQa8ZWb7jS4Q4Uxqbk/NfcBsQoj7Mja+vkwfn/4rHEfNnKeX4+KQf0NfcL/mBcRGzTq+VqjMi9bSzSPaS7KXJubT7X0HwwssskOmvCuO/+4Em3nX2BLYdmCcwqkUmdbyTkuMaWQ+4J7aulOk5ps78uyu8p2btcsvjOFiQs60F7bvfFBXE6BisdrCxiuBP8EIRW8BDI04TEEjYnH4="
           on:
             repo: kuzzleio/sdk-javascript
             all_branches: true
-            condition: $TRAVIS_BRANCH =~ ^[0-9]+-beta$
