@@ -25,6 +25,8 @@ try {
   /*
   { successes:
     [ { _id: 'panipokari',
+        created: true,
+        _version: 1,
         _source: {
           "licence": "B",
           "_kuzzle_info": {
@@ -32,13 +34,15 @@ try {
             "createdAt": 746186305 } },
         _version: 1 },
       { _id: 'AWvlrMIZE7sKlamkyoHr',
+        created: true,
+        _version: 1,
         _source: {
           "licence": "B",
           "_kuzzle_info": {
             "creator": "dahi",
             "createdAt": 835005505 } },
         _version: 1 } ],
-    total: 2 }
+    errors: [] }
   */
 
   console.log(`Document creator is ${result.successes[1]._source._kuzzle_info.creator}`);
