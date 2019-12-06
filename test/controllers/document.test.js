@@ -449,6 +449,23 @@ describe('Document Controller', () => {
         });
     });
 
+    it.only('should allow to set value of 0 for size', () => {
+      const result = {
+        hits: [],
+        total: 0
+      };
+      kuzzle.document.query = sinon.stub().resolves({result});
+
+      return kuzzle.document.search('index', 'collection', {}, { size: 0 })
+        .then(() => {
+          should(kuzzle.document.query).be.calledOnce();
+
+          const request = kuzzle.document.query.getCall(0).args[0];
+          should(request.from).be.eql(0);
+          should(request.size).be.eql(0);
+        });
+    });
+
     it('should not set default value for from if scroll or sort are specified', () => {
       const result = {
         hits: [],
