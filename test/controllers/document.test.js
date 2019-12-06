@@ -449,7 +449,7 @@ describe('Document Controller', () => {
         });
     });
 
-    it.only('should allow to set value of 0 for size', () => {
+    it('should allow to set value of 0 for size', () => {
       const result = {
         hits: [],
         total: 0
