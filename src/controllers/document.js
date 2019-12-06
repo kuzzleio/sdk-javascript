@@ -194,7 +194,10 @@ class DocumentController extends BaseController {
       delete options[opt];
     }
 
-    request.size = request.size || 10;
+    if (request.size === undefined) {
+      request.size = 10;
+    }
+
     if (!request.scroll && !request.body.sort && !request.from) {
       request.from = 0;
     }
