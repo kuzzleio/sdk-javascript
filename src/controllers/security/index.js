@@ -56,6 +56,9 @@ class SecurityController extends BaseController {
       action: 'createOrReplaceRole'
     };
 
+    if (options.force) {
+      request.force = true;
+    }
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
@@ -92,7 +95,9 @@ class SecurityController extends BaseController {
       body,
       action: 'createRole'
     };
-
+    if (options.force) {
+      request.force = true;
+    }
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
@@ -382,6 +387,9 @@ class SecurityController extends BaseController {
       action: 'updateRole'
     };
 
+    if (options.force) {
+      request.force = true;
+    }
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
