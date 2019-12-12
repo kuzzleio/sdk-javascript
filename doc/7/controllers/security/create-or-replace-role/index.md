@@ -35,6 +35,7 @@ createOrReplaceRole(id, body, [options]);
 | --- | --- | --- |
 | `queuable` | <pre>boolean</pre><br />(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
 | `refresh` | <pre>boolean</pre><br />(`false`) | If set to `wait_for`, Kuzzle will not respond until the created/replaced role is indexed |
+| `force`   | <pre>boolean</pre><br />(`false`) | If set to `true`, Kuzzle will force the creation of a role even if it contains invalid plugin API rights. However, even if you use this option, you can't set invalid rights about the native API. |
 
 ## Resolves
 
