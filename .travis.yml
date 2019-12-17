@@ -154,7 +154,7 @@ jobs:
         - npm run doc-cloudfront
 
     - stage: Deploy latest release on NPM
-      if: type = push AND branch =~ /^master$/
+      if: type = push AND branch = master
       sudo: false
       language: node_js
       node_js: 10
