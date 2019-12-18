@@ -7,11 +7,11 @@ hooks:
         {
           "roleId": "admin",
           "restrictedTo": [
-            { "index": "someIndex" },
+            { "index": "someindex" },
             {
-              "index": "anotherIndex",
+              "index": "anotherindex",
               "collections": [
-                "someCollection"
+                "somecollection"
               ]
             }
           ]
@@ -23,4 +23,4 @@ hooks:
     }' kuzzle:7512/profiles/myProfile/_create
   after: curl -XDELETE kuzzle:7512/profiles/myProfile
 template: default
-expected: '^    value: ''allowed'' },$'
+expected: "^    value: 'allowed' },$"

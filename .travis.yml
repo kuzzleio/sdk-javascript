@@ -87,7 +87,6 @@ jobs:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
 
-
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
       if: type = push AND branch =~ /^[0-9]+-dev$/
@@ -154,8 +153,42 @@ jobs:
       after_deploy:
         - npm run doc-cloudfront
 
+    - stage: Deploy latest release on NPM
+      if: type = push AND branch = master
+      sudo: false
+      language: node_js
+      node_js: 10
+
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-4.9
+            - g++-4.9
+
+      before_install:
+        - export CC="gcc-4.9" CXX="g++-4.9"
+
+      install:
+        - npm install
+
+      script:
+        - npm run build
+
+      deploy:
+        provider: npm
+        skip_cleanup: true
+        email: support@kuzzle.io
+        tag: latest
+        api_key:
+          secure: "oZG8eiOGQxH5sEvTI6sNcSL8+RnE/qOs1TMOn1eB0GvRB/pQ9Oylzunjntp7WzHpEm23+3Cfj898sgQ6uNBeKm/bEYOxN+kYbzpY0kSiwaW+dDneFzVIa+r1dF8+/oCvH720VIu+92KYK/8+A6jJGlevMezL+w5ggD6I2j0i+QBPyplvh5qjyd7OayGPCPUq22Om9U9QPux4FFYmpX6TDn/l0iVYat0T8B5+tyUKjsY7XV/Ad4ob8y52kQ1gmxtK09FXkR8im5sEmEaC3QWKQKqWc0XpZ7wwgw/cojVShQvEp25ZgVNxG0cPynIbIu0Y3yCO3c0WVq1QpmMx41ekMb61kBjQ4UYmSKcHODMt3MdP6VgFJOlAVCrP5KgIwAro2vqM+vSWEI8kNMBi/Zivve8hp4TQEAuhHjl9naQnrsoKsw9+CMatMVbDS56O+fmy8H0fnDtvW8SyZThjzhTK2Cee8KbbRF65LlXU9OpR6XOkfsTEseyVlaGm5C+engXl/YKnH8SNgzZNjE45ptYldOhKGlYrMqBv/Nivljsl3K9+yyLrTOE3qG5TxwEOPGoIOBjGGfvur91yP5pZnmefSMnryPEPlAQEzIBh21vqXvG+wYZh6U6YUPKDN3aZgBt4fjLWfcQbBZF95JixG/5CBOEExdrMfVJIbpoVeljcITw="
+        on:
+          repo: kuzzleio/sdk-javascript
+          all_branches: true
+
     - stage: Deploy Stable release on NPM
-      if: type = push AND branch =~ /^master|[0-9]+-stable$/
+      if: type = push AND branch =~ /^[0-9]+-stable$/
       sudo: false
       language: node_js
       node_js: 10
