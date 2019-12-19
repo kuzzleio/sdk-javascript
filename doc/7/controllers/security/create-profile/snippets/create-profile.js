@@ -10,7 +10,7 @@ try {
           roleId: 'admin',
           restrictedTo: [
             {
-              index: 'someIndex',
+              index: 'someindex',
               collections: [
                 'collection1',
                 'collection2'
