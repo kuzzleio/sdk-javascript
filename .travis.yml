@@ -20,6 +20,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -47,6 +48,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -101,6 +103,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           packages:
             - python
             - python-pip
@@ -134,6 +137,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           packages:
             - python
             - python-pip
@@ -162,6 +166,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -195,6 +200,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
