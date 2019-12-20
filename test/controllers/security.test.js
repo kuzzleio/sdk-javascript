@@ -154,7 +154,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createOrReplaceRole'
+              action: 'createOrReplaceRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
@@ -216,7 +217,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createRole'
+              action: 'createRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
@@ -1155,7 +1157,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'updateRole'
+              action: 'updateRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
