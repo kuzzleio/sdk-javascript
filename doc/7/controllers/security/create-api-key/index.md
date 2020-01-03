@@ -2,7 +2,7 @@
 code: true
 type: page
 title: createApiKey
-description: Creates a new API key for a user
+description: Creates a new API key for an user
 ---
 
 # createApiKey
@@ -11,7 +11,7 @@ description: Creates a new API key for a user
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Creates a new API key for a user.
+Creates a new API key for an user.
 
 <br />
 

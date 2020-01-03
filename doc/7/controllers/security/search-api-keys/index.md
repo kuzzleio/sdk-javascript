@@ -2,7 +2,7 @@
 code: true
 type: page
 title: searchApiKeys
-description: Creates a new API key for a user
+description: Searches for an user API keys.
 ---
 
 # searchApiKeys

@@ -1,5 +1,5 @@
 name: security#createApiKey
-description: Creates a new API key for a user
+description: Creates a new API key for an user
 hooks:
   before: >
     curl -H "Content-type: application/json" -d '{
