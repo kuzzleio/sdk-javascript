@@ -1,0 +1,18 @@
+name: security#deleteApiKey
+description: Deletes an user API key
+hooks:
+  before: >
+    curl -H "Content-type: application/json" -d '{
+      "content": {
+        "profileIds": ["default"]
+      }
+    }' "kuzzle:7512/users/john.doe/_create?refresh=wait_for"
+    &&
+    curl -XPOST -H "Content-type: application/json" -d '{
+      "description": "Sigfox API key"
+    }' "kuzzle:7512/users/john.doe/api-keys/_create?_id=fQRa28BsidO6V_wmOcL&refresh=wait_for"
+  after:
+    curl -XDELETE kuzzle:7512/users/john.doe
+template: default
+expected:
+  - API key successfully deleted
