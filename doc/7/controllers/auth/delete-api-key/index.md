@@ -2,7 +2,7 @@
 code: true
 type: page
 title: deleteApiKey
-description: Deletes an user API key.
+description: Deletes an API key for the currently loggued user.
 ---
 
 # deleteApiKey
@@ -11,19 +11,18 @@ description: Deletes an user API key.
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Deletes an user API key.
+Deletes an API key for the currently loggued user.
 
 <br />
 
 ```js
-deleteApiKey(userId, id, [options]);
+deleteApiKey(id, [options]);
 ```
 
 <br />
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `id` | <pre>string</pre> | API key unique ID |
 | `options` | <pre>object</pre> | Additional options |
 

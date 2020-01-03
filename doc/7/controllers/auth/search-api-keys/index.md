@@ -2,7 +2,7 @@
 code: true
 type: page
 title: searchApiKeys
-description: Creates a new API key for a user
+description: Searches API keys for the currently loggued user.
 ---
 
 # searchApiKeys
@@ -11,19 +11,18 @@ description: Creates a new API key for a user
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Searches for an user API keys.
+Searches API keys for the currently loggued user.
 
 <br />
 
 ```js
-searchApiKeys(userId, [query], [options]);
+searchApiKeys([query], [options]);
 ```
 
 <br />
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `userId` | <pre>string</pre> | User kuid |
 | `query` | <pre>object</pre> | Search query |
 | `options` | <pre>object</pre> | Additional options |
 
@@ -31,7 +30,7 @@ searchApiKeys(userId, [query], [options]);
 
 The search query to apply to API keys content, using [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
 
-If left empty, the result will return all available API keys for the user.
+If left empty, the result will return all available API keys of the currently loggued user.
 
 ### options
 

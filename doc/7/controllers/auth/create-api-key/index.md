@@ -2,7 +2,7 @@
 code: true
 type: page
 title: createApiKey
-description: Creates a new API key for a user
+description: Creates a new API key for the currently loggued user.
 ---
 
 # createApiKey
@@ -11,19 +11,18 @@ description: Creates a new API key for a user
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Creates a new API key for a user.
+Creates a new API key for the currently loggued user.
 
 <br />
 
 ```js
-createApiKey(userId, description, [options]);
+createApiKey(description, [options]);
 ```
 
 <br />
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
 | `description` | <pre>string</pre> | API key description |
 | `options` | <pre>object</pre> | Additional options |
 
