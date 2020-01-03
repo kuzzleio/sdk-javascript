@@ -100,7 +100,7 @@ class AuthController extends BaseController {
    * @param {Object} [query] - Search query
    * @param {Object} [options] - { from, size }
    *
-   * @returns {Promise}
+   * @returns {Promise.<object[]>} - { hits, total }
    */
   searchApiKeys(query = {}, options = {}) {
     const request = {

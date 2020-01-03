@@ -68,7 +68,7 @@ class SecurityController extends BaseController {
    * @param {Object} [query] - Search query
    * @param {Object} [options] - { from, size }
    *
-   * @returns {Promise}
+   * @returns {Promise.<object[]>} - { hits, total }
    */
   searchApiKeys(userId, query = {}, options = {}) {
     const request = {
