@@ -53,9 +53,9 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createOrReplaceRole'
+      action: 'createOrReplaceRole',
+      force: options.force ? true : null
     };
-
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
@@ -90,9 +90,9 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'createRole'
+      action: 'createRole',
+      force: options.force ? true : null
     };
-
     return this.query(request, options)
       .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
@@ -379,7 +379,8 @@ class SecurityController extends BaseController {
     const request = {
       _id,
       body,
-      action: 'updateRole'
+      action: 'updateRole',
+      force: options.force ? true : null
     };
 
     return this.query(request, options)
