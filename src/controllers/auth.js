@@ -53,6 +53,68 @@ class AuthController extends BaseController {
   }
 
   /**
+   * Creates a new API key for the currently loggued user.
+   *
+   * @param {String} description - API key description
+   * @param {Object} [options] - { _id, expiresIn, refresh }
+   *
+   * @returns {Promise.<Object>} ApiKey { _id, _source }
+   */
+  createApiKey(description, options = {}) {
+    const request = {
+      action: 'createApiKey',
+      _id: options._id,
+      expiresIn: options.expiresIn,
+      refresh: options.refresh,
+      body: {
+        description
+      }
+    };
+
+    return this.query(request)
+      .then(response => response.result);
+  }
+
+  /**
+   * Deletes an API key for the currently loggued user.
+   *
+   * @param {String} id - API key ID
+   * @param {Object} [options] - { refresh }
+   *
+   * @returns {Promise}
+   */
+  deleteApiKey(id, options = {}) {
+    const request = {
+      action: 'deleteApiKey',
+      _id: id,
+      refresh: options.refresh
+    };
+
+    return this.query(request)
+      .then(() => {});
+  }
+
+  /**
+   * Searches API keys for the currently loggued user.
+   *
+   * @param {Object} [query] - Search query
+   * @param {Object} [options] - { from, size }
+   *
+   * @returns {Promise.<object[]>} - { hits, total }
+   */
+  searchApiKeys(query = {}, options = {}) {
+    const request = {
+      action: 'searchApiKeys',
+      from: options.from,
+      size: options.size,
+      body: query
+    };
+
+    return this.query(request)
+      .then(response => response.result);
+  }
+
+  /**
    * Checks whether a given jwt token still represents a valid session in Kuzzle.
    *
    * @param  {string}   token     The jwt token to check

@@ -53,7 +53,7 @@ When('I create a document in {string}', function (collection) {
       collection,
       {a: 'document'},
       'some-id',
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     });
@@ -68,7 +68,7 @@ When('I create a document with id {string}', function (id) {
       this.collection,
       {a: 'document'},
       id,
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     })
@@ -108,7 +108,7 @@ When('I createOrReplace a document with id {string}', function (id) {
       this.collection,
       id,
       {a: 'replaced document'},
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     })
@@ -159,7 +159,7 @@ When('I delete the documents [{string}, {string}]', function (id1, id2) {
       this.index,
       this.collection,
       [id1, id2],
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     })
@@ -177,7 +177,7 @@ When('I replace a document with id {string}', function (id) {
       this.collection,
       id,
       {a: 'replaced document'},
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     })
@@ -197,7 +197,7 @@ When('I replace the documents [{string}, {string}]', function (id1, id2) {
         {_id: id1, body: {a: 'replaced document'}},
         {_id: id2, body: {a: 'replaced document'}}
       ],
-      {refresh: true})
+      {refresh: 'wait_for'})
     .then(content => {
       this.content = content;
     })
@@ -293,7 +293,7 @@ When('I update the documents [{string}, {string}]', function (id1, id2) {
         {_id: id1, body: {a: 'replaced document', some: 'update'}},
         {_id: id2, body: {a: 'replaced document', some: 'update'}}
       ],
-      { refresh: true })
+      { refresh: 'wait_for' })
     .then(content => {
       this.content = content;
     })

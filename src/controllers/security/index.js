@@ -15,6 +15,74 @@ class SecurityController extends BaseController {
     super(kuzzle, 'security');
   }
 
+  /**
+   * Creates a new API key for a user.
+   *
+   * @param {String} userId - User kuid
+   * @param {String} description - API key description
+   * @param {Object} [options] - { _id, expiresIn, refresh }
+   *
+   * @returns {Promise.<Object>} ApiKey { _id, _source }
+   */
+  createApiKey(userId, description, options = {}) {
+    const request = {
+      userId,
+      action: 'createApiKey',
+      _id: options._id,
+      expiresIn: options.expiresIn,
+      refresh: options.refresh,
+      body: {
+        description
+      }
+    };
+
+    return this.query(request)
+      .then(response => response.result);
+  }
+
+  /**
+   * Deletes an user API key.
+   *
+   * @param {String} userId - User kuid
+   * @param {String} id - API key ID
+   * @param {Object} [options] - { refresh }
+   *
+   * @returns {Promise}
+   */
+  deleteApiKey(userId, id, options = {}) {
+    const request = {
+      userId,
+      action: 'deleteApiKey',
+      _id: id,
+      refresh: options.refresh
+    };
+
+    return this.query(request)
+      .then(() => {});
+  }
+
+  /**
+   * Searches for an user API key.
+   *
+   * @param {String} userId - User kuid
+   * @param {Object} [query] - Search query
+   * @param {Object} [options] - { from, size }
+   *
+   * @returns {Promise.<object[]>} - { hits, total }
+   */
+  searchApiKeys(userId, query = {}, options = {}) {
+    const request = {
+      userId,
+      action: 'searchApiKeys',
+      from: options.from,
+      size: options.size,
+      body: query
+    };
+
+    return this.query(request)
+      .then(response => response.result);
+  }
+
   createCredentials (strategy, _id, body, options = {}) {
     return this.query({
       _id,

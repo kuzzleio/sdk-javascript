@@ -153,9 +153,11 @@ describe('Kuzzle query management', () => {
     });
 
     it('should handle option "refresh" properly', () => {
-      kuzzle.query({refresh: 'foo'});
-      should(kuzzle.protocol.query).be.calledOnce();
+      kuzzle.query({refresh: 'wait_for'});
       should(kuzzle.protocol.query).be.calledWithMatch({refresh: 'wait_for'});
+
+      kuzzle.query({refresh: false});
+      should(kuzzle.protocol.query).be.calledWithMatch({refresh: false});
     });
 
     it('should not generate a new request ID if one is already defined', () => {
