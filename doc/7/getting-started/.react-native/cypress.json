@@ -1,0 +1,15 @@
+{
+    "baseUrl": "http://localhost:19006",
+    "projectId": "ce9wca",
+    "videoUploadOnPasses": false,
+    "viewport": "iphone-6",
+    "defaultCommandTimeout": 5000,
+    "env": {
+      "kuzzle": {
+        "host": "localhost",
+        "port": "7512",
+        "index": "chat",
+        "collection": "messages"
+      }
+    }
+  }
