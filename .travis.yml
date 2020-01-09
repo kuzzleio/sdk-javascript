@@ -92,6 +92,8 @@ jobs:
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
+      env:
+        - BRANCH=$(if [ "${TRAVIS_BRANCH}" =~ /^master|[0-9]+-(stable|beta)$ ]; then echo "stable"; else echo "dev"; fi)
 
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
