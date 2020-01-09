@@ -1,6 +1,8 @@
+/* snippet:start:1 */
 import React from 'react';
 import { StyleSheet, Text, TextInput, KeyboardAvoidingView } from 'react-native';
-
+/* snippet:end */
+/* snippet:start:2 */
 export default class Login extends React.Component {
     render() {
         return (
@@ -21,7 +23,8 @@ export default class Login extends React.Component {
         );
     }
 }
-
+/* snippet:end */
+/* snippet:start:3 */
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -34,3 +37,4 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     }
 });
+/* snippet:end */

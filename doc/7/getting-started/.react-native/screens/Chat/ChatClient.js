@@ -1,7 +1,10 @@
+/* snippet:start:1 */
 import React from 'react';
 import ChatView from './ChatView';
 import kuzzle from '../../services/kuzzle';
+/* snippet:end */
 
+/* snippet:start:2 */
 class ChatClient extends React.Component {
     constructor(props) {
         super(props);
@@ -10,7 +13,7 @@ class ChatClient extends React.Component {
         };
         this.kuzzle = kuzzle;
         this.initConnection();
-        this.handleSendMessage = this.onSendMessage.bind(this); // (9)
+        this.handleSendMessage = this.onSendMessage.bind(this);
     }
 
     async initConnection() {
@@ -25,19 +28,25 @@ class ChatClient extends React.Component {
         await this.fetchMessages();
         await this.subscribeMessages();
     }
-    displayDate(previousDate, currentDate) { 
+    /* snippet:end */
+
+    /* snippet:start:4 */
+    displayDate(previousDate, currentDate) {
         if (previousDate === null) {// Message is the first of the array so need to display the date
             return true;
         }
         const d1 = new Date(previousDate).toDateString()
         const d2 = new Date(currentDate).toDateString()
         if (d1 !== d2) {
-             // Previous message and current has different dates so need to display the date
-             return true
+            // Previous message and current has different dates so need to display the date
+            return true
         };
         // Previous message and current has same dates so doesn't need to display the date
         return false;
     }
+    /* snippet:end */
+
+    /* snippet:start:5 */
     getMessage(hit, idx, array) {
         // display will be set to true only if the previous message is from another day in goal to display only one time the dates
         // and only the hours on each messages
@@ -47,9 +56,9 @@ class ChatClient extends React.Component {
         if (length == 0) {
             display = false;
         } else if (idx === null || array === null) {
-            display = this.displayDate( this.state.messages[length - 1].date, hit._source._kuzzle_info.createdAt)
+            display = this.displayDate(this.state.messages[length - 1].date, hit._source._kuzzle_info.createdAt)
         } else { // idx and array provided -> call from fetch 
-            display = idx === 0? true : this.displayDate(array[idx - 1]._source._kuzzle_info.createdAt , hit._source._kuzzle_info.createdAt);
+            display = idx === 0 ? true : this.displayDate(array[idx - 1]._source._kuzzle_info.createdAt, hit._source._kuzzle_info.createdAt);
         }
         const message = {
             // The unique id of the document containing the message
@@ -65,6 +74,9 @@ class ChatClient extends React.Component {
         };
         return message;
     }
+    /* snippet:end */
+
+    /* snippet:start:6 */
     async fetchMessages() {
         // Call the search method of the document controller
         const results = await this.kuzzle.document.search(
@@ -78,7 +90,9 @@ class ChatClient extends React.Component {
             messages: results.hits.reverse().map((hit, idx, array) => this.getMessage(hit, idx, array))
         });
     }
+    /* snippet:end */
 
+    /* snippet:start:7 */
     async subscribeMessages() {
         // Call the subscribe method of the realtime controller and receive the roomId
         const roomId = await this.kuzzle.realtime.subscribe(
@@ -91,7 +105,7 @@ class ChatClient extends React.Component {
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
                 // Add the new message to our array
-                this.setState({
+                await this.setState({
                     messages: [...this.state.messages.slice(), this.getMessage(notification.result, null, null)]
                 });
             }
@@ -99,7 +113,9 @@ class ChatClient extends React.Component {
         // Save the id of our subscription (we could need it to unsubscribe)
         this.setState({ roomId: roomId });
     }
+    /* snippet:end */
 
+    /* snippet:start:8 */
     async onSendMessage(text) {
         await kuzzle.document.create(
             "chat",
@@ -111,7 +127,9 @@ class ChatClient extends React.Component {
             }
         );
     }
+    /* snippet:end */
 
+    /* snippet:start:9 */
     render() {
         const messages = this.state.messages;
         return (
@@ -120,3 +138,4 @@ class ChatClient extends React.Component {
     }
 }
 export default ChatClient;
+    /* snippet:end */

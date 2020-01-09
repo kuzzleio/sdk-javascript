@@ -1,3 +1,4 @@
+/* snippet:start: 1 */
 import React from 'react';
 import {
     StyleSheet,
@@ -8,24 +9,25 @@ import {
     SafeAreaView,
     KeyboardAvoidingView
 } from 'react-native';
-
+/* snippet:end */
+/* snippet:start:2 */
 class ChatView extends React.Component {
     constructor(props) {
         super(props);
         this.handleSendMessage = this.onSendMessage.bind(this);
-        this.state = {
-        }
     }
-
     onSendMessage = e => {
         this.props.onSendMessage(e.nativeEvent.text);
         this.refs.input.clear();
     }
+    /* snippet:end */
+    /* snippet:start:4 */
     getDate(timestamp) {
         const date = new Date(timestamp);
         return date.toTimeString().split('GMT')[0]
     }
-
+    /* snippet:end */
+    /* snippet:start:5 */
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
@@ -34,14 +36,14 @@ class ChatView extends React.Component {
                         style={styles.list}
                         data={this.props.messages}
                         ref={ref => this.flatList = ref}
-                        onContentSizeChange={() => this.flatList.scrollToEnd({animated: true})}
+                        onContentSizeChange={() => this.flatList.scrollToEnd({ animated: true })}
                         renderItem={({ item }) =>
                             <View>
                                 <View>
                                     {
-                                        item.displayDate ? 
-                                        <Text style={styles.date}>{new Date(item.date).toDateString()}</Text> : 
-                                       null
+                                        item.displayDate ?
+                                            <Text style={styles.date}>{new Date(item.date).toDateString()}</Text> :
+                                            null
                                     }
                                 </View>
                                 <View
@@ -63,6 +65,8 @@ class ChatView extends React.Component {
                         }
                         keyExtractor={item => item.id}
                     />
+                    {/* snippet:end  */}
+                    {/* snippet:start:6 */}
                     <TextInput
                         style={styles.inputMessage}
                         placeholder='Send message...'
@@ -73,13 +77,15 @@ class ChatView extends React.Component {
                         blurOnSubmit={false}
                         ref="input"
                     />
+                    {/* snippet:end  */}
+                    {/* snippet:start:7 */}
                 </KeyboardAvoidingView>
             </SafeAreaView>
         );
     }
 }
-let lastDate = null;
-
+/* snippet:end  */
+/* snippet:start:8 */
 const offset = 24;
 const styles = StyleSheet.create({
     name: {
@@ -126,3 +132,4 @@ const styles = StyleSheet.create({
     }
 });
 export default ChatView;
+/* snippet:end  */
