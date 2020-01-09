@@ -213,8 +213,10 @@ class DocumentController extends BaseController {
       _id,
       body,
       action: 'update',
-      retryOnConflict: options.retryOnConflict
+      retryOnConflict: options.retryOnConflict,
+      source: options.source
     };
+    delete options.source;
     delete options.retryOnConflict;
 
     return this.query(request, options)
