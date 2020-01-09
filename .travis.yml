@@ -83,6 +83,7 @@ jobs:
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
 
       before_script:
+        - npm ci
         - npm run doc-prepare
         - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
         - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
@@ -111,6 +112,7 @@ jobs:
 
       install:
         - pip install awscli --upgrade --user
+        - npm ci
 
       script:
         - npm run doc-prepare
@@ -145,6 +147,7 @@ jobs:
 
       install:
         - pip install awscli --upgrade --user
+        - npm ci
 
       script:
         - npm run doc-prepare
