@@ -13,8 +13,6 @@ class ChatView extends React.Component {
     constructor(props) {
         super(props);
         this.handleSendMessage = this.onSendMessage.bind(this);
-        this.state = {
-        }
     }
 
     onSendMessage = e => {
@@ -78,8 +76,6 @@ class ChatView extends React.Component {
         );
     }
 }
-let lastDate = null;
-
 const offset = 24;
 const styles = StyleSheet.create({
     name: {

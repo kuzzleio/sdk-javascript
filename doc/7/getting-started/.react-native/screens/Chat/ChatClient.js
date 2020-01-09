@@ -10,7 +10,7 @@ class ChatClient extends React.Component {
         };
         this.kuzzle = kuzzle;
         this.initConnection();
-        this.handleSendMessage = this.onSendMessage.bind(this); // (9)
+        this.handleSendMessage = this.onSendMessage.bind(this);
     }
 
     async initConnection() {
