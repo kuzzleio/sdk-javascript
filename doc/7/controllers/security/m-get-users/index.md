@@ -12,7 +12,7 @@ Gets multiple security users.
 <br />
 
 ```js
-mGetUsers(ids, [options]);
+mGetUsers(kuids, [options]);
 ```
 The route exists in `GET` and `POST`.
 By default, the SDK hits the `GET` one.
