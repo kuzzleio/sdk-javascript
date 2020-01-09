@@ -300,7 +300,7 @@ class SecurityController extends BaseController {
     }
 
     return this.query(request, options)
-      .then(response => response.result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source.policies)));
+      .then(response => response.result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source)));
   }
 
   mGetRoles (ids, options = {}) {
