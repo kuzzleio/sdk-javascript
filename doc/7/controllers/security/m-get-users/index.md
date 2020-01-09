@@ -34,7 +34,7 @@ You can force it to be `POST` in the `options`.
 
 ## Resolves
 
-An array of retrieved [`User`](/sdk/js/6/core-classes/user/introduction) objects.
+An array of retrieved [`User`](/sdk/js/7/core-classes/user/introduction) objects.
 
 ## Usage
 
