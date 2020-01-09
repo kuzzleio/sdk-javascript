@@ -84,7 +84,8 @@ jobs:
 
       before_script:
         - npm run doc-prepare
-        - npm run --prefix doc/framework repositories -- clone
+        - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
+        - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
       script:
         - gem install typhoeus
         - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
@@ -95,6 +96,7 @@ jobs:
       language: node_js
       node_js: 10
       env:
+        - BRANCH=dev
         - NODE_ENV=production
         - S3_BUCKET=docs-next.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
