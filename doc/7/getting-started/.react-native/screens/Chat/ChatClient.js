@@ -100,12 +100,12 @@ class ChatClient extends React.Component {
             "messages", // Id of the collection
             {}, // Filter
             // Callback to receive notifications
-            notification => {
+            async notification => {
                 // Check if the notification interest us (only document creation)
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
                 // Add the new message to our array
-                this.setState({
+                await this.setState({
                     messages: [...this.state.messages.slice(), this.getMessage(notification.result, null, null)]
                 });
             }
