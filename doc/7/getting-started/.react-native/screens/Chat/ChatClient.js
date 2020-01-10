@@ -105,7 +105,7 @@ class ChatClient extends React.Component {
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
                 // Add the new message to our array
-                await this.setState({
+                this.setState({
                     messages: [...this.state.messages.slice(), this.getMessage(notification.result, null, null)]
                 });
             }
@@ -138,4 +138,4 @@ class ChatClient extends React.Component {
     }
 }
 export default ChatClient;
-    /* snippet:end */
+/* snippet:end */
