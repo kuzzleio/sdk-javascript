@@ -43,7 +43,7 @@
     "@babel/preset-env": "^7.7.1",
     "audit": "0.0.6",
     "babel-loader": "^8.0.6",
-    "kuzdoc": "^1.2.0",
+    "kuzdoc": "^1.2.2",
     "min-req-promise": "^1.0.1",
     "ora": "^3.4.0",
     "webpack": "^4.41.2",
