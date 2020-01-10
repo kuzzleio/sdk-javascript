@@ -512,7 +512,8 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              retryOnConflict: undefined
+              retryOnConflict: undefined,
+              source: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -539,7 +540,36 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              retryOnConflict: true
+              retryOnConflict: true,
+              source: undefined
+            }, {});
+
+          should(res).be.equal(result);
+        });
+    });
+
+    it('should inject the "source" option into the request', () => {
+      const result = {
+        _id: 'document-id',
+        _version: 1,
+        _source: { foo: 'bar' },
+        created: false
+      };
+      kuzzle.query.resolves({ result });
+
+      return kuzzle.document.update('index', 'collection', 'document-id', { foo: 'bar' }, { source: true })
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'update',
+              index: 'index',
+              collection: 'collection',
+              _id: 'document-id',
+              body: { foo: 'bar' },
+              retryOnConflict: undefined,
+              source: true
             }, {});
 
           should(res).be.equal(result);
