@@ -49,7 +49,7 @@ class ChatClient extends React.Component {
         } else if (idx === null || array === null) {
             display = this.displayDate( this.state.messages[length - 1].date, hit._source._kuzzle_info.createdAt)
         } else { // idx and array provided -> call from fetch 
-            display = idx === 0? true : this.displayDate(array[idx - 1]._source._kuzzle_info.createdAt , hit._source._kuzzle_info.createdAt);
+            display = idx === 0 ? true : this.displayDate(array[idx - 1]._source._kuzzle_info.createdAt , hit._source._kuzzle_info.createdAt);
         }
         const message = {
             // The unique id of the document containing the message
@@ -70,7 +70,7 @@ class ChatClient extends React.Component {
         const results = await this.kuzzle.document.search(
             "chat", // Name of the index
             "messages", // Name of the collection
-            { sort: [{ ["_kuzzle_info.createdAt"]: { order: "desc" } }] }, // Query => Sort the messages by creation date
+            { sort: { "_kuzzle_info.createdAt": { order: "desc" } } }, // Query => Sort the messages by creation date
             { size: 100 } // Options => get a maximum of 100 messages
         );
         // Add messages to our array after formating them
