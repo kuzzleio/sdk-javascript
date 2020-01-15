@@ -9,8 +9,13 @@ class ChatClient extends React.Component {
             messages: []
         };
         this.kuzzle = kuzzle;
-        this.initConnection();
         this.handleSendMessage = this.onSendMessage.bind(this);
+    }
+    
+    async componentDidMount() {
+        await this.initConnection();
+        await this.fetchMessages();
+        await this.subscribeMessages();
     }
 
     async initConnection() {
@@ -22,8 +27,6 @@ class ChatClient extends React.Component {
             await kuzzle.index.create("chat");
             await kuzzle.collection.create("chat", "messages");
         }
-        await this.fetchMessages();
-        await this.subscribeMessages();
     }
     displayDate(previousDate, currentDate) { 
         if (previousDate === null) {// Message is the first of the array so need to display the date
