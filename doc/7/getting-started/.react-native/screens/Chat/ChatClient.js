@@ -41,28 +41,28 @@ class ChatClient extends React.Component {
         // Previous message and current has same dates so doesn't need to display the date
         return false;
     }
-    getMessage(hit, idx, array) {
+    getMessage(msg, msgIdx, arrayOfMsg) {
         // display will be set to true only if the previous message is from another day in goal to display only one time the dates
         // and only the hours on each messages
         let display = null;
-        // Not idx and array provided -> call from subscribe
+        // Not msgIdx and arrayOfMsg provided -> call from subscribe
         let length = this.state.messages.length;
         if (length == 0) {
             display = false;
-        } else if (idx === null || array === null) {
-            display = this.displayDate( this.state.messages[length - 1].date, hit._source._kuzzle_info.createdAt)
-        } else { // idx and array provided -> call from fetch 
-            display = idx === 0 ? true : this.displayDate(array[idx - 1]._source._kuzzle_info.createdAt , hit._source._kuzzle_info.createdAt);
+        } else if (msgIdx === null || arrayOfMsg === null) {
+            display = this.displayDate( this.state.messages[length - 1].date, msg._source._kuzzle_info.createdAt)
+        } else { // msgIdx and arrayOfMsg provided -> call from fetch 
+            display = msgIdx === 0 ? true : this.displayDate(arrayOfMsg[msgIdx - 1]._source._kuzzle_info.createdAt , msg._source._kuzzle_info.createdAt);
         }
         const message = {
             // The unique id of the document containing the message
-            id: hit._id,
+            id: msg._id,
             // The text of the message
-            message: hit._source.message,
+            message: msg._source.message,
             // The creation date
-            date: hit._source._kuzzle_info.createdAt,
+            date: msg._source._kuzzle_info.createdAt,
             // The author name
-            author: hit._source.author,
+            author: msg._source.author,
             // Boolean to display or not the date
             displayDate: display
         };
@@ -78,7 +78,7 @@ class ChatClient extends React.Component {
         );
         // Add messages to our array after formating them
         await this.setState({
-            messages: results.hits.reverse().map((hit, idx, array) => this.getMessage(hit, idx, array))
+            messages: results.hits.reverse().map((msg, msgIdx, arrayOfMsg) => this.getMessage(msg, msgIdx, arrayOfMsg))
         });
     }
 
