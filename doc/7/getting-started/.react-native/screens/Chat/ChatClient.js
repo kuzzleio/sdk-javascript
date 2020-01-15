@@ -41,19 +41,7 @@ class ChatClient extends React.Component {
         // Previous message and current has same dates so doesn't need to display the date
         return false;
     }
-    getMessage(msg, msgIdx, arrayOfMsg) {
-        // display will be set to true only if the previous message is from another day in goal to display only one time the dates
-        // and only the hours on each messages
-        let display = null;
-        // Not msgIdx and arrayOfMsg provided -> call from subscribe
-        let length = this.state.messages.length;
-        if (length == 0) {
-            display = false;
-        } else if (msgIdx === null || arrayOfMsg === null) {
-            display = this.displayDate( this.state.messages[length - 1].date, msg._source._kuzzle_info.createdAt)
-        } else { // msgIdx and arrayOfMsg provided -> call from fetch 
-            display = msgIdx === 0 ? true : this.displayDate(arrayOfMsg[msgIdx - 1]._source._kuzzle_info.createdAt , msg._source._kuzzle_info.createdAt);
-        }
+    getMessage(msg, displayDate) {
         const message = {
             // The unique id of the document containing the message
             id: msg._id,
@@ -64,8 +52,10 @@ class ChatClient extends React.Component {
             // The author name
             author: msg._source.author,
             // Boolean to display or not the date
-            displayDate: display
+            displayDate: displayDate
         };
+        // displayDate will be set to true only if the previous message is from another day in goal to display only one time the dates
+        // and only the hours on each messages
         return message;
     }
     async fetchMessages() {
@@ -73,12 +63,20 @@ class ChatClient extends React.Component {
         const results = await this.kuzzle.document.search(
             "chat", // Name of the index
             "messages", // Name of the collection
-            { sort: { "_kuzzle_info.createdAt": { order: "desc" } } }, // Query => Sort the messages by creation date
+            { sort: { "_kuzzle_info.createdAt": { order: "asc" } } }, // Query => Sort the messages by creation date
             { size: 100 } // Options => get a maximum of 100 messages
         );
         // Add messages to our array after formating them
         await this.setState({
-            messages: results.hits.reverse().map((msg, msgIdx, arrayOfMsg) => this.getMessage(msg, msgIdx, arrayOfMsg))
+            messages: results.hits.map((msg, msgIdx, arrayOfMsg) => {
+                let displayDate;
+                if (msgIdx === 0) { // We always display the date for the first fetched message 
+                    displayDate = true;
+                } else {  // Check if the message is in the same day of the previous
+                    displayDate = this.displayDate(arrayOfMsg[msgIdx - 1]._source._kuzzle_info.createdAt , msg._source._kuzzle_info.createdAt);
+                }
+               return this.getMessage(msg, displayDate)
+            })
         });
     }
 
@@ -93,9 +91,16 @@ class ChatClient extends React.Component {
                 // Check if the notification interest us (only document creation)
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
+                let length = this.state.messages.length;
+                let displayDate;
+                if (length === 0) { // If we haven't fetched some messages we must display the date for the first message we receive
+                    displayDate = true;
+                } else { // Check if the message is in the same day of the last message
+                    displayDate = this.displayDate( this.state.messages[length - 1].date, notification.result._source._kuzzle_info.createdAt);
+                }
                 // Add the new message to our array
                 this.setState({
-                    messages: [...this.state.messages.slice(), this.getMessage(notification.result, null, null)]
+                    messages: [...this.state.messages.slice(), this.getMessage(notification.result, displayDate)]
                 });
             }
         );
@@ -103,14 +108,14 @@ class ChatClient extends React.Component {
         this.setState({ roomId: roomId });
     }
 
-    async onSendMessage(text) {
+    async onSendMessage(message) {
         await kuzzle.document.create(
             "chat",
             "messages",
             // Pass the document to be stored in Kuzzle as a parameter
             {
                 author: this.props.name,
-                message: text
+                message
             }
         );
     }
