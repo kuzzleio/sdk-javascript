@@ -18,7 +18,7 @@ This section deals with **Kuzzle** (+ [**Javascript SDK**](/sdk/js/7/)) and **Re
 - **Running Kuzzle Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle/))
 - **Expo CLI** ([install here](https://docs.expo.io/versions/v36.0.0/get-started/installation/))
 
-[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase.
+"[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase."
 
 ## Prepare your environment
 
