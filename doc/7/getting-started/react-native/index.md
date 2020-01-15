@@ -9,14 +9,16 @@ order: 400
 
 # Getting Started with Kuzzle and React Native
 
-This section deals with **Kuzzle** (+ **Javascript SDK**) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle** (+ [**Javascript SDK**](/sdk/js/7/)) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 
 ## Requirements
 
 - **Node.js** >= 12.0.0 ([install here](https://nodejs.org/en/download/))
-- **Expo CLI** ([install here](https://docs.expo.io/versions/v36.0.0/get-started/installation/))
 - **Running Kuzzle Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle/))
+- **Expo CLI** ([install here](https://docs.expo.io/versions/v36.0.0/get-started/installation/))
+
+[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase.
 
 ## Prepare your environment
 
