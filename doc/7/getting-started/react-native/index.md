@@ -74,11 +74,11 @@ First, add the following imports:
 
 Then we need to do three changes:
   - First, we must export our *App* class:
-    <<< ./snippets/App.js.snippet:2[js]
+<<< ./snippets/App.js.snippet:2[js]
   - Then we need to create our `onSubmitName` function:
-    <<< ./snippets/App.js.snippet:3[js]
+<<< ./snippets/App.js.snippet:3[js]
   - Finally we will create our render function:
-    <<< ./snippets/App.js.snippet:4[js]
+<<< ./snippets/App.js.snippet:4[js]
 
 You can see that we will have to create a new component, `ChatClient`.
 That new component will contain the link to our Kuzzle backend so we need first declare our Kuzzle service.
