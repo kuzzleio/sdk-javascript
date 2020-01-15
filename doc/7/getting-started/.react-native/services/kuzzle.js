@@ -1,10 +1,7 @@
 import { Kuzzle, WebSocket } from 'kuzzle-sdk';
 
 const options = {
-    offlineMode: 'auto',
-    autoReplay: true,
-    autoQueue: true,
-    autoResubscribe: true
+    offlineMode: 'auto'
   };
 
-export default new Kuzzle(new WebSocket('localhost'), options);
+  export default new Kuzzle(new WebSocket('localhost'), options);
