@@ -36,6 +36,7 @@ done
 npm run test
 
 cd ${here}/../doc/7/getting-started/.react-native
+# Here we use install instead of ci because expo-cli cannot be installed with ci
 npm install
 npm run web &
 until $(curl --output /dev/null --silent --head --fail http://localhost:19006); do
