@@ -81,7 +81,7 @@ jobs:
     - stage: Tests
       name: Dead link check
       language: node_js
-      node_js: 10
+      node_js: 12
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
 
       before_script:
