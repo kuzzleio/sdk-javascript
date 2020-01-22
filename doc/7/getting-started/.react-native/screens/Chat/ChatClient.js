@@ -11,7 +11,7 @@ class ChatClient extends React.Component {
         this.kuzzle = kuzzle;
         this.handleSendMessage = this.onSendMessage.bind(this);
     }
-    
+
     async componentDidMount() {
         await this.initConnection();
         await this.fetchMessages();
@@ -28,15 +28,15 @@ class ChatClient extends React.Component {
             await kuzzle.collection.create("chat", "messages");
         }
     }
-    displayDate(previousDate, currentDate) { 
+    displayDate(previousDate, currentDate) {
         if (previousDate === null) {// Message is the first of the array so need to display the date
             return true;
         }
-        const d1 = new Date(previousDate).toDateString()
-        const d2 = new Date(currentDate).toDateString()
+        const d1 = new Date(previousDate).toDateString();
+        const d2 = new Date(currentDate).toDateString();
         if (d1 !== d2) {
-             // Previous message and current has different dates so need to display the date
-             return true
+            // Previous message and current has different dates so need to display the date
+            return true;
         };
         // Previous message and current has same dates so doesn't need to display the date
         return false;
@@ -73,9 +73,9 @@ class ChatClient extends React.Component {
                 if (msgIdx === 0) { // We always display the date for the first fetched message 
                     displayDate = true;
                 } else {  // Check if the message is in the same day of the previous
-                    displayDate = this.displayDate(arrayOfMsg[msgIdx - 1]._source._kuzzle_info.createdAt , msg._source._kuzzle_info.createdAt);
+                    displayDate = this.displayDate(arrayOfMsg[msgIdx - 1]._source._kuzzle_info.createdAt, msg._source._kuzzle_info.createdAt);
                 }
-               return this.getMessage(msg, displayDate)
+                return this.getMessage(msg, displayDate);
             })
         });
     }
@@ -96,7 +96,7 @@ class ChatClient extends React.Component {
                 if (length === 0) { // If we haven't fetched some messages we must display the date for the first message we receive
                     displayDate = true;
                 } else { // Check if the message is in the same day of the last message
-                    displayDate = this.displayDate( this.state.messages[length - 1].date, notification.result._source._kuzzle_info.createdAt);
+                    displayDate = this.displayDate(this.state.messages[length - 1].date, notification.result._source._kuzzle_info.createdAt);
                 }
                 // Add the new message to our array
                 this.setState({
