@@ -1,4 +1,4 @@
-/* snippet:start: 1 */
+/* snippet:start:1 */
 import React from 'react';
 import {
     StyleSheet,
@@ -65,7 +65,7 @@ class ChatView extends React.Component {
                         }
                         keyExtractor={item => item.id}
                     />
-                    {/* snippet:end  */}
+                    {/* snippet:end */}
                     {/* snippet:start:6 */}
                     <TextInput
                         style={styles.inputMessage}
@@ -77,14 +77,14 @@ class ChatView extends React.Component {
                         blurOnSubmit={false}
                         ref="input"
                     />
-                    {/* snippet:end  */}
+                    {/* snippet:end */}
                     {/* snippet:start:7 */}
                 </KeyboardAvoidingView>
             </SafeAreaView>
         );
     }
 }
-/* snippet:end  */
+/* snippet:end */
 /* snippet:start:8 */
 const offset = 24;
 const styles = StyleSheet.create({
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
     }
 });
 export default ChatView;
-/* snippet:end  */
+/* snippet:end */
