@@ -4,4 +4,4 @@ const options = {
     offlineMode: 'auto'
   };
 
-  export default new Kuzzle(new WebSocket('localhost'), options);
+export default new Kuzzle(new WebSocket('localhost'), options);

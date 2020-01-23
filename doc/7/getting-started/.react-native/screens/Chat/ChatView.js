@@ -24,7 +24,7 @@ class ChatView extends React.Component {
     /* snippet:start:4 */
     getDate(timestamp) {
         const date = new Date(timestamp);
-        return date.toTimeString().split('GMT')[0]
+        return date.toTimeString().split('GMT')[0];
     }
     /* snippet:end */
     /* snippet:start:5 */
