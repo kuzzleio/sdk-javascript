@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  AbortableRequest = require('./abortableRequest'),
   staticHttpRoutes = require('./routes.json'),
   KuzzleAbstractProtocol = require('./abstract/common');
 
@@ -230,24 +231,25 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
   _sendHttpRequest (method, path, payload = {}) {
     if (typeof XMLHttpRequest === 'undefined') {
-      // NodeJS implementation, using http.request:
-
-      const httpClient = require('min-req-promise');
+      // NodeJS implementation, using http(s).request:
 
       if (path[0] !== '/') {
         path = `/${path}`;
       }
-      const url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
       const headers = payload.headers || {};
       headers['Content-Length'] = Buffer.byteLength(payload.body || '');
 
-      return httpClient.request(url, method, {
-        headers,
+      const request = new AbortableRequest(this._timeout, this.protocol, {
+        host: this.host,
+        port: this.port,
         body: payload.body,
+        path,
+        headers,
         timeout: this._timeout
-      })
-        .then(response => JSON.parse(response.body));
+      });
+
+      return request.run().then(response => JSON.parse(response.body));
     }
 
     // Browser implementation, using XMLHttpRequest:
