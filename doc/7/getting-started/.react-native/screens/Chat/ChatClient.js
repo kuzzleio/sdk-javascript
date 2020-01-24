@@ -1,7 +1,10 @@
+/* snippet:start:1 */
 import React from 'react';
 import ChatView from './ChatView';
 import kuzzle from '../../services/kuzzle';
+/* snippet:end */
 
+/* snippet:start:2 */
 class ChatClient extends React.Component {
     constructor(props) {
         super(props);
@@ -28,6 +31,9 @@ class ChatClient extends React.Component {
             await kuzzle.collection.create("chat", "messages");
         }
     }
+    /* snippet:end */
+
+    /* snippet:start:4 */
     displayDate(previousDate, currentDate) {
         if (previousDate === null) {// Message is the first of the array so need to display the date
             return true;
@@ -41,6 +47,9 @@ class ChatClient extends React.Component {
         // Previous message and current has same dates so doesn't need to display the date
         return false;
     }
+    /* snippet:end */
+
+    /* snippet:start:5 */
     getMessage(msg, displayDate) {
         const message = {
             // The unique id of the document containing the message
@@ -58,6 +67,9 @@ class ChatClient extends React.Component {
         // and only the hours on each messages
         return message;
     }
+    /* snippet:end */
+
+    /* snippet:start:6 */
     async fetchMessages() {
         // Call the search method of the document controller
         const results = await this.kuzzle.document.search(
@@ -79,7 +91,9 @@ class ChatClient extends React.Component {
             })
         });
     }
+    /* snippet:end */
 
+    /* snippet:start:7 */
     async subscribeMessages() {
         // Call the subscribe method of the realtime controller and receive the roomId
         const roomId = await this.kuzzle.realtime.subscribe(
@@ -87,7 +101,7 @@ class ChatClient extends React.Component {
             "messages", // Id of the collection
             {}, // Filter
             // Callback to receive notifications
-            notification => {
+            async notification => {
                 // Check if the notification interest us (only document creation)
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
@@ -99,7 +113,7 @@ class ChatClient extends React.Component {
                     displayDate = this.displayDate(this.state.messages[length - 1].date, notification.result._source._kuzzle_info.createdAt);
                 }
                 // Add the new message to our array
-                this.setState({
+                await this.setState({
                     messages: [...this.state.messages.slice(), this.getMessage(notification.result, displayDate)]
                 });
             }
@@ -107,7 +121,9 @@ class ChatClient extends React.Component {
         // Save the id of our subscription (we could need it to unsubscribe)
         this.setState({ roomId: roomId });
     }
+    /* snippet:end */
 
+    /* snippet:start:8 */
     async onSendMessage(message) {
         await kuzzle.document.create(
             "chat",
@@ -119,7 +135,9 @@ class ChatClient extends React.Component {
             }
         );
     }
+    /* snippet:end */
 
+    /* snippet:start:9 */
     render() {
         const messages = this.state.messages;
         return (
@@ -128,3 +146,4 @@ class ChatClient extends React.Component {
     }
 }
 export default ChatClient;
+/* snippet:end */
