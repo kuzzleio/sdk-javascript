@@ -18,7 +18,8 @@ class WSNode extends RTWrapper {
       this.WebSocketClient = WebSocket;
       // There are no options allowed in the browsers WebSocket API
       this.options = null;
-    } else {
+    }
+    else {
       this.WebSocketClient = require('ws');
       this.options = {
         perMessageDeflate: false,

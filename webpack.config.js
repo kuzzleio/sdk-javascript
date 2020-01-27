@@ -36,7 +36,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.IgnorePlugin(/^(http|min-req-promise|package|ws)$/),
+    new webpack.IgnorePlugin(/^(http|https|package|ws)$/),
     new webpack.DefinePlugin({
       SDKVERSION: JSON.stringify(version),
       BUILT: true

@@ -3,7 +3,7 @@
 const
   AbortableRequest = require('./abortableRequest'),
   staticHttpRoutes = require('./routes.json'),
-  KuzzleAbstractProtocol = require('./abstract/common');
+  KuzzleAbstractProtocol = require('../abstract/common');
 
 class HttpWrapper extends KuzzleAbstractProtocol {
   constructor(host, options = {}) {
@@ -230,60 +230,18 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   }
 
   _sendHttpRequest (method, path, payload = {}) {
-    if (typeof XMLHttpRequest === 'undefined') {
-      // NodeJS implementation, using http(s).request:
-
-      if (path[0] !== '/') {
-        path = `/${path}`;
-      }
-
-      const headers = payload.headers || {};
-      headers['Content-Length'] = Buffer.byteLength(payload.body || '');
-
-      const request = new AbortableRequest(this._timeout, this.protocol, {
-        host: this.host,
-        port: this.port,
-        body: payload.body,
-        path,
-        headers,
-        timeout: this._timeout
-      });
-
-      return request.run().then(response => JSON.parse(response.body));
-    }
-
-    // Browser implementation, using XMLHttpRequest:
-    return new Promise((resolve, reject) => {
-      const
-        xhr = new XMLHttpRequest(),
-        url = `${this.protocol}://${this.host}:${this.port}${path}`;
-
-      xhr.timeout = this._timeout;
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 0) {
-          reject(new Error('Cannot connect to host. Is the host online?'));
-        }
-      };
-
-      xhr.open(method, url);
-
-      for (const header of Object.keys(payload.headers || {})) {
-        xhr.setRequestHeader(header, payload.headers[header]);
-      }
-
-      xhr.onload = () => {
-        try {
-          const json = JSON.parse(xhr.responseText);
-          resolve(json);
-        }
-        catch (err) {
-          reject(err);
-        }
-      };
-
-      xhr.send(payload.body);
+    const request = new AbortableRequest(this.protocol, this._timeout, {
+      host: this.host,
+      port: this.port,
+      body: payload.body,
+      headers: payload.headers,
+      timeout: this._timeout,
+      method,
+      path
     });
+
+    return request.run()
+      .then(response => JSON.parse(response.body));
   }
 
   _constructRoutes (publicApi) {

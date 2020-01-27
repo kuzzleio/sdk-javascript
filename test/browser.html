@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kuzzle Javascript SDK</title>
+    <script src="../dist/kuzzle.js"></script>
+  </head>
+  <body>
+    <h1>
+      Kuzzle JS SDK
+    </h1>
+    <form>
+      <button onclick="test()">Submit</button>
+    </form>
+    <script type="application/javascript">
+      (async function () {
+        window.kuzzle = new KuzzleSDK.Kuzzle(new KuzzleSDK.WebSocket('localhost'))
+
+        await window.kuzzle.connect()
+      })();
+
+      async function test() {
+        console.log(await window.kuzzle.server.info());
+      }
+    </script>
+  </body>
+</html>

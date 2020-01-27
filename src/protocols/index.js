@@ -1,7 +1,7 @@
 'use strict';
 
 const
-  Http = require('./http'),
+  Http = require('./http/http'),
   WebSocket = require('./websocket');
 
 module.exports = {
