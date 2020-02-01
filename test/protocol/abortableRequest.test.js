@@ -10,7 +10,7 @@ describe('AbortableRequest', () => {
 
   describe('#run', () => {
     it('should abort the request after timeout', done => {
-       const
+      const
         requestStub = {
           on: sinon.stub(),
           write: sinon.stub(),
@@ -95,7 +95,7 @@ describe('AbortableRequest', () => {
     });
 
     it('should call http.request with a body and some headers', async () => {
-      abortableRequest._options.headers.foo = 'bar'
+      abortableRequest._options.headers.foo = 'bar';
       const promise = abortableRequest.run();
       abortableRequest.resolve('{"foo":"bar"}');
 
