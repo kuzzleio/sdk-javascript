@@ -12,7 +12,6 @@ const
   ServerController = require('../../src/controllers/server'),
   RealTimeController = require('../../src/controllers/realtime'),
   {
-    SocketIO,
     WebSocket, // eslint-disable-line no-redeclare
     Http
   } = require('../../src/protocols'),
@@ -139,14 +138,6 @@ describe('Kuzzle constructor', () => {
 
     should(kuzzle.autoQueue).be.true();
     should(kuzzle.autoReplay).be.true();
-  });
-
-  it('should initialize kuzzle with SocketIO', () => {
-    should(() => {
-      new Kuzzle(
-        new SocketIO('localhost')
-      );
-    }).not.throw();
   });
 
   it('should initialize kuzzle with WebSocket', () => {

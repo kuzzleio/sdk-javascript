@@ -12,7 +12,8 @@ class AbstractWrapper extends KuzzleEventEmitter {
 
     this._pendingRequests = new Map();
     this._host = host;
-    this._port = typeof options.port === 'number' ? options.port : 7512;
+    const port = parseInt(options.port, 10);
+    this._port = isNaN(port) ? 7512 : port;
     this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
     this.id = uuidv4();

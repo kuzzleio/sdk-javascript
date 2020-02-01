@@ -31,7 +31,7 @@ Additional query options
 
 ## Resolves
 
-A [User](/sdk/js/6/core-classes/user) representing the current user logged with the SDK.
+A [User](/sdk/js/7/core-classes/user) representing the current user logged with the SDK.
 
 ## Usage
 

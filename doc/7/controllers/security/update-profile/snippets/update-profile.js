@@ -10,10 +10,10 @@ try {
           roleId: 'privileged',
           restrictedTo: [
             {
-              index: 'someIndex'
+              index: 'someindex'
             },
             {
-              index: 'anotherIndex',
+              index: 'anotherindex',
               collections: [
                 'coll1',
                 'coll2'

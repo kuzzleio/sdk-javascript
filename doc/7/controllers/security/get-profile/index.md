@@ -32,7 +32,7 @@ Additional query options
 
 ## Resolves
 
-The retrieved [`Profile`](/sdk/js/6/core-classes/profile/introduction) object.
+The retrieved [`Profile`](/sdk/js/7/core-classes/profile/introduction) object.
 
 ## Usage
 

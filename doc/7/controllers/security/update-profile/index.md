@@ -20,7 +20,7 @@ updateProfile(id, profile, [options]);
 | Property | Type | Description |
 |--- |--- |--- |
 | `id` | <pre>string</pre> | Profile identifier |
-| `profile` | <pre>object</pre> | [Profile definition content](/core/1/guides/essentials/security#defining-profiles) |
+| `profile` | <pre>object</pre> | [Profile definition content](/core/2/guides/essentials/security#defining-profiles) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
@@ -32,9 +32,8 @@ updateProfile(id, profile, [options]);
 
 ## Resolves
 
-A [`Profile`](/sdk/js/6/core-classes/profile/introduction) object representing the updated profile.
+A [`Profile`](/sdk/js/7/core-classes/profile/introduction) object representing the updated profile.
 
 ## Usage
 
 <<< ./snippets/update-profile.js
-

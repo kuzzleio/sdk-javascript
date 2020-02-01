@@ -467,6 +467,23 @@ describe('Document Controller', () => {
         });
     });
 
+    it('should allow to set value of 0 for size', () => {
+      const result = {
+        hits: [],
+        total: 0
+      };
+      kuzzle.document.query = sinon.stub().resolves({result});
+
+      return kuzzle.document.search('index', 'collection', {}, { size: 0 })
+        .then(() => {
+          should(kuzzle.document.query).be.calledOnce();
+
+          const request = kuzzle.document.query.getCall(0).args[0];
+          should(request.from).be.eql(0);
+          should(request.size).be.eql(0);
+        });
+    });
+
     it('should not set default value for from if scroll or sort are specified', () => {
       const result = {
         hits: [],
@@ -513,7 +530,8 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              retryOnConflict: undefined
+              retryOnConflict: undefined,
+              source: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -540,7 +558,36 @@ describe('Document Controller', () => {
               collection: 'collection',
               _id: 'document-id',
               body: {foo: 'bar'},
-              retryOnConflict: true
+              retryOnConflict: true,
+              source: undefined
+            }, {});
+
+          should(res).be.equal(result);
+        });
+    });
+
+    it('should inject the "source" option into the request', () => {
+      const result = {
+        _id: 'document-id',
+        _version: 1,
+        _source: { foo: 'bar' },
+        created: false
+      };
+      kuzzle.query.resolves({ result });
+
+      return kuzzle.document.update('index', 'collection', 'document-id', { foo: 'bar' }, { source: true })
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'update',
+              index: 'index',
+              collection: 'collection',
+              _id: 'document-id',
+              body: { foo: 'bar' },
+              retryOnConflict: undefined,
+              source: true
             }, {});
 
           should(res).be.equal(result);

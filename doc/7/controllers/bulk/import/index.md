@@ -9,7 +9,7 @@ description: Performs a bulk import on a collection
 
 Create, update or delete large amount of documents as fast as possible.
 
-This route is faster than the `document:m*` routes family (e.g. [document:mCreate](/sdk/js/6/controllers/document/m-create)), but no real-time notifications will be generated, even if some of the documents in the import match subscription filters.
+This route is faster than the `document:m*` routes family (e.g. [document:mCreate](/sdk/js/7/controllers/document/m-create)), but no real-time notifications will be generated, even if some of the documents in the import match subscription filters.
 
 <br/>
 

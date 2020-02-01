@@ -21,4 +21,4 @@ The `content` property is an object containing, alongside custom defined values,
 | Property | Type | Description |
 |--- |--- |--- |
 | `profileIds` | <pre>string[]</pre> | Profiles IDs for this user |
-| `_kuzzle_info` | <pre>object</pre> | [Kuzzle metadata](/core/1/guides/essentials/document-metadata) |
+| `_kuzzle_info` | <pre>object</pre> | [Kuzzle metadata](/core/2/guides/essentials/document-metadata) |

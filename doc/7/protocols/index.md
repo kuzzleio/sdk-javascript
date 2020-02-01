@@ -3,5 +3,5 @@ code: false
 type: branch
 order: 300
 title: Protocols
-description: Javascript SDK v6.x protocols
+description: Javascript SDK v7.x protocols
 ---

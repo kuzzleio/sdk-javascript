@@ -199,7 +199,10 @@ class DocumentController extends BaseController {
       delete options[opt];
     }
 
-    request.size = request.size || 10;
+    if (request.size === undefined) {
+      request.size = 10;
+    }
+
     if (!request.scroll && !request.body.sort && !request.from) {
       request.from = 0;
     }
@@ -215,8 +218,10 @@ class DocumentController extends BaseController {
       _id,
       body,
       action: 'update',
-      retryOnConflict: options.retryOnConflict
+      retryOnConflict: options.retryOnConflict,
+      source: options.source
     };
+    delete options.source;
     delete options.retryOnConflict;
 
     return this.query(request, options)

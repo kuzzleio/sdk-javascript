@@ -406,10 +406,8 @@ class Kuzzle extends KuzzleEventEmitter {
       request.requestId = uuidv4();
     }
 
-    // we follow the api but allow some more logical "mistakes"
-    // (the only allowed value for refresh arg is "wait_for")
-    if (request.refresh || options.refresh) {
-      request.refresh = 'wait_for';
+    if (typeof request.refresh === 'undefined' && typeof options.refresh !== 'undefined') {
+      request.refresh = options.refresh;
     }
 
     if (! request.volatile) {

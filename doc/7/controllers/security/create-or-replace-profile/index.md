@@ -27,7 +27,7 @@ createOrReplaceProfile(id, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `policies` | <pre>object</pre> | [Profile content](/core/1/guides/essentials/security#defining-profiles) |
+| `policies` | <pre>object</pre> | [Profile content](/core/2/guides/essentials/security#defining-profiles) |
 
 ### options
 
@@ -38,7 +38,7 @@ createOrReplaceProfile(id, body, [options]);
 
 ## Resolves
 
-A [`Profile`](/sdk/js/6/core-classes/profile/introduction) object representing the updated/created profile.
+A [`Profile`](/sdk/js/7/core-classes/profile/introduction) object representing the updated/created profile.
 
 ## Usage
 

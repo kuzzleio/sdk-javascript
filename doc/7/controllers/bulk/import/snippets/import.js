@@ -13,7 +13,7 @@ try {
   const response = await kuzzle.bulk.import('nyc-open-data', 'yellow-taxi', bulkData);
   console.log(response);
   /*
-    { errors: false,
+    { errors: [],
       successes:
       [ {
           index: {
@@ -34,11 +34,7 @@ try {
           }
         } ] }
   */
-  const successfulImport = response.successes.filter(item => {
-    return Object.values(item)[0].status < 400;
-  });
-
-  console.log(`Successfully imported ${successfulImport.length} documents`);
+  console.log(`Successfully imported ${response.successes.length} documents`);
 } catch (error) {
   console.error(error.message);
 }

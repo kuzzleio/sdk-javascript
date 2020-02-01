@@ -9,14 +9,14 @@ order: 0
 
 # Getting Started with Kuzzle and VueJS
 
-This section deals with **Kuzzle** (+ **Javascript SDK**) and **VueJS**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/6/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle** (+ **Javascript SDK**) and **VueJS**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 
 ## Requirements
 
 - **Node.js** >= 8.0.0 ([install here](https://nodejs.org/en/download/))
 - **Vue CLI** ([install here](https://cli.vuejs.org/guide/installation.html))
-- **Running Kuzzle Stack** ([instructions here](/core/1/guides/getting-started/running-kuzzle/))
+- **Running Kuzzle Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle/))
 
 ## Prepare your environment
 
@@ -46,7 +46,7 @@ We need to import our Kuzzle SDK instance, so just add the following line in you
 
 <<< ./snippets/App.vue.snippet:3[js]
 
-Then we will [establish the connection](/sdk/js/6/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our chat. 
+Then we will [establish the connection](/sdk/js/7/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) of our chat. 
 Add the following `valid()` method in the export of the `<script>` tag of your _App.vue_ file:
 
 <<< ./snippets/App.vue.snippet:2[js]
@@ -71,7 +71,7 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./snippets/App.vue.snippet:6[js]
 
-The function `fetchMessage()` will [search](/sdk/js/6/controllers/document/search/) for the first hundred newest messages and store them in our array, before subscribing to changes in the `messages` collection. We called it in the `valid()` function we created above.
+The function `fetchMessage()` will [search](/sdk/js/7/controllers/document/search/) for the first hundred newest messages and store them in our array, before subscribing to changes in the `messages` collection. We called it in the `valid()` function we created above.
 
 <<< ./snippets/App.vue.snippet:7[js]
 
@@ -87,7 +87,7 @@ We can now display the messages stored in Kuzzle. All there is to do is to creat
 
 ## Send messages
 
-We need to write a simple method that will [create](/sdk/js/6/controllers/document/create/) a new message document in Kuzzle.
+We need to write a simple method that will [create](/sdk/js/7/controllers/document/create/) a new message document in Kuzzle.
 
 <<< ./snippets/App.vue.snippet:10[js]
 
@@ -96,7 +96,7 @@ As you can see we don't push the new message in our array on message creation.
 Indeed, we will receive notifications from Kuzzle each time we modify our message collection (even if it is a message creation on our part) that we will use to add the messages in our array.
 
 Now, we need to subscribe to the collection that contains our messages.
-So let's create our `subscribeMessages()` action. It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/6/controllers/realtime/subscribe/) on message creations:
+So let's create our `subscribeMessages()` action. It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe/) on message creations:
 
 <<< ./snippets/App.vue.snippet:11[js]
 
@@ -115,7 +115,7 @@ You can now add new messages to Kuzzle and receive the creation notification to 
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn more about Kuzzle [realtime engine](/core/1/guides/essentials/real-time/)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/1/guides/essentials/security/)
-- lean how to use Kuzzle [Admin Console](/core/1/guides/essentials/admin-console/) to manage your users and data
-- learn how to perform a [basic authentication](/sdk/js/6/controllers/auth/login)
+- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time/)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security/)
+- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console/) to manage your users and data
+- learn how to perform a [basic authentication](/sdk/js/7/controllers/auth/login)

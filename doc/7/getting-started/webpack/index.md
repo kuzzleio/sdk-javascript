@@ -17,11 +17,11 @@ Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzz
 
 ## Running Kuzzle
 
-Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/1/guides/getting-started/running-kuzzle) if you don't have one yet.
+Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/2/guides/getting-started/running-kuzzle) if you don't have one yet.
 
 ## Fun with the SDK
 
-It's time to play with the [Kuzzle Javscript SDK](/sdk/js/6). In this section, we will store a document and subscribe to notifications in Kuzzle using the Javascript SDK in your browser.
+It's time to play with the [Kuzzle Javscript SDK](/sdk/js/7). In this section, we will store a document and subscribe to notifications in Kuzzle using the Javascript SDK in your browser.
 
 Before proceeding, please make sure your system has **Node.js** version 8 or higher ([instructions here](https://nodejs.org/en/download/)) installed.
 
@@ -152,7 +152,7 @@ New document successfully created!
 
 ::: success
 You have now successfully stored your first document into Kuzzle. Click
-[here](/core/1/guides/essentials/admin-console) to see how you can use the
+[here](/core/2/guides/essentials/admin-console) to see how you can use the
 [**Kuzzle Admin Console**](http://console.kuzzle.io) to browse your collection and
 confirm that your document was saved.
 :::
@@ -163,7 +163,7 @@ Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuz
 
 ## Subscribe to realtime document notifications (pub/sub)
 
-Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/6/essentials/realtime-notifications) documentation).
+Kuzzle provides pub/sub features that can be used to trigger real-time notifications based on the state of your data (for a deep-dive on notifications check out the [realtime notifications](/sdk/js/7/essentials/realtime-notifications) documentation).
 
 Let's get started. Create a `subscribe.js` file with following code:
 
@@ -206,7 +206,7 @@ Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuz
 
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
-- take a look at the [SDK Reference](/sdk/js/6)
-- learn how to use [Koncorde](/core/1/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
-- follow our guide to learn how to implement [basic authentication](/core/1/guides/essentials/user-authentication#local-strategy)
-- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/1/guides/essentials/security)
+- take a look at the [SDK Reference](/sdk/js/7)
+- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
+- follow our guide to learn how to implement [basic authentication](/core/2/guides/essentials/user-authentication#local-strategy)
+- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/2/guides/essentials/security)

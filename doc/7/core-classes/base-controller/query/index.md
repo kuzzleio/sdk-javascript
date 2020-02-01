@@ -7,9 +7,9 @@ description: Wrapper around the Kuzzle.query method
 
 # query
 
-Base method used to send queries to a Kuzzle controller, following the [API Documentation](/core/1/api/essentials/connecting-to-kuzzle).  
+Base method used to send queries to a Kuzzle controller, following the [API Documentation](/core/2/api/essentials/connecting-to-kuzzle).  
 
-This method injects the controller name into the the request and forwards it to the original [Kuzzle.query](/sdk/js/6/core-classes/kuzzle/query) method.
+This method injects the controller name into the the request and forwards it to the original [Kuzzle.query](/sdk/js/7/core-classes/kuzzle/query) method.
 
 ## Arguments
 
@@ -40,7 +40,7 @@ The following properties are the most common.
 | `volatile`   | <pre>object</pre> | Additional information to send to Kuzzle |
 
 **Note:**
- - If the `controller` property is not set, the controller [name property](/sdk/js/6/core-classes/base-controller/properties) will be used
+ - If the `controller` property is not set, the controller [name property](/sdk/js/7/core-classes/base-controller/properties) will be used
 
 ### options
 
@@ -52,4 +52,4 @@ Additional query options
 
 ## Resolves
 
-Resolve to the raw Kuzzle API response. See the [API Documentation](/core/1/api/essentials/connecting-to-kuzzle).
+Resolve to the raw Kuzzle API response. See the [API Documentation](/core/2/api/essentials/connecting-to-kuzzle).

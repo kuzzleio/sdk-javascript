@@ -43,7 +43,7 @@ Each deletion error is an object of the `errors` array with the following proper
 
 | Name      | Type              | Description                                            |
 | --------- | ----------------- | ------------------------------------------------------ |
-| `id`  | <pre>object</pre> | Document ID                                      |
+| `id`  | <pre>string</pre> | Document ID                                      |
 | `reason`  | <pre>string</pre> | Human readable reason |
 
 ## Usage

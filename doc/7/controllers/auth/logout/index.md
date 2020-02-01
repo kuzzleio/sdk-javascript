@@ -11,7 +11,7 @@ Revokes the current authentication token.
 
 If there were any, real-time subscriptions are cancelled.
 
-If this action is successful, then the [jwt](/sdk/js/6/core-classes/kuzzle/properties) property of this class instance is unset.
+If this action is successful, then the [jwt](/sdk/js/7/core-classes/kuzzle/properties) property of this class instance is unset.
 
 <br/>
 

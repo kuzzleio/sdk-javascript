@@ -35,10 +35,11 @@ Additional query options
 | `queuable`        | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again       |
 | `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
 | `retryOnConflict` | <pre>int</pre><br/>(`0`)        | The number of times the database layer should retry in case of version conflict    |
+| `source`          | <pre>boolean</pre><br/>(`false`)| If true, returns the updated document inside the response
 
 ## Resolves
 
-Resolves to an object containing the the document update result.
+Resolves to an object containing the document update result.
 
 ## Usage
 
