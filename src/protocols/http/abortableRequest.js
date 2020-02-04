@@ -12,14 +12,18 @@ const CHARSETS = [
   'latin1'
 ];
 
+/**
+ * Class to abstract HTTP request between the browser and Node.js
+ * Include a timeout mecanism:
+ *   - connect timeout: abort the request when the socket can't be open
+ *   - request timeout: abort the request when the respond is too long
+ */
 class AbortableRequest {
-  constructor (protocol, timeout, options) {
+  constructor (protocol, timeout, options = {}) {
     this._protocol = protocol;
     this._timeout = timeout;
     this._options = options;
     this._request = null;
-
-    this._options.timeout = this._timeout;
 
     this._promise = new Promise((resolve, reject) => {
       this._resolve = resolve;
@@ -38,8 +42,8 @@ class AbortableRequest {
       }
 
       this._options.headers = this._options.headers || {};
-      this._options.headers['Content-Length'] = Buffer.byteLength(
-        this._options.body || '');
+      this._options.headers['Content-Length'] =
+        Buffer.byteLength(this._options.body || '');
 
       this._nodeRequest();
     }
@@ -67,7 +71,8 @@ class AbortableRequest {
 
     this._request = new XMLHttpRequest();
 
-    this._request.timeout = this._timeout;
+    // connect timeout
+    this._request.timeout = this._options.timeout;
 
     this._request.onreadystatechange = () => {
       if (this._request.readyState === 4 && this._request.status === 0) {

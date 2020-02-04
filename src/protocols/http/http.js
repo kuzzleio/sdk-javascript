@@ -15,7 +15,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
     this._routes = {};
 
-    this._timeout = options.timeout || 0;
+    // @deprecated: options.timeout is deprecated since 7.0.2
+    this._connectTimeout = options.connectTimeout || options.timeout || 0;
+
+    this._requestTimeout = options.requestTimeout || 0;
 
     this.customRoutes = options.customRoutes || {};
 
@@ -226,22 +229,23 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
     this._sendHttpRequest(method, url, payload)
       .then(response => this.emit(payload.requestId, response))
-      .catch(error => this.emit(payload.requestId, {error}));
+      .catch(error => this.emit(payload.requestId, { error }));
   }
 
-  _sendHttpRequest (method, path, payload = {}) {
-    const request = new AbortableRequest(this.protocol, this._timeout, {
+  async _sendHttpRequest (method, path, payload = {}) {
+    const request = new AbortableRequest(this.protocol, this._requestTimeout, {
       host: this.host,
       port: this.port,
       body: payload.body,
       headers: payload.headers,
-      timeout: this._timeout,
+      timeout: this._connectTimeout,
       method,
       path
     });
 
-    return request.run()
-      .then(response => JSON.parse(response.body));
+    const response = await request.run();
+
+    return JSON.parse(response.body);
   }
 
   _constructRoutes (publicApi) {
@@ -273,7 +277,6 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   _warn (message) {
     console.warn(message); // eslint-disable-line no-console
   }
-
 }
 
 function getCorrectRoute (routes) {
