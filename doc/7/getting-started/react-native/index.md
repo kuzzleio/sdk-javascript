@@ -128,7 +128,7 @@ If you decided to add the optional part, you'll need to implement the `displayDa
 
 <<< ./snippets/ChatClient.js.snippet:4[js]
 
-In the constructor of this component, we set a `handleSendMessage` property to a bound `onSendMessage` function. Let's implement that function:
+We will need a function to create a document in Kuzzle when an user send a message. Let's implement that function:
 
 <<< ./snippets/ChatClient.js.snippet:8[js]
 
@@ -153,7 +153,7 @@ Then, just add the following imports:
 
 <<< ./snippets/ChatView.js.snippet:1[js]
 
-Now we need to create ou `ChatView` class and bind a `handleSendMessage` property to an `onSendMessage` function that will call the props parent function. 
+Now we need to create our `ChatView` class and create an `handleSendMessage` function that will call the props parent function `onHandleSendMessage`. 
 
 <<< ./snippets/ChatView.js.snippet:2[js]
 
@@ -162,9 +162,14 @@ There is no logic in this component so let's work on the render function:
 <<< ./snippets/ChatView.js.snippet:5[js]
 
 In the previous snippet, you can see that we are using a `Flatlist` to display the messages passed as props from the `ChatClient` component.
-The first view part in the `Flatlist` to the previous optional part. It is used to display the date only once for each message sent at the same date.
 
-Then just add the `TextInput` part with a call to our `handleSendMessage` property:
+We used a `renderFlatListItem` function to render each messages:
+
+<<< ./snippets/ChatView.js.snippet:9[js]
+
+The first view part in the this method is used to display the date only once for each message sent at the same date.
+
+Then just add the `TextInput` part with a call to our `handleSendMessage` function:
 
 <<< ./snippets/ChatView.js.snippet:6[js]
 
