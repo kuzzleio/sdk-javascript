@@ -3,7 +3,7 @@ description: mget users
 hooks:
   before: |
     for i in 1 2 3; do
-      curl -H "Content-type: application/json" -d '
+      curl -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["profile${i}"],
         "fullname": "user${i}"
@@ -13,7 +13,8 @@ hooks:
           "username": "foo",
           "password": "bar"
         }
-      }, kuzzle:7512/users/user${i}/_create '
+      }
+    }' kuzzle:7512/users/user${i}/_create
     done
   after: |
     for i in 1 2 3; do
