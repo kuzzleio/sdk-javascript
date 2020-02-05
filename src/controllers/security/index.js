@@ -355,7 +355,7 @@ class SecurityController extends BaseController {
       .then(response => response.result.hits.map(hit => new Profile(this.kuzzle, hit._id , hit._source.policies)));
   }
 
-  mGetUsers(ids, options = {}) {
+  mGetUsers (ids, options = {}) {
     const request = {
       action: 'mGetUsers'
     };

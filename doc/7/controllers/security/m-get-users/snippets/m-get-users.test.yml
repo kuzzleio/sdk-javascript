@@ -5,12 +5,12 @@ hooks:
     for i in 1 2 3; do
       curl -H "Content-type: application/json" -d '{
       "content": {
-        "profileIds": ["profile${i}"],
-        "fullname": "user${i}"
+        "profileIds": ["default"],
+        "fullname": "user'${i}'"
       },
-      "credentials" {
+      "credentials": {
         "local": {
-          "username": "foo",
+          "username": "user'${i}'",
           "password": "bar"
         }
       }
