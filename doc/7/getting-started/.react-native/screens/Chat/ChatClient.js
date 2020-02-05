@@ -61,7 +61,7 @@ class ChatClient extends React.Component {
             // The author name
             author: msg._source.author,
             // Boolean to display or not the date
-            displayDate: displayDate
+            displayDate
         };
         // displayDate will be set to true only if the previous message is from another day in goal to display only one time the dates
         // and only the hours on each messages
@@ -105,7 +105,7 @@ class ChatClient extends React.Component {
                 // Check if the notification interest us (only document creation)
                 if (notification.type !== "document") return;
                 if (notification.action !== "create") return;
-                let length = this.state.messages.length;
+                const length = this.state.messages.length;
                 let displayDate;
                 if (length === 0) { // If we haven't fetched some messages we must display the date for the first message we receive
                     displayDate = true;
@@ -128,7 +128,7 @@ class ChatClient extends React.Component {
         await kuzzle.document.create(
             "chat",
             "messages",
-            // Pass the document to be stored in Kuzzle as a parameter
+            // The document to be stored is passed in parameter
             {
                 author: this.props.name,
                 message
