@@ -157,17 +157,16 @@ Now we need to create our `ChatView` class and create an `handleSendMessage` fun
 
 <<< ./snippets/ChatView.js.snippet:2[js]
 
-There is no logic in this component so let's work on the render function:
-
-<<< ./snippets/ChatView.js.snippet:5[js]
-
-In the previous snippet, you can see that we are using a `Flatlist` to display the messages passed as props from the `ChatClient` component.
-
-We used a `renderFlatListItem` function to render each messages:
+There is no logic in this component but we will need a function to display the messages of our list: `renderFlatListItem(item)`:
 
 <<< ./snippets/ChatView.js.snippet:9[js]
 
 The first view part in the this method is used to display the date only once for each message sent at the same date.
+Now, let's work on the render function:
+
+<<< ./snippets/ChatView.js.snippet:5[js]
+
+In the previous snippet, you can see that we are using a `Flatlist` to display the messages passed as props from the `ChatClient` component and that we are calling our `renderFlatListItem` function to render the messages.
 
 Then just add the `TextInput` part with a call to our `handleSendMessage` function:
 
