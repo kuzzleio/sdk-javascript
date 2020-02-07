@@ -194,6 +194,7 @@ class DocumentController extends BaseController {
       action: 'search',
     };
 
+    options.verb = 'POST';
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
       delete options[opt];
