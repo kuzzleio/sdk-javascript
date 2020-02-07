@@ -402,7 +402,7 @@ describe('Document Controller', () => {
               action: 'search',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'},
+              searchBody: {foo: 'bar'},
               from: 0,
               size: 10,
               scroll: undefined
@@ -436,7 +436,7 @@ describe('Document Controller', () => {
               action: 'search',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'},
+              searchBody: {foo: 'bar'},
               from: 1,
               size: 2,
               scroll: '1m'

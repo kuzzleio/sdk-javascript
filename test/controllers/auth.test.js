@@ -302,7 +302,7 @@ describe('Auth Controller', () => {
               strategy: 'strategy',
               expiresIn: 'expiresIn',
               body: credentials
-            }, {queuable: false});
+            }, {queuable: false, verb: 'POST'});
 
           should(res).be.equal(jwt);
         });

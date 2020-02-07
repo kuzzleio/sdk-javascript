@@ -190,11 +190,16 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body,
       action: 'search',
     };
 
-    options.verb = 'POST';
+    if (options.verb === 'POST') {
+      request.body = body;
+    }
+    else {
+      request.searchBody = body;
+    }
+
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
       delete options[opt];
@@ -204,7 +209,7 @@ class DocumentController extends BaseController {
       request.size = 10;
     }
 
-    if (!request.scroll && !request.body.sort && !request.from) {
+    if (!request.scroll && ((!request.body || !request.body.sort) && (!request.searchBody || !request.searchBody.sort)) && !request.from) {
       request.from = 0;
     }
 
