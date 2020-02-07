@@ -190,15 +190,9 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
+      body,
       action: 'search',
     };
-
-    if (options.verb === 'POST') {
-      request.body = body;
-    }
-    else {
-      request.searchBody = body;
-    }
 
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
