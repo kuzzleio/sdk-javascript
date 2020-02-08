@@ -1,0 +1,8 @@
+---
+name: kuzzle#registerPipe
+description: Register pipes around SDK actions
+hooks:
+  before:
+  after:
+template: blank
+expected: Try to login as aschen
