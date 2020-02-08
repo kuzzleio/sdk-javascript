@@ -10,5 +10,7 @@ const kuzzle = new Kuzzle(
   new WebSocket('kuzzle')
 );
 
-[snippet-code]
-console.log('Everything is ok');
+(async () => {
+  [snippet-code]
+  console.log('Everything is ok');
+})();

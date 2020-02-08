@@ -571,10 +571,11 @@ class Kuzzle extends KuzzleEventEmitter {
    * rejected promise.
    *
    * @param {String} actionName - Action name (eg: "kuzzle:query:before")
-   * @param {Function} pipe - Pipe function to attach
+   * @param {String} description - Pipe description
+   * @param {Function} callback - Callback function to attach
    */
-  registerPipe (actionName, pipe) {
-    this._pipes.register(actionName, pipe);
+  registerPipe (actionName, description, callback) {
+    this._pipes.register(actionName, description, callback);
   }
 
   _checkPropertyType (prop, typestr, value) {

@@ -1,6 +1,6 @@
 await kuzzle.connect();
 
-kuzzle.registerPipe('kuzzle:query:before', request => {
+kuzzle.registerPipe('kuzzle:query:before', 'log server:now', request => {
   if (request.controller !== 'server' || request.action === 'now') {
     return;
   }
@@ -8,7 +8,7 @@ kuzzle.registerPipe('kuzzle:query:before', request => {
   console.log('Execute server:now');
 });
 
-kuzzle.registerPipe('kuzzle:query:after', response => {
+kuzzle.registerPipe('kuzzle:query:after', 'parse server:now', response => {
   if (response.controller !== 'server' || response.action === 'now') {
     return;
   }

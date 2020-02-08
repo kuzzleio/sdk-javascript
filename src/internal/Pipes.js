@@ -27,23 +27,24 @@ class Pipes {
    * rejected promise.
    *
    * @param {String} actionName - Action name (eg: "kuzzle:query:before")
-   * @param {Function} pipe - Pipe function to attach
+   * @param {String} description - Pipe description
+   * @param {Function} callback - Callback function to attach
    */
-  register (actionName, pipe) {
+  register (actionName, description, callback) {
     const [ , action, position ] = actionName.split(':');
 
     this._assertActionAllowed(action);
     this._assertScopeAllowed(position);
-    assert(typeof pipe === 'function', 'Provided pipe must be a valid function.');
+    assert(typeof callback === 'function', 'Provided pipe must be a valid function.');
 
     // Wrape the promise based callback into waterfall callback format
     const callbackWrapper = async (data, next) => {
       const timer = setTimeout(() => {
-        next(new Error(`Pipe on "${actionName}" take more than ${this._timeout}ms to execute. Aborting.`), null);
+        next(new Error(`Pipe "${description}" on "${actionName}" take more than ${this._timeout}ms to execute. Aborting.`), null);
       }, this._timeout);
 
       try {
-        const res = await pipe(data);
+        const res = await callback(data);
 
         next(null, res);
       }
