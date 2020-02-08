@@ -21,7 +21,7 @@ class AuthController extends BaseController {
     this._authenticationToken = null;
 
     // add authentication token to query
-    this.kuzzle.registerPipe('kuzzle:query:before', async request => {
+    this.kuzzle.registerPipe('kuzzle:query:before', 'add auth token', async request => {
       this._authenticateRequest(request);
 
       return request;
