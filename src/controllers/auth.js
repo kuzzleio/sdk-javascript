@@ -19,6 +19,13 @@ class AuthController extends BaseController {
     super(kuzzle, 'auth');
 
     this._authenticationToken = null;
+
+    // add authentication token to query
+    this.kuzzle.registerPipe('query:before', (request, cb) => {
+      this._authenticateRequest(request);
+
+      cb(null, request);
+    });
   }
 
   get authenticationToken () {
@@ -28,9 +35,11 @@ class AuthController extends BaseController {
   set authenticationToken (encodedJwt) {
     if (encodedJwt === undefined || encodedJwt === null) {
       this._authenticationToken = null;
-    } else if (typeof encodedJwt === 'string') {
+    }
+    else if (typeof encodedJwt === 'string') {
       this._authenticationToken = new Jwt(encodedJwt);
-    } else {
+    }
+    else {
       throw new Error(`Invalid token argument: ${encodedJwt}`);
     }
   }
@@ -41,7 +50,7 @@ class AuthController extends BaseController {
    *
    * @param {object} request
    */
-  authenticateRequest (request) {
+  _authenticateRequest (request) {
     if ( !this.authenticationToken
       || (request.controller === 'auth'
       && (request.action === 'checkToken' || request.action === 'login'))

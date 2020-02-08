@@ -76,6 +76,9 @@ class Kuzzle extends KuzzleEventEmitter {
       ? options.volatile
       : {};
 
+    // initialize pipes
+    this._pipes = new Pipes(['query']);
+
     // controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
@@ -121,9 +124,6 @@ class Kuzzle extends KuzzleEventEmitter {
     this.queuing = false;
 
     this._lastTokenExpired = null;
-
-    // initialize pipes
-    this._pipes = new Pipes(['query']);
 
     return proxify(this, {
       seal: true,
@@ -444,8 +444,6 @@ class Kuzzle extends KuzzleEventEmitter {
     }
     request.volatile.sdkInstanceId = request.volatile.sdkInstanceId || this.protocol.id;
     request.volatile.sdkName = request.volatile.sdkName || this.sdkName;
-
-    this.auth.authenticateRequest(request);
 
     let queuable = true;
     if (options && options.queuable === false) {

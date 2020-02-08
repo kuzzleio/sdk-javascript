@@ -54,7 +54,7 @@ class Pipes {
   _assertActionAllowed (action) {
     assert(
       this._actions.includes(action),
-      `Action ${action} is not eligible for pipelining. Available actions: ${this._actions.join(', ')}.`);
+      `Action "${action}" is not eligible for pipelining. Available actions: ${this._actions.join(', ')}.`);
   }
 
   _assertScopeAllowed (scope) {
