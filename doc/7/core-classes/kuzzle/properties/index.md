@@ -14,6 +14,7 @@ order: 10
 | `connected` | <pre>boolean</pre> | Returns `true` if the SDK is currently connected to a Kuzzle server. |
 | `offlineQueue` | <pre>object[]</pre> | Contains the queued requests during offline mode   |
 | `protocol` | <pre>Protocol</pre> | Protocol used by the SDK |
+| `pipesTimeout` | <pre>Number</pre> | Maximal pipes execution time in ms <SinceBadge version="7.1.0"/> |
 
 ### connected
 

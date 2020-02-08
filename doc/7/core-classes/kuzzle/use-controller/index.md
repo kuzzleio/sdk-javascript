@@ -7,10 +7,10 @@ description: Adds a new controller to the SDK
 
 # useController
 
-Adds a new controller to the SDK. 
+Adds a new controller to the SDK.
 
-*See also:* 
-  - *[Extend the SDK](/sdk/js/7/essentials/extend-sdk)*
+*See also:*
+  - *[Add custom controller](/sdk/js/7/essentials/extend-sdk/custom-controller)*
 
 ## Arguments
 

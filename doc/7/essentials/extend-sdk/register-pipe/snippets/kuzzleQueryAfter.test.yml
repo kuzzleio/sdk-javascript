@@ -1,0 +1,9 @@
+---
+name: extend-sdk#registerPipe#kuzzleQueryAfter
+description: SDK actio kuzzle:query:after
+hooks:
+  before:
+  after:
+template: blank
+expected:
+  - Parsed date is \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z

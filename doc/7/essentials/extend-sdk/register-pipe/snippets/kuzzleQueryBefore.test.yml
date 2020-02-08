@@ -1,0 +1,8 @@
+---
+name: extend-sdk#registerPipe#kuzzleQueryBefore
+description: SDK actio kuzzle:query:before
+hooks:
+  before:
+  after:
+template: blank
+expected: "Execute server:now"

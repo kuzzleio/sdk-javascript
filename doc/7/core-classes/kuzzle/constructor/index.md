@@ -43,6 +43,7 @@ Kuzzle SDK instance options.
 | `autoResubscribe` | <pre>boolean</pre><br/>(`true`)  | Automatically renew all subscriptions on a `reconnected` event     |
 | `eventTimeout`    | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored               |
 | `offlineMode`     | <pre>string</pre><br/>(`manual`) | Offline mode configuration. Can be `manual` or `auto`              |
+| `pipesTimeout`    | <pre>number</pre><br/>(`100`) | Maximal pipes execution time in ms <SinceBadge version="7.1.0"/> |
 | `queueTTL`        | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds |
 | `queueMaxSize`    | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                |
 | `replayInterval`  | <pre>number</pre><br/>(`10`)     | Delay between each replayed requests, in milliseconds              |

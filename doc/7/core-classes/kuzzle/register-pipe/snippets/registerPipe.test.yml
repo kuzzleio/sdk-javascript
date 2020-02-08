@@ -5,4 +5,6 @@ hooks:
   before:
   after:
 template: blank
-expected: Try to login as aschen
+expected:
+  - "Execute server:now"
+  - Parsed date is \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z
