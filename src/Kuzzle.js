@@ -11,6 +11,7 @@ const
   MemoryStorageController = require('./controllers/memoryStorage'),
   BaseController = require('./controllers/base'),
   uuidv4 = require('./uuidv4'),
+  Pipes = require('./internal/Pipes'),
   proxify = require('./proxify');
 
 const
@@ -120,6 +121,9 @@ class Kuzzle extends KuzzleEventEmitter {
     this.queuing = false;
 
     this._lastTokenExpired = null;
+
+    // initialize pipes
+    this._pipes = new Pipes(['query']);
 
     return proxify(this, {
       seal: true,
@@ -249,6 +253,19 @@ class Kuzzle extends KuzzleEventEmitter {
     this._tokenExpiredInterval = value;
   }
 
+  /**
+   * Registers a new pipe for the specified action.
+   *
+   * The pipe function will be called with 2 arguments:
+   *   - data: object containing pipe data
+   *   - cb: callback method to call inside the pipe like this: cb(error, data)
+   *
+   * @param {String} actionName - Action name and scope (eg: "query:before")
+   * @param {Function} pipe - Pipe function to attach
+   */
+  registerPipe (actionName, pipe) {
+    this._pipes.register(actionName, pipe);
+  }
 
   /**
   * Emit an event to all registered listeners
@@ -393,7 +410,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @returns {Promise<object>}
    */
-  query (request = {}, options = {}) {
+  async query (request = {}, options = {}) {
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }
@@ -439,26 +456,34 @@ class Kuzzle extends KuzzleEventEmitter {
       queuable = queuable && this.queueFilter(request);
     }
 
+    const modifiedRequest = await this._pipes.execute('query:before', request);
+
     if (this.queuing) {
       if (queuable) {
         this._cleanQueue();
-        this.emit('offlineQueuePush', {request});
+        this.emit('offlineQueuePush', { request: modifiedRequest });
+
         return new Promise((resolve, reject) => {
           this.offlineQueue.push({
             resolve,
             reject,
-            request,
+            request: modifiedRequest,
             ts: Date.now()
           });
         });
       }
 
-      this.emit('discarded', {request});
-      return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
-Discarded request: ${JSON.stringify(request)}`));
+      this.emit('discarded', { request: modifiedRequest });
+
+      const error = new Error(`Unable to execute request: not connected to a Kuzzle server.
+      Discarded request: ${JSON.stringify(modifiedRequest)}`);
+
+      throw error;
     }
 
-    return this.protocol.query(request);
+    const response = await this.protocol.query(modifiedRequest);
+
+    return this._pipes.execute('query:after', response);
   }
 
   /**
