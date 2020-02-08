@@ -12,8 +12,8 @@ order: 200
 
 You can modify existing SDK actions behavior by registering pipes before or after these actions.  
 
-A pipe is a callback method taking the same parameter as the action it is hooked on.  
-Pipes have to return this parameter either directly or through a promise resolving to it.  
+A pipe is a callback method taking a payload depending of the action it is hooked on.  
+Pipes have to return this payload either directly or through a promise resolving to it.  
 
 Pipes have to be registered using the [Kuzzle.registerPipe](/sdk/js/7/core-classes/kuzzle/register-pipe) method.
 
@@ -21,7 +21,7 @@ Pipes have to be registered using the [Kuzzle.registerPipe](/sdk/js/7/core-class
 
 If a pipe take too long to be executed, Kuzzle will throw an error and abort the action execution.  
 
-This timeout can be configured in the [Kuzzle object constructor](/sdk/js/7/core-classes/kuzzle/constructor)
+This timeout can be configured in the [Kuzzle object constructor](/sdk/js/7/core-classes/kuzzle/constructor). The default value is 100ms.
 
 ## Available actions
 

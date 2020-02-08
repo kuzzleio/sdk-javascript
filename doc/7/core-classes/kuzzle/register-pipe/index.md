@@ -11,7 +11,7 @@ description: Register pipes around SDK actions
 
 Registers a callback function to be executed around a SDK action.
 
-You can use this method to [modify SDK actions](/sdk/js/7/essentials/extend-sdk/register-pipe#modify-SDK-actions).
+*See also: [Modify SDK actions](/sdk/js/7/essentials/extend-sdk/register-pipe)*
 
 ::: warning
 If the provided function take too long to return, the SDK action will abort.

@@ -1,11 +1,13 @@
 await kuzzle.connect();
 
 kuzzle.registerPipe('kuzzle:query:after', 'parse server:now', response => {
-  if (response.controller !== 'server' || response.action === 'now') {
+  if (response.controller !== 'server' || response.action !== 'now') {
     return;
   }
 
   response.result.parsed = new Date(response.result.now);
+
+  return response;
 });
 
 

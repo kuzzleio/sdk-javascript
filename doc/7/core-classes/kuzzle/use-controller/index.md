@@ -9,8 +9,7 @@ description: Adds a new controller to the SDK
 
 Adds a new controller to the SDK.
 
-*See also:*
-  - *[Add custom controller](/sdk/js/7/essentials/extend-sdk/custom-controller)*
+*See also: [Add custom controller](/sdk/js/7/essentials/extend-sdk/custom-controller)*
 
 ## Arguments
 
