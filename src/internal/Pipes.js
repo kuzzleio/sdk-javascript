@@ -54,7 +54,7 @@ class Pipes {
       finally {
         clearTimeout(timer);
       }
-    }
+    };
 
     this._pipes[action][position].push(callbackWrapper);
   }
