@@ -21,10 +21,10 @@ class AuthController extends BaseController {
     this._authenticationToken = null;
 
     // add authentication token to query
-    this.kuzzle.registerPipe('query:before', (request, cb) => {
+    this.kuzzle.registerPipe('kuzzle:query:before', async request => {
       this._authenticateRequest(request);
 
-      cb(null, request);
+      return request;
     });
   }
 

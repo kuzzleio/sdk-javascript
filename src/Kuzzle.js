@@ -76,8 +76,10 @@ class Kuzzle extends KuzzleEventEmitter {
       ? options.volatile
       : {};
 
+    this._pipesTimeout = options.pipesTimeout || 100;
+
     // initialize pipes
-    this._pipes = new Pipes(['query']);
+    this._pipes = new Pipes(this._pipesTimeout, ['query']);
 
     // controllers
     this.useController(AuthController, 'auth');
@@ -196,6 +198,10 @@ class Kuzzle extends KuzzleEventEmitter {
     this._offlineQueueLoader = value;
   }
 
+  get pipesTimeout () {
+    return this._pipesTimeout;
+  }
+
   get port () {
     return this.protocol.port;
   }
@@ -251,20 +257,6 @@ class Kuzzle extends KuzzleEventEmitter {
   set tokenExpiredInterval (value) {
     this._checkPropertyType('_tokenExpiredInterval', 'number', value);
     this._tokenExpiredInterval = value;
-  }
-
-  /**
-   * Registers a new pipe for the specified action.
-   *
-   * The pipe function will be called with 2 arguments:
-   *   - data: object containing pipe data
-   *   - cb: callback method to call inside the pipe like this: cb(error, data)
-   *
-   * @param {String} actionName - Action name and scope (eg: "query:before")
-   * @param {Function} pipe - Pipe function to attach
-   */
-  registerPipe (actionName, pipe) {
-    this._pipes.register(actionName, pipe);
   }
 
   /**
@@ -567,6 +559,22 @@ class Kuzzle extends KuzzleEventEmitter {
     this[accessor] = controller;
 
     return this;
+  }
+
+  /**
+   * Registers a new pipe for the specified action.
+   *
+   * The pipe function will be called with a payload that must be returned
+   * either directly or by a promise.
+
+   * If an error occur, the pipe function must throw an exception or return a
+   * rejected promise.
+   *
+   * @param {String} actionName - Action name (eg: "kuzzle:query:before")
+   * @param {Function} pipe - Pipe function to attach
+   */
+  registerPipe (actionName, pipe) {
+    this._pipes.register(actionName, pipe);
   }
 
   _checkPropertyType (prop, typestr, value) {

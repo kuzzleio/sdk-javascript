@@ -3,7 +3,8 @@ const
   waterfall = require('./waterfall');
 
 class Pipes {
-  constructor (actions) {
+  constructor (timeout, actions) {
+    this._timeout = timeout;
     this._actions = actions;
 
     this._pipes = {};
@@ -19,21 +20,42 @@ class Pipes {
   /**
    * Registers a new pipe for the specified action.
    *
-   * The pipe function will be called with 2 arguments:
-   *   - data: object containing pipe data
-   *   - cb: callback method to call inside the pipe like this: cb(error, data)
+   * The pipe function will be called with a payload that must be returned
+   * either directly or by a promise.
+
+   * If an error occur, the pipe function must throw an exception or return a
+   * rejected promise.
    *
-   * @param {String} actionName - Action name and scope (eg: "query:before")
+   * @param {String} actionName - Action name (eg: "kuzzle:query:before")
    * @param {Function} pipe - Pipe function to attach
    */
   register (actionName, pipe) {
-    const [ action, scope ] = actionName.split(':');
+    const [ , action, position ] = actionName.split(':');
 
     this._assertActionAllowed(action);
-    this._assertScopeAllowed(scope);
+    this._assertScopeAllowed(position);
     assert(typeof pipe === 'function', 'Provided pipe must be a valid function.');
 
-    this._pipes[action][scope].push(pipe);
+    // Wrape the promise based callback into waterfall callback format
+    const callbackWrapper = async (data, next) => {
+      const timer = setTimeout(() => {
+        next(new Error(`Pipe on "${actionName}" take more than ${this._timeout}ms to execute. Aborting.`), null);
+      }, this._timeout);
+
+      try {
+        const res = await pipe(data);
+
+        next(null, res);
+      }
+      catch (error) {
+        next(error, null);
+      }
+      finally {
+        clearTimeout(timer);
+      }
+    }
+
+    this._pipes[action][position].push(callbackWrapper);
   }
 
   /**
