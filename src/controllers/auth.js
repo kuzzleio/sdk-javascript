@@ -21,11 +21,10 @@ class AuthController extends BaseController {
     this._authenticationToken = null;
 
     // add authentication token to query
-    this.kuzzle.registerPipe('kuzzle:query:before', 'add auth token', async request => {
-      this._authenticateRequest(request);
-
-      return request;
-    });
+    this.kuzzle.registerPipe(
+      'kuzzle:query:before',
+      'add auth token',
+      this._authenticateRequest.bind(this));
   }
 
   get authenticationToken () {
@@ -51,14 +50,14 @@ class AuthController extends BaseController {
    * @param {object} request
    */
   _authenticateRequest (request) {
-    if ( !this.authenticationToken
-      || (request.controller === 'auth'
-      && (request.action === 'checkToken' || request.action === 'login'))
+    if ( this.authenticationToken
+      && (request.controller === 'auth'
+      && (request.action !== 'checkToken' || request.action !== 'login'))
     ) {
-      return;
+      request.jwt = this.authenticationToken.encodedJwt;
     }
 
-    request.jwt = this.authenticationToken.encodedJwt;
+    return request;
   }
 
   /**
