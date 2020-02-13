@@ -4,4 +4,4 @@ hooks:
   before:
   after:
 template: default
-expected: ongoingRequests
+expected: hits
