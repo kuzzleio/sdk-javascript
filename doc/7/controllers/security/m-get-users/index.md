@@ -22,7 +22,7 @@ You can force it to be `POST` in the `options`.
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `ids` | <pre>array&lt;string&gt;</pre> | User identifiers |
+| `ids` | <pre>string[]</pre> | User identifiers |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
