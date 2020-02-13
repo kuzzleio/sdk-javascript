@@ -4,7 +4,4 @@ hooks:
   before:
   after:
 template: default
-expected: ^(Last Kuzzle Stats:) {("connections":{.*}),("ongoingRequests":{.*}),("completedRequests":{.*}),("failedRequests":{.*}),("timestamp":[0-9]{13})}$
-
-sdk: js
-version: 6
+expected: ongoingRequests
