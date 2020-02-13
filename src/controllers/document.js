@@ -203,7 +203,7 @@ class DocumentController extends BaseController {
       request.size = 10;
     }
 
-    if (!request.scroll && ((!request.body || !request.body.sort) && (!request.searchBody || !request.searchBody.sort)) && !request.from) {
+    if (!request.scroll && !request.body.sort && !request.from) {
       request.from = 0;
     }
 
