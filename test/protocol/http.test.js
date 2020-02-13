@@ -709,6 +709,12 @@ describe('HTTP networking module', () => {
               { verb: 'POST', url: '/:index/:collection/:_id/_create' }
             ]
           },
+          mGet: {
+            http: [
+              { verb: 'GET', url: '/:index/:collection/_mGet' },
+              { verb: 'POST', url: '/:index/:collection/_mGet' }
+            ]
+          },
           subscribe: {},
           list: {
             http: [ { verb: 'GET', url: '/:index/_list' } ]
@@ -722,9 +728,14 @@ describe('HTTP networking module', () => {
       should(routes.foo.list.url).be.eql('/:index/_list');
       should(routes.foo.list.verb).be.eql('GET');
 
-      // with same URL size, we keep the POST route
+      // with same URL size, we keep the GET route
       should(routes.foo.login.url).be.eql('/_login/:strategy');
-      should(routes.foo.login.verb).be.eql('POST');
+      should(routes.foo.login.verb).be.eql('GET');
+
+      // with same URL size, we keep the GET route
+      should(routes.foo.mGet.url).be.eql('/:index/:collection/_mGet');
+      should(routes.foo.mGet.verb).be.eql('GET');
+
 
       // with differents URL sizes, we keep the shortest because URL params
       // will be in the query string

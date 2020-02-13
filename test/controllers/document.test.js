@@ -249,16 +249,16 @@ describe('Document Controller', () => {
   });
 
   describe('mGet', () => {
-    it('should call document/mGet query and return a Promise which resolves the list of documents', () => {
-      const result = {
-        hits: [
-          {_id: 'document1', _version: 1, _source: {foo: 'bar'}},
-          {_id: 'document2', _version: 3, _source: {foo: 'baz'}}
-        ],
-        total: 2
-      };
+    const result = {
+      hits: [
+        { _id: 'document1', _version: 1, _source: { foo: 'bar' } },
+        { _id: 'document2', _version: 3, _source: { foo: 'baz' } }
+      ],
+      total: 2
+    };
+    it('should call document/mGet POST query and return a Promise which resolves the list of documents', () => {
       kuzzle.query.resolves({result});
-
+      options.verb = 'POST';
       return kuzzle.document.mGet('index', 'collection', ['document1', 'document2'], options)
         .then(res => {
           should(kuzzle.query)
@@ -269,6 +269,24 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               body: {ids: ['document1', 'document2']}
+            }, options);
+
+          should(res).be.equal(result);
+        });
+    });
+    it('should call document/mGet GET query and return a Promise which resolves the list of documents', () => {
+      kuzzle.query.resolves({ result });
+      options.verb = undefined;
+      return kuzzle.document.mGet('index', 'collection', ['document1', 'document2'], options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'mGet',
+              index: 'index',
+              collection: 'collection',
+              ids: 'document1,document2'
             }, options);
 
           should(res).be.equal(result);

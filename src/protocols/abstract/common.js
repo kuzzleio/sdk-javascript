@@ -81,7 +81,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
     this.clear();
   }
 
-  query (request) {
+  query (request, options) {
     if (!this.isReady()) {
       this.emit('discarded', request);
       return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
@@ -109,7 +109,7 @@ Discarded request: ${JSON.stringify(request)}`));
       pending.resolve(response);
     });
 
-    this.send(request);
+    this.send(request, options);
 
     return pending.promise;
   }

@@ -15,6 +15,7 @@ Gets multiple documents.
 mGet(index, collection, ids, [options]);
 ```
 
+
 | Argument     | Type            | Description     |
 | ------------ | --------------- | --------------- |
 | `index`      | <pre>string</pre>        | Index name      |
@@ -29,6 +30,12 @@ Additional query options
 | Options    | Type<br/>(default)     | Description                                                                  |
 | ---------- | ---------------------- | ---------------------------------------------------------------------------- |
 | `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
+| `verb`     | <pre>string</pre>      | (HTTP only) Forces the verb of the route |
+
+#### verb
+
+When instantiated with a HTTP protocol object, the SDK uses the GET API by default for this API route.
+You can set the `verb` option to `POST` to force the SDK to use the POST API instead.
 
 ## Resolves
 

@@ -247,7 +247,7 @@ class AuthController extends BaseController {
       action: 'login'
     };
 
-    return this.query(request, {queuable: false})
+    return this.query(request, {queuable: false, verb: 'POST'})
       .then(response => {
         try {
           this._authenticationToken = new Jwt(response.result.jwt);
