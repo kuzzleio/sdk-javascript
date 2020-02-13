@@ -198,7 +198,8 @@ describe('HTTP networking module', () => {
 
       protocol.status = 'ready';
       protocol._routes = {
-        foo: {bar: {verb: 'VERB', url: '/foo/bar'}}
+        foo: {bar: {verb: 'VERB', url: '/foo/bar'}},
+        index: {create: {verb: 'VERB', url: '/:index/_create'}}
       };
     });
 
@@ -458,6 +459,24 @@ describe('HTTP networking module', () => {
 
       protocol.send(data);
     });
+
+    it('should return and discard request when an URL param is missing', done => {
+      const data = {
+        requestId: 'requestId',
+        controller: 'index',
+        action: 'create'
+      };
+
+      protocol.on('requestId', error => {
+        should(protocol._sendHttpRequest).not.be.called();
+        should(error.status).be.eql(400);
+
+        done();
+      });
+
+      protocol.send(data);
+    });
+
   });
 
   describe('#sendHttpRequest NodeJS', () => {

@@ -175,9 +175,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
         && this.routes[payload.controller][payload.action];
 
     if (! route) {
-      const error =
-        new Error(`No URL found for "${payload.controller}:${payload.action}".`);
-      this.emit(payload.requestId, {status: 400, error});
+      const error = new Error(
+        `No URL found for "${payload.controller}:${payload.action}".`);
+
+      this.emit(payload.requestId, { status: 400, error });
 
       return;
     }
@@ -191,8 +192,21 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       matches = regex.exec(url);
 
     while (matches) {
+      const urlParam = data[ matches[1] ];
+
+      // check if an url param is missing (eg: "/:index/_create)
+      if (!urlParam) {
+        const error = new Error(
+          `Missing URL param "${matches[1]}" in "${matches.input}"`);
+
+        this.emit(payload.requestId, { status: 400, error });
+        return;
+      }
+
       url = url.replace(regex, '/' + data[ matches[1] ]);
+
       delete(queryArgs[ matches[1] ]);
+
       matches = regex.exec(url);
     }
 
