@@ -14,9 +14,6 @@ Gets multiple security users.
 ```js
 mGetUsers(kuids, [options]);
 ```
-The route exists in `GET` and `POST`.
-By default, the SDK hits the `GET` one.
-You can force it to be `POST` in the `options`.
 
 <br />
 
@@ -27,10 +24,15 @@ You can force it to be `POST` in the `options`.
 
 ### options
 
-| Property | Type<br />(default) | Description |
+| Property | Type | Description |
 | --- | --- | --- |
-| `queuable` | <pre>boolean</pre><br />(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
-| `verb`     | <pre>string</pre>      | (HTTP only) Forces the verb of the API route |
+| `queuable` | <pre>boolean</pre> | If true, queues the request during downtime, until connected to Kuzzle again |
+| `verb`     | <pre>string</pre> | (HTTP only) Forces the verb of the API route |
+
+#### verb
+
+When instantiated with a HTTP protocol object, the SDK uses the GET API by default for this API route.
+You can set the `verb` option to `POST` to force the SDK to use the POST API instead.
 
 ## Resolves
 
