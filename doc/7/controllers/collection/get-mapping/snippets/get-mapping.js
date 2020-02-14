@@ -4,7 +4,7 @@ try {
   console.log(mapping);
   /*
   {
-    dynamic: 'false',
+    dynamic: 'true',
     _meta: {
       area: 'Panipokhari
     },
@@ -20,7 +20,7 @@ try {
   }
   */
 
-  console.log(mapping._meta.area); // Panipokhari
+  console.log(mapping.dynamic); // true
 } catch (error) {
   console.error(error.message);
 }
