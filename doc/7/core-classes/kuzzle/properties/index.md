@@ -29,12 +29,14 @@ See the associated documentation:
 | `autoQueue` | <pre>boolean</pre> | If `true`, automatically queues all requests during offline mode |
 | `autoReplay` | <pre>boolean</pre> | If `true`, automatically replays queued requests on a `reconnected` event |
 | `autoResubscribe` | <pre>boolean</pre> | If `true`, automatically renews all subscriptions on a `reconnected` event |
+| `connectTimeout`  | <pre>number</pre>  | Connection timeout in milliseconds <SinceBadge version="7.1.0"/>| Get/Set |
 | `jwt` | <pre>string</pre> | Authentication token |
 | `offlineQueueLoader` | <pre>function</pre> | Called before dequeuing requests after exiting offline mode, to add items at the beginning of the offline queue  |
 | `queueFilter` | <pre>function</pre> | Custom function called during offline mode to filter queued requests on-the-fly |
 | `queueMaxSize` | <pre>number</pre>  | Number of maximum requests kept during offline mode|
 | `queueTTL` | <pre>number</pre>  | Time a queued request is kept during offline mode, in milliseconds |
 | `replayInterval` | <pre>number</pre>  | Delay between each replayed requests |
+| `requestTimeout`  | <pre>number</pre>  | Request timeout in milliseconds <SinceBadge version="7.1.0"/>| Get/Set |
 | `volatile` | <pre>object</pre> | Common volatile data, will be sent to all future requests |
 
 ### offlineQueueLoader

@@ -121,6 +121,12 @@ class Kuzzle extends KuzzleEventEmitter {
 
     this._lastTokenExpired = null;
 
+    // timeout management
+    this._connectTimeout = options.connectTimeout || 0;
+    this._requestTimeout = options.requestTimeout || 0;
+
+    this._connectTimeoutTimer = null;
+
     return proxify(this, {
       seal: true,
       name: 'kuzzle',
@@ -161,6 +167,14 @@ class Kuzzle extends KuzzleEventEmitter {
 
   get connected () {
     return this.protocol.connected;
+  }
+
+  get connectTimeout () {
+    return this._connectTimeout;
+  }
+
+  set connectTimeout (value) {
+    this._connectTimeout = value;
   }
 
   get host () {
@@ -236,6 +250,14 @@ class Kuzzle extends KuzzleEventEmitter {
     this._replayInterval = value;
   }
 
+  get requestTimeout () {
+    return this._requestTimeout;
+  }
+
+  set requestTimeout (value) {
+    this._requestTimeout = value;
+  }
+
   get sslConnection () {
     return this.protocol.sslConnection;
   }
@@ -289,6 +311,10 @@ class Kuzzle extends KuzzleEventEmitter {
     this.protocol.addListener('tokenExpired', () => this.tokenExpired());
 
     this.protocol.addListener('connect', () => {
+      if (this._connectTimeoutTimer) {
+        clearTimeout(this._connectTimeoutTimer);
+      }
+
       if (this.autoQueue) {
         this.stopQueuing();
       }
@@ -346,7 +372,24 @@ class Kuzzle extends KuzzleEventEmitter {
 
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
-    return this.protocol.connect();
+    let resolve;
+    let reject;
+    let timeoutPromise = new Promise((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+
+    if (this._connectTimeout !== 0) {
+      this._connectTimeoutTimer = setTimeout(() => {
+        reject(new Error('Cannot connect to host after. Is the host online?'));
+      }, this._connectTimeout);
+    }
+
+    this.protocol.connect()
+      .then(resolve)
+      .catch(reject);
+
+    return timeoutPromise;
   }
 
   /**

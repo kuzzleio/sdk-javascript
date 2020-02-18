@@ -15,10 +15,8 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
     this._routes = {};
 
-    // @deprecated: options.timeout is deprecated since 7.0.2
-    this._connectTimeout = options.connectTimeout || options.timeout || 0;
-
-    this._requestTimeout = options.requestTimeout || 0;
+    // @deprecated: options.timeout is deprecated since 7.1.0
+    this._connectTimeout = options.timeout || 0;
 
     this.customRoutes = options.customRoutes || {};
 
@@ -233,7 +231,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   }
 
   async _sendHttpRequest (method, path, payload = {}) {
-    const request = new AbortableRequest(this.protocol, this._requestTimeout, {
+    const request = new AbortableRequest(this.protocol, {
       host: this.host,
       port: this.port,
       body: payload.body,

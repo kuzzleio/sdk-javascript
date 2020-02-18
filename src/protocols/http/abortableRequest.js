@@ -14,14 +14,10 @@ const CHARSETS = [
 
 /**
  * Class to abstract HTTP request between the browser and Node.js
- * Include a timeout mecanism:
- *   - connect timeout: abort the request when the socket can't be open
- *   - request timeout: abort the request when the respond is too long
  */
 class AbortableRequest {
-  constructor (protocol, timeout, options = {}) {
+  constructor (protocol, options = {}) {
     this._protocol = protocol;
-    this._timeout = timeout;
     this._options = options;
     this._request = null;
 
@@ -29,8 +25,6 @@ class AbortableRequest {
       this._resolve = resolve;
       this._reject = reject;
     });
-
-    this._timer = null;
   }
 
   run () {
@@ -51,13 +45,6 @@ class AbortableRequest {
       this._browserRequest();
     }
 
-    // Set request abortion timeout if it is specified
-    if (this._timeout > 0) {
-      this._timer = setTimeout(() => {
-        this._request.abort();
-      }, this._timeout);
-    }
-
     return this._promise;
   }
 
@@ -71,7 +58,7 @@ class AbortableRequest {
 
     this._request = new XMLHttpRequest();
 
-    // connect timeout
+    // @deprecrated 7.1.0: old connect timeout
     this._request.timeout = this._options.timeout;
 
     this._request.onreadystatechange = () => {
@@ -156,14 +143,10 @@ class AbortableRequest {
   }
 
   reject (arg) {
-    clearTimeout(this._timer);
-
     this._reject(arg);
   }
 
   resolve (arg) {
-    clearTimeout(this._timer);
-
     this._resolve(arg);
   }
 }
