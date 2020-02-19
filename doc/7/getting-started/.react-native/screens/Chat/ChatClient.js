@@ -12,6 +12,7 @@ class ChatClient extends React.Component {
       messages: []
     };
     this.kuzzle = kuzzle;
+    this.handleSendMessage = this.handleSendMessage.bind(this);
   }
 
   async componentDidMount() {
@@ -157,7 +158,7 @@ class ChatClient extends React.Component {
     return (
       <ChatView
         messages={messages}
-        onHandleSendMessage={(message) => this.handleSendMessage(message)}
+        onHandleSendMessage={this.handleSendMessage}
         name={this.props.name}
       />
     );

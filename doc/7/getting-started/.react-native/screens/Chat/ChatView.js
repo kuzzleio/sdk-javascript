@@ -14,6 +14,7 @@ import {
 class ChatView extends React.Component {
   constructor(props) {
     super(props);
+    this.handleSendMessage = this.handleSendMessage.bind(this);
   }
   handleSendMessage(e) {
     this.props.onHandleSendMessage(e.nativeEvent.text);
@@ -72,7 +73,7 @@ class ChatView extends React.Component {
             onContentSizeChange={() =>
               this.flatList.scrollToEnd({ animated: true })
             }
-            renderItem={item => this.renderFlatListItem(item)}
+            renderItem={item => this.renderFlatListItem(item.item)}
             keyExtractor={item => item.id}
           />
           {/* snippet:end */}
