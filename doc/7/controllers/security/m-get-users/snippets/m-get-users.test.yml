@@ -1,0 +1,24 @@
+name: security#mGetUsers
+description: mget users
+hooks:
+  before: |
+    for i in 1 2 3; do
+      curl -H "Content-type: application/json" -d '{
+      "content": {
+        "profileIds": ["default"],
+        "fullname": "user'${i}'"
+      },
+      "credentials": {
+        "local": {
+          "username": "user'${i}'",
+          "password": "bar"
+        }
+      }
+    }' kuzzle:7512/users/user${i}/_create
+    done
+  after: |
+    for i in 1 2 3; do
+      curl -XDELETE kuzzle:7512/users/user${i}
+    done
+template: default
+expected: '^    _id: ''user3'',$'

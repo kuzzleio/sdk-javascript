@@ -136,10 +136,15 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {ids},
       action: 'mGet'
     };
 
+    if (options.verb === 'POST') {
+      request.body = {ids};
+    }
+    else {
+      request.ids = ids.join();
+    }
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -213,8 +218,10 @@ class DocumentController extends BaseController {
       _id,
       body,
       action: 'update',
-      retryOnConflict: options.retryOnConflict
+      retryOnConflict: options.retryOnConflict,
+      source: options.source
     };
+    delete options.source;
     delete options.retryOnConflict;
 
     return this.query(request, options)

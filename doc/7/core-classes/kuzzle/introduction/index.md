@@ -16,7 +16,7 @@ Once instantiated, it represents a connection to your Kuzzle server.
 It gives access to the different features of the SDKs:
 
 - access to the available controllers
-- [SDK events](/sdk/js/6/essentials/events) handling
+- [SDK events](/sdk/js/7/essentials/events) handling
 - resilience to connection loss
 - network request queue management
 

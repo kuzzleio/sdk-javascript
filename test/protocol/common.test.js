@@ -18,6 +18,30 @@ describe('Common Protocol', () => {
     sendSpy = sinon.spy(protocol, 'send');
   });
 
+  describe('#constructor', () => {
+    it('should accept string as port', () => {
+      protocol = new AbstractWrapper('somewhere', { port: '443' });
+
+      should(protocol.port).be.eql(443);
+    });
+
+    it('should use 7512 when no port is given or when port is not a parseable number', () => {
+      protocol = new AbstractWrapper('somewhere', { port: 'foobar' });
+
+      should(protocol.port).be.eql(7512);
+
+      protocol = new AbstractWrapper('somewhere');
+
+      should(protocol.port).be.eql(7512);
+    });
+
+    it('should accept number as port', () => {
+      protocol = new AbstractWrapper('somewhere', { port: 443 });
+
+      should(protocol.port).be.eql(443);
+    });
+  });
+
   describe('#connected', () => {
     it('should return true if the protocol state is "connected"', () => {
       protocol.state = 'connected';

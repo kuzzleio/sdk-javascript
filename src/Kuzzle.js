@@ -458,7 +458,7 @@ class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request);
+    return this.protocol.query(request, options);
   }
 
   /**
