@@ -135,7 +135,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (data) {
+  send (data, options = {}) {
     const
       payload = {
         action: undefined,
@@ -175,15 +175,15 @@ class HttpWrapper extends KuzzleAbstractProtocol {
         && this.routes[payload.controller][payload.action];
 
     if (! route) {
-      const error =
-        new Error(`No URL found for "${payload.controller}:${payload.action}".`);
-      this.emit(payload.requestId, {status: 400, error});
+      const error = new Error(`No URL found for "${payload.controller}:${payload.action}".`);
+
+      this.emit(payload.requestId, { status: 400, error });
 
       return;
     }
 
     const
-      method = route.verb,
+      method = options.verb || route.verb,
       regex = /\/:([^/]*)/;
 
     let
@@ -191,8 +191,20 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       matches = regex.exec(url);
 
     while (matches) {
+      const urlParam = data[ matches[1] ];
+
+      // check if an url param is missing (eg: "/:index/_create)
+      if (!urlParam) {
+        const error = new Error(`Missing URL param "${matches[1]}" in "${matches.input}"`);
+
+        this.emit(payload.requestId, { status: 400, error });
+        return;
+      }
+
       url = url.replace(regex, '/' + data[ matches[1] ]);
+
       delete(queryArgs[ matches[1] ]);
+
       matches = regex.exec(url);
     }
 
@@ -319,7 +331,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 function getCorrectRoute (routes) {
   let
     shortestRoute = routes[0],
-    postRoute,
+    getRoute,
     minLength = routes[0].url.length,
     sameLength = true;
 
@@ -333,19 +345,15 @@ function getCorrectRoute (routes) {
       minLength = route.url.length;
     }
 
-    if (route.verb === 'POST') {
-      postRoute = route;
+    if (route.verb === 'GET') {
+      getRoute = route;
     }
   }
 
-  if (sameLength) {
-    // with same URL size, we keep the POST route
-    return postRoute;
-  }
-
+  // with same URL size, we keep the GET route
   // with differents URL sizes, we keep the shortest because URL params
   // will be in the query string
-  return shortestRoute;
+  return sameLength ? getRoute : shortestRoute;
 }
 
 module.exports = HttpWrapper;

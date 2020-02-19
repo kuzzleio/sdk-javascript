@@ -20,6 +20,76 @@ describe('Auth Controller', () => {
     kuzzle.auth = new AuthController(kuzzle);
   });
 
+  describe('createApiKey', () => {
+    it('should send request to Kuzzle API', async () => {
+      const apiResult = {
+        _id: 'api-key-id',
+        _source: {
+          userId: 'kuid',
+          description: 'description',
+          expiresAt: Date.now() + 10000,
+          ttl: 10000,
+          token: 'secret-token'
+        }
+      };
+      kuzzle.query.resolves({ result: apiResult });
+
+      const result = await kuzzle.auth.createApiKey('description', {
+        expiresIn: 10000,
+        _id: 'api-key-id',
+        refresh: 'wait_for'
+      });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'auth',
+        action: 'createApiKey',
+        _id: 'api-key-id',
+        expiresIn: 10000,
+        refresh: 'wait_for',
+        body: {
+          description: 'description'
+        }
+      });
+
+      should(result).be.eql(apiResult);
+    });
+  });
+
+  describe('deleteApiKey', () => {
+    it('should send request to Kuzzle API', async () => {
+      kuzzle.query.resolves();
+
+      await kuzzle.auth.deleteApiKey('api-key-id', { refresh: 'wait_for' });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'auth',
+        action: 'deleteApiKey',
+        _id: 'api-key-id',
+        refresh: 'wait_for'
+      });
+    });
+  });
+
+  describe('searchApiKeys', () => {
+    it('should send request to Kuzzle API', async () => {
+      kuzzle.query.resolves({ result: { hits: [1, 2] } });
+
+      const result = await kuzzle.auth.searchApiKeys(
+        { match: {} },
+        { from: 1, size: 2 });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'auth',
+        action: 'searchApiKeys',
+        body: { match: {} },
+        from: 1,
+        size: 2
+      });
+
+      should(result).be.eql({ hits: [1, 2] });
+    });
+  });
+
   describe('#checkToken', () => {
     it('should call auth/checkToken query with the token and return a Promise which resolves the token validity', () => {
       kuzzle.query.resolves({
@@ -232,7 +302,7 @@ describe('Auth Controller', () => {
               strategy: 'strategy',
               expiresIn: 'expiresIn',
               body: credentials
-            }, {queuable: false});
+            }, {queuable: false, verb: 'POST'});
 
           should(res).be.equal(jwt);
         });

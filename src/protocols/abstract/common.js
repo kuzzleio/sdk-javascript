@@ -12,7 +12,8 @@ class AbstractWrapper extends KuzzleEventEmitter {
 
     this._pendingRequests = new Map();
     this._host = host;
-    this._port = typeof options.port === 'number' ? options.port : 7512;
+    const port = parseInt(options.port, 10);
+    this._port = isNaN(port) ? 7512 : port;
     this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
 
     this.id = uuidv4();
@@ -80,7 +81,7 @@ class AbstractWrapper extends KuzzleEventEmitter {
     this.clear();
   }
 
-  query (request) {
+  query (request, options) {
     if (!this.isReady()) {
       this.emit('discarded', request);
       return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
@@ -108,7 +109,7 @@ Discarded request: ${JSON.stringify(request)}`));
       pending.resolve(response);
     });
 
-    this.send(request);
+    this.send(request, options);
 
     return pending.promise;
   }

@@ -4,4 +4,4 @@ hooks:
   before:
   after:
 template: default
-expected: "^Kuzzle Server information:"
+expected: serverInfo

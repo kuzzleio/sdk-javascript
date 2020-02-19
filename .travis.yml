@@ -20,6 +20,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -47,6 +48,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -78,14 +80,18 @@ jobs:
 
     - stage: Tests
       name: Dead link check
+      language: node_js
+      node_js: 12
       if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
 
       before_script:
+        - npm ci
         - npm run doc-prepare
-        - npm run --prefix doc/framework repositories -- clone
+        - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
+        - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
       script:
         - gem install typhoeus
-        - HYDRA_MAX_CONCURRENCY=20 npm run --prefix doc/framework dead-links
+        - cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 ruby .ci/dead-links.rb -p src/sdk/js/7/
 
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
@@ -93,6 +99,7 @@ jobs:
       language: node_js
       node_js: 10
       env:
+        - BRANCH=dev
         - NODE_ENV=production
         - S3_BUCKET=docs-next.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
@@ -100,12 +107,14 @@ jobs:
 
       addons:
         apt:
+          update: true
           packages:
             - python
             - python-pip
 
       install:
         - pip install awscli --upgrade --user
+        - npm ci
 
       script:
         - npm run doc-prepare
@@ -116,6 +125,8 @@ jobs:
         script:
           - npm run doc-upload
         skip_cleanup: true
+        on:
+          all_branches: true
 
       after_deploy:
         - npm run doc-cloudfront
@@ -133,12 +144,14 @@ jobs:
 
       addons:
         apt:
+          update: true
           packages:
             - python
             - python-pip
 
       install:
         - pip install awscli --upgrade --user
+        - npm ci
 
       script:
         - npm run doc-prepare
@@ -149,6 +162,8 @@ jobs:
         script:
           - npm run doc-upload
         skip_cleanup: true
+        on:
+          all_branches: true
 
       after_deploy:
         - npm run doc-cloudfront
@@ -195,6 +210,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:
@@ -228,6 +244,7 @@ jobs:
 
       addons:
         apt:
+          update: true
           sources:
             - ubuntu-toolchain-r-test
           packages:

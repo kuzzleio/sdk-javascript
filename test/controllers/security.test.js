@@ -21,6 +21,80 @@ describe('Security Controller', () => {
     kuzzle.security = new SecurityController(kuzzle);
   });
 
+  describe('createApiKey', () => {
+    it('should send request to Kuzzle API', async () => {
+      const apiResult = {
+        _id: 'api-key-id',
+        _source: {
+          userId: 'kuid',
+          description: 'description',
+          expiresAt: Date.now() + 10000,
+          ttl: 10000,
+          token: 'secret-token'
+        }
+      };
+      kuzzle.query.resolves({ result: apiResult });
+
+      const result = await kuzzle.security.createApiKey('kuid', 'description', {
+        expiresIn: 10000,
+        _id: 'api-key-id',
+        refresh: 'wait_for'
+      });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'security',
+        action: 'createApiKey',
+        _id: 'api-key-id',
+        userId: 'kuid',
+        expiresIn: 10000,
+        refresh: 'wait_for',
+        body: {
+          description: 'description'
+        }
+      });
+
+      should(result).be.eql(apiResult);
+    });
+  });
+
+  describe('deleteApiKey', () => {
+    it('should send request to Kuzzle API', async () => {
+      kuzzle.query.resolves();
+
+      await kuzzle.security.deleteApiKey('kuid', 'api-key-id', { refresh: 'wait_for' });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'security',
+        action: 'deleteApiKey',
+        _id: 'api-key-id',
+        userId: 'kuid',
+        refresh: 'wait_for'
+      });
+    });
+  });
+
+  describe('searchApiKeys', () => {
+    it('should send request to Kuzzle API', async () => {
+      kuzzle.query.resolves({ result: { hits: [1, 2] } });
+
+      const result = await kuzzle.security.searchApiKeys(
+        'kuid',
+        { match: {} },
+        { from: 1, size: 2 });
+
+      should(kuzzle.query).be.calledWith({
+        controller: 'security',
+        action: 'searchApiKeys',
+        userId: 'kuid',
+        body: { match: {} },
+        from: 1,
+        size: 2
+      });
+
+      should(result).be.eql({ hits: [1, 2] });
+    });
+  });
+
   describe('createCredentials', () => {
     it('should call security/createCredentials query with the user credentials and return a Promise which resolves a json object', () => {
       const result = {
@@ -154,7 +228,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createOrReplaceRole'
+              action: 'createOrReplaceRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
@@ -216,7 +291,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'createRole'
+              action: 'createRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
@@ -1155,7 +1231,8 @@ describe('Security Controller', () => {
               _id: 'roleId',
               body: {foo: 'bar'},
               controller: 'security',
-              action: 'updateRole'
+              action: 'updateRole',
+              force: null
             }, options);
 
           should(role).be.an.instanceOf(Role);
