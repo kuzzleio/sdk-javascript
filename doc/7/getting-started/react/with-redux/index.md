@@ -9,13 +9,13 @@ order: 0
 
 # Getting Started with Kuzzle and React with Redux Saga
 
-This section deals with **Kuzzle** (+ **Javascript SDK**) and **React** (with **Redux** and **Redux Saga**). We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React** (with **Redux** and **Redux Saga**). We will create **documents** in Kuzzle and subscribe to [document notifications](/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 ## Requirements
 
 - **Node.js** >= 8.0.0 ([install here](https://nodejs.org/en/download/))
 - **Create React App** ([install here](https://github.com/facebook/create-react-app))
-- **Running Kuzzle Stack** ([instructions here](core/1/guides/getting-started/running-kuzzle/))
+- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
 
 ## Prepare your environment
 
@@ -24,7 +24,7 @@ Create your React app and install all the dependencies from the command line usi
 ```bash
 yarn create react-app kuzzle-playground
 cd kuzzle-playground
-yarn add kuzzle-sdk redux redux-saga react-redux
+yarn add kuzzle-sdk@7 redux redux-saga react-redux
 ```
 
 We'll rewrite the _src/App.js_ so you can remove everything inside.
@@ -54,7 +54,7 @@ After that, create that function with the connection to Kuzzle:
 
 <<< ./snippets/App.js.snippet:2[js]
 
-Then we will [establish the connection](/sdk/js/7/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/6/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/6/controllers/collection/create/) for our chat. 
+Then we will [establish the connection](/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/controllers/index/exists), the [index](/controllers/index/create) and [collection](/controllers/collection/create) for our chat. 
 
 Add the following lines to the `_initialize` function:
 
@@ -116,7 +116,7 @@ We can now display the messages stored in Kuzzle. In the next part, we'll see ho
 
 ## Send messages
 
-We need to write a simple method that will [create](/sdk/js/7/controllers/document/create/) a new message document in Kuzzle.
+We need to write a simple method that will [create](/controllers/document/create) a new message document in Kuzzle.
 Add the following function in your `app` class in the_src/App.js_ file:
 
 <<< ./snippets/App.js.snippet:10[js]
@@ -130,7 +130,7 @@ Let's add it in the _src/state/sagas.js_ file:
 
 As you can see we don't push the new message in our state on message creation.
 Now, we need to subscribe to changes made on the collection containing our messages.
-So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe/) on message creations:
+So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call Kuzzle's realtime controller to allow us to [receive notifications](/controllers/realtime/subscribe) on message creations:
 
 <<< ./snippets/App.js.snippet:8[js]
 
@@ -164,8 +164,6 @@ You can now add new messages to Kuzzle and receive the notification of the creat
 Now that you're more familiar with Kuzzle with React, you can:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction/) to create incredibly fine-grained and blazing-fast subscriptions
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time/)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/guide/1/essentials/security/)
-
-To help you starting a new project with Kuzzle and React, you can start with the [**Kuzzle, React and Redux boilerplate**](https://github.com/kuzzleio/kuzzle-react-redux-boilerplate).
+- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction) to create incredibly fine-grained and blazing-fast subscriptions
+- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
