@@ -9,7 +9,7 @@ order: 400
 
 # Getting Started with Kuzzle and React Native
 
-This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications) to develop a realtime chat.
+This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications#document-messages) to develop a realtime chat.
 
 
 ## Requirements
