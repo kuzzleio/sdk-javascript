@@ -9,7 +9,7 @@ order: 0
 
 # Getting Started with Kuzzle and React with Redux Saga
 
-This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React** (with **Redux** and **Redux Saga**). We will create **documents** in Kuzzle and subscribe to [document notifications](/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React** (with **Redux** and **Redux Saga**). We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
 
 ## Requirements
 
@@ -54,7 +54,7 @@ After that, create that function with the connection to Kuzzle:
 
 <<< ./snippets/App.js.snippet:2[js]
 
-Then we will [establish the connection](/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/controllers/index/exists), the [index](/controllers/index/create) and [collection](/controllers/collection/create) for our chat. 
+Then we will [establish the connection](/sdk/js/7/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/sdk/js/7/controllers/index/exists), the [index](/sdk/js/7/controllers/index/create) and [collection](/sdk/js/7/controllers/collection/create) for our chat. 
 
 Add the following lines to the `_initialize` function:
 
@@ -116,7 +116,7 @@ We can now display the messages stored in Kuzzle. In the next part, we'll see ho
 
 ## Send messages
 
-We need to write a simple method that will [create](/controllers/document/create) a new message document in Kuzzle.
+We need to write a simple method that will [create](/sdk/js/7/controllers/document/create) a new message document in Kuzzle.
 Add the following function in your `app` class in the_src/App.js_ file:
 
 <<< ./snippets/App.js.snippet:10[js]
@@ -130,7 +130,7 @@ Let's add it in the _src/state/sagas.js_ file:
 
 As you can see we don't push the new message in our state on message creation.
 Now, we need to subscribe to changes made on the collection containing our messages.
-So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call Kuzzle's realtime controller to allow us to [receive notifications](/controllers/realtime/subscribe) on message creations:
+So let's create our `_subscribeToNewMessages()` function in the `app` class in _src/App.js_ file. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe) on message creations:
 
 <<< ./snippets/App.js.snippet:8[js]
 
