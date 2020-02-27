@@ -9,13 +9,13 @@ order: 400
 
 # Getting Started with Kuzzle and React Native
 
-This section deals with **Kuzzle** (+ [**Javascript SDK**](/sdk/js/7/)) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications/#document-messages) to develop a realtime chat.
+This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Native**. We will create **documents** in Kuzzle and subscribe to [document notifications](/sdk/js/7/essentials/realtime-notifications#document-messages) to develop a realtime chat.
 
 
 ## Requirements
 
 - **Node.js** >= 12.0.0 ([install here](https://nodejs.org/en/download/))
-- **Running Kuzzle Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle/))
+- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
 - **Expo CLI** ([install here](https://docs.expo.io/versions/v36.0.0/get-started/installation/))
 
 "[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase."
@@ -32,7 +32,7 @@ Then choose a blank project, type 'Kuzzle' and type y.
 Install Kuzzle's Javascript SDK: 
 ```bash
 cd getting-started-kuzzle
-npm install kuzzle-sdk
+npm install kuzzle-sdk@7
 ```
 
 Now, you can run your app and access it by different ways:
@@ -100,7 +100,7 @@ Like in our previous components, we'll first need to add our imports:
 
 <<< ./snippets/ChatClient.js.snippet:1[js]
 
-Then we will create our state that will contains our messages and call the function that will initialize our kuzzle by [establish the connection](/sdk/js/7/core-classes/kuzzle/connect/) to kuzzle and create, if they don't [exist](sdk/js/7/controllers/index/exists/), the [index](sdk/js/6/controllers/index/create/) and [collection](sdk/js/7/controllers/collection/create/) of our chat. 
+Then we will create our state that will contains our messages and call the function that will initialize our kuzzle by [establish the connection](/sdk/js/7/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/sdk/js/7/controllers/index/exists), the [index](/sdk/js/7/controllers/index/create) and [collection](/sdk/js/7/controllers/collection/create) of our chat. 
 
 <<< ./snippets/ChatClient.js.snippet:2[js]
 
@@ -111,10 +111,10 @@ Create the following function to fetch the messages:
 
 <<< ./snippets/ChatClient.js.snippet:6[js]
 
-The function `fetchMessage()` will [search](/sdk/js/7/controllers/document/search/) for the first hundred newest messages and store them in our state, before subscribing to changes in the `messages` collection.
+The function `fetchMessage()` will [search](/sdk/js/7/controllers/document/search) for the first hundred newest messages and store them in our state, before subscribing to changes in the `messages` collection.
 
 Then, create the `subscribeMessages()` function.
-It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe/) on message creations:
+It will call the Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe) on message creations:
 
 <<< ./snippets/ChatClient.js.snippet:7[js]
 
@@ -132,7 +132,7 @@ We will need a function to create a document in Kuzzle when an user send a messa
 
 <<< ./snippets/ChatClient.js.snippet:8[js]
 
-This simple method will [create](/sdk/js/7/controllers/document/create/) a new message document in Kuzzle. 
+This simple method will [create](/sdk/js/7/controllers/document/create) a new message document in Kuzzle. 
 
 As you can see we don't push the new message in our array on message creation.
 
@@ -187,7 +187,7 @@ You can now add new messages to Kuzzle and receive the creation notification to 
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time/)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security/)
-- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console/) to manage your users and data
+- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
+- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
 - learn how to perform a [basic authentication](/sdk/js/7/controllers/auth/login)
