@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kuzzle JS SDK</title>
+    <script src="../dist/kuzzle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <h1>
+      Kuzzle JS SDK
+    </h1>
+    <div id="app">
+      <div>
+        {{ document.message }}
+      </div>
+    </div>
+    <div>
+      <input id="documentMessage" type="text"/>
+      <button onclick="modifyDocument()">Create Or replace</button>
+    </div>
+    <script type="application/javascript">
+      (async function () {
+        window.kuzzle = new KuzzleSDK.Kuzzle(new KuzzleSDK.WebSocket('localhost'))
+
+        await window.kuzzle.connect()
+
+        console.log(await kuzzle.server.now());
+
+        const app = new Vue({
+          el: '#app',
+          async mounted () {
+            const doc = await kuzzle.document.get(
+            'index',
+            'collection',
+            'document-1',
+            { ctor: true });
+
+            await doc.subscribe()
+
+            this.document = doc._source
+          },
+          data: {
+            document: {}
+          }
+        })
+      })();
+
+      async function modifyDocument () {
+        const message = document.getElementById('documentMessage').value
+
+        await window.kuzzle.document.createOrReplace('index', 'collection', 'document-1', { message });
+      }
+    </script>
+  </body>
+</html>

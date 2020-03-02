@@ -1,4 +1,5 @@
 const
+  Document = require('../core/Document'),
   BaseController = require('./base'),
   DocumentSearchResult = require('./searchResult/document');
 
@@ -92,8 +93,17 @@ class DocumentController extends BaseController {
       action: 'get'
     };
 
+    const ctor = options.ctor;
+    options.ctor = undefined;
+
     return this.query(request, options)
-      .then(response => response.result);
+      .then(response => {
+        if (ctor) {
+          return new Document(this.kuzzle, response);
+        }
+
+        return response.result;
+      });
   }
 
   mCreate (index, collection, documents, options = {}) {
