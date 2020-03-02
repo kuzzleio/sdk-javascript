@@ -7,7 +7,7 @@ class Document {
     this._kuzzle = kuzzle;
   }
 
-  subscribe () {
+  subscribe (callback = null, ...callbackArgs) {
     const filters = {
       ids: { values: [this._id] }
     };
@@ -17,8 +17,14 @@ class Document {
       this._collection,
       filters,
       notification => {
-        for (const [field, value] of Object.entries(notification.result._source)) {
+        const body = notification.result._source;
+
+        for (const [field, value] of Object.entries(body)) {
           this._source[field] = value;
+        }
+
+        if (callback) {
+          callback(...callbackArgs, body);
         }
       }
     )
