@@ -16,6 +16,17 @@ That limit is by default set at 10000 documents, and you can't get over it even 
 When processing a large number of documents (i.e. more than 1000), it is advised to paginate the results using [SearchResult.next](/sdk/js/7/core-classes/search-result/next) rather than increasing the size parameter.
 :::
 
+::: warning
+When using a cursor with the `scroll` option, Elasticsearch has to duplicate the transaction log to keep the same result during the entire scroll session.  
+It can lead to memory leaks in a too great scroll duration is provided or if too many scroll session are open simultaneously.  
+:::
+
+::: info
+<SinceBadge version="Kuzzle 2.2.0"/>
+You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key and the maximum number of simultaneously opened scroll session under the `services.storage.maxScroll` configuration key.
+:::
+
+
 <br/>
 
 ```js
