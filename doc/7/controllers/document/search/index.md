@@ -18,7 +18,7 @@ When processing a large number of documents (i.e. more than 1000), it is advised
 
 ::: warning
 When using a cursor with the `scroll` option, Elasticsearch has to duplicate the transaction log to keep the same result during the entire scroll session.  
-It can lead to memory leaks in a too great scroll duration is provided or if too many scroll session are open simultaneously.  
+It can lead to memory leaks if a too great scroll duration is provided or if too many scroll sessions are open simultaneously.  
 :::
 
 ::: info
