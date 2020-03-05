@@ -42,12 +42,12 @@ This is the most consistent way to paginate results, however, this comes at a hi
 
 ::: warning
 When using a cursor with the `scroll` option, Elasticsearch has to duplicate the transaction log to keep the same result during the entire scroll session.  
-It can lead to memory leaks in a too great scroll duration is provided or if too many scroll session are open simultaneously.  
+It can lead to memory leaks if a too great scroll duration is provided or if too many scroll sessions are open simultaneously.  
 :::
 
 ::: info
 <SinceBadge version="Kuzzle 2.2.0"/>
-You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key and the maximum number of simultaneously opened scroll session under the `services.storage.maxScroll` configuration key.
+You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key and the maximum number of simultaneously opened scroll sessions under the `services.storage.maxScroll` configuration key.
 :::
 
 <<< ./snippets/scroll.js
