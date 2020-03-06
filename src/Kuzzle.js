@@ -1,5 +1,5 @@
 const
-  KuzzleEventEmitter = require('./eventEmitter'),
+  KuzzleEventEmitter = require('./core/KuzzleEventEmitter'),
   AuthController = require('./controllers/auth'),
   BulkController = require('./controllers/bulk'),
   CollectionController = require('./controllers/collection'),
@@ -9,6 +9,7 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
+  ObserveController = require('./controllers/observe'),
   BaseController = require('./controllers/base'),
   uuidv4 = require('./uuidv4'),
   proxify = require('./proxify');
@@ -85,6 +86,7 @@ class Kuzzle extends KuzzleEventEmitter {
     this.useController(RealtimeController, 'realtime');
     this.useController(SecurityController, 'security');
     this.useController(ServerController, 'server');
+    this.useController(ObserveController, 'observe');
 
     // offline queue
     this._offlineQueue = [];

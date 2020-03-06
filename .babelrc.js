@@ -7,9 +7,7 @@ module.exports = {
           browsers: ['> 1%']
         }
       }
-    ]
-  ],
-  plugins: [
-    ['@babel/plugin-transform-for-of', {'assumeArray': true}]
+    ],
+    "@babel/preset-react"
   ]
 };

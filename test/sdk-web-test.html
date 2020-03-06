@@ -12,12 +12,19 @@
     </h1>
     <div id="app">
       <div>
-        {{ document.message }}
+        <div>Document content:</div>
+        {{ document._id }} - {{ document._source.message }}
       </div>
-    </div>
-    <div>
-      <input id="documentMessage" type="text"/>
-      <button onclick="modifyDocument()">Create Or replace</button>
+      <div>
+        <input id="documentMessage" type="text"/>
+        <button onclick="modifyDocument()">Create Or replace</button>
+      </div>
+        <div>
+          <div>List of documents</div>
+        <li v-for="document in documents">
+          {{ document._id }} - {{ document._source.message }}
+        </li>
+      </div>
     </div>
     <script type="application/javascript">
       (async function () {
@@ -30,18 +37,24 @@
         const app = new Vue({
           el: '#app',
           async mounted () {
-            const doc = await kuzzle.document.get(
+            const doc = await kuzzle.observe.get(
             'index',
             'collection',
-            'document-1',
-            { ctor: true });
+            'document-1');
 
-            await doc.subscribe()
+            this.document = doc
 
-            this.document = doc._source
+            const result = await kuzzle.observe.search(
+              'index',
+              'collection');
+
+            this.documents = result.hits
           },
           data: {
-            document: {}
+            document: {
+              _source: {}
+            },
+            documents: []
           }
         })
       })();

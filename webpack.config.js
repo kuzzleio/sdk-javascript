@@ -5,7 +5,7 @@ const
 module.exports = {
   name: 'browser',
   mode: 'production',
-  entry: './index.js',
+  entry: ['babel-polyfill','./index.js'],
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
@@ -27,11 +27,6 @@ module.exports = {
         use: {
           loader: 'babel-loader'
         }
-      },
-      {
-        test: /\.?js$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader'
       }
     ]
   },

@@ -1,13 +1,17 @@
-class Document {
-  constructor(kuzzle, response) {
-    this._id = response.result._id;
-    this._source = response.result._source;
-    this._index = response.index;
-    this._collection = response.collection;
+const KuzzleEventEmitter = require('./KuzzleEventEmitter');
+
+class Observer extends KuzzleEventEmitter {
+  constructor(kuzzle, index, collection, document) {
+    super();
+
     this._kuzzle = kuzzle;
+    this._index = index;
+    this._collection = collection;
+    this._id = document._id;
+    this._source = document._source;
   }
 
-  subscribe (callback = null) {
+  start () {
     const filters = {
       ids: { values: [this._id] }
     };
@@ -23,13 +27,11 @@ class Document {
           this._source[field] = value;
         }
 
-        if (callback) {
-          callback(documentChanges);
-        }
+        this.emit('change', documentChanges);
       }
     )
       .then(() => this);
   }
 }
 
-module.exports = Document;
+module.exports = Observer;

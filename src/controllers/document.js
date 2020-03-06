@@ -1,5 +1,4 @@
 const
-  Document = require('../core/Document'),
   BaseController = require('./base'),
   DocumentSearchResult = require('./searchResult/document');
 
@@ -93,17 +92,8 @@ class DocumentController extends BaseController {
       action: 'get'
     };
 
-    const ctor = options.ctor;
-    options.ctor = undefined;
-
     return this.query(request, options)
-      .then(response => {
-        if (ctor) {
-          return new Document(this.kuzzle, response);
-        }
-
-        return response.result;
-      });
+      .then(response => response.result);
   }
 
   mCreate (index, collection, documents, options = {}) {
@@ -197,6 +187,13 @@ class DocumentController extends BaseController {
   }
 
   search (index, collection, body = {}, options = {}) {
+    return this._search(index, collection, body, options)
+      .then(({ response, request }) => (
+        new DocumentSearchResult(this.kuzzle, request, options, response.result)
+      ));
+  }
+
+  _search (index, collection, body = {}, options = {}) {
     const request = {
       index,
       collection,
@@ -218,7 +215,10 @@ class DocumentController extends BaseController {
     }
 
     return this.query(request, options)
-      .then(response => new DocumentSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => {
+        console.log(response)
+        return ({ response, request })
+      });
   }
 
   update (index, collection, _id, body, options = {}) {

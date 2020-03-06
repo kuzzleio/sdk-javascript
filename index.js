@@ -6,7 +6,7 @@ const
   } = require('./src/protocols'),
   BaseController = require('./src/controllers/base'),
   KuzzleAbstractProtocol = require('./src/protocols/abstract/common'),
-  KuzzleEventEmitter = require('./src/eventEmitter');
+  KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
