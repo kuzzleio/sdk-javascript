@@ -215,10 +215,7 @@ class DocumentController extends BaseController {
     }
 
     return this.query(request, options)
-      .then(response => {
-        console.log(response)
-        return ({ response, request })
-      });
+      .then(response => ({ response, request }));
   }
 
   update (index, collection, _id, body, options = {}) {

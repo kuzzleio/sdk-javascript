@@ -76,17 +76,17 @@ class Kuzzle extends KuzzleEventEmitter {
       ? options.volatile
       : {};
 
-    // controllers
+    // native controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
     this.useController(CollectionController, 'collection');
     this.useController(DocumentController, 'document');
     this.useController(IndexController, 'index');
     this.useController(MemoryStorageController, 'ms');
+    this.useController(ObserveController, 'observe');
     this.useController(RealtimeController, 'realtime');
     this.useController(SecurityController, 'security');
     this.useController(ServerController, 'server');
-    this.useController(ObserveController, 'observe');
 
     // offline queue
     this._offlineQueue = [];

@@ -1,0 +1,12 @@
+name: observe#get
+description: Gets an observer linked to a document
+hooks:
+  before: |
+    curl -XDELETE kuzzle:7512/nyc-open-data
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: default
+expected:
+  - "_listening: true"
+  - "\"capacity\": 4"

@@ -5,7 +5,11 @@ class Profile {
    * @param {Object} data
    */
   constructor (kuzzle, _id = null, policies = []) {
-    this._kuzzle = kuzzle;
+    Reflect.defineProperty(this, '_kuzzle', {
+      enumerable: false,
+      value: kuzzle
+    });
+
     this._id = _id;
     this.policies = policies;
   }

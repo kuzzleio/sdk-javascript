@@ -1,7 +1,7 @@
 const DocumentsSearchResult = require('./document');
 const Observer = require('../../core/Observer');
 
-class ObserversSearchResult extends DocumentsSearchResult {
+class ObserverSearchResult extends DocumentsSearchResult {
 
   /**
    * @param {Kuzzle} kuzzle
@@ -12,21 +12,50 @@ class ObserversSearchResult extends DocumentsSearchResult {
   constructor (kuzzle, request, options, response) {
     super(kuzzle, request, options, response);
 
+    if (request.aggs || request.aggregations) {
+      throw new Error('Aggregations are not supported for observers');
+    }
+
     const hits = this.hits;
     this.hits = [];
 
-    this._promises = hits.map(document => {
+    this.hits = hits.map(document => {
       const observer = new Observer(kuzzle, request.index, request.collection, document);
 
-      return observer.start()
-        .then(observer => this.hits.push(observer));
+      observer.on('change', changes => {
+        this.emit('change', observer._id, changes);
+      });
+
+      observer.on('delete', () => {
+        this.emit('delete', observer._id,);
+      });
+
+      observer.on('error', error => {
+        this.emit('error', observer._id, error);
+      });
+
+      return observer;
     });
   }
 
-  wait () {
-    return Promise.all(this._promises);
+  start () {
+    return Promise.all(this.hits.map(observer => observer.start()))
+      .then(() => this);
+  }
+
+  stop () {
+    return Promise.all(this.hits.map(observer => observer.stop()))
+      .then(() => this);
+  }
+
+  _buildNextSearchResult (response) {
+    const nextSearchResult = new this.constructor(this._kuzzle, this._request, this._options, response.result);
+
+    nextSearchResult.fetched += this.fetched;
+
+    return nextSearchResult.start();
   }
 
 }
 
-module.exports = ObserversSearchResult;
+module.exports = ObserverSearchResult;

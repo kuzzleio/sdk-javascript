@@ -1,0 +1,13 @@
+name: observer#mGet
+description: Get multiple observers
+hooks:
+  before: |
+    curl -XDELETE kuzzle:7512/nyc-open-data
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: default
+expected:
+    - "_listening: true"
+    - "\"capacity\": 4"
+    - "\"capacity\": 7"

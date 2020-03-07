@@ -5,7 +5,11 @@ class Role {
    * @param {Object} data
    */
   constructor (kuzzle, _id = null, controllers = {}) {
-    this._kuzzle = kuzzle;
+    Reflect.defineProperty(this, '_kuzzle', {
+      enumerable: false,
+      value: kuzzle
+    });
+
     this._id = _id;
     this.controllers = controllers;
   }

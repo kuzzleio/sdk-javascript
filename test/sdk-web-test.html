@@ -13,7 +13,9 @@
     <div id="app">
       <div>
         <div>Document content:</div>
-        {{ document._id }} - {{ document._source.message }}
+        <span v-if="document._source">
+          {{ document._id }} - {{ document._source.message }}
+        </span>
       </div>
       <div>
         <input id="documentMessage" type="text"/>
@@ -42,6 +44,11 @@
             'collection',
             'document-1');
 
+            doc.on('change', console.log);
+            doc.on('delete', id => {
+              console.log(id)
+              this.document = {}
+            })
             this.document = doc
 
             const result = await kuzzle.observe.search(

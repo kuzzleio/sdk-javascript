@@ -7,7 +7,11 @@ class Listener {
 
 class KuzzleEventEmitter {
   constructor() {
-    this._events = {};
+    Reflect.defineProperty(this, '_events', {
+      writable: true,
+      enumerable: false,
+      value: {}
+    });
   }
 
   _exists (listeners, fn) {

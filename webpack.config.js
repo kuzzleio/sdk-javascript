@@ -5,7 +5,7 @@ const
 module.exports = {
   name: 'browser',
   mode: 'production',
-  entry: ['babel-polyfill','./index.js'],
+  entry: ['./index.js'],
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',

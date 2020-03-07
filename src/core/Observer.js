@@ -1,10 +1,22 @@
 const KuzzleEventEmitter = require('./KuzzleEventEmitter');
 
+const DELETE_ACTIONS = ['delete', 'mDelete', 'deleteByQuery'];
+
 class Observer extends KuzzleEventEmitter {
   constructor(kuzzle, index, collection, document) {
     super();
 
-    this._kuzzle = kuzzle;
+    Reflect.defineProperty(this, '_kuzzle', {
+      enumerable: false,
+      value: kuzzle
+    });
+
+    Reflect.defineProperty(this, '_room', {
+      writable: true,
+      enumerable: false
+    });
+
+    this._listening = false;
     this._index = index;
     this._collection = collection;
     this._id = document._id;
@@ -21,16 +33,48 @@ class Observer extends KuzzleEventEmitter {
       this._collection,
       filters,
       notification => {
-        const documentChanges = notification.result._source;
-
-        for (const [field, value] of Object.entries(documentChanges)) {
-          this._source[field] = value;
+        if (DELETE_ACTIONS.includes(notification.action)) {
+          this._onDelete();
         }
-
-        this.emit('change', documentChanges);
-      }
+        else {
+          this._onChange(notification);
+        }
+      },
+      { subscribeToSelf: true }
     )
-      .then(() => this);
+      .then(room => {
+        this._room = room;
+        this._listening = true;
+
+        return this;
+      });
+  }
+
+  stop () {
+    return this._kuzzle.realtime.unsubscribe(this._room)
+      .then(() => {
+        this._room = undefined;
+        this._listening = false;
+
+        return this;
+      });
+  }
+
+  _onChange (notification) {
+    const documentChanges = notification.result._source;
+
+    for (const [field, value] of Object.entries(documentChanges)) {
+      this._source[field] = value;
+    }
+
+    this.emit('change', documentChanges);
+  }
+
+  _onDelete () {
+    this.emit('delete');
+
+    this.stop()
+      .catch(error => this.emit('error', error));
   }
 }
 

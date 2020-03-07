@@ -1,4 +1,6 @@
-class SearchResultBase {
+const KuzzleEventEmitter = require('../../core/KuzzleEventEmitter');
+
+class SearchResultBase extends KuzzleEventEmitter {
 
   /**
    *
@@ -8,18 +10,53 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    this._kuzzle = kuzzle;
-    this._request = request;
-    this._response = response;
-    this._options = options;
+    Reflect.defineProperty(this, '_kuzzle', {
+      enumerable: false,
+      value: kuzzle
+    });
 
-    this._controller = request.controller;
-    this._searchAction = 'search';
-    this._scrollAction = 'scroll';
+    Reflect.defineProperty(this, '_request', {
+      enumerable: false,
+      writable: true,
+      value: request
+    });
 
-    this.aggregations = response.aggregations;
+    Reflect.defineProperty(this, '_response', {
+      enumerable: false,
+      writable: true,
+      value: response
+    });
+
+    Reflect.defineProperty(this, '_options', {
+      enumerable: false,
+      writable: true,
+      value: options
+    });
+
+    Reflect.defineProperty(this, '_controller', {
+      enumerable: false,
+      writable: true,
+      value: request.controller
+    });
+
+    Reflect.defineProperty(this, '_searchAction', {
+      enumerable: false,
+      writable: true,
+      value: 'search'
+    });
+
+
+    Reflect.defineProperty(this, '_scrollAction', {
+      enumerable: false,
+      writable: true,
+      value: 'scroll'
+    });
+
+    if (response.aggregations) {
+      this.aggregations = response.aggregations;
+    }
     this.hits = response.hits || [];
-    this.fetched = this.hits.length;
+    this.fetched = response.hits.length;
     this.total = response.total || 0;
   }
 
