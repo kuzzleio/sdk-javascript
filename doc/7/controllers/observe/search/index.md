@@ -9,6 +9,8 @@ description: Gets multiple observers for documents matching a search query
 
 Gets multiple observers for documents matching a search query
 
+This method make a call to [document.search](/sdk/js/7/controllers/document/search) and then to [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe).
+
 ::: info
 The returned observers will already be listening for changes.
 :::

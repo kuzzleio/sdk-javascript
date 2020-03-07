@@ -9,6 +9,8 @@ description: Gets an observer linked to a document
 
 Gets an [Observer](/sdk/js/7/core-classes/observer) instance.
 
+This method make a call to [document.get](/sdk/js/7/controllers/document/get) and then to [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe).
+
 ::: info
 The returned observer will already be listening for changes.
 :::
