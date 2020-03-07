@@ -28,6 +28,10 @@ search(index, collection, [query], [options]);
 | `query`      | <pre>object</pre> | Search query    |
 | `options`    | <pre>object</pre> | Query options   |
 
+::: warning
+Aggregations are not supported by the Observe controller search method.
+:::
+
 ### Options
 
 Additional query options
@@ -37,6 +41,7 @@ Additional query options
 | `from`   | <pre>number</pre><br/>(`0`)  | Offset of the first document to fetch                                                                                                                                                                             |
 | `size`   | <pre>number</pre><br/>(`10`) | Maximum number of documents to retrieve per page                                                                                                                                                                  |
 | `scroll` | <pre>string</pre><br/>(`""`) | When set, gets a forward-only cursor having its ttl set to the given value (ie `30s`; cf [elasticsearch time limits](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/common-options.html#time-units)) |
+
 
 ## Body properties
 

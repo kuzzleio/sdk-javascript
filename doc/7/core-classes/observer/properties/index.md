@@ -18,3 +18,14 @@ Available properties:
 | `_collection` | <pre>string</pre>  | Collection name                                 |
 | `_listening`  | <pre>boolean</pre> | `true` is the observer is listening for changes |
 
+```js
+Observer {
+  _listening: true,
+  _index: <index>,
+  _collection: <collection>,
+  _id: <document-id>,
+  _source: {
+    // document content
+  }
+}
+```

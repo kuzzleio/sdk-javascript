@@ -29,7 +29,7 @@ Triggered when the linked document has changed.
 
 **Callback arguments:**
 
-`@param {object} changes`
+`@param {object} changes - document body changes`
 
 ```js
 observer.on('change', changes => {

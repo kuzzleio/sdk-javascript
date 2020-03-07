@@ -12,13 +12,14 @@ The SDK offers the possibility to manipulate [Observer](/sdk/js/7/core-classes/o
 
 An Observer is able to automatically synchronize itself in real-time with its linked document stored into Kuzzle.
 
-An `Observer` has the same properties as a document, so they are interchangeable within an application. 
+An `Observer` has the same properties as a document (`_id` and `_source`), so they are interchangeable within an application. 
 
 ::: warning
-`Observer` are meant to be read-only. Use the [Document Controller](/sdk/js/7/controllers/document) if you need to mutate document content.
+`Observer` are meant to be read-only.  
+Use the [Document Controller](/sdk/js/7/controllers/document) if you need to mutate document content.
 :::
 
-Internally, the `Observer` uses the [realtime.subscribe](/sdk/js/7/controller/realtime/subscribe) method to receive [real-time notifications](/sdk/js/7/essentials/realtime-notifications) whenever a document changes.
+Internally, the `Observer` uses the [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe) method to receive [real-time notifications](/sdk/js/7/essentials/realtime-notifications) whenever a document changes.
 
 ## Observer API
 
@@ -84,7 +85,7 @@ const app = new Vue({
     this.document = observer;
 
     // Any change made on the document "document-1" 
-    // will be synchronized with this component state
+    // will be synchronized within this component state
   }
 })
 ```
@@ -107,7 +108,7 @@ const app = new Vue({
     this.documents = result.hits;
 
     // Any change made to any returned matching document
-    // will be synchronized with this component state
+    // will be synchronized within this component state
   }
 })
 ```

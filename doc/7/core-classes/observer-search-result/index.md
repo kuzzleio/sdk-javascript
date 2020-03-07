@@ -1,7 +1,7 @@
 ---
 code: true
 type: branch
-title: SearchResult
-description: SearchResult class documentation
+title: ObserverSearchResult
+description: ObserverSearchResult class documentation
 order: 510
 ---
