@@ -10,6 +10,8 @@ class SearchResultBase extends KuzzleEventEmitter {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
+    super();
+
     Reflect.defineProperty(this, '_kuzzle', {
       enumerable: false,
       value: kuzzle

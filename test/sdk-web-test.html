@@ -14,17 +14,18 @@
       <div>
         <div>Document content:</div>
         <span v-if="document._source">
-          {{ document._id }} - {{ document._source.message }}
+          {{ document._source.message }} - {{ document._id }}
         </span>
       </div>
       <div>
         <input id="documentMessage" type="text"/>
         <button onclick="modifyDocument()">Create Or replace</button>
       </div>
+    </br>
         <div>
           <div>List of documents</div>
         <li v-for="document in documents">
-          {{ document._id }} - {{ document._source.message }}
+          {{ document._source.message }} - {{ document._id }}
         </li>
       </div>
     </div>
@@ -44,11 +45,6 @@
             'collection',
             'document-1');
 
-            doc.on('change', console.log);
-            doc.on('delete', id => {
-              console.log(id)
-              this.document = {}
-            })
             this.document = doc
 
             const result = await kuzzle.observe.search(
