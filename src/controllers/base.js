@@ -5,12 +5,11 @@ class BaseController {
    * @param {string} name - Controller full name for API request.
    */
   constructor (kuzzle, name) {
-    this._kuzzle = kuzzle;
-    this._name = name;
-  }
+    Reflect.defineProperty(this, 'kuzzle', {
+      value: kuzzle
+    });
 
-  get kuzzle () {
-    return this._kuzzle;
+    this._name = name;
   }
 
   get name () {
@@ -25,7 +24,7 @@ class BaseController {
   query (request = {}, options = {}) {
     request.controller = request.controller || this.name;
 
-    return this._kuzzle.query(request, options);
+    return this.kuzzle.query(request, options);
   }
 }
 

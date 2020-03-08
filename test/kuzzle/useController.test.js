@@ -25,7 +25,7 @@ class CustomController extends BaseController {
 
 class NotInheritingController {
   constructor (kuzzle) {
-    this._kuzzle = kuzzle;
+    this.kuzzle = kuzzle;
   }
 }
 
