@@ -10,13 +10,14 @@ order: 10
 
 Available properties:
 
-| Property      | Type               | Description                                     |
-|---------------|--------------------|-------------------------------------------------|
-| `_id`         | <pre>string</pre>  | Document ID                                     |
-| `_source`     | <pre>object</pre>  | Document content                                |
-| `_index`      | <pre>string</pre>  | Index name                                      |
-| `_collection` | <pre>string</pre>  | Collection name                                 |
-| `_listening`  | <pre>boolean</pre> | `true` is the observer is listening for changes |
+| Property      | Type               | Description                                         |
+|---------------|--------------------|-----------------------------------------------------|
+| `_id`         | <pre>string</pre>  | Document ID                                         |
+| `_source`     | <pre>object</pre>  | Document content                                    |
+| `_index`      | <pre>string</pre>  | Index name                                          |
+| `_collection` | <pre>string</pre>  | Collection name                                     |
+| `_listening`  | <pre>boolean</pre> | `true` is the observer is listening for changes     |
+| `notifyOnly`  | <pre>boolean</pre> | If `true`, the observer will not update its content |
 
 ```js
 Observer {

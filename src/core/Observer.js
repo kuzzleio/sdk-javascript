@@ -3,7 +3,7 @@ const KuzzleEventEmitter = require('./KuzzleEventEmitter');
 const DELETE_ACTIONS = ['delete', 'mDelete', 'deleteByQuery'];
 
 class Observer extends KuzzleEventEmitter {
-  constructor(kuzzle, index, collection, document) {
+  constructor(kuzzle, index, collection, document, options = {}) {
     super();
 
     Reflect.defineProperty(this, '_kuzzle', {
@@ -14,6 +14,12 @@ class Observer extends KuzzleEventEmitter {
     Reflect.defineProperty(this, '_room', {
       writable: true,
       enumerable: false
+    });
+
+    Reflect.defineProperty(this, 'notifyOnly', {
+      writable: true,
+      enumerable: false,
+      value: options.notifyOnly || false
     });
 
     this._listening = false;
@@ -63,8 +69,10 @@ class Observer extends KuzzleEventEmitter {
   _onChange (notification) {
     const documentChanges = notification.result._source;
 
-    for (const [field, value] of Object.entries(documentChanges)) {
-      this._source[field] = value;
+    if (! this.notifyOnly) {
+      for (const [field, value] of Object.entries(documentChanges)) {
+        this._source[field] = value;
+      }
     }
 
     this.emit('change', documentChanges);

@@ -38,6 +38,10 @@ class ObserverSearchResult extends DocumentsSearchResult {
     });
   }
 
+  set notifyOnly (value) {
+    this.hits.forEach(observer => observer.notifyOnly = value);
+  }
+
   start () {
     return Promise.all(this.hits.map(observer => observer.start()))
       .then(() => this);
