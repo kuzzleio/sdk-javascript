@@ -9,13 +9,20 @@ description: Gets an observer linked to a document
 
 Gets an [Observer](/sdk/js/7/core-classes/observer) instance.
 
-This method make a call to [document.get](/sdk/js/7/controllers/document/get) and then to [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe).
+Api method used:
+ - [document.get](/sdk/js/7/controllers/document/get)
+ - [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe)
 
 ::: info
 The returned observer will already be listening for changes.
 :::
 
-See also [document.get](/sdk/js/7/controllers/document/get)
+::: warning 
+Don't forget to call the [Observer.stop](/sdk/js/7/core-classes/observer/stop) when you don't need the observer anymore otherwise Kuzzle will continue to send real-time updates.
+:::
+
+See also: [document.get](/sdk/js/7/controllers/document/get)
+
 
 <br/>
 

@@ -27,12 +27,16 @@ Internally, observers uses the [realtime.subscribe](/sdk/js/7/controllers/realti
 
 The only way to get [Observer](/sdk/js/7/core-classes/observer) is to use the [Observe Controller](/sdk/js/7/controllers/observe).  
 
-It has 3 methods that are based on the document controller methods:
+It has 3 methods that are based on the document controller methods and they almost the same parameters:
  - [observe.get](/sdk/js/7/controllers/observe/get): returns an [Observer](/sdk/js/7/core-classes/observer)
  - [observe.mGet](/sdk/js/7/controllers/observe/m-get): returns an array of [Observer](/sdk/js/7/core-classes/observer)
  - [observe.search](/sdk/js/7/controllers/observe/search): returns an [ObserverSearchResult](/sdk/js/7/core-classes/observer-search-result)
 
 The resulting observers are directly synchronized with Kuzzle. (The [Observer.start](/sdk/js/7/core-classes/observer/start) has already been called)
+
+::: warning 
+Don't forget to call the [Observer.stop](/sdk/js/7/core-classes/observer/stop) when you don't need the observer anymore otherwise Kuzzle will continue to send real-time updates.
+:::
 
 ### Observer
 
