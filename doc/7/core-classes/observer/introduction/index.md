@@ -21,7 +21,7 @@ The following methods return an `Observer` or an `Observer[]`:
 
 ## Events
 
-The following event are available
+The following events are available:
 
 ### change
 

@@ -7,7 +7,7 @@ description: Observer stop method
 
 # stop
 
-Stops listening to real-time notification about linked document changes.
+Stops listening to real-time notifications about linked document changes.
 
 ## Arguments
 
@@ -18,4 +18,3 @@ stop();
 ## Resolve
 
 Resolves to the `ObserverSearchResult` instance.
-

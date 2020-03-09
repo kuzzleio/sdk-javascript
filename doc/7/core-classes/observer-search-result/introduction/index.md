@@ -18,7 +18,7 @@ A `ObserverSearchResult` instance is returned by [observe.search](/sdk/js/7/cont
 
 ## Events
 
-The following event are available
+The following events are available:
 
 ### change
 
