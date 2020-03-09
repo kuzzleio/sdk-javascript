@@ -47,7 +47,7 @@ It can lead to memory leaks if ascroll duration too great is provided, or if too
 
 ::: info
 <SinceBadge version="Kuzzle 2.2.0"/>
-You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key and the maximum number of simultaneously opened scroll sessions under the `services.storage.maxScroll` configuration key.
+You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key.
 :::
 
 <<< ./snippets/scroll.js
