@@ -70,9 +70,7 @@ class Observer extends KuzzleEventEmitter {
     const documentChanges = notification.result._source;
 
     if (! this.notifyOnly) {
-      for (const [field, value] of Object.entries(documentChanges)) {
-        this._source[field] = value;
-      }
+      Object.assign(this._source, documentChanges);
     }
 
     this.emit('change', documentChanges);
