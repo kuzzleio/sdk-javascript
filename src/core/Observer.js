@@ -7,18 +7,16 @@ class Observer extends KuzzleEventEmitter {
     super();
 
     Reflect.defineProperty(this, '_kuzzle', {
-      enumerable: false,
+      writable: true,
       value: kuzzle
     });
 
     Reflect.defineProperty(this, '_room', {
-      writable: true,
-      enumerable: false
+      writable: true
     });
 
     Reflect.defineProperty(this, 'notifyOnly', {
       writable: true,
-      enumerable: false,
       value: options.notifyOnly || false
     });
 

@@ -13,43 +13,37 @@ class SearchResultBase extends KuzzleEventEmitter {
     super();
 
     Reflect.defineProperty(this, '_kuzzle', {
-      enumerable: false,
+      writable: true,
       value: kuzzle
     });
 
     Reflect.defineProperty(this, '_request', {
-      enumerable: false,
       writable: true,
       value: request
     });
 
     Reflect.defineProperty(this, '_response', {
-      enumerable: false,
       writable: true,
       value: response
     });
 
     Reflect.defineProperty(this, '_options', {
-      enumerable: false,
       writable: true,
       value: options
     });
 
     Reflect.defineProperty(this, '_controller', {
-      enumerable: false,
       writable: true,
       value: request.controller
     });
 
     Reflect.defineProperty(this, '_searchAction', {
-      enumerable: false,
       writable: true,
       value: 'search'
     });
 
 
     Reflect.defineProperty(this, '_scrollAction', {
-      enumerable: false,
       writable: true,
       value: 'scroll'
     });

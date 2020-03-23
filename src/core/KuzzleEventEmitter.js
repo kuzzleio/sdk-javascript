@@ -9,7 +9,6 @@ class KuzzleEventEmitter {
   constructor() {
     Reflect.defineProperty(this, '_events', {
       writable: true,
-      enumerable: false,
       value: {}
     });
   }

@@ -6,6 +6,7 @@ class BaseController {
    */
   constructor (kuzzle, name) {
     Reflect.defineProperty(this, 'kuzzle', {
+      writable: true,
       value: kuzzle
     });
 
