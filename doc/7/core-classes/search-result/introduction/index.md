@@ -10,7 +10,6 @@ order: 0
 
 Inherits from: [KuzzleEventEmitter](/sdk/js/7/core-classes/kuzzle-event-emitter).
 
-An `SearchResult` contains documents matching a search query.  
+A `SearchResult` object contains the documents matching a search query.  
 
-A `SearchResult` instance is returned by [document:search](/sdk/js/7/controllers/document/search).
-
+`SearchResult` instances are returned by [document:search](/sdk/js/7/controllers/document/search).

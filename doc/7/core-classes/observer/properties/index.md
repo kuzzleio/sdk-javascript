@@ -16,7 +16,7 @@ Available properties:
 | `_source`     | <pre>object</pre>  | Document content                                    |
 | `_index`      | <pre>string</pre>  | Index name                                          |
 | `_collection` | <pre>string</pre>  | Collection name                                     |
-| `_listening`  | <pre>boolean</pre> | `true` is the observer is listening for changes     |
+| `_listening`  | <pre>boolean</pre> | `true` if the observer is listening for changes     |
 | `notifyOnly`  | <pre>boolean</pre> | If `true`, the observer will not update its content |
 
 ```js

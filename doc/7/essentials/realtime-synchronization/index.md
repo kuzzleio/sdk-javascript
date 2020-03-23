@@ -8,7 +8,7 @@ order: 310
 
 # Realtime Synchronization
 
-The SDK offers the possibility to manipulate [Observer](/sdk/js/7/core-classes/observer) representing documents.
+The SDK offers the possibility to manipulate [Observer](/sdk/js/7/core-classes/observer) objects representing documents.
 
 An observer is able to automatically synchronize itself in real-time with its linked document stored into Kuzzle.
 
@@ -19,15 +19,15 @@ Observers are meant to be read-only.
 Use the [Document Controller](/sdk/js/7/controllers/document) if you need to mutate document content.
 :::
 
-Internally, observers uses the [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe) method to receive [real-time notifications](/sdk/js/7/essentials/realtime-notifications) whenever a document changes.
+Internally, observers use the [realtime.subscribe](/sdk/js/7/controllers/realtime/subscribe) method to receive [real-time notifications](/sdk/js/7/essentials/realtime-notifications) whenever a document changes.
 
 ## Observer API
 
 ### ObserveController
 
-The only way to get [Observer](/sdk/js/7/core-classes/observer) is to use the [Observe Controller](/sdk/js/7/controllers/observe).  
+The only way to get [Observer](/sdk/js/7/core-classes/observer) instances is to use the [Observe Controller](/sdk/js/7/controllers/observe).  
 
-It has 3 methods that are based on the document controller methods and they almost the same parameters:
+It has 3 methods that are based on the document controller methods and they require similar parameters:
  - [observe.get](/sdk/js/7/controllers/observe/get): returns an [Observer](/sdk/js/7/core-classes/observer)
  - [observe.mGet](/sdk/js/7/controllers/observe/m-get): returns an array of [Observer](/sdk/js/7/core-classes/observer)
  - [observe.search](/sdk/js/7/controllers/observe/search): returns an [ObserverSearchResult](/sdk/js/7/core-classes/observer-search-result)
@@ -48,7 +48,7 @@ When the linked document is modified in Kuzzle, the observer content (`_source` 
 You can use the [Observer.stop](/sdk/js/7/core-classes/observer/stop) method to stop synchronization and [Observer.start](/sdk/js/7/core-classes/observer/start) to restart it. 
 :::
 
-In addition to synchronizing its contents, an Observer is a [KuzzleEventEmitter](sdk/js/7/core-classe/kuzzle-event-emitter) emitting the following events:
+In addition to synchronizing its contents, an Observer inherits from [KuzzleEventEmitter](sdk/js/7/core-classe/kuzzle-event-emitter), and emits the following events:
  - `change`: the linked document has been modified.
  - `delete`: the linked document has been deleted.
  - `error`: an error occurred during the subscription process.
@@ -59,7 +59,7 @@ See also: [Observer events](/sdk/js/7/core-classes/observer/introduction#events)
 
 An [ObserverSearchResult](/sdk/js/7/core-classes/observer-search-result) behaves like a [SearchResult](/sdk/js/7/core-classes/search-result) and contains a paginated list of [Observer](/sdk/js/7/core-classes/observer).  
 
-Each item in the `hits` arrayt is an observer linked to a document stored into Kuzzle.
+Each item in the `hits` array is an observer linked to a document stored into Kuzzle.
 
 ::: info
 You can use the [ObserverSearchResult.stop](/sdk/js/7/core-classes/observer-search-result/stop) method to stop observers synchronization and [ObserverSearchResult.start](/sdk/js/7/core-classes/observer-search-result/start) to resume it. 
@@ -163,4 +163,3 @@ const app = new Vue({
   }
 })
 ```
-
