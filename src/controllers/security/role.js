@@ -6,7 +6,6 @@ class Role {
    */
   constructor (kuzzle, _id = null, controllers = {}) {
     Reflect.defineProperty(this, '_kuzzle', {
-      writable: true,
       value: kuzzle
     });
 

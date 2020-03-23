@@ -8,7 +8,6 @@ class Listener {
 class KuzzleEventEmitter {
   constructor() {
     Reflect.defineProperty(this, '_events', {
-      writable: true,
       value: {}
     });
   }

@@ -7,7 +7,6 @@ class Observer extends KuzzleEventEmitter {
     super();
 
     Reflect.defineProperty(this, '_kuzzle', {
-      writable: true,
       value: kuzzle
     });
 

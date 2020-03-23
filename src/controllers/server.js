@@ -111,6 +111,7 @@ class ServerController extends BaseControler {
    * @returns {Promise<Number>}
    */
   now (options) {
+    console.log("NOW")
     return this.query({
       action: 'now'
     }, options)

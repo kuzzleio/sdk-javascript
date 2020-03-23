@@ -6,7 +6,6 @@ class Profile {
    */
   constructor (kuzzle, _id = null, policies = []) {
     Reflect.defineProperty(this, '_kuzzle', {
-      writable: true,
       value: kuzzle
     });
 
