@@ -187,6 +187,13 @@ class DocumentController extends BaseController {
   }
 
   search (index, collection, body = {}, options = {}) {
+    return this._search(index, collection, body, options)
+      .then(({ response, request }) => (
+        new DocumentSearchResult(this.kuzzle, request, options, response.result)
+      ));
+  }
+
+  _search (index, collection, body = {}, options = {}) {
     const request = {
       index,
       collection,
@@ -208,7 +215,7 @@ class DocumentController extends BaseController {
     }
 
     return this.query(request, options)
-      .then(response => new DocumentSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => ({ response, request }));
   }
 
   update (index, collection, _id, body, options = {}) {

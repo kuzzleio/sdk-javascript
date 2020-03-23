@@ -2,7 +2,7 @@ const Kuzzle = require('./src/Kuzzle');
 const { Http, WebSocket } = require('./src/protocols');
 const BaseController = require('./src/controllers/base');
 const KuzzleAbstractProtocol = require('./src/protocols/abstract/common');
-const KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
+const KuzzleEventEmitter = require('./src/eventEmitter');
 const {
   SearchResultBase,
   DocumentSearchResult,
