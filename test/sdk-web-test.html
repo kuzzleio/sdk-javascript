@@ -40,12 +40,36 @@
         const app = new Vue({
           el: '#app',
           async mounted () {
+            const document = await kuzzle.document.get(
+              'index',
+              'collection',
+              'document-1');
+
+            const filters = {
+              ids: { values: [this._id] }
+            }
+            const options = {
+              subscribeToSelf: true
+            }
+
+            await kuzzle.realtime.subscribe(
+              'index',
+              'collection',
+              filters,
+              notification => {
+                this.document = notification.result._source;
+              },
+              options)
+
+
+
             const doc = await kuzzle.observe.get(
             'index',
             'collection',
             'document-1');
 
             this.document = doc
+
 
             const result = await kuzzle.observe.search(
               'index',
