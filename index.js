@@ -1,12 +1,16 @@
-const
-  Kuzzle = require('./src/Kuzzle'),
-  {
-    Http,
-    WebSocket
-  } = require('./src/protocols'),
-  BaseController = require('./src/controllers/base'),
-  KuzzleAbstractProtocol = require('./src/protocols/abstract/common'),
-  KuzzleEventEmitter = require('./src/eventEmitter');
+const Kuzzle = require('./src/Kuzzle');
+const { Http, WebSocket } = require('./src/protocols');
+const BaseController = require('./src/controllers/base');
+const KuzzleAbstractProtocol = require('./src/protocols/abstract/common');
+const KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
+const {
+  SearchResultBase,
+  DocumentSearchResult,
+  ProfileSearchResult,
+  RoleSearchResult,
+  SpecificationSearchResult,
+  UserSearchResult
+} = require('./src/controllers/searchResult');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
@@ -21,5 +25,11 @@ module.exports = {
   WebSocket,
   BaseController,
   KuzzleAbstractProtocol,
-  KuzzleEventEmitter
+  KuzzleEventEmitter,
+  SearchResultBase,
+  DocumentSearchResult,
+  ProfileSearchResult,
+  RoleSearchResult,
+  SpecificationSearchResult,
+  UserSearchResult
 };
