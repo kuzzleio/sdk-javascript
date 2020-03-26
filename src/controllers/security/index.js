@@ -357,15 +357,9 @@ class SecurityController extends BaseController {
 
   mGetUsers (ids, options = {}) {
     const request = {
-      action: 'mGetUsers'
+      action: 'mGetUsers',
+      body: {ids}
     };
-    
-    if (options.verb === 'POST') {
-      request.body = { ids };
-    }
-    else {
-      request.ids = ids.join();
-    }
 
     return this.query(request, options)
       .then(response => response.result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source)));

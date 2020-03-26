@@ -136,26 +136,41 @@ class HttpWrapper extends KuzzleAbstractProtocol {
    * @returns {Promise<any>}
    */
   send (data, options = {}) {
-    const
-      payload = {
-        action: undefined,
-        body: undefined,
-        collection: undefined,
-        controller: undefined,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        index: undefined,
-        meta: undefined,
-        requestId: undefined,
+    const route = this.routes[data.controller]
+      && this.routes[data.controller][data.action];
+
+    if (! route) {
+      const error = new Error(`No URL found for "${data.controller}:${data.action}".`);
+      this.emit(data.requestId, { status: 400, error });
+      return;
+    }
+
+    const method = options.verb || route.verb;
+
+    const payload = {
+      action: undefined,
+      body: undefined,
+      collection: undefined,
+      controller: undefined,
+      headers: {
+        'Content-Type': 'application/json'
       },
-      queryArgs = {};
+      index: undefined,
+      meta: undefined,
+      requestId: undefined,
+    };
+    const queryArgs = {};
 
     for (const key of Object.keys(data)) {
       const value = data[key];
 
       if (key === 'body') {
-        payload.body = JSON.stringify(value);
+        if (method === 'GET') {
+          Object.assign(queryArgs, value);
+        }
+        else {
+          payload.body = JSON.stringify(value);
+        }
       }
       else if (key === 'jwt') {
         payload.headers.authorization = 'Bearer ' + value;
@@ -171,24 +186,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       }
     }
 
-    const route = this.routes[payload.controller]
-        && this.routes[payload.controller][payload.action];
+    const regex = /\/:([^/]*)/;
 
-    if (! route) {
-      const error = new Error(`No URL found for "${payload.controller}:${payload.action}".`);
-
-      this.emit(payload.requestId, { status: 400, error });
-
-      return;
-    }
-
-    const
-      method = options.verb || route.verb,
-      regex = /\/:([^/]*)/;
-
-    let
-      url = route.url,
-      matches = regex.exec(url);
+    let url = route.url;
+    let matches = regex.exec(url);
 
     while (matches) {
       const urlParam = data[ matches[1] ];
@@ -214,8 +215,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
       const value = queryArgs[key];
 
       if (Array.isArray(value)) {
-        queryString.push(...value.map(v => `${key}=${v}`));
-
+        queryString.push(`${key}=${value.join()}`);
       }
       else if (typeof value === 'boolean') {
         // In Kuzzle, an optional boolean option is set to true if present in
