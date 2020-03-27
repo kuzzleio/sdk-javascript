@@ -1,0 +1,7 @@
+{
+  "reporter": "dot",
+  "recursive": true,
+  "slow": 2000,
+  "timeout": 10000,
+  "require": ["should-sinon"]
+}

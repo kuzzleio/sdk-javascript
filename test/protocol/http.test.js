@@ -199,7 +199,8 @@ describe('HTTP networking module', () => {
       protocol.status = 'ready';
       protocol._routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar'}},
-        index: {create: {verb: 'VERB', url: '/:index/_create'}}
+        index: {create: {verb: 'VERB', url: '/:index/_create'}},
+        getreq: {action: {verb: 'GET', url: '/foo'}}
       };
     });
 
@@ -291,6 +292,30 @@ describe('HTTP networking module', () => {
         });
 
         done();
+      });
+
+      protocol.send(data);
+    });
+
+    it('should inject the body as querystring on a GET request', done => {
+      const data = {
+        requestId: 'requestId',
+        action: 'action',
+        controller: 'getreq',
+        body: {foo: 'bar', baz: ['oh', 'an', 'array'] }
+      };
+
+      protocol.on('requestId', () => {
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
+          should(protocol._sendHttpRequest.firstCall.args[1])
+            .be.equal('/foo?foo=bar&baz=oh,an,array');
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
       });
 
       protocol.send(data);
@@ -421,7 +446,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo/bar?foo=bar&foo=baz&foo=qux&qux=123');
+            .be.equal('/foo/bar?foo=bar,baz,qux&qux=123');
         }
         catch (error) {
           return done(error);
