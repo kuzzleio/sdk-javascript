@@ -382,7 +382,8 @@ class Kuzzle extends KuzzleEventEmitter {
   }
 
   /**
-   * This is a low-level method, exposed to allow advanced SDK users to bypass high-level methods.
+   * This is a low-level method, exposed to allow advanced SDK users to bypass
+   * high-level methods.
    * Base method used to send read queries to Kuzzle
    *
    * Takes an optional argument object with the following properties:
