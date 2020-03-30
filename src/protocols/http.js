@@ -310,7 +310,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
           }
           else if (http && http.length > 1) {
             // We need this ugly fix because the document:search route can also
-            // in GET with this url: "/:index/:collection"
+            // be accessed in GET with this url: "/:index/:collection"
             // But to send a query, we need to pass it in the body so we need POST
             // so we can change the verb but then POST on "/:index/:collection"
             // is the collection:update method (document:search is "/:index/:collection/_search")
