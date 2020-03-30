@@ -721,6 +721,14 @@ describe('HTTP networking module', () => {
   describe('_constructRoutes', () => {
     it('should construct http routes from server:publicApi', () => {
       const publicApi = {
+        document: {
+          search: {
+            http: [
+              { verb: 'GET', url: '/:index/:collection/' },
+              { verb: 'POST', url: '/:index/:collection/_search' }
+            ]
+          }
+        },
         foo: {
           login: {
             http: [
@@ -766,8 +774,10 @@ describe('HTTP networking module', () => {
       // will be in the query string
       should(routes.foo.create.url).be.eql('/:index/:collection/_create');
 
-      should(routes.foo.subscribe).be.undefined();
+      // we should choose the POST route for document:create
+      should(routes.document.search.url).be.eql('/:index/:collection/_search');
 
+      should(routes.foo.subscribe).be.undefined();
     });
 
     it('should overwrite kuzzle routes with custom routes', () => {
