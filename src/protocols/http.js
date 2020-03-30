@@ -339,7 +339,7 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 }
 
 function getPostRoute (routes) {
-  return routes[0].verb === 'POST' ? routes[0] : routes[1]
+  return routes[0].verb === 'POST' ? routes[0] : routes[1];
 }
 
 function getCorrectRoute (routes) {
