@@ -182,6 +182,13 @@ class DocumentController extends BaseController {
   }
 
   search (index, collection, body = {}, options = {}) {
+    return this._search(index, collection, body, options)
+      .then(({ response, request }) => (
+        new DocumentSearchResult(this.kuzzle, request, options, response.result)
+      ));
+  }
+
+  _search (index, collection, body = {}, options = {}) {
     const request = {
       index,
       collection,
@@ -194,16 +201,12 @@ class DocumentController extends BaseController {
       delete options[opt];
     }
 
-    if (request.size === undefined) {
-      request.size = 10;
-    }
-
-    if (!request.scroll && !request.body.sort && !request.from) {
-      request.from = 0;
+    if (!options.verb) {
+      options.verb = 'POST';
     }
 
     return this.query(request, options)
-      .then(response => new DocumentSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => ({ response, request }));
   }
 
   update (index, collection, _id, body, options = {}) {

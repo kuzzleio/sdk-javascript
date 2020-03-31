@@ -307,8 +307,19 @@ class HttpWrapper extends KuzzleAbstractProtocol {
 
           if (http && http.length === 1) {
             routes[controller][action] = http[0];
-          } else if (http && http.length > 1) {
-            routes[controller][action] = getCorrectRoute(http);
+          }
+          else if (http && http.length > 1) {
+            // We need this ugly fix because the document:search route can also
+            // be accessed in GET with this url: "/:index/:collection"
+            // But to send a query, we need to pass it in the body so we need POST
+            // so we can change the verb but then POST on "/:index/:collection"
+            // is the collection:update method (document:search is "/:index/:collection/_search")
+            if (controller === 'document' && action === 'search') {
+              routes[controller][action] = getPostRoute(http);
+            }
+            else {
+              routes[controller][action] = getCorrectRoute(http);
+            }
           }
         }
 
@@ -325,7 +336,10 @@ class HttpWrapper extends KuzzleAbstractProtocol {
   _warn (message) {
     console.warn(message); // eslint-disable-line no-console
   }
+}
 
+function getPostRoute (routes) {
+  return routes[0].verb === 'POST' ? routes[0] : routes[1];
 }
 
 function getCorrectRoute (routes) {
