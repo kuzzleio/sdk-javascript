@@ -82,12 +82,6 @@ describe('Kuzzle custom controllers management', () => {
         });
     });
 
-    it('should throw if the controller does not inherits from BaseController', () => {
-      should(() => {
-        kuzzle.useController(NotInheritingController, 'wrong');
-      }).throw('Controllers must inherits from the BaseController class.');
-    });
-
     it('should throw if the controller does not have a name', () => {
       should(() => {
         kuzzle.useController(UnamedController, 'unamed');

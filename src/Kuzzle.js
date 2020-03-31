@@ -516,10 +516,6 @@ Discarded request: ${JSON.stringify(request)}`));
    * @returns {Kuzzle}
    */
   useController (ControllerClass, accessor) {
-    if (!(ControllerClass.prototype.__proto__.constructor.name === 'BaseController')) {
-      throw new Error('Controllers must inherits from the BaseController class.');
-    }
-
     if (!(accessor && accessor.length > 0)) {
       throw new Error('You must provide a valid accessor.');
     }

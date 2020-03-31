@@ -110,7 +110,7 @@ describe('ProfileSearchResult', () => {
       };
 
       beforeEach(() => {
-        request.scroll = '1m';
+        request.scroll = '10s';
 
         response = {
           scrollId: 'scroll-id',
