@@ -23,12 +23,6 @@ class CustomController extends BaseController {
   }
 }
 
-class NotInheritingController {
-  constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-}
-
 class UnamedController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle);
