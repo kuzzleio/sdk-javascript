@@ -382,14 +382,14 @@ describe('Document Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'document',
               action: 'search',
               index: 'index',
               collection: 'collection',
               body: {foo: 'bar'},
-              from: 0,
-              size: 10,
+              from: undefined,
+              size: undefined,
               scroll: undefined
             }, options);
 
@@ -416,7 +416,7 @@ describe('Document Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'document',
               action: 'search',
               index: 'index',
@@ -428,27 +428,10 @@ describe('Document Controller', () => {
             }, {});
 
           should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res._options).be.empty();
+          should(res._options).match({ verb: 'POST' });
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
-        });
-    });
-
-    it('should set default value for from and size', () => {
-      const result = {
-        hits: [],
-        total: 0
-      };
-      kuzzle.document.query = sinon.stub().resolves({result});
-
-      return kuzzle.document.search('index', 'collection', {})
-        .then(() => {
-          should(kuzzle.document.query).be.calledOnce();
-
-          const request = kuzzle.document.query.getCall(0).args[0];
-          should(request.from).be.eql(0);
-          should(request.size).be.eql(10);
         });
     });
 
@@ -464,7 +447,6 @@ describe('Document Controller', () => {
           should(kuzzle.document.query).be.calledOnce();
 
           const request = kuzzle.document.query.getCall(0).args[0];
-          should(request.from).be.eql(0);
           should(request.size).be.eql(0);
         });
     });
