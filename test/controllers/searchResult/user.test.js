@@ -112,7 +112,7 @@ describe('UserSearchResult', () => {
       };
 
       beforeEach(() => {
-        request.scroll = '1m';
+        request.scroll = '10s';
 
         response = {
           scrollId: 'scroll-id',
@@ -135,7 +135,7 @@ describe('UserSearchResult', () => {
               .be.calledWith({
                 controller: 'security',
                 action: 'scrollUsers',
-                scroll: '1m',
+                scroll: '10s',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);

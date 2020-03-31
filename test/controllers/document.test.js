@@ -412,7 +412,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
 
-      return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {from: 1, size: 2, scroll: '1m'})
+      return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {from: 1, size: 2, scroll: '10s'})
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -424,7 +424,7 @@ describe('Document Controller', () => {
               body: {foo: 'bar'},
               from: 1,
               size: 2,
-              scroll: '1m'
+              scroll: '10s'
             }, {});
 
           should(res).be.an.instanceOf(DocumentSearchResult);

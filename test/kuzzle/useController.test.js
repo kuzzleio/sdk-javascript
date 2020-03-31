@@ -23,12 +23,6 @@ class CustomController extends BaseController {
   }
 }
 
-class NotInheritingController {
-  constructor (kuzzle) {
-    this._kuzzle = kuzzle;
-  }
-}
-
 class UnamedController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle);
@@ -80,12 +74,6 @@ describe('Kuzzle custom controllers management', () => {
             sinon.match.has('controller', 'custom-plugin/custom')
           );
         });
-    });
-
-    it('should throw if the controller does not inherits from BaseController', () => {
-      should(() => {
-        kuzzle.useController(NotInheritingController, 'wrong');
-      }).throw('Controllers must inherits from the BaseController class.');
     });
 
     it('should throw if the controller does not have a name', () => {

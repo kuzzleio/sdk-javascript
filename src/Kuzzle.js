@@ -9,7 +9,6 @@ const
   ServerController = require('./controllers/server'),
   SecurityController = require('./controllers/security'),
   MemoryStorageController = require('./controllers/memoryStorage'),
-  BaseController = require('./controllers/base'),
   uuidv4 = require('./uuidv4'),
   proxify = require('./proxify');
 
@@ -517,10 +516,6 @@ Discarded request: ${JSON.stringify(request)}`));
    * @returns {Kuzzle}
    */
   useController (ControllerClass, accessor) {
-    if (!(ControllerClass.prototype instanceof BaseController)) {
-      throw new Error('Controllers must inherits from the BaseController class.');
-    }
-
     if (!(accessor && accessor.length > 0)) {
       throw new Error('You must provide a valid accessor.');
     }

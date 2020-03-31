@@ -100,7 +100,7 @@ describe('SpecificationsSearchResult', () => {
       };
 
       beforeEach(() => {
-        request.scroll = '1m';
+        request.scroll = '10s';
 
         response = {
           scrollId: 'scroll-id',
@@ -123,7 +123,7 @@ describe('SpecificationsSearchResult', () => {
               .be.calledWith({
                 controller: 'collection',
                 action: 'scrollSpecifications',
-                scroll: '1m',
+                scroll: '10s',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);

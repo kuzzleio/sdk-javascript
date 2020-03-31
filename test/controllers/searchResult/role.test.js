@@ -84,7 +84,7 @@ describe('RoleSearchResult', () => {
 
 
     it('should throw an error if scrollId parameters is set', () => {
-      request.scroll = '1m';
+      request.scroll = '10s';
       searchResult = new RoleSearchResult(kuzzle, request, options, response);
 
       should(function () {
