@@ -10,7 +10,7 @@ try {
   const options = {
     size: 50,
     offset: 0,
-    scroll: '10m'
+    scroll: '10s'
   };
 
   const searchResult = await kuzzle.collection.searchSpecifications(body, options);

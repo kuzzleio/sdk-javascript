@@ -135,7 +135,7 @@ describe('UserSearchResult', () => {
               .be.calledWith({
                 controller: 'security',
                 action: 'scrollUsers',
-                scroll: '1m',
+                scroll: '10s',
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);

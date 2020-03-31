@@ -985,7 +985,7 @@ describe('Security Controller', () => {
       };
       kuzzle.query.resolves({result});
 
-      return kuzzle.security.searchProfiles({roles: ['foo', 'bar']}, {from: 1, size: 2, scroll: '1m'})
+      return kuzzle.security.searchProfiles({roles: ['foo', 'bar']}, {from: 1, size: 2, scroll: '10s'})
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -995,7 +995,7 @@ describe('Security Controller', () => {
               body: {roles: ['foo', 'bar']},
               from: 1,
               size: 2,
-              scroll: '1m'
+              scroll: '10s'
             }, {});
 
           should(res).be.an.instanceOf(ProfileSearchResult);
@@ -1113,7 +1113,7 @@ describe('Security Controller', () => {
       };
       kuzzle.query.resolves({result});
 
-      return kuzzle.security.searchUsers({foo: 'bar'}, {from: 1, size: 2, scroll: '1m'})
+      return kuzzle.security.searchUsers({foo: 'bar'}, {from: 1, size: 2, scroll: '10s'})
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -1123,7 +1123,7 @@ describe('Security Controller', () => {
               body: {foo: 'bar'},
               from: 1,
               size: 2,
-              scroll: '1m'
+              scroll: '10s'
             }, {});
 
           should(res).be.an.instanceOf(UserSearchResult);

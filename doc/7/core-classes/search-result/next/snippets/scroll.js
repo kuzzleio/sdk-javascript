@@ -13,7 +13,7 @@ try {
     'nyc-open-data',
     'yellow-taxi',
     { query: { match: { category: 'suv' } } },
-    { scroll: '1m', size: 10 });
+    { scroll: '10s', size: 10 });
 
   // Fetch the matched items by advancing through the result pages
   const matched = [];
