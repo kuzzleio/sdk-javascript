@@ -220,7 +220,7 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'list',
               index: 'index',
-              size: 42000
+              size: 0
             }, options);
 
           should(res).match({
