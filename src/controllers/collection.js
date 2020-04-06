@@ -72,7 +72,8 @@ class CollectionController extends BaseController {
     const request = {
       index,
       action: 'list',
-      size: 0
+      size: options.size || 0,
+      from: options.from
     };
     delete options.from;
     delete options.size;
