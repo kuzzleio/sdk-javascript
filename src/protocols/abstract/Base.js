@@ -5,7 +5,7 @@ const uuidv4 = require('../../utils/uuidv4');
 const KuzzleEventEmitter = require('../../core/KuzzleEventEmitter');
 const PendingRequest = require('./PendingRequest');
 
-class BaseProtocol extends KuzzleEventEmitter {
+class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   constructor (host, options = {}) {
     super();
 
@@ -134,4 +134,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
 }
 
-module.exports = BaseProtocol;
+module.exports = KuzzleAbstractProtocol;
