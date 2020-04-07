@@ -1,10 +1,9 @@
 'use strict';
 
-const
-  KuzzleError = require('../KuzzleError'),
-  RTWrapper = require('./abstract/realtime');
+const KuzzleError = require('../KuzzleError');
+const BaseProtocolRealtime = require('./abstract/Realtime');
 
-class WSNode extends RTWrapper {
+class WebSocketProtocol extends BaseProtocolRealtime {
 
   constructor(host, options = {}) {
     super(host, options);
@@ -18,7 +17,8 @@ class WSNode extends RTWrapper {
       this.WebSocketClient = WebSocket;
       // There are no options allowed in the browsers WebSocket API
       this.options = null;
-    } else {
+    }
+    else {
       this.WebSocketClient = require('ws');
       this.options = {
         perMessageDeflate: false,
@@ -149,4 +149,4 @@ class WSNode extends RTWrapper {
   }
 }
 
-module.exports = WSNode;
+module.exports = WebSocketProtocol;

@@ -3,7 +3,7 @@ const
   sinon = require('sinon'),
   lolex = require('lolex'),
   NodeWS = require('ws'),
-  WS = require('../../src/protocols/websocket'),
+  WS = require('../../src/protocols/WebSocket'),
   windowMock = require('../mocks/window.mock');
 
 describe('WebSocket networking module', () => {
@@ -17,7 +17,8 @@ describe('WebSocket networking module', () => {
     clock = lolex.install();
     clientStub = {
       send: sinon.stub(),
-      close: sinon.stub()
+      close: sinon.stub(),
+      toto: 'toto'
     };
 
     windowMock.inject();
@@ -50,7 +51,9 @@ describe('WebSocket networking module', () => {
 
   it('should initialize a WS connection properly', () => {
     clientStub.on = sinon.stub();
+
     websocket.connect();
+
     should(wsargs).match(['ws://address:1234']);
     should(clientStub.onopen).not.be.undefined();
     should(clientStub.onclose).not.be.undefined();

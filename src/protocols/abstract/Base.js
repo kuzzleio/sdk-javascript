@@ -1,12 +1,11 @@
 'use strict';
 
-const
-  KuzzleError = require('../../KuzzleError'),
-  uuidv4 = require('../../utils/uuidv4'),
-  KuzzleEventEmitter = require('../../core/KuzzleEventEmitter'),
-  PendingRequest = require('./pendingRequest');
+const KuzzleError = require('../../KuzzleError');
+const uuidv4 = require('../../utils/uuidv4');
+const KuzzleEventEmitter = require('../../core/KuzzleEventEmitter');
+const PendingRequest = require('./PendingRequest');
 
-class AbstractWrapper extends KuzzleEventEmitter {
+class BaseProtocol extends KuzzleEventEmitter {
   constructor (host, options = {}) {
     super();
 
@@ -135,4 +134,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
 }
 
-module.exports = AbstractWrapper;
+module.exports = BaseProtocol;

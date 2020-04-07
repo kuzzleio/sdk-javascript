@@ -1,9 +1,8 @@
 'use strict';
 
-const
-  KuzzleAbstractProtocol = require('./common');
+const KuzzleAbstractProtocol = require('./Base');
 
-class RTWrapper extends KuzzleAbstractProtocol {
+class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   constructor (host, options = {}) {
     super(host, options);
 
@@ -92,4 +91,4 @@ class RTWrapper extends KuzzleAbstractProtocol {
   }
 }
 
-module.exports = RTWrapper;
+module.exports = BaseProtocolRealtime;

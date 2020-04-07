@@ -79,7 +79,7 @@ describe('Realtime Controller', () => {
       room = null;
 
       mockrequire(
-        '../../../src/core/realtime/Room',
+        '../../src/core/Room',
         function (controller, index, collection, body, callback, opts = {}) {
           room = {
             controller,
@@ -104,10 +104,6 @@ describe('Realtime Controller', () => {
     it('should create a Room object with the propataged arguments and bind subscribe() method to it', () => {
       const body = {foo: 'bar'};
       const cb = sinon.stub();
-      kuzzle.query.resolves(subscribeResponse);
-      kuzzle.protocol = {
-        on: sinon.stub()
-      };
 
 
       return kuzzle.realtime.subscribe('index', 'collection', body, cb, options)

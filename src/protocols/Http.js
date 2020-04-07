@@ -1,10 +1,9 @@
 'use strict';
 
-const
-  staticHttpRoutes = require('./routes.json'),
-  KuzzleAbstractProtocol = require('./abstract/common');
+const staticHttpRoutes = require('./routes.json');
+const BaseProtocol = require('./abstract/Base');
 
-class HttpWrapper extends KuzzleAbstractProtocol {
+class HttpProtocol extends BaseProtocol {
   constructor(host, options = {}) {
     super(host, options);
 
@@ -370,4 +369,4 @@ function getCorrectRoute (routes) {
   return sameLength ? getRoute : shortestRoute;
 }
 
-module.exports = HttpWrapper;
+module.exports = HttpProtocol;

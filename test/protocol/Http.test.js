@@ -3,7 +3,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   staticHttpRoutes = require('../../src/protocols/routes.json'),
-  Http = require('../../src/protocols/http');
+  Http = require('../../src/protocols/Http');
 
 describe('HTTP networking module', () => {
   let protocol;
@@ -516,7 +516,7 @@ describe('HTTP networking module', () => {
     beforeEach(() => {
       httpRequestStub = sinon.stub().resolves({body: JSON.stringify(mockResponseBody)});
 
-      const MockHttp = proxyquire('../../src/protocols/http', {
+      const MockHttp = proxyquire('../../src/protocols/Http', {
         'min-req-promise': {request: httpRequestStub}
       });
 
