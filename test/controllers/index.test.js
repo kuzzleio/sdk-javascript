@@ -1,5 +1,5 @@
 const
-  IndexController = require('../../src/controllers/index'),
+  IndexController = require('../../src/controllers/Index'),
   sinon = require('sinon'),
   should = require('should');
 

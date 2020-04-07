@@ -1,4 +1,4 @@
-const BaseControler = require('./base');
+const BaseControler = require('./Base');
 
 /**
  * @class ServerController

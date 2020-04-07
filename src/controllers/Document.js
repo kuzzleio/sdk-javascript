@@ -1,6 +1,5 @@
-const
-  BaseController = require('./base'),
-  DocumentSearchResult = require('./searchResult/document');
+const BaseController = require('./Base');
+const DocumentSearchResult = require('../core/searchResult/Document');
 
 class DocumentController extends BaseController {
 

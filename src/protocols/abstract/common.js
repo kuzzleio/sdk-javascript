@@ -2,8 +2,8 @@
 
 const
   KuzzleError = require('../../KuzzleError'),
-  uuidv4 = require('../../uuidv4'),
-  KuzzleEventEmitter = require('../../eventEmitter'),
+  uuidv4 = require('../../utils/uuidv4'),
+  KuzzleEventEmitter = require('../../core/KuzzleEventEmitter'),
   PendingRequest = require('./pendingRequest');
 
 class AbstractWrapper extends KuzzleEventEmitter {

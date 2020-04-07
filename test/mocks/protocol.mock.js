@@ -1,6 +1,6 @@
 const
   sinon = require('sinon'),
-  KuzzleEventEmitter = require('../../src/eventEmitter');
+  KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
 
 class ProtocolMock extends KuzzleEventEmitter {
 

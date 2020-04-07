@@ -1,9 +1,9 @@
 const
-  Profile = require('../../../src/controllers/security/profile'),
+  Profile = require('../../../src/core/security/Profile'),
   sinon = require('sinon'),
   should = require('should');
 
-describe('security/profile', () => {
+describe('Profile', () => {
   let profile;
 
   beforeEach(() => {

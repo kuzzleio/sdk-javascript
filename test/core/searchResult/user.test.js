@@ -1,6 +1,6 @@
 const
-  UserSearchResult = require('../../../src/controllers/searchResult/user'),
-  User = require('../../../src/controllers/security/user'),
+  UserSearchResult = require('../../../src/core/searchResult/User'),
+  User = require('../../../src/core/security/User'),
   sinon = require('sinon'),
   should = require('should');
 

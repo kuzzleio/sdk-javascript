@@ -1,11 +1,10 @@
-const
-  BaseController = require('../base'),
-  Role = require('./role'),
-  RoleSearchResult = require('../searchResult/role'),
-  Profile = require('./profile'),
-  ProfileSearchResult = require('../searchResult/profile'),
-  User = require('./user'),
-  UserSearchResult = require('../searchResult/user');
+const BaseController = require('./Base');
+const Role = require('../core/security/Role');
+const RoleSearchResult = require('../core/searchResult/Role');
+const Profile = require('../core/security/Profile');
+const ProfileSearchResult = require('../core/searchResult/Profile');
+const User = require('../core/security/User');
+const UserSearchResult = require('../core/searchResult/User');
 
 class SecurityController extends BaseController {
   /**

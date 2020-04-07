@@ -1,6 +1,6 @@
 const
-  RoleSearchResult = require('../../../src/controllers/searchResult/role'),
-  Role = require('../../../src/controllers/security/role'),
+  RoleSearchResult = require('../../../src/core/searchResult/Role'),
+  Role = require('../../../src/core/security/Role'),
   sinon = require('sinon'),
   should = require('should');
 

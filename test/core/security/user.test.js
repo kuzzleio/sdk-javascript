@@ -1,9 +1,9 @@
 const
-  User = require('../../../src/controllers/security/user'),
+  User = require('../../../src/core/security/User'),
   sinon = require('sinon'),
   should = require('should');
 
-describe('security/user', () => {
+describe('User', () => {
   let user;
 
   beforeEach(() => {

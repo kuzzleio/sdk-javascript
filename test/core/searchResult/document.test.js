@@ -1,5 +1,5 @@
 const
-  DocumentSearchResult = require('../../../src/controllers/searchResult/document'),
+  DocumentSearchResult = require('../../../src/core/searchResult/Document'),
   sinon = require('sinon'),
   should = require('should');
 

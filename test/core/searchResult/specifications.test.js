@@ -1,6 +1,5 @@
 const
-  SpecificationsSearchResult = require(
-    '../../../src/controllers/searchResult/specifications'),
+  SpecificationsSearchResult = require('../../../src/core/searchResult/Specifications'),
   sinon = require('sinon'),
   should = require('should');
 

@@ -1,6 +1,5 @@
-const
-  Profile = require('../security/profile'),
-  SearchResultBase = require('./base');
+const Profile = require('../security/Profile');
+const SearchResultBase = require('./SearchResultBase');
 
 class ProfileSearchResult extends SearchResultBase {
 

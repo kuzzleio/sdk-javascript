@@ -1,11 +1,11 @@
 const
-  AuthController = require('../../src/controllers/auth'),
-  RealtimeController = require('../../src/controllers/realtime'),
+  AuthController = require('../../src/controllers/Auth'),
+  RealtimeController = require('../../src/controllers/Realtime'),
   generateJwt = require('../mocks/generateJwt.mock'),
   mockrequire = require('mock-require'),
   sinon = require('sinon'),
   should = require('should'),
-  uuidv4 = require('../../src/uuidv4');
+  uuidv4 = require('../../src/utils/uuidv4');
 
 describe('Realtime Controller', () => {
   const options = {opt: 'in'};
@@ -79,7 +79,7 @@ describe('Realtime Controller', () => {
       room = null;
 
       mockrequire(
-        '../../src/controllers/realtime/room',
+        '../../../src/core/realtime/Room',
         function (controller, index, collection, body, callback, opts = {}) {
           room = {
             controller,
@@ -97,14 +97,19 @@ describe('Realtime Controller', () => {
         });
 
       const MockRealtimeController =
-        mockrequire.reRequire('../../src/controllers/realtime/index');
+        mockrequire.reRequire('../../src/controllers/Realtime');
       kuzzle.realtime = new MockRealtimeController(kuzzle);
     });
 
     it('should create a Room object with the propataged arguments and bind subscribe() method to it', () => {
-      const
-        body = {foo: 'bar'},
-        cb = sinon.stub();
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
+      kuzzle.query.resolves(subscribeResponse);
+      kuzzle.protocol = {
+        on: sinon.stub()
+      };
+
+
       return kuzzle.realtime.subscribe('index', 'collection', body, cb, options)
         .then(res => {
           should(room.kuzzle).be.equal(kuzzle);

@@ -1,5 +1,4 @@
-const
-  SearchResultBase = require('./base');
+const SearchResultBase = require('./SearchResultBase');
 
 class DocumentsSearchResult extends SearchResultBase {
 

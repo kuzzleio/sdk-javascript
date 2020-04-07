@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  proxify = require('../../src/proxify');
+  proxify = require('../../src/utils/proxify');
 
 describe('proxify', () => {
   let
@@ -41,7 +41,7 @@ describe('proxify', () => {
     const obj = proxify(srcObj);
     should(() => {
       obj.prop2 = 42;
-    }).throwError('Cannot set a value to the undefined \'prop2\' property in \'object\'');    
+    }).throwError('Cannot set a value to the undefined \'prop2\' property in \'object\'');
   });
 
   it('should not warn if use non-deprecated property', () => {
@@ -91,7 +91,7 @@ describe('proxify', () => {
     });
     should(() => {
       obj.foo = 42;
-    }).throwError('Cannot set a value to the undefined \'foo\' property in \'object\'');    
+    }).throwError('Cannot set a value to the undefined \'foo\' property in \'object\'');
     obj.__proxy__.registerProp('foo');
     should.doesNotThrow(() => {
       obj.foo += 1;
@@ -108,7 +108,7 @@ describe('proxify', () => {
     obj.__proxy__.unregisterProp('prop');
     should(() => {
       obj.prop = 42;
-    }).throwError('Cannot set a value to the undefined \'prop\' property in \'object\'');    
+    }).throwError('Cannot set a value to the undefined \'prop\' property in \'object\'');
   });
 
   it('should check has props without warn', () => {

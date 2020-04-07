@@ -1,6 +1,5 @@
-const
-  Role = require('../security/role'),
-  SearchResultBase = require('./base');
+const Role = require('../security/Role');
+const SearchResultBase = require('./SearchResultBase');
 
 class RoleSearchResult extends SearchResultBase {
 

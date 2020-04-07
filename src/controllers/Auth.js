@@ -1,7 +1,6 @@
-const
-  Jwt = require('../core/Jwt'),
-  BaseController = require('./base'),
-  User = require('./security/user');
+const Jwt = require('../core/Jwt');
+const BaseController = require('./Base');
+const User = require('../core/security/User');
 
 /**
  * Auth controller

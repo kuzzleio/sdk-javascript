@@ -1,8 +1,8 @@
 const Kuzzle = require('./src/Kuzzle');
 const { Http, WebSocket } = require('./src/protocols');
-const BaseController = require('./src/controllers/base');
+const BaseController = require('./src/controllers/Base');
 const KuzzleAbstractProtocol = require('./src/protocols/abstract/common');
-const KuzzleEventEmitter = require('./src/eventEmitter');
+const KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
 const {
   SearchResultBase,
   DocumentSearchResult,
@@ -10,7 +10,7 @@ const {
   RoleSearchResult,
   SpecificationSearchResult,
   UserSearchResult
-} = require('./src/controllers/searchResult');
+} = require('./src/core/searchResult');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +

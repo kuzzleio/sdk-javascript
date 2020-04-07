@@ -1,6 +1,5 @@
-const
-  BaseController = require('../base'),
-  Room = require('./room');
+const BaseController = require('./Base');
+const Room = require('../core/Room');
 
 
 class RealTimeController extends BaseController {
