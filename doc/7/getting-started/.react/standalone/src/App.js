@@ -95,7 +95,7 @@ class App extends React.Component {
     if (this.state.validate === false)
       return (
         <div className="wrapper">
-          <input autoFocus name="username"
+          <input autoFocus name="username" id="username"
             onKeyUp={this.handleInputChange}
             type="text"
             placeholder="Enter your nickname"
@@ -125,6 +125,7 @@ class App extends React.Component {
       return (
         <div className="wrapper">
           <input autoFocus type="text"
+            id="message"
             name="message"
             onChange={this.handleInputChange}
             placeholder="Enter your message"

@@ -6,18 +6,18 @@ describe('test realtime chat', () => {
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
-        cy.get('[placeholder="Enter your message"]')
+        cy.get('#message')
           .should('not.exist');
 
-        cy.get('[placeholder="Enter your nickname"]')
+        cy.get('#username')
           .type(this.fixt.username);
 
         cy.contains('Valid')
           .click();
 
-        cy.get('[placeholder="Enter your message"]')
+        cy.get('#message')
           .should('exist');
-        cy.get('[placeholder="Enter your nickname"]')
+        cy.get('#username')
           .should('not.exist');
       });
   });
@@ -28,7 +28,7 @@ describe('test realtime chat', () => {
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
-        cy.get('[placeholder="Enter your nickname"]')
+        cy.get('#username')
           .type(this.fixt.username);
         cy.contains('Valid')
           .click();
@@ -48,11 +48,11 @@ describe('test realtime chat', () => {
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
-        cy.get('[placeholder="Enter your nickname"]')
+        cy.get('#username')
           .type(this.fixt.username);
         cy.contains('Valid')
           .click();
-        cy.get('[placeholder="Enter your message"]')
+        cy.get('#message')
           .type(this.fixt.body.value);
         cy.contains('Send')
           .click();
@@ -70,7 +70,7 @@ describe('test realtime chat', () => {
       .then(() => cy.wait(2000))
       .then(() => {
         cy.visit('/');
-        cy.get('[placeholder="Enter your nickname"]')
+        cy.get('#username')
           .type(this.fixt.username);
         cy.contains('Valid')
           .click();
