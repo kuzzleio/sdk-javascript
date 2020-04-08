@@ -25,7 +25,6 @@ class App extends React.Component {
       messages: [],
       validate: false,
     };
-    this.valid = this.valid.bind(this);
   }
 /* snippet:end */
   /* snippet:start:3 */
@@ -41,7 +40,7 @@ class App extends React.Component {
   }
   /* snippet:end */
   /* snippet:start:10 */
-  async subscribeMessages() {
+  subscribeMessages = async () => {
     await kuzzle.realtime.subscribe(
       "chat",
       "messages", {},
@@ -59,7 +58,7 @@ class App extends React.Component {
   }
   /* snippet:end */
   /* snippet:start:6 */
-  getMessage(document) {
+  getMessage = (document) => {
     const message = {
       _id: document._id,
       value: document._source.value,
@@ -70,7 +69,7 @@ class App extends React.Component {
   }
   /* snippet:end */
   /* snippet:start:7 */
-  async fetchMessages() {
+fetchMessages = async () => {
     const results = await kuzzle.document.search(
       "chat",
       "messages", { sort: ["_kuzzle_info.createdAt"] }, { size: 100 }
