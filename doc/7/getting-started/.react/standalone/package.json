@@ -13,6 +13,7 @@
     "react-scripts": "3.4.1"
   },
   "scripts": {
+    "postinstall": "if [ ! -f  ../../../../../dist/kuzzle.js ]; then npm run build --prefix ../../../../../;fi && rm -rf ./node_modules/kuzzle-sdk/* && rsync -r --exclude 'getting-started' ../../../../../ ./node_modules/kuzzle-sdk",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "./node_modules/.bin/cypress run --record",
