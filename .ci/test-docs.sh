@@ -17,7 +17,16 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:7512); d
   sleep 5
 done
 
-cd ${here}/../doc/7/getting-started/.react
+cd ${here}/../doc/7/getting-started/.react/with-redux
+npm ci
+SKIP_PREFLIGHT_CHECK=true npm run start &
+until $(curl --output /dev/null --silent --head --fail http://localhost:3000); do
+  printf '.'
+  sleep 5
+done
+npm run test
+
+cd ${here}/../doc/7/getting-started/.react/standalone
 npm ci
 SKIP_PREFLIGHT_CHECK=true npm run start &
 until $(curl --output /dev/null --silent --head --fail http://localhost:3000); do
