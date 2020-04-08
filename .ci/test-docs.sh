@@ -25,6 +25,7 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:3000); d
   sleep 5
 done
 npm run test
+kill $(lsof -t -i:3000)
 
 cd ${here}/../doc/7/getting-started/.react/standalone
 npm ci
