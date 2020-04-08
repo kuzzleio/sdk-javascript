@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "./node_modules/.bin/cypress run",
+    "test": "./node_modules/.bin/cypress run --record",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
