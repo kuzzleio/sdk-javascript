@@ -13,7 +13,7 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **ReactJS**. 
 
 ## Requirements
 
-- **Node.js** >= 8.0.0 ([install here](https://nodejs.org/en/download/))
+- **Node.js** >= 12.0.0 ([install here](https://nodejs.org/en/download/))
 - **Create React App** ([install here](https://github.com/facebook/create-react-app))
 - **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
 

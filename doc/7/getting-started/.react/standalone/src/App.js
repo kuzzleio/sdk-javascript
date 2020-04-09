@@ -26,7 +26,7 @@ class App extends React.Component {
       validate: false,
     };
   }
-/* snippet:end */
+  /* snippet:end */
   /* snippet:start:3 */
   valid = async () => {
     await kuzzle.connect();
@@ -34,31 +34,33 @@ class App extends React.Component {
       await kuzzle.index.create("chat");
       await kuzzle.collection.create("chat", "messages");
     }
-    await this.fetchMessages();
     await this.subscribeMessages();
+    await this.fetchMessages();
     this.setState({ validate: true });
   }
   /* snippet:end */
   /* snippet:start:10 */
-  subscribeMessages = async () => {
-    await kuzzle.realtime.subscribe(
-      "chat",
-      "messages", {},
-      notification => {
-        if (notification.type !== "document") return;
-        if (notification.action !== "create") return;
-        this.setState({
-          messages: [
-            this.getMessage(notification.result),
-            ...this.state.messages
-          ]
-        })
-      }
+  subscribeMessages = () => {
+    return (
+      kuzzle.realtime.subscribe(
+        "chat",
+        "messages", {},
+        notification => {
+          if (notification.type !== "document") return;
+          if (notification.action !== "create") return;
+          this.setState({
+            messages: [
+              this.getMessage(notification.result),
+              ...this.state.messages
+            ]
+          })
+        }
+      )
     );
   }
   /* snippet:end */
   /* snippet:start:6 */
-  getMessage = (document) => {
+  getMessage = document => {
     const message = {
       _id: document._id,
       value: document._source.value,
@@ -69,10 +71,16 @@ class App extends React.Component {
   }
   /* snippet:end */
   /* snippet:start:7 */
-fetchMessages = async () => {
+  fetchMessages = async () => {
     const results = await kuzzle.document.search(
       "chat",
-      "messages", { sort: ["_kuzzle_info.createdAt"] }, { size: 100 }
+      "messages",
+      {
+        sort: ["_kuzzle_info.createdAt"]
+      },
+      {
+        size: 100
+      }
     );
     results.hits.map(hit => {
       this.setState({ messages: [this.getMessage(hit), ...this.state.messages] })
@@ -80,7 +88,7 @@ fetchMessages = async () => {
   }
   /* snippet:end */
   /* snippet:start:5 */
-  handleInputChange = (event) => {
+  handleInputChange = event => {
     const value = event.target.value;
     const name = event.target.name;
     this.setState({
@@ -106,14 +114,14 @@ fetchMessages = async () => {
   /* snippet:end */
   /* snippet:start:9 */
   sendMessage = async () => {
-    console.log("Send");
     if (this.state.message === "") return;
     await kuzzle.document.create(
       "chat",
-      "messages", {
-      value: this.state.message,
-      username: this.state.username
-    }
+      "messages",
+      {
+        value: this.state.message,
+        username: this.state.username
+      }
     );
     this.setState({ message: "" })
   }
