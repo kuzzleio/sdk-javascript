@@ -117,3 +117,5 @@ Now that you're more familiar with Kuzzle, dive even deeper to learn how to leve
 - learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
 - lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
 - learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction) to create incredibly fine-grained and blazing-fast subscriptions
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
+
