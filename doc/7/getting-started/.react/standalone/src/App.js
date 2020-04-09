@@ -26,7 +26,7 @@ class App extends React.Component {
       validate: false,
     };
   }
-  /* snippet:end */
+/* snippet:end */
   /* snippet:start:3 */
   valid = async () => {
     await kuzzle.connect();
@@ -82,9 +82,11 @@ class App extends React.Component {
         size: 100
       }
     );
-    results.hits.map(hit => {
-      this.setState({ messages: [this.getMessage(hit), ...this.state.messages] })
+    let messages = [];
+    results.hits.forEach(hit => {
+      messages = [this.getMessage(hit), ...messages]
     });
+    this.setState({ messages: messages })
   }
   /* snippet:end */
   /* snippet:start:5 */
