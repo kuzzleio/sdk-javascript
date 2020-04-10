@@ -44,7 +44,8 @@ class App extends React.Component {
     return (
       kuzzle.realtime.subscribe(
         "chat",
-        "messages", {},
+        "messages",
+        {},
         notification => {
           if (notification.type !== "document") return;
           if (notification.action !== "create") return;
@@ -84,7 +85,7 @@ class App extends React.Component {
     );
     let messages = [];
     results.hits.forEach(hit => {
-      messages = [this.getMessage(hit), ...messages]
+      messages.push(this.getMessage(hit))
     });
     this.setState({ messages: messages })
   }
