@@ -1,16 +1,15 @@
-const
-  KuzzleEventEmitter = require('./eventEmitter'),
-  AuthController = require('./controllers/auth'),
-  BulkController = require('./controllers/bulk'),
-  CollectionController = require('./controllers/collection'),
-  DocumentController = require('./controllers/document'),
-  IndexController = require('./controllers/index'),
-  RealtimeController = require('./controllers/realtime'),
-  ServerController = require('./controllers/server'),
-  SecurityController = require('./controllers/security'),
-  MemoryStorageController = require('./controllers/memoryStorage'),
-  uuidv4 = require('./uuidv4'),
-  proxify = require('./proxify');
+const KuzzleEventEmitter = require('./core/KuzzleEventEmitter');
+const AuthController = require('./controllers/Auth');
+const BulkController = require('./controllers/Bulk');
+const CollectionController = require('./controllers/Collection');
+const DocumentController = require('./controllers/Document');
+const IndexController = require('./controllers/Index');
+const RealtimeController = require('./controllers/Realtime');
+const ServerController = require('./controllers/Server');
+const SecurityController = require('./controllers/Security');
+const MemoryStorageController = require('./controllers/MemoryStorage');
+const uuidv4 = require('./utils/uuidv4');
+const proxify = require('./utils/proxify');
 
 const
   events = [

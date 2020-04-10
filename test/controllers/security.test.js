@@ -1,11 +1,11 @@
 const
-  SecurityController = require('../../src/controllers/security'),
-  Profile = require('../../src/controllers/security/profile'),
-  Role = require('../../src/controllers/security/role'),
-  User = require('../../src/controllers/security/user'),
-  ProfileSearchResult = require('../../src/controllers/searchResult/profile'),
-  RoleSearchResult = require('../../src/controllers/searchResult/role'),
-  UserSearchResult = require('../../src/controllers/searchResult/user'),
+  SecurityController = require('../../src/controllers/Security'),
+  Profile = require('../../src/core/security/Profile'),
+  Role = require('../../src/core/security/Role'),
+  User = require('../../src/core/security/User'),
+  ProfileSearchResult = require('../../src/core/searchResult/Profile'),
+  RoleSearchResult = require('../../src/core/searchResult/Role'),
+  UserSearchResult = require('../../src/core/searchResult/User'),
   sinon = require('sinon'),
   should = require('should');
 

@@ -1,5 +1,5 @@
 const
-  BulkController = require('../../src/controllers/bulk'),
+  BulkController = require('../../src/controllers/Bulk'),
   sinon = require('sinon'),
   should = require('should');
 
