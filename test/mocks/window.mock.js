@@ -1,6 +1,6 @@
 const
   sinon = require('sinon'),
-  KuzzleEventEmitter = require('../../src/eventEmitter');
+  KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
 
 // A class to mock the global window object
 class WindowMock extends KuzzleEventEmitter {

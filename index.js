@@ -1,16 +1,15 @@
 const Kuzzle = require('./src/Kuzzle');
 const { Http, WebSocket } = require('./src/protocols');
-const BaseController = require('./src/controllers/base');
-const KuzzleAbstractProtocol = require('./src/protocols/abstract/common');
-const KuzzleEventEmitter = require('./src/eventEmitter');
-const {
-  SearchResultBase,
-  DocumentSearchResult,
-  ProfileSearchResult,
-  RoleSearchResult,
-  SpecificationSearchResult,
-  UserSearchResult
-} = require('./src/controllers/searchResult');
+const BaseController = require('./src/controllers/Base');
+const KuzzleAbstractProtocol = require('./src/protocols/abstract/Base');
+const KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
+
+const SearchResultBase = require('./src/core/searchResult/SearchResultBase');
+const DocumentSearchResult = require('./src/core/searchResult/Document');
+const ProfileSearchResult = require('./src/core/searchResult/Profile');
+const RoleSearchResult = require('./src/core/searchResult/Role');
+const SpecificationSearchResult = require('./src/core/searchResult/Specifications');
+const UserSearchResult = require('./src/core/searchResult/User');
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
