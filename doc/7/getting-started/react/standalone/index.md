@@ -8,7 +8,7 @@ order: 0
 
 # Getting Started with Kuzzle and ReactJS
 
-This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **ReactJS**. We will create **documents** in Kuzzle and subscribe to
+This tutorial will help you get started deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **ReactJS**. We will create **documents** in Kuzzle and subscribe to
 [document notifications](/sdk/js/7/essentials/realtime-notifications#document-messages) to develop a realtime chat.
 
 ## Requirements
@@ -29,24 +29,24 @@ cd kuzzle-playground
 npm install kuzzle-sdk@7
 ```
 
-We'll rewrite the src/App.js so you can remove everything inside.
+We'll rewrite the *src/App.js* so you can remove everything inside.
 
 ## Instantiating Kuzzle SDK
 
 We have to connect the server so that our client can interact with it.
-To do this, we have to create a *src/services/kuzzle.js* file to put our kuzzle instance declaration:
+To achieve this, we have to create a *src/services/kuzzle.js* file to put our kuzzle instance declaration:
 
 <<< ./snippets/kuzzle.js.snippet[js]
 
-You can now edit the *src/App.js* file to connect to Kuzzle. To do this, import the kuzzle service file and the following imports in the same time:
+You can now edit the *src/App.js* file to connect to Kuzzle. To do this, add the following imports at the top of the file:
 
 <<< ./snippets/App.js.snippet:1[js]
 
-Now, add the app class and add in the constructor a `message` property in the state (we'll use it to store the user input message) a `username` property, `messages` property (we’ll use it to store all messages) and a `validate` property (Value that will change the display):
+Now, define the `App` class. The constructor must add a `message` property in the state (we'll use it to store the user input message) a `username` property, `messages` property (we’ll use it to store all messages) and a `validate` property (Value that will change the display):
 
 <<< ./snippets/App.js.snippet:2[js]
 
-Then we will establish the connection to kuzzle and create the index and collection of our chat if they don't exist. Add the following `valid()` method in the App Component:
+Then we will establish the connection to kuzzle and create the index and collection of our chat if they don't exist. Once connection is established, we need to ensure our Kuzzle instance is properly initialized before we allow the user to interact with it. We implement this logic in the the following `valid()` method in the App Component:
 
 <<< ./snippets/App.js.snippet:3[js]
 
@@ -66,7 +66,7 @@ Then, create the following functions to fetch and display the messages:
 
 <<< ./snippets/App.js.snippet:6[js]
 
-The function `fetchMessage()` will [search](/sdk/js/7/controllers/document/search) for the first hundred newest messages and store them in our array, before subscribing to changes in the messages collection. We called it in the `valid()` function we created above.
+The `fetchMessage()` function will [search](/sdk/js/7/controllers/document/search) for the first hundred newest messages and store them in our array. We called it in the `valid()` function we created above.
 
 <<< ./snippets/App.js.snippet:7[js]
 
@@ -80,8 +80,10 @@ We need to write a simple method that will [create](/sdk/js/7/controllers/docume
 
 <<< ./snippets/App.js.snippet:9[js]
 
-We will receive notifications from Kuzzle each time we modify our message collection (even if it is a message creation on our part) that we will use to add the messages in our array.
-Now, we need to subscribe to the collection that contains our messages. So let's create our `subscribeMessages()` action. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe) on message creations:
+We will receive real-time notification from Kuzzle each time a message is added to our message collection.
+We will use those notifications to append the messages to our application state.
+
+Now, we need to subscribe to the collection that contains our messages. So let's create our `subscribeMessages()` method. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe) on message creations:
 
 <<< ./snippets/App.js.snippet:10[js]
 
@@ -93,7 +95,7 @@ Add the following CSS classes:
 
 <<< ./snippets/App.css.snippet[js]
 
-To finish, add render of our App component:
+Finally, add the `render()` method of our App component:
 
 <<< ./snippets/App.js.snippet:12[js]
 
@@ -107,7 +109,7 @@ To launch this app, just type the following command:
 npm start
 ```
 
-You can now add new messages to Kuzzle and receive the notification of the creation to update your state and display the new messages.
+You can now send new messages to Kuzzle and receive the notifications of messages creation to update your state and display the new messages.
 
 ## go further ?
 

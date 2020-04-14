@@ -1,6 +1,6 @@
 /* snippet:start:1 */
 import React from 'react';
-import kuzzle from "./services/kuzzle";
+import kuzzle from './services/kuzzle';
 import './App.css';
 /* snippet:end */
 /* snippet:start:8 */
@@ -26,7 +26,7 @@ class App extends React.Component {
       validate: false,
     };
   }
-/* snippet:end */
+  /* snippet:end */
   /* snippet:start:3 */
   valid = async () => {
     await kuzzle.connect();
@@ -43,12 +43,12 @@ class App extends React.Component {
   subscribeMessages = () => {
     return (
       kuzzle.realtime.subscribe(
-        "chat",
-        "messages",
+        'chat',
+        'messages',
         {},
         notification => {
-          if (notification.type !== "document") return;
-          if (notification.action !== "create") return;
+          if (notification.type !== 'document') return;
+          if (notification.action !== 'create') return;
           this.setState({
             messages: [
               this.getMessage(notification.result),
@@ -74,10 +74,10 @@ class App extends React.Component {
   /* snippet:start:7 */
   fetchMessages = async () => {
     const results = await kuzzle.document.search(
-      "chat",
-      "messages",
+      'chat',
+      'messages',
       {
-        sort: ["_kuzzle_info.createdAt"]
+        sort: ['_kuzzle_info.createdAt']
       },
       {
         size: 100
@@ -92,8 +92,8 @@ class App extends React.Component {
   /* snippet:end */
   /* snippet:start:5 */
   handleInputChange = event => {
-    const value = event.target.value;
-    const name = event.target.name;
+    let value, name;
+    [value, name] = [event.target.value, event.target.name];
     this.setState({
       [name]: value
     });
@@ -102,7 +102,7 @@ class App extends React.Component {
 
   /* snippet:start:4 */
   renderUsernameInput = () => {
-    if (this.state.validate === false)
+    if (this.state.validate === false) {
       return (
         <div className="wrapper">
           <input autoFocus name="username" id="username"
@@ -113,25 +113,26 @@ class App extends React.Component {
           <button onClick={this.valid}>Valid</button>
         </div>
       );
+    }
   }
   /* snippet:end */
   /* snippet:start:9 */
   sendMessage = async () => {
-    if (this.state.message === "") return;
+    if (this.state.message === '') return;
     await kuzzle.document.create(
-      "chat",
-      "messages",
+      'chat',
+      'messages',
       {
         value: this.state.message,
         username: this.state.username
       }
     );
-    this.setState({ message: "" })
+    this.setState({ message: '' })
   }
   /* snippet:end */
   /* snippet:start:11 */
   renderMessageInput = () => {
-    if (this.state.validate === true)
+    if (this.state.validate === true) {
       return (
         <div className="wrapper">
           <input autoFocus type="text"
@@ -144,6 +145,7 @@ class App extends React.Component {
           <button onClick={() => this.sendMessage()}>Send</button>
         </div>
       );
+    }
   }
   /* snippet:end */
   /* snippet:start:12 */
