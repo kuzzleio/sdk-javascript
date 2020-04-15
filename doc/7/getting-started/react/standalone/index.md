@@ -34,7 +34,7 @@ We'll rewrite the *src/App.js* so you can remove everything inside.
 ## Instantiating Kuzzle SDK
 
 We have to connect the server so that our client can interact with it.
-To achieve this, we have to create a *src/services/kuzzle.js* file to put our kuzzle instance declaration:
+To achieve this, create a *src/services/kuzzle.js* file to put our kuzzle instance declaration:
 
 <<< ./snippets/kuzzle.js.snippet[js]
 
@@ -52,7 +52,7 @@ Then we will establish the connection to kuzzle and create the index and collect
 
 ## Get the username
 
-First of all, we need to know the user's name. Let's start by adding the following function.
+First of all, we need to know the user's name, this function will return the input allowing the user to enter his or her name. Let's add this one.
 
 <<< ./snippets/App.js.snippet:4[js]
 
@@ -91,7 +91,7 @@ Add an input field bound to the message property, and a button which calls our `
 
 <<< ./snippets/App.js.snippet:11[js]
 
-Add the following CSS classes:
+Add the following CSS classes in the *src/App.css* file:
 
 <<< ./snippets/App.css.snippet[js]
 
