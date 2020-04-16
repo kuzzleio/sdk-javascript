@@ -23,3 +23,6 @@ doc/6/getting-started/.react/cypress/screenshots
 doc/6/getting-started/.react/cypress/videos
 doc/6/getting-started/.vuejs/cypress/screenshots
 doc/6/getting-started/.vuejs/cypress/videos
+
+# Debug snippets
+test-*.js
