@@ -1,18 +1,19 @@
-const
-  ora = require('ora'),
-  webpack = require('webpack'),
-  webpackConfig = require('./webpack.config.js'),
-  spinner = ora('Building SDK...');
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config.js');
+
+/* eslint-disable no-console */
+
+console.log('Building SDK...');
 
 process.env.NODE_ENV = 'production';
 
-spinner.start();
-
 webpack(webpackConfig, function (err, stats) {
-  spinner.stop();
   if (err) {
     throw err;
   }
+
+  console.log('Build complete.');
+
   process.stdout.write(stats.toString({
     colors: true,
     modules: false,
