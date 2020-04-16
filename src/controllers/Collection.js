@@ -50,11 +50,14 @@ class CollectionController extends BaseController {
   }
 
   getMapping (index, collection, options = {}) {
-    return this.query({
+    const request = {
       index,
       collection,
-      action: 'getMapping'
-    }, options)
+      action: 'getMapping',
+      includeKuzzleMeta: options.includeKuzzleMeta || false
+    };
+
+    return this.query(request, options)
       .then(response => response.result);
   }
 

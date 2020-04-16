@@ -131,6 +131,8 @@ describe('Collection Controller', () => {
           }
         }
       });
+      options.includeKuzzleMeta = true;
+
 
       return kuzzle.collection.getMapping('index', 'collection', options)
         .then(res => {
@@ -140,7 +142,8 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'getMapping',
               index: 'index',
-              collection: 'collection'
+              collection: 'collection',
+              includeKuzzleMeta: true
             }, options);
 
           should(res).match({
