@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  KuzzleEventEmitter = require('../../src/eventEmitter');
+  KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
 
 describe('Event emitter', () => {
   const

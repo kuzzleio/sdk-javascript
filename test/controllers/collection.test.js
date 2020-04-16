@@ -1,6 +1,6 @@
 const
-  CollectionController = require('../../src/controllers/collection'),
-  SpecificationsSearchResult = require('../../src/controllers/searchResult/specifications'),
+  CollectionController = require('../../src/controllers/Collection'),
+  SpecificationsSearchResult = require('../../src/core/searchResult/Specifications'),
   sinon = require('sinon'),
   should = require('should');
 
@@ -220,8 +220,8 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'list',
               index: 'index',
-              from: undefined,
-              size: undefined
+              size: 0,
+              from: undefined
             }, options);
 
           should(res).match({

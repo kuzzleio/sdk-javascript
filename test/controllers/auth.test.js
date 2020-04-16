@@ -1,7 +1,7 @@
 const
   Jwt = require('../../src/core/Jwt'),
-  AuthController = require('../../src/controllers/auth'),
-  User = require('../../src/controllers/security/user'),
+  AuthController = require('../../src/controllers/Auth'),
+  User = require('../../src/core/security/User'),
   generateJwt = require('../mocks/generateJwt.mock'),
   sinon = require('sinon'),
   should = require('should');

@@ -1,5 +1,5 @@
 const
-  ServerController = require('../../src/controllers/server'),
+  ServerController = require('../../src/controllers/Server'),
   sinon = require('sinon'),
   should = require('should');
 

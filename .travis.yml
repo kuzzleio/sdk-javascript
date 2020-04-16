@@ -62,9 +62,9 @@ jobs:
 
       install:
         - npm install
+        - npm run build
 
       script:
-        - npm run build
         - npm run functional-testing
 
     - stage: Tests
@@ -75,6 +75,8 @@ jobs:
 
       before_script:
         - sudo apt-get install libgconf-2-4
+        - npm install
+        - npm run build
       script:
         - npm run doc-testing
 
