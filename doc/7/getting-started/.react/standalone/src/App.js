@@ -83,9 +83,11 @@ class App extends React.Component {
         size: 100
       }
     );
+    let messages = []
     results.hits.map(hit => {
-      this.setState({ messages: [this.getMessage(hit), ...this.state.messages] })
+      messages.push(this.getMessage(hit))
     });
+    this.setState({ messages: messages })
   }
   /* snippet:end */
   /* snippet:start:5 */
