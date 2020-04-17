@@ -77,20 +77,21 @@ class App extends React.Component {
       'chat',
       'messages',
       {
-        sort: ['_kuzzle_info.createdAt']
+        sort: {
+          '_kuzzle_info.createdAt': 'desc'
+        }
       },
       {
         size: 100
       }
     );
-    let messages = results.hits.reverse().map(hit => this.getMessage(hit));
+    let messages = results.hits.map(hit => this.getMessage(hit));
     this.setState({ messages })
   }
   /* snippet:end */
   /* snippet:start:5 */
   handleInputChange = event => {
-    let value, name;
-    [value, name] = [event.target.value, event.target.name];
+    const { value, name } = event.target;
     this.setState({
       [name]: value
     });
