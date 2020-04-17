@@ -20,7 +20,7 @@ describe('Kuzzle listeners management', () => {
     KuzzleEventEmitterMock.prototype.emit = emitStub;
 
     Kuzzle = proxyquire('../../src/Kuzzle', {
-      './eventEmitter': KuzzleEventEmitterMock
+      './core/KuzzleEventEmitter': KuzzleEventEmitterMock
     });
   });
 
