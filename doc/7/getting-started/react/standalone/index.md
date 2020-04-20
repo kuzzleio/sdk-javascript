@@ -8,7 +8,7 @@ order: 0
 
 # Getting Started with Kuzzle and ReactJS
 
-This tutorial will help you get started deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **ReactJS**. We will create **documents** in Kuzzle and subscribe to
+This tutorial will help you get started with **Kuzzle V2** (+ **Javascript SDK 7**) and **ReactJS**. We will create **documents** in Kuzzle and subscribe to
 [document notifications](/sdk/js/7/essentials/realtime-notifications#document-messages) to develop a realtime chat.
 
 ## Requirements
@@ -80,14 +80,14 @@ We need to write a simple method that will [create](/sdk/js/7/controllers/docume
 
 <<< ./snippets/App.js.snippet:9[js]
 
-We will receive real-time notification from Kuzzle each time a message is added to our message collection.
+We will receive real-time notifications from Kuzzle each time a message is added to our message collection.
 We will use those notifications to append the messages to our application state.
 
 Now, we need to subscribe to the collection that contains our messages. So let's create our `subscribeMessages()` method. It will call Kuzzle's realtime controller to allow us to [receive notifications](/sdk/js/7/controllers/realtime/subscribe) on message creations:
 
 <<< ./snippets/App.js.snippet:10[js]
 
-Add an input field bound to the message property, and a button which calls our `sendMessage()` function: 
+Add an input field bound to the message property, and a button which calls our `sendMessage()` function:
 
 <<< ./snippets/App.js.snippet:11[js]
 
@@ -111,13 +111,12 @@ npm start
 
 You can now send new messages to Kuzzle and receive the notifications of messages creation to update your state and display the new messages.
 
-## go further ?
+## Going further
 
-Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
+Now that you are more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
-- discover what this SDK has to offer by browsing other sections of this documentation
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
-- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
-- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction) to create incredibly fine-grained and blazing-fast subscriptions
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
-
+- Discover what this SDK has to offer by browsing other sections of this documentation
+- Learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
+- Lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
+- Learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction) to create incredibly fine-grained and blazing-fast subscriptions
+- Follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
