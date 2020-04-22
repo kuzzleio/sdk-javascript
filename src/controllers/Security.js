@@ -113,7 +113,10 @@ class SecurityController extends BaseController {
     };
 
     return this.query(request, options)
-      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
 
   createOrReplaceRole (_id, body, options = {}) {
@@ -135,7 +138,10 @@ class SecurityController extends BaseController {
     };
 
     return this.query(request, options)
-      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
 
   createRestrictedUser (body, _id = null, options = {}) {
@@ -247,11 +253,11 @@ class SecurityController extends BaseController {
   }
 
   getProfile (_id, options = {}) {
-    return this.query({
-      _id,
-      action: 'getProfile'
-    }, options)
-      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
+    return this.query({_id, action: 'getProfile'}, options)
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
 
   getProfileMapping (options = {}) {
@@ -347,11 +353,9 @@ class SecurityController extends BaseController {
   }
 
   mGetProfiles (ids, options = {}) {
-    return this.query({
-      action: 'mGetProfiles',
-      body: {ids}
-    }, options)
-      .then(response => response.result.hits.map(hit => new Profile(this.kuzzle, hit._id , hit._source.policies)));
+    return this.query({action: 'mGetProfiles', body: {ids}}, options)
+      .then(response => response.result.hits.map(
+        hit => new Profile(this.kuzzle, hit._id, hit._source)));
   }
 
   mGetUsers (ids, options = {}) {
@@ -440,8 +444,12 @@ class SecurityController extends BaseController {
       body,
       action: 'updateProfile'
     };
+
     return this.query(request, options)
-      .then(response => new Profile(this.kuzzle, response.result._id, response.result._source.policies));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
 
   updateProfileMapping (body, options = {}) {

@@ -4,10 +4,11 @@ class Profile {
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle, _id = null, policies = []) {
+  constructor (kuzzle, _id = null, content = null) {
     this._kuzzle = kuzzle;
     this._id = _id;
-    this.policies = policies;
+    this.rateLimit = content ? content.rateLimit : 0;
+    this.policies = content ? content.policies : [];
   }
 
   get kuzzle () {
@@ -21,7 +22,10 @@ class Profile {
     if (!this.policies || this.policies.length === 0) {
       return Promise.resolve([]);
     }
-    return this.kuzzle.security.mGetRoles(this.policies.map(policy => policy.roleId), options);
+
+    return this.kuzzle.security.mGetRoles(
+      this.policies.map(policy => policy.roleId),
+      options);
   }
 }
 
