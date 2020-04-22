@@ -20,9 +20,9 @@ next();
 
 Resolves to a `SearchResult` object, or to `null` if no more pages are available.
 
-## Throw
+## Rejects
 
-This method throws an exception if:
+This method return a rejected promise with an error if:
 
 - No pagination strategy can be applied (see below)
 - If invoking it would lead to more than 10 000 items being retrieved with the `from/size` strategy
@@ -56,7 +56,10 @@ You can restrict the scroll session maximum duration under the `services.storage
 
 If the initial search contains `sort` and `size` parameters, the `next` method retrieves the next page of results following the sort order, the last item of the current page acting as a live cursor.
 
-To avoid too many duplicates, it is advised to provide a sort combination that will always identify one item only. The recommended way is to use the field `_uid` which is certain to contain one unique value for each document.
+::: warning
+You have to provide a sort combination that will always identify one item only. The recommended way is to use the field `_uid` which is certain to contain one unique value for each document.
+To prevent partial retrieval of results, the SDK will reject with an error if the sort combination can identify multiple items.
+:::
 
 Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
 
@@ -69,6 +72,6 @@ If the initial search contains `from` and `size` parameters, the `next` method r
 Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
 
 It's the fastest pagination method available, but also the less consistent, and it is not possible to retrieve more than 10000 items using it.  
-Above that limit, any call to `next` throws an Exception.
+Above that limit, any call to `next` will return a rejected promise with an error.
 
 <<< ./snippets/fromsize.js

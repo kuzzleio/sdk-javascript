@@ -38,17 +38,33 @@ class SearchResultBase {
         .then(response => this._buildNextSearchResult(response));
     }
     else if (this._request.size && this._request.body.sort) {
-      const  request = { ...this._request, action: this._searchAction };
+      const request = { ...this._request, action: this._searchAction };
       const hit = this._response.hits[this._response.hits.length - 1];
+
+      // When sorting only on a non unique field, the search_after will not iterate
+      // over all documents having the same values but ES will returns the results
+      // directly after.
+      // It resulting in having less fetched documents than the total and thus the SDK
+      // try to fetch the next results page but it's empty
+      if (! hit) {
+        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only'));
+      }
 
       request.body.search_after = [];
 
-      const sorts = Array.isArray(this._request.body.sort)
-        ? this._request.body.sort
-        : Object.keys(this._request.body.sort);
+      let sorts;
+      if (typeof this._request.body.sort === 'string') {
+        sorts = [this._request.body.sort];
+      }
+      else if (Array.isArray(this._request.body.sort)) {
+        sorts = this._request.body.sort;
+      }
+      else {
+        sorts = Object.keys(this._request.body.sort);
+      }
 
       if (sorts.length === 0) {
-        throw new Error('Unable to retrieve next results from search: sort param is empty');
+        return Promise.reject(new Error('Unable to retrieve next results from search: sort param is empty'));
       }
 
       for (const sort of sorts) {
@@ -71,14 +87,15 @@ class SearchResultBase {
         return Promise.resolve(null);
       }
 
-      return this._kuzzle.query(Object.assign({}, this._request, {
+      return this._kuzzle.query({
+        ...this._request,
         action: this._searchAction,
         from: this.fetched
-      }), this._options)
+      }, this._options)
         .then(response => this._buildNextSearchResult(response));
     }
 
-    throw new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+    return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params'));
   }
 
   _get (object, path) {
