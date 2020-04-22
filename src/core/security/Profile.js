@@ -7,8 +7,8 @@ class Profile {
   constructor (kuzzle, _id = null, content = null) {
     this._kuzzle = kuzzle;
     this._id = _id;
-    this.rateLimit = content ? content.rateLimit : 0;
-    this.policies = content ? content.policies : [];
+    this.rateLimit = content && content.rateLimit ? content.rateLimit : 0;
+    this.policies = content && content.policies ? content.policies : [];
   }
 
   get kuzzle () {

@@ -17,10 +17,18 @@ describe('Profile', () => {
   });
 
   describe('profile class', () => {
-    it('should initialize empty profile with the correct default values', () => {
+    it('should initialize a null profile with the correct default values', () => {
       const profile = new Profile(kuzzleMock);
 
       should(profile._id).be.null();
+      should(profile.policies).be.Array().and.be.empty();
+      should(profile.rateLimit).eql(0);
+    });
+
+    it('should initialize an empty profile with the correct default values', () => {
+      const profile = new Profile(kuzzleMock, 'foo', {});
+
+      should(profile._id).eql('foo');
       should(profile.policies).be.Array().and.be.empty();
       should(profile.rateLimit).eql(0);
     });
