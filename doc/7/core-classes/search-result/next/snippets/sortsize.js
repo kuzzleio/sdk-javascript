@@ -14,7 +14,11 @@ try {
     'yellow-taxi',
     {
       query: { match: { category: 'suv' } },
-      sort: ['_kuzzle_info.createdAt', 'category']
+      sort: [
+        'category',
+        { '_kuzzle_info.createdAt': 'desc' },
+        '_uid'
+      ]
     },
     { size: 5 });
 
