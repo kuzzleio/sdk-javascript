@@ -165,7 +165,7 @@ describe('DocumentSearchResult', () => {
         };
 
         request.size = 2;
-        request.body.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
+        request.body.sort = ['foo', {bar: 'asc'}, {_id: 'desc'}];
 
         response = {
           hits: [
@@ -192,8 +192,8 @@ describe('DocumentSearchResult', () => {
                   query: {
                     foo: 'bar'
                   },
-                  sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
-                  search_after: ['barbar', 2345, 'collection#document2']
+                  sort: ['foo', {bar: 'asc'}, {_id: 'desc'}],
+                  search_after: ['barbar', 2345, 'document2']
                 },
                 controller: 'document',
                 action: 'search',
