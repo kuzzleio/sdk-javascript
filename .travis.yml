@@ -62,9 +62,9 @@ jobs:
 
       install:
         - npm install
+        - npm run build
 
       script:
-        - npm run build
         - npm run functional-testing
 
     - stage: Tests
@@ -75,6 +75,8 @@ jobs:
 
       before_script:
         - sudo apt-get install libgconf-2-4
+        - npm install
+        - npm run build
       script:
         - npm run doc-testing
 
@@ -114,7 +116,7 @@ jobs:
 
       install:
         - pip install awscli --upgrade --user
-        - npm ci
+        - npm install --production=false
 
       script:
         - npm run doc-prepare
@@ -151,7 +153,7 @@ jobs:
 
       install:
         - pip install awscli --upgrade --user
-        - npm ci
+        - npm install --production=false
 
       script:
         - npm run doc-prepare
