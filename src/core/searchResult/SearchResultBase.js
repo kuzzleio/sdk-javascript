@@ -47,7 +47,7 @@ class SearchResultBase {
       // It resulting in having less fetched documents than the total and thus the SDK
       // try to fetch the next results page but it's empty
       if (! hit) {
-        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only'));
+        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.'));
       }
 
       request.body.search_after = [];
@@ -72,8 +72,8 @@ class SearchResultBase {
           ? sort
           : Object.keys(sort)[0];
 
-        const value = key === '_uid'
-          ? this._request.collection + '#' + hit._id
+        const value = key === '_id'
+          ? hit._id
           : this._get(hit._source, key.split('.'));
 
         request.body.search_after.push(value);

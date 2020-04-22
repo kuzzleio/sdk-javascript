@@ -17,7 +17,7 @@ try {
       sort: [
         'category',
         { '_kuzzle_info.createdAt': 'desc' },
-        '_uid'
+        '_id'
       ]
     },
     { size: 5 });

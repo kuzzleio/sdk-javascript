@@ -59,7 +59,7 @@ If the initial search contains `sort` and `size` parameters, the `next` method r
 This strategy use Elasticsearch [search_after](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-search-after) parameter.
 
 ::: warning
-You have to provide a sort combination that will always identify one item only. The recommended way is to use the field `_uid` which is certain to contain one unique value for each document.
+You have to provide a sort combination that will always identify one item only. The recommended way is to use the field `_id` which is certain to contain one unique value for each document.
 To prevent partial retrieval of results, the SDK will reject with an error if the sort combination can identify multiple items.
 :::
 
