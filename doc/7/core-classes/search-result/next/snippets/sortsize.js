@@ -15,7 +15,6 @@ try {
     {
       query: { match: { category: 'suv' } },
       sort: [
-        'category',
         { '_kuzzle_info.createdAt': 'desc' },
         '_id'
       ]
