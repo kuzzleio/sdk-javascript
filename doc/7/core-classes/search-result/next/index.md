@@ -22,7 +22,7 @@ Resolves to a `SearchResult` object, or to `null` if no more pages are available
 
 ## Rejects
 
-This method return a rejected promise with an error if:
+This method returns a rejected promise with an error if:
 
 - No pagination strategy can be applied (see below)
 - If invoking it would lead to more than 10 000 items being retrieved with the `from/size` strategy
