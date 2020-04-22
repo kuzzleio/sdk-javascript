@@ -56,6 +56,8 @@ You can restrict the scroll session maximum duration under the `services.storage
 
 If the initial search contains `sort` and `size` parameters, the `next` method retrieves the next page of results following the sort order, the last item of the current page acting as a live cursor.
 
+This strategy use Elasticsearch [search_after](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-search-after) parameter.
+
 ::: warning
 You have to provide a sort combination that will always identify one item only. The recommended way is to use the field `_uid` which is certain to contain one unique value for each document.
 To prevent partial retrieval of results, the SDK will reject with an error if the sort combination can identify multiple items.
@@ -64,6 +66,8 @@ To prevent partial retrieval of results, the SDK will reject with an error if th
 Because this method does not freeze the search results between two calls, there can be missing or duplicated documents between two result pages.
 
 This method efficiently mitigates the costs of scroll searches, but returns less consistent results: it's a middle ground, ideal for real-time search requests.
+
+<<< ./snippets/sortsize.js
 
 ### Strategy: from / size
 
