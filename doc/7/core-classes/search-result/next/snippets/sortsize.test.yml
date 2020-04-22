@@ -1,0 +1,11 @@
+name: searchresult#sortsize
+description: Next method with sort/size
+hooks:
+  before: |
+    curl -XDELETE kuzzle:7512/nyc-open-data
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after: |
+    curl -XDELETE kuzzle:7512/nyc-open-data
+template: default
+expected: Successfully retrieved 100 documents

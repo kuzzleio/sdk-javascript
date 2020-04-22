@@ -38,18 +38,24 @@ class SearchResultBase {
         .then(response => this._buildNextSearchResult(response));
     }
     else if (this._request.size && this._request.body.sort) {
-      const
-        request = Object.assign({}, this._request, {
-          action: this._searchAction
-        }),
-        hit = this._response.hits[this._response.hits.length - 1];
+      const  request = { ...this._request, action: this._searchAction };
+      const hit = this._response.hits[this._response.hits.length - 1];
 
       request.body.search_after = [];
 
-      for (const sort of this._request.body.sort) {
+      const sorts = Array.isArray(this._request.body.sort)
+        ? this._request.body.sort
+        : Object.keys(this._request.body.sort);
+
+      if (sorts.length === 0) {
+        throw new Error('Unable to retrieve next results from search: sort param is empty');
+      }
+
+      for (const sort of sorts) {
         const key = typeof sort === 'string'
           ? sort
           : Object.keys(sort)[0];
+
         const value = key === '_uid'
           ? this._request.collection + '#' + hit._id
           : this._get(hit._source, key.split('.'));
