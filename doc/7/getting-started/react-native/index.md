@@ -16,7 +16,7 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Nativ
 
 - **Node.js** >= 12.0.0 ([install here](https://nodejs.org/en/download/))
 - **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
-- **Expo CLI** ([install here](https://docs.expo.io/versions/v36.0.0/get-started/installation/))
+- **Expo CLI** ([install here](https://docs.expo.io/get-started/installation))
 
 "[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase."
 
