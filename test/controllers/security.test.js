@@ -1,13 +1,12 @@
-const
-  SecurityController = require('../../src/controllers/Security'),
-  Profile = require('../../src/core/security/Profile'),
-  Role = require('../../src/core/security/Role'),
-  User = require('../../src/core/security/User'),
-  ProfileSearchResult = require('../../src/core/searchResult/Profile'),
-  RoleSearchResult = require('../../src/core/searchResult/Role'),
-  UserSearchResult = require('../../src/core/searchResult/User'),
-  sinon = require('sinon'),
-  should = require('should');
+const SecurityController = require('../../src/controllers/Security');
+const Profile = require('../../src/core/security/Profile');
+const Role = require('../../src/core/security/Role');
+const User = require('../../src/core/security/User');
+const ProfileSearchResult = require('../../src/core/searchResult/Profile');
+const RoleSearchResult = require('../../src/core/searchResult/Role');
+const UserSearchResult = require('../../src/core/searchResult/User');
+const sinon = require('sinon');
+const should = require('should');
 
 describe('Security Controller', () => {
   const options = {opt: 'in'};
