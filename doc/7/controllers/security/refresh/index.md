@@ -20,19 +20,13 @@ Forcing immediate refreshes comes with performance costs, and should only perfor
 :::
 
 
-
 ```js
 refresh(collection);
 ```
 
----
-
-
 ## Arguments
 
 - `collection`: collection name to refresh
-
----
 
 ## Resolves
 

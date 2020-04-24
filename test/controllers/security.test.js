@@ -910,7 +910,7 @@ describe('Security Controller', () => {
   });
 
   describe('refresh', () => {
-    it('should call security/refresh query and return a Promise which resolves a boolean', () => {
+    it('should call security/refresh query and return a Promise', () => {
       kuzzle.query.resolves(null);
 
       return kuzzle.security.refresh('collection')
