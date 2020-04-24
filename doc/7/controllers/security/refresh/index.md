@@ -6,8 +6,6 @@ title: refresh
 
 # refresh
 
-<SinceBadge version="2.1.0"/>
-
 Forces an immediate [reindexation](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/docs-refresh.html) of the provided security collection.
 
 The available security collections are: `users`, `profiles`, `roles`.
