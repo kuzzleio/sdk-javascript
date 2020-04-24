@@ -376,6 +376,13 @@ class SecurityController extends BaseController {
       .then(response => response.result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
   }
 
+  refresh(collection) {
+    return this.query({
+      collection,
+      action: 'refresh'
+    });
+  }
+
   replaceUser (_id, body, options = {}) {
     const request = {
       _id,
