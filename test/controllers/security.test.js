@@ -909,6 +909,25 @@ describe('Security Controller', () => {
     });
   });
 
+  describe('refresh', () => {
+    it('should call security/refresh query and return a Promise', () => {
+      kuzzle.query.resolves(null);
+
+      return kuzzle.security.refresh('collection')
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'security',
+              action: 'refresh',
+              collection: 'collection'
+            });
+
+          should(res).be.Null();
+        });
+    });
+  });
+
   describe('replaceUser', () => {
     it('should call security/replaceUser query with the user content and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
