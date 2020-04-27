@@ -17,7 +17,7 @@ Before proceeding, make sure your system has **Node.js** version 8 or higher ([d
 In this tutorial, you'll learn how to **store** a document and **subscribe** to notifications in Kuzzle using the Javascript SDK.
 
 :::info
-Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzzle)!
+Having trouble? Get in touch with us on [Discord](http://join.discord.kuzzle.io)!
 :::
 
 ## Prepare your environment

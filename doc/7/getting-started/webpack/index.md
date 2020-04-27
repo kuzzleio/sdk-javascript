@@ -12,7 +12,7 @@ In this tutorial you will learn how to install, run and use **Kuzzle** with the 
 We will walk you through creating scripts that can **store** documents in Kuzzle and subscribe to **notifications** for each new document created.
 
 :::info
-Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzzle)!
+Having trouble? Get in touch with us on [Discord](http://join.discord.kuzzle.io)!
 :::
 
 ## Running Kuzzle
@@ -107,7 +107,7 @@ Congratulations! You are now ready to say Hello to the World!
 :::
 
 ::: info
-Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
+Having trouble? Get in touch with us on [Discord!](http://join.discord.kuzzle.io) We're happy to help.
 :::
 
 ## Create your first document
@@ -158,7 +158,7 @@ confirm that your document was saved.
 :::
 
 ::: info
-Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
+Having trouble? Get in touch with us on [Discord!](http://join.discord.kuzzle.io) We're happy to help.
 :::
 
 ## Subscribe to realtime document notifications (pub/sub)
@@ -199,7 +199,7 @@ Congratulations! You have just choreographed your first pub/sub pattern!
 :::
 
 ::: info
-Having trouble? Get in touch with us on [Gitter!](https://gitter.im/kuzzleio/kuzzle) We're happy to help.
+Having trouble? Get in touch with us on [Discord!](http://join.discord.kuzzle.io) We're happy to help.
 :::
 
 ## Where do we go from here?

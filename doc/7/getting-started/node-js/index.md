@@ -17,7 +17,7 @@ To follow this tutorial, you must have a Kuzzle Server up and running. Follow th
 
 
 :::info
-Having trouble? Get in touch with us on [Gitter](https://gitter.im/kuzzleio/kuzzle)!
+Having trouble? Get in touch with us on [Discord](http://join.discord.kuzzle.io)!
 :::
 
 ## Explore the SDK
