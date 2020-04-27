@@ -182,8 +182,8 @@ class DocumentController extends BaseController {
 
   search (index, collection, body = {}, options = {}) {
     return this._search(index, collection, body, options)
-      .then(({ response, request }) => (
-        new DocumentSearchResult(this.kuzzle, request, options, response.result)
+      .then(({ response, request, opts }) => (
+        new DocumentSearchResult(this.kuzzle, request, opts, response.result)
       ));
   }
 
@@ -197,15 +197,12 @@ class DocumentController extends BaseController {
 
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
-      delete options[opt];
     }
 
-    if (!options.verb) {
-      options.verb = 'POST';
-    }
+    const opts = { verb: 'POST', ...options };
 
-    return this.query(request, options)
-      .then(response => ({ response, request }));
+    return this.query(request, opts)
+      .then(response => ({ response, request, opts }));
   }
 
   update (index, collection, _id, body, options = {}) {
@@ -218,8 +215,6 @@ class DocumentController extends BaseController {
       retryOnConflict: options.retryOnConflict,
       source: options.source
     };
-    delete options.source;
-    delete options.retryOnConflict;
 
     return this.query(request, options)
       .then(response => response.result);

@@ -263,7 +263,7 @@ describe('Collection Controller', () => {
               from: 3,
               size: 42,
               scroll: 'scroll'
-            }, {foo: 'bar'});
+            }, { foo: 'bar', from: 3, scroll: 'scroll', size: 42 });
 
           should(res).be.an.instanceOf(SpecificationsSearchResult);
           should(res._request).match({

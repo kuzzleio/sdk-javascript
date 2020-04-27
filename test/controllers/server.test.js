@@ -47,21 +47,6 @@ describe('Server Controller', () => {
         });
     });
 
-    it('should reject the promise if receiving a response in bad format (missing result)', () => {
-      kuzzle.query.resolves({foo: 'bar'});
-      return should(kuzzle.server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
-    });
-
-    it('should reject the promise if receiving a response in bad format (missing "exists" attribute)', () => {
-      kuzzle.query.resolves({result: {foo: 'bar'}});
-      return should(kuzzle.server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
-    });
-
-    it('should reject the promise if receiving a response in bad format (bad type of "exists" attribute)', () => {
-      kuzzle.query.resolves({result: {exists: 'foobar'}});
-      return should(kuzzle.server.adminExists()).be.rejectedWith({status: 400, message: 'adminExists: bad response format'});
-    });
-
     it('should reject the promise if an error occurs', () => {
       const error = new Error('foobar error');
       error.status = 412;
@@ -425,21 +410,6 @@ describe('Server Controller', () => {
           should(kuzzle.query).be.calledWith(expectedQuery, {queuable: false});
           should(res).be.exactly(12345);
         });
-    });
-
-    it('should reject the promise if receiving a response in bad format (missing result)', () => {
-      kuzzle.query.resolves({foo: 'bar'});
-      return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
-    });
-
-    it('should reject the promise if receiving a response in bad format (missing "now" attribute)', () => {
-      kuzzle.query.resolves({result: {foo: 'bar'}});
-      return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
-    });
-
-    it('should reject the promise if receiving a response in bad format (bad type for "now" attribute)', () => {
-      kuzzle.query.resolves({result: {now: 'bar'}});
-      return should(kuzzle.server.now()).be.rejectedWith({status: 400, message: 'now: bad response format'});
     });
 
     it('should reject the promise if an error occurs', () => {

@@ -394,7 +394,8 @@ describe('Document Controller', () => {
             }, options);
 
           should(res).be.an.instanceOf(DocumentSearchResult);
-          should(res._options).be.equal(options);
+          should(res._options).match(options);
+          should(res._options.verb).be.eql('POST');
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
@@ -527,7 +528,7 @@ describe('Document Controller', () => {
               body: {foo: 'bar'},
               retryOnConflict: true,
               source: undefined
-            }, {});
+            }, { retryOnConflict: true });
 
           should(res).be.equal(result);
         });
@@ -555,7 +556,7 @@ describe('Document Controller', () => {
               body: { foo: 'bar' },
               retryOnConflict: undefined,
               source: true
-            }, {});
+            }, { source: true });
 
           should(res).be.equal(result);
         });
