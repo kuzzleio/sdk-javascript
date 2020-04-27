@@ -1014,10 +1014,9 @@ describe('Security Controller', () => {
               from: 1,
               size: 2,
               scroll: '10s'
-            }, {});
+            }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(ProfileSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
@@ -1077,10 +1076,9 @@ describe('Security Controller', () => {
               body: {controllers: ['foo', 'bar']},
               from: 1,
               size: 2
-            }, {});
+            }, { from: 1, size: 2 });
 
           should(res).be.an.instanceOf(RoleSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
@@ -1142,10 +1140,9 @@ describe('Security Controller', () => {
               from: 1,
               size: 2,
               scroll: '10s'
-            }, {});
+            }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(UserSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);

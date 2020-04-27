@@ -400,7 +400,6 @@ class SecurityController extends BaseController {
     };
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
-      delete options[opt];
     }
 
     return this.query(request, options)
@@ -414,7 +413,6 @@ class SecurityController extends BaseController {
     };
     for (const opt of ['from', 'size']) {
       request[opt] = options[opt];
-      delete options[opt];
     }
 
     return this.query(request, options)
@@ -428,7 +426,6 @@ class SecurityController extends BaseController {
     };
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
-      delete options[opt];
     }
 
     return this.query(request, options)

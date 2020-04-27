@@ -77,8 +77,6 @@ class CollectionController extends BaseController {
       size: options.size || 0,
       from: options.from
     };
-    delete options.from;
-    delete options.size;
 
     return this.query(request, options)
       .then(response => response.result);
@@ -92,8 +90,6 @@ class CollectionController extends BaseController {
 
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
-
-      delete options[opt];
     }
 
     return this.query(request, options)
