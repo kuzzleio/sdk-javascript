@@ -501,9 +501,6 @@ Discarded request: ${JSON.stringify(request)}`));
 
     this._lastTokenExpired = now;
 
-    this.auth.authenticationToken = null;
-    this.realtime.tokenExpired();
-
     this.emit('tokenExpired');
   }
 

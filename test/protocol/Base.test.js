@@ -119,7 +119,7 @@ describe('Common Protocol', () => {
         eventStub = sinon.stub(),
         response = {
           error: {
-            message: 'Token expired'
+            id: 'security.token.invalid'
           }
         };
 

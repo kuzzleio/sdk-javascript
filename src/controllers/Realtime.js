@@ -11,6 +11,8 @@ class RealTimeController extends BaseController {
 
     this.subscriptions = {};
     this.subscriptionsOff = {};
+
+    this.kuzzle.on('tokenExpired', () => this.tokenExpired());
   }
 
   count (roomId, options = {}) {

@@ -1,22 +1,21 @@
-const
-  AuthController = require('../../src/controllers/Auth'),
-  RealtimeController = require('../../src/controllers/Realtime'),
-  generateJwt = require('../mocks/generateJwt.mock'),
-  mockrequire = require('mock-require'),
-  sinon = require('sinon'),
-  should = require('should'),
-  uuidv4 = require('../../src/utils/uuidv4');
+const mockrequire = require('mock-require');
+const sinon = require('sinon');
+const should = require('should');
+
+const KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
+const AuthController = require('../../src/controllers/Auth');
+const RealtimeController = require('../../src/controllers/Realtime');
+const generateJwt = require('../mocks/generateJwt.mock');
+const uuidv4 = require('../../src/utils/uuidv4');
 
 describe('Realtime Controller', () => {
   const options = {opt: 'in'};
   let kuzzle;
 
   beforeEach(() => {
-    kuzzle = {
-      addListener: sinon.stub(),
-      query: sinon.stub().resolves(),
-      emit: sinon.stub()
-    };
+    kuzzle = new KuzzleEventEmitter();
+    kuzzle.query = sinon.stub();
+
     kuzzle.realtime = new RealtimeController(kuzzle);
     kuzzle.auth = new AuthController(kuzzle);
     kuzzle.auth.authenticationToken = generateJwt();
@@ -25,6 +24,19 @@ describe('Realtime Controller', () => {
   after(() => {
     mockrequire.stopAll();
   });
+
+  describe('on: tokenExpired', () => {
+    it('should call tokenExpired() method', () => {
+      kuzzle.realtime.tokenExpired = sinon.stub();
+
+      kuzzle.emit('tokenExpired');
+
+      process.nextTick(() => {
+        should(kuzzle.realtime.tokenExpired).be.called();
+      });
+    });
+  });
+
 
   describe('#count', () => {
     it('should call realtime/count query with the roomId and return a Promise which resolves a number', () => {

@@ -98,7 +98,7 @@ Discarded request: ${JSON.stringify(request)}`));
 
         this.emit('queryError', error, request);
 
-        if (request.action !== 'logout' && error.message === 'Token expired') {
+        if (request.action !== 'logout' && error.id === 'security.token.invalid') {
           this.emit('tokenExpired');
         }
 
