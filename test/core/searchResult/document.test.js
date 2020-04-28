@@ -89,9 +89,8 @@ describe('DocumentSearchResult', () => {
 
       searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
-      should(function () {
-        searchResult.next();
-      }).throw('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+      return should(searchResult.next())
+        .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
     });
 
     describe('#with scroll option', () => {
@@ -153,18 +152,20 @@ describe('DocumentSearchResult', () => {
     });
 
     describe('#with size and sort option', () => {
-      const nextResponse = {
-        hits: [
-          {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz', bar: 4567}},
-          {_id: 'document4', _score: 0.6123, _source: {foo: 'bazbar', bar: 6789}}
-        ],
-        aggregations: 'nextAggregations',
-        total: 30
-      };
+      let nextResponse;
 
       beforeEach(() => {
+        nextResponse = {
+          hits: [
+            {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz', bar: 4567}},
+            {_id: 'document4', _score: 0.6123, _source: {foo: 'bazbar', bar: 6789}}
+          ],
+          aggregations: 'nextAggregations',
+          total: 30
+        };
+
         request.size = 2;
-        request.body.sort = ['foo', {bar: 'asc'}, {_uid: 'desc'}];
+        request.body.sort = ['foo', {bar: 'asc'}, {_id: 'desc'}];
 
         response = {
           hits: [
@@ -191,8 +192,8 @@ describe('DocumentSearchResult', () => {
                   query: {
                     foo: 'bar'
                   },
-                  sort: ['foo', {bar: 'asc'}, {_uid: 'desc'}],
-                  search_after: ['barbar', 2345, 'collection#document2']
+                  sort: ['foo', {bar: 'asc'}, {_id: 'desc'}],
+                  search_after: ['barbar', 2345, 'document2']
                 },
                 controller: 'document',
                 action: 'search',
@@ -214,6 +215,22 @@ describe('DocumentSearchResult', () => {
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
             should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
+      });
+
+      it('should reject with an error if the sort is invalid', () => {
+        request.body.sort = [];
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+
+        return should(searchResult.next())
+          .be.rejected();
+      });
+
+      it('should reject if the sort combination does not allow to retrieve all the documents', () => {
+        response.hits = [];
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+
+        return should(searchResult.next())
+          .be.rejected();
       });
     });
 

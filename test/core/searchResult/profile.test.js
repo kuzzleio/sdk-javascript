@@ -82,7 +82,7 @@ describe('ProfileSearchResult', () => {
 
     });
 
-    it('should throw an error if neither scroll, nor size/sort, nor size/from parameters are set', () => {
+    it('should reject with an error if neither scroll, nor size/sort, nor size/from parameters are set', () => {
       response = {
         scrollId: 'scroll-id',
         hits: [
@@ -94,9 +94,8 @@ describe('ProfileSearchResult', () => {
 
       searchResult = new ProfileSearchResult(kuzzle, request, options, response);
 
-      should(function () {
-        searchResult.next();
-      }).throw('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+      return should(searchResult.next())
+        .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
     });
 
     describe('#with scroll option', () => {

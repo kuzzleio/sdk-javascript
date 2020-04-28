@@ -79,34 +79,30 @@ describe('RoleSearchResult', () => {
           should(kuzzle.query).not.be.called();
           should(result).be.Null();
         });
-
     });
 
 
-    it('should throw an error if scrollId parameters is set', () => {
+    it('should reject with an error if scrollId parameters is set', () => {
       request.scroll = '10s';
       searchResult = new RoleSearchResult(kuzzle, request, options, response);
 
-      should(function () {
-        searchResult.next();
-      }).throw('only from/size params are allowed for role search');
+      return should(searchResult.next())
+        .be.rejectedWith('only from/size params are allowed for role search');
     });
 
-    it('should throw an error if sort parameters is set', () => {
-      request.sort = ['foo', {bar: 'asc'}];
+    it('should reject with an error if sort parameters is set', () => {
+      request.sort = ['foo', { bar: 'asc' }];
       searchResult = new RoleSearchResult(kuzzle, request, options, response);
 
-      should(function () {
-        searchResult.next();
-      }).throw('only from/size params are allowed for role search');
+      return should(searchResult.next())
+        .be.rejectedWith('only from/size params are allowed for role search');
     });
 
-    it('should throw an error if size and from parameters are not set', () => {
+    it('should reject with an error if size and from parameters are not set', () => {
       searchResult = new RoleSearchResult(kuzzle, request, options, response);
 
-      should(function () {
-        searchResult.next();
-      }).throw('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
+      return should(searchResult.next())
+        .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
     });
 
     describe('#with from and size option', () => {

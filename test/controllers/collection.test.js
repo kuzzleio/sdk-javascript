@@ -131,6 +131,8 @@ describe('Collection Controller', () => {
           }
         }
       });
+      options.includeKuzzleMeta = true;
+
 
       return kuzzle.collection.getMapping('index', 'collection', options)
         .then(res => {
@@ -140,7 +142,8 @@ describe('Collection Controller', () => {
               controller: 'collection',
               action: 'getMapping',
               index: 'index',
-              collection: 'collection'
+              collection: 'collection',
+              includeKuzzleMeta: true
             }, options);
 
           should(res).match({
@@ -260,7 +263,7 @@ describe('Collection Controller', () => {
               from: 3,
               size: 42,
               scroll: 'scroll'
-            }, {foo: 'bar'});
+            }, { foo: 'bar', from: 3, scroll: 'scroll', size: 42 });
 
           should(res).be.an.instanceOf(SpecificationsSearchResult);
           should(res._request).match({

@@ -1,10 +1,11 @@
-const
-  Jwt = require('../../src/core/Jwt'),
-  AuthController = require('../../src/controllers/Auth'),
-  User = require('../../src/core/security/User'),
-  generateJwt = require('../mocks/generateJwt.mock'),
-  sinon = require('sinon'),
-  should = require('should');
+const sinon = require('sinon');
+const should = require('should');
+
+const KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
+const Jwt = require('../../src/core/Jwt');
+const AuthController = require('../../src/controllers/Auth');
+const User = require('../../src/core/security/User');
+const generateJwt = require('../mocks/generateJwt.mock');
 
 describe('Auth Controller', () => {
   const options = {opt: 'in'};
@@ -13,11 +14,22 @@ describe('Auth Controller', () => {
     kuzzle;
 
   beforeEach(() => {
-    kuzzle = {
-      emit: sinon.stub(),
-      query: sinon.stub()
-    };
+    kuzzle = new KuzzleEventEmitter();
+    kuzzle.query = sinon.stub();
+
     kuzzle.auth = new AuthController(kuzzle);
+  });
+
+  describe('on: tokenExpired', () => {
+    it('should set the authenticationToken to null', () => {
+      kuzzle.auth.authenticationToken = generateJwt();
+
+      kuzzle.emit('tokenExpired');
+
+      process.nextTick(() => {
+        should(kuzzle.auth.authenticationToken).be.null();
+      });
+    });
   });
 
   describe('createApiKey', () => {
@@ -309,6 +321,8 @@ describe('Auth Controller', () => {
     });
 
     it('should trigger a "loginAttempt" event once the user is logged in', () => {
+      kuzzle.emit = sinon.stub();
+
       return kuzzle.auth.login('strategy', credentials, 'expiresIn')
         .then(() => {
           should(kuzzle.emit)

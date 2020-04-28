@@ -18,6 +18,10 @@ class AuthController extends BaseController {
     super(kuzzle, 'auth');
 
     this._authenticationToken = null;
+
+    this.kuzzle.on('tokenExpired', () => {
+      this._authenticationToken = null;
+    });
   }
 
   get authenticationToken () {
@@ -27,9 +31,11 @@ class AuthController extends BaseController {
   set authenticationToken (encodedJwt) {
     if (encodedJwt === undefined || encodedJwt === null) {
       this._authenticationToken = null;
-    } else if (typeof encodedJwt === 'string') {
+    }
+    else if (typeof encodedJwt === 'string') {
       this._authenticationToken = new Jwt(encodedJwt);
-    } else {
+    }
+    else {
       throw new Error(`Invalid token argument: ${encodedJwt}`);
     }
   }

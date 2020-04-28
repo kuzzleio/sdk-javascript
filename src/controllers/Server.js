@@ -23,15 +23,7 @@ class ServerController extends BaseControler {
     return this.query({
       action: 'adminExists'
     }, options)
-      .then(response => {
-        if (typeof response.result !== 'object' || typeof response.result.exists !== 'boolean') {
-          const error = new Error('adminExists: bad response format');
-          error.status = 400;
-          error.response = response;
-          return Promise.reject(error);
-        }
-        return response.result.exists;
-      });
+      .then(response => response.result.exists);
   }
 
 
@@ -114,15 +106,7 @@ class ServerController extends BaseControler {
     return this.query({
       action: 'now'
     }, options)
-      .then(response => {
-        if (typeof response.result !== 'object' || typeof response.result.now !== 'number') {
-          const error = new Error('now: bad response format');
-          error.status = 400;
-          error.response = response;
-          return Promise.reject(error);
-        }
-        return response.result.now;
-      });
+      .then(response => response.result.now);
   }
 }
 

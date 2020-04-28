@@ -1,13 +1,12 @@
-const
-  SecurityController = require('../../src/controllers/Security'),
-  Profile = require('../../src/core/security/Profile'),
-  Role = require('../../src/core/security/Role'),
-  User = require('../../src/core/security/User'),
-  ProfileSearchResult = require('../../src/core/searchResult/Profile'),
-  RoleSearchResult = require('../../src/core/searchResult/Role'),
-  UserSearchResult = require('../../src/core/searchResult/User'),
-  sinon = require('sinon'),
-  should = require('should');
+const SecurityController = require('../../src/controllers/Security');
+const Profile = require('../../src/core/security/Profile');
+const Role = require('../../src/core/security/Role');
+const User = require('../../src/core/security/User');
+const ProfileSearchResult = require('../../src/core/searchResult/Profile');
+const RoleSearchResult = require('../../src/core/searchResult/Role');
+const UserSearchResult = require('../../src/core/searchResult/User');
+const sinon = require('sinon');
+const should = require('should');
 
 describe('Security Controller', () => {
   const options = {opt: 'in'};
@@ -910,6 +909,25 @@ describe('Security Controller', () => {
     });
   });
 
+  describe('refresh', () => {
+    it('should call security/refresh query and return a Promise', () => {
+      kuzzle.query.resolves(null);
+
+      return kuzzle.security.refresh('collection')
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'security',
+              action: 'refresh',
+              collection: 'collection'
+            });
+
+          should(res).be.Null();
+        });
+    });
+  });
+
   describe('replaceUser', () => {
     it('should call security/replaceUser query with the user content and return a Promise which resolves a User object', () => {
       kuzzle.query.resolves({
@@ -996,10 +1014,9 @@ describe('Security Controller', () => {
               from: 1,
               size: 2,
               scroll: '10s'
-            }, {});
+            }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(ProfileSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
@@ -1059,10 +1076,9 @@ describe('Security Controller', () => {
               body: {controllers: ['foo', 'bar']},
               from: 1,
               size: 2
-            }, {});
+            }, { from: 1, size: 2 });
 
           should(res).be.an.instanceOf(RoleSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
@@ -1124,10 +1140,9 @@ describe('Security Controller', () => {
               from: 1,
               size: 2,
               scroll: '10s'
-            }, {});
+            }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(UserSearchResult);
-          should(res._options).be.empty();
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
