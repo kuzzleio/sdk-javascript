@@ -195,11 +195,11 @@ class DocumentController extends BaseController {
       action: 'search',
     };
 
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'verb']) {
       request[opt] = options[opt];
     }
 
-    const opts = { verb: 'POST', ...options };
+    const opts = { verb: options.verb || 'POST', ...options };
 
     return this.query(request, opts)
       .then(response => ({ response, request, opts }));

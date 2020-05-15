@@ -77,7 +77,7 @@
       "url": "/:index/:collection/_create"
     },
     "search": {
-      "url": "/:index/:collection",
+      "url": "/:index/:collection/_search",
       "verb": "GET"
     },
     "scroll": {
