@@ -310,7 +310,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo?foo="bar"&baz=oh,an,array');
+            .be.equal('/foo?foo=bar&baz=oh,an,array');
           done();
         }
         catch (error) {
@@ -357,7 +357,7 @@ describe('HTTP networking module', () => {
         should(protocol._sendHttpRequest).be.calledOnce();
 
         should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo="bar"');
+        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo=bar');
 
         done();
       });

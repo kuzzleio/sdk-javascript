@@ -226,7 +226,7 @@ class HttpProtocol extends BaseProtocol {
         }
       }
       else {
-        queryString.push(`${key}=${JSON.stringify(value)}`);
+        queryString.push(`${key}=${typeof value === 'object' ? JSON.stringify(value) : value}`);
       }
     }
 
