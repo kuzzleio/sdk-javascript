@@ -50,7 +50,6 @@
     "eslint": "^6.8.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^4.0.0",
-    "eslint-plugin-import": "^2.20.2",
     "kuzdoc": "^1.2.2",
     "lolex": "^6.0.0",
     "mocha": "7.1.1",
