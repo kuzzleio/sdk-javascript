@@ -2,6 +2,7 @@ const
   DocumentController = require('../../src/controllers/Document'),
   DocumentSearchResult = require('../../src/core/searchResult/Document'),
   sinon = require('sinon'),
+  HttpProtocol = require('../../src/protocols/Http'),
   should = require('should');
 
 describe('Document Controller', () => {
@@ -412,6 +413,10 @@ describe('Document Controller', () => {
         ],
         total: 3
       };
+      kuzzle.protocol = new HttpProtocol('address', {
+        port: 1234
+      });
+      kuzzle.document = new DocumentController(kuzzle);
       kuzzle.query.resolves({result});
       options.verb = 'GET';
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, options)

@@ -1,4 +1,5 @@
 const BaseController = require('./Base');
+const HttpProtocol = require('../protocols/Http');
 const DocumentSearchResult = require('../core/searchResult/Document');
 
 class DocumentController extends BaseController {
@@ -188,7 +189,10 @@ class DocumentController extends BaseController {
   }
 
   _search (index, collection, body = {}, options = {}) {
-    if (options.verb && options.verb.toLowerCase() === 'get') {
+    if ( this._kuzzle.protocol instanceof HttpProtocol
+      && options.verb
+      && options.verb.toLowerCase() === 'get'
+    ) {
       body = {query: body};
     }
     const request = {
