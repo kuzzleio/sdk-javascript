@@ -139,6 +139,10 @@
     "validate": {
       "url": "/:index/:collection/_validate",
       "verb": "POST"
+    },
+    "search": {
+      "url": "/:index/:collection/_search",
+      "verb": "GET"
     }
   },
   "security": {
