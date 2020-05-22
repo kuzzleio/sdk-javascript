@@ -321,6 +321,30 @@ describe('HTTP networking module', () => {
       protocol.send(data);
     });
 
+    it('should inject the nested body object as querystring on a GET request', done => {
+      const data = {
+        requestId: 'requestId',
+        action: 'action',
+        controller: 'getreq',
+        body: { foo: { foofoo: { barbar: 'bar' } }, baz: ['oh', 'an', 'array'] }
+      };
+
+      protocol.on('requestId', () => {
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
+          should(protocol._sendHttpRequest.firstCall.args[1])
+            .be.equal('/foo?foo={"foofoo":{"barbar":"bar"}}&baz=oh,an,array');
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+
+      protocol.send(data);
+    });
+    
     it('should inject queryString to the HTTP request', done => {
       const data = {
         requestId: 'requestId',
