@@ -6,8 +6,7 @@ try {
       query: {
         term: { capacity: 7 }
       }
-    },
-    {refresh: 'wait_for'}
+    }
   );
 
   console.log(`Successfully deleted ${deleted.length} documents`);
