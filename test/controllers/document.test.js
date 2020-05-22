@@ -402,6 +402,42 @@ describe('Document Controller', () => {
         });
     });
 
+    it('should call document/search query and return a Promise which resolves a DocumentSearchResult instance', () => {
+      const result = {
+        scrollId: 'scroll-id',
+        hits: [
+          {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
+          {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}},
+          {_id: 'document3', _score: 0.6543, _source: {foo: 'barbaz'}}
+        ],
+        total: 3
+      };
+      kuzzle.query.resolves({result});
+      options.verb = 'GET';
+      return kuzzle.document.search('index', 'collection', {foo: 'bar'}, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWithMatch({
+              controller: 'document',
+              action: 'search',
+              index: 'index',
+              collection: 'collection',
+              body: {query: {foo: 'bar'}},
+              from: undefined,
+              size: undefined,
+              scroll: undefined
+            }, options);
+
+          should(res).be.an.instanceOf(DocumentSearchResult);
+          should(res._options).match(options);
+          should(res._options.verb).be.eql('GET');
+          should(res._response).be.equal(result);
+          should(res.fetched).be.equal(3);
+          should(res.total).be.equal(3);
+        });
+    });
+
     it('should inject the "from", "size", "scroll" options into the request', () => {
       const result = {
         scrollId: 'scroll-id',

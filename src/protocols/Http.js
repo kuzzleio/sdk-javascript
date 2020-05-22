@@ -210,6 +210,7 @@ class HttpProtocol extends BaseProtocol {
 
     // inject queryString arguments:
     const queryString = [];
+
     for (const key of Object.keys(queryArgs)) {
       const value = queryArgs[key];
 

@@ -344,7 +344,7 @@ describe('HTTP networking module', () => {
 
       protocol.send(data);
     });
-    
+
     it('should inject queryString to the HTTP request', done => {
       const data = {
         requestId: 'requestId',

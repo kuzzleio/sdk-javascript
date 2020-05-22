@@ -188,19 +188,20 @@ class DocumentController extends BaseController {
   }
 
   _search (index, collection, body = {}, options = {}) {
+    if (options.verb && options.verb.toLowerCase() === 'get') {
+      body = {query: body};
+    }
     const request = {
       index,
       collection,
       body,
       action: 'search',
     };
-
-    for (const opt of ['from', 'size', 'scroll', 'verb']) {
+    for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
     }
 
     const opts = { verb: options.verb || 'POST', ...options };
-
     return this.query(request, opts)
       .then(response => ({ response, request, opts }));
   }
