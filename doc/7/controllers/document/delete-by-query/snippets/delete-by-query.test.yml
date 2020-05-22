@@ -14,7 +14,7 @@ hooks:
       curl -H "Content-type: application/json" -d '{"capacity": 7}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
     done
 
-    curl -XPOST kuzzle:7512/nyc-open-data/_refresh
+    curl -XPOST kuzzle:7512/nyc-open-data/yellow-taxi/_refresh
   after:
 template: default
 expected: Successfully deleted 5 documents
