@@ -6,11 +6,12 @@ const KuzzleEventEmitter = require('../../core/KuzzleEventEmitter');
 const PendingRequest = require('./PendingRequest');
 
 class KuzzleAbstractProtocol extends KuzzleEventEmitter {
-  constructor (host, options = {}) {
+  constructor (host, options = {}, name = undefined) {
     super();
 
     this._pendingRequests = new Map();
     this._host = host;
+    this._name = name;
     const port = parseInt(options.port, 10);
     this._port = isNaN(port) ? 7512 : port;
     this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;

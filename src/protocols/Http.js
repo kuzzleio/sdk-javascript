@@ -5,7 +5,7 @@ const BaseProtocol = require('./abstract/Base');
 
 class HttpProtocol extends BaseProtocol {
   constructor(host, options = {}) {
-    super(host, options);
+    super(host, options, 'http');
 
     if (typeof host !== 'string' || host === '') {
       throw new Error('host is required');
