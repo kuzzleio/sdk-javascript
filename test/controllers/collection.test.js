@@ -328,6 +328,28 @@ describe('Collection Controller', () => {
     });
   });
 
+  describe('update', () => {
+    it('should call collection/update query with the new mapping and return a Promise which resolves a json object', () => {
+      kuzzle.query.resolves({ result: { foo: 'bar' } });
+
+      const body = { foo: 'bar' };
+      return kuzzle.collection.update('index', 'collection', body)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              body,
+              controller: 'collection',
+              action: 'update',
+              index: 'index',
+              collection: 'collection'
+            });
+
+          should(res).match({ foo: 'bar' });
+        });
+    });
+  });
+
   describe('updateSpecifications', () => {
     it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
       kuzzle.query.resolves({ result: { foo: 'bar' } });
