@@ -23,7 +23,6 @@ kuzzle.on('networkError', error => {
   }
   try {
     [snippet-code]
-    console.log(result.successes);
     for (const elem of result.successes) {
       console.log(elem);
     }
