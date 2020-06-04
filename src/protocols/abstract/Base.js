@@ -32,6 +32,10 @@ class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     return this._host;
   }
 
+  get name () {
+    return this._name;
+  }
+
   get port () {
     return this._port;
   }
