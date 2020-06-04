@@ -194,7 +194,7 @@ class DocumentController extends BaseController {
       body: null,
       action: 'search',
     };
-    if ( this._kuzzle.protocol._name === 'http'
+    if ( this.kuzzle.protocol.name === 'http'
       && options.verb
       && options.verb.toLowerCase() === 'get'
     ) {

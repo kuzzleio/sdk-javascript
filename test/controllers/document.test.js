@@ -378,7 +378,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       kuzzle.protocol = {};
-      kuzzle.protocol._name = 'http';
+      kuzzle.protocol.name = 'http';
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
           should(kuzzle.query)
@@ -415,7 +415,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       kuzzle.protocol = {};
-      kuzzle.protocol._name = 'http';
+      kuzzle.protocol.name = 'http';
       options.verb = 'GET';
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -453,7 +453,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       kuzzle.protocol = {};
-      kuzzle.protocol._name = 'http';
+      kuzzle.protocol.name = 'http';
       return kuzzle.document.search('index', 'collection', {foo: 'bar'}, {from: 1, size: 2, scroll: '10s'})
         .then(res => {
           should(kuzzle.query)
@@ -484,7 +484,7 @@ describe('Document Controller', () => {
       };
       kuzzle.document.query = sinon.stub().resolves({result});
       kuzzle.protocol = {};
-      kuzzle.protocol._name = 'http';
+      kuzzle.protocol.name = 'http';
       return kuzzle.document.search('index', 'collection', {}, { size: 0 })
         .then(() => {
           should(kuzzle.document.query).be.calledOnce();
@@ -501,7 +501,7 @@ describe('Document Controller', () => {
       };
       kuzzle.document.query = sinon.stub().resolves({result});
       kuzzle.protocol = {};
-      kuzzle.protocol._name = 'http';
+      kuzzle.protocol.name = 'http';
       return kuzzle.document.search('index', 'collection', {}, { scroll: '42s' })
         .then(() => {
           should(kuzzle.document.query).be.calledOnce();
