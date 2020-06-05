@@ -7,8 +7,8 @@ description: Update the collection mapping
 
 # updateMapping
 
-<SinceBadge version="1.7.1" />
-<DeprecatedBadge version="2.1.0"/>
+<SinceBadge version="Kuzzle 1.7.1" />
+<DeprecatedBadge version="Kuzzle 2.1.0"/>
 
 __Use [collection:update](/sdk/js/7/controllers/collection/update/) instead.__
 
