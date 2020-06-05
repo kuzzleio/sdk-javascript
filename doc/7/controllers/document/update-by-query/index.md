@@ -46,18 +46,18 @@ Each updated document is an object of the `successes` array with the following p
 
 | Property     | Type                                         | Description                      |
 |------------- |--------------------------------------------- |--------------------------------- |
-| `_source`    | <pre>ConcurrentHashMap<String, Object></pre> | Updated document (if `source` option set to true)  |
-| `_id`        | <pre>String</pre>                            | ID of the udated document                   |
-| `_version`   | <pre>Integer</pre>                           | Version of the document in the persistent data storage |
-| `status`     | <pre>Integer</pre>                           | HTTP status code |
+| `_source`    | <pre>object<String, Object></pre> | Updated document (if `source` option set to true)  |
+| `_id`        | <pre>string</pre>                            | ID of the udated document                   |
+| `_version`   | <pre>number</pre>                           | Version of the document in the persistent data storage |
+| `status`     | <pre>number</pre>                           | HTTP status code |
 
 Each errored document is an object of the `errors` array with the following properties:
 
 | Property     | Type                                         | Description                      |
 |------------- |--------------------------------------------- |--------------------------------- |
-| `document`   | <pre>ConcurrentHashMap<String, Object></pre> | Document that causes the error   |
-| `status`     | <pre>Integer</pre>                           | HTTP error status                |
-| `reason`     | <pre>String</pre>                            | Human readable reason |
+| `document`   | <pre>object<String, Object></pre> | Document that causes the error   |
+| `status`     | <pre>number</pre>                           | HTTP error status                |
+| `reason`     | <pre>string</pre>                            | Human readable reason |
 
 ## Usage
 
