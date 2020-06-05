@@ -556,7 +556,7 @@ describe('Document Controller', () => {
               body: { foo: 'bar' },
               retryOnConflict: undefined,
               source: true
-            }, { source: true });
+            });
 
           should(res).be.equal(result);
         });
@@ -572,15 +572,17 @@ describe('Document Controller', () => {
         created: false
       };
       kuzzle.query.resolves({ result });
-      const body = {
+      const searchQuery = {
         query: {
           match: { foo: 'bar' }
-        },
+        }
+      };
+      const changes = {
         changes: {
           bar: 'foo'
         }
       };
-      return kuzzle.document.updateByQuery('index', 'collection', body, options)
+      return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, options)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -589,7 +591,14 @@ describe('Document Controller', () => {
               action: 'updateByQuery',
               index: 'index',
               collection: 'collection',
-              body,
+              body: {
+                query: {
+                  match: {foo: 'bar'}
+                },
+                changes: {
+                  bar: 'foo'
+                }
+              },
               source: undefined
             }, options);
 
@@ -605,16 +614,18 @@ describe('Document Controller', () => {
         created: false
       };
       kuzzle.query.resolves({ result });
-      const body = {
+      const searchQuery = {
         query: {
           match: { foo: 'bar' }
-        },
+        }
+      };
+      const changes = {
         changes: {
           bar: 'foo'
         }
       };
 
-      return kuzzle.document.updateByQuery('index', 'collection', body, { source: true })
+      return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, { source: true })
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -623,9 +634,16 @@ describe('Document Controller', () => {
               action: 'updateByQuery',
               index: 'index',
               collection: 'collection',
-              body,
+              body: {
+                query: {
+                  match: { foo: 'bar' }
+                },
+                changes: {
+                  bar: 'foo'
+                }
+              },
               source: true
-            }, { source: true });
+            });
 
           should(res).be.equal(result);
         });

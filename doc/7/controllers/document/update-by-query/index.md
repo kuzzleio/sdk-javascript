@@ -16,7 +16,7 @@ An empty or null query will match all documents in the collection.
 <br/>
 
 ```js
-updateByQuery(index, collection, body, [options])
+updateByQuery(index, collection, searchQuery, changes, [options])
 ```
 
 | Argument           | Type                                         | Description     |

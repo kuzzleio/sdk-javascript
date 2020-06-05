@@ -220,11 +220,11 @@ class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  updateByQuery(index, collection, body, options = {}) {
+  updateByQuery(index, collection, searchQuery, changes, options = {}) {
     const request = {
       index,
       collection,
-      body,
+      body: {...searchQuery, ...changes},
       action: 'updateByQuery',
       source: options.source
     };
