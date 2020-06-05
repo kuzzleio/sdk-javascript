@@ -224,7 +224,7 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {...searchQuery, ...changes},
+      body: {query: searchQuery, changes},
       action: 'updateByQuery',
       source: options.source
     };

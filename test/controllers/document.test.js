@@ -573,14 +573,10 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({ result });
       const searchQuery = {
-        query: {
-          match: { foo: 'bar' }
-        }
+        match: { foo: 'bar' }
       };
       const changes = {
-        changes: {
-          bar: 'foo'
-        }
+        bar: 'foo'
       };
       return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, options)
         .then(res => {
@@ -615,14 +611,10 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({ result });
       const searchQuery = {
-        query: {
-          match: { foo: 'bar' }
-        }
+        match: { foo: 'bar' }
       };
       const changes = {
-        changes: {
-          bar: 'foo'
-        }
+        bar: 'foo'
       };
 
       return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, { source: true })

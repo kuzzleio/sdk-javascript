@@ -3,15 +3,11 @@ try {
     'nyc-open-data',
     'yellow-taxi',
     {
-      query: {
-        match: {
-          capacity: 4
-        }
+      match: {
+        capacity: 4
       }
     }, {
-      changes: {
-        capacity: 42
-      }
+      capacity: 42
     });
 /*
 {
