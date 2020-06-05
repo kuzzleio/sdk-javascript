@@ -16,19 +16,16 @@ kuzzle.on('networkError', error => {
 });
 
 (async () => {
+  let result;
   try {
     await kuzzle.connect();
   } catch (error) {
     console.log(`Can not connect to Kuzzle: ${error.message}`);
   }
-  try {
-    [snippet-code]
-    for (const elem of result.successes) {
-      console.log(elem);
-    }
-  } catch (error) {
-    console.error(error.message);
-  } finally {
+  [snippet-code] finally {
     kuzzle.disconnect();
+  }
+  for (const elem of result.successes) {
+    console.log(elem);
   }
 })();
