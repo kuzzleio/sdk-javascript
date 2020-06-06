@@ -45,7 +45,7 @@
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
-    "codecov": "^3.6.5",
+    "codecov": "^3.7.0",
     "cucumber": "^6.0.5",
     "eslint": "^6.8.0",
     "eslint-friendly-formatter": "^4.0.1",

@@ -116,6 +116,10 @@
       "url": "/:index/:collection/:_id/_update",
       "verb": "PUT"
     },
+    "updateByQuery": {
+      "url": "/:index/:collection/_query",
+      "verb": "PUT"
+    },
     "mUpdate": {
       "url": "/:index/:collection/_mUpdate",
       "verb": "PUT"

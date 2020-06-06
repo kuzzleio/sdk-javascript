@@ -556,7 +556,86 @@ describe('Document Controller', () => {
               body: { foo: 'bar' },
               retryOnConflict: undefined,
               source: true
-            }, { source: true });
+            });
+
+          should(res).be.equal(result);
+        });
+    });
+  });
+
+  describe('updateByQuery', () => {
+    it('should call document/update query and return a Promise which resolves the updated document', () => {
+      const result = {
+        _id: 'document-id',
+        _version: 1,
+        _source: { foo: 'bar' },
+        created: false
+      };
+      kuzzle.query.resolves({ result });
+      const searchQuery = {
+        match: { foo: 'bar' }
+      };
+      const changes = {
+        bar: 'foo'
+      };
+      return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'updateByQuery',
+              index: 'index',
+              collection: 'collection',
+              body: {
+                query: {
+                  match: {foo: 'bar'}
+                },
+                changes: {
+                  bar: 'foo'
+                }
+              },
+              source: undefined
+            }, options);
+
+          should(res).be.equal(result);
+        });
+    });
+
+    it('should inject the "source" option into the request', () => {
+      const result = {
+        _id: 'document-id',
+        _version: 1,
+        _source: { foo: 'bar' },
+        created: false
+      };
+      kuzzle.query.resolves({ result });
+      const searchQuery = {
+        match: { foo: 'bar' }
+      };
+      const changes = {
+        bar: 'foo'
+      };
+
+      return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, { source: true })
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'updateByQuery',
+              index: 'index',
+              collection: 'collection',
+              body: {
+                query: {
+                  match: { foo: 'bar' }
+                },
+                changes: {
+                  bar: 'foo'
+                }
+              },
+              source: true
+            });
 
           should(res).be.equal(result);
         });
