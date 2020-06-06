@@ -10,7 +10,7 @@ const
     new WebSocket('kuzzle', { autoReconnect: false })
   );
 
-// Adds a listener to detect any connection problems
+// Adds a listener to detect connection problems
 kuzzle.on('networkError', error => {
   console.error(`Network Error: ${error.message}`);
 });
