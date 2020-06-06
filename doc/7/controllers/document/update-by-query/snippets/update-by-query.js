@@ -12,17 +12,17 @@ try {
 /*
 {
 successes: [
-          {
-            _id: <document-id>,
-            _source: <updated document> // if source set to true
-            status: 200
-          },
-          {
-            _id: <document id>,
-            _source: <updated document> // if source set to true
-            status: 200
-          }
-        ],
+  {
+    _id: <document-id>,
+    _source: <updated document> // if source set to true
+    status: 200
+  },
+  {
+    _id: <document id>,
+    _source: <updated document> // if source set to true
+    status: 200
+  }
+],
 errors: []
 }
 */
