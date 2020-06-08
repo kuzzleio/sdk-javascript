@@ -191,16 +191,23 @@ class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body,
+      body: null,
       action: 'search',
     };
-
+    if ( this.kuzzle.protocol.name === 'http'
+      && options.verb
+      && options.verb.toLowerCase() === 'get'
+    ) {
+      request.searchBody = body;
+    }
+    else {
+      request.body = body;
+    }
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
     }
 
-    const opts = { verb: 'POST', ...options };
-
+    const opts = { verb: options.verb || 'POST', ...options };
     return this.query(request, opts)
       .then(response => ({ response, request, opts }));
   }

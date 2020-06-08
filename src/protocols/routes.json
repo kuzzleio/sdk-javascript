@@ -76,10 +76,6 @@
       "verb": "POST",
       "url": "/:index/:collection/_create"
     },
-    "search": {
-      "url": "/:index/:collection",
-      "verb": "GET"
-    },
     "scroll": {
       "url": "/_scroll/:scrollId",
       "verb": "GET"
@@ -147,6 +143,10 @@
     "validate": {
       "url": "/:index/:collection/_validate",
       "verb": "POST"
+    },
+    "search": {
+      "url": "/:index/:collection/_search",
+      "verb": "GET"
     }
   },
   "security": {
