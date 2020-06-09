@@ -237,7 +237,6 @@ for (const action of Object.keys(commands)) {
         for (const opt of command.opts) {
           if (options[opt] !== null && options[opt] !== undefined) {
             assignParameter(request, command.getter, opt, options[opt]);
-            delete options[opt];
           }
         }
       }
@@ -296,7 +295,6 @@ function assignGeoRadiusOptions(data, options) {
     .forEach(function (opt) {
       if (opt === 'withcoord' || opt === 'withdist') {
         parsed.push(opt);
-        delete options[opt];
       }
       else if (opt === 'count' || opt === 'sort') {
         if (opt === 'count') {
@@ -305,8 +303,6 @@ function assignGeoRadiusOptions(data, options) {
 
         parsed.push(options[opt]);
       }
-
-      delete options[opt];
     });
 
   if (parsed.length > 0) {
@@ -327,7 +323,6 @@ function assignZrangeOptions (data, options) {
 
   if (options.limit) {
     data.limit = options.limit;
-    delete options.limit;
   }
 }
 

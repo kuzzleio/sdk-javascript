@@ -99,7 +99,6 @@ class SecurityController extends BaseController {
       action: 'createFirstAdmin',
       reset: options.reset
     };
-    delete options.reset;
 
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));

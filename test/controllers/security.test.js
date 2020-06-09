@@ -165,7 +165,7 @@ describe('Security Controller', () => {
               controller: 'security',
               action: 'createFirstAdmin',
               reset: true
-            }, {});
+            }, {reset: true});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('id');

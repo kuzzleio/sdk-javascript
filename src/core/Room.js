@@ -25,12 +25,13 @@ class Room {
       collection,
       body,
       controller: 'realtime',
-      action: 'subscribe'
+      action: 'subscribe',
+      state: this.options.state,
+      scope: this.options.scope,
+      users: this.options.users,
+      volatile: this.options.volatile,
+      cluster: this.options.cluster
     };
-    for (const opt of ['state', 'scope', 'users', 'volatile']) {
-      this.request[opt] = this.options[opt];
-      delete this.options[opt];
-    }
 
     this.autoResubscribe = typeof options.autoResubscribe === 'boolean'
       ? options.autoResubscribe
@@ -38,10 +39,6 @@ class Room {
     this.subscribeToSelf = typeof options.subscribeToSelf === 'boolean'
       ? options.subscribeToSelf
       : true;
-
-    for (const opt of ['autoResubscribe', 'subscribeToSelf']) {
-      delete this.options[opt];
-    }
 
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);

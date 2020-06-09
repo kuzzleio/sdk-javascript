@@ -9,8 +9,8 @@ class RealTimeController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle, 'realtime');
 
-    this.subscriptions = {};
-    this.subscriptionsOff = {};
+    this.subscriptions = new Map();
+    this.subscriptionsOff = new Map();
 
     this.kuzzle.on('tokenExpired', () => this.tokenExpired());
   }
@@ -40,16 +40,16 @@ class RealTimeController extends BaseController {
 
     return room.subscribe()
       .then(() => {
-        if (!this.subscriptions[room.id]) {
-          this.subscriptions[room.id] = [];
+        if (!this.subscriptions.has(room.id)) {
+          this.subscriptions.set(room.id, []);
         }
-        this.subscriptions[room.id].push(room);
+        this.subscriptions.get(room.id).push(room);
         return room.id;
       });
   }
 
   unsubscribe (roomId, options = {}) {
-    const rooms = this.subscriptions[roomId];
+    const rooms = this.subscriptions.get(roomId);
 
     if (!rooms) {
       return Promise.reject(new Error(`not subscribed to ${roomId}`));
@@ -58,7 +58,7 @@ class RealTimeController extends BaseController {
     for (const room of rooms) {
       room.removeListeners();
     }
-    delete this.subscriptions[roomId];
+    this.subscriptions.delete(roomId);
 
     return this.query({
       action: 'unsubscribe',
@@ -71,19 +71,19 @@ class RealTimeController extends BaseController {
 
   // called on network error or disconnection
   disconnected () {
-    for (const roomId of Object.keys(this.subscriptions)) {
-      for (const room of this.subscriptions[roomId]) {
+    for (const roomId of this.subscriptions.keys()) {
+      for (const room of this.subscriptions.get(roomId)) {
         room.removeListeners();
 
         if (room.autoResubscribe) {
-          if (!this.subscriptionsOff[roomId]) {
-            this.subscriptionsOff[roomId] = [];
+          if (!this.subscriptionsOff.has(roomId)) {
+            this.subscriptionsOff.set(roomId, []);
           }
-          this.subscriptionsOff[roomId].push(room);
+          this.subscriptionsOff.get(roomId).push(room);
         }
       }
 
-      delete this.subscriptions[roomId];
+      this.subscriptions.delete(roomId);
     }
   }
 
@@ -92,18 +92,18 @@ class RealTimeController extends BaseController {
    * Resubscribe to eligible disabled rooms.
    */
   reconnected () {
-    for (const roomId of Object.keys(this.subscriptionsOff)) {
-      for (const room of this.subscriptionsOff[roomId]) {
-        if (!this.subscriptions[roomId]) {
-          this.subscriptions[roomId] = [];
+    for (const roomId of this.subscriptionsOff.keys()) {
+      for (const room of this.subscriptionsOff.get(roomId)) {
+        if (!this.subscriptions.has(roomId)) {
+          this.subscriptions.set(roomId, []);
         }
-        this.subscriptions[roomId].push(room);
+        this.subscriptions.get(roomId).push(room);
 
         room.subscribe()
           .catch(() => this.kuzzle.emit('discarded', {request: room.request}));
       }
 
-      delete this.subscriptionsOff[roomId];
+      this.subscriptionsOff.delete(roomId);
     }
   }
 
@@ -111,12 +111,14 @@ class RealTimeController extends BaseController {
    * Removes all subscriptions.
    */
   tokenExpired() {
-    for (const roomId of Object.keys(this.subscriptions)) {
-      this.subscriptions[roomId].forEach(room => room.removeListeners());
+    for (const roomId of this.subscriptions.keys()) {
+      for (const room of this.subscriptions.get(roomId)) {
+        room.removeListeners();
+      }
     }
 
-    this.subscriptions = {};
-    this.subscriptionsOff = {};
+    this.subscriptions = new Map();
+    this.subscriptionsOff = new Map();
   }
 
 }
