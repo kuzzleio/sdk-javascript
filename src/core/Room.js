@@ -30,6 +30,7 @@ class Room {
       scope: this.options.scope,
       users: this.options.users,
       volatile: this.options.volatile,
+      // the "cluster" option is meant to be used by the embedded plugin SDK only
       cluster: this.options.cluster
     };
 

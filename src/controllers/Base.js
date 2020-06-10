@@ -5,7 +5,10 @@ class BaseController {
    * @param {string} name - Controller full name for API request.
    */
   constructor (kuzzle, name) {
-    this._kuzzle = kuzzle;
+    Reflect.defineProperty(this, '_kuzzle', {
+      value: kuzzle
+    });
+
     this._name = name;
   }
 
