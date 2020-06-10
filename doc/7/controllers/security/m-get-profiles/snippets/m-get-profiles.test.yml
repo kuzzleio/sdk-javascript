@@ -12,4 +12,4 @@ hooks:
       curl -XDELETE kuzzle:7512/profiles/profile${i}
     done
 template: default
-expected: '^    policies: \[ \[Object\] \] } \]$'
+expected: '^\w+policies:\w+\[\w+\[Object\]\w+\]\w+}\w+\]$'
