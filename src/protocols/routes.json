@@ -328,6 +328,10 @@
     }
   },
   "collection": {
+    "update": {
+      "url": "/:index/:collection/",
+      "verb": "POST"
+    },
     "updateMapping": {
       "url": "/:index/:collection/_mapping",
       "verb": "PUT"

@@ -1,16 +1,13 @@
 ---
 code: true
 type: page
-title: updateMapping
+title: update
 description: Update the collection mapping
 ---
 
-# updateMapping
+# update
 
-<SinceBadge version="Kuzzle 1.7.1" />
-<DeprecatedBadge version="Kuzzle 2.1.0"/>
-
-__Use [collection:update](/sdk/js/7/controllers/collection/update/) instead.__
+<SinceBadge version="Kuzzle 2.1.0" />
 
 You can define the collection [dynamic mapping policy](/core/2/guides/essentials/database-mappings#dynamic-mapping-policy) by setting the `dynamic` field to the desired value.
 
@@ -19,7 +16,7 @@ You can define [collection additional metadata](/core/2/guides/essentials/databa
 <br/>
 
 ```js
-updateMapping(index, collection, mapping, [options]);
+update(index, collection, mapping);
 ```
 
 <br/>
@@ -29,7 +26,6 @@ updateMapping(index, collection, mapping, [options]);
 | `index`      | <pre>string</pre> | Index name                                                                                                                                                                    |
 | `collection` | <pre>string</pre> | Collection name                                                                                                                                                               |
 | `mapping`    | <pre>object</pre> | Describes the collection mapping  |
-| `options`    | <pre>object</pre> | Query options                                                                                                                                                                 |
 
 ### mapping
 
@@ -52,18 +48,10 @@ const mapping = {
 
 More informations about database mappings [here](/core/2/guides/essentials/database-mappings).
 
-### options
-
-Additional query options
-
-| Property   | Type<br/>(default)              | Description                                                                  |
-| ---------- | ------------------------------- | ---------------------------------------------------------------------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
-
 ## Resolves
 
 Resolve if the collection is successfully updated.
 
 ## Usage
 
-<<< ./snippets/update-mapping.js
+<<< ./snippets/update.js
