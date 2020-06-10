@@ -61,19 +61,17 @@ describe('Room', () => {
       should(room.request.state).be.undefined();
       should(room.request.users).be.undefined();
       should(room.request.volatile).be.undefined();
-      should(room.request.cluster).be.undefined();
 
       should(room.autoResubscribe).be.equal('default');
       should(room.subscribeToSelf).be.a.Boolean().and.be.True();
     });
 
-    it('should handle scope/state/users/volatile/cluster options', () => {
+    it('should handle scope/state/users/volatile options', () => {
       const opts = {
         scope: 'scope',
         state: 'state',
         users: 'users',
-        volatile: 'volatile',
-        cluster: false
+        volatile: 'volatile'
       };
       const body = {foo: 'bar'};
       const cb = sinon.stub();
@@ -84,7 +82,6 @@ describe('Room', () => {
       should(room.request.state).be.equal('state');
       should(room.request.users).be.equal('users');
       should(room.request.volatile).be.equal('volatile');
-      should(room.request.cluster).be.equal(false);
     });
 
     it('should handle autoResubscribe option', () => {
@@ -149,8 +146,7 @@ describe('Room', () => {
           scope: 'in',
           state: 'done',
           users: 'all',
-          volatile: {bar: 'foo'},
-          cluster: false
+          volatile: {bar: 'foo'}
         },
         body = {foo: 'bar'},
         cb = sinon.stub(),
@@ -169,8 +165,7 @@ describe('Room', () => {
               scope: 'in',
               state: 'done',
               users: 'all',
-              volatile: {bar: 'foo'},
-              cluster: false
+              volatile: {bar: 'foo'}
             }, opts);
 
           should(res).be.equal(response);
