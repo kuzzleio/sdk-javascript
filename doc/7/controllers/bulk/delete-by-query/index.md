@@ -36,7 +36,7 @@ Additional query options
 
 ## Resolves
 
-Resolves to a number of the deleted documents.
+Resolves to the number of the deleted documents.
 
 ## Usage
 
