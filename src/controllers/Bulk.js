@@ -17,7 +17,7 @@ class BulkController extends BaseController {
   * @param {Object} [options] - Additional options
   * @returns {Promise}
   */
-  deleteByQuery(index, collection, query, options = {}) {
+  deleteByQuery(index, collection, query = {}, options = {}) {
     const request = {
       index,
       collection,
