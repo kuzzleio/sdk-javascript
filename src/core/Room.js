@@ -9,8 +9,10 @@ class Room {
    * @param {object} options
    */
   constructor (controller, index, collection, body, callback, options = {}) {
+    Reflect.defineProperty(this, '_kuzzle', {
+      value: controller.kuzzle
+    });
     this.controller = controller;
-    this.kuzzle = controller.kuzzle;
     this.index = index;
     this.collection = collection;
     this.callback = callback;
@@ -41,6 +43,10 @@ class Room {
 
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
+  }
+
+  get kuzzle () {
+    return this._kuzzle;
   }
 
   subscribe () {

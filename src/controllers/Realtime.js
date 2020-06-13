@@ -49,22 +49,23 @@ class RealTimeController extends BaseController {
   }
 
   unsubscribe (roomId, options = {}) {
-    const rooms = this.subscriptions.get(roomId);
-
-    if (!rooms) {
-      return Promise.reject(new Error(`not subscribed to ${roomId}`));
-    }
-
-    for (const room of rooms) {
-      room.removeListeners();
-    }
-    this.subscriptions.delete(roomId);
-
-    return this.query({
+    const request = {
       action: 'unsubscribe',
-      body: {roomId}
-    }, options)
+      body: { roomId }
+    };
+
+    return this.query(request, options)
       .then(response => {
+        const rooms = this.subscriptions.get(roomId);
+
+        if (rooms) {
+          for (const room of rooms) {
+            room.removeListeners();
+          }
+
+          this.subscriptions.delete(roomId);
+        }
+
         return response.result;
       });
   }

@@ -178,16 +178,6 @@ describe('Realtime Controller', () => {
       kuzzle.query.resolves({result: roomId});
     });
 
-    it('should reject the promise if the room is not found', () => {
-      return kuzzle.realtime.unsubscribe('bar')
-        .then(() => {
-          throw new Error('Expected Function unsubscribe() to reject');
-        })
-        .catch(err => {
-          should(err.message).be.equal('not subscribed to bar');
-        });
-    });
-
     it('should call removeListeners for each room', () => {
       return kuzzle.realtime.unsubscribe(roomId)
         .then(() => {

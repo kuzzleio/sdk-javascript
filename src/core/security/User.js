@@ -6,11 +6,9 @@ class User {
    */
   constructor (kuzzle, _id = null, content = {}) {
     Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle,
-      writable: true
+      value: kuzzle
     });
 
-    this._kuzzle = kuzzle;
     this._id = _id;
     this.content = content;
   }
