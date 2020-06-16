@@ -58,6 +58,10 @@
     }
   },
   "bulk": {
+    "deleteByQuery": {
+      "url": "/:index/:collection/_bulk/_query",
+      "verb": "DELETE"
+    },
     "import": {
       "verb": "POST",
       "url": "/:index/:collection/_bulk"

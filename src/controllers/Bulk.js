@@ -6,6 +6,30 @@ class BulkController extends BaseController {
   }
 
   /**
+  * Directly deletes every documents matching the search query without:
+  *  - applying max documents write limit
+  *  - fetching deleted documents
+  *  - triggering realtime notifications
+  * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/delete-by-query/|Official documentation}
+  * @param {String} index - Index name
+  * @param {String} collection - Collection name
+  * @param {Object[]} query - Query matching documents to delete
+  * @param {Object} [options] - Additional options
+  * @returns {Promise}
+  */
+  deleteByQuery(index, collection, query = {}, options = {}) {
+    const request = {
+      index,
+      collection,
+      body: query,
+      action: 'deleteByQuery'
+    };
+
+    return this.query(request, options)
+      .then(response => response.result.deleted);
+  }
+
+  /**
    * Creates, updates or deletes large amounts of documents as fast as possible.
    * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/import/|Official documentation}
    *
