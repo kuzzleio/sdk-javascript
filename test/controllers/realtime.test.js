@@ -60,6 +60,7 @@ describe('Realtime Controller', () => {
   describe('#publish', () => {
     it('should call realtime/publish query with the index, collection and body and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {published: true}});
+      options._id = 'doc-id';
 
       return kuzzle.realtime.publish('index', 'collection', {foo: 'bar'}, options)
         .then(published => {
@@ -70,7 +71,8 @@ describe('Realtime Controller', () => {
               action: 'publish',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'}
+              body: {foo: 'bar'},
+              _id: 'doc-id'
             }, options);
 
           should(published).be.a.Boolean().and.be.true();

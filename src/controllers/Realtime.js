@@ -28,7 +28,8 @@ class RealTimeController extends BaseController {
       index,
       collection,
       body: message,
-      action: 'publish'
+      action: 'publish',
+      _id: options._id
     };
 
     return this.query(request, options)
