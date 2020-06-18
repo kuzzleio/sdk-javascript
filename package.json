@@ -30,7 +30,7 @@
     "doc-dev": "kuzdoc repo:dev -d /sdk/js/7/ -v 7",
     "doc-build": "kuzdoc repo:build -d /sdk/js/7/ -v 7",
     "doc-upload": "kuzdoc repo:deploy -d /sdk/js/7/ -v 7",
-    "doc-cloudfront": "kuzdoc repo:cloudfront -d /sdk/js/7/",
+    "doc-cloudfront": "kuzdoc repo:cloudfront -d /sdk/js/7/*",
     "doc-deploy": "npm run doc-upload && npm run doc-cloudfront",
     "doc-netlify": "npm run doc-prepare && kuzdoc repo:build -d / -v 7"
   },
