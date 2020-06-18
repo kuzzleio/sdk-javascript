@@ -21,4 +21,4 @@ hooks:
       curl -XDELETE kuzzle:7512/users/user${i}
     done
 template: default
-expected: '.*User.*_id.*profiles.*'
+expected: '.*User.*_id.*content.*'
