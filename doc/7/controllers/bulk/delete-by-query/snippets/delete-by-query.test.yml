@@ -1,4 +1,4 @@
-name: document#deleteByQuery
+name: bulk#deleteByQuery
 description: Delete documents matching query
 hooks:
   before: |

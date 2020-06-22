@@ -106,6 +106,17 @@ class CollectionController extends BaseController {
       .then(response => response.result);
   }
 
+  update(index, collection, body) {
+    return this.query({
+      index,
+      collection,
+      body,
+      action: 'update'
+    })
+      .then(response => response.result);
+  }
+
+  // @deprecated
   updateMapping (index, collection, body, options = {}) {
     return this.query({
       index,

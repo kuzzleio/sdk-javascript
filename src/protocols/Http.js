@@ -5,7 +5,7 @@ const BaseProtocol = require('./abstract/Base');
 
 class HttpProtocol extends BaseProtocol {
   constructor(host, options = {}) {
-    super(host, options);
+    super(host, options, 'http');
 
     if (typeof host !== 'string' || host === '') {
       throw new Error('host is required');
@@ -210,6 +210,7 @@ class HttpProtocol extends BaseProtocol {
 
     // inject queryString arguments:
     const queryString = [];
+
     for (const key of Object.keys(queryArgs)) {
       const value = queryArgs[key];
 
@@ -226,7 +227,7 @@ class HttpProtocol extends BaseProtocol {
         }
       }
       else {
-        queryString.push(`${key}=${value}`);
+        queryString.push(`${key}=${typeof value === 'object' ? JSON.stringify(value) : value}`);
       }
     }
 

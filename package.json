@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.1.4",
+  "version": "7.2.0",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -20,9 +20,9 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "test": "npm run --silent lint && npm run unit-testing && npm run functional-testing",
-    "unit-testing": "nyc --reporter=text-summary --reporter=lcov mocha",
-    "functional-testing": "cucumber-js --exit --fail-fast",
-    "lint": "eslint --max-warnings=0 ./src ./test ./features",
+    "test:unit": "nyc --reporter=text-summary --reporter=lcov mocha",
+    "test:functional": "cucumber-js --exit --fail-fast",
+    "test:lint": "eslint --max-warnings=0 ./src ./test ./features",
     "build": "node build.js",
     "doc": "docker-compose -f doc/docker-compose.yml up",
     "doc-testing": "bash .ci/test-docs.sh",
@@ -30,7 +30,7 @@
     "doc-dev": "kuzdoc repo:dev -d /sdk/js/7/ -v 7",
     "doc-build": "kuzdoc repo:build -d /sdk/js/7/ -v 7",
     "doc-upload": "kuzdoc repo:deploy -d /sdk/js/7/ -v 7",
-    "doc-cloudfront": "kuzdoc repo:cloudfront -d /sdk/js/7/",
+    "doc-cloudfront": "kuzdoc repo:cloudfront -d /sdk/js/7/*",
     "doc-deploy": "npm run doc-upload && npm run doc-cloudfront",
     "doc-netlify": "npm run doc-prepare && kuzdoc repo:build -d / -v 7"
   },
@@ -39,20 +39,20 @@
   "license": "Apache-2.0",
   "dependencies": {
     "min-req-promise": "^1.0.1",
-    "ws": "^7.2.3"
+    "ws": "^7.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
-    "codecov": "^3.6.5",
+    "codecov": "^3.7.0",
     "cucumber": "^6.0.5",
     "eslint": "^6.8.0",
     "eslint-friendly-formatter": "^4.0.1",
-    "eslint-loader": "^4.0.0",
+    "eslint-loader": "^4.0.2",
     "kuzdoc": "^1.2.2",
     "lolex": "^6.0.0",
-    "mocha": "7.1.1",
+    "mocha": "7.2.0",
     "mock-require": "^3.0.3",
     "nyc": "^15.0.1",
     "proxyquire": "^2.1.3",
@@ -61,7 +61,7 @@
     "should": "13.2.3",
     "should-sinon": "0.0.6",
     "sinon": "^9.0.2",
-    "webpack": "^4.42.1"
+    "webpack": "^4.43.0"
   },
   "engines": {
     "node": ">= 10.13.0"

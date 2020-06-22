@@ -20,6 +20,27 @@ describe('Bulk Controller', () => {
 
     kuzzle.bulk = new BulkController(kuzzle);
   });
+  describe('deleteByQuery', () => {
+    it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
+      kuzzle.query.resolves({ result: { deleted: 3 } });
+      const options = {refresh: 'wait_for'};
+      return kuzzle.bulk.deleteByQuery('index', 'collection', { query: { match: { foo: 'bar' } } }, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'bulk',
+              action: 'deleteByQuery',
+              index: 'index',
+              collection: 'collection',
+              body: {query: {match: {foo: 'bar' }}}
+            }, options);
+
+          should(res).be.an.Number();
+          should(res).be.equal(3);
+        });
+    });
+  });
 
   describe('import', () => {
     it('should call bulk/import query with the bulk data and return a Promise which resolves json object', () => {
