@@ -45,7 +45,7 @@ an administration console and a set of plugins that provide advanced functionali
 * :octocat: __[Github](https://github.com/kuzzleio/kuzzle)__
 * :earth_africa: __[Website](https://kuzzle.io)__
 * :books: __[Documentation](https://docs.kuzzle.io)__
-* :email: __[Gitter](https://gitter.im/kuzzleio/kuzzle)__
+* :email: __[Discord](http://join.discord.kuzzle.io)__
 
 
 ## Get trained by the creators of Kuzzle :zap:
@@ -58,11 +58,11 @@ Our teams will be able to meet your needs in terms of expertise and multi-techno
 
 ## Compatibility matrix
 
-| Kuzzle Version | SDK Version    |
-| -------------- | -------------- |
-| 1.x.x          | 5.x.x          | 
-| 1.x.x          | 6.x.x          | 
-| 2.x.x          | 7.x.x          | 
+| Kuzzle Version | SDK Version |
+|----------------|-------------|
+| 1.x.x          | 5.x.x       |
+| 1.x.x          | 6.x.x       |
+| 2.x.x          | 7.x.x       |
 
 ## Getting started :point_right:
 
