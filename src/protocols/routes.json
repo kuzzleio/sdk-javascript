@@ -552,6 +552,10 @@
       "url": "/ms/_ltrim/:_id",
       "verb": "POST"
     },
+    "mexecute": {
+        "url": "/ms/_mexecute",
+        "verb": "POST"
+    },
     "mget": {
       "url": "/ms/_mget",
       "verb": "GET"
