@@ -96,6 +96,7 @@ const
     lrem: {required: ['_id', 'count', 'value']},
     lset: {required: ['_id', 'index', 'value'], mapResults: mapNoResult},
     ltrim: {required: ['_id', 'start', 'stop'], mapResults: mapNoResult},
+    mexecute: {required: ['actions']},
     mget: getKeys,
     mset: {required: ['entries'], mapResults: mapNoResult},
     msetnx: {required: ['entries'], mapResults: Boolean},
