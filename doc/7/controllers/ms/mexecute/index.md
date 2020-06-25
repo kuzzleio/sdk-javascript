@@ -8,7 +8,7 @@ title: mexecute
 
 Allows the execution of multiple commands or 'actions' in a single step.
 
-It creates a redis **transaction** block and **executes** it immediately, all actions will be executed sequentially and as a single atomic and isolated operation.
+It creates a Redis **transaction** block and **executes** it immediately, all actions will be executed sequentially and as a single atomic and isolated operation.
 
 [[_Redis documentation_]](https://redis.io/topics/transactions)
 
