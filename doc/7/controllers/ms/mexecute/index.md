@@ -13,7 +13,7 @@ It creates a Redis **transaction** block and **executes** it immediately, all ac
 [[_Redis documentation_]](https://redis.io/topics/transactions)
 
 ::: warning
-Only already supported actions can be executed using **mexecute**.
+Only already valid actions of the memoryStorage controller can be executed using **mexecute**.
 :::
 
 ## Arguments
