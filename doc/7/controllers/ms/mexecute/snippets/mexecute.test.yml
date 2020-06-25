@@ -5,5 +5,3 @@ hooks:
   after:
 template: default
 expected: "\\[ \\[ null, 'OK' ], \\[ null, '1' ], \\[ null, 1 ] ]"
-sdk: js
-version: 7
