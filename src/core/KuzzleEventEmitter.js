@@ -7,7 +7,7 @@ class Listener {
 
 class KuzzleEventEmitter {
   constructor() {
-    this._events = {};
+    this._events = new Map();
   }
 
   _exists (listeners, fn) {
@@ -15,11 +15,11 @@ class KuzzleEventEmitter {
   }
 
   listeners (eventName) {
-    if (this._events[eventName] === undefined) {
+    if (! this._events.has(eventName)) {
       return [];
     }
 
-    return this._events[eventName].map(listener => listener.fn);
+    return this._events.get(eventName).map(listener => listener.fn);
   }
 
   addListener (eventName, listener, once = false) {
@@ -33,12 +33,12 @@ class KuzzleEventEmitter {
       throw new Error(`Invalid listener type: expected a function, got a ${listenerType}`);
     }
 
-    if (this._events[eventName] === undefined) {
-      this._events[eventName] = [];
+    if (! this._events.has(eventName)) {
+      this._events.set(eventName, []);
     }
 
-    if (!this._exists(this._events[eventName], listener)) {
-      this._events[eventName].push(new Listener(listener, once));
+    if (! this._exists(this._events.get(eventName), listener)) {
+      this._events.get(eventName).push(new Listener(listener, once));
     }
 
     return this;
@@ -53,12 +53,14 @@ class KuzzleEventEmitter {
       return this;
     }
 
-    if (this._events[eventName] === undefined) {
-      this._events[eventName] = [];
+    if (! this._events.has(eventName)) {
+      this._events.set(eventName, []);
     }
 
-    if (!this._exists(this._events[eventName], listener)) {
-      this._events[eventName] = [new Listener(listener, once)].concat(this._events[eventName]);
+    if (!this._exists(this._events.get(eventName), listener)) {
+      const listeners = [new Listener(listener, once)].concat(this._events.get(eventName));
+
+      this._events.set(eventName, listeners);
     }
 
     return this;
@@ -77,7 +79,7 @@ class KuzzleEventEmitter {
   }
 
   removeListener (eventName, listener) {
-    const listeners = this._events[eventName];
+    const listeners = this._events.get(eventName);
 
     if (!listeners || !listeners.length) {
       return this;
@@ -90,7 +92,7 @@ class KuzzleEventEmitter {
     }
 
     if (listeners.length === 0) {
-      delete this._events[eventName];
+      this._events.delete(eventName);
     }
 
     return this;
@@ -98,16 +100,17 @@ class KuzzleEventEmitter {
 
   removeAllListeners (eventName) {
     if (eventName) {
-      delete this._events[eventName];
-    } else {
-      this._events = {};
+      this._events.delete(eventName);
+    }
+    else {
+      this._events = new Map();
     }
 
     return this;
   }
 
   emit (eventName, ...payload) {
-    const listeners = this._events[eventName];
+    const listeners = this._events.get(eventName);
 
     if (listeners === undefined) {
       return false;
@@ -131,11 +134,11 @@ class KuzzleEventEmitter {
   }
 
   eventNames () {
-    return Object.keys(this._events);
+    return Array.from(this._events.keys());
   }
 
   listenerCount (eventName) {
-    return this._events[eventName] && this._events[eventName].length || 0;
+    return this._events.has(eventName) && this._events.get(eventName).length || 0;
   }
 }
 

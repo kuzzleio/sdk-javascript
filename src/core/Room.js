@@ -9,8 +9,10 @@ class Room {
    * @param {object} options
    */
   constructor (controller, index, collection, body, callback, options = {}) {
+    Reflect.defineProperty(this, '_kuzzle', {
+      value: controller.kuzzle
+    });
     this.controller = controller;
-    this.kuzzle = controller.kuzzle;
     this.index = index;
     this.collection = collection;
     this.callback = callback;
@@ -25,12 +27,12 @@ class Room {
       collection,
       body,
       controller: 'realtime',
-      action: 'subscribe'
+      action: 'subscribe',
+      state: this.options.state,
+      scope: this.options.scope,
+      users: this.options.users,
+      volatile: this.options.volatile
     };
-    for (const opt of ['state', 'scope', 'users', 'volatile']) {
-      this.request[opt] = this.options[opt];
-      delete this.options[opt];
-    }
 
     this.autoResubscribe = typeof options.autoResubscribe === 'boolean'
       ? options.autoResubscribe
@@ -39,12 +41,12 @@ class Room {
       ? options.subscribeToSelf
       : true;
 
-    for (const opt of ['autoResubscribe', 'subscribeToSelf']) {
-      delete this.options[opt];
-    }
-
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
+  }
+
+  get kuzzle () {
+    return this._kuzzle;
   }
 
   subscribe () {

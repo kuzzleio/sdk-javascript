@@ -8,10 +8,18 @@ class SearchResultBase {
    * @param {object} response
    */
   constructor (kuzzle, request = {}, options = {}, response = {}) {
-    this._kuzzle = kuzzle;
-    this._request = request;
-    this._response = response;
-    this._options = options;
+    Reflect.defineProperty(this, '_kuzzle', {
+      value: kuzzle
+    });
+    Reflect.defineProperty(this, '_request', {
+      value: request
+    });
+    Reflect.defineProperty(this, '_options', {
+      value: options
+    });
+    Reflect.defineProperty(this, '_response', {
+      value: response
+    });
 
     this._controller = request.controller;
     this._searchAction = 'search';

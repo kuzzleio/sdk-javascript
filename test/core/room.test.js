@@ -67,19 +67,16 @@ describe('Room', () => {
     });
 
     it('should handle scope/state/users/volatile options', () => {
-      const
-        opts = {
-          scope: 'scope',
-          state: 'state',
-          users: 'users',
-          volatile: 'volatile'
-        },
-        body = {foo: 'bar'},
-        cb = sinon.stub();
+      const opts = {
+        scope: 'scope',
+        state: 'state',
+        users: 'users',
+        volatile: 'volatile'
+      };
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
 
       const room = new Room(controller, 'index', 'collection', body, cb, opts);
-
-      should(room.options).be.empty();
 
       should(room.request.scope).be.equal('scope');
       should(room.request.state).be.equal('state');
@@ -104,10 +101,6 @@ describe('Room', () => {
           controller, 'index', 'collection', body, cb,
           {autoResubscribe: 'foobar'});
 
-      should(room1.options).be.empty();
-      should(room2.options).be.empty();
-      should(room3.options).be.empty();
-
       should(room1.autoResubscribe).be.a.Boolean().and.be.True();
       should(room2.autoResubscribe).be.a.Boolean().and.be.False();
       should(room3.autoResubscribe).be.equal('default');
@@ -127,10 +120,6 @@ describe('Room', () => {
         room3 = new Room(
           controller, 'index', 'collection', body, cb,
           {subscribeToSelf: 'foobar'});
-
-      should(room1.options).be.empty();
-      should(room2.options).be.empty();
-      should(room3.options).be.empty();
 
       should(room1.subscribeToSelf).be.a.Boolean().and.be.True();
       should(room2.subscribeToSelf).be.a.Boolean().and.be.False();
@@ -177,7 +166,7 @@ describe('Room', () => {
               state: 'done',
               users: 'all',
               volatile: {bar: 'foo'}
-            }, options);
+            }, opts);
 
           should(res).be.equal(response);
         });

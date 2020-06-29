@@ -5,7 +5,10 @@ class User {
    * @param {Object} data
    */
   constructor (kuzzle, _id = null, content = {}) {
-    this._kuzzle = kuzzle;
+    Reflect.defineProperty(this, '_kuzzle', {
+      value: kuzzle
+    });
+
     this._id = _id;
     this.content = content;
   }
