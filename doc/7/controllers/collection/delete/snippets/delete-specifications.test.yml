@@ -5,6 +5,3 @@ hooks:
   after:
 template: default
 expected: Success
-
-sdk: js
-version: 6

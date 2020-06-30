@@ -147,13 +147,13 @@ class CollectionController extends BaseController {
       .then(response => response.result);
   }
 
-  delete (index, collection, options = {}) {
+  delete (index, collection) {
     const request = {
       index,
       collection,
       action: 'delete'
     };
-    return this.query(request, options)
+    return this.query(request)
       .then(response => response.result);
   }
 }

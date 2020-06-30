@@ -408,7 +408,7 @@ describe('Collection Controller', () => {
     it('should call collection/delete query and return a Promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
-      return kuzzle.collection.delete('index', 'collection', options)
+      return kuzzle.collection.delete('index', 'collection')
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -417,7 +417,7 @@ describe('Collection Controller', () => {
               action: 'delete',
               index: 'index',
               collection: 'collection',
-            }, options);
+            });
           should(res.acknowledged).be.a.Boolean().and.be.true();
         });
     });

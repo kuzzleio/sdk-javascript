@@ -2,7 +2,7 @@
 code: true
 type: page
 title: delete
-description: Delete a collection
+description: Deletes a collection
 ---
 
 # delete
@@ -12,7 +12,7 @@ Deletes a collection.
 <br/>
 
 ```js
-delete(index, collection, [options]);
+delete(index, collection);
 ```
 
 <br/>
@@ -25,7 +25,7 @@ delete(index, collection, [options]);
 
 ## Resolves
 
-Resolves if the collection is successfully delete.
+Resolves if the collection is successfully deleted.
 
 ## Usage
 
