@@ -418,7 +418,7 @@ describe('Collection Controller', () => {
               index: 'index',
               collection: 'collection',
             });
-          should(res.acknowledged).be.undefined;
+          should(res.acknowledged).be.undefined();
         });
     });
   });
