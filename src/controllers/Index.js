@@ -49,7 +49,6 @@ class IndexController extends BaseController {
         indexes
       }
     };
-
     return this.query(request, options)
       .then(response => response.result.deleted);
   }
