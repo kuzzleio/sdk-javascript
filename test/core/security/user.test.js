@@ -1,5 +1,5 @@
 const
-  User = require('../../../src/core/security/User'),
+  { User } = require('../../../src/core/security/User'),
   sinon = require('sinon'),
   should = require('should');
 

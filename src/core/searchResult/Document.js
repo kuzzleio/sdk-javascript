@@ -1,4 +1,4 @@
-const SearchResultBase = require('./SearchResultBase');
+const { SearchResultBase } = require('./SearchResultBase');
 
 class DocumentsSearchResult extends SearchResultBase {
 
@@ -16,4 +16,4 @@ class DocumentsSearchResult extends SearchResultBase {
   }
 }
 
-module.exports = DocumentsSearchResult;
+module.exports = { DocumentsSearchResult };

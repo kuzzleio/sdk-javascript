@@ -1,5 +1,5 @@
-const BaseController = require('./Base');
-const SpecificationsSearchResult = require('../core/searchResult/Specifications');
+const { BaseController } = require('./Base');
+const { SpecificationsSearchResult } = require('../core/searchResult/Specifications');
 
 class CollectionController extends BaseController {
 
@@ -148,4 +148,4 @@ class CollectionController extends BaseController {
   }
 }
 
-module.exports = CollectionController;
+module.exports = { CollectionController };

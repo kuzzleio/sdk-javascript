@@ -1,4 +1,4 @@
-class Profile {
+export class Profile {
   /**
    *
    * @param {Kuzzle} kuzzle
@@ -32,5 +32,5 @@ class Profile {
   }
 }
 
-module.exports = Profile;
+module.exports = { Profile };
 

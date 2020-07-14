@@ -110,4 +110,4 @@ class ServerController extends BaseControler {
   }
 }
 
-module.exports = ServerController;
+module.exports = { ServerController };

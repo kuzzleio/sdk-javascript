@@ -31,7 +31,9 @@ Additional query options
 
 ## Resolves
 
-An `object[]` containing:
+An array containing user rights objects.
+
+Each user right object has the following properties:
 
 | Property      | Type              | Description                                 |
 | ------------- | ----------------- | ------------------------------------------- |

@@ -25,3 +25,12 @@ doc/7/getting-started/.vuejs/cypress/videos
 
 # Debug snippets
 test-*.js
+
+# Typescript related files
+*.d.ts
+*.js.map
+src/Kuzzle.js
+src/controllers/Auth.js
+src/controllers/Base.js
+src/core/security/User.js
+src/utils/interfaces.js

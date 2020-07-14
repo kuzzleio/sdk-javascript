@@ -142,4 +142,4 @@ class KuzzleEventEmitter {
   }
 }
 
-module.exports = KuzzleEventEmitter;
+module.exports = { KuzzleEventEmitter };

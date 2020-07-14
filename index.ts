@@ -1,15 +1,5 @@
-const Kuzzle = require('./src/Kuzzle');
-const { Http, WebSocket } = require('./src/protocols');
-const BaseController = require('./src/controllers/Base');
-const KuzzleAbstractProtocol = require('./src/protocols/abstract/Base');
-const KuzzleEventEmitter = require('./src/core/KuzzleEventEmitter');
-
-const SearchResultBase = require('./src/core/searchResult/SearchResultBase');
-const DocumentSearchResult = require('./src/core/searchResult/Document');
-const ProfileSearchResult = require('./src/core/searchResult/Profile');
-const RoleSearchResult = require('./src/core/searchResult/Role');
-const SpecificationSearchResult = require('./src/core/searchResult/Specifications');
-const UserSearchResult = require('./src/core/searchResult/User');
+// defined by webpack plugin
+declare var BUILT: any;
 
 if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
@@ -18,7 +8,20 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
                'Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser');
 }
 
-module.exports = {
+import { Kuzzle } from './src/Kuzzle';
+import { Http, WebSocket } from './src/protocols';
+import * as BaseController from './src/controllers/Base';
+import * as KuzzleAbstractProtocol from './src/protocols/abstract/Base';
+import * as KuzzleEventEmitter from './src/core/KuzzleEventEmitter';
+
+import * as SearchResultBase from './src/core/searchResult/SearchResultBase';
+import * as DocumentSearchResult from './src/core/searchResult/Document';
+import * as ProfileSearchResult from './src/core/searchResult/Profile';
+import * as RoleSearchResult from './src/core/searchResult/Role';
+import * as SpecificationSearchResult from './src/core/searchResult/Specifications';
+import * as UserSearchResult from './src/core/searchResult/User';
+
+const exported = {
   Kuzzle,
   Http,
   WebSocket,
@@ -31,4 +34,7 @@ module.exports = {
   RoleSearchResult,
   SpecificationSearchResult,
   UserSearchResult
-};
+}
+
+export default exported;
+

@@ -1,8 +1,8 @@
-const BaseController = require('./Base');
+const { BaseController } = require('./Base');
 const Room = require('../core/Room');
 
 
-class RealTimeController extends BaseController {
+class RealtimeController extends BaseController {
   /**
    * @param {Kuzzle} kuzzle
    */
@@ -125,4 +125,4 @@ class RealTimeController extends BaseController {
 
 }
 
-module.exports = RealTimeController;
+module.exports = { RealtimeController };

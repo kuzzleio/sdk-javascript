@@ -1,5 +1,5 @@
-const Profile = require('../security/Profile');
-const SearchResultBase = require('./SearchResultBase');
+const { Profile } = require('../security/Profile');
+const { SearchResultBase } = require('./SearchResultBase');
 
 class ProfileSearchResult extends SearchResultBase {
   constructor (kuzzle, request, options, response) {
@@ -26,4 +26,4 @@ class ProfileSearchResult extends SearchResultBase {
   }
 }
 
-module.exports = ProfileSearchResult;
+module.exports = { ProfileSearchResult };

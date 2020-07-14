@@ -1,6 +1,6 @@
 const
   should = require('should'),
-  Kuzzle = require('../../src/Kuzzle'),
+  { Kuzzle } = require('../../src/Kuzzle'),
   ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle proxy', () => {
@@ -10,7 +10,7 @@ describe('Kuzzle proxy', () => {
     const kuzzle = new Kuzzle(protocolMock);
     should(() => {
       kuzzle.jvt = 'foobar';
-    }).throwError('Cannot set a value to the undefined \'jvt\' property in \'kuzzle\'');    
+    }).throwError('Cannot set a value to the undefined \'jvt\' property in \'kuzzle\'');
   });
 
 });

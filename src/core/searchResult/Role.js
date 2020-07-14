@@ -1,5 +1,5 @@
 const Role = require('../security/Role');
-const SearchResultBase = require('./SearchResultBase');
+const { SearchResultBase } = require('./SearchResultBase');
 
 class RoleSearchResult extends SearchResultBase {
 
@@ -32,4 +32,4 @@ class RoleSearchResult extends SearchResultBase {
   }
 }
 
-module.exports = RoleSearchResult;
+module.exports = { RoleSearchResult };

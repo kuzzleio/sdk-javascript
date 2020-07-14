@@ -2,4 +2,8 @@
 src/**/*.d.ts
 src/**/*.js.map
 
-src/controllers/*.js
+src/Kuzzle.js
+src/controllers/Auth.js
+src/controllers/Base.js
+src/core/security/User.js
+src/utils/interfaces.js

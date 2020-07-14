@@ -465,4 +465,4 @@ function mapScanResults (results) {
   };
 }
 
-module.exports = MemoryStorageController;
+module.exports = { MemoryStorageController };

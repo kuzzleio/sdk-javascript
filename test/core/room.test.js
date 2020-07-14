@@ -1,6 +1,6 @@
 const
   Room = require('../../src/core/Room'),
-  KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter'),
+  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter'),
   sinon = require('sinon'),
   should = require('should');
 

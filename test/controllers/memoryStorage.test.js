@@ -1,5 +1,5 @@
 const
-  MemoryStorageController = require('../../src/controllers/MemoryStorage'),
+  { MemoryStorageController } = require('../../src/controllers/MemoryStorage'),
   should = require('should'),
   sinon = require('sinon');
 

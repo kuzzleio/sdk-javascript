@@ -129,4 +129,4 @@ class SearchResultBase {
 }
 
 
-module.exports = SearchResultBase;
+module.exports = { SearchResultBase };

@@ -1,4 +1,4 @@
-const BaseController = require('./Base');
+const { BaseController } = require('./Base');
 const DocumentSearchResult = require('../core/searchResult/Document');
 
 class DocumentController extends BaseController {
@@ -251,4 +251,4 @@ class DocumentController extends BaseController {
   }
 }
 
-module.exports = DocumentController;
+module.exports = { DocumentController };

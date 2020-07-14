@@ -3,7 +3,7 @@ const
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
   generateJwt = require('../mocks/generateJwt.mock'),
-  Kuzzle = require('../../src/Kuzzle');
+  { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle query management', () => {
   describe('#query', () => {
