@@ -29,6 +29,7 @@ test-*.js
 # Typescript related files
 *.d.ts
 *.js.map
+index.js
 src/Kuzzle.js
 src/controllers/Auth.js
 src/controllers/Base.js
