@@ -1,0 +1,5 @@
+# JS generated files from TS
+src/**/*.d.ts
+src/**/*.js.map
+
+src/controllers/*.js
