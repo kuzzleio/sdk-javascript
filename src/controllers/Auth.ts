@@ -1,39 +1,7 @@
 import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
-import { JSONObject } from '../utils/interfaces';
-
-export interface ApiKey {
-  /**
-   * ApiKey unique ID
-   */
-  _id: string;
-  /**
-   * ApiKey content
-   */
-  _source: {
-    /**
-     * User kuid
-     */
-    userId: string;
-    /**
-     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
-     */
-    expiresAt: number;
-    /**
-     * Original TTL in ms
-     */
-    ttl: number;
-    /**
-     * API key description
-     */
-    description: string;
-    /**
-     * Authentication token associated with this API key
-     */
-    token: string;
-  }
-}
+import { JSONObject, ApiKey } from '../utils/interfaces';
 
 /**
  * Auth controller
@@ -165,7 +133,7 @@ export class AuthController extends BaseController {
         /**
          * Array of found ApiKeys
          */
-        hits: ApiKey[],
+        hits: Array<ApiKey>,
         /**
          * Total number of API keys found
          */
@@ -308,7 +276,7 @@ export class AuthController extends BaseController {
     return this.query({
       action: 'getMyRights'
     }, options)
-      .then(response => response.result.hits as {
+      .then(response => response.result.hits as Array<{
         /**
          * Controller on wich the rights are applied
          */
@@ -329,7 +297,7 @@ export class AuthController extends BaseController {
          * Rights ("allowed" or "denied")
          */
         value: string
-      }[]);
+      }>);
   }
 
   /**
@@ -344,7 +312,7 @@ export class AuthController extends BaseController {
     return this.query({
       action: 'getStrategies'
     }, options)
-      .then(response => response.result as string[]);
+      .then(response => response.result as Array<string>);
   }
 
   /**

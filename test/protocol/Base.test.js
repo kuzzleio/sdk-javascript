@@ -2,7 +2,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   KuzzleError = require('../../src/KuzzleError'),
-  AbstractWrapper = require('../../src/protocols/abstract/Base'),
+  { KuzzleAbstractProtocol } = require('../../src/protocols/abstract/Base'),
   PendingRequest = require('../../src/protocols/abstract/PendingRequest');
 
 describe('Common Protocol', () => {
@@ -11,7 +11,7 @@ describe('Common Protocol', () => {
     protocol;
 
   beforeEach(function () {
-    protocol = new AbstractWrapper('somewhere');
+    protocol = new KuzzleAbstractProtocol('somewhere');
     protocol.send = function(request) {
       protocol.emit(request.requestId, request.response);
     };
@@ -20,23 +20,23 @@ describe('Common Protocol', () => {
 
   describe('#constructor', () => {
     it('should accept string as port', () => {
-      protocol = new AbstractWrapper('somewhere', { port: '443' });
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: '443' });
 
       should(protocol.port).be.eql(443);
     });
 
     it('should use 7512 when no port is given or when port is not a parseable number', () => {
-      protocol = new AbstractWrapper('somewhere', { port: 'foobar' });
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: 'foobar' });
 
       should(protocol.port).be.eql(7512);
 
-      protocol = new AbstractWrapper('somewhere');
+      protocol = new KuzzleAbstractProtocol('somewhere');
 
       should(protocol.port).be.eql(7512);
     });
 
     it('should accept number as port', () => {
-      protocol = new AbstractWrapper('somewhere', { port: 443 });
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: 443 });
 
       should(protocol.port).be.eql(443);
     });

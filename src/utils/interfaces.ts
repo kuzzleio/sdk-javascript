@@ -60,7 +60,7 @@ export interface ProfilePolicy {
      * Collection names.
      * Rights will only be applied on those collections.
      */
-    collections?: string[];
+    collections?: Array<string>;
   }
 }
 
@@ -92,5 +92,40 @@ export interface RoleRightsDefinition {
     actions: {
       [key: string]: boolean
     }
+  }
+}
+
+/**
+ * ApiKey
+ */
+export interface ApiKey {
+  /**
+   * ApiKey unique ID
+   */
+  _id: string;
+  /**
+   * ApiKey content
+   */
+  _source: {
+    /**
+     * User kuid
+     */
+    userId: string;
+    /**
+     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+     */
+    expiresAt: number;
+    /**
+     * Original TTL in ms
+     */
+    ttl: number;
+    /**
+     * API key description
+     */
+    description: string;
+    /**
+     * Authentication token associated with this API key
+     */
+    token: string;
   }
 }

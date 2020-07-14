@@ -1,9 +1,9 @@
-const
-  DocumentSearchResult = require('../../../src/core/searchResult/Document'),
-  sinon = require('sinon'),
-  should = require('should');
+const sinon = require('sinon');
+const should = require('should');
 
-describe('DocumentSearchResult', () => {
+const { DocumentsSearchResult } = require('../../../src/core/searchResult/Document');
+
+describe('DocumentsSearchResult', () => {
   const options = {opt: 'in'};
 
   let
@@ -31,7 +31,7 @@ describe('DocumentSearchResult', () => {
   });
 
   describe('constructor', () => {
-    it('should create a DocumentSearchResult instance with good properties', () => {
+    it('should create a DocumentsSearchResult instance with good properties', () => {
       response = {
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
@@ -40,7 +40,7 @@ describe('DocumentSearchResult', () => {
         total: 3
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
@@ -67,7 +67,7 @@ describe('DocumentSearchResult', () => {
         total: 2
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
       return searchResult.next()
         .then(result => {
@@ -87,7 +87,7 @@ describe('DocumentSearchResult', () => {
         total: 30
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -116,12 +116,12 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/scroll action with scrollId parameter and resolve to a new DocumentSearchResult', () => {
+      it('should call document/scroll action with scrollId parameter and resolve to a new DocumentsSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -133,7 +133,7 @@ describe('DocumentSearchResult', () => {
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
           });
       });
 
@@ -175,12 +175,12 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/search action with search_after parameter and resolve to a new DocumentSearchResult', () => {
+      it('should call document/search action with search_after parameter and resolve to a new DocumentsSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -200,7 +200,7 @@ describe('DocumentSearchResult', () => {
                 size: 2
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
           });
       });
 
@@ -219,7 +219,7 @@ describe('DocumentSearchResult', () => {
 
       it('should reject with an error if the sort is invalid', () => {
         request.body.sort = [];
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
         return should(searchResult.next())
           .be.rejected();
@@ -227,7 +227,7 @@ describe('DocumentSearchResult', () => {
 
       it('should reject if the sort combination does not allow to retrieve all the documents', () => {
         response.hits = [];
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
         return should(searchResult.next())
           .be.rejected();
@@ -256,7 +256,7 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -273,7 +273,7 @@ describe('DocumentSearchResult', () => {
       });
 
 
-      it('should call document/search action with from/size parameters and resolve to a new DocumentSearchResult', () => {
+      it('should call document/search action with from/size parameters and resolve to a new DocumentsSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -288,7 +288,7 @@ describe('DocumentSearchResult', () => {
                 from: 2
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
           });
       });
 

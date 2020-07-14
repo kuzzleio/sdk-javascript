@@ -1,5 +1,5 @@
 const { BaseController } = require('./Base');
-const DocumentSearchResult = require('../core/searchResult/Document');
+const { DocumentsSearchResult } = require('../core/searchResult/Document');
 
 class DocumentController extends BaseController {
 
@@ -183,7 +183,7 @@ class DocumentController extends BaseController {
   search (index, collection, body = {}, options = {}) {
     return this._search(index, collection, body, options)
       .then(({ response, request, opts }) => (
-        new DocumentSearchResult(this.kuzzle, request, opts, response.result)
+        new DocumentsSearchResult(this.kuzzle, request, opts, response.result)
       ));
   }
 

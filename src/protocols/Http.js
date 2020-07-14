@@ -1,9 +1,9 @@
 'use strict';
 
 const staticHttpRoutes = require('./routes.json');
-const BaseProtocol = require('./abstract/Base');
+const { KuzzleAbstractProtocol } = require('./abstract/Base');
 
-class HttpProtocol extends BaseProtocol {
+class HttpProtocol extends KuzzleAbstractProtocol {
   constructor(host, options = {}) {
     super(host, options, 'http');
 

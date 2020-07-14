@@ -34,14 +34,14 @@ export class User {
   /**
    * Array of profile IDs
    */
-  get profileIds (): string[] {
+  get profileIds (): Array<string> {
     return this.content.profileIds || [];
   }
 
   /**
    * Gets user profile definitions from the API
    */
-  getProfiles (): Promise<Profile[]> {
+  getProfiles (): Promise<Array<Profile>> {
     if (!this.profileIds || this.profileIds.length === 0) {
       return Promise.resolve([]);
     }

@@ -179,7 +179,7 @@ describe('Kuzzle query management', () => {
     });
 
     it('should queue the request if queing and queuable', () => {
-      kuzzle.queuing = true;
+      kuzzle._queuing = true;
 
       const eventStub = sinon.stub();
       kuzzle.addListener('offlineQueuePush', eventStub);
@@ -197,7 +197,7 @@ describe('Kuzzle query management', () => {
     });
 
     it('should not queue if the request is not queuable', () => {
-      kuzzle.queuing = true;
+      kuzzle._queuing = true;
 
       const eventStub = sinon.stub();
       kuzzle.addListener('discarded', eventStub);
@@ -222,7 +222,7 @@ describe('Kuzzle query management', () => {
     });
 
     it('should not queue if queueFilter is set and says so', () => {
-      kuzzle.queuing = true;
+      kuzzle._queuing = true;
       kuzzle.queueFilter = () => false;
 
       return kuzzle.query({controller: 'foo', action: 'bar'}, {queuable: true})

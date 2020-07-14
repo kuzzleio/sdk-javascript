@@ -1,4 +1,4 @@
-const BaseControler = require('./Base');
+const { BaseController } = require('./Base');
 
 // Parameter mutualization
 const getId = {getter: true, required: ['_id']};
@@ -188,7 +188,7 @@ const commands = {
  * @param {object} kuzzle - Kuzzle instance to inherit from
  * @constructor
  */
-class MemoryStorageController extends BaseControler {
+class MemoryStorageController extends BaseController {
 
   constructor (kuzzle) {
     super(kuzzle, 'ms');

@@ -1,10 +1,10 @@
-const BaseControler = require('./Base');
+const { BaseController } = require('./Base');
 
 /**
  * @class ServerController
  * @property {Kuzzle} kuzzle - The Kuzzle SDK Instance
  */
-class ServerController extends BaseControler {
+class ServerController extends BaseController {
 
   /**
    * @param {Kuzzle} kuzzle - The Kuzzle SDK Instance

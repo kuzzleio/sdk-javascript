@@ -1,6 +1,6 @@
 import { RoleRightsDefinition } from '../../utils/interfaces';
 
-class Role {
+export class Role {
   /**
    * Role unique ID
    */

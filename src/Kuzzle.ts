@@ -320,8 +320,11 @@ export class Kuzzle extends KuzzleEventEmitter {
       }
       protectedEvent.lastEmitted = now;
     }
+    return this._superEmit(eventName, ...payload)
+  }
 
-    super.emit(eventName, ...payload);
+  _superEmit (eventName, ...payload) {
+    return super.emit(eventName, ...payload);
   }
 
   /**
@@ -414,6 +417,10 @@ export class Kuzzle extends KuzzleEventEmitter {
       throw new Error(`[${event}] is not a known event. Known events: ${events.toString()}`);
     }
 
+    return this._superAddListener(event, listener);
+  }
+
+  _superAddListener (event, listener) {
     return super.addListener(event, listener);
   }
 

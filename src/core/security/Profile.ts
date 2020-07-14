@@ -15,7 +15,7 @@ export class Profile {
   /**
    * Array of policies
    */
-  public policies: ProfilePolicy[] | [];
+  public policies: Array<ProfilePolicy>;
 
 
   private _kuzzle: any;
@@ -42,7 +42,7 @@ export class Profile {
   /**
    * Gets the associated roles definitions from the API.
    */
-  getRoles (options = {}): Promise<Role[] | []> {
+  getRoles (options = {}): Promise<Array<Role>> {
     if (!this.policies || this.policies.length === 0) {
       return Promise.resolve([]);
     }
