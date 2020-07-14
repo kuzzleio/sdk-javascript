@@ -38,3 +38,4 @@ const exported = {
 
 export default exported;
 
+module.exports = exported;

@@ -314,13 +314,14 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     if (protectedEvent) {
       if ( protectedEvent.lastEmitted
-        && protectedEvent.lastEmitted > now - this.eventTimeout)
-      {
+        && protectedEvent.lastEmitted > now - this.eventTimeout
+      ) {
         return false;
       }
       protectedEvent.lastEmitted = now;
     }
-    return this._superEmit(eventName, ...payload)
+
+    return this._superEmit(eventName, ...payload);
   }
 
   _superEmit (eventName, ...payload) {
