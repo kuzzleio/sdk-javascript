@@ -1,5 +1,5 @@
 const { BaseController } = require('./Base');
-const Role = require('../core/security/Role');
+const { Role } = require('../core/security/Role');
 const { RoleSearchResult } = require('../core/searchResult/Role');
 const { Profile } = require('../core/security/Profile');
 const { ProfileSearchResult } = require('../core/searchResult/Profile');

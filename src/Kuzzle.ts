@@ -15,7 +15,7 @@ import { proxify } from './utils/proxify';
 import { JSONObject } from './utils/interfaces';
 
 // defined by webpack plugin
-declare var SDKVERSION: any;
+declare const SDKVERSION: any;
 
 const events = [
   'connected',
@@ -118,6 +118,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       : 200;
 
     this.sdkVersion = typeof SDKVERSION === 'undefined'
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       ? require('../package').version
       : SDKVERSION;
 

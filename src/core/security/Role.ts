@@ -1,4 +1,16 @@
+import { RoleRightsDefinition } from '../../utils/interfaces';
+
 class Role {
+  /**
+   * Role unique ID
+   */
+  public _id: string;
+  /**
+   * List of rights on controllers/actions
+   */
+  public controllers: RoleRightsDefinition;
+
+  private _kuzzle: any;
 
   /**
    * @param {Kuzzle} kuzzle
@@ -13,10 +25,10 @@ class Role {
     this.controllers = controllers;
   }
 
-  get kuzzle () {
+  protected get kuzzle () {
     return this._kuzzle;
   }
 }
 
-module.exports = Role;
+module.exports = { Role };
 

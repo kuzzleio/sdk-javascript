@@ -9,7 +9,7 @@ describe('Jwt', () => {
     authenticationToken;
 
   beforeEach(() => {
-    { Jwt } = rewire('../../src/core/Jwt');
+    ({ Jwt } = rewire('../../src/core/Jwt'));
   });
 
   describe('#constructor', () => {

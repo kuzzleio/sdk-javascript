@@ -1,6 +1,6 @@
 const { SecurityController } = require('../../src/controllers/Security');
 const { Profile } = require('../../src/core/security/Profile');
-const Role = require('../../src/core/security/Role');
+const { Role } = require('../../src/core/security/Role');
 const { User } = require('../../src/core/security/User');
 const { ProfileSearchResult } = require('../../src/core/searchResult/Profile');
 const { RoleSearchResult } = require('../../src/core/searchResult/Role');

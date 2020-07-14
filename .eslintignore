@@ -6,4 +6,6 @@ src/Kuzzle.js
 src/controllers/Auth.js
 src/controllers/Base.js
 src/core/security/User.js
+src/core/security/Profile.js
+src/core/security/Role.js
 src/utils/interfaces.js

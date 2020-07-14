@@ -23,7 +23,7 @@
     "test:unit": "nyc --reporter=text-summary --reporter=lcov mocha",
     "test:functional": "cucumber-js --exit --fail-fast",
     "test:lint": "npm run test:lint:js && npm run test:lint:ts",
-    "test:lint:js": "eslint --max-warnings=0 index.js ./src ./test ./features",
+    "test:lint:js": "eslint --max-warnings=0 ./src ./test ./features",
     "test:lint:ts": "eslint ./src --ext .ts --config .eslintc-ts.json",
     "build": "npm run build-ts && node build.js",
     "build-ts": "tsc --build tsconfig.json",

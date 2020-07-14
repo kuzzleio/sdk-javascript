@@ -1,4 +1,4 @@
-import { JSONObject } from "../../utils/interfaces";
+import { JSONObject } from '../../utils/interfaces';
 import { Profile } from './Profile';
 
 export class User {
@@ -39,7 +39,7 @@ export class User {
   }
 
   /**
-   * Gets user profile definitions
+   * Gets user profile definitions from the API
    */
   getProfiles (): Promise<Profile[]> {
     if (!this.profileIds || this.profileIds.length === 0) {

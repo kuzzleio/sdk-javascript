@@ -1,4 +1,25 @@
+import { Role } from './Role';
+import { ProfilePolicy } from '../../utils/interfaces';
+
 export class Profile {
+  /**
+   * Profile unique ID
+   */
+  public _id: string;
+
+  /**
+   * Maximum number of requests per second and per node with this profile
+   */
+  public rateLimit: number;
+
+  /**
+   * Array of policies
+   */
+  public policies: ProfilePolicy[] | [];
+
+
+  private _kuzzle: any;
+
   /**
    *
    * @param {Kuzzle} kuzzle
@@ -14,14 +35,14 @@ export class Profile {
     this.policies = content && content.policies ? content.policies : [];
   }
 
-  get kuzzle () {
+  protected get kuzzle () {
     return this._kuzzle;
   }
 
   /**
-   * @returns {Promise<[Role]>}
+   * Gets the associated roles definitions from the API.
    */
-  getRoles (options = {}) {
+  getRoles (options = {}): Promise<Role[] | []> {
     if (!this.policies || this.policies.length === 0) {
       return Promise.resolve([]);
     }
