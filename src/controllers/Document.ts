@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import { DocumentsSearchResult } from '../core/searchResult/Document';
+import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { JSONObject, Document } from '../utils/interfaces';
 
 export class DocumentController extends BaseController {
@@ -13,11 +13,13 @@ export class DocumentController extends BaseController {
    * A query can be provided to alter the count result,
    * otherwise returns the total number of documents in the collection.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/count/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param query Query to match
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns The number of matching documents
    */
@@ -41,13 +43,15 @@ export class DocumentController extends BaseController {
   /**
    * Creates a new document in the persistent data storage.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/create/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param content Document content
    * @param _id Optional document ID
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns The created document
    */
@@ -74,13 +78,15 @@ export class DocumentController extends BaseController {
    * Creates a new document in the persistent data storage,
    * or replaces its content if it already exists.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/create-or-replace/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param id Document ID
    * @param content Document content
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns The created or replaced document
    */
@@ -106,12 +112,14 @@ export class DocumentController extends BaseController {
   /**
    * Deletes a document.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/delete/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns The document ID
    */
@@ -135,12 +143,14 @@ export class DocumentController extends BaseController {
   /**
    * Deletes documents matching the provided search query.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/delete-by-query/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param query Query to match
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns The deleted documents IDs
    */
@@ -164,12 +174,14 @@ export class DocumentController extends BaseController {
   /**
    * Checks if the given document exists.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/exists/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns True if the document exists
    */
@@ -193,12 +205,14 @@ export class DocumentController extends BaseController {
   /**
    * Gets a document.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/get/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns The document
    */
@@ -222,12 +236,14 @@ export class DocumentController extends BaseController {
   /**
    * Creates multiple documents.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-create/
+   *
    * @param index Index name
    * @param collection Collection name
    * @param documents Documents to create
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -279,11 +295,61 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mCreateOrReplace (index, collection, documents, options = {}) {
+  /**
+   * Creates or replaces multiple documents.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-create-or-replace/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param documents Documents to create
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mCreateOrReplace (
+    index: string,
+    collection: string,
+    documents: Array<{
+      /**
+       * Document ID
+       */
+      _id: string;
+      /**
+       * Document content
+       */
+      body: JSONObject;
+    }>,
+    options: { queuable?: boolean, refresh?: string } = {}
+  ): Promise<{
+    /**
+     * Array of successfully created documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
+    errors: Array<{
+      /**
+       * Document that cause the error
+       */
+      document: Document;
+      /**
+       * HTTP error status
+       */
+      status: number;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
     const request = {
       index,
       collection,
-      body: {documents},
+      body: { documents },
       action: 'mCreateOrReplace'
     };
 
@@ -291,7 +357,44 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mDelete (index, collection, ids, options = {}) {
+  /**
+   * Deletes multiple documents.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-delete/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param ids Document IDs
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mDelete (
+    index: string,
+    collection: string,
+    ids: Array<string>,
+    options: { queuable?: boolean, refresh?: string } = {}
+  ): Promise<{
+    /**
+     * Array of successfully deleted documents IDS
+     */
+    successes: Array<string>;
+    /**
+     * Array of failed deletion
+     */
+    errors: Array<{
+      /**
+       * Document ID
+       */
+      id: string;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
     const request = {
       index,
       collection,
@@ -303,23 +406,101 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mGet (index, collection, ids, options = {}) {
+  /**
+   * Gets multiple documents.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-get/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param ids Document IDs
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `verb` (HTTP only) Forces the verb of the route
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mGet (
+    index: string,
+    collection: string,
+    ids: Array<string>,
+    options: { queuable?: boolean, verb?: string } = {}
+  ): Promise<{
+    /**
+     * Array of successfully retrieved documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of the IDs of not found documents.
+     */
+    errors: Array<string>;
+  }> {
     const request = {
       index,
       collection,
       action: 'mGet',
-      body: {ids}
+      body: { ids }
     };
 
     return this.query(request, options)
       .then(response => response.result);
   }
 
-  mReplace (index, collection, documents, options = {}) {
+  /**
+   * Replaces multiple documents.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-replace/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param documents Documents to create
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mReplace (
+    index: string,
+    collection: string,
+    documents: Array<{
+      /**
+       * Document ID
+       */
+      _id: string;
+      /**
+       * Document content
+       */
+      body: JSONObject;
+    }>,
+    options: { queuable?: boolean, refresh?: string } = {}
+  ): Promise<{
+    /**
+     * Array of successfully replaced documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
+    errors: Array<{
+      /**
+       * Document that cause the error
+       */
+      document: Document;
+      /**
+       * HTTP error status
+       */
+      status: number;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
     const request = {
       index,
       collection,
-      body: {documents},
+      body: { documents },
       action: 'mReplace'
     };
 
@@ -327,7 +508,61 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  mUpdate (index, collection, documents, options = {}) {
+  /**
+   * Updates multiple documents.
+   *
+   * Conflicts may occur if the same document gets updated multiple times
+   * within a short timespan in a database cluster. (See `retryOnConflict`)
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-update/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param documents Documents to create
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mUpdate (
+    index: string,
+    collection: string,
+    documents: Array<{
+      /**
+       * Document ID
+       */
+      _id: string;
+      /**
+       * Document content
+       */
+      body: JSONObject;
+    }>,
+    options: { queuable?: boolean, refresh?: string, retryOnConflict?: number } = {}
+  ): Promise<{
+    /**
+     * Array of successfully updated documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
+    errors: Array<{
+      /**
+       * Document that cause the error
+       */
+      document: Document;
+      /**
+       * HTTP error status
+       */
+      status: number;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
     const request = {
       index,
       collection,
@@ -339,12 +574,33 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  replace (index, collection, _id, body, options = {}) {
+  /**
+   * Replaces the content of an existing document.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/replace/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param id Document ID
+   * @param content Document content
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *
+   * @returns The replaced document
+   */
+  replace (
+    index: string,
+    collection: string,
+    _id: string,
+    content: JSONObject,
+    options: { queuable?: boolean, refresh?: string } = {}
+  ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
-      body,
+      body: content,
       action: 'replace'
     };
 
@@ -352,15 +608,48 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  search (index, collection, body = {}, options = {}) {
-    return this._search(index, collection, body, options)
+  /**
+   * Searches documents.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/search/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param query Search query
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `from` Offset of the first document to fetch
+   *    - `size` Maximum number of documents to retrieve per page
+   *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
+   *    - `verb` (HTTP only) Forces the verb of the route
+   *
+   * @returns A SearchResult
+   */
+  search (
+    index: string,
+    collection: string,
+    query: JSONObject = {},
+    options: {
+      queuable?: boolean;
+      from?: number;
+      size?: number;
+      scroll?: string;
+      verb?: string;
+    } = {}
+  ): Promise<SearchResult> {
+    return this._search(index, collection, query, options)
       .then(({ response, request, opts }) => (
         new DocumentsSearchResult(this.kuzzle, request, opts, response.result)
       ));
   }
 
-  _search (index, collection, body = {}, options = {}) {
-    const request = {
+  private _search (
+    index: string,
+    collection: string,
+    body: JSONObject = {},
+    options: JSONObject = {}
+  ) {
+    const request: any = {
       index,
       collection,
       body: null,
@@ -384,12 +673,40 @@ export class DocumentController extends BaseController {
       .then(response => ({ response, request, opts }));
   }
 
-  update (index, collection, _id, body, options = {}) {
+  /**
+   * Updates the content of an existing document.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/update/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param id Document ID
+   * @param content Document content
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `source` If true, returns the updated document inside the response
+   *
+   * @returns The replaced document
+   */
+  update (
+    index: string,
+    collection: string,
+    _id: string,
+    content: JSONObject,
+    options: {
+      queuable?: boolean,
+      refresh?: string,
+      retryOnConflict?: boolean,
+      source?: boolean
+    } = {}
+   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
-      body,
+      body: content,
       action: 'update',
       retryOnConflict: options.retryOnConflict,
       source: options.source
@@ -399,11 +716,54 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  updateByQuery(index, collection, searchQuery, changes, options = {}) {
+  /**
+   * Updates documents matching the provided search query.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/update-by-query/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param query Query to match
+   * @param changes Partial changes to apply to the documents
+   * @param options Additional options
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `source` If true, returns the updated document inside the response
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  updateByQuery(
+    index: string,
+    collection: string,
+    query: JSONObject,
+    changes: JSONObject,
+    options: { refresh?: string, source?: boolean } = {}
+  ): Promise<{
+    /**
+     * Array of successfully updated documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
+    errors: Array<{
+      /**
+       * Document that cause the error
+       */
+      document: Document;
+      /**
+       * HTTP error status
+       */
+      status: number;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
     const request = {
       index,
       collection,
-      body: {query: searchQuery, changes},
+      body: { query, changes },
       action: 'updateByQuery',
       source: options.source
     };
@@ -412,11 +772,29 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-  validate (index, collection, body, options = {}) {
+  /**
+   * Validates a document against existing validation rules.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/validate/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param content Document content
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *
+   * @returns True if the document is valid
+   */
+  validate (
+    index: string,
+    collection: string,
+    content: JSONObject,
+    options: { queuable?: boolean } = {}
+  ): Promise<boolean> {
     return this.query({
       index,
       collection,
-      body,
+      body: content,
       action: 'validate'
     }, options)
       .then(response => response.result);

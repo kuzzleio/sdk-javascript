@@ -1,4 +1,59 @@
-class SearchResultBase {
+import { JSONObject, KuzzleRequest } from "../../utils/interfaces";
+import { Kuzzle } from '../../Kuzzle';
+
+export interface SearchResult {
+  /**
+   * Search aggregations
+   */
+  aggregations?: JSONObject;
+
+  /**
+   * Page results
+   */
+  hits: Array<Document>;
+
+  /**
+   * Total number of items that can be retrieved
+   */
+  total: number;
+
+  /**
+   * Number of retrieved items so far
+   */
+  fetched: number;
+
+  /**
+   * Advances through the search results and returns the next page of items.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/core-classes/search-result/next/
+   *
+   * @example
+   * while (result) {
+   *   // process result.hits here
+   *   result = await result.next();
+   * }
+   *
+   * @returns A SearchResult or null if no more pages
+   */
+  next (): Promise<SearchResult | null>;
+}
+
+export class SearchResultBase implements SearchResult {
+  protected _searchAction: string;
+  protected _scrollAction: string;
+  protected _controller: string;
+  protected _request: KuzzleRequest;
+  protected _kuzzle: Kuzzle;
+  protected _options: JSONObject;
+  protected _response: JSONObject;
+
+  public aggregations?: JSONObject;
+
+  public hits: Array<Document>;
+
+  public total: number;
+
+  public fetched: number;
 
   /**
    *
@@ -7,7 +62,12 @@ class SearchResultBase {
    * @param {object} options
    * @param {object} response
    */
-  constructor (kuzzle, request = {}, options = {}, response = {}) {
+  constructor (
+    kuzzle: Kuzzle,
+    request: KuzzleRequest = {},
+    options: any = {},
+    response: any = {}
+  ) {
     Reflect.defineProperty(this, '_kuzzle', {
       value: kuzzle
     });
@@ -31,7 +91,7 @@ class SearchResultBase {
     this.total = response.total || 0;
   }
 
-  next () {
+  next (): Promise<SearchResult | null> {
     if (this.fetched >= this.total) {
       return Promise.resolve(null);
     }
@@ -55,7 +115,7 @@ class SearchResultBase {
       // It resulting in having less fetched documents than the total and thus the SDK
       // try to fetch the next results page but it's empty
       if (! hit) {
-        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.'));
+        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only. Add document `_id` to the sort.'));
       }
 
       request.body.search_after = [];
@@ -120,7 +180,9 @@ class SearchResultBase {
   }
 
   _buildNextSearchResult (response) {
-    const nextSearchResult = new this.constructor(this._kuzzle, this._request, this._options, response.result);
+    const Constructor: any = this.constructor;
+
+    const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, response.result);
     nextSearchResult.fetched += this.fetched;
 
     return nextSearchResult;

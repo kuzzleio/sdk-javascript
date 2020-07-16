@@ -145,7 +145,7 @@ export interface Document {
   /**
    * Document Content
    */
-  _source: {
+  _source?: {
     [key: string]: JSONObject | any,
     /**
      * Kuzzle metadata

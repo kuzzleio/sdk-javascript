@@ -1,7 +1,6 @@
-const { SearchResultBase } = require('./SearchResultBase');
+import { SearchResultBase } from './SearchResultBase';
 
 class DocumentsSearchResult extends SearchResultBase {
-
   /**
    * @param {Kuzzle} kuzzle
    * @param {object} query

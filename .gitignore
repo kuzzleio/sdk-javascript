@@ -38,3 +38,5 @@ src/core/security/User.js
 src/core/security/Profile.js
 src/core/security/Role.js
 src/utils/interfaces.js
+src/core/searchResult/SearchResultBase.js
+src/core/searchResult/Document.js
