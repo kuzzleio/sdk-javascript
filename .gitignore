@@ -32,6 +32,7 @@ test-*.js
 index.js
 src/Kuzzle.js
 src/controllers/Auth.js
+src/controllers/Document.js
 src/controllers/Base.js
 src/core/security/User.js
 src/core/security/Profile.js
