@@ -1,1452 +1,1452 @@
 {
   "auth": {
     "login": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/_login/:strategy"
     },
     "logout": {
       "url": "/_logout",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "getCurrentUser": {
       "url": "/users/_me",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getMyRights": {
       "url": "/users/_me/_rights",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "checkToken": {
       "url": "/_checkToken",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "updateSelf": {
       "url": "/_updateSelf",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "getStrategies": {
       "url": "/strategies",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "createMyCredentials": {
       "url": "/credentials/:strategy/_me/_create",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "updateMyCredentials": {
       "url": "/credentials/:strategy/_me/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "credentialsExist": {
       "url": "/credentials/:strategy/_me/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "validateMyCredentials": {
       "url": "/credentials/:strategy/_me/_validate",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "deleteMyCredentials": {
       "url": "/credentials/:strategy/_me",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "getMyCredentials": {
       "url": "/credentials/:strategy/_me",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "refreshToken": {
       "url": "/_refreshToken",
-      `verb`: "POST"
+      "verb": "POST"
     }
   },
   "bulk": {
     "deleteByQuery": {
       "url": "/:index/:collection/_bulk/_query",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "import": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/:index/:collection/_bulk"
     },
     "write": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/:index/:collection/_write"
     },
     "mWrite": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/:index/:collection/_mWrite"
     }
   },
   "document": {
     "create": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/:index/:collection/_create"
     },
     "scroll": {
       "url": "/_scroll/:scrollId",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "exists": {
       "url": "/:index/:collection/:_id/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "get": {
       "url": "/:index/:collection/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "mGet": {
       "url": "/:index/:collection/_mGet",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "count": {
       "url": "/:index/:collection/_count",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "mCreate": {
       "url": "/:index/:collection/_mCreate",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "createOrReplace": {
       "url": "/:index/:collection/:_id",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "mCreateOrReplace": {
       "url": "/:index/:collection/_mCreateOrReplace",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "update": {
       "url": "/:index/:collection/:_id/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "updateByQuery": {
       "url": "/:index/:collection/_query",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "mUpdate": {
       "url": "/:index/:collection/_mUpdate",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "replace": {
       "url": "/:index/:collection/:_id/_replace",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "mReplace": {
       "url": "/:index/:collection/_mReplace",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "delete": {
       "url": "/:index/:collection/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "mDelete": {
       "url": "/:index/:collection/_mDelete",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "deleteByQuery": {
       "url": "/:index/:collection/_query",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "validate": {
       "url": "/:index/:collection/_validate",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "search": {
       "url": "/:index/:collection/_search",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "security": {
     "createFirstAdmin": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/_createFirstAdmin"
     },
     "createRestrictedUser": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/users/_createRestricted"
     },
     "createUser": {
-      `verb`: "POST",
+      "verb": "POST",
       "url": "/users/_create"
     },
     "getRoleMapping": {
       "url": "/roles/_mapping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "updateRoleMapping": {
       "url": "/roles/_mapping",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "getProfileMapping": {
       "url": "/profiles/_mapping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "updateProfileMapping": {
       "url": "/profiles/_mapping",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "getUserMapping": {
       "url": "/users/_mapping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "updateUserMapping": {
       "url": "/users/_mapping",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "getRole": {
       "url": "/roles/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "mGetRoles": {
       "url": "/roles/_mGet",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "searchRoles": {
       "url": "/roles/_search",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "createOrReplaceRole": {
       "url": "/roles/:_id",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "createRole": {
       "url": "/roles/:_id/_create",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "deleteRole": {
       "url": "/roles/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "getProfile": {
       "url": "/profiles/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "mGetProfiles": {
       "url": "/profiles/_mGet",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "createOrReplaceProfile": {
       "url": "/profiles/:_id",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "createProfile": {
       "url": "/profiles/:_id/_create",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "deleteProfile": {
       "url": "/profiles/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "searchProfiles": {
       "url": "/profiles/_search",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "getUser": {
       "url": "/users/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getProfileRights": {
       "url": "/profiles/:_id/_rights",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getUserRights": {
       "url": "/users/:_id/_rights",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "searchUsers": {
       "url": "/users/_search",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "deleteUser": {
       "url": "/users/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "updateUser": {
       "url": "/users/:_id/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "replaceUser": {
       "url": "/users/:_id/_replace",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "updateProfile": {
       "url": "/profiles/:_id/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "updateRole": {
       "url": "/roles/:_id/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "mDeleteProfiles": {
       "url": "/profiles/_mDelete",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "mDeleteRoles": {
       "url": "/roles/_mDelete",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "mDeleteUsers": {
       "url": "/users/_mDelete",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "scrollUsers": {
       "url": "/users/_scroll/:scrollId",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "scrollProfiles": {
       "url": "/profiles/_scroll/:scrollId",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "createCredentials": {
       "url": "/credentials/:strategy/:_id/_create",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "updateCredentials": {
       "url": "/credentials/:strategy/:_id/_update",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "hasCredentials": {
       "url": "/credentials/:strategy/:_id/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "validateCredentials": {
       "url": "/credentials/:strategy/:_id/_validate",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "deleteCredentials": {
       "url": "/credentials/:strategy/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "getCredentials": {
       "url": "/credentials/:strategy/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getCredentialsById": {
       "url": "/credentials/:strategy/:_id/_byId",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getCredentialFields": {
       "url": "/credentials/:strategy/_fields",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getAllCredentialFields": {
       "url": "/credentials/_fields",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "collection": {
     "update": {
       "url": "/:index/:collection/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "updateMapping": {
       "url": "/:index/:collection/_mapping",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "getMapping": {
       "url": "/:index/:collection/_mapping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getSpecifications": {
       "url": "/:index/:collection/_specifications",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "searchSpecifications": {
       "url": "/validations/_search",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "scrollSpecifications": {
       "url": "/validations/_scroll/:scrollId",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "updateSpecifications": {
       "url": "/:index/:collection/_specifications",
-      `verb`: "PUT"
+      "verb": "PUT"
     },
     "deleteSpecifications": {
       "url": "/:index/:collection/_specifications",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "validateSpecifications": {
       "url": "/:index/:collection/_validateSpecifications",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "truncate": {
       "url": "/:index/:collection/_truncate",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "list": {
       "url": "/:index/_list",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "exists": {
       "url": "/:index/:collection/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "create": {
       "url": "/:index/:collection",
-      `verb`: "PUT"
+      "verb": "PUT"
     }
   },
   "index": {
     "mDelete": {
       "url": "/_mdelete",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "create": {
       "url": "/:index/_create",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "delete": {
       "url": "/:index",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
-    `refresh`: {
+    "refresh": {
       "url": "/:index/_refresh",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "list": {
       "url": "/_list",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "refreshInternal": {
       "url": "/_refreshInternal",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "getAutoRefresh": {
       "url": "/:index/_autoRefresh",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "setAutoRefresh": {
       "url": "/:index/_autoRefresh",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "exists": {
       "url": "/:index/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "ms": {
     "append": {
       "url": "/ms/_append/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "bitcount": {
       "url": "/ms/_bitcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "bitop": {
       "url": "/ms/_bitop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "bitpos": {
       "url": "/ms/_bitpos/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "dbsize": {
       "url": "/ms/_dbsize",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "decrby": {
       "url": "/ms/_decrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "del": {
       "url": "/ms",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "expire": {
       "url": "/ms/_expire/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "expireat": {
       "url": "/ms/_expireat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "flushdb": {
       "url": "/ms/_flushdb",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geoadd": {
       "url": "/ms/_geoadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geodist": {
       "url": "/ms/_geodist/:_id/:member1/:member2",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "geohash": {
       "url": "/ms/_geohash/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "georadius": {
       "url": "/ms/_georadius/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "georadiusbymember": {
       "url": "/ms/_georadiusbymember/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getbit": {
       "url": "/ms/_getbit/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getrange": {
       "url": "/ms/_getrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hdel": {
       "url": "/ms/_hdel/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "hmget": {
       "url": "/ms/_hmget/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hexists": {
       "url": "/ms/_hexists/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hincrby": {
       "url": "/ms/_hincrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hmset": {
       "url": "/ms/_hmset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hset": {
       "url": "/ms/_hset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hstrlen": {
       "url": "/ms/_hstrlen/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "keys": {
       "url": "/ms/_keys/:pattern",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "lindex": {
       "url": "/ms/_lindex/:_id/:idx",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "linsert": {
       "url": "/ms/_linsert/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpush": {
       "url": "/ms/_lpush/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lrange": {
       "url": "/ms/_lrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "lrem": {
       "url": "/ms/_lrem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "lset": {
       "url": "/ms/_lset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "ltrim": {
       "url": "/ms/_ltrim/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "mexecute": {
         "url": "/ms/_mexecute",
-        `verb`: "POST"
+        "verb": "POST"
     },
     "mget": {
       "url": "/ms/_mget",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "mset": {
       "url": "/ms/_mset",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "object": {
       "url": "/ms/_object/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "pexpire": {
       "url": "/ms/_pexpire/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pexpireat": {
       "url": "/ms/_pexpireat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pfadd": {
       "url": "/ms/_pfadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pfmerge": {
       "url": "/ms/_pfmerge/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "ping": {
       "url": "/ms/_ping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "psetex": {
       "url": "/ms/_psetex/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "randomkey": {
       "url": "/ms/_randomkey",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "rename": {
       "url": "/ms/_rename/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "renamenx": {
       "url": "/ms/_renamenx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpoplpush": {
       "url": "/ms/_rpoplpush",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sadd": {
       "url": "/ms/_sadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "scan": {
       "url": "/ms/_scan",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sdiff": {
       "url": "/ms/_sdiff/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sdiffstore": {
       "url": "/ms/_sdiffstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "set": {
       "url": "/ms/_set/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "setex": {
       "url": "/ms/_setex/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "setnx": {
       "url": "/ms/_setnx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sinterstore": {
       "url": "/ms/_sinterstore",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sismember": {
       "url": "/ms/_sismember/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "smove": {
       "url": "/ms/_smove/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sort": {
       "url": "/ms/_sort/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "spop": {
       "url": "/ms/_spop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "srandmember": {
       "url": "/ms/_srandmember/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "srem": {
       "url": "/ms/_srem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "sscan": {
       "url": "/ms/_sscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sunion": {
       "url": "/ms/_sunion",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sunionstore": {
       "url": "/ms/_sunionstore",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "time": {
       "url": "/ms/_time",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "touch": {
       "url": "/ms/_touch",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zadd": {
       "url": "/ms/_zadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zcount": {
       "url": "/ms/_zcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zincrby": {
       "url": "/ms/_zincrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zinterstore": {
       "url": "/ms/_zinterstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zlexcount": {
       "url": "/ms/_zlexcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrange": {
       "url": "/ms/_zrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrangebylex": {
       "url": "/ms/_zrangebylex/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrangebyscore": {
       "url": "/ms/_zrangebyscore/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrem": {
       "url": "/ms/_zrem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebylex": {
       "url": "/ms/_zremrangebylex/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebyrank": {
       "url": "/ms/_zremrangebyrank/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebyscore": {
       "url": "/ms/_zremrangebyscore/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zrevrangebylex": {
       "url": "/ms/_zrevrangebylex/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrevrangebyscore": {
       "url": "/ms/_zrevrangebyscore/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrevrank": {
       "url": "/ms/_zrevrank/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zunionstore": {
       "url": "/ms/_zunionstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zcard": {
       "url": "/ms/_zcard/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "type": {
       "url": "/ms/_type/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "ttl": {
       "url": "/ms/_ttl/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "strlen": {
       "url": "/ms/_strlen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "smembers": {
       "url": "/ms/_smembers/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "scard": {
       "url": "/ms/_scard/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "rpop": {
       "url": "/ms/_rpop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pttl": {
       "url": "/ms/_pttl/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "persist": {
       "url": "/ms/_persist/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpop": {
       "url": "/ms/_lpop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "llen": {
       "url": "/ms/_llen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "incr": {
       "url": "/ms/_incr/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hvals": {
       "url": "/ms/_hvals/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hlen": {
       "url": "/ms/_hlen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hkeys": {
       "url": "/ms/_hkeys/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hgetall": {
       "url": "/ms/_hgetall/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "get": {
       "url": "/ms/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "decr": {
       "url": "/ms/_decr/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpushx": {
       "url": "/ms/_rpushx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpushx": {
       "url": "/ms/_lpushx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "getset": {
       "url": "/ms/_getset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sinter": {
       "url": "/ms/_sinter",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "pfcount": {
       "url": "/ms/_pfcount",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "incrbyfloat": {
       "url": "/ms/_incrbyfloat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "incrby": {
       "url": "/ms/_incrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geopos": {
       "url": "/ms/_geopos/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hget": {
       "url": "/ms/_hget/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hsetnx": {
       "url": "/ms/_hsetnx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "msetnx": {
       "url": "/ms/_msetnx",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpush": {
       "url": "/ms/_rpush/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hincrbyfloat": {
       "url": "/ms/_hincrbyfloat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zrevrange": {
       "url": "/ms/_zrevrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrank": {
       "url": "/ms/_zrank/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zscore": {
       "url": "/ms/_zscore/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zscan": {
       "url": "/ms/_zscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hscan": {
       "url": "/ms/_hscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "exists": {
       "url": "/ms/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "memoryStorage": {
     "append": {
       "url": "/ms/_append/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "bitcount": {
       "url": "/ms/_bitcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "bitop": {
       "url": "/ms/_bitop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "bitpos": {
       "url": "/ms/_bitpos/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "dbsize": {
       "url": "/ms/_dbsize",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "decrby": {
       "url": "/ms/_decrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "del": {
       "url": "/ms",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "expire": {
       "url": "/ms/_expire/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "expireat": {
       "url": "/ms/_expireat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "flushdb": {
       "url": "/ms/_flushdb",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geoadd": {
       "url": "/ms/_geoadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geodist": {
       "url": "/ms/_geodist/:_id/:member1/:member2",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "geohash": {
       "url": "/ms/_geohash/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "georadius": {
       "url": "/ms/_georadius/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "georadiusbymember": {
       "url": "/ms/_georadiusbymember/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getbit": {
       "url": "/ms/_getbit/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getrange": {
       "url": "/ms/_getrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hdel": {
       "url": "/ms/_hdel/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "hmget": {
       "url": "/ms/_hmget/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hexists": {
       "url": "/ms/_hexists/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hincrby": {
       "url": "/ms/_hincrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hmset": {
       "url": "/ms/_hmset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hset": {
       "url": "/ms/_hset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hstrlen": {
       "url": "/ms/_hstrlen/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "keys": {
       "url": "/ms/_keys/:pattern",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "lindex": {
       "url": "/ms/_lindex/:_id/:idx",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "linsert": {
       "url": "/ms/_linsert/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpush": {
       "url": "/ms/_lpush/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lrange": {
       "url": "/ms/_lrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "lrem": {
       "url": "/ms/_lrem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "lset": {
       "url": "/ms/_lset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "ltrim": {
       "url": "/ms/_ltrim/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "mget": {
       "url": "/ms/_mget",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "mset": {
       "url": "/ms/_mset",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "object": {
       "url": "/ms/_object/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "pexpire": {
       "url": "/ms/_pexpire/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pexpireat": {
       "url": "/ms/_pexpireat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pfadd": {
       "url": "/ms/_pfadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pfmerge": {
       "url": "/ms/_pfmerge/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "ping": {
       "url": "/ms/_ping",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "psetex": {
       "url": "/ms/_psetex/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "randomkey": {
       "url": "/ms/_randomkey",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "rename": {
       "url": "/ms/_rename/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "renamenx": {
       "url": "/ms/_renamenx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpoplpush": {
       "url": "/ms/_rpoplpush",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sadd": {
       "url": "/ms/_sadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "scan": {
       "url": "/ms/_scan",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sdiff": {
       "url": "/ms/_sdiff/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sdiffstore": {
       "url": "/ms/_sdiffstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "set": {
       "url": "/ms/_set/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "setex": {
       "url": "/ms/_setex/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "setnx": {
       "url": "/ms/_setnx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sinterstore": {
       "url": "/ms/_sinterstore",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sismember": {
       "url": "/ms/_sismember/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "smove": {
       "url": "/ms/_smove/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sort": {
       "url": "/ms/_sort/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "spop": {
       "url": "/ms/_spop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "srandmember": {
       "url": "/ms/_srandmember/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "srem": {
       "url": "/ms/_srem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "sscan": {
       "url": "/ms/_sscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sunion": {
       "url": "/ms/_sunion",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "sunionstore": {
       "url": "/ms/_sunionstore",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "time": {
       "url": "/ms/_time",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "touch": {
       "url": "/ms/_touch",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zadd": {
       "url": "/ms/_zadd/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zcount": {
       "url": "/ms/_zcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zincrby": {
       "url": "/ms/_zincrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zinterstore": {
       "url": "/ms/_zinterstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zlexcount": {
       "url": "/ms/_zlexcount/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrange": {
       "url": "/ms/_zrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrangebylex": {
       "url": "/ms/_zrangebylex/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrangebyscore": {
       "url": "/ms/_zrangebyscore/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrem": {
       "url": "/ms/_zrem/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebylex": {
       "url": "/ms/_zremrangebylex/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebyrank": {
       "url": "/ms/_zremrangebyrank/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zremrangebyscore": {
       "url": "/ms/_zremrangebyscore/:_id",
-      `verb`: "DELETE"
+      "verb": "DELETE"
     },
     "zrevrangebylex": {
       "url": "/ms/_zrevrangebylex/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrevrangebyscore": {
       "url": "/ms/_zrevrangebyscore/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrevrank": {
       "url": "/ms/_zrevrank/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zunionstore": {
       "url": "/ms/_zunionstore/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zcard": {
       "url": "/ms/_zcard/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "type": {
       "url": "/ms/_type/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "ttl": {
       "url": "/ms/_ttl/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "strlen": {
       "url": "/ms/_strlen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "smembers": {
       "url": "/ms/_smembers/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "scard": {
       "url": "/ms/_scard/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "rpop": {
       "url": "/ms/_rpop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "pttl": {
       "url": "/ms/_pttl/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "persist": {
       "url": "/ms/_persist/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpop": {
       "url": "/ms/_lpop/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "llen": {
       "url": "/ms/_llen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "incr": {
       "url": "/ms/_incr/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hvals": {
       "url": "/ms/_hvals/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hlen": {
       "url": "/ms/_hlen/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hkeys": {
       "url": "/ms/_hkeys/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hgetall": {
       "url": "/ms/_hgetall/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "get": {
       "url": "/ms/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "decr": {
       "url": "/ms/_decr/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpushx": {
       "url": "/ms/_rpushx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "lpushx": {
       "url": "/ms/_lpushx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "getset": {
       "url": "/ms/_getset/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "sinter": {
       "url": "/ms/_sinter",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "pfcount": {
       "url": "/ms/_pfcount",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "incrbyfloat": {
       "url": "/ms/_incrbyfloat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "incrby": {
       "url": "/ms/_incrby/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "geopos": {
       "url": "/ms/_geopos/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hget": {
       "url": "/ms/_hget/:_id/:field",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hsetnx": {
       "url": "/ms/_hsetnx/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "msetnx": {
       "url": "/ms/_msetnx",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "rpush": {
       "url": "/ms/_rpush/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "hincrbyfloat": {
       "url": "/ms/_hincrbyfloat/:_id",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "zrevrange": {
       "url": "/ms/_zrevrange/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zrank": {
       "url": "/ms/_zrank/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zscore": {
       "url": "/ms/_zscore/:_id/:member",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "zscan": {
       "url": "/ms/_zscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "hscan": {
       "url": "/ms/_hscan/:_id",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "exists": {
       "url": "/ms/_exists",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "realtime": {
     "list": {
       "url": "/_listSubscriptions",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "publish": {
       "url": "/:index/:collection/_publish",
-      `verb`: "POST"
+      "verb": "POST"
     }
   },
   "server": {
     "getStats": {
       "url": "/_getStats",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getLastStats": {
       "url": "/_getLastStats",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getAllStats": {
       "url": "/_getAllStats",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "getConfig": {
       "url": "/_getConfig",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "adminExists": {
       "url": "/_adminExists",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "now": {
       "url": "/_now",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "healthCheck": {
       "url": "/_healthCheck",
-      `verb`: "GET"
+      "verb": "GET"
     },
     "info": {
       "url": "/",
-      `verb`: "GET"
+      "verb": "GET"
     }
   },
   "admin": {
     "resetKuzzleData": {
       "url": "/admin/_resetKuzzleData/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "resetCache": {
       "url": "/admin/_resetCache",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "resetSecurity": {
       "url": "/admin/_resetSecurity/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "resetDatabase": {
       "url": "/admin/_resetDatabase/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "dump": {
       "url": "/admin/_dump",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "shutdown": {
       "url": "/admin/_shutdown/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "loadFixtures": {
       "url": "/admin/_loadFixtures/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "loadMappings": {
       "url": "/admin/_loadMappings/",
-      `verb`: "POST"
+      "verb": "POST"
     },
     "loadSecurities": {
       "url": "/admin/_loadSecurities/",
-      `verb`: "POST"
+      "verb": "POST"
     }
   }
 }

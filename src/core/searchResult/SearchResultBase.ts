@@ -1,4 +1,4 @@
-import { JSONObject, KuzzleRequest } from "../../utils/interfaces";
+import { JSONObject, KuzzleRequest } from '../../utils/interfaces';
 import { Kuzzle } from '../../Kuzzle';
 
 export interface SearchResult {

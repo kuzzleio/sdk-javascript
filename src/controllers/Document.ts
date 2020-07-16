@@ -1,5 +1,6 @@
 import { BaseController } from './Base';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
+import { DocumentsSearchResult } from '../core/searchResult/Document';
 import { JSONObject, Document } from '../utils/interfaces';
 
 export class DocumentController extends BaseController {
@@ -221,7 +222,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     options: { queuable?: boolean, refresh?: string } = {}
-   ): Promise<Document> {
+  ): Promise<Document> {
     const request = {
       index,
       collection,
@@ -701,7 +702,7 @@ export class DocumentController extends BaseController {
       retryOnConflict?: boolean,
       source?: boolean
     } = {}
-   ): Promise<Document> {
+  ): Promise<Document> {
     const request = {
       index,
       collection,
