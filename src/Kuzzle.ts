@@ -14,7 +14,7 @@ import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
 import { JSONObject } from './utils/interfaces';
 
-// defined by webpack plugin
+// Defined by webpack plugin
 declare const SDKVERSION: any;
 
 const events = [
