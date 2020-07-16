@@ -63,6 +63,8 @@ export class AuthController extends BaseController {
   /**
    * Creates a new API key for the currently loggued user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/create-api-key
+   *
    * @param description API key description
    * @param options Additional options
    *    - "_id" API key unique ID
@@ -74,7 +76,7 @@ export class AuthController extends BaseController {
   createApiKey(
     description: string,
     options: { _id?: string, expiresIn?: number, refresh?: string } = {}
-  ) {
+  ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
       _id: options._id,
@@ -86,17 +88,19 @@ export class AuthController extends BaseController {
     };
 
     return this.query(request)
-      .then(response => response.result as ApiKey);
+      .then(response => response.result);
   }
 
   /**
    * Deletes an API key for the currently loggued user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
+   *
    * @param id API key ID
    * @param options Additional options
    *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    */
-  deleteApiKey(id: string, options: { refresh?: string } = {}) {
+  deleteApiKey(id: string, options: { refresh?: string } = {}): Promise<null> {
     const request = {
       action: 'deleteApiKey',
       _id: id,
@@ -110,6 +114,8 @@ export class AuthController extends BaseController {
   /**
    * Searches API keys for the currently loggued user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/search-api-keys
+   *
    * @param query Search query
    * @param options Additional options
    *    - "from" Offset of the first document to fetch
@@ -120,7 +126,16 @@ export class AuthController extends BaseController {
   searchApiKeys(
     query: JSONObject = {},
     options: { from?: number, size?: number } = {}
-  ) {
+  ): Promise<{
+    /**
+     * Array of found ApiKeys
+     */
+    hits: Array<ApiKey>,
+    /**
+     * Total number of API keys found
+     */
+    total: number
+  }> {
     const request = {
       action: 'searchApiKeys',
       from: options.from,
@@ -129,26 +144,32 @@ export class AuthController extends BaseController {
     };
 
     return this.query(request)
-      .then(response => response.result as {
-        /**
-         * Array of found ApiKeys
-         */
-        hits: Array<ApiKey>,
-        /**
-         * Total number of API keys found
-         */
-        total: number
-      });
+      .then(response => response.result);
   }
 
   /**
    * Checks whether a given jwt token still represents a valid session in Kuzzle.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-token
+   *
    * @param token The jwt token to check (default to current SDK token)
    *
    * @returns A token validity object
    */
-  checkToken (token?: string) {
+  checkToken (token?: string): Promise<{
+    /**
+     * Tell if the token is valid or not
+     */
+    valid: boolean,
+    /**
+     * Explain why the token is invalid
+     */
+    state: string,
+    /**
+     * Token expiration timestamp
+     */
+    expiresAt: number
+  }> {
     if (token === undefined && this.authenticationToken) {
       token = this.authenticationToken.encodedJwt;
     }
@@ -157,24 +178,13 @@ export class AuthController extends BaseController {
       action: 'checkToken',
       body: { token }
     }, { queuable: false })
-      .then(response => response.result as {
-        /**
-         * Tell if the token is valid or not
-         */
-        valid: boolean,
-        /**
-         * Explain why the token is invalid
-         */
-        state: string,
-        /**
-         * Token expiration timestamp
-         */
-        expiresAt: number
-      });
+      .then(response => response.result);
   }
 
   /**
    * Create credentials of the specified strategy for the current user.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/create-my-credentials
    *
    * @param strategy New credentials
    * @param credentials Name of the strategy to use
@@ -188,17 +198,19 @@ export class AuthController extends BaseController {
     strategy: string,
     credentials: JSONObject,
     options: { queuable?: boolean } = {}
-  ) {
+  ): Promise<JSONObject> {
     return this.query({
       strategy,
       action: 'createMyCredentials',
       body: credentials
     }, options)
-      .then(response => response.result as JSONObject);
+      .then(response => response.result);
   }
 
   /**
    * Check the existence of the specified strategy's credentials for the current user.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/credentials-exist
    *
    * @param strategy Name of the strategy to use
    * @param options Additional options
@@ -206,37 +218,48 @@ export class AuthController extends BaseController {
    *
    * @returns A boolean indicating if the credentials exists
    */
-  credentialsExist (strategy: string, options: { queuable?: boolean } = {}) {
+  credentialsExist (
+    strategy: string,
+    options: { queuable?: boolean } = {}
+  ): Promise<boolean> {
     return this.query({
       strategy,
       action: 'credentialsExist'
     }, options)
-      .then(response => response.result as boolean);
+      .then(response => response.result);
   }
 
   /**
    * Delete credentials of the specified strategy for the current user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-my-credentials
+   *
    * @param strategy Name of the strategy to use
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
    */
-  deleteMyCredentials (strategy: string, options: { queuable?: boolean } = {}) {
+  deleteMyCredentials (
+    strategy: string,
+    options: { queuable?: boolean } = {}
+  ): Promise<boolean> {
     return this.query({
       strategy,
       action: 'deleteMyCredentials'
     }, options)
-      .then(response => response.result.acknowledged as boolean);
+      .then(response => response.result.acknowledged);
   }
 
   /**
    * Fetches the current user.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-current-user
+   *
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns Currently loggued User
    */
-  getCurrentUser (options: { queuable?: boolean } = {}) {
+  getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
     return this.query({
       action: 'getCurrentUser'
     }, options)
@@ -249,6 +272,8 @@ export class AuthController extends BaseController {
   /**
    * Get credential information of the specified strategy for the current user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-my-credentials
+   *
    * @param strategy Name of the strategy to use
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
@@ -256,68 +281,79 @@ export class AuthController extends BaseController {
    * @returns An object representing the credentials for the provided authentication strategy.
    *    Its content depends on the authentication strategy.
    */
-  getMyCredentials(strategy, options: { queuable?: boolean } = {}) {
+  getMyCredentials(
+    strategy: string,
+    options: { queuable?: boolean } = {}
+  ): Promise<JSONObject> {
     return this.query({
       strategy,
       action: 'getMyCredentials'
     }, options)
-      .then(response => response.result as JSONObject);
+      .then(response => response.result);
   }
 
   /**
    * Gets the rights array of the currently logged user.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-my-rights
    *
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An array containing user rights objects
    */
-  getMyRights (options: { queuable?: boolean } = {}) {
+  getMyRights (
+    options: { queuable?: boolean } = {}
+  ): Promise<Array<{
+    /**
+     * Controller on wich the rights are applied
+     */
+    controller: string,
+    /**
+     * Action on wich the rights are applied
+     */
+    action: string,
+    /**
+     * Index on wich the rights are applied
+     */
+    index: string,
+    /**
+     * Collection on wich the rights are applied
+     */
+    collection: string,
+    /**
+     * Rights ("allowed" or "denied")
+     */
+    value: string
+  }>> {
     return this.query({
       action: 'getMyRights'
     }, options)
-      .then(response => response.result.hits as Array<{
-        /**
-         * Controller on wich the rights are applied
-         */
-        controller: string,
-        /**
-         * Action on wich the rights are applied
-         */
-        action: string,
-        /**
-         * Index on wich the rights are applied
-         */
-        index: string,
-        /**
-         * Collection on wich the rights are applied
-         */
-        collection: string,
-        /**
-         * Rights ("allowed" or "denied")
-         */
-        value: string
-      }>);
+      .then(response => response.result.hits);
   }
 
   /**
    * Get all the strategies registered in Kuzzle by all auth plugins
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-strategies
    *
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An array of available strategies names
    */
-  getStrategies (options: { queuable?: boolean } = {}) {
+  getStrategies (options: { queuable?: boolean } = {}): Promise<Array<string>> {
     return this.query({
       action: 'getStrategies'
     }, options)
-      .then(response => response.result as Array<string>);
+      .then(response => response.result);
   }
 
   /**
    * Send login request to kuzzle with credentials
    * If login success, store the jwt into kuzzle object
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/login
    *
    * @param strategy Name of the strategy to use
    * @param credentials Credentials object for the strategy
@@ -325,7 +361,11 @@ export class AuthController extends BaseController {
    *
    * @returns The encrypted JSON Web Token
    */
-  login (strategy: string, credentials: JSONObject, expiresIn: string | null = null) {
+  login (
+    strategy: string,
+    credentials: JSONObject,
+    expiresIn: string = null
+  ): Promise<string> {
     const request = {
       strategy,
       expiresIn,
@@ -344,7 +384,7 @@ export class AuthController extends BaseController {
           return Promise.reject(err);
         }
 
-        return response.result.jwt as string;
+        return response.result.jwt;
       })
       .catch(err => {
         this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
@@ -354,11 +394,13 @@ export class AuthController extends BaseController {
 
   /**
    * Send logout request to kuzzle with jwt.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/logout
    */
-  logout () {
+  logout (): Promise<void> {
     return this.query({
       action: 'logout'
-    }, {queuable: false})
+    }, { queuable: false })
       .then(() => {
         this._authenticationToken = null;
       });
@@ -366,6 +408,8 @@ export class AuthController extends BaseController {
 
   /**
    * Update credentials of the specified strategy for the current user.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/update-my-credentials
    *
    * @param strategy Name of the strategy to use
    * @param credentials Updated credentials
@@ -379,18 +423,20 @@ export class AuthController extends BaseController {
     strategy: string,
     credentials: JSONObject,
     options: { queuable?: boolean } = {}
-  ) {
+  ): Promise<JSONObject> {
     return this.query({
       strategy,
       body: credentials,
       action: 'updateMyCredentials'
     }, options)
-      .then(response => response.result as JSONObject);
+      .then(response => response.result);
   }
 
   /**
    * Update current user in Kuzzle.
    * This route cannot update the list of associated security profiles.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/update-self
    *
    * @param {object} content - User custom information
    * @param options Additional options
@@ -398,7 +444,10 @@ export class AuthController extends BaseController {
    *
    * @returns Currently loggued User
    */
-  updateSelf (content: JSONObject, options: { queuable?: boolean } = {}) {
+  updateSelf (
+    content: JSONObject,
+    options: { queuable?: boolean } = {}
+  ): Promise<User> {
     return this.query({
       body: content,
       action: 'updateSelf'
@@ -412,22 +461,30 @@ export class AuthController extends BaseController {
   /**
    * Validate credentials of the specified strategy for the current user.
    *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/validate-my-credentials
+   *
    * @param strategy Name of the strategy to use
    * @param credentials Credentials to validate
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
    */
-  validateMyCredentials (strategy, credentials, options: { queuable?: boolean } = {}) {
+  validateMyCredentials (
+    strategy: string,
+    credentials: JSONObject,
+    options: { queuable?: boolean } = {}
+  ): Promise<boolean> {
     return this.query({
       strategy,
       body: credentials,
       action: 'validateMyCredentials'
     }, options)
-      .then(response => response.result as boolean);
+      .then(response => response.result);
   }
 
   /**
    * Refresh the SDK current authentication token
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/refresh-token
    *
    * @param options Additional options
    *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
@@ -435,7 +492,26 @@ export class AuthController extends BaseController {
    *
    * @returns The refreshed token
    */
-  refreshToken(options: { queuable?: boolean, expiresIn?: number } = {}) {
+  refreshToken(
+    options: { queuable?: boolean, expiresIn?: number } = {}
+  ): Promise<{
+    /**
+     * Token unique ID
+     */
+    _id: string;
+    /**
+     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+     */
+    expiresAt: number;
+    /**
+     * Authentication token associated with this API key
+     */
+    jwt: string;
+    /**
+     * Original TTL in ms
+     */
+    ttl: number;
+  }> {
     const query = {
       action: 'refreshToken',
       expiresIn: options.expiresIn
@@ -445,24 +521,7 @@ export class AuthController extends BaseController {
       .then(response => {
         this._authenticationToken = new Jwt(response.result.jwt);
 
-        return response.result as {
-          /**
-           * Token unique ID
-           */
-          _id: string;
-          /**
-           * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
-           */
-          expiresAt: number;
-          /**
-           * Authentication token associated with this API key
-           */
-          jwt: string;
-          /**
-           * Original TTL in ms
-           */
-          ttl: number;
-        };
+        return response.result;
       });
   }
 }
