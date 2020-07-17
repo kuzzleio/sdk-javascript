@@ -1,7 +1,7 @@
 import { BaseController } from './Base';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { DocumentsSearchResult } from '../core/searchResult/Document';
-import { JSONObject, Document } from '../utils/interfaces';
+import { JSONObject, Document, DocumentHit } from '../utils/interfaces';
 
 export class DocumentController extends BaseController {
   constructor (kuzzle) {
@@ -637,7 +637,7 @@ export class DocumentController extends BaseController {
       scroll?: string;
       verb?: string;
     } = {}
-  ): Promise<SearchResult> {
+  ): Promise<SearchResult<DocumentHit>> {
     return this._search(index, collection, query, options)
       .then(({ response, request, opts }) => (
         new DocumentsSearchResult(this.kuzzle, request, opts, response.result)

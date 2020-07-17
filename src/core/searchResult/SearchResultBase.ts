@@ -1,7 +1,7 @@
 import { JSONObject, KuzzleRequest } from '../../utils/interfaces';
 import { Kuzzle } from '../../Kuzzle';
 
-export interface SearchResult {
+export interface SearchResult<T> {
   /**
    * Search aggregations
    */
@@ -10,7 +10,7 @@ export interface SearchResult {
   /**
    * Page results
    */
-  hits: Array<Document>;
+  hits: Array<T>;
 
   /**
    * Total number of items that can be retrieved
@@ -35,10 +35,10 @@ export interface SearchResult {
    *
    * @returns A SearchResult or null if no more pages
    */
-  next (): Promise<SearchResult | null>;
+  next (): Promise<SearchResult<T> | null>;
 }
 
-export class SearchResultBase implements SearchResult {
+export class SearchResultBase<T> implements SearchResult<T> {
   protected _searchAction: string;
   protected _scrollAction: string;
   protected _controller: string;
@@ -49,7 +49,7 @@ export class SearchResultBase implements SearchResult {
 
   public aggregations?: JSONObject;
 
-  public hits: Array<Document>;
+  public hits: Array<T>;
 
   public total: number;
 
@@ -91,7 +91,7 @@ export class SearchResultBase implements SearchResult {
     this.total = response.total || 0;
   }
 
-  next (): Promise<SearchResult | null> {
+  next (): Promise<SearchResult<T> | null> {
     if (this.fetched >= this.total) {
       return Promise.resolve(null);
     }
