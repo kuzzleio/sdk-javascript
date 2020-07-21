@@ -1,7 +1,7 @@
 class Room {
 
   /**
-   * @param {RealTimeController} controller
+   * @param {RealtimeController} controller
    * @param {string} index
    * @param {string} collection
    * @param {object} body

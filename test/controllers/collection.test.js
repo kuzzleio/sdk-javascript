@@ -1,6 +1,6 @@
 const
-  CollectionController = require('../../src/controllers/Collection'),
-  SpecificationsSearchResult = require('../../src/core/searchResult/Specifications'),
+  { CollectionController } = require('../../src/controllers/Collection'),
+  { SpecificationsSearchResult } = require('../../src/core/searchResult/Specifications'),
   sinon = require('sinon'),
   should = require('should');
 

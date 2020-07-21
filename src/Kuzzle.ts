@@ -1,37 +1,91 @@
-const KuzzleEventEmitter = require('./core/KuzzleEventEmitter');
-const AuthController = require('./controllers/Auth');
-const BulkController = require('./controllers/Bulk');
-const CollectionController = require('./controllers/Collection');
-const DocumentController = require('./controllers/Document');
-const IndexController = require('./controllers/Index');
-const RealtimeController = require('./controllers/Realtime');
-const ServerController = require('./controllers/Server');
-const SecurityController = require('./controllers/Security');
-const MemoryStorageController = require('./controllers/MemoryStorage');
-const uuidv4 = require('./utils/uuidv4');
-const proxify = require('./utils/proxify');
+import { KuzzleEventEmitter } from './core/KuzzleEventEmitter';
 
-const
-  events = [
-    'connected',
-    'discarded',
-    'disconnected',
-    'loginAttempt',
-    'networkError',
-    'offlineQueuePush',
-    'offlineQueuePop',
-    'queryError',
-    'reconnected',
-    'tokenExpired'
-  ];
+import { AuthController } from './controllers/Auth';
+import { BulkController } from './controllers/Bulk';
+import { CollectionController } from './controllers/Collection';
+import { DocumentController } from './controllers/Document';
+import { IndexController } from './controllers/Index';
+import { RealtimeController } from './controllers/Realtime';
+import { ServerController } from './controllers/Server';
+import { SecurityController } from './controllers/Security';
+import { MemoryStorageController } from './controllers/MemoryStorage';
 
-class Kuzzle extends KuzzleEventEmitter {
+import { uuidv4 } from './utils/uuidv4';
+import { proxify } from './utils/proxify';
+import { JSONObject, KuzzleRequest } from './utils/interfaces';
+
+// Defined by webpack plugin
+declare const SDKVERSION: any;
+
+const events = [
+  'connected',
+  'discarded',
+  'disconnected',
+  'loginAttempt',
+  'networkError',
+  'offlineQueuePush',
+  'offlineQueuePop',
+  'queryError',
+  'reconnected',
+  'tokenExpired'
+];
+
+export class Kuzzle extends KuzzleEventEmitter {
+  /**
+   * Protocol used by the SDK to communicate with Kuzzle.
+   */
+  public protocol: any;
+  /**
+   * If true, automatically renews all subscriptions on a reconnected event.
+   */
+  public autoResubscribe: boolean;
+  /**
+   * Timeout before sending again a similar event.
+   */
+  public eventTimeout: number;
+  /**
+   * SDK version.
+   */
+  public sdkVersion: string;
+  /**
+   * SDK name (e.g: js@7.4.2).
+   */
+  public sdkName: string;
+  /**
+   * Common volatile data that will be sent to all future requests.
+   */
+  public volatile: JSONObject;
+
+  public auth: AuthController;
+  public bulk: any;
+  public collection: any;
+  public document: DocumentController;
+  public index: any;
+  public ms: any;
+  public realtime: any;
+  public security: any;
+  public server: any;
+
+  private _protectedEvents: any;
+  private _offlineQueue: any;
+  private _autoQueue: any;
+  private _autoReplay: any;
+  private _offlineQueueLoader: any;
+  private _queuing: boolean;
+  private _queueFilter: any;
+  private _queueMaxSize: any;
+  private _queueTTL: any;
+  private _replayInterval: any;
+  private _tokenExpiredInterval: any;
+  private _lastTokenExpired: any;
+
+  private __proxy__: any;
 
   /**
    * @param protocol - the protocol to use
    * @param [options] - Kuzzle options
    */
-  constructor(protocol, options = {}) {
+  constructor(protocol: any, options: any = {}) {
     super();
 
     if (protocol === undefined || protocol === null) {
@@ -64,6 +118,7 @@ class Kuzzle extends KuzzleEventEmitter {
       : 200;
 
     this.sdkVersion = typeof SDKVERSION === 'undefined'
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       ? require('../package').version
       : SDKVERSION;
 
@@ -115,7 +170,7 @@ class Kuzzle extends KuzzleEventEmitter {
       this._autoQueue = true;
       this._autoReplay = true;
     }
-    this.queuing = false;
+    this._queuing = false;
 
     this._lastTokenExpired = null;
 
@@ -123,7 +178,7 @@ class Kuzzle extends KuzzleEventEmitter {
       seal: true,
       name: 'kuzzle',
       exposeApi: true
-    });
+    }) as Kuzzle;
   }
 
   get authenticated () {
@@ -259,21 +314,25 @@ class Kuzzle extends KuzzleEventEmitter {
 
     if (protectedEvent) {
       if ( protectedEvent.lastEmitted
-        && protectedEvent.lastEmitted > now - this.eventTimeout)
-      {
+        && protectedEvent.lastEmitted > now - this.eventTimeout
+      ) {
         return false;
       }
       protectedEvent.lastEmitted = now;
     }
 
-    super.emit(eventName, ...payload);
+    return this._superEmit(eventName, ...payload);
+  }
+
+  _superEmit (eventName, ...payload) {
+    return super.emit(eventName, ...payload);
   }
 
   /**
    * Connects to a Kuzzle instance using the provided host name
    * @returns {Promise<Object>}
    */
-  connect () {
+  connect (): Promise<void> {
     if (this.protocol.isReady()) {
       return Promise.resolve();
     }
@@ -359,6 +418,10 @@ class Kuzzle extends KuzzleEventEmitter {
       throw new Error(`[${event}] is not a known event. Known events: ${events.toString()}`);
     }
 
+    return this._superAddListener(event, listener);
+  }
+
+  _superAddListener (event, listener) {
     return super.addListener(event, listener);
   }
 
@@ -392,7 +455,7 @@ class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @returns {Promise<object>}
    */
-  query (request = {}, options = {}) {
+  query (request: KuzzleRequest = {}, options: JSONObject = {}): Promise<JSONObject> {
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }
@@ -438,7 +501,7 @@ class Kuzzle extends KuzzleEventEmitter {
       queuable = queuable && this.queueFilter(request);
     }
 
-    if (this.queuing) {
+    if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
         this.emit('offlineQueuePush', {request});
@@ -464,7 +527,7 @@ Discarded request: ${JSON.stringify(request)}`));
    * Starts the requests queuing.
    */
   startQueuing () {
-    this.queuing = true;
+    this._queuing = true;
     return this;
   }
 
@@ -472,7 +535,7 @@ Discarded request: ${JSON.stringify(request)}`));
    * Stops the requests queuing.
    */
   stopQueuing () {
-    this.queuing = false;
+    this._queuing = false;
     return this;
   }
 
@@ -633,4 +696,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
 }
 
-module.exports = Kuzzle;
+module.exports = { Kuzzle };

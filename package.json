@@ -22,8 +22,11 @@
     "test": "npm run --silent lint && npm run unit-testing && npm run functional-testing",
     "test:unit": "nyc --reporter=text-summary --reporter=lcov mocha",
     "test:functional": "cucumber-js --exit --fail-fast",
-    "test:lint": "eslint --max-warnings=0 ./src ./test ./features",
-    "build": "node build.js",
+    "test:lint": "npm run test:lint:js && npm run test:lint:ts",
+    "test:lint:js": "eslint --max-warnings=0 ./src ./test ./features",
+    "test:lint:ts": "eslint ./src --ext .ts --config .eslintc-ts.json",
+    "build": "npm run build-ts && node build.js",
+    "build-ts": "tsc --build tsconfig.json",
     "doc": "docker-compose -f doc/docker-compose.yml up",
     "doc-testing": "bash .ci/test-docs.sh",
     "doc-prepare": "kuzdoc framework:install",
@@ -44,6 +47,9 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
+    "@types/node": "^14.0.23",
+    "@typescript-eslint/eslint-plugin": "^3.6.1",
+    "@typescript-eslint/parser": "^3.6.1",
     "babel-loader": "^8.1.0",
     "codecov": "^3.7.0",
     "cucumber": "^6.0.5",
@@ -61,14 +67,18 @@
     "should": "13.2.3",
     "should-sinon": "0.0.6",
     "sinon": "^9.0.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6",
     "webpack": "^4.43.0"
   },
   "engines": {
     "node": ">= 10.13.0"
   },
   "files": [
-    "src/**/*",
+    "dist/**/*",
     "index.js",
-    "dist/**/*"
+    "index.d.ts",
+    "src/**/*.js",
+    "src/**/*.d.ts"
   ]
 }

@@ -132,4 +132,4 @@ const proxify = (obj, opts = {}) => {
   return new Proxy(obj, handler);
 };
 
-module.exports = proxify;
+module.exports = { proxify };

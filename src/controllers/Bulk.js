@@ -1,4 +1,4 @@
-const BaseController = require('./Base');
+const { BaseController } = require('./Base');
 
 class BulkController extends BaseController {
   constructor (kuzzle) {
@@ -95,4 +95,4 @@ class BulkController extends BaseController {
 
 }
 
-module.exports = BulkController;
+module.exports = { BulkController };

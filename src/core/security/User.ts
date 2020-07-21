@@ -1,4 +1,18 @@
-class User {
+import { JSONObject } from '../../utils/interfaces';
+import { Profile } from './Profile';
+
+export class User {
+  /**
+   * Kuid (Kuzzle unique ID)
+   */
+  public _id: string;
+  /**
+   * Custom content
+   */
+  public content: JSONObject;
+
+  private _kuzzle: any;
+
   /**
    *
    * @param {Kuzzle} kuzzle
@@ -13,25 +27,29 @@ class User {
     this.content = content;
   }
 
-  get kuzzle () {
+  private get kuzzle () {
     return this._kuzzle;
   }
 
-  get profileIds () {
+  /**
+   * Array of profile IDs
+   */
+  get profileIds (): Array<string> {
     return this.content.profileIds || [];
   }
 
   /**
-   * @returns {Promise<[Profile]>}
+   * Gets user profile definitions from the API
    */
-  getProfiles () {
+  getProfiles (): Promise<Array<Profile>> {
     if (!this.profileIds || this.profileIds.length === 0) {
       return Promise.resolve([]);
     }
+
     return this.kuzzle.security.mGetProfiles(this.profileIds);
   }
 
 }
 
-module.exports = User;
+module.exports = { User };
 

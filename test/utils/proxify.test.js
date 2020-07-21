@@ -1,7 +1,7 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  proxify = require('../../src/utils/proxify');
+  { proxify } = require('../../src/utils/proxify');
 
 describe('proxify', () => {
   let

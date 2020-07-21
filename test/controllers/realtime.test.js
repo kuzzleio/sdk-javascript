@@ -2,11 +2,11 @@ const mockrequire = require('mock-require');
 const sinon = require('sinon');
 const should = require('should');
 
-const KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
-const AuthController = require('../../src/controllers/Auth');
-const RealtimeController = require('../../src/controllers/Realtime');
+const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
+const { AuthController } = require('../../src/controllers/Auth');
+const { RealtimeController } = require('../../src/controllers/Realtime');
 const generateJwt = require('../mocks/generateJwt.mock');
-const uuidv4 = require('../../src/utils/uuidv4');
+const { uuidv4 } = require('../../src/utils/uuidv4');
 
 describe('Realtime Controller', () => {
   const options = {opt: 'in'};
@@ -110,8 +110,9 @@ describe('Realtime Controller', () => {
           return room;
         });
 
-      const MockRealtimeController =
-        mockrequire.reRequire('../../src/controllers/Realtime');
+      const reRequire = mockrequire.reRequire('../../src/controllers/Realtime');
+      const MockRealtimeController = reRequire.RealtimeController;
+
       kuzzle.realtime = new MockRealtimeController(kuzzle);
     });
 

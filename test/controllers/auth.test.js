@@ -1,10 +1,10 @@
 const sinon = require('sinon');
 const should = require('should');
 
-const KuzzleEventEmitter = require('../../src/core/KuzzleEventEmitter');
-const Jwt = require('../../src/core/Jwt');
-const AuthController = require('../../src/controllers/Auth');
-const User = require('../../src/core/security/User');
+const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
+const { Jwt } = require('../../src/core/Jwt');
+const { AuthController } = require('../../src/controllers/Auth');
+const { User } = require('../../src/core/security/User');
 const generateJwt = require('../mocks/generateJwt.mock');
 
 describe('Auth Controller', () => {

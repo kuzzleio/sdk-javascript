@@ -2,11 +2,11 @@ const
   should = require('should'),
   ProtocolMock = require('../mocks/protocol.mock'),
   generateJwt = require('../mocks/generateJwt.mock'),
-  Kuzzle = require('../../src/Kuzzle');
+  { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle getters', () => {
   let
-    jwt, 
+    jwt,
     kuzzle;
 
   beforeEach(() => {

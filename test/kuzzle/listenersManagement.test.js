@@ -1,35 +1,22 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  proxyquire = require('proxyquire'),
-  ProtocolMock = require('../mocks/protocol.mock');
+const should = require('should');
+const sinon = require('sinon');
+
+const { Kuzzle } = require('../../src/Kuzzle');
+const { KuzzleEventEmitter } =require('../../src/core/KuzzleEventEmitter');
+const ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle listeners management', () => {
-  const
-    addListenerStub = sinon.stub(),
-    emitStub = sinon.stub();
-
-  let
-    Kuzzle,
-    kuzzle;
-
-  before(() => {
-    const KuzzleEventEmitterMock = function() {};
-
-    KuzzleEventEmitterMock.prototype.addListener = addListenerStub;
-    KuzzleEventEmitterMock.prototype.emit = emitStub;
-
-    Kuzzle = proxyquire('../../src/Kuzzle', {
-      './core/KuzzleEventEmitter': KuzzleEventEmitterMock
-    });
-  });
-
+  let kuzzle;
 
   beforeEach(() => {
     const protocol = new ProtocolMock();
     kuzzle = new Kuzzle(protocol, {eventTimeout: 20});
-    addListenerStub.reset();
-    emitStub.reset();
+    sinon.stub(KuzzleEventEmitter.prototype, 'addListener').resolves();
+    sinon.stub(KuzzleEventEmitter.prototype, 'emit').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('should only listen to allowed events', () => {
@@ -46,16 +33,19 @@ describe('Kuzzle listeners management', () => {
       'tokenExpired'
     ];
 
-    should(function() {kuzzle.addListener('foo', sinon.stub());}).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());
+    should(function() {
+      kuzzle.addListener('foo', sinon.stub());
+    }).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());
 
     let i;
     for (i = 0; i < knownEvents.length; i++) {
       kuzzle.addListener(knownEvents[i], sinon.stub());
     }
 
-    should(addListenerStub.callCount).be.exactly(10);
+    should(KuzzleEventEmitter.prototype.addListener).have.called(10);
+
     for (i = 0; i < knownEvents.length; i++) {
-      should(addListenerStub.getCall(i)).be.calledWith(knownEvents[i]);
+      should(KuzzleEventEmitter.prototype.addListener.getCall(i)).be.calledWith(knownEvents[i]);
     }
   });
 
@@ -68,18 +58,18 @@ describe('Kuzzle listeners management', () => {
     kuzzle.emit('offlineQueuePush', 'bar');
 
     setTimeout(function () {
-      should(emitStub).be.calledTwice();
-      should(emitStub.firstCall).be.calledWith('connected', 'foo');
-      should(emitStub.secondCall).be.calledWith('offlineQueuePush', 'bar');
+      should(KuzzleEventEmitter.prototype.emit).be.calledTwice();
+      should(KuzzleEventEmitter.prototype.emit.firstCall).be.calledWith('connected', 'foo');
+      should(KuzzleEventEmitter.prototype.emit.secondCall).be.calledWith('offlineQueuePush', 'bar');
 
-      emitStub.reset();
+      KuzzleEventEmitter.prototype.emit.reset();
       setTimeout(function () {
         kuzzle.emit('connected', 'bar');
         kuzzle.emit('connected', 'bar');
 
         setTimeout(function () {
-          should(emitStub).be.calledOnce();
-          should(emitStub).be.calledWith('connected', 'bar');
+          should(KuzzleEventEmitter.prototype.emit).be.calledOnce();
+          should(KuzzleEventEmitter.prototype.emit).be.calledWith('connected', 'bar');
           done();
         }, 0);
       }, 30);

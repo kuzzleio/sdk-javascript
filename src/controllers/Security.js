@@ -1,10 +1,10 @@
-const BaseController = require('./Base');
-const Role = require('../core/security/Role');
-const RoleSearchResult = require('../core/searchResult/Role');
-const Profile = require('../core/security/Profile');
-const ProfileSearchResult = require('../core/searchResult/Profile');
-const User = require('../core/security/User');
-const UserSearchResult = require('../core/searchResult/User');
+const { BaseController } = require('./Base');
+const { Role } = require('../core/security/Role');
+const { RoleSearchResult } = require('../core/searchResult/Role');
+const { Profile } = require('../core/security/Profile');
+const { ProfileSearchResult } = require('../core/searchResult/Profile');
+const { User } = require('../core/security/User');
+const { UserSearchResult } = require('../core/searchResult/User');
 
 class SecurityController extends BaseController {
   /**
@@ -512,4 +512,4 @@ class SecurityController extends BaseController {
   }
 }
 
-module.exports = SecurityController;
+module.exports = { SecurityController };

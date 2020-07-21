@@ -1,6 +1,6 @@
 const
-  ProfileSearchResult = require('../../../src/core/searchResult/Profile'),
-  Profile = require('../../../src/core/security/Profile'),
+  { ProfileSearchResult } = require('../../../src/core/searchResult/Profile'),
+  { Profile } = require('../../../src/core/security/Profile'),
   sinon = require('sinon'),
   should = require('should');
 
