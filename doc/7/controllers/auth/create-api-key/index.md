@@ -56,7 +56,7 @@ The API key content has the following properties:
 | Name      | Type              | Description      |
 | --------- | ----------------- | ---------------- |
 | `userId`      | <pre>string</pre> | User kuid |
-| `expiresAt`  | <pre>number</pre> | Expiration date in UNIX micro-timestamp format (`-1` if the token never expires) |
+| `expiresAt`  | <pre>number</pre> | Expiration date in Epoch-millis format (`-1` if the token never expires) |
 | `ttl`  | <pre>number</pre> | Original TTL |
 | `description`  | <pre>string</pre> | API key description |
 | `token`  | <pre>string</pre> | Authentication token associated with this API key |
