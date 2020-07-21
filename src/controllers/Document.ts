@@ -699,7 +699,7 @@ export class DocumentController extends BaseController {
     options: {
       queuable?: boolean,
       refresh?: string,
-      retryOnConflict?: boolean,
+      retryOnConflict?: number,
       source?: boolean
     } = {}
   ): Promise<Document> {
