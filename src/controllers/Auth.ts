@@ -364,7 +364,7 @@ export class AuthController extends BaseController {
   login (
     strategy: string,
     credentials: JSONObject,
-    expiresIn: string = null
+    expiresIn?: string|number
   ): Promise<string> {
     const request = {
       strategy,
