@@ -7,7 +7,7 @@ description: Validate a document
 
 # validate
 
-Validates data against existing validation rules.
+Validates a document against existing validation rules.
 
 Note that if no validation specifications are set for the `<index>`/`<collection>`, the document will always be valid.
 

@@ -12,7 +12,7 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
-import { JSONObject } from './utils/interfaces';
+import { JSONObject, KuzzleRequest } from './utils/interfaces';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -59,7 +59,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   public auth: AuthController;
   public bulk: any;
   public collection: any;
-  public document: any;
+  public document: DocumentController;
   public index: any;
   public ms: any;
   public realtime: any;
@@ -332,7 +332,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Connects to a Kuzzle instance using the provided host name
    * @returns {Promise<Object>}
    */
-  connect () {
+  connect (): Promise<void> {
     if (this.protocol.isReady()) {
       return Promise.resolve();
     }
@@ -455,7 +455,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param {object} [options] - Optional arguments
    * @returns {Promise<object>}
    */
-  query (request: any = {}, options: any = {}) {
+  query (request: KuzzleRequest = {}, options: JSONObject = {}): Promise<JSONObject> {
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }

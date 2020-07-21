@@ -67,9 +67,9 @@ export class AuthController extends BaseController {
    *
    * @param description API key description
    * @param options Additional options
-   *    - "_id" API key unique ID
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - "expiresIn" Expiration duration
+   *    - `_id` API key unique ID
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `expiresIn` Expiration duration
    *
    * @returns The created API key
    */
@@ -98,7 +98,7 @@ export class AuthController extends BaseController {
    *
    * @param id API key ID
    * @param options Additional options
-   *    - "refresh" If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    */
   deleteApiKey(id: string, options: { refresh?: string } = {}): Promise<null> {
     const request = {
@@ -118,8 +118,8 @@ export class AuthController extends BaseController {
    *
    * @param query Search query
    * @param options Additional options
-   *    - "from" Offset of the first document to fetch
-   *    - "size" Maximum number of documents to retrieve per page
+   *    - `from` Offset of the first document to fetch
+   *    - `size` Maximum number of documents to retrieve per page
    *
    * @returns A search result object
    */
@@ -189,7 +189,7 @@ export class AuthController extends BaseController {
    * @param strategy New credentials
    * @param credentials Name of the strategy to use
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An object representing the new credentials.
    *    The content depends on the authentication strategy
@@ -214,7 +214,7 @@ export class AuthController extends BaseController {
    *
    * @param strategy Name of the strategy to use
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns A boolean indicating if the credentials exists
    */
@@ -236,7 +236,7 @@ export class AuthController extends BaseController {
    *
    * @param strategy Name of the strategy to use
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    */
   deleteMyCredentials (
     strategy: string,
@@ -255,7 +255,7 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-current-user
    *
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns Currently loggued User
    */
@@ -276,7 +276,7 @@ export class AuthController extends BaseController {
    *
    * @param strategy Name of the strategy to use
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An object representing the credentials for the provided authentication strategy.
    *    Its content depends on the authentication strategy.
@@ -298,7 +298,7 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-my-rights
    *
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An array containing user rights objects
    */
@@ -338,7 +338,7 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-strategies
    *
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An array of available strategies names
    */
@@ -409,7 +409,7 @@ export class AuthController extends BaseController {
    * @param strategy Name of the strategy to use
    * @param credentials Updated credentials
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns An object representing the updated credentials.
    *    The content depends on the authentication strategy
@@ -435,7 +435,7 @@ export class AuthController extends BaseController {
    *
    * @param {object} content - User custom information
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
    * @returns Currently loggued User
    */
@@ -461,7 +461,7 @@ export class AuthController extends BaseController {
    * @param strategy Name of the strategy to use
    * @param credentials Credentials to validate
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    */
   validateMyCredentials (
     strategy: string,
@@ -482,8 +482,8 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/refresh-token
    *
    * @param options Additional options
-   *    - "queuable" If true, queues the request during downtime, until connected to Kuzzle again
-   *    - "expiresIn" Expiration duration
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `expiresIn` Expiration duration
    *
    * @returns The refreshed token
    */
