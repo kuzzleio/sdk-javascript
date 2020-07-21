@@ -1,8 +1,9 @@
 const should = require('should');
 const sinon = require('sinon');
 
-const ProtocolMock = require('../mocks/protocol.mock');
 const { Kuzzle } = require('../../src/Kuzzle');
+const { KuzzleEventEmitter } =require('../../src/core/KuzzleEventEmitter');
+const ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle listeners management', () => {
   let kuzzle;
@@ -10,8 +11,12 @@ describe('Kuzzle listeners management', () => {
   beforeEach(() => {
     const protocol = new ProtocolMock();
     kuzzle = new Kuzzle(protocol, {eventTimeout: 20});
-    sinon.stub(kuzzle, '_superAddListener');
-    sinon.stub(kuzzle, '_superEmit');
+    sinon.stub(KuzzleEventEmitter.prototype, 'addListener').resolves();
+    sinon.stub(KuzzleEventEmitter.prototype, 'emit').resolves();
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   it('should only listen to allowed events', () => {
@@ -37,10 +42,10 @@ describe('Kuzzle listeners management', () => {
       kuzzle.addListener(knownEvents[i], sinon.stub());
     }
 
-    should(kuzzle._superAddListener).have.called(10);
+    should(KuzzleEventEmitter.prototype.addListener).have.called(10);
 
     for (i = 0; i < knownEvents.length; i++) {
-      should(kuzzle._superAddListener.getCall(i)).be.calledWith(knownEvents[i]);
+      should(KuzzleEventEmitter.prototype.addListener.getCall(i)).be.calledWith(knownEvents[i]);
     }
   });
 
@@ -53,18 +58,18 @@ describe('Kuzzle listeners management', () => {
     kuzzle.emit('offlineQueuePush', 'bar');
 
     setTimeout(function () {
-      should(kuzzle._superEmit).be.calledTwice();
-      should(kuzzle._superEmit.firstCall).be.calledWith('connected', 'foo');
-      should(kuzzle._superEmit.secondCall).be.calledWith('offlineQueuePush', 'bar');
+      should(KuzzleEventEmitter.prototype.emit).be.calledTwice();
+      should(KuzzleEventEmitter.prototype.emit.firstCall).be.calledWith('connected', 'foo');
+      should(KuzzleEventEmitter.prototype.emit.secondCall).be.calledWith('offlineQueuePush', 'bar');
 
-      kuzzle._superEmit.reset();
+      KuzzleEventEmitter.prototype.emit.reset();
       setTimeout(function () {
         kuzzle.emit('connected', 'bar');
         kuzzle.emit('connected', 'bar');
 
         setTimeout(function () {
-          should(kuzzle._superEmit).be.calledOnce();
-          should(kuzzle._superEmit).be.calledWith('connected', 'bar');
+          should(KuzzleEventEmitter.prototype.emit).be.calledOnce();
+          should(KuzzleEventEmitter.prototype.emit).be.calledWith('connected', 'bar');
           done();
         }, 0);
       }, 30);
