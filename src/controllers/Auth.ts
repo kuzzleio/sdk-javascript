@@ -47,7 +47,7 @@ export class AuthController extends BaseController {
 
   /**
    * Do not add the token for the checkToken route, to avoid getting a token error when
-   * a developer simply wish to verify his token
+   * a developer simply wishes to verify their token
    */
   authenticateRequest (request: any) {
     if ( !this.authenticationToken
