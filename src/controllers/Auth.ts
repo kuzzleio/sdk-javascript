@@ -375,14 +375,9 @@ export class AuthController extends BaseController {
 
     return this.query(request, {queuable: false, verb: 'POST'})
       .then(response => {
-        try {
-          this._authenticationToken = new Jwt(response.result.jwt);
+        this._authenticationToken = new Jwt(response.result.jwt);
 
-          this.kuzzle.emit('loginAttempt', {success: true});
-        }
-        catch (err) {
-          return Promise.reject(err);
-        }
+        this.kuzzle.emit('loginAttempt', {success: true});
 
         return response.result.jwt;
       })
