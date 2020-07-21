@@ -6,7 +6,8 @@
     "target": "es2020",
     "moduleResolution": "node",
     "sourceMap": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "resolveJsonModule": true
   },
   "rootDir": "src/",
   "include": [
