@@ -493,7 +493,7 @@ export class AuthController extends BaseController {
    * @returns The refreshed token
    */
   refreshToken(
-    options: { queuable?: boolean, expiresIn?: number } = {}
+    options: { queuable?: boolean, expiresIn?: number|string } = {}
   ): Promise<{
     /**
      * Token unique ID
