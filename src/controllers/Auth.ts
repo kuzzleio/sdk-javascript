@@ -47,7 +47,7 @@ export class AuthController extends BaseController {
 
   /**
    * Do not add the token for the checkToken route, to avoid getting a token error when
-   * a developer simply wish to verify his token
+   * a developer simply wishes to verify their token
    */
   authenticateRequest (request: any) {
     if ( !this.authenticationToken
@@ -364,7 +364,7 @@ export class AuthController extends BaseController {
   login (
     strategy: string,
     credentials: JSONObject,
-    expiresIn: string = null
+    expiresIn?: string|number
   ): Promise<string> {
     const request = {
       strategy,
@@ -488,7 +488,7 @@ export class AuthController extends BaseController {
    * @returns The refreshed token
    */
   refreshToken(
-    options: { queuable?: boolean, expiresIn?: number } = {}
+    options: { queuable?: boolean, expiresIn?: number|string } = {}
   ): Promise<{
     /**
      * Token unique ID
