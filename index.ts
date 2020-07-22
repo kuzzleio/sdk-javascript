@@ -34,7 +34,7 @@ const exported = {
   RoleSearchResult,
   SpecificationSearchResult,
   UserSearchResult
-}
+};
 
 export default exported;
 
