@@ -1,6 +1,7 @@
-const { SearchResultBase } = require('./SearchResultBase');
+import { SearchResultBase } from './SearchResultBase';
+import { JSONObject } from "../../utils/interfaces";
 
-class SpecificationsSearchResult extends SearchResultBase {
+export class SpecificationsSearchResult extends SearchResultBase<JSONObject> {
 
   constructor (kuzzle, query, options, response) {
     super(kuzzle, query, options, response);
@@ -10,5 +11,3 @@ class SpecificationsSearchResult extends SearchResultBase {
     this._scrollAction = 'scrollSpecifications';
   }
 }
-
-module.exports = { SpecificationsSearchResult };

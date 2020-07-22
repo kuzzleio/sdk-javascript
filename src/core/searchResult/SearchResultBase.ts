@@ -166,7 +166,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params'));
   }
 
-  _get (object, path) {
+  protected _get (object, path) {
     if (!object) {
       return object;
     }
@@ -179,7 +179,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return this._get(object[key], path);
   }
 
-  _buildNextSearchResult (response) {
+  protected _buildNextSearchResult (response) {
     const Constructor: any = this.constructor;
 
     const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, response.result);
