@@ -1,4 +1,4 @@
-const mapping = {
+const mappings = {
   properties: {
     license: { type: 'keyword' },
     driver: {
@@ -11,7 +11,7 @@ const mapping = {
 };
 
 try {
-  await kuzzle.collection.create('nyc-open-data', 'yellow-taxi', mapping);
+  await kuzzle.collection.create('nyc-open-data', 'yellow-taxi', { mapping });
 
   console.log('Success');
 } catch (error) {

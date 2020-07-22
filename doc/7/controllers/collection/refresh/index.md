@@ -7,7 +7,7 @@ description: Forces an Elasticsearch search index update
 
 # refresh
 
-When writing or deleting documents in Kuzzle, the update needs to be indexed before being available in search results.
+Refreshes a collection to reindex the writed and deleted documents so they are available in search results.  
 
 :::info
 A refresh operation comes with some performance costs.
