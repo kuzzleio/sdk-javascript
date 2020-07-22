@@ -112,7 +112,11 @@ export interface ApiKey {
      */
     userId: string;
     /**
+<<<<<<< HEAD
      * Expiration date in Epoch-millis format (-1 if the token never expires)
+=======
+     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+>>>>>>> 7-dev
      */
     expiresAt: number;
     /**
@@ -185,6 +189,7 @@ export interface DocumentHit extends Document {
    */
   _score: number;
 }
+<<<<<<< HEAD
 
 /**
  * Enum for notification types
@@ -318,3 +323,5 @@ export interface ServerNotification extends BaseNotification {
 
   type: ENotificationType.TokenExpired;
 }
+=======
+>>>>>>> 7-dev

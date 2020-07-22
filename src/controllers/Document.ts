@@ -27,7 +27,7 @@ export class DocumentController extends BaseController {
   count (
     index: string,
     collection: string,
-    body: JSONObject,
+    body?: JSONObject,
     options: { queuable?: boolean } = {}
   ): Promise<number> {
     const request = {
@@ -699,7 +699,7 @@ export class DocumentController extends BaseController {
     options: {
       queuable?: boolean,
       refresh?: string,
-      retryOnConflict?: boolean,
+      retryOnConflict?: number,
       source?: boolean
     } = {}
   ): Promise<Document> {

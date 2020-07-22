@@ -8,20 +8,6 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
                'Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser');
 }
 
-export * from './src/Kuzzle'
-export * from './src/protocols/Http';
-export * from './src/protocols/WebSocket';
-export * from './src/controllers/Base';
-export * from './src/protocols/abstract/Base';
-export * from './src/core/KuzzleEventEmitter';
-
-export * from './src/core/searchResult/SearchResultBase';
-export * from './src/core/searchResult/Document';
-export * from './src/core/searchResult/Profile';
-export * from './src/core/searchResult/Role';
-export * from './src/core/searchResult/Specifications';
-export * from './src/core/searchResult/User';
-
 import { Kuzzle } from './src/Kuzzle';
 import { Http, WebSocket } from './src/protocols';
 import * as BaseController from './src/controllers/Base';
@@ -35,7 +21,7 @@ import * as RoleSearchResult from './src/core/searchResult/Role';
 import * as SpecificationSearchResult from './src/core/searchResult/Specifications';
 import * as UserSearchResult from './src/core/searchResult/User';
 
-module.exports = {
+const exported = {
   Kuzzle,
   Http,
   WebSocket,
@@ -48,4 +34,8 @@ module.exports = {
   RoleSearchResult,
   SpecificationSearchResult,
   UserSearchResult
-};
+}
+
+export default exported;
+
+module.exports = exported;
