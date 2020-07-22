@@ -1,10 +1,10 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  lolex = require('lolex'),
-  NodeWS = require('ws'),
-  WS = require('../../src/protocols/WebSocket'),
-  windowMock = require('../mocks/window.mock');
+const should = require('should');
+const sinon = require('sinon');
+const lolex = require('lolex');
+const NodeWS = require('ws');
+
+const { default: WS } = require('../../src/protocols/WebSocket');
+const windowMock = require('../mocks/window.mock');
 
 describe('WebSocket networking module', () => {
   let

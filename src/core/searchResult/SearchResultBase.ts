@@ -187,8 +187,4 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
     return nextSearchResult;
   }
-
 }
-
-
-module.exports = { SearchResultBase };

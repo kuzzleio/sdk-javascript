@@ -185,3 +185,40 @@ export interface DocumentHit extends Document {
    */
   _score: number;
 }
+
+/**
+ * HTTP routes definition format
+ * @example
+ * {
+ *    <controller>: {
+ *      <action>: { <verb>, <url> }
+ *   }
+ * }
+ *
+ * {
+ *    'my-plugin/my-controller': {
+ *      action: { verb: 'GET', url: '/some/url' },
+ *      action2: { verb: 'GET', url: '/some/url/with/:parameter' }
+ *   }
+ * }
+ */
+export interface HttpRoutes {
+  /**
+   * Controller name
+   */
+  [key: string]: {
+    /**
+     * Action name
+     */
+    [key: string]: {
+      /**
+       * HTTP verb
+       */
+      verb: string,
+      /**
+       * URL
+       */
+      url: string
+    }
+  }
+}

@@ -40,5 +40,3 @@ export class BaseController {
     return this._kuzzle.query(request, options);
   }
 }
-
-module.exports = { BaseController };

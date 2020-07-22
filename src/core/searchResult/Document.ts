@@ -15,5 +15,3 @@ export class DocumentsSearchResult extends SearchResultBase<DocumentHit> {
     this._scrollAction = 'scroll';
   }
 }
-
-module.exports = { DocumentsSearchResult };

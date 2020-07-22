@@ -1,11 +1,59 @@
 'use strict';
 
-const KuzzleError = require('../KuzzleError');
-const BaseProtocolRealtime = require('./abstract/Realtime');
+import { KuzzleError } from '../KuzzleError';
+import { BaseProtocolRealtime } from './abstract/Realtime';
+import { JSONObject, KuzzleRequest } from '../utils/interfaces';
 
-class WebSocketProtocol extends BaseProtocolRealtime {
+export default class WebSocketProtocol extends BaseProtocolRealtime {
+  private WebSocketClient: any;
+  private options: any;
+  private client: any;
+  private lasturl: any;
 
-  constructor(host, options = {}) {
+  /**
+   * Automatically reconnect after a connection loss
+   */
+  public autoReconnect: boolean;
+  /**
+   * `true` if the socket is open
+   */
+  public connected: boolean;
+  /**
+   * Kuzzle server host or IP
+   */
+  public host: string;
+  /**
+   * Kuzzle server port
+   */
+  public port: number;
+  /**
+   * `true` if ssl is active
+   */
+  public ssl: boolean;
+
+  /**
+   * @param host Kuzzle server hostname or IP
+   * @param options WebSocket connection options
+   *    - `autoReconnect` Automatically reconnect to kuzzle after a `disconnected` event. (default: `true`)
+   *    - `port` Kuzzle server port (default: `7512`)
+   *    - `headers` Connection custom HTTP headers (Not supported by browsers)
+   *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
+   *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
+   */
+  constructor(
+    host: string,
+    options: {
+      autoReconnect?: boolean;
+      port?: number;
+      headers?: JSONObject;
+      reconnectionDelay?: number;
+      /**
+       * @deprecated Use `ssl` instead
+       */
+      sslConnection?: boolean;
+      ssl?: boolean;
+    } = {}
+  ) {
     super(host, options, 'ws');
 
     if (typeof host !== 'string' || host === '') {
@@ -39,7 +87,7 @@ class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * Connect to the websocket server
    */
-  connect () {
+  connect (): Promise<void> {
     return new Promise((resolve, reject) => {
       const url = `${this.ssl ? 'wss' : 'ws'}://${this.host}:${this.port}`;
 
@@ -79,7 +127,7 @@ class WebSocketProtocol extends BaseProtocolRealtime {
         // do not forward a connection close error if no
         // connection has been previously established
         else if (this.wasConnected) {
-          const error = new Error(reason);
+          const error: any = new Error(reason);
           error.status = status;
 
           this.clientNetworkError(error);
@@ -127,9 +175,9 @@ class WebSocketProtocol extends BaseProtocolRealtime {
    *
    * @param {Object} payload
    */
-  send (payload) {
+  send (request: KuzzleRequest) {
     if (this.client && this.client.readyState === this.client.OPEN) {
-      this.client.send(JSON.stringify(payload));
+      this.client.send(JSON.stringify(request));
     }
   }
 
@@ -148,5 +196,3 @@ class WebSocketProtocol extends BaseProtocolRealtime {
     super.close();
   }
 }
-
-module.exports = WebSocketProtocol;
