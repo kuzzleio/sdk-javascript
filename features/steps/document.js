@@ -334,7 +334,7 @@ Then('the document is successfully deleted', function (cb) {
 
 Then(/^the document is (successfully|not) found$/, function (yesno) {
   should(this.error).be.null();
-  should(this.content.constructor.name).eql('DocumentsSearchResult');
+  should(this.content.constructor.name).eql('DocumentSearchResult');
   should(this.content.total).eql(yesno === 'successfully' ? 1 : 0);
 });
 
@@ -386,7 +386,7 @@ Then('the documents should be retrieved', function () {
 });
 
 Then(/^The search result should have (fetched|a total of) (\d+) documents$/, function (what, number) {
-  should(this.content.constructor.name).eql('DocumentsSearchResult');
+  should(this.content.constructor.name).eql('DocumentSearchResult');
 
   let field;
   switch (what) {
