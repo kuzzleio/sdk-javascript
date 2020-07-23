@@ -15,7 +15,7 @@ import { KuzzleAbstractProtocol } from './src/protocols/abstract/Base';
 import { KuzzleEventEmitter } from './src/core/KuzzleEventEmitter';
 
 import { SearchResultBase } from './src/core/searchResult/SearchResultBase';
-import { DocumentsSearchResult } from './src/core/searchResult/Document';
+import { DocumentSearchResult } from './src/core/searchResult/Document';
 import { ProfileSearchResult } from './src/core/searchResult/Profile';
 import { RoleSearchResult } from './src/core/searchResult/Role';
 import { SpecificationSearchResult } from './src/core/searchResult/Specifications';
@@ -29,7 +29,7 @@ const exported = {
   KuzzleAbstractProtocol,
   KuzzleEventEmitter,
   SearchResultBase,
-  DocumentsSearchResult,
+  DocumentSearchResult,
   ProfileSearchResult,
   RoleSearchResult,
   SpecificationSearchResult,

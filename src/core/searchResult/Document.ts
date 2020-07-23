@@ -1,7 +1,7 @@
 import { SearchResultBase } from './SearchResultBase';
 import { DocumentHit } from '../../utils/interfaces';
 
-export class DocumentsSearchResult extends SearchResultBase<DocumentHit> {
+export class DocumentSearchResult extends SearchResultBase<DocumentHit> {
   /**
    * @param {Kuzzle} kuzzle
    * @param {object} query
@@ -16,4 +16,4 @@ export class DocumentsSearchResult extends SearchResultBase<DocumentHit> {
   }
 }
 
-module.exports = { DocumentsSearchResult };
+module.exports = { DocumentSearchResult };
