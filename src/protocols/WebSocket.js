@@ -6,7 +6,7 @@ const BaseProtocolRealtime = require('./abstract/Realtime');
 class WebSocketProtocol extends BaseProtocolRealtime {
 
   constructor(host, options = {}) {
-    super(host, options);
+    super(host, options, 'ws');
 
     if (typeof host !== 'string' || host === '') {
       throw new Error('host is required');

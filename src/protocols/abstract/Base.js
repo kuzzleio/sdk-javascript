@@ -1,16 +1,17 @@
 'use strict';
 
 const KuzzleError = require('../../KuzzleError');
-const uuidv4 = require('../../utils/uuidv4');
-const KuzzleEventEmitter = require('../../core/KuzzleEventEmitter');
+const { uuidv4 } = require('../../utils/uuidv4');
+const { KuzzleEventEmitter } = require('../../core/KuzzleEventEmitter');
 const PendingRequest = require('./PendingRequest');
 
 class KuzzleAbstractProtocol extends KuzzleEventEmitter {
-  constructor (host, options = {}) {
+  constructor (host, options = {}, name = undefined) {
     super();
 
     this._pendingRequests = new Map();
     this._host = host;
+    this._name = name;
     const port = parseInt(options.port, 10);
     this._port = isNaN(port) ? 7512 : port;
     this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
@@ -29,6 +30,10 @@ class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
   get host () {
     return this._host;
+  }
+
+  get name () {
+    return this._name;
   }
 
   get port () {
@@ -134,4 +139,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
 }
 
-module.exports = KuzzleAbstractProtocol;
+module.exports = { KuzzleAbstractProtocol };

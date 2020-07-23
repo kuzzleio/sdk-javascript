@@ -1,11 +1,11 @@
 'use strict';
 
 const staticHttpRoutes = require('./routes.json');
-const BaseProtocol = require('./abstract/Base');
+const { KuzzleAbstractProtocol } = require('./abstract/Base');
 
-class HttpProtocol extends BaseProtocol {
+class HttpProtocol extends KuzzleAbstractProtocol {
   constructor(host, options = {}) {
-    super(host, options);
+    super(host, options, 'http');
 
     if (typeof host !== 'string' || host === '') {
       throw new Error('host is required');
@@ -201,7 +201,7 @@ class HttpProtocol extends BaseProtocol {
         return;
       }
 
-      url = url.replace(regex, '/' + data[ matches[1] ]);
+      url = url.replace(regex, `/${encodeURIComponent(data[matches[1]])}`);
 
       delete(queryArgs[ matches[1] ]);
 
@@ -210,11 +210,13 @@ class HttpProtocol extends BaseProtocol {
 
     // inject queryString arguments:
     const queryString = [];
+
     for (const key of Object.keys(queryArgs)) {
-      const value = queryArgs[key];
+      let value = queryArgs[key];
+      const encodedKey = encodeURIComponent(key);
 
       if (Array.isArray(value)) {
-        queryString.push(`${key}=${value.join()}`);
+        queryString.push(`${encodedKey}=${encodeURIComponent(value.join())}`);
       }
       else if (typeof value === 'boolean') {
         // In Kuzzle, an optional boolean option is set to true if present in
@@ -222,11 +224,12 @@ class HttpProtocol extends BaseProtocol {
         // As there is no boolean type in querystrings, encoding a boolean
         // option "foo=false" in it will make Kuzzle consider it as truthy.
         if (value === true) {
-          queryString.push(key);
+          queryString.push(encodedKey);
         }
       }
       else {
-        queryString.push(`${key}=${value}`);
+        value = typeof value === 'object' ? JSON.stringify(value) : value;
+        queryString.push(`${encodedKey}=${encodeURIComponent(value)}`);
       }
     }
 

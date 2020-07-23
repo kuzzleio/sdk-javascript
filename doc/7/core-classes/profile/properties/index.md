@@ -12,6 +12,7 @@ order: 10
 |--- |--- |--- |
 | `_id` | <pre>string</pre> | Profile ID |
 | `policies` | <pre>object[]</pre> | Array of policies for this profile |
+| `rateLimit` | <pre>number</pre> | Maximum number of requests per second and per node with this profile |
 
 ### policies
 

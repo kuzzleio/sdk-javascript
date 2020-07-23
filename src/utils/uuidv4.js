@@ -3,7 +3,7 @@
 //
 // cf amazing https://gist.github.com/jed/982883
 
-const b = (a) => a
+const uuidv4 = a => a
   ? (
     a ^
     Math.random()
@@ -18,7 +18,7 @@ const b = (a) => a
     -1e11
   ).replace(
     /[018]/g,
-    b
+    uuidv4
   );
 
-module.exports = b;
+module.exports = { uuidv4 };

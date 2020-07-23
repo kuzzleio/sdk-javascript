@@ -3,8 +3,8 @@ const
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
   generateJwt = require('../mocks/generateJwt.mock'),
-  Jwt = require('../../src/core/Jwt'),
-  Kuzzle = require('../../src/Kuzzle');
+  { Jwt } = require('../../src/core/Jwt'),
+  { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle setters', () => {
   let kuzzle;

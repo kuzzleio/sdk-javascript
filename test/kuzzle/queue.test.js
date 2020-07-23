@@ -2,7 +2,7 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
-  Kuzzle = require('../../src/Kuzzle');
+  { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle queue', () => {
   let kuzzle;

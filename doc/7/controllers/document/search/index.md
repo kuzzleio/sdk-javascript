@@ -50,6 +50,12 @@ Additional query options
 | `from`     | <pre>number</pre><br/>(`0`)     | Offset of the first document to fetch                                                                                                                                                                             |
 | `size`     | <pre>number</pre><br/>(`10`)    | Maximum number of documents to retrieve per page                                                                                                                                                                  |
 | `scroll`   | <pre>string</pre><br/>(`""`)    | When set, gets a forward-only cursor having its ttl set to the given value (ie `30s`; cf [elasticsearch time limits](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/common-options.html#time-units)) |
+| `verb`     | <pre>string</pre>      | (HTTP only) Forces the verb of the route |
+
+#### verb
+
+When instantiated with a HTTP protocol object, the SDK uses the POST API by default for this API route.
+You can set the `verb` option to `GET` to force the SDK to use the GET API instead.
 
 ## Body properties
 

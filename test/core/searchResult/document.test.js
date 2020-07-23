@@ -1,7 +1,7 @@
-const
-  DocumentSearchResult = require('../../../src/core/searchResult/Document'),
-  sinon = require('sinon'),
-  should = require('should');
+const sinon = require('sinon');
+const should = require('should');
+
+const { DocumentSearchResult } = require('../../../src/core/searchResult/Document');
 
 describe('DocumentSearchResult', () => {
   const options = {opt: 'in'};

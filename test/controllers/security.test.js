@@ -1,10 +1,10 @@
-const SecurityController = require('../../src/controllers/Security');
-const Profile = require('../../src/core/security/Profile');
-const Role = require('../../src/core/security/Role');
-const User = require('../../src/core/security/User');
-const ProfileSearchResult = require('../../src/core/searchResult/Profile');
-const RoleSearchResult = require('../../src/core/searchResult/Role');
-const UserSearchResult = require('../../src/core/searchResult/User');
+const { SecurityController } = require('../../src/controllers/Security');
+const { Profile } = require('../../src/core/security/Profile');
+const { Role } = require('../../src/core/security/Role');
+const { User } = require('../../src/core/security/User');
+const { ProfileSearchResult } = require('../../src/core/searchResult/Profile');
+const { RoleSearchResult } = require('../../src/core/searchResult/Role');
+const { UserSearchResult } = require('../../src/core/searchResult/User');
 const sinon = require('sinon');
 const should = require('should');
 
@@ -165,7 +165,7 @@ describe('Security Controller', () => {
               controller: 'security',
               action: 'createFirstAdmin',
               reset: true
-            }, {});
+            }, {reset: true});
 
           should(user).be.an.instanceOf(User);
           should(user._id).be.eql('id');

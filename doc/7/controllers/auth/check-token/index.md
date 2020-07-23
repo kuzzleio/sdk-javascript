@@ -31,7 +31,7 @@ An `object` representing the token validity status
 | ------------- | ------------------ | --------------------------------- |
 | `valid`       | <pre>boolean</pre> | Tell if the token is valid or not |
 | `state`       | <pre>string</pre>  | Explain why the token is invalid  |
-|  `expires_at` | <pre>number</pre>  | Token expiration timestamp        |
+|  `expiresAt` | <pre>number</pre>  | Token expiration timestamp        |
 
 ## Usage
 

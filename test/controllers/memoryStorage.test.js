@@ -1,5 +1,5 @@
 const
-  MemoryStorageController = require('../../src/controllers/MemoryStorage'),
+  { MemoryStorageController } = require('../../src/controllers/MemoryStorage'),
   should = require('should'),
   sinon = require('sinon');
 
@@ -692,6 +692,24 @@ describe('MemoryStorage Controller', function () {
       {},
       'OK',
       undefined
+    );
+  });
+
+  it('#mexecute', function () {
+    const actions = [
+      { 'action': 'set', 'args': { '_id': 'list:a', 'body': { 'value': 1, 'ex': 100, 'nx': true } } },
+      { 'action': 'get', 'args': { '_id': 'list:a' } },
+      { 'action': 'del', 'args': { 'body': { 'keys': ['list:a'] } } }
+    ];
+
+    return testReadCommand(
+      'mexecute',
+      [actions],
+      {},
+      {body: {actions: actions}},
+      {},
+      [[null, 'OK'], [null, '1'], [null, 1]],
+      [[null, 'OK'], [null, '1'], [null, 1]],
     );
   });
 

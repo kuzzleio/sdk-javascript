@@ -1,8 +1,32 @@
-const BaseController = require('./Base');
+const { BaseController } = require('./Base');
 
 class BulkController extends BaseController {
   constructor (kuzzle) {
     super(kuzzle, 'bulk');
+  }
+
+  /**
+  * Directly deletes every documents matching the search query without:
+  *  - applying max documents write limit
+  *  - fetching deleted documents
+  *  - triggering realtime notifications
+  * {@link https://docs.kuzzle.io/core/2/api/controllers/bulk/delete-by-query/|Official documentation}
+  * @param {String} index - Index name
+  * @param {String} collection - Collection name
+  * @param {Object[]} query - Query matching documents to delete
+  * @param {Object} [options] - Additional options
+  * @returns {Promise}
+  */
+  deleteByQuery(index, collection, query = {}, options = {}) {
+    const request = {
+      index,
+      collection,
+      body: query,
+      action: 'deleteByQuery'
+    };
+
+    return this.query(request, options)
+      .then(response => response.result.deleted);
   }
 
   /**
@@ -71,4 +95,4 @@ class BulkController extends BaseController {
 
 }
 
-module.exports = BulkController;
+module.exports = { BulkController };

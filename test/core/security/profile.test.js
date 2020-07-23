@@ -1,4 +1,4 @@
-const Profile = require('../../../src/core/security/Profile');
+const { Profile } = require('../../../src/core/security/Profile');
 const sinon = require('sinon');
 const should = require('should');
 

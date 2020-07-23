@@ -1,4 +1,4 @@
-const BaseController = require('./Base');
+const { BaseController } = require('./Base');
 
 class IndexController extends BaseController {
 
@@ -55,4 +55,4 @@ class IndexController extends BaseController {
   }
 }
 
-module.exports = IndexController;
+module.exports = { IndexController };

@@ -1,10 +1,10 @@
-const BaseController = require('./Base');
-const Role = require('../core/security/Role');
-const RoleSearchResult = require('../core/searchResult/Role');
-const Profile = require('../core/security/Profile');
-const ProfileSearchResult = require('../core/searchResult/Profile');
-const User = require('../core/security/User');
-const UserSearchResult = require('../core/searchResult/User');
+const { BaseController } = require('./Base');
+const { Role } = require('../core/security/Role');
+const { RoleSearchResult } = require('../core/searchResult/Role');
+const { Profile } = require('../core/security/Profile');
+const { ProfileSearchResult } = require('../core/searchResult/Profile');
+const { User } = require('../core/security/User');
+const { UserSearchResult } = require('../core/searchResult/User');
 
 class SecurityController extends BaseController {
   /**
@@ -99,7 +99,6 @@ class SecurityController extends BaseController {
       action: 'createFirstAdmin',
       reset: options.reset
     };
-    delete options.reset;
 
     return this.query(request, options)
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
@@ -513,4 +512,4 @@ class SecurityController extends BaseController {
   }
 }
 
-module.exports = SecurityController;
+module.exports = { SecurityController };

@@ -1,7 +1,7 @@
-const SearchResultBase = require('./SearchResultBase');
+import { SearchResultBase } from './SearchResultBase';
+import { DocumentHit } from '../../utils/interfaces';
 
-class DocumentsSearchResult extends SearchResultBase {
-
+export class DocumentSearchResult extends SearchResultBase<DocumentHit> {
   /**
    * @param {Kuzzle} kuzzle
    * @param {object} query
@@ -16,4 +16,4 @@ class DocumentsSearchResult extends SearchResultBase {
   }
 }
 
-module.exports = DocumentsSearchResult;
+module.exports = { DocumentSearchResult };

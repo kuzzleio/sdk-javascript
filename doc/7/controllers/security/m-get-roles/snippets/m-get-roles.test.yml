@@ -18,4 +18,4 @@ hooks:
       curl -XDELETE kuzzle:7512/roles/role${i}
     done
 template: default
-expected: '^    _id: ''role3'',$'
+expected: '.*Role.*_id.*controllers.*'

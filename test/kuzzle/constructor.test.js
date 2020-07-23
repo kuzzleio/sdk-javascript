@@ -1,16 +1,16 @@
 const
   should = require('should'),
   sinon = require('sinon'),
-  Kuzzle = require('../../src/Kuzzle'),
-  AuthController = require('../../src/controllers/Auth'),
-  BulkController = require('../../src/controllers/Bulk'),
-  CollectionController = require('../../src/controllers/Collection'),
-  DocumentController = require('../../src/controllers/Document'),
-  IndexController = require('../../src/controllers/Index'),
-  MemoryStorageController = require('../../src/controllers/MemoryStorage'),
-  SecurityController = require('../../src/controllers/Security'),
-  ServerController = require('../../src/controllers/Server'),
-  RealTimeController = require('../../src/controllers/Realtime'),
+  { Kuzzle } = require('../../src/Kuzzle'),
+  { AuthController } = require('../../src/controllers/Auth'),
+  { BulkController } = require('../../src/controllers/Bulk'),
+  { CollectionController } = require('../../src/controllers/Collection'),
+  { DocumentController } = require('../../src/controllers/Document'),
+  { IndexController } = require('../../src/controllers/Index'),
+  { MemoryStorageController } = require('../../src/controllers/MemoryStorage'),
+  { SecurityController } = require('../../src/controllers/Security'),
+  { ServerController } = require('../../src/controllers/Server'),
+  { RealtimeController } = require('../../src/controllers/Realtime'),
   {
     WebSocket, // eslint-disable-line no-redeclare
     Http
@@ -65,7 +65,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.ms).be.an.instanceof(MemoryStorageController);
     should(kuzzle.security).be.an.instanceof(SecurityController);
     should(kuzzle.server).be.an.instanceof(ServerController);
-    should(kuzzle.realtime).be.an.instanceof(RealTimeController);
+    should(kuzzle.realtime).be.an.instanceof(RealtimeController);
   });
 
   it('should expose the documented properties with their default values', () => {
@@ -123,7 +123,7 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.ms).be.an.instanceof(MemoryStorageController);
     should(kuzzle.security).be.an.instanceof(SecurityController);
     should(kuzzle.server).be.an.instanceof(ServerController);
-    should(kuzzle.realtime).be.an.instanceof(RealTimeController);
+    should(kuzzle.realtime).be.an.instanceof(RealtimeController);
     should(kuzzle.protocol).be.an.instanceof(ProtocolMock);
     should(kuzzle.sdkVersion).be.a.String().and.be.equal(version);
     should(kuzzle.jwt).be.null();

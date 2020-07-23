@@ -71,4 +71,4 @@ class Jwt {
   }
 }
 
-module.exports = Jwt;
+module.exports = { Jwt };

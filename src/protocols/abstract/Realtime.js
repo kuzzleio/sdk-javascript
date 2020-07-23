@@ -1,6 +1,6 @@
 'use strict';
 
-const KuzzleAbstractProtocol = require('./Base');
+const { KuzzleAbstractProtocol } = require('./Base');
 
 class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   constructor (host, options = {}) {

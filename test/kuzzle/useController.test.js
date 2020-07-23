@@ -2,8 +2,8 @@ const
   should = require('should'),
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
-  BaseController = require('../../src/controllers/Base'),
-  Kuzzle = require('../../src/Kuzzle');
+  { BaseController } = require('../../src/controllers/Base'),
+  { Kuzzle } = require('../../src/Kuzzle');
 
 class CustomController extends BaseController {
   constructor (kuzzle) {

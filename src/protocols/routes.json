@@ -58,6 +58,10 @@
     }
   },
   "bulk": {
+    "deleteByQuery": {
+      "url": "/:index/:collection/_bulk/_query",
+      "verb": "DELETE"
+    },
     "import": {
       "verb": "POST",
       "url": "/:index/:collection/_bulk"
@@ -75,10 +79,6 @@
     "create": {
       "verb": "POST",
       "url": "/:index/:collection/_create"
-    },
-    "search": {
-      "url": "/:index/:collection",
-      "verb": "GET"
     },
     "scroll": {
       "url": "/_scroll/:scrollId",
@@ -116,6 +116,10 @@
       "url": "/:index/:collection/:_id/_update",
       "verb": "PUT"
     },
+    "updateByQuery": {
+      "url": "/:index/:collection/_query",
+      "verb": "PUT"
+    },
     "mUpdate": {
       "url": "/:index/:collection/_mUpdate",
       "verb": "PUT"
@@ -143,6 +147,10 @@
     "validate": {
       "url": "/:index/:collection/_validate",
       "verb": "POST"
+    },
+    "search": {
+      "url": "/:index/:collection/_search",
+      "verb": "GET"
     }
   },
   "security": {
@@ -324,6 +332,10 @@
     }
   },
   "collection": {
+    "update": {
+      "url": "/:index/:collection/",
+      "verb": "POST"
+    },
     "updateMapping": {
       "url": "/:index/:collection/_mapping",
       "verb": "PUT"
@@ -539,6 +551,10 @@
     "ltrim": {
       "url": "/ms/_ltrim/:_id",
       "verb": "POST"
+    },
+    "mexecute": {
+        "url": "/ms/_mexecute",
+        "verb": "POST"
     },
     "mget": {
       "url": "/ms/_mget",

@@ -1,5 +1,5 @@
-const SearchResultBase = require('./SearchResultBase');
-const User = require('../security/User');
+const { SearchResultBase } = require('./SearchResultBase');
+const { User } = require('../security/User');
 
 class UserSearchResult extends SearchResultBase {
 
@@ -24,4 +24,4 @@ class UserSearchResult extends SearchResultBase {
   }
 }
 
-module.exports = UserSearchResult;
+module.exports = { UserSearchResult };

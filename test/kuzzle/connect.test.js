@@ -3,7 +3,7 @@ const
   sinon = require('sinon'),
   ProtocolMock = require('../mocks/protocol.mock'),
   generateJwt = require('../mocks/generateJwt.mock'),
-  Kuzzle = require('../../src/Kuzzle');
+  { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle connect', () => {
 
@@ -98,7 +98,7 @@ describe('Kuzzle connect', () => {
 
     it('should keep a valid JWT at reconnection', () => {
       const
-        jwt = generateJwt(), 
+        jwt = generateJwt(),
         kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.auth.checkToken = sinon.stub().resolves({
@@ -116,7 +116,7 @@ describe('Kuzzle connect', () => {
 
     it('should empty the JWT at reconnection if it has expired', () => {
       const
-        jwt = generateJwt(), 
+        jwt = generateJwt(),
         kuzzle = new Kuzzle(protocols.somewhereagain);
 
       kuzzle.auth.checkToken = sinon.stub().resolves({
