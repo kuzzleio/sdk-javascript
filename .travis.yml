@@ -103,6 +103,7 @@ jobs:
       env:
         - BRANCH=dev
         - NODE_ENV=production
+        - NODE_OPTIONS="--max_old_space_size=4096"
         - S3_BUCKET=docs-next.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
         - AWS_DEFAULT_REGION=us-west-2
@@ -140,6 +141,7 @@ jobs:
       node_js: 10
       env:
         - NODE_ENV=production
+        - NODE_OPTIONS="--max_old_space_size=4096"
         - S3_BUCKET=docs.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
         - AWS_DEFAULT_REGION=us-west-2
