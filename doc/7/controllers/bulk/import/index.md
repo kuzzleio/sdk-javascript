@@ -14,13 +14,15 @@ This route is faster than the `document:m*` routes family (e.g. [document:mCreat
 <br/>
 
 ```js
-import (bulkData, [options])
+import (index, collection, bulkData, [options])
 ```
 
 <br/>
 
 | Arguments  | Type                | Description                                     |
 | ---------- | ------------------- | ----------------------------------------------- |
+| `index`      | <pre>string</pre> | Index name           |
+| `collection` | <pre>string</pre> | Collection name      |
 | `bulkData` | <pre>object[]</pre> | List of documents to be added to the collection |
 | `options`  | <pre>object</pre>   | Query options                                   |
 
@@ -93,7 +95,6 @@ Each error object contain the following properties:
 | `type`  | <pre>String</pre> | Elasticsearch client error type |
 | `reason`  | <pre>String</pre> | human readable error message |
 
-```
 
 ## Usage
 
