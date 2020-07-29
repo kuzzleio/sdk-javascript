@@ -405,7 +405,7 @@ describe('Collection Controller', () => {
   });
 
   describe('delete', () => {
-    it('should call collection/delete query and return a Promise which resolves an acknowledgement', () => {
+    it('should call collection/delete query and return a promise which resolves an acknowledgement', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
       return kuzzle.collection.delete('index', 'collection')
         .then(res => {
