@@ -154,7 +154,7 @@ class CollectionController extends BaseController {
       action: 'delete'
     };
     return this.query(request)
-      .then(undefined);
+      .then(() => undefined);
   }
 }
 
