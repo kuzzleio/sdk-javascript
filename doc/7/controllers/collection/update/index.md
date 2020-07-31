@@ -16,7 +16,7 @@ You can define [collection additional metadata](/core/2/guides/essentials/databa
 <SinceBadge version="Kuzzle 2.2.0" />
 <SinceBadge version="auto-version" />
 
-You can also provide Elasticsearch [index settings](https:/www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings) when creating a new collection.
+You can also provide Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings) when creating a new collection.
 
 <br/>
 
@@ -33,15 +33,14 @@ update(index, collection, definition);
 | `definition` | <pre>object</pre> | Describes the collection mappings and the ES index settings |
 | `options`    | <pre>object</pre> | Query options                                               |
 
-<SinceBadge version="Kuzzle 2.2.0" />
 <SinceBadge version="auto-version">
 
 ### definition
 
 An object containings:
  - [collection mappings](/core/2/guides/essentials/database-mappings).
- - Elasticsearch [index settings](https:/www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
-The mapping must have a root field `properties` that contain the mapping definition:
+ - Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
+
 
 ```js
 const definition = {
@@ -56,7 +55,7 @@ const definition = {
     }    
   },
   settings: {
-
+    // index settings (e.g. analyzers)
   }
 };
 ```
@@ -64,7 +63,6 @@ const definition = {
 </SinceBadge>
 
 
-<DeprecatedBadge version="Kuzzle 2.2.0" />
 <DeprecatedBadge version="auto-version">
 
 ### definition
