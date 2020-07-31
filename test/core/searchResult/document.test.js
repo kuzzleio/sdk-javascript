@@ -1,9 +1,9 @@
 const sinon = require('sinon');
 const should = require('should');
 
-const { DocumentsSearchResult } = require('../../../src/core/searchResult/Document');
+const { DocumentSearchResult } = require('../../../src/core/searchResult/Document');
 
-describe('DocumentsSearchResult', () => {
+describe('DocumentSearchResult', () => {
   const options = {opt: 'in'};
 
   let
@@ -31,7 +31,7 @@ describe('DocumentsSearchResult', () => {
   });
 
   describe('constructor', () => {
-    it('should create a DocumentsSearchResult instance with good properties', () => {
+    it('should create a DocumentSearchResult instance with good properties', () => {
       response = {
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
@@ -40,7 +40,7 @@ describe('DocumentsSearchResult', () => {
         total: 3
       };
 
-      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
@@ -67,7 +67,7 @@ describe('DocumentsSearchResult', () => {
         total: 2
       };
 
-      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
       return searchResult.next()
         .then(result => {
@@ -87,7 +87,7 @@ describe('DocumentsSearchResult', () => {
         total: 30
       };
 
-      searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -116,12 +116,12 @@ describe('DocumentsSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/scroll action with scrollId parameter and resolve to a new DocumentsSearchResult', () => {
+      it('should call document/scroll action with scrollId parameter and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -133,7 +133,7 @@ describe('DocumentsSearchResult', () => {
                 scrollId: 'scroll-id'
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 
@@ -175,12 +175,12 @@ describe('DocumentsSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
 
-      it('should call document/search action with search_after parameter and resolve to a new DocumentsSearchResult', () => {
+      it('should call document/search action with search_after parameter and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -200,7 +200,7 @@ describe('DocumentsSearchResult', () => {
                 size: 2
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 
@@ -219,7 +219,7 @@ describe('DocumentsSearchResult', () => {
 
       it('should reject with an error if the sort is invalid', () => {
         request.body.sort = [];
-        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
         return should(searchResult.next())
           .be.rejected();
@@ -227,7 +227,7 @@ describe('DocumentsSearchResult', () => {
 
       it('should reject if the sort combination does not allow to retrieve all the documents', () => {
         response.hits = [];
-        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
         return should(searchResult.next())
           .be.rejected();
@@ -256,7 +256,7 @@ describe('DocumentsSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentsSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -273,7 +273,7 @@ describe('DocumentsSearchResult', () => {
       });
 
 
-      it('should call document/search action with from/size parameters and resolve to a new DocumentsSearchResult', () => {
+      it('should call document/search action with from/size parameters and resolve to a new DocumentSearchResult', () => {
         return searchResult.next()
           .then(nextSearchResult => {
             should(kuzzle.query)
@@ -288,7 +288,7 @@ describe('DocumentsSearchResult', () => {
                 from: 2
               }, options);
             should(nextSearchResult).not.be.equal(searchResult);
-            should(nextSearchResult).be.instanceOf(DocumentsSearchResult);
+            should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
       });
 

@@ -146,6 +146,16 @@ class CollectionController extends BaseController {
     }, options)
       .then(response => response.result);
   }
+
+  delete (index, collection) {
+    const request = {
+      index,
+      collection,
+      action: 'delete'
+    };
+    return this.query(request)
+      .then(() => undefined);
+  }
 }
 
 module.exports = { CollectionController };
