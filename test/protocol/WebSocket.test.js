@@ -246,8 +246,6 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-    should(cb.firstCall.args[0].internal.status).be.equal(4666);
-    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
     websocket.clear.should.be.calledOnce();
 
@@ -259,8 +257,6 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-    should(cb.firstCall.args[0].internal.status).be.equal(4666);
-    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
     websocket.clear.should.be.calledOnce();
   });

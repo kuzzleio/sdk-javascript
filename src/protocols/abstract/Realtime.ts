@@ -65,7 +65,7 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this.state = 'offline';
     this.clear();
 
-    const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}: ${error.message}`);
+    const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}: ${error.message} (ws status=${error.status})`);
 
     this.emit('networkError', connectionError);
 
