@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import { Room } from '../core/Room';
+import * as Room from '../core/Room';
 import { JSONObject } from '../utils/interfaces';
 
 /**

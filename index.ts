@@ -18,7 +18,7 @@ import { SearchResultBase } from './src/core/searchResult/SearchResultBase';
 import { DocumentSearchResult } from './src/core/searchResult/Document';
 import { ProfileSearchResult } from './src/core/searchResult/Profile';
 import { RoleSearchResult } from './src/core/searchResult/Role';
-import { SpecificationSearchResult } from './src/core/searchResult/Specifications';
+import { SpecificationsSearchResult } from './src/core/searchResult/Specifications';
 import { UserSearchResult } from './src/core/searchResult/User';
 
 const exported = {
@@ -32,10 +32,11 @@ const exported = {
   DocumentSearchResult,
   ProfileSearchResult,
   RoleSearchResult,
-  SpecificationSearchResult,
+  SpecificationsSearchResult,
   UserSearchResult
 };
 
 export default exported;
+
 
 module.exports = exported;
