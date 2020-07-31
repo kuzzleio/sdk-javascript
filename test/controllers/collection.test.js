@@ -403,4 +403,22 @@ describe('Collection Controller', () => {
         });
     });
   });
+
+  describe('delete', () => {
+    it('should call collection/delete query and return a promise which resolves an acknowledgement', () => {
+      kuzzle.query.resolves({result: {acknowledged: true}});
+      return kuzzle.collection.delete('index', 'collection')
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'collection',
+              action: 'delete',
+              index: 'index',
+              collection: 'collection',
+            });
+          should(res).be.undefined();
+        });
+    });
+  });
 });

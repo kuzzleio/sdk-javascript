@@ -403,4 +403,26 @@ export class CollectionController extends BaseController {
     }, options)
       .then(response => response.result);
   }
+
+  /**
+   * Deletes a collection.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/collection/delete/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   */
+  delete (
+    index: string,
+    collection: string
+  ): Promise<void> {
+    const request = {
+      index,
+      collection,
+      action: 'delete'
+    };
+
+    return this.query(request)
+      .then(() => undefined);
+  }
 }
