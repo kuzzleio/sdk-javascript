@@ -22,7 +22,7 @@ You can also provide Elasticsearch [index settings](https:/www.elastic.co/guide/
 <br/>
 
 ```js
-create(index, collection, [body], [options]);
+create(index, collection, [definition], [options]);
 ```
 
 <br/>

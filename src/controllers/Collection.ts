@@ -43,8 +43,9 @@ export class CollectionController extends BaseController {
       body: definition,
       action: 'create'
     };
+
     return this.query(request, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**
@@ -68,7 +69,7 @@ export class CollectionController extends BaseController {
       action: 'deleteSpecifications'
     };
     return this.query(request, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**
@@ -115,7 +116,7 @@ export class CollectionController extends BaseController {
       collection,
       action: 'refresh'
     }, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**
@@ -282,7 +283,7 @@ export class CollectionController extends BaseController {
       action: 'truncate'
     };
     return this.query(request, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**
@@ -321,7 +322,7 @@ export class CollectionController extends BaseController {
       body: definition,
       action: 'update'
     }, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**

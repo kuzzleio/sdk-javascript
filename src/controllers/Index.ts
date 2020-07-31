@@ -21,7 +21,7 @@ export class IndexController extends BaseController {
       action: 'create'
     };
     return this.query(request, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**
@@ -39,7 +39,7 @@ export class IndexController extends BaseController {
       action: 'delete'
     };
     return this.query(request, options)
-      .then(() => {});
+      .then(() => undefined);
   }
 
   /**

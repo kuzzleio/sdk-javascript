@@ -21,7 +21,7 @@ You can also provide Elasticsearch [index settings](https:/www.elastic.co/guide/
 <br/>
 
 ```js
-update(index, collection, body);
+update(index, collection, definition);
 ```
 
 <br/>

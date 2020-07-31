@@ -42,4 +42,11 @@ Resolves if the index does not already exists
 
 ## Usage
 
+:::: tabs
+::: tab yourTabName
 <<< ./snippets/create.js
+:::
+::: tab anotherTab
+<<< ./snippets/create.js
+:::
+::::
