@@ -93,7 +93,7 @@ jobs:
         - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
       script:
         - gem install typhoeus
-        - cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 ruby .ci/dead-links.rb -p src/sdk/js/7/
+        - cd doc/framework/ && travis_retry HYDRA_MAX_CONCURRENCY=20 ruby .ci/dead-links.rb -p src/sdk/js/7/
 
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
