@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const should = require('should');
 
 const { DocumentController } = require('../../src/controllers/Document');
-const { DocumentsSearchResult } = require('../../src/core/searchResult/Document');
+const { DocumentSearchResult } = require('../../src/core/searchResult/Document');
 
 describe('Document Controller', () => {
   const options = {opt: 'in'};
@@ -366,7 +366,7 @@ describe('Document Controller', () => {
   });
 
   describe('search', () => {
-    it('should call document/search query and return a Promise which resolves a DocumentsSearchResult instance', () => {
+    it('should call document/search query and return a Promise which resolves a DocumentSearchResult instance', () => {
       const result = {
         scrollId: 'scroll-id',
         hits: [
@@ -394,7 +394,7 @@ describe('Document Controller', () => {
               scroll: undefined
             }, options);
 
-          should(res).be.an.instanceOf(DocumentsSearchResult);
+          should(res).be.an.instanceOf(DocumentSearchResult);
           should(res._options).match(options);
           should(res._options.verb).be.eql('POST');
           should(res._response).be.equal(result);
@@ -403,7 +403,7 @@ describe('Document Controller', () => {
         });
     });
 
-    it('should call document/search query and return a Promise which resolves a DocumentsSearchResult instance', () => {
+    it('should call document/search query and return a Promise which resolves a DocumentSearchResult instance', () => {
       const result = {
         scrollId: 'scroll-id',
         hits: [
@@ -433,7 +433,7 @@ describe('Document Controller', () => {
               scroll: undefined
             }, options);
 
-          should(res).be.an.instanceOf(DocumentsSearchResult);
+          should(res).be.an.instanceOf(DocumentSearchResult);
           should(res._options).match(options);
           should(res._options.verb).be.eql('GET');
           should(res._response).be.equal(result);
@@ -469,7 +469,7 @@ describe('Document Controller', () => {
               scroll: '10s'
             }, {});
 
-          should(res).be.an.instanceOf(DocumentsSearchResult);
+          should(res).be.an.instanceOf(DocumentSearchResult);
           should(res._options).match({ verb: 'POST' });
           should(res._response).be.equal(result);
           should(res.fetched).be.equal(2);

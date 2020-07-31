@@ -10,16 +10,16 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
 
 import { Kuzzle } from './src/Kuzzle';
 import { Http, WebSocket } from './src/protocols';
-import * as BaseController from './src/controllers/Base';
-import * as KuzzleAbstractProtocol from './src/protocols/abstract/Base';
-import * as KuzzleEventEmitter from './src/core/KuzzleEventEmitter';
+import { BaseController } from './src/controllers/Base';
+import { KuzzleAbstractProtocol } from './src/protocols/abstract/Base';
+import { KuzzleEventEmitter } from './src/core/KuzzleEventEmitter';
 
-import * as SearchResultBase from './src/core/searchResult/SearchResultBase';
-import * as DocumentSearchResult from './src/core/searchResult/Document';
-import * as ProfileSearchResult from './src/core/searchResult/Profile';
-import * as RoleSearchResult from './src/core/searchResult/Role';
-import * as SpecificationSearchResult from './src/core/searchResult/Specifications';
-import * as UserSearchResult from './src/core/searchResult/User';
+import { SearchResultBase } from './src/core/searchResult/SearchResultBase';
+import { DocumentSearchResult } from './src/core/searchResult/Document';
+import { ProfileSearchResult } from './src/core/searchResult/Profile';
+import { RoleSearchResult } from './src/core/searchResult/Role';
+import { SpecificationsSearchResult } from './src/core/searchResult/Specifications';
+import { UserSearchResult } from './src/core/searchResult/User';
 
 const exported = {
   Kuzzle,
@@ -32,7 +32,7 @@ const exported = {
   DocumentSearchResult,
   ProfileSearchResult,
   RoleSearchResult,
-  SpecificationSearchResult,
+  SpecificationsSearchResult,
   UserSearchResult
 }
 

@@ -239,9 +239,9 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         return;
       }
 
-      url = url.replace(regex, '/' + request[ matches[1] ]);
+      url = url.replace(regex, `/${encodeURIComponent(request[matches[1]])}`);
 
-      delete(queryArgs[ matches[1] ]);
+      delete queryArgs[matches[1]];
 
       matches = regex.exec(url);
     }
@@ -250,10 +250,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     const queryString = [];
 
     for (const key of Object.keys(queryArgs)) {
-      const value = queryArgs[key];
+      let value = queryArgs[key];
+      const encodedKey = encodeURIComponent(key);
 
       if (Array.isArray(value)) {
-        queryString.push(`${key}=${value.join()}`);
+        queryString.push(`${encodedKey}=${encodeURIComponent(value.join())}`);
       }
       else if (typeof value === 'boolean') {
         // In Kuzzle, an optional boolean option is set to true if present in
@@ -261,11 +262,12 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         // As there is no boolean type in querystrings, encoding a boolean
         // option "foo=false" in it will make Kuzzle consider it as truthy.
         if (value === true) {
-          queryString.push(key);
+          queryString.push(encodedKey);
         }
       }
       else {
-        queryString.push(`${key}=${typeof value === 'object' ? JSON.stringify(value) : value}`);
+        value = typeof value === 'object' ? JSON.stringify(value) : value;
+        queryString.push(`${encodedKey}=${encodeURIComponent(value)}`);
       }
     }
 

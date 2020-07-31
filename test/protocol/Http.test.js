@@ -216,24 +216,29 @@ describe('HTTP networking module', () => {
       };
 
       protocol.on('requestId', () => {
-        should(protocol._sendHttpRequest).be.calledOnce();
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
 
-        should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-        should(protocol._sendHttpRequest.firstCall.args[2]).match({
-          requestId: 'requestId',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          controller: 'foo',
-          action: 'bar',
-          index: 'index',
-          collection: 'collection',
-          meta: 'meta',
-          body: JSON.stringify({foo: 'bar'})
-        });
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(protocol._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            controller: 'foo',
+            action: 'bar',
+            index: 'index',
+            collection: 'collection',
+            meta: 'meta',
+            body: JSON.stringify({foo: 'bar'})
+          });
 
-        done();
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
       });
 
       protocol.send(data);
@@ -248,20 +253,25 @@ describe('HTTP networking module', () => {
       };
 
       protocol.on('requestId', () => {
-        should(protocol._sendHttpRequest).be.calledOnce();
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
 
-        should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-        should(protocol._sendHttpRequest.firstCall.args[2]).match({
-          requestId: 'requestId',
-          headers: {
-            authorization: 'Bearer fake-jwt'
-          },
-          controller: 'foo',
-          action: 'bar'
-        });
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(protocol._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              authorization: 'Bearer fake-jwt'
+            },
+            controller: 'foo',
+            action: 'bar'
+          });
 
-        done();
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
       });
 
       protocol.send(data);
@@ -278,20 +288,25 @@ describe('HTTP networking module', () => {
       };
 
       protocol.on('requestId', () => {
-        should(protocol._sendHttpRequest).be.calledOnce();
+        try {
+          should(protocol._sendHttpRequest).be.calledOnce();
 
-        should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-        should(protocol._sendHttpRequest.firstCall.args[2]).match({
-          requestId: 'requestId',
-          headers: {
-            'x-kuzzle-volatile': '{"some":"volatile-data"}'
-          },
-          controller: 'foo',
-          action: 'bar'
-        });
+          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
+          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
+          should(protocol._sendHttpRequest.firstCall.args[2]).match({
+            requestId: 'requestId',
+            headers: {
+              'x-kuzzle-volatile': '{"some":"volatile-data"}'
+            },
+            controller: 'foo',
+            action: 'bar'
+          });
 
-        done();
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
       });
 
       protocol.send(data);
@@ -310,7 +325,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo?foo=bar&baz=oh,an,array');
+            .be.equal(`/foo?foo=bar&baz=${encodeURIComponent('oh,an,array')}`);
           done();
         }
         catch (error) {
@@ -326,7 +341,7 @@ describe('HTTP networking module', () => {
         requestId: 'requestId',
         action: 'action',
         controller: 'getreq',
-        body: { foo: { foofoo: { barbar: 'bar' } }, baz: ['oh', 'an', 'array'] }
+        body: { foo: { foofoo: { barbar: 'bar' } }, '&baz': ['oh', 'an', 'array'] }
       };
 
       protocol.on('requestId', () => {
@@ -334,7 +349,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo?foo={"foofoo":{"barbar":"bar"}}&baz=oh,an,array');
+            .be.equal(`/foo?foo=${encodeURIComponent('{"foofoo":{"barbar":"bar"}}')}&${encodeURIComponent('&baz')}=${encodeURIComponent('oh,an,array')}`);
           done();
         }
         catch (error) {
@@ -350,14 +365,15 @@ describe('HTTP networking module', () => {
         requestId: 'requestId',
         action: 'bar',
         controller: 'foo',
-        foo: 'bar'
+        'foo?lol': 'bar&baz'
       };
 
       protocol.on('requestId', () => {
         should(protocol._sendHttpRequest).be.calledOnce();
 
         should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar?foo=bar');
+        should(protocol._sendHttpRequest.firstCall.args[1])
+          .be.equal(`/foo/bar?${encodeURIComponent('foo?lol')}=${encodeURIComponent('bar&baz')}`);
 
         done();
       });
@@ -370,7 +386,7 @@ describe('HTTP networking module', () => {
         requestId: 'requestId',
         controller: 'foo',
         action: 'bar',
-        foo: 'baz'
+        foo: 'baz&qux'
       };
       protocol._routes = {
         foo: {bar: {verb: 'VERB', url: '/foo/bar/:foo'}}
@@ -380,7 +396,8 @@ describe('HTTP networking module', () => {
         should(protocol._sendHttpRequest).be.calledOnce();
 
         should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar/baz');
+        should(protocol._sendHttpRequest.firstCall.args[1])
+          .be.equal(`/foo/bar/${encodeURIComponent('baz&qux')}`);
 
         done();
       });
@@ -470,7 +487,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo/bar?foo=bar,baz,qux&qux=123');
+            .be.equal(`/foo/bar?foo=${encodeURIComponent('bar,baz,qux')}&qux=123`);
         }
         catch (error) {
           return done(error);
@@ -488,7 +505,7 @@ describe('HTTP networking module', () => {
         action: 'bar',
         controller: 'foo',
         foo: false,
-        bar: true,
+        '?bar': true,
         qux: 123
       };
 
@@ -497,7 +514,7 @@ describe('HTTP networking module', () => {
           should(protocol._sendHttpRequest).be.calledOnce();
           should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
           should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal('/foo/bar?bar&qux=123');
+            .be.equal(`/foo/bar?${encodeURIComponent('?bar')}&qux=123`);
         }
         catch (error) {
           return done(error);
