@@ -14,4 +14,4 @@ hooks:
       }' kuzzle:7512/roles/role${i}/_create
     done
 template: default
-expected: '^\[ ''role5'', ''role4'', ''role3'', ''role2'', ''role1'' \]$'
+expected: '^\[ ''role\d'', ''role\d'', ''role\d'', ''role\d'', ''role\d'' \]$'
