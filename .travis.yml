@@ -78,7 +78,7 @@ jobs:
         - npm install
         - npm run build
       script:
-        - npm run doc-testing
+        - travis_retry npm run doc-testing
 
     - stage: Tests
       name: Dead link check
