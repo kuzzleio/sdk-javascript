@@ -14,5 +14,5 @@ src/core/searchResult/SearchResultBase.js
 src/core/searchResult/Document.js
 src/core/searchResult/Profile.js
 src/core/searchResult/Role.js
-src/core/searchResult/Specification.js
+src/core/searchResult/Specifications.js
 src/core/searchResult/User.js
