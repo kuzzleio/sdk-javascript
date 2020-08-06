@@ -29,6 +29,10 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     const port = parseInt(options.port, 10);
     this._port = isNaN(port) ? 7512 : port;
 
+    if (options.ssl !== undefined && options.sslConnection !== undefined) {
+      throw new Error('Both "ssl" and "sslConnection" options has been set. Use only "ssl".');
+    }
+
     if (typeof options.ssl === 'boolean') {
       this._ssl = options.ssl;
     }
