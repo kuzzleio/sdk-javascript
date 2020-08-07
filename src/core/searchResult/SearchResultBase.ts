@@ -74,7 +74,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
       value: response
     });
     Reflect.defineProperty(this, '_controller', {
-      value: response
+      value: request.controller,
+      writable: true
     });
     Reflect.defineProperty(this, '_searchAction', {
       value: 'search',
