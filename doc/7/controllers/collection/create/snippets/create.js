@@ -11,7 +11,7 @@ const mappings = {
 };
 
 try {
-  await kuzzle.collection.create('nyc-open-data', 'yellow-taxi', { mapping });
+  await kuzzle.collection.create('nyc-open-data', 'yellow-taxi', { mappings });
 
   console.log('Success');
 } catch (error) {
