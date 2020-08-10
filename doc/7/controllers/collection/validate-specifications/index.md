@@ -7,7 +7,7 @@ description: Validate specifications format
 
 # validateSpecifications
 
-Checks if a validation specification is well formatted. It does not store or modify the existing specification.
+Checks if a validation specification is well formatted. It does not store nor modify the existing specification.
 
 When the validation specification is not formatted correctly, a detailed error message is returned to help you to debug.
 
