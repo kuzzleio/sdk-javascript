@@ -37,7 +37,7 @@ update(index, collection, definition);
 
 ### definition
 
-An object containings:
+An object containing:
  - [collection mappings](/core/2/guides/essentials/database-mappings).
  - Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
 
