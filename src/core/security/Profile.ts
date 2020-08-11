@@ -52,6 +52,3 @@ export class Profile {
       options);
   }
 }
-
-module.exports = { Profile };
-

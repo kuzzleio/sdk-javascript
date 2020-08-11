@@ -21,6 +21,7 @@ export interface KuzzleRequest extends JSONObject {
   jwt?: string;
   volatile?: JSONObject;
   body?: JSONObject;
+  [key: string]: any;
 }
 
 /**
@@ -88,8 +89,14 @@ export interface ProfilePolicy {
  * @see https://docs.kuzzle.io/core/2/guides/essentials/security#defining-roles
  */
 export interface RoleRightsDefinition {
+  /**
+   * API controller name
+   */
   [key: string]: {
     actions: {
+      /**
+       * API action name
+       */
       [key: string]: boolean
     }
   }
@@ -112,7 +119,7 @@ export interface ApiKey {
      */
     userId: string;
     /**
-     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+     * Expiration date in Epoch-millis format (-1 if the token never expires)
      */
     expiresAt: number;
     /**
@@ -178,6 +185,11 @@ export interface Document {
 
 /**
  * Document retrieved from a search
+ *
+ * @property _id
+ * @property _version
+ * @property _source
+ * @property _score
  */
 export interface DocumentHit extends Document {
   /**

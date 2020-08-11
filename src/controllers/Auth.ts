@@ -495,7 +495,7 @@ export class AuthController extends BaseController {
      */
     _id: string;
     /**
-     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+     * Expiration date in Epoch-millis format (-1 if the token never expires)
      */
     expiresAt: number;
     /**
