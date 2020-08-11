@@ -224,5 +224,5 @@ export interface CollectionMappings {
    *
    * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#dynamic-mapping-policy
    */
-  dynamic?: 'true' | 'false' | 'strict',
+  dynamic?: 'true' | 'false' | 'strict' | boolean,
 }
