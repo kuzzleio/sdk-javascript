@@ -58,9 +58,9 @@ export class Kuzzle extends KuzzleEventEmitter {
 
   public auth: AuthController;
   public bulk: any;
-  public collection: any;
+  public collection: CollectionController;
   public document: DocumentController;
-  public index: any;
+  public index: IndexController;
   public ms: any;
   public realtime: any;
   public security: any;

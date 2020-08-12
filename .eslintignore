@@ -6,6 +6,8 @@ src/Kuzzle.js
 src/KuzzleError.js
 src/controllers/Auth.js
 src/controllers/Document.js
+src/controllers/Index.js
+src/controllers/Collection.js
 src/controllers/Base.js
 src/core/security/User.js
 src/core/security/Profile.js
