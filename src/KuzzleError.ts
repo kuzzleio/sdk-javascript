@@ -11,9 +11,13 @@ export class KuzzleError extends Error {
    */
   public status: number;
   /**
-   * Stacktrace (only if NODE_ENV=development)
+   * Kuzzle stacktrace (only if NODE_ENV=development)
    */
-  public stack?: string;
+  public backendStack?: string;
+  /**
+   * Stacktrace
+   */
+  public stack: string;
   /**
    * Unique ID
    */
@@ -38,7 +42,9 @@ export class KuzzleError extends Error {
     super(apiError.message);
 
     this.status = apiError.status;
-    this.stack = apiError.stack;
+    if (apiError.stack) {
+      this.backendStack = apiError.stack;
+    }
     this.id = apiError.id;
     this.code = apiError.code;
 
