@@ -31,6 +31,7 @@ test-*.js
 *.js.map
 index.js
 src/Kuzzle.js
+src/KuzzleError.js
 src/controllers/Auth.js
 src/controllers/Document.js
 src/controllers/Realtime.js
@@ -38,6 +39,16 @@ src/controllers/Base.js
 src/core/security/User.js
 src/core/security/Profile.js
 src/core/security/Role.js
+src/protocols/abstract/Base.js
+src/protocols/abstract/Realtime.js
+src/protocols/Http.js
+src/protocols/WebSocket.js
+src/protocols/index.js
 src/utils/interfaces.js
+src/core/KuzzleEventEmitter.js
 src/core/searchResult/SearchResultBase.js
 src/core/searchResult/Document.js
+src/core/searchResult/Profile.js
+src/core/searchResult/Role.js
+src/core/searchResult/Specifications.js
+src/core/searchResult/User.js

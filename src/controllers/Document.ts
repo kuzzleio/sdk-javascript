@@ -801,5 +801,3 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 }
-
-module.exports = { DocumentController };

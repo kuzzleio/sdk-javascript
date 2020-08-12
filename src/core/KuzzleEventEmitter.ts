@@ -1,12 +1,20 @@
 class Listener {
+  public fn: (...any) => any;
+  public once: boolean;
+
   constructor(fn, once = false) {
     this.fn = fn;
     this.once = once;
   }
 }
 
-class KuzzleEventEmitter {
-  constructor() {
+/**
+ * @todo proper TS conversion
+ */
+export class KuzzleEventEmitter {
+  private _events: Map<string, Array<Listener>>;
+
+  constructor () {
     this._events = new Map();
   }
 
@@ -98,7 +106,7 @@ class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners (eventName) {
+  removeAllListeners (eventName?: string) {
     if (eventName) {
       this._events.delete(eventName);
     }

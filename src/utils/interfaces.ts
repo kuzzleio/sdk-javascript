@@ -21,6 +21,7 @@ export interface KuzzleRequest extends JSONObject {
   jwt?: string;
   volatile?: JSONObject;
   body?: JSONObject;
+  [key: string]: any;
 }
 
 /**
@@ -88,8 +89,14 @@ export interface ProfilePolicy {
  * @see https://docs.kuzzle.io/core/2/guides/essentials/security#defining-roles
  */
 export interface RoleRightsDefinition {
+  /**
+   * API controller name
+   */
   [key: string]: {
     actions: {
+      /**
+       * API action name
+       */
       [key: string]: boolean
     }
   }
@@ -178,6 +185,11 @@ export interface Document {
 
 /**
  * Document retrieved from a search
+ *
+ * @property _id
+ * @property _version
+ * @property _source
+ * @property _score
  */
 export interface DocumentHit extends Document {
   /**
@@ -187,6 +199,7 @@ export interface DocumentHit extends Document {
 }
 
 /**
+<<<<<<< HEAD
  * Enum for notification types
  */
 export enum ENotificationType {
@@ -317,4 +330,40 @@ export interface ServerNotification extends BaseNotification {
   message: string;
 
   type: ENotificationType.TokenExpired;
+=======
+ * HTTP routes definition format
+ * @example
+ * {
+ *    <controller>: {
+ *      <action>: { <verb>, <url> }
+ *   }
+ * }
+ *
+ * {
+ *    'my-plugin/my-controller': {
+ *      action: { verb: 'GET', url: '/some/url' },
+ *      action2: { verb: 'GET', url: '/some/url/with/:parameter' }
+ *   }
+ * }
+ */
+export interface HttpRoutes {
+  /**
+   * Controller name
+   */
+  [key: string]: {
+    /**
+     * Action name
+     */
+    [key: string]: {
+      /**
+       * HTTP verb
+       */
+      verb: string,
+      /**
+       * URL
+       */
+      url: string
+    }
+  }
+>>>>>>> 7-dev
 }

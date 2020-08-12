@@ -1,10 +1,16 @@
 'use strict';
 
-const { KuzzleAbstractProtocol } = require('./Base');
+import { KuzzleAbstractProtocol } from './Base';
 
-class BaseProtocolRealtime extends KuzzleAbstractProtocol {
-  constructor (host, options = {}) {
-    super(host, options);
+export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
+  protected _autoReconnect: boolean;
+  protected _reconnectionDelay: number;
+  protected wasConnected: boolean;
+  protected stopRetryingToConnect: boolean;
+  protected retrying: boolean;
+
+  constructor (host, options: any = {}, name: string) {
+    super(host, options, name);
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
@@ -18,18 +24,23 @@ class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     return this._autoReconnect;
   }
 
-  get reconnectionDelay () {
+  /**
+   * Number of milliseconds between reconnection attempts
+   */
+  get reconnectionDelay (): number {
     return this._reconnectionDelay;
   }
 
-  connect() {
+  connect (): Promise<any> {
     this.state = 'connecting';
+
+    return Promise.resolve();
   }
 
   /**
    * Called when the client's connection is established
    */
-  clientConnected() {
+  clientConnected () {
     super.clientConnected('connected', this.wasConnected);
 
     this.state = 'connected';
@@ -40,7 +51,7 @@ class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   /**
    * Called when the client's connection is closed
    */
-  clientDisconnected() {
+  clientDisconnected () {
     this.clear();
     this.emit('disconnect');
   }
@@ -54,8 +65,7 @@ class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this.state = 'offline';
     this.clear();
 
-    const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
-    connectionError.internal = error;
+    const connectionError = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}: ${error.message} (ws status=${error.status})`);
 
     this.emit('networkError', connectionError);
 
@@ -90,5 +100,3 @@ class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     return this.state === 'connected';
   }
 }
-
-module.exports = BaseProtocolRealtime;
