@@ -55,17 +55,10 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
   public fetched: number;
 
-  /**
-   *
-   * @param {Kuzzle} kuzzle
-   * @param {object} request
-   * @param {object} options
-   * @param {object} response
-   */
   constructor (
     kuzzle: Kuzzle,
     request: KuzzleRequest = {},
-    options: any = {},
+    options: JSONObject = {},
     response: any = {}
   ) {
     Reflect.defineProperty(this, '_kuzzle', {
@@ -80,10 +73,18 @@ export class SearchResultBase<T> implements SearchResult<T> {
     Reflect.defineProperty(this, '_response', {
       value: response
     });
-
-    this._controller = request.controller;
-    this._searchAction = 'search';
-    this._scrollAction = 'scroll';
+    Reflect.defineProperty(this, '_controller', {
+      value: request.controller,
+      writable: true
+    });
+    Reflect.defineProperty(this, '_searchAction', {
+      value: 'search',
+      writable: true
+    });
+    Reflect.defineProperty(this, '_scrollAction', {
+      value: 'scroll',
+      writable: true
+    });
 
     this.aggregations = response.aggregations;
     this.hits = response.hits || [];
@@ -166,7 +167,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params'));
   }
 
-  _get (object, path) {
+  protected _get (object, path) {
     if (!object) {
       return object;
     }
@@ -179,7 +180,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return this._get(object[key], path);
   }
 
-  _buildNextSearchResult (response) {
+  protected _buildNextSearchResult (response) {
     const Constructor: any = this.constructor;
 
     const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, response.result);
@@ -187,8 +188,4 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
     return nextSearchResult;
   }
-
 }
-
-
-module.exports = { SearchResultBase };

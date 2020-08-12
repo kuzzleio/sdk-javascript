@@ -693,7 +693,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
     dequeuingProcess();
   }
-
 }
-
-module.exports = { Kuzzle };

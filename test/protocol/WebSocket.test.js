@@ -1,10 +1,10 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  lolex = require('lolex'),
-  NodeWS = require('ws'),
-  WS = require('../../src/protocols/WebSocket'),
-  windowMock = require('../mocks/window.mock');
+const should = require('should');
+const sinon = require('sinon');
+const lolex = require('lolex');
+const NodeWS = require('ws');
+
+const { default: WS } = require('../../src/protocols/WebSocket');
+const windowMock = require('../mocks/window.mock');
 
 describe('WebSocket networking module', () => {
   let
@@ -246,8 +246,6 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-    should(cb.firstCall.args[0].internal.status).be.equal(4666);
-    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
     websocket.clear.should.be.calledOnce();
 
@@ -259,8 +257,6 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
     should(cb).be.calledOnce();
     should(cb.firstCall.args[0]).be.an.instanceOf(Error);
-    should(cb.firstCall.args[0].internal.status).be.equal(4666);
-    should(cb.firstCall.args[0].internal.message).be.equal('foobar');
     should(websocket.listeners('networkError').length).be.eql(1);
     websocket.clear.should.be.calledOnce();
   });
