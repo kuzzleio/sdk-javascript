@@ -34,8 +34,9 @@ const exported = {
   RoleSearchResult,
   SpecificationsSearchResult,
   UserSearchResult
-}
+};
 
 export default exported;
+
 
 module.exports = exported;

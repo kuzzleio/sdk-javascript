@@ -8,4 +8,4 @@ hooks:
       }' kuzzle:7512/profiles/profile${i}/_create
     done
 template: default
-expected: '^\[ ''profile\d'', ''profile\d'', ''profile\d'', ''profile\d', ''profile\d'' \]$'
+expected: '^\[ ''profile\d'', ''profile\d'', ''profile\d'', ''profile\d'', ''profile\d'' \]$'

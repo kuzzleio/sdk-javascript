@@ -27,7 +27,7 @@ export class DocumentController extends BaseController {
   count (
     index: string,
     collection: string,
-    body: JSONObject = null,
+    body?: JSONObject,
     options: { queuable?: boolean } = {}
   ): Promise<number> {
     const request = {

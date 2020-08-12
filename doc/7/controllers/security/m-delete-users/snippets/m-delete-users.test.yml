@@ -16,4 +16,4 @@ hooks:
       }' kuzzle:7512/users/user${i}/_create
     done
 template: default
-expected: '^\[ ''user1'', ''user2'', ''user3'' \]$'
+expected: '^\[ ''user\d'', ''user\d'', ''user\d'' \]$'
