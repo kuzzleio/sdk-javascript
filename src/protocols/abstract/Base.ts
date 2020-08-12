@@ -56,8 +56,6 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
         this[opt] = options[opt];
       }
     });
-
-    this._stacks = new Map();
   }
 
   get host () {
