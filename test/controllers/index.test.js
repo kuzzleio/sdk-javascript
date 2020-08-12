@@ -33,8 +33,7 @@ describe('Index Controller', () => {
               index: 'index'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
-          should(res.shards_acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
   });
@@ -55,7 +54,7 @@ describe('Index Controller', () => {
               index: 'index'
             }, options);
 
-          should(res).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
   });
