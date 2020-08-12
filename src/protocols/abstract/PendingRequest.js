@@ -20,4 +20,4 @@ class PendingRequest {
   }
 }
 
-module.exports = PendingRequest;
+module.exports = { PendingRequest };

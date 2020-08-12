@@ -1,9 +1,9 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  KuzzleError = require('../../src/KuzzleError'),
-  { KuzzleAbstractProtocol } = require('../../src/protocols/abstract/Base'),
-  PendingRequest = require('../../src/protocols/abstract/PendingRequest');
+const should = require('should');
+const sinon = require('sinon');
+
+const { KuzzleError } = require('../../src/KuzzleError');
+const { KuzzleAbstractProtocol } = require('../../src/protocols/abstract/Base');
+const { PendingRequest } = require('../../src/protocols/abstract/PendingRequest');
 
 describe('Common Protocol', () => {
   let
@@ -23,6 +23,30 @@ describe('Common Protocol', () => {
       protocol = new KuzzleAbstractProtocol('somewhere', { port: '443' });
 
       should(protocol.port).be.eql(443);
+    });
+
+    it('should use ssl option if available and fallback to sslConnection option', () => {
+      protocol = new KuzzleAbstractProtocol('somewhere', { ssl: true });
+
+      should(protocol.ssl).be.true();
+
+      protocol = new KuzzleAbstractProtocol('somewhere', { sslConnection: true });
+
+      should(protocol.ssl).be.true();
+    });
+
+    it('should use ssl connection when port is 443 or 7443 and option is not defined', () => {
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: 443 });
+
+      should(protocol.ssl).be.true();
+
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: 7443 });
+
+      should(protocol.ssl).be.true();
+
+      protocol = new KuzzleAbstractProtocol('somewhere', { port: 4242 });
+
+      should(protocol.ssl).be.false();
     });
 
     it('should use 7512 when no port is given or when port is not a parseable number', () => {
@@ -91,7 +115,7 @@ describe('Common Protocol', () => {
 
       const pending = protocol.pendingRequests.get('bar');
 
-      pending.should.be.an.instanceOf(PendingRequest).and.match({request});
+      should(pending).be.instanceOf(PendingRequest).and.match({request});
     });
 
     it('should fire a "queryError" event and reject if an error occurred', () => {
