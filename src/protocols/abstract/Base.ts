@@ -56,6 +56,8 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
         this[opt] = options[opt];
       }
     });
+
+    this._stacks = new Map();
   }
 
   get host () {
@@ -109,6 +111,8 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
+    const stack = Error().stack;
+
     const pending = new PendingRequest(request);
     this._pendingRequests.set(request.requestId, pending);
 
@@ -116,7 +120,7 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        const error = new KuzzleError(response.error);
+        const error = new KuzzleError(response.error, stack);
 
         this.emit('queryError', error, request);
 

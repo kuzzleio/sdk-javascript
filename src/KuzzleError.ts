@@ -11,10 +11,6 @@ export class KuzzleError extends Error {
    */
   public status: number;
   /**
-   * Kuzzle stacktrace (only if NODE_ENV=development)
-   */
-  public backendStack?: string;
-  /**
    * Stacktrace
    */
   public stack: string;
@@ -38,13 +34,18 @@ export class KuzzleError extends Error {
    */
   public count?: number;
 
-  constructor (apiError) {
+  constructor (apiError, stack = null) {
     super(apiError.message);
 
     this.status = apiError.status;
-    if (apiError.stack) {
-      this.backendStack = apiError.stack;
+
+    if (stack) {
+      const lines = stack.split('\n');
+      lines[0] += apiError.message;
+      lines[3] = ' 🡆  ' + lines[3].trimStart();
+      this.stack = lines.join('\n');
     }
+
     this.id = apiError.id;
     this.code = apiError.code;
 
