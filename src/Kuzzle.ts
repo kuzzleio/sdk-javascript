@@ -361,15 +361,10 @@ export class Kuzzle extends KuzzleEventEmitter {
       if (this.autoQueue) {
         this.startQueuing();
       }
-
-      this.realtime.disconnected();
-
       this.emit('networkError', error);
     });
 
     this.protocol.addListener('disconnect', () => {
-      this.realtime.disconnected();
-
       this.emit('disconnected');
     });
 
@@ -381,8 +376,6 @@ export class Kuzzle extends KuzzleEventEmitter {
       if (this.autoReplay) {
         this.playQueue();
       }
-
-      this.realtime.reconnected();
 
       if (this.auth.authenticationToken) {
         return this.auth.checkToken()

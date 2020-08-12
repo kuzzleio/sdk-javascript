@@ -199,7 +199,6 @@ export interface DocumentHit extends Document {
 }
 
 /**
-<<<<<<< HEAD
  * Enum for notification types
  */
 export enum ENotificationType {
@@ -330,7 +329,9 @@ export interface ServerNotification extends BaseNotification {
   message: string;
 
   type: ENotificationType.TokenExpired;
-=======
+}
+
+/**
  * HTTP routes definition format
  * @example
  * {
@@ -365,5 +366,4 @@ export interface HttpRoutes {
       url: string
     }
   }
->>>>>>> 7-dev
 }

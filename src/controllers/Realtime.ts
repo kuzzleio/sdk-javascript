@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import * as Room from '../core/Room';
+import Room from '../core/Room';
 import { JSONObject } from '../utils/interfaces';
 
 /**
@@ -56,7 +56,10 @@ export class RealtimeController extends BaseController {
     this._subscriptions = new Map();
     this._subscriptionsOff = new Map();
 
-    this.kuzzle.on('tokenExpired', () => this.tokenExpired());
+    this.kuzzle.on('tokenExpired', () => this.removeSubscriptions());
+    this.kuzzle.on('disconnected', () => this.saveSubscriptions());
+    this.kuzzle.on('networkError', () => this.saveSubscriptions());
+    this.kuzzle.on('reconnected', () => this.resubscribe());
   }
 
   /**
@@ -123,6 +126,11 @@ export class RealtimeController extends BaseController {
    * @param collection Collection name
    * @param filters Optional subscription filters (@see https://docs.kuzzle.io/core/2/guides/cookbooks/realtime-api)
    * @param callback Callback function to handle notifications
+   * @param options Additional options
+   *    - `scope` Subscribe to document entering or leaving the scope. (default: 'all')
+   *    - `users` Subscribe to users entering or leaving the room. (default: 'none')
+   *    - `subscribeToSelf` Subscribe to notifications fired by our own queries. (default: true)
+   *    - `volatile` Subscription information sent alongside notifications
    *
    * @returns A string containing the room ID
    */
@@ -195,11 +203,9 @@ export class RealtimeController extends BaseController {
   }
 
   /**
-   * Internal method.
-   *
-   * Should be called on network error or disconnection
+   * Called when kuzzle is disconnected
    */
-  disconnected () {
+  private saveSubscriptions () {
     for (const roomId of this._subscriptions.keys()) {
       for (const room of this._subscriptions.get(roomId)) {
         room.removeListeners();
@@ -217,12 +223,9 @@ export class RealtimeController extends BaseController {
   }
 
   /**
-   * Internal method.
-   *
-   * Called on kuzzle reconnection.
-   * Resubscribe to eligible disabled rooms.
+   * Called on kuzzle reconnection
    */
-  reconnected () {
+  private resubscribe () {
     for (const roomId of this._subscriptionsOff.keys()) {
       for (const room of this._subscriptionsOff.get(roomId)) {
         if (!this._subscriptions.has(roomId)) {
@@ -231,7 +234,7 @@ export class RealtimeController extends BaseController {
         this._subscriptions.get(roomId).push(room);
 
         room.subscribe()
-          .catch(() => this.kuzzle.emit('discarded', {request: room.request}));
+          .catch(() => this.kuzzle.emit('discarded', { request: room.request }));
       }
 
       this._subscriptionsOff.delete(roomId);
@@ -239,11 +242,9 @@ export class RealtimeController extends BaseController {
   }
 
   /**
-   * Internal method.
-   *
-   * Removes all subscriptions.
+   * Called when a token expire
    */
-  tokenExpired() {
+  private removeSubscriptions() {
     for (const roomId of this._subscriptions.keys()) {
       for (const room of this._subscriptions.get(roomId)) {
         room.removeListeners();
@@ -253,7 +254,6 @@ export class RealtimeController extends BaseController {
     this._subscriptions = new Map();
     this._subscriptionsOff = new Map();
   }
-
 }
 
 module.exports = { RealtimeController };

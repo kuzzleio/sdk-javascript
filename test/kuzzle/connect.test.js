@@ -53,7 +53,7 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.nowhere),
         eventStub = sinon.stub();
 
-      kuzzle.realtime.disconnected = sinon.stub();
+      kuzzle.realtime.saveSubscriptions = sinon.stub();
 
       kuzzle.addListener('networkError', eventStub);
 
@@ -62,7 +62,7 @@ describe('Kuzzle connect', () => {
           throw new Error('should not happen');
         })
         .catch(() => {
-          should(kuzzle.realtime.disconnected).be.calledOnce();
+          should(kuzzle.realtime.saveSubscriptions).be.calledOnce();
           should(eventStub).be.calledOnce();
         });
     });
@@ -85,13 +85,13 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.somewhereagain),
         eventStub = sinon.stub();
 
-      kuzzle.realtime.reconnected = sinon.stub();
+      kuzzle.realtime.resubscribe = sinon.stub();
 
       kuzzle.addListener('reconnected', eventStub);
 
       return kuzzle.connect()
         .then(() => {
-          should(kuzzle.realtime.reconnected).be.calledOnce();
+          should(kuzzle.realtime.resubscribe).be.calledOnce();
           should(eventStub).be.calledOnce();
         });
     });
@@ -137,14 +137,14 @@ describe('Kuzzle connect', () => {
         kuzzle = new Kuzzle(protocols.somewhere),
         eventStub = sinon.stub();
 
-      kuzzle.realtime.disconnected = sinon.stub();
+      kuzzle.realtime.saveSubscriptions = sinon.stub();
 
       kuzzle.addListener('disconnected', eventStub);
 
       return kuzzle.connect()
         .then(() => kuzzle.protocol.disconnect())
         .then(() => {
-          should(kuzzle.realtime.disconnected).be.calledOnce();
+          should(kuzzle.realtime.saveSubscriptions).be.calledOnce();
           should(eventStub).be.calledOnce();
         });
     });

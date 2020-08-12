@@ -26,17 +26,52 @@ describe('Realtime Controller', () => {
   });
 
   describe('on: tokenExpired', () => {
-    it('should call tokenExpired() method', () => {
-      kuzzle.realtime.tokenExpired = sinon.stub();
+    it('should call removeSubscriptions() method', () => {
+      kuzzle.realtime.removeSubscriptions = sinon.stub();
 
       kuzzle.emit('tokenExpired');
 
       process.nextTick(() => {
-        should(kuzzle.realtime.tokenExpired).be.called();
+        should(kuzzle.realtime.removeSubscriptions).be.called();
       });
     });
   });
 
+  describe('on: disconnected', () => {
+    it('should call saveSubscriptions() method', () => {
+      kuzzle.realtime.saveSubscriptions = sinon.stub();
+
+      kuzzle.emit('disconnected');
+
+      process.nextTick(() => {
+        should(kuzzle.realtime.saveSubscriptions).be.called();
+      });
+    });
+  });
+
+  describe('on: networkError', () => {
+    it('should call saveSubscriptions() method', () => {
+      kuzzle.realtime.saveSubscriptions = sinon.stub();
+
+      kuzzle.emit('networkError');
+
+      process.nextTick(() => {
+        should(kuzzle.realtime.saveSubscriptions).be.called();
+      });
+    });
+  });
+
+  describe('on: reconnected', () => {
+    it('should call resubscribe() method', () => {
+      kuzzle.realtime.resubscribe = sinon.stub();
+
+      kuzzle.emit('reconnected');
+
+      process.nextTick(() => {
+        should(kuzzle.realtime.resubscribe).be.called();
+      });
+    });
+  });
 
   describe('#count', () => {
     it('should call realtime/count query with the roomId and return a Promise which resolves a number', () => {
@@ -218,7 +253,7 @@ describe('Realtime Controller', () => {
     });
   });
 
-  describe('#disconnected', () => {
+  describe('#saveSubscriptions', () => {
     it('should disable current subscriptions', () => {
       const roomA = {
         autoResubscribe: true,
@@ -238,7 +273,7 @@ describe('Realtime Controller', () => {
         ['bar', [roomC]]
       ]);
 
-      kuzzle.realtime.disconnected();
+      kuzzle.realtime.saveSubscriptions();
 
       should(kuzzle.realtime._subscriptions).be.empty();
       should(kuzzle.realtime._subscriptionsOff).eql(new Map([
@@ -250,7 +285,7 @@ describe('Realtime Controller', () => {
     });
   });
 
-  describe('#reconnected', () => {
+  describe('#resubscribe', () => {
     it('should resubmit pending subcriptions', () => {
       const roomA = { subscribe: sinon.stub().resolves() };
       const roomB = { subscribe: sinon.stub().resolves() };
@@ -261,7 +296,7 @@ describe('Realtime Controller', () => {
         ['bar', [roomC]]
       ]);
 
-      kuzzle.realtime.reconnected();
+      kuzzle.realtime.resubscribe();
 
       should(kuzzle.realtime._subscriptionsOff).be.empty();
       should(kuzzle.realtime._subscriptions).eql(new Map([
@@ -276,8 +311,8 @@ describe('Realtime Controller', () => {
     });
   });
 
-  describe('#tokenExpired', () => {
-    it('should clear all subscriptions and emit a "tokenExpired" event', () => {
+  describe('#removeSubscriptions', () => {
+    it('should clear all subscriptions', () => {
       const stub = sinon.stub();
 
       kuzzle.jwt = 'foobar';
@@ -286,7 +321,7 @@ describe('Realtime Controller', () => {
         kuzzle.realtime._subscriptions.set(uuidv4(), [{removeListeners: stub}]);
       }
 
-      kuzzle.realtime.tokenExpired();
+      kuzzle.realtime.removeSubscriptions();
 
       should(kuzzle.realtime._subscriptions).be.empty();
       should(stub.callCount).be.eql(10);
