@@ -1,5 +1,5 @@
 import { KuzzleEventEmitter } from './core/KuzzleEventEmitter';
-import { KuzzleAbstractProtocol } from './protocols/abstract/Base'
+import { KuzzleAbstractProtocol } from './protocols/abstract/Base';
 
 import { AuthController } from './controllers/Auth';
 import { BulkController } from './controllers/Bulk';
