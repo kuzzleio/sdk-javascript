@@ -46,6 +46,7 @@ Kuzzle SDK instance options.
 | `queueTTL`        | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds |
 | `queueMaxSize`    | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                |
 | `replayInterval`  | <pre>number</pre><br/>(`10`)     | Delay between each replayed requests, in milliseconds              |
+| `tokenExpiredInterval` | <pre>number</pre><br/>(`1000`)    | Time (in ms) during which a TokenExpired event is ignored               |
 | `volatile`        | <pre>object</pre><br/>(`{}`)     | Common volatile data, will be sent to all future requests          |
 
 ## Return

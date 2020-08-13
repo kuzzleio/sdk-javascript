@@ -4,6 +4,9 @@ import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject, KuzzleRequest } from '../utils/interfaces';
 
+/**
+ * WebSocket protocol used to connect to a Kuzzle server.
+ */
 export default class WebSocketProtocol extends BaseProtocolRealtime {
   private WebSocketClient: any;
   private options: any;

@@ -1,4 +1,5 @@
 import { KuzzleEventEmitter } from './core/KuzzleEventEmitter';
+import { KuzzleAbstractProtocol } from './protocols/abstract/Base'
 
 import { AuthController } from './controllers/Auth';
 import { BulkController } from './controllers/Bulk';
@@ -12,7 +13,7 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
-import { JSONObject, KuzzleRequest } from './utils/interfaces';
+import { JSONObject, KuzzleRequest, KuzzleResponse } from './utils/interfaces';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -31,6 +32,9 @@ const events = [
 ];
 
 export class Kuzzle extends KuzzleEventEmitter {
+  // We need to define any string key because users can register new controllers
+  [key: string]: any;
+
   /**
    * Protocol used by the SDK to communicate with Kuzzle.
    */
@@ -48,7 +52,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    */
   public sdkVersion: string;
   /**
-   * SDK name (e.g: js@7.4.2).
+   * SDK name (e.g: `js@7.4.2`).
    */
   public sdkName: string;
   /**
@@ -62,7 +66,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   public document: DocumentController;
   public index: IndexController;
   public ms: any;
-  public realtime: any;
+  public realtime: RealtimeController;
   public security: any;
   public server: any;
 
@@ -82,10 +86,84 @@ export class Kuzzle extends KuzzleEventEmitter {
   private __proxy__: any;
 
   /**
-   * @param protocol - the protocol to use
-   * @param [options] - Kuzzle options
+   * Instantiate a new SDK
+   *
+   * @example
+   *
+   * import { Kuzzle, WebSocket } from 'kuzzle-sdk';
+   *
+   * const kuzzle = new Kuzzle(
+   *   new WebSocket('localhost')
+   * );
    */
-  constructor(protocol: any, options: any = {}) {
+  constructor(
+    /**
+     * Network protocol to connect to Kuzzle. (e.g. `Http` or `WebSocket`)
+     */
+    protocol: KuzzleAbstractProtocol,
+    options: {
+      /**
+       * Automatically renew all subscriptions on a `reconnected` event
+       * Default: `true`
+       */
+      autoResubscribe?: boolean;
+      /**
+       * Time (in ms) during which a similar event is ignored
+       * Default: `200`
+       */
+      eventTimeout?: number;
+      /**
+       * Common volatile data, will be sent to all future requests
+       * Default: `{}`
+       */
+      volatile?: JSONObject;
+      /**
+       * If `true`, automatically queues all requests during offline mode
+       * Default: `false`
+       */
+      autoQueue?: boolean;
+      /**
+       * If `true`, automatically replays queued requests
+       * on a `reconnected` event
+       * Default: `false`
+       */
+      autoReplay?: boolean;
+      /**
+       * Custom function called during offline mode to filter
+       * queued requests on-the-fly
+       */
+      queueFilter?: (request: KuzzleRequest) => boolean;
+      /**
+       * Called before dequeuing requests after exiting offline mode,
+       * to add items at the beginning of the offline queue
+       */
+      offlineQueueLoader?: (...any) => any;
+      /**
+       * Number of maximum requests kept during offline mode
+       * Default: `500`
+       */
+      queueMaxSize?: number;
+      /**
+       * Time a queued request is kept during offline mode, in milliseconds
+       * Default: `120000`
+       */
+      queueTTL?: number;
+      /**
+       * Delay between each replayed requests, in milliseconds
+       * Default: `10`
+       */
+      replayInterval?: number;
+      /**
+       * Time (in ms) during which a TokenExpired event is ignored
+       * Default: `1000`
+       */
+      tokenExpiredInterval?: number;
+      /**
+       * If set to `auto`, the `autoQueue` and `autoReplay` are also set to `true`
+       */
+      offlineMode?: 'auto';
+    } = {}
+  ) {
     super();
 
     if (protocol === undefined || protocol === null) {
@@ -324,13 +402,12 @@ export class Kuzzle extends KuzzleEventEmitter {
     return this._superEmit(eventName, ...payload);
   }
 
-  _superEmit (eventName, ...payload) {
+  private _superEmit (eventName, ...payload) {
     return super.emit(eventName, ...payload);
   }
 
   /**
-   * Connects to a Kuzzle instance using the provided host name
-   * @returns {Promise<Object>}
+   * Connects to a Kuzzle instance
    */
   connect (): Promise<void> {
     if (this.protocol.isReady()) {
@@ -414,7 +491,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     return this._superAddListener(event, listener);
   }
 
-  _superAddListener (event, listener) {
+  private _superAddListener (event, listener) {
     return super.addListener(event, listener);
   }
 
@@ -444,11 +521,10 @@ export class Kuzzle extends KuzzleEventEmitter {
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
-   * @param {object} request
-   * @param {object} [options] - Optional arguments
-   * @returns {Promise<object>}
+   * @param request
+   * @param options - Optional arguments
    */
-  query (request: KuzzleRequest = {}, options: JSONObject = {}): Promise<JSONObject> {
+  query (request: KuzzleRequest = {}, options: JSONObject = {}): Promise<KuzzleResponse> {
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }
@@ -563,11 +639,10 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Adds a new controller and make it available in the SDK.
    *
-   * @param {BaseController} ControllerClass
-   * @param {string} accessor
-   * @returns {Kuzzle}
+   * @param ControllerClass
+   * @param accessor
    */
-  useController (ControllerClass, accessor) {
+  useController (ControllerClass: any, accessor: string) {
     if (!(accessor && accessor.length > 0)) {
       throw new Error('You must provide a valid accessor.');
     }
@@ -594,7 +669,7 @@ Discarded request: ${JSON.stringify(request)}`));
     return this;
   }
 
-  _checkPropertyType (prop, typestr, value) {
+  private _checkPropertyType (prop, typestr, value) {
     const wrongType = typestr === 'array' ? !Array.isArray(value) : typeof value !== typestr;
 
     if (wrongType) {
@@ -605,7 +680,7 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Clean up the queue, ensuring the queryTTL and queryMaxSize properties are respected
    */
-  _cleanQueue () {
+  private _cleanQueue () {
     const now = Date.now();
     let lastDocumentIndex = -1;
 
@@ -637,7 +712,7 @@ Discarded request: ${JSON.stringify(request)}`));
   /**
    * Play all queued requests, in order.
    */
-  _dequeue() {
+  private _dequeue() {
     const
       uniqueQueue = {},
       dequeuingProcess = () => {

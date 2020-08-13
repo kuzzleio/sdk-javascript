@@ -25,6 +25,30 @@ export interface KuzzleRequest extends JSONObject {
 }
 
 /**
+ * Kuzzle API response
+ *
+ * @see https://docs.kuzzle.io/core/2/api/essentials/kuzzle-response/
+ */
+export interface KuzzleResponse extends JSONObject {
+  controller: string;
+  action: string;
+  index?: string;
+  collection?: string;
+  error?: {
+    id: string;
+    code: number;
+    message: string;
+    status: number;
+    stack?: string;
+  };
+  requestId: string;
+  result: JSONObject | null;
+  status: number;
+  volatile?: JSONObject;
+  room?: string;
+}
+
+/**
  * A profile policy is composed of a roleId to define API rights
  * and an optional array of restrictions on index and collections
  *
