@@ -138,7 +138,7 @@ export class RealtimeController extends BaseController {
     index: string,
     collection: string,
     filters: JSONObject,
-    callback: (Notification) => void | Promise<void>,
+    callback: (notification: Notification) => void | Promise<void>,
     options: {
       /**
        * Subscribe to document entering or leaving the scope. (default: 'all')
