@@ -15,6 +15,10 @@ export class KuzzleError extends Error {
    */
   public stack: string;
   /**
+   * Kuzzle stacktrace (development mode only)
+   */
+  public kuzzleStack?: string;
+  /**
    * Unique ID
    */
   public id: string;
@@ -38,6 +42,11 @@ export class KuzzleError extends Error {
     super(apiError.message);
 
     this.status = apiError.status;
+    if (apiError.stack) {
+      Reflect.defineProperty(this, 'kuzzleStack', {
+        value: apiError.stack
+      });
+    }
 
     if (stack) {
       const lines = stack.split('\n');
