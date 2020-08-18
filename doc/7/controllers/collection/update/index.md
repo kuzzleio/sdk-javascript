@@ -14,7 +14,7 @@ You can define the collection [dynamic mapping policy](/core/2/guides/essentials
 You can define [collection additional metadata](/core/2/guides/essentials/database-mappings#collection-metadata) within the `_meta` root field.
 
 <SinceBadge version="Kuzzle 2.2.0" />
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.4.0" />
 
 You can also provide Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings) when creating a new collection.
 
@@ -33,7 +33,7 @@ update(index, collection, definition);
 | `definition` | <pre>object</pre> | Describes the collection mappings and the ES index settings |
 | `options`    | <pre>object</pre> | Query options                                               |
 
-<SinceBadge version="auto-version">
+<SinceBadge version="7.4.0">
 
 ### definition
 
@@ -63,7 +63,7 @@ const definition = {
 </SinceBadge>
 
 
-<DeprecatedBadge version="auto-version">
+<DeprecatedBadge version="7.4.0">
 
 ### definition
 
