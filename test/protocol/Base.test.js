@@ -185,7 +185,7 @@ describe('Common Protocol', () => {
           should(error).be.instanceOf(KuzzleError);
           should(error.message).be.eql('foo-bar');
           should(error.status).be.eql(442);
-          should(error.stack).be.eql('you are the bug');
+          should(error.kuzzleStack).be.eql('you are the bug');
         });
     });
 
@@ -209,7 +209,7 @@ describe('Common Protocol', () => {
           should(error).be.instanceOf(KuzzleError);
           should(error.message).be.eql('foo-bar');
           should(error.status).be.eql(206);
-          should(error.stack).be.eql('you are the bug');
+          should(error.kuzzleStack).be.eql('you are the bug');
           should(error.errors).be.an.Array();
           should(error.errors.length).eql(2);
           should(error.count).eql(42);
