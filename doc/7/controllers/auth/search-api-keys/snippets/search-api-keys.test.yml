@@ -2,19 +2,19 @@ name: auth#searchApiKeys
 description: Searches API keys for the currently loggued user.
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"]
       },
       "credentials": {
         "local": {
-          "username": "john.doe",
+          "username": "jared.doe",
           "password": "password"
         }
       }
-    }' "kuzzle:7512/users/john.doe/_create?refresh=wait_for"
+    }' "kuzzle:7512/users/jared.doe/_create?refresh=wait_for"
   after:
-    curl -XDELETE kuzzle:7512/users/john.doe
+    curl -XDELETE kuzzle:7512/users/jared.doe
 template: default
 expected:
   - Found 2 API keys matching "LoRa"

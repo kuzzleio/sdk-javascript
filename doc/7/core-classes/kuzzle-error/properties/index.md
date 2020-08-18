@@ -14,3 +14,6 @@ order: 10
 | `message`            | <pre>string</pre> | Error message    |
 | `status`             | <pre>number</pre> | Error status code      |
 | `stack`              | <pre>string</pre> | Error stacktrace (only in development mode)   |
+| `id`  | <pre>string</pre> | Error unique identifier                    |
+| `code`  | <pre>string</pre> | Error unique code                    |
+

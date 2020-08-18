@@ -3,7 +3,7 @@ description: mget roles
 hooks:
   before: |
     for i in 1 2 3; do
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
         "controllers": {
           "*": {
             "actions": {

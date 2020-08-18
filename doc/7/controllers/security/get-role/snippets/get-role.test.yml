@@ -2,7 +2,7 @@ name: security#getRole
 description: get role
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "controllers": {
         "auth": {
           "actions": {

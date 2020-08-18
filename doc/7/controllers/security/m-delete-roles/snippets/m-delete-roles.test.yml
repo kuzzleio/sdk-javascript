@@ -3,7 +3,7 @@ description: mdelete roles
 hooks:
   before: |
     for i in 1 2 3 4 5; do
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
         "controllers": {
           "*": {
             "actions": {
@@ -14,4 +14,4 @@ hooks:
       }' kuzzle:7512/roles/role${i}/_create
     done
 template: default
-expected: '^\[ ''role1'', ''role2'', ''role3'', ''role4'', ''role5'' \]$'
+expected: '^\[ ''role\d'', ''role\d'', ''role\d'', ''role\d'', ''role\d'' \]$'

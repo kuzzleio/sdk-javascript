@@ -1,7 +1,7 @@
-const { Role } = require('../security/Role');
-const { SearchResultBase } = require('./SearchResultBase');
+import { Role } from '../security/Role';
+import { SearchResultBase } from './SearchResultBase';
 
-class RoleSearchResult extends SearchResultBase {
+export class RoleSearchResult extends SearchResultBase<Role> {
 
   constructor (kuzzle, query, options, response) {
     super(kuzzle, query, options, response);
@@ -9,7 +9,9 @@ class RoleSearchResult extends SearchResultBase {
     this._searchAction = 'searchRoles';
     this._scrollAction = null; // scrollRoles action does not exists in Kuzzle API.
 
-    this.hits = this._response.hits.map(hit => new Role(this._kuzzle, hit._id, hit._source.controllers));
+    this.hits = this._response.hits.map(hit => (
+      new Role(this._kuzzle, hit._id, hit._source.controllers)
+    ));
   }
 
   next () {
@@ -20,16 +22,16 @@ class RoleSearchResult extends SearchResultBase {
     }
 
     return super.next()
-      .then(nextSearchResult => {
+      .then((nextSearchResult: RoleSearchResult) => {
         if (! nextSearchResult) {
           return null;
         }
 
-        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers));
+        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => (
+          new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers)
+        ));
 
         return nextSearchResult;
       });
   }
 }
-
-module.exports = { RoleSearchResult };

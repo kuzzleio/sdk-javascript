@@ -1,16 +1,24 @@
 class Listener {
+  public fn: (...any) => any;
+  public once: boolean;
+
   constructor(fn, once = false) {
     this.fn = fn;
     this.once = once;
   }
 }
 
-class KuzzleEventEmitter {
-  constructor() {
+/**
+ * @todo proper TS conversion
+ */
+export class KuzzleEventEmitter {
+  private _events: Map<string, Array<Listener>>;
+
+  constructor () {
     this._events = new Map();
   }
 
-  _exists (listeners, fn) {
+  private _exists (listeners, fn) {
     return Boolean(listeners.find(listener => listener.fn === fn));
   }
 
@@ -98,7 +106,7 @@ class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners (eventName) {
+  removeAllListeners (eventName?: string) {
     if (eventName) {
       this._events.delete(eventName);
     }

@@ -2,7 +2,7 @@ name: security#replaceUser
 description: replace user
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": [ "default" ]
       },

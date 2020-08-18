@@ -21,6 +21,31 @@ export interface KuzzleRequest extends JSONObject {
   jwt?: string;
   volatile?: JSONObject;
   body?: JSONObject;
+  [key: string]: any;
+}
+
+/**
+ * Kuzzle API response
+ *
+ * @see https://docs.kuzzle.io/core/2/api/essentials/kuzzle-response/
+ */
+export interface KuzzleResponse extends JSONObject {
+  controller: string;
+  action: string;
+  index?: string;
+  collection?: string;
+  error?: {
+    id: string;
+    code: number;
+    message: string;
+    status: number;
+    stack?: string;
+  };
+  requestId: string;
+  result: JSONObject | null;
+  status: number;
+  volatile?: JSONObject;
+  room?: string;
 }
 
 /**
@@ -88,8 +113,14 @@ export interface ProfilePolicy {
  * @see https://docs.kuzzle.io/core/2/guides/essentials/security#defining-roles
  */
 export interface RoleRightsDefinition {
+  /**
+   * API controller name
+   */
   [key: string]: {
     actions: {
+      /**
+       * API action name
+       */
       [key: string]: boolean
     }
   }
@@ -112,7 +143,7 @@ export interface ApiKey {
      */
     userId: string;
     /**
-     * Expiration date in UNIX micro-timestamp format (-1 if the token never expires)
+     * Expiration date in Epoch-millis format (-1 if the token never expires)
      */
     expiresAt: number;
     /**
@@ -178,10 +209,226 @@ export interface Document {
 
 /**
  * Document retrieved from a search
+ *
+ * @property _id
+ * @property _version
+ * @property _source
+ * @property _score
  */
 export interface DocumentHit extends Document {
   /**
    * Relevance score
    */
   _score: number;
+}
+
+export interface MappingsProperties {
+  /**
+   * Properties types definition
+   *
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#properties-types-definition
+   */
+  properties?: MappingsProperties,
+  /**
+   * Dynamic mapping policy
+   *
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#dynamic-mapping-policy
+   */
+  dynamic?: 'true' | 'false' | 'strict' | boolean
+}
+
+/**
+ * Collection mappings definition
+ *
+ * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/
+ */
+export interface CollectionMappings {
+  /**
+   * Collection metadata
+   *
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#collection-metadata
+   */
+  _meta?: JSONObject;
+  /**
+   * Properties types definition
+   *
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#properties-types-definition
+   */
+  properties?: MappingsProperties,
+  /**
+   * Dynamic mapping policy
+   *
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#dynamic-mapping-policy
+   */
+  dynamic?: 'true' | 'false' | 'strict' | boolean,
+}
+
+/**
+ * Enum for notification types
+ */
+export enum ENotificationType {
+  document = 'document',
+  user = 'user',
+  TokenExpired = 'TokenExpired'
+}
+
+/**
+ * Real-time notifications sent by Kuzzle.
+ *
+ */
+export interface Notification {
+  /**
+   * Notification type
+   */
+  type: ENotificationType;
+}
+
+export interface BaseNotification extends Notification {
+  /**
+   * Controller that triggered the notification
+   */
+  controller: string;
+  /**
+   * Action that triggered the notification
+   */
+  action: string;
+  /**
+   * Index name
+   */
+  index: string;
+  /**
+   * Collection name
+   */
+  collection: string;
+  /**
+   * Network protocol used to trigger the notification
+   */
+  protocol: string;
+  /**
+   * Subscription channel identifier.
+   * Can be used to link a notification to its corresponding subscription
+   */
+  room: string;
+  /**
+   * Timestamp of the event, in Epoch-millis format
+   */
+  timestamp: number;
+  /**
+   * Request volatile data
+   * @see https://docs.kuzzle.io/core/2/guides/essentials/volatile-data/
+   */
+  volatile: JSONObject;
+}
+
+/**
+ * State of the document regarding the scope
+ */
+export enum EDocumentScope {
+  /**
+   * Document enters or stays in the scope
+   */
+  in = 'in',
+  /**
+   * Document exit the scope
+   */
+  out = 'out'
+}
+
+/**
+ * Notification triggered by a document change.
+ * (create, update, delete)
+ */
+export interface DocumentNotification extends BaseNotification {
+  /**
+   * Updated document that triggered the notification
+   */
+  result: Document;
+  /**
+   * State of the document regarding the scope (`in` or `out`)
+   */
+  scope: EDocumentScope;
+
+  type: ENotificationType.document;
+}
+
+/**
+ * Tells wether an user leave or join the subscription room
+ */
+export enum EUserScope {
+  /**
+   * User enters the subscription room
+   */
+  in = 'in',
+  /**
+   * User leaves the subscription room
+   */
+  out = 'out'
+}
+
+/**
+ * Notification triggered by an user joining or leaving a subscription room
+ */
+export interface UserNotification extends BaseNotification {
+  /**
+   * Tell wether an user leave or join the subscription room (`in` or `out`)
+   */
+  user: EUserScope;
+
+  /**
+   * Contains the actual number of users in the subscription room
+   */
+  result: {
+    /**
+     * Updated users count sharing the same subscription room
+     */
+    count: number;
+  }
+
+  type: ENotificationType.user;
+}
+
+export interface ServerNotification extends BaseNotification {
+  /**
+   * Server message explaining why this notifications has been triggered
+   */
+  message: string;
+
+  type: ENotificationType.TokenExpired;
+}
+
+/**
+ * HTTP routes definition format
+ * @example
+ * {
+ *    <controller>: {
+ *      <action>: { verb: <verb>, url: <url> }
+ *   }
+ * }
+ *
+ * {
+ *    'my-plugin/my-controller': {
+ *      action: { verb: 'GET', url: '/some/url' },
+ *      action2: { verb: 'GET', url: '/some/url/with/:parameter' }
+ *   }
+ * }
+ */
+export interface HttpRoutes {
+  /**
+   * Controller name
+   */
+  [key: string]: {
+    /**
+     * Action name
+     */
+    [key: string]: {
+      /**
+       * HTTP verb
+       */
+      verb: string,
+      /**
+       * URL
+       */
+      url: string
+    }
+  }
 }

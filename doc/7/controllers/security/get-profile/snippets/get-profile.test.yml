@@ -2,7 +2,7 @@ name: security#getProfile
 description: get profile
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "policies": [
         {
           "roleId": "admin",

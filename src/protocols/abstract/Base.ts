@@ -1,12 +1,26 @@
 'use strict';
 
-const KuzzleError = require('../../KuzzleError');
-const { uuidv4 } = require('../../utils/uuidv4');
-const { KuzzleEventEmitter } = require('../../core/KuzzleEventEmitter');
-const PendingRequest = require('./PendingRequest');
+import { KuzzleError } from '../../KuzzleError';
+import { uuidv4 } from '../../utils/uuidv4';
+import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
+import { PendingRequest } from './PendingRequest';
+import { KuzzleRequest, JSONObject } from '../../utils/interfaces';
 
-class KuzzleAbstractProtocol extends KuzzleEventEmitter {
-  constructor (host, options = {}, name = undefined) {
+/**
+ * @todo proper TS conversion
+ */
+export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
+  private _pendingRequests: Map<string, PendingRequest>;
+  private _host: string;
+  private _name: string;
+  private _port: number;
+  private _ssl: boolean;
+
+  public id: string;
+
+  public state: string;
+
+  constructor (host: string, options: JSONObject = {}, name: string = undefined) {
     super();
 
     this._pendingRequests = new Map();
@@ -14,7 +28,23 @@ class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     this._name = name;
     const port = parseInt(options.port, 10);
     this._port = isNaN(port) ? 7512 : port;
-    this._ssl = typeof options.sslConnection === 'boolean' ? options.sslConnection : false;
+
+    if (options.ssl !== undefined && options.sslConnection !== undefined) {
+      throw new Error('Both "ssl" and "sslConnection" options are set. Use only "ssl".');
+    }
+
+    if (typeof options.ssl === 'boolean') {
+      this._ssl = options.ssl;
+    }
+    else if (typeof options.sslConnection === 'boolean') {
+      this._ssl = options.sslConnection;
+    }
+    else if (port === 443 || port === 7443) {
+      this._ssl = true;
+    }
+    else {
+      this._ssl = false;
+    }
 
     this.id = uuidv4();
     this.state = 'offline';
@@ -52,27 +82,14 @@ class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     return this._pendingRequests;
   }
 
-  /**
-   * @abstract
-   * @returns {Promise<any>}
-   */
-  connect () {
-    throw new Error('Method "connect" is not implemented');
-  }
+  abstract connect (): Promise<any>
 
-  /**
-   * @abstract
-   * @param request
-   * @returns {Promise<any>}
-   */
-  send () {
-    throw new Error('Method "send" is not implemented');
-  }
+  abstract send (request: KuzzleRequest, options: JSONObject): void
 
   /**
    * Called when the client's connection is established
    */
-  clientConnected (state, wasConnected) {
+  clientConnected (state?: string, wasConnected?: boolean) {
     this.state = state || 'ready';
     this.emit(wasConnected && 'reconnect' || 'connect');
   }
@@ -92,6 +109,8 @@ class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
+    const stack = Error().stack;
+
     const pending = new PendingRequest(request);
     this._pendingRequests.set(request.requestId, pending);
 
@@ -99,7 +118,7 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        const error = new KuzzleError(response.error);
+        const error = new KuzzleError(response.error, stack);
 
         this.emit('queryError', error, request);
 
@@ -136,7 +155,4 @@ Discarded request: ${JSON.stringify(request)}`));
 
     this._pendingRequests.clear();
   }
-
 }
-
-module.exports = { KuzzleAbstractProtocol };

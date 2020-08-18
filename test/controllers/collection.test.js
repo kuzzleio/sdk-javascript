@@ -16,7 +16,7 @@ describe('Collection Controller', () => {
   });
 
   describe('create', () => {
-    it('should call collection/create query and return a Promise which resolves an acknowledgement', () => {
+    it('should call collection/create query and return a Promise which resolves', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.create('index', 'collection', null, options)
@@ -31,7 +31,7 @@ describe('Collection Controller', () => {
               collection: 'collection'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
 
@@ -50,13 +50,13 @@ describe('Collection Controller', () => {
               collection: 'collection'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
   });
 
   describe('deleteSpecifications', () => {
-    it('should call collection/deleteSpecifications query and return a Promise which resolves an acknowledgement', () => {
+    it('should call collection/deleteSpecifications query and return a Promise which resolves', () => {
       kuzzle.query.resolves({result: {acknowledged: true}});
 
       return kuzzle.collection.deleteSpecifications('index', 'collection', options)
@@ -70,7 +70,7 @@ describe('Collection Controller', () => {
               collection: 'collection'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
   });
@@ -110,7 +110,7 @@ describe('Collection Controller', () => {
               collection: 'collection'
             }, options);
 
-          should(res).be.Null();
+          should(res).be.undefined();
         });
     });
   });
@@ -301,7 +301,7 @@ describe('Collection Controller', () => {
               collection: 'collection'
             }, options);
 
-          should(res.acknowledged).be.a.Boolean().and.be.true();
+          should(res).be.undefined();
         });
     });
   });
@@ -345,7 +345,7 @@ describe('Collection Controller', () => {
               collection: 'collection'
             });
 
-          should(res).match({ foo: 'bar' });
+          should(res).be.undefined();
         });
     });
   });
@@ -400,6 +400,24 @@ describe('Collection Controller', () => {
             description: 'foo bar',
             details: ['foo', 'bar']
           });
+        });
+    });
+  });
+
+  describe('delete', () => {
+    it('should call collection/delete query and return a promise which resolves an acknowledgement', () => {
+      kuzzle.query.resolves({result: {acknowledged: true}});
+      return kuzzle.collection.delete('index', 'collection')
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'collection',
+              action: 'delete',
+              index: 'index',
+              collection: 'collection',
+            });
+          should(res).be.undefined();
         });
     });
   });

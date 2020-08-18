@@ -2,7 +2,7 @@ name: security#deleteApiKey
 description: Deletes an user API key
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"]
       }

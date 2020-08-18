@@ -2,7 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 
 const { Kuzzle } = require('../../src/Kuzzle');
-const { KuzzleEventEmitter } =require('../../src/core/KuzzleEventEmitter');
+const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
 const ProtocolMock = require('../mocks/protocol.mock');
 
 describe('Kuzzle listeners management', () => {

@@ -8,34 +8,15 @@ if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
                'Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser');
 }
 
-import { Kuzzle } from './src/Kuzzle';
-import { Http, WebSocket } from './src/protocols';
-import { BaseController } from './src/controllers/Base';
-import { KuzzleAbstractProtocol } from './src/protocols/abstract/Base';
-import { KuzzleEventEmitter } from './src/core/KuzzleEventEmitter';
+export * from './src/Kuzzle';
+export * from './src/protocols';
+export * from './src/controllers/Base';
+export * from './src/protocols/abstract/Base';
+export * from './src/core/KuzzleEventEmitter';
 
-import { SearchResultBase } from './src/core/searchResult/SearchResultBase';
-import { DocumentSearchResult } from './src/core/searchResult/Document';
-import { ProfileSearchResult } from './src/core/searchResult/Profile';
-import { RoleSearchResult } from './src/core/searchResult/Role';
-import { SpecificationSearchResult } from './src/core/searchResult/Specifications';
-import { UserSearchResult } from './src/core/searchResult/User';
-
-const exported = {
-  Kuzzle,
-  Http,
-  WebSocket,
-  BaseController,
-  KuzzleAbstractProtocol,
-  KuzzleEventEmitter,
-  SearchResultBase,
-  DocumentSearchResult,
-  ProfileSearchResult,
-  RoleSearchResult,
-  SpecificationSearchResult,
-  UserSearchResult
-}
-
-export default exported;
-
-module.exports = exported;
+export * from './src/core/searchResult/SearchResultBase';
+export * from './src/core/searchResult/Document';
+export * from './src/core/searchResult/Profile';
+export * from './src/core/searchResult/Role';
+export * from './src/core/searchResult/Specifications';
+export * from './src/core/searchResult/User';

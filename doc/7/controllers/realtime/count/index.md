@@ -32,7 +32,7 @@ Additional query options
 
 ## Resolves
 
-Resolves to a number represensting active connections using the same provided subscription room.
+Resolves to a number representing active connections using the same provided subscription room.
 
 ## Usage
 

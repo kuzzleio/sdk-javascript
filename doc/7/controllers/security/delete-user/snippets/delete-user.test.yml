@@ -2,7 +2,7 @@ name: security#deleteUser
 description: Deletes a user
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"]
       },

@@ -3,7 +3,7 @@ description: mget users
 hooks:
   before: |
     for i in 1 2 3; do
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"],
         "fullname": "user'${i}'"
