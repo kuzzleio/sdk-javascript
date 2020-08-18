@@ -18,7 +18,7 @@ export class KuzzleEventEmitter {
     this._events = new Map();
   }
 
-  _exists (listeners, fn) {
+  private _exists (listeners, fn) {
     return Boolean(listeners.find(listener => listener.fn === fn));
   }
 

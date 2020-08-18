@@ -4,6 +4,11 @@ import staticHttpRoutes from './routes.json';
 import { KuzzleAbstractProtocol } from './abstract/Base';
 import { HttpRoutes, JSONObject, KuzzleRequest } from '../utils/interfaces';
 
+/**
+ * Http protocol used to connect to a Kuzzle server.
+ *
+ * The Http protocol cannot use the realtime capabilities of Kuzzle.
+ */
 export default class HttpProtocol extends KuzzleAbstractProtocol {
   private _routes: HttpRoutes;
   private _timeout: number;
