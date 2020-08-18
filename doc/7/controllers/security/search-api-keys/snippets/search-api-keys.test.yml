@@ -2,7 +2,7 @@ name: security#searchApiKeys
 description: Searches for an user API keys
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"]
       }

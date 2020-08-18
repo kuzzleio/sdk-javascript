@@ -3,11 +3,11 @@ description: updates a security profile definition
 hooks:
   before:
     - >
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
         "policies": []
       }' kuzzle:7512/profiles/myProfile/_create
     - >
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
         "controllers": {
           "*": {
             "actions": {

@@ -2,7 +2,7 @@ name: security#getUserRights
 description: get user rights
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": [ "default" ],
         "fullName": "John Doe"
