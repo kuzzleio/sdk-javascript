@@ -13,6 +13,7 @@ hooks:
         }
       }
     }' "kuzzle:7512/users/john.doe/_create?refresh=wait_for"
+    sleep 2
   after:
     curl -XDELETE kuzzle:7512/users/john.doe
 template: default
