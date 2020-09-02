@@ -29,7 +29,7 @@ expo init getting-started-kuzzle
 You can use yarn to install dependencies if you want.
 Then choose a blank project, type 'Kuzzle' and type y.
 
-Install Kuzzle's Javascript SDK: 
+Install Kuzzle's Javascript SDK:
 ```bash
 cd getting-started-kuzzle
 npm install kuzzle-sdk@7
@@ -37,7 +37,7 @@ npm install kuzzle-sdk@7
 
 Now, you can run your app and access it by different ways:
 
-  - To test it on your smartphone, you'll need to download the 
+  - To test it on your smartphone, you'll need to download the
   expo application and scan the displayed qrCode after running this command:
   ```bash
   expo start
@@ -64,7 +64,7 @@ To finish, we can add some style properties to let our login page looks prettier
 
 <<< ./snippets/Login.js.snippet:3[js]
 
-This parent component of _Login.js_ will be _App.js_ so let's work on it. 
+This parent component of _Login.js_ will be _App.js_ so let's work on it.
 
 You can delete all the code from the _App.js_ file, we will rewrite it.
 
@@ -74,10 +74,15 @@ First, add the following imports:
 
 Then we need to do three changes:
   - First, we must export our *App* class:
+
 <<< ./snippets/App.js.snippet:2[js]
+
   - Then we need to create our `onSubmitName` function:
+
 <<< ./snippets/App.js.snippet:3[js]
+
   - Finally we will create our render function:
+
 <<< ./snippets/App.js.snippet:4[js]
 
 You can see that we will have to create a new component, `ChatClient`.
@@ -100,14 +105,14 @@ Like in our previous components, we'll first need to add our imports:
 
 <<< ./snippets/ChatClient.js.snippet:1[js]
 
-Then we will create our state that will contains our messages and call the function that will initialize our kuzzle by [establish the connection](/sdk/js/7/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/sdk/js/7/controllers/index/exists), the [index](/sdk/js/7/controllers/index/create) and [collection](/sdk/js/7/controllers/collection/create) of our chat. 
+Then we will create our state that will contains our messages and call the function that will initialize our kuzzle by [establish the connection](/sdk/js/7/core-classes/kuzzle/connect) to kuzzle and create, if they don't [exist](/sdk/js/7/controllers/index/exists), the [index](/sdk/js/7/controllers/index/create) and [collection](/sdk/js/7/controllers/collection/create) of our chat.
 
 <<< ./snippets/ChatClient.js.snippet:2[js]
 
-You can see that we are calling two functions at the end: 
+You can see that we are calling two functions at the end:
 `fetchMessages()` and `subscribeMessages()`, let's write them.
 
-Create the following function to fetch the messages: 
+Create the following function to fetch the messages:
 
 <<< ./snippets/ChatClient.js.snippet:6[js]
 
@@ -122,7 +127,7 @@ You can see in the two function we just wrote a call to a `getMessage()` functio
 
 <<< ./snippets/ChatClient.js.snippet:5[js]
 
-Note: The first part of this function is optional and can be replaced by a set of the `display` variable to false. 
+Note: The first part of this function is optional and can be replaced by a set of the `display` variable to false.
 
 If you decided to add the optional part, you'll need to implement the `displayDate()` function:
 
@@ -132,14 +137,14 @@ We will need a function to create a document in Kuzzle when an user send a messa
 
 <<< ./snippets/ChatClient.js.snippet:8[js]
 
-This simple method will [create](/sdk/js/7/controllers/document/create) a new message document in Kuzzle. 
+This simple method will [create](/sdk/js/7/controllers/document/create) a new message document in Kuzzle.
 
 As you can see we don't push the new message in our array on message creation.
 
 Indeed, we will receive notifications from Kuzzle each time we modify our message collection (even if it is a message creation on our part) that we will use to add the messages in our array.
 
-Since this component is used to do the connection to Kuzzle, it will render another one that will display the messages _screens/Chat/ChatView.js_. 
-To finish, we just need to add the `render()` function: 
+Since this component is used to do the connection to Kuzzle, it will render another one that will display the messages _screens/Chat/ChatView.js_.
+To finish, we just need to add the `render()` function:
 
 <<< ./snippets/ChatClient.js.snippet:9[js]
 
@@ -147,13 +152,13 @@ As you can see, we are passing as props the fetched messages, the client usernam
 
 ## Display and Send messages
 
-In this part we'll work on another component, so we need to create the _screens/Chat/ChatView.js_ file. 
+In this part we'll work on another component, so we need to create the _screens/Chat/ChatView.js_ file.
 
 Then, just add the following imports:
 
 <<< ./snippets/ChatView.js.snippet:1[js]
 
-Now we need to create our `ChatView` class and create an `handleSendMessage` function that will call the props parent function `onHandleSendMessage`. 
+Now we need to create our `ChatView` class and create an `handleSendMessage` function that will call the props parent function `onHandleSendMessage`.
 
 <<< ./snippets/ChatView.js.snippet:2[js]
 
