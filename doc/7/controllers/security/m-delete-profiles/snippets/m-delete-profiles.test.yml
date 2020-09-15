@@ -3,7 +3,7 @@ description: mdelete profiles
 hooks:
   before: |
     for i in 1 2 3 4 5; do
-      curl -H "Content-type: application/json" -d '{
+      curl --fail -H "Content-type: application/json" -d '{
         "policies": [{ "roleId": "default" }]
       }' kuzzle:7512/profiles/profile${i}/_create
     done

@@ -2,7 +2,7 @@ name: auth#createApiKey
 description: Creates a new API key for the currently loggued user.
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "content": {
         "profileIds": ["default"]
       },

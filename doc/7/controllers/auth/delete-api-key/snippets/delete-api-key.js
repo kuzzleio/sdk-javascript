@@ -1,5 +1,5 @@
 try {
-  await kuzzle.auth.login('local', { username: 'john.doe', password: 'password' });
+  await kuzzle.auth.login('local', { username: 'jane.doe', password: 'password' });
 
   await kuzzle.auth.deleteApiKey('fQRa28BsidO6V_wmOcL');
 

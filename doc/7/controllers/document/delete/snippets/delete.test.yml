@@ -5,7 +5,7 @@ hooks:
     curl -XDELETE kuzzle:7512/nyc-open-data
     curl -XPOST kuzzle:7512/nyc-open-data/_create
     curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
-    curl -H "Content-type: application/json" -XPUT -d '{}' kuzzle:7512/nyc-open-data/yellow-taxi/some-id
+    curl --fail -H "Content-type: application/json" -XPUT -d '{}' kuzzle:7512/nyc-open-data/yellow-taxi/some-id
   after:
 template: default
 expected: Success

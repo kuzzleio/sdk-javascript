@@ -7,11 +7,11 @@ hooks:
     curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
 
     for i in  1 2 3 4 5; do
-      curl -H "Content-type: application/json" -d '{"capacity": 4}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
+      curl --fail -H "Content-type: application/json" -d '{"capacity": 4}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
     done
 
     for i in  1 2 3 4 5; do
-      curl -H "Content-type: application/json" -d '{"capacity": 7}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
+      curl --fail -H "Content-type: application/json" -d '{"capacity": 7}' kuzzle:7512/nyc-open-data/yellow-taxi/_create
     done
 
     curl -XPOST kuzzle:7512/nyc-open-data/yellow-taxi/_refresh

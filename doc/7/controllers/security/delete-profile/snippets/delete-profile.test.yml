@@ -2,7 +2,7 @@ name: security#deleteProfile
 description: deletes profile
 hooks:
   before: >
-    curl -H "Content-type: application/json" -d '{
+    curl --fail -H "Content-type: application/json" -d '{
       "policies": []
     }' kuzzle:7512/profiles/myProfile/_create
 template: default
