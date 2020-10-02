@@ -97,7 +97,7 @@ jobs:
           npm ci
           npm install kuzzle-sdk-v7@$TRAVIS_BUILD_DIR
           cd test/e2e/run-test && npm ci && cd -
-          CYPRESS_RETRIES=5 npm run e2e
+          CYPRESS_RETRIES=5 npm run test:e2e
         fi
 
     - stage: Tests
@@ -116,7 +116,7 @@ jobs:
           npm ci
           npm install kuzzle-sdk-v6@$TRAVIS_BUILD_DIR
           cd test/e2e/run-test && npm ci && cd -
-          CYPRESS_RETRIES=5 npm run e2e
+          CYPRESS_RETRIES=5 npm run test:e2e
         fi
 
     - stage: Tests
