@@ -239,7 +239,7 @@ describe('Realtime Controller', () => {
 
     it('should call realtime/unsubscribe query with the roomId and return a Promise which resolves the roomId', () => {
       return kuzzle.realtime.unsubscribe(roomId, options)
-        .then(res => {
+        .then(() => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith({
@@ -247,8 +247,6 @@ describe('Realtime Controller', () => {
               action: 'unsubscribe',
               body: {roomId}
             }, options);
-
-          should(res).be.equal(roomId);
         });
     });
   });
