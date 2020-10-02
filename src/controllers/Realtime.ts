@@ -187,7 +187,7 @@ export class RealtimeController extends BaseController {
     };
 
     return this.query(request, options)
-      .then(response => {
+      .then(() => {
         const rooms = this._subscriptions.get(roomId);
 
         if (rooms) {
@@ -197,8 +197,6 @@ export class RealtimeController extends BaseController {
 
           this._subscriptions.delete(roomId);
         }
-
-        return response.result;
       });
   }
 
