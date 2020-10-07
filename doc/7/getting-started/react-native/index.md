@@ -20,6 +20,10 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Nativ
 
 "[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase."
 
+:::info
+Note that this getting-started uses Expo for ease of use, the following React Native code is just as valid without Expo.
+:::
+
 ## Prepare your environment
 
 Create your React Native app with Expo CLI.
