@@ -61,7 +61,7 @@ class SecurityController extends BaseController {
   }
 
   /**
-   * Searches for an user API key.
+   * Searches for a user API key.
    *
    * @param {String} userId - User kuid
    * @param {Object} [query] - Search query
