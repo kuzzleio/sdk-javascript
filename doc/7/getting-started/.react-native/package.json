@@ -7,7 +7,7 @@
     "ios": "node_modules/.bin/expo-cli start --ios",
     "web": "node_modules/.bin/expo-cli start --web",
     "eject": "node_modules/.bin/expo-cli eject",
-    "test": "node_modules/.bin/cypress run --record"
+    "test": "node_modules/.bin/cypress run --record --key $CYPRESS_RECORD_KEY_DOC"
   },
   "dependencies": {
     "cypress": "^3.8.1",
