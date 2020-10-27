@@ -1,5 +1,5 @@
 name: security#searchApiKeys
-description: Searches for an user API keys
+description: Searches for a user API keys
 hooks:
   before: >
     curl --fail -H "Content-type: application/json" -d '{
