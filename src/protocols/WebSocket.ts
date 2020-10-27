@@ -14,27 +14,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private lasturl: any;
 
   /**
-   * Automatically reconnect after a connection loss
-   */
-  public autoReconnect: boolean;
-  /**
-   * `true` if the socket is open
-   */
-  public connected: boolean;
-  /**
-   * Kuzzle server host or IP
-   */
-  public host: string;
-  /**
-   * Kuzzle server port
-   */
-  public port: number;
-  /**
-   * `true` if ssl is active
-   */
-  public ssl: boolean;
-
-  /**
    * @param host Kuzzle server hostname or IP
    * @param options WebSocket connection options
    *    - `autoReconnect` Automatically reconnect to kuzzle after a `disconnected` event. (default: `true`)

@@ -37,6 +37,11 @@ module.exports = {
       BUILT: true
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
-    new webpack.optimize.OccurrenceOrderPlugin()
-  ]
+  ],
+  resolve: {
+    fallback: {
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+    }
+  },
 };
