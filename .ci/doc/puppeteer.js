@@ -42,7 +42,4 @@ console.log(snippet.toString());
 
 console.dir(fs.statSync('/var/snippets/web/node_modules/kuzzle-sdk/dist/kuzzle.js'), {depth: null, colors: true});
 
-
 runInBrowser(renderedSnippetPath);
-
-
