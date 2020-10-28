@@ -59,11 +59,9 @@ const definition = {
   }
 };
 ```
-
 </SinceBadge>
 
-
-<DeprecatedBadge version="7.4.0">
+<DeprecatedBadge version="7.4.0" >
 
 ### definition
 
@@ -87,7 +85,6 @@ const mappings = {
 More informations about database mappings [here](/core/2/guides/essentials/database-mappings).
 
 </DeprecatedBadge>
-
 
 ## Resolves
 

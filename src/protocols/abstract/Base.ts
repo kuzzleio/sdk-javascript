@@ -6,9 +6,6 @@ import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
 import { KuzzleRequest, JSONObject } from '../../utils/interfaces';
 
-/**
- * @todo proper TS conversion
- */
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;
   private _host: string;
@@ -58,22 +55,37 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     });
   }
 
+  /**
+   * Kuzzle server host or IP.
+   */
   get host () {
     return this._host;
   }
 
+  /**
+   * Protocol name.
+   */
   get name () {
     return this._name;
   }
 
+  /**
+   * Kuzzle server port.
+   */
   get port () {
     return this._port;
   }
 
+  /**
+   * `true` if ssl is active.
+   */
   get ssl () {
     return this._ssl;
   }
 
+  /**
+   * `true` if the socket is open.
+   */
   get connected () {
     return this.state === 'connected';
   }

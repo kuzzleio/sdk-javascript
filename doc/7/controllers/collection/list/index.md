@@ -30,8 +30,8 @@ Additional query options
 | Property   | Type<br/>(default)              | Description                                                                  |
 |------------|---------------------------------|------------------------------------------------------------------------------|
 | `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
-| `from`     | <pre>number</pre> <br/>(`0`)    | Offset of the first result <DeprecatedBadge since="7.1.4"/>                |
-| `size`     | <pre>number</pre> <br/>(`10`)   | Maximum number of returned results <DeprecatedBadge since="7.1.4"/>     |
+| `from`     | <pre>number</pre> <br/>(`0`)    | Offset of the first result <DeprecatedBadge version="7.1.4"/>                |
+| `size`     | <pre>number</pre> <br/>(`10`)   | Maximum number of returned results <DeprecatedBadge version="7.1.4"/>     |
 
 ## Resolves
 
@@ -41,8 +41,8 @@ Resolves to an object containing the following properties:
 |---------------|---------------------|--------------------------------------------------------------------|
 | `type`        | <pre>string</pre>   | Types of returned collections <br/>(`all`, `realtime` or `stored`) |
 | `collections` | <pre>object[]</pre> | List of collections                                                |
-| `from`        | <pre>number</pre>   | Offset of the first result <DeprecatedBadge since="7.1.4"/>                                        |
-| `size`        | <pre>number</pre>   | Maximum number of returned results <DeprecatedBadge since="7.1.4"/>                                |
+| `from`        | <pre>number</pre>   | Offset of the first result <DeprecatedBadge version="7.1.4"/>                                        |
+| `size`        | <pre>number</pre>   | Maximum number of returned results <DeprecatedBadge version="7.1.4"/>                                |
 
 Each object in the `collections` array contains the following properties:
 
