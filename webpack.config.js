@@ -9,11 +9,7 @@ module.exports = {
   output: {
     path: `${__dirname}/dist`,
     filename: 'kuzzle.js',
-    library: {
-      root: 'KuzzleSDK',
-      amd: 'kuzzle-sdk',
-      commonjs: 'kuzzle-sdk'
-    },
+    library: 'KuzzleSDK',
     libraryTarget: 'umd'
   },
   target: 'web',
@@ -37,6 +33,13 @@ module.exports = {
       BUILT: true
     }),
     new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
-    new webpack.optimize.OccurrenceOrderPlugin()
-  ]
+  ],
+  resolve: {
+    fallback: {
+      buffer: require.resolve('buffer'),
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      url: require.resolve('url/'),
+    }
+  },
 };

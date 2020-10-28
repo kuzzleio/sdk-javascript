@@ -13,10 +13,6 @@ hooks:
         }
       }
     }' "kuzzle:7512/users/jane.doe/_create?refresh=wait_for"
-    &&
-    curl -XPOST -H "Content-type: application/json" -d '{
-      "description": "Sigfox API key"
-    }' "kuzzle:7512/users/jane.doe/api-keys/_create?_id=fQRa28BsidO6V_wmOcL&refresh=wait_for"
   after:
     curl -XDELETE kuzzle:7512/users/jane.doe
 template: default
