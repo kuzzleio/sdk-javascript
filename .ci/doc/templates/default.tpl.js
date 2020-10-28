@@ -5,10 +5,7 @@ const {
 } = require('kuzzle-sdk');
 
 // Instantiates a Kuzzle client
-const
-  kuzzle = new Kuzzle(
-    new WebSocket('kuzzle', { autoReconnect: false })
-  );
+const kuzzle = new Kuzzle(new WebSocket('kuzzle', { autoReconnect: false }));
 
 // Adds a listener to detect any connection problems
 kuzzle.on('networkError', error => {
@@ -21,6 +18,7 @@ kuzzle.on('networkError', error => {
   } catch (error) {
     console.log(`Can not connect to Kuzzle: ${error.message}`);
   }
+
   [snippet-code] finally {
     kuzzle.disconnect();
   }

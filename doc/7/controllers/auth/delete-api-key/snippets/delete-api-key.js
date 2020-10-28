@@ -1,7 +1,12 @@
 try {
-  await kuzzle.auth.login('local', { username: 'jane.doe', password: 'password' });
+  await kuzzle.auth.login('local', {
+    username: 'jane.doe',
+    password: 'password',
+  });
 
-  const apiKey = await kuzzle.auth.createApiKey('Sigfox API key', { refresh: 'wait_for '});
+  const apiKey = await kuzzle.auth.createApiKey('Sigfox API key', {
+    refresh: 'wait_for'
+  });
 
   await kuzzle.auth.deleteApiKey(apiKey._id);
 
