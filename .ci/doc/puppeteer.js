@@ -35,11 +35,4 @@ const runInBrowser = async snippetPath => {
   }
 };
 
-const fs = require('fs');
-
-const snippet = fs.readFileSync('/var/snippets/web/gettingstartedbrowservanillacreate_2efbe92.html');
-console.log(snippet.toString());
-
-console.dir(fs.statSync('/var/snippets/web/node_modules/kuzzle-sdk/dist/kuzzle.js'), {depth: null, colors: true});
-
 runInBrowser(renderedSnippetPath);
