@@ -43,7 +43,7 @@ Returns an object containing 2 arrays: `successes` and `errors`
 
 The `successes` array contain the list of retrieved documents.
 
-Each document have with following properties:
+Each document have the following properties:
 
 | Name      | Type              | Description                                            |
 | --------- | ----------------- | ------------------------------------------------------ |
