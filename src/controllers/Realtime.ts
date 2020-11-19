@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import Room from '../core/Room';
-import { JSONObject } from '../utils/interfaces';
+import { Notification, JSONObject } from '../utils/interfaces';
 
 /**
  * Enum for `scope` option of realtime.subscribe method
@@ -253,5 +253,3 @@ export class RealtimeController extends BaseController {
     this._subscriptionsOff = new Map();
   }
 }
-
-module.exports = { RealtimeController };
