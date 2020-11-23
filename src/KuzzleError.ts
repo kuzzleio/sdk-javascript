@@ -48,13 +48,6 @@ export class KuzzleError extends Error {
       });
     }
 
-    if (stack) {
-      const lines = stack.split('\n');
-      lines[0] += apiError.message;
-      lines[3] = ' 🡆  ' + lines[3].trimStart();
-      this.stack = lines.join('\n');
-    }
-
     this.id = apiError.id;
     this.code = apiError.code;
 
