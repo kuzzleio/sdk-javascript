@@ -105,18 +105,17 @@ jobs:
       if: type = pull_request AND branch =~ /^6-(dev|stable)$/
       language: node_js
       node_js: 10
-      script:
-        if [ $TRAVIS_BRANCH = "6-stable" ];
+      script: if [ $TRAVIS_BRANCH = "6-stable" ];
         then
-          sudo sysctl -w vm.max_map_count=262144
-          ./.ci/start_kuzzle_v1.sh
-          npm install
-          git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
-          cd /tmp/admin-console
-          npm ci
-          npm install kuzzle-sdk-v6@$TRAVIS_BUILD_DIR
-          cd test/e2e/run-test && npm ci && cd -
-          CYPRESS_RETRIES=5 npm run test:e2e
+        sudo sysctl -w vm.max_map_count=262144
+        ./.ci/start_kuzzle_v1.sh
+        npm install
+        git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
+        cd /tmp/admin-console
+        npm ci
+        npm install kuzzle-sdk-v6@$TRAVIS_BUILD_DIR
+        cd test/e2e/run-test && npm ci && cd -
+        CYPRESS_RETRIES=5 npm run test:e2e
         fi
 
     - stage: Tests
@@ -146,6 +145,7 @@ jobs:
         - S3_BUCKET=docs-next.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E2ZCCEK9GRB49U
         - AWS_DEFAULT_REGION=us-west-2
+        - FRAMEWORK_BRANCH=develop
 
       addons:
         apt:
@@ -184,6 +184,7 @@ jobs:
         - S3_BUCKET=docs.kuzzle.io
         - CLOUDFRONT_DISTRIBUTION_ID=E3D6RP0POLCJMM
         - AWS_DEFAULT_REGION=us-west-2
+        - FRAMEWORK_BRANCH=master
 
       addons:
         apt:
