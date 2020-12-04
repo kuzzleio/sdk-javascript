@@ -30,7 +30,7 @@ validateSpecifications(index, collection, specifications, [options]);
 
 An object representing the specifications.
 
-This object must follow the [Specification Structure](/core/2/guides/cookbooks/datavalidation):
+This object must follow the [Specification Structure](/core/2/guides/advanced/data-validation):
 
 ```js
 {

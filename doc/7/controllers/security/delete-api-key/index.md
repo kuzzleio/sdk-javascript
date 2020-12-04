@@ -23,7 +23,7 @@ deleteApiKey(userId, id, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `id` | <pre>string</pre> | API key unique ID |
 | `options` | <pre>object</pre> | Additional options |
 

@@ -30,7 +30,7 @@ Additional query options
 | Property   | Type<br/>(default)              | Description                                                                  |
 | ---------- | ------------------------------- | ---------------------------------------------------------------------------- |
 | `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
-| `includeKuzzleMeta` | <pre>boolean</pre><br/>(`true`) | If true, the returned mappings will contain [Kuzzle metadata](/core/2/guides/essentials/document-metadata/) |
+| `includeKuzzleMeta` | <pre>boolean</pre><br/>(`true`) | If true, the returned mappings will contain [Kuzzle metadata](/core/2/guides/main-concepts/data-storage#kuzzle-metadata) |
 
 ## Resolves
 

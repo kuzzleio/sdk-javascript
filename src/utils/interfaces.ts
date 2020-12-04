@@ -10,7 +10,7 @@ export interface JSONObject {
 /**
  * Kuzzle API request
  *
- * @see https://docs.kuzzle.io/core/2/api/essentials/query-syntax/#other-protocols
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/querying#other-protocols
  */
 export interface KuzzleRequest extends JSONObject {
   controller?: string;
@@ -63,7 +63,7 @@ export interface KuzzleResponse extends JSONObject {
  *   }
  * }
  *
- * @see https://docs.kuzzle.io/core/2/guides/essentials/security/#defining-profiles
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/permissions#profiles
  */
 export interface ProfilePolicy {
   /**
@@ -110,7 +110,7 @@ export interface ProfilePolicy {
  *   }
  * }
  *
- * @see https://docs.kuzzle.io/core/2/guides/essentials/security#defining-roles
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/permissions#roles
  */
 export interface RoleRightsDefinition {
   /**
@@ -163,7 +163,7 @@ export interface ApiKey {
 
 /**
  * Kuzzle metadata
- * @see https://docs.kuzzle.io/core/2/guides/essentials/document-metadata/
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#kuzzle-metadata
  */
 export interface KuzzleMetadata {
   _kuzzle_info: {
@@ -234,13 +234,13 @@ export interface MappingsProperties {
   /**
    * Properties types definition
    *
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#properties-types-definition
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#properties-types-definition
    */
   properties?: MappingsProperties,
   /**
    * Dynamic mapping policy
    *
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#dynamic-mapping-policy
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#mappings-dynamic-policy
    */
   dynamic?: 'true' | 'false' | 'strict' | boolean
 }
@@ -248,25 +248,25 @@ export interface MappingsProperties {
 /**
  * Collection mappings definition
  *
- * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage
  */
 export interface CollectionMappings {
   /**
    * Collection metadata
    *
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#collection-metadata
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#collection-metadata
    */
   _meta?: JSONObject;
   /**
    * Properties types definition
    *
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#properties-types-definition
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#properties-types-definition
    */
   properties?: MappingsProperties,
   /**
    * Dynamic mapping policy
    *
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/#dynamic-mapping-policy
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage#mappings-dynamic-policy
    */
   dynamic?: 'true' | 'false' | 'strict' | boolean,
 }

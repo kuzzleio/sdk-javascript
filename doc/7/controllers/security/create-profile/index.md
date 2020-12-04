@@ -20,7 +20,7 @@ createProfile(id, profile, [options]);
 | Property | Type | Description |
 |--- |--- |--- |
 | `id` | <pre>string</pre> | Profile identifier |
-| `profile` | <pre>object</pre> | [Profile definition content](/core/2/guides/essentials/security#defining-profiles) |
+| `profile` | <pre>object</pre> | [Profile definition content](/core/2/guides/main-concepts/permissions#profiles) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options
