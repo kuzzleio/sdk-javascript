@@ -323,7 +323,7 @@ export interface BaseNotification extends Notification {
   timestamp: number;
   /**
    * Request volatile data
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/volatile-data/
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/api#volatile-data/
    */
   volatile: JSONObject;
 }
