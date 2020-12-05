@@ -2,7 +2,7 @@
 
 import staticHttpRoutes from './routes.json';
 import { KuzzleAbstractProtocol } from './abstract/Base';
-import { HttpRoutes, JSONObject, KuzzleRequest } from '../utils/interfaces';
+import { HttpRoutes, JSONObject, RequestPayload } from '../types';
 
 /**
  * Http protocol used to connect to a Kuzzle server.
@@ -177,7 +177,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (request: KuzzleRequest, options: JSONObject = {}) {
+  send (request: RequestPayload, options: JSONObject = {}) {
     const route = this.routes[request.controller]
       && this.routes[request.controller][request.action];
 

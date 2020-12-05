@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import { SpecificationsSearchResult } from '../core/searchResult/Specifications';
-import { CollectionMappings, JSONObject } from '../utils/interfaces';
+import { CollectionMappings, JSONObject } from '../types';
 
 export class CollectionController extends BaseController {
   constructor (kuzzle) {

@@ -20,7 +20,7 @@ export * from './src/core/searchResult/Role';
 export * from './src/core/searchResult/Specifications';
 export * from './src/core/searchResult/User';
 
-export * from './src/utils/interfaces';
+export * from './src/types';
 
 export * from './src/controllers/Auth';
 export * from './src/controllers/Base';

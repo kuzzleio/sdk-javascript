@@ -4,7 +4,7 @@ import { KuzzleError } from '../../KuzzleError';
 import { uuidv4 } from '../../utils/uuidv4';
 import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
-import { KuzzleRequest, JSONObject } from '../../utils/interfaces';
+import { RequestPayload, JSONObject } from '../../types';
 
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;
@@ -96,7 +96,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
   abstract connect (): Promise<any>
 
-  abstract send (request: KuzzleRequest, options: JSONObject): void
+  abstract send (request: RequestPayload, options: JSONObject): void
 
   /**
    * Called when the client's connection is established

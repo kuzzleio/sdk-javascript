@@ -18,7 +18,7 @@ src/protocols/abstract/Realtime.js
 src/protocols/Http.js
 src/protocols/WebSocket.js
 src/protocols/index.js
-src/utils/interfaces.js
+src/types/*.js
 src/core/KuzzleEventEmitter.js
 src/core/searchResult/SearchResultBase.js
 src/core/searchResult/Document.js

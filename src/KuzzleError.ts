@@ -38,7 +38,7 @@ export class KuzzleError extends Error {
    */
   public count?: number;
 
-  constructor (apiError, stack = null) {
+  constructor (apiError) {
     super(apiError.message);
 
     this.status = apiError.status;

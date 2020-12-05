@@ -13,7 +13,7 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
-import { JSONObject, KuzzleRequest, KuzzleResponse } from './utils/interfaces';
+import { JSONObject, RequestPayload, ResponsePayload } from './types';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -132,7 +132,7 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Custom function called during offline mode to filter
        * queued requests on-the-fly
        */
-      queueFilter?: (request: KuzzleRequest) => boolean;
+      queueFilter?: (request: RequestPayload) => boolean;
       /**
        * Called before dequeuing requests after exiting offline mode,
        * to add items at the beginning of the offline queue
@@ -524,7 +524,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param request
    * @param options - Optional arguments
    */
-  query (request: KuzzleRequest = {}, options: JSONObject = {}): Promise<KuzzleResponse> {
+  query (request: RequestPayload = {}, options: JSONObject = {}): Promise<ResponsePayload> {
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }

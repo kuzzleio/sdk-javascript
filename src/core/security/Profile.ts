@@ -1,5 +1,5 @@
 import { Role } from './Role';
-import { ProfilePolicy } from '../../utils/interfaces';
+import { ProfilePolicy } from '../../types';
 
 export class Profile {
   /**

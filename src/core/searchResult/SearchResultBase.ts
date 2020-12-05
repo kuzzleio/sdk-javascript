@@ -1,4 +1,4 @@
-import { JSONObject, KuzzleRequest } from '../../utils/interfaces';
+import { JSONObject, RequestPayload } from '../../types';
 import { Kuzzle } from '../../Kuzzle';
 
 export interface SearchResult<T> {
@@ -42,7 +42,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
   protected _searchAction: string;
   protected _scrollAction: string;
   protected _controller: string;
-  protected _request: KuzzleRequest;
+  protected _request: RequestPayload;
   protected _kuzzle: Kuzzle;
   protected _options: JSONObject;
   protected _response: JSONObject;
@@ -57,7 +57,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
   constructor (
     kuzzle: Kuzzle,
-    request: KuzzleRequest = {},
+    request: RequestPayload = {},
     options: JSONObject = {},
     response: any = {}
   ) {
