@@ -2,7 +2,8 @@
 
 import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
-import { JSONObject, RequestPayload } from '../types';
+import { JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.

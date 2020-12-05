@@ -2,7 +2,8 @@
 
 import staticHttpRoutes from './routes.json';
 import { KuzzleAbstractProtocol } from './abstract/Base';
-import { HttpRoutes, JSONObject, RequestPayload } from '../types';
+import { HttpRoutes, JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 /**
  * Http protocol used to connect to a Kuzzle server.

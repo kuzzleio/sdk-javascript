@@ -1,4 +1,5 @@
-import { JSONObject, RequestPayload } from '../../types';
+import { JSONObject } from '../../types';
+import { RequestPayload } from '../../types/RequestPayload';
 import { Kuzzle } from '../../Kuzzle';
 
 export interface SearchResult<T> {

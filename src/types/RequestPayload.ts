@@ -9,12 +9,12 @@ export type RequestPayload = {
   /**
    * API controller name
    */
-  controller: string;
+  controller?: string;
 
   /**
    * API action name
    */
-  action: string;
+  action?: string;
 
   /**
    * Index name

@@ -13,7 +13,9 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
-import { JSONObject, RequestPayload, ResponsePayload } from './types';
+import { JSONObject } from './types';
+import { RequestPayload } from './types/RequestPayload';
+import { ResponsePayload } from './types/ResponsePayload';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;

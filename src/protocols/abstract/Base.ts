@@ -4,7 +4,8 @@ import { KuzzleError } from '../../KuzzleError';
 import { uuidv4 } from '../../utils/uuidv4';
 import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
-import { RequestPayload, JSONObject } from '../../types';
+import { JSONObject } from '../../types';
+import { RequestPayload } from '../../types/RequestPayload';
 
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;

@@ -1,4 +1,5 @@
-import { RequestPayload, JSONObject } from '../types';
+import { JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 export class BaseController {
   private _name: string;
