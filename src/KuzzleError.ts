@@ -38,7 +38,7 @@ export class KuzzleError extends Error {
    */
   public count?: number;
 
-  constructor (apiError) {
+  constructor (apiError, stack = null) {
     super(apiError.message);
 
     this.status = apiError.status;
@@ -46,6 +46,10 @@ export class KuzzleError extends Error {
       Reflect.defineProperty(this, 'kuzzleStack', {
         value: apiError.stack
       });
+    }
+
+    if (stack) {
+      this.stack = stack;
     }
 
     this.id = apiError.id;
