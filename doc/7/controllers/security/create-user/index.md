@@ -19,7 +19,7 @@ createUser(kuid, body, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | User content &amp; credentials |
 | `options` | <pre>object</pre> | Query options |
 

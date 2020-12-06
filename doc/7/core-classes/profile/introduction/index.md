@@ -10,4 +10,4 @@ order: 0
 
 This class represents a Kuzzle Profile.
 
-Refer to the [Security guide](/core/2/guides/essentials/security#defining-profiles) for more information about profiles.
+Refer to the [Security guide](/core/2/guides/main-concepts/permissions#profiles) for more information about profiles.

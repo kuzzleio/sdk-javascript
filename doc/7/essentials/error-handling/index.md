@@ -19,7 +19,7 @@ All SDK methods return a promise, that can be rejected with a `KuzzleError` valu
 | `code`  | <pre>string</pre> | Error unique code                    |
 
 
-You can find a detailed list of possible errors messages and statuses in the [documentation API](/core/2/api/essentials/error-handling).
+You can find a detailed list of possible errors messages and statuses in the [documentation API](/core/2/api/errors/types).
 
 #### Example with a promise chain
 

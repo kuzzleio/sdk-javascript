@@ -15,7 +15,7 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React** (wi
 
 - **Node.js** >= 8.0.0 ([install here](https://nodejs.org/en/download/))
 - **Create React App** ([install here](https://github.com/facebook/create-react-app))
-- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
+- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/run-kuzzle))
 
 ## Prepare your environment
 
@@ -164,6 +164,6 @@ You can now add new messages to Kuzzle and receive the notification of the creat
 Now that you're more familiar with Kuzzle with React, you can:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api/introduction) to create incredibly fine-grained and blazing-fast subscriptions
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
+- learn how to use [Koncorde](/core/2/api/koncorde-filters-syntax) to create incredibly fine-grained and blazing-fast subscriptions
+- learn more about Kuzzle [realtime engine](/core/2/guides/main-concepts/realtime-engine)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/main-concepts/permissions)

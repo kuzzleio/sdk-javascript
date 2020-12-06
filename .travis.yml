@@ -119,20 +119,20 @@ jobs:
           CYPRESS_RETRIES=5 npm run test:e2e
         fi
 
-    # - stage: Tests
-    #   name: Dead link check
-    #   language: node_js
-    #   node_js: 12
-    #   if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
+    - stage: Tests
+      name: Dead link check
+      language: node_js
+      node_js: 12
+      if: type = pull_request OR type = push AND branch =~ /^master|[0-9]+-(dev|stable|beta)$/ OR type = cron
 
-    #   before_script:
-    #     - npm ci
-    #     - npm run doc-prepare
-    #     - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
-    #     - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
-    #   script:
-    #     - gem install typhoeus
-    #     - cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 travis_retry ruby .ci/dead-links.rb -p src/sdk/js/7/
+      before_script:
+        - npm ci
+        - npm run doc-prepare
+        - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
+        - $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
+      script:
+        - gem install typhoeus
+        - cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 travis_retry ruby .ci/dead-links.rb -p src/sdk/js/7/
 
     - stage: Deployment Doc Dev
       name: Deploy next-docs.kuzzle.io
