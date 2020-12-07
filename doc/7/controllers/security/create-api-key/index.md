@@ -23,7 +23,7 @@ createApiKey(userId, description, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `userId` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `description` | <pre>string</pre> | API key description |
 | `options` | <pre>object</pre> | Additional options |
 

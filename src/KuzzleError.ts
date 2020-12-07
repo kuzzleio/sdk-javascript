@@ -3,7 +3,7 @@
 /**
  * Standard Kuzzle error.
  *
- * @see https://docs.kuzzle.io/core/2/api/essentials/error-handling/
+ * @see https://docs.kuzzle.io/core/2/api/errors/types/
  */
 export class KuzzleError extends Error {
   /**

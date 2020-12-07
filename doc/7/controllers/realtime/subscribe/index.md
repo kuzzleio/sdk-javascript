@@ -7,7 +7,7 @@ description: Subscribe to real-time notifications
 
 # subscribe
 
-Subscribes by providing a set of filters: messages, document changes and, optionally, user events matching the provided filters will generate [real-time notifications](/core/2/api/essentials/notifications), sent to you in real-time by Kuzzle.
+Subscribes by providing a set of filters: messages, document changes and, optionally, user events matching the provided filters will generate [real-time notifications](/core/2/api/payloads/notifications), sent to you in real-time by Kuzzle.
 
 <br/>
 
@@ -21,7 +21,7 @@ subscribe(index, collection, filters, callback, [options]);
 | ------------ | ------------------- | ------------------------------------------------------------- |
 | `index`      | <pre>string</pre>   | Index name                                                    |
 | `collection` | <pre>string</pre>   | Collection name                                               |
-| `filters`    | <pre>object</pre>   | Set of filters following [Koncorde syntax](/core/2/guides/cookbooks/realtime-api) |
+| `filters`    | <pre>object</pre>   | Set of filters following [Koncorde syntax](/core/2/api/koncorde-filters-syntax) |
 | `callback`   | <pre>function</pre> | Callback function to handle notifications                     |
 | `options`    | <pre>object</pre>   | Query options                                                 |
 
@@ -39,7 +39,7 @@ Additional subscription options.
 | `scope`           | <pre>string</pre><br/>(`all`)   | Subscribe to document entering or leaving the scope</br>Possible values: `all`, `in`, `out`, `none`      |
 | `users`           | <pre>string</pre><br/>(`none`)  | Subscribe to users entering or leaving the room</br>Possible values: `all`, `in`, `out`, `none`          |
 | `subscribeToSelf` | <pre>boolean</pre><br/>(`true`) | Subscribe to notifications fired by our own queries                                                      |
-| `volatile`        | <pre>object</pre><br/>(`null`)  | subscription information, used in [user join/leave notifications](/core/2/api/essentials/volatile-data) |
+| `volatile`        | <pre>object</pre><br/>(`null`)  | subscription information, used in [user join/leave notifications](/core/2/guides/main-concepts/api#volatile-data) |
 
 ## Resolves
 

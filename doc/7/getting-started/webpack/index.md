@@ -17,7 +17,7 @@ Having trouble? Get in touch with us on [Discord](http://join.discord.kuzzle.io)
 
 ## Running Kuzzle
 
-Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/2/guides/getting-started/running-kuzzle) if you don't have one yet.
+Before going through this tutorial, you should have a Kuzzle server running. Please refer to the [Running Kuzzle Tutorial](/core/2/guides/getting-started/run-kuzzle) if you don't have one yet.
 
 ## Fun with the SDK
 
@@ -152,7 +152,7 @@ New document successfully created!
 
 ::: success
 You have now successfully stored your first document into Kuzzle. Click
-[here](/core/2/guides/essentials/admin-console) to see how you can use the
+[here](http://next-console.kuzzle.io) to see how you can use the
 [**Kuzzle Admin Console**](http://console.kuzzle.io) to browse your collection and
 confirm that your document was saved.
 :::
@@ -207,6 +207,6 @@ Having trouble? Get in touch with us on [Discord!](http://join.discord.kuzzle.io
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - take a look at the [SDK Reference](/sdk/js/7)
-- learn how to use [Koncorde](/core/2/guides/cookbooks/realtime-api) to create incredibly fine-grained and blazing-fast subscriptions
-- follow our guide to learn how to implement [basic authentication](/core/2/guides/essentials/user-authentication#local-strategy)
-- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/2/guides/essentials/security)
+- learn how to use [Koncorde](/core/2/api/koncorde-filters-syntax) to create incredibly fine-grained and blazing-fast subscriptions
+- follow our guide to learn how to implement [basic authentication](/core/2/guides/main-concepts/authentication#local-strategy)
+- follow our guide to learn how to implement [manage users and setup fine-grained access control](/core/2/guides/main-concepts/permissions)

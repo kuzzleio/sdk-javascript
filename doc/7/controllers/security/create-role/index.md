@@ -27,7 +27,7 @@ createRole(id, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `controllers` | <pre>object</pre> | [Role definition](/core/2/guides/essentials/security#defining-roles) |
+| `controllers` | <pre>object</pre> | [Role definition](/core/2/guides/main-concepts/permissions#roles) |
 
 ### options
 

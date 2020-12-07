@@ -10,4 +10,4 @@ order: 0
 
 Inherits from the standard `Error` class.
 
-The KuzzleError class represents an [error response from Kuzzle API](/core/2/api/essentials/error-handling).
+The KuzzleError class represents an [error response from Kuzzle API](/core/2/api/payloads/error).

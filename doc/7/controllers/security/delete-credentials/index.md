@@ -20,7 +20,7 @@ deleteCredentials(strategy, kuid, [options]);
 | Property | Type | Description |
 | --- | --- | --- |
 | `strategy` | <pre>string</pre> | Strategy to use |
-| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

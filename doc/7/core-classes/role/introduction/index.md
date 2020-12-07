@@ -10,4 +10,4 @@ order: 0
 
 This class represents a Kuzzle Role.
 
-Refer to the [Security guide](/core/2/guides/essentials/security#defining-roles) for more information about roles.
+Refer to the [Security guide](/core/2/guides/main-concepts/permissions#roles) for more information about roles.
