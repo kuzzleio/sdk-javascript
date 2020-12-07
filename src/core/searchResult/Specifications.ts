@@ -1,5 +1,5 @@
 import { SearchResultBase } from './SearchResultBase';
-import { JSONObject } from '../../utils/interfaces';
+import { JSONObject } from '../../types';
 
 export class SpecificationsSearchResult extends SearchResultBase<JSONObject> {
 

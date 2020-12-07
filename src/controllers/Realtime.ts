@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import Room from '../core/Room';
-import { Notification, JSONObject } from '../utils/interfaces';
+import { Notification, JSONObject } from '../types';
 
 /**
  * Enum for `scope` option of realtime.subscribe method

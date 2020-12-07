@@ -1,4 +1,5 @@
-import { KuzzleRequest, JSONObject } from '../utils/interfaces';
+import { JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 export class BaseController {
   private _name: string;
@@ -34,7 +35,7 @@ export class BaseController {
    * @param request
    * @param options
   */
-  query (request: KuzzleRequest = {}, options: any = {}): Promise<JSONObject> {
+  query (request: RequestPayload = {}, options: any = {}): Promise<JSONObject> {
     request.controller = request.controller || this.name;
 
     return this._kuzzle.query(request, options);

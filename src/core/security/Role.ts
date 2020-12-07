@@ -1,4 +1,4 @@
-import { RoleRightsDefinition } from '../../utils/interfaces';
+import { RoleRightsDefinition } from '../../types';
 
 export class Role {
   /**

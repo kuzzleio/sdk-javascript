@@ -1,7 +1,7 @@
 import { BaseController } from './Base';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { DocumentSearchResult } from '../core/searchResult/Document';
-import { JSONObject, Document, DocumentHit } from '../utils/interfaces';
+import { JSONObject, Document, DocumentHit } from '../types';
 
 export class DocumentController extends BaseController {
   constructor (kuzzle) {

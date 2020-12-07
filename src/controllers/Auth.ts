@@ -1,7 +1,7 @@
 import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
-import { JSONObject, ApiKey } from '../utils/interfaces';
+import { JSONObject, ApiKey } from '../types';
 
 /**
  * Auth controller

@@ -48,6 +48,10 @@ export class KuzzleError extends Error {
       });
     }
 
+    if (stack) {
+      this.stack = stack;
+    }
+
     this.id = apiError.id;
     this.code = apiError.code;
 

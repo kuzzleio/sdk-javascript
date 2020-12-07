@@ -1,4 +1,4 @@
-import { JSONObject } from '../../utils/interfaces';
+import { JSONObject } from '../../types';
 import { Profile } from './Profile';
 
 export class User {
