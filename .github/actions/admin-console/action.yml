@@ -15,7 +15,7 @@ runs:
       shell: bash
     - run: npm ci
       shell: bash
-    - run: npm install kuzzle-sdk@${{ inputs.kuzzle-sdk }}
+    - run: npm install kuzzle-sdk-v{{ inputs.kuzzle-sdk }}@npm:kuzzle-sdk@{{ inputs.kuzzle-sdk }}
       shell: bash
     - run: cd test/e2e/run-test && npm ci && cd -
       shell: bash
