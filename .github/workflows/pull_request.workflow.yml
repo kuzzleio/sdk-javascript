@@ -66,13 +66,9 @@ jobs:
            node-version: "12"
        - uses: ./.github/actions/integration-tests
 
-  admin-console:
+  admin-console-node-10:
     name: Admin Console
     runs-on: ubuntu-latest
-    strategy:
-       matrix:
-         sdk: ['kuzzle-sdk-v6', 'kuzzle-sdk-v7']
-         node: ['10', '12']
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -88,10 +84,33 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 10
       - uses: ./.github/actions/admin-console
         with:
-          kuzzle-sdk: ${{ matrix.sdk }}
+          kuzzle-sdk: kuzzle-sdk-v6
+
+  admin-console-node-12:
+    name: Admin Console
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: ./.github/actions/admin-console
+        with:
+          kuzzle-sdk: kuzzle-sdk-v7
   
   dead-links:
     name: Admin Console
