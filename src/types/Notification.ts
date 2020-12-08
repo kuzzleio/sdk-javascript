@@ -1,4 +1,5 @@
 import { JSONObject } from './JSONObject';
+import { Document } from './Document';
 
 /**
  * Enum for notification types
