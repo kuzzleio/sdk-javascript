@@ -3,7 +3,7 @@ name: Integration Tests
 on: [push]
 
 jobs:
-  integration-test:
+  integration:
     runs-on: ubuntu-latest
 
     steps:
@@ -12,8 +12,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12"
-      # - run: sudo apt-get install gcc-4.9 g++-4.9 -y
-      # - run: export CC="gcc-4.9" CXX="g++-4.9"
       - run: sudo sysctl -w vm.max_map_count=262144
       - run: "./.ci/start_kuzzle.sh"
       - run: npm install

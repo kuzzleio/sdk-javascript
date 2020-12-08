@@ -1,0 +1,50 @@
+name: Admin console Tests
+
+on: [pull_request]
+
+jobs:
+  documentation-node-12:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Documentation tests
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+      - run: |
+          if [ $TRAVIS_BRANCH = "master" ];
+          then
+            sudo sysctl -w vm.max_map_count=262144
+            ./.ci/start_kuzzle_v2.sh
+            npm ci
+            git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
+            cd /tmp/admin-console
+            npm ci
+            npm install kuzzle-sdk-v7@$TRAVIS_BUILD_DIR
+            cd test/e2e/run-test && npm ci && cd -
+            CYPRESS_RETRIES=5 npm run test:e2e
+          fi
+
+  documentation-node-10:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Documentation tests
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10"
+      - run: |
+          if [ $TRAVIS_BRANCH = "master" ];
+          then
+            sudo sysctl -w vm.max_map_count=262144
+            ./.ci/start_kuzzle_v2.sh
+            npm ci
+            git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
+            cd /tmp/admin-console
+            npm ci
+            npm install kuzzle-sdk-v7@$TRAVIS_BUILD_DIR
+            cd test/e2e/run-test && npm ci && cd -
+            CYPRESS_RETRIES=5 npm run test:e2e
+          fi
