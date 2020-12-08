@@ -87,7 +87,7 @@ jobs:
           node-version: 10
       - uses: ./.github/actions/admin-console
         with:
-          kuzzle-sdk: kuzzle-sdk-v6
+          kuzzle-sdk: 6
 
   admin-console-node-12:
     name: Admin Console
@@ -110,10 +110,10 @@ jobs:
           node-version: 12
       - uses: ./.github/actions/admin-console
         with:
-          kuzzle-sdk: kuzzle-sdk-v7
+          kuzzle-sdk: 7
   
   dead-links:
-    name: Admin Console
+    name: Dead links
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

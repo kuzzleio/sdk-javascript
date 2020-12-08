@@ -11,7 +11,7 @@ runs:
       shell: bash
     - run: $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
       shell: bash
-    - run: gem install typhoeus
+    - run: sudo gem install typhoeus
       shell: bash
     - run: cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 ruby .ci/dead-links.rb -p src/sdk/js/7/
       shell: bash
