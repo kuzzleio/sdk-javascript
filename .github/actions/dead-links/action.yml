@@ -1,0 +1,17 @@
+name: Dead Links
+description: Run Dead Links Tests
+runs:
+  using: "composite"
+  steps: 
+    - run: npm ci
+      shell: bash
+    - run: npm run doc-prepare
+      shell: bash
+    - run: $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
+      shell: bash
+    - run: $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
+      shell: bash
+    - run: gem install typhoeus
+      shell: bash
+    - run: cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 travis_retry ruby .ci/dead-links.rb -p src/sdk/js/7/
+      shell: bash
