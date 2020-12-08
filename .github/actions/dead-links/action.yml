@@ -13,5 +13,5 @@ runs:
       shell: bash
     - run: gem install typhoeus
       shell: bash
-    - run: cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 travis_retry ruby .ci/dead-links.rb -p src/sdk/js/7/
+    - run: cd doc/framework/ && HYDRA_MAX_CONCURRENCY=20 ruby .ci/dead-links.rb -p src/sdk/js/7/
       shell: bash
