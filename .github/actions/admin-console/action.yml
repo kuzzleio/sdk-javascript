@@ -5,7 +5,7 @@ runs:
   steps: 
     - run: sudo sysctl -w vm.max_map_count=262144
       shell: bash
-    - run: ../../.ci/start_kuzzle.sh
+    - run: ./.ci/start_kuzzle.sh
       shell: bash
     - run: npm ci
       shell: bash
@@ -15,7 +15,7 @@ runs:
       shell: bash
     - run: npm ci
       shell: bash
-    - run: npm install kuzzle-sdk-v7@${CI_PROJECT_DIR}
+    - run: npm install ${{ inputs.kuzzle-sdk }}@${CI_PROJECT_DIR}
       shell: bash
     - run: cd test/e2e/run-test && npm ci && cd -
       shell: bash

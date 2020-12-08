@@ -69,6 +69,10 @@ jobs:
   admin-console:
     name: Admin Console
     runs-on: ubuntu-latest
+    strategy:
+       matrix:
+         sdk: ['kuzzle-sdk-v6', 'kuzzle-sdk-v7']
+         node: ['10', '12']
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -84,8 +88,10 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: ${{ matrix.node }}
       - uses: ./.github/actions/admin-console
+        with:
+          kuzzle-sdk: ${{ matrix.sdk }}
   
   dead-links:
     name: Admin Console
@@ -106,4 +112,4 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "12"
-      - uses: ./.github/actions/admin-console
+      - uses: ./.github/actions/dead-links
