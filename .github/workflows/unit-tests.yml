@@ -3,7 +3,7 @@ name: Unit Tests
 on: [push]
 
 jobs:
-  build:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -12,9 +12,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12"
-      - run: sudo apt-get install gcc-4.9 g++-4.9 -y
-      - run: sudo sysctl -w vm.max_map_count=262144
-      - run: "./.ci/start_kuzzle.sh"
+      # - run: sudo apt-get install gcc-4.9 g++-4.9 -y
+      # - run: export CC="gcc-4.9" CXX="g++-4.9"
       - run: npm install
       - run: npm run build
-      - run: npm run test:functional
+      - run: npm run test:lint
+      - run: npm run test:unit
+      - run: cat ./coverage/lcov.info | ./node_modules/.bin/codecov
