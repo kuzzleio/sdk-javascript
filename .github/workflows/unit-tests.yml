@@ -1,0 +1,20 @@
+name: Unit Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Unit tests
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+      - run: sudo apt-get install gcc-4.9 g++-4.9 -y
+      - run: sudo sysctl -w vm.max_map_count=262144
+      - run: "./.ci/start_kuzzle.sh"
+      - run: npm install
+      - run: npm run build
+      - run: npm run test:functional
