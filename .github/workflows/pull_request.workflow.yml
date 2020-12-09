@@ -44,7 +44,7 @@ jobs:
          with:
            node-version: "12"
        - uses: ./.github/actions/unit-tests
-  
+
   integration-tests:
      name: Integration Tests
      runs-on: ubuntu-latest
@@ -66,52 +66,6 @@ jobs:
            node-version: "12"
        - uses: ./.github/actions/integration-tests
 
-  admin-console-node-10:
-    name: Admin Console
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 10
-      - uses: ./.github/actions/admin-console
-        with:
-          kuzzle-sdk: 6
-
-  admin-console-node-12:
-    name: Admin Console
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - uses: ./.github/actions/admin-console
-        with:
-          kuzzle-sdk: 7
-  
   dead-links:
     name: Dead links
     runs-on: ubuntu-latest

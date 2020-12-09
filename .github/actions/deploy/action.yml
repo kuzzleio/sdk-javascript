@@ -1,0 +1,11 @@
+name: Deploy
+description: Run Deploy
+runs:
+  using: "composite"
+  steps: 
+    - run: npm install
+      shell: bash
+    - run: npm run build
+      shell: bash
+    - run: npm publish
+      shell: bash

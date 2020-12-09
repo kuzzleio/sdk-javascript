@@ -1,0 +1,37 @@
+name: Deployment Doc Dev
+
+on:
+  push:
+    branches:
+      - master
+      - 6-stable
+      - 7-stable
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/documentation
+        env:
+          BRANCH: dev
+          NODE_ENV: production
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          S3_BUCKET: docs.kuzzle.io
+          CLOUDFRONT_DISTRIBUTION_ID: E3D6RP0POLCJMM
+          AWS_DEFAULT_REGION: us-west-2

@@ -1,0 +1,17 @@
+name: Doc Dev
+description: Run Doc Dev
+runs:
+  using: "composite"
+  steps: 
+    - run: pip install awscli --upgrade --user
+      shell: bash
+    - run: npm install --production=false
+      shell: bash
+    - run: npm run doc-prepare
+      shell: bash
+    - run: npm run doc-build
+      shell: bash
+    - run: npm run doc-upload
+      shell: bash
+    - run: npm run doc-cloudfront
+      shell: bash
