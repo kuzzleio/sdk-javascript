@@ -1,4 +1,4 @@
-name: Deployment Doc Dev
+name: Deployment Doc Prod
 
 on:
   push:
