@@ -29,7 +29,7 @@ jobs:
           node-version: "12"
       - uses: ./.github/actions/documentation
         env:
-          BRANCH: dev
+          FRAMEWORK_BRANCH: master          
           NODE_ENV: production
           NODE_OPTIONS: "--max_old_space_size=4096"
           S3_BUCKET: docs.kuzzle.io
