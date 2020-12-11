@@ -1,5 +1,5 @@
-name: Deploy doc
-description: Run Deploy doc
+name: Test Admin Console
+description: Run Test Admin Console
 runs:
   using: "composite"
   steps:
