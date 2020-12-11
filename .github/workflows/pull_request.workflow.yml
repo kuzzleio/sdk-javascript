@@ -54,7 +54,6 @@ jobs:
          uses: actions/cache@v2
          env:
            cache-name: cache-node-modules
-           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
          with:
            path: ~/.npm
            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
@@ -66,6 +65,8 @@ jobs:
          with:
            node-version: "12"
        - uses: ./.github/actions/integration-tests
+         env:
+          CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   docs-tests:
      name: Doc Tests
@@ -76,7 +77,6 @@ jobs:
          uses: actions/cache@v2
          env:
            cache-name: cache-node-modules
-           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
          with:
            path: ~/.npm
            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
@@ -88,6 +88,8 @@ jobs:
          with:
            node-version: "12"
        - uses: ./.github/actions/doc-tests
+         env:
+          CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   dead-links:
     name: Dead links
