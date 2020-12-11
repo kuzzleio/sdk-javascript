@@ -75,6 +75,7 @@ jobs:
          uses: actions/cache@v2
          env:
            cache-name: cache-node-modules
+           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
          with:
            path: ~/.npm
            key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
