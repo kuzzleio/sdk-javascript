@@ -13,7 +13,7 @@
  *   }
  * }
  *
- * @see https://docs.kuzzle.io/core/2/guides/essentials/security/#defining-profiles
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/permissions/#policies
  */
 export type ProfilePolicy = {
   /**

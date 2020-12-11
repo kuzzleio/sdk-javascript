@@ -2,26 +2,26 @@ import { JSONObject } from './JSONObject';
 
 /**
  * Kuzzle metadata
- * @see https://docs.kuzzle.io/core/2/guides/essentials/document-metadata/
+ * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#kuzzle-metadata
  */
 export interface DocumentMetadata {
-  _kuzzle_info: {
+  _kuzzle_info?: {
     /**
      * Kuid of the user who created the document
      */
-    author: string,
+    author?: string,
     /**
      * Creation date in micro-timestamp
      */
-    createdAt: number,
+    createdAt?: number,
     /**
      * Kuid of the user who last updated the document
      */
-    updater: string | null,
+    updater?: string | null,
     /**
      * Update date in micro-timestamp
      */
-    updatedAt: number | null
+    updatedAt?: number | null
   }
 }
 
