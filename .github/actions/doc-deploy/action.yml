@@ -1,5 +1,5 @@
-name: Doc Dev
-description: Run Doc Dev
+name: Deploy doc
+description: Run Deploy doc
 runs:
   using: "composite"
   steps: 

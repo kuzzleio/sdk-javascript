@@ -19,7 +19,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1.4.4
         with:
           node-version: "12"
       - uses: ./.github/actions/es-lint
@@ -40,7 +40,7 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v1
+       - uses: actions/setup-node@v1.4.4
          with:
            node-version: "12"
        - uses: ./.github/actions/unit-tests
@@ -61,10 +61,31 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v1
+       - uses: actions/setup-node@v1.4.4
          with:
            node-version: "12"
        - uses: ./.github/actions/integration-tests
+
+  docs-tests:
+     name: Integration Tests
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v2
+       - name: Cache node modules
+         uses: actions/cache@v2
+         env:
+           cache-name: cache-node-modules
+         with:
+           path: ~/.npm
+           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+           restore-keys: |
+             ${{ runner.os }}-build-${{ env.cache-name }}-
+             ${{ runner.os }}-build-
+             ${{ runner.os }}-
+       - uses: actions/setup-node@v1.4.4
+         with:
+           node-version: "12"
+       - uses: ./.github/actions/doc-tests
 
   dead-links:
     name: Dead links
@@ -82,7 +103,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1.4.4
         with:
           node-version: "12"
       - uses: ./.github/actions/dead-links

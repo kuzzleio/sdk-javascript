@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - 6-stable
-      - 7-stable
 
 jobs:
   lint:
@@ -27,11 +26,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "12"
-      - uses: ./.github/actions/documentation
+      - uses: ./.github/actions/doc-deploy
         env:
-          FRAMEWORK_BRANCH: master          
+          FRAMEWORK_BRANCH: master
           NODE_ENV: production
           NODE_OPTIONS: "--max_old_space_size=4096"
           S3_BUCKET: docs.kuzzle.io
           CLOUDFRONT_DISTRIBUTION_ID: E3D6RP0POLCJMM
           AWS_DEFAULT_REGION: us-west-2
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

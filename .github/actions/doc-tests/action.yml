@@ -1,0 +1,11 @@
+name: Deploy doc
+description: Run Deploy doc
+runs:
+  using: "composite"
+  steps: 
+    - run: npm install
+      shell: bash
+    - run: npm run build
+      shell: bash
+    - run: npm run doc-testing
+      shell: bash
