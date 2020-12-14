@@ -307,7 +307,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       })
         .then(response => {
           if (response.statusCode === 431) {
-            throw new Error(`Request query string is too large. Try to use the method with the POST verb instead.`);
+            throw new Error('Request query string is too large. Try to use the method with the POST verb instead.');
           }
 
           return JSON.parse(response.body);
