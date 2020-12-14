@@ -1,5 +1,5 @@
-name: Tests Docs
-description: Run Tests Docs
+name: Documentation Snippets Tests
+description: Run Documentation Snippets Tests
 runs:
   using: "composite"
   steps: 
