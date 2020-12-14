@@ -122,7 +122,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    let stack = Error().stack;
+    const stack = Error().stack;
 
     const pending = new PendingRequest(request);
     this._pendingRequests.set(request.requestId, pending);
