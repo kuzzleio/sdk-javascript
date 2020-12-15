@@ -2,7 +2,9 @@ name: Deploy doc
 description: Run Deploy doc
 runs:
   using: "composite"
-  steps: 
+  steps:
+    - run: sudo apt install python python-pip -y
+      shell: bash
     - run: pip install awscli --upgrade --user
       shell: bash
     - run: npm install --production=false
