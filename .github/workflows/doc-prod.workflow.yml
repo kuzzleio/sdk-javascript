@@ -7,8 +7,8 @@ on:
       - 6-stable
 
 jobs:
-  lint:
-    name: Lint
+  doc-prod:
+    name: Deployment Doc Prod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

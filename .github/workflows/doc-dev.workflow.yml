@@ -7,8 +7,8 @@ on:
       - 7-dev
 
 jobs:
-  lint:
-    name: Lint
+  doc-dev:
+    name: Deployment Doc Dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
