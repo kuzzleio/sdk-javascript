@@ -773,7 +773,7 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-   /**
+  /**
    * Applies a partial update to an existing document.
    * If the document doesn't already exist, a new document is created.
    *
@@ -785,7 +785,7 @@ export class DocumentController extends BaseController {
    * @param options
    * @returns {Promise<Object>}
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
-   */
+  */
   upsert (
     index: string,
     collection: string,
