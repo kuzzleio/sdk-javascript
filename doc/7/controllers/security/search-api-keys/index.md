@@ -33,7 +33,7 @@ The search query to apply to API keys content, using [ElasticSearch Query DSL](h
 
 <SinceBadge version="change-me"/>
 
-This method also supports the [Koncorde Filters DSL](/core/2/guides/cookbooks/realtime-api) to match documents by passing the `lang` argument with the value `koncorde`.  
+This method also supports the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) to match documents by passing the `lang` argument with the value `koncorde`.  
 Koncorde filters will be translated into an Elasticsearch query.  
 
 ::: warning
