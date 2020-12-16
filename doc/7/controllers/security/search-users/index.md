@@ -24,7 +24,7 @@ searchUsers([query], [options]);
 
 ### query
 
-The search query to apply to users content, using [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+The search query to apply to users content, using [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) or the [Koncorde Filters DSL](/core/2/guides/cookbooks/realtime-api) syntax.
 
 <SinceBadge version="change-me"/>
 
@@ -49,7 +49,7 @@ If left empty, the result will return all available users.
 
 ## Resolves
 
-A [`SearchResult`](sdk/js/6/core-classes/search-result) object containing the retrieved [`User`](/sdk/js/7/core-classes/user) objects.
+A [`SearchResult`](sdk/js/7/core-classes/search-result) object containing the retrieved [`User`](/sdk/js/7/core-classes/user) objects.
 
 ## Usage
 

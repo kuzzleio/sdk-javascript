@@ -55,7 +55,7 @@ example:
 
 ## Resolves
 
-An [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the updated user.
+An [`User`](sdk/js/7/core-classes/user/introduction) object containing information about the updated user.
 
 ## Usage
 

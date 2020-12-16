@@ -38,7 +38,7 @@ searchRoles([body], [options]);
 
 ## Resolves
 
-A [`SearchResult`](sdk/js/6/core-classes/search-result) object containing the retrieved [`Role`](/sdk/js/7/core-classes/role) objects.
+A [`SearchResult`](sdk/js/7/core-classes/search-result) object containing the retrieved [`Role`](/sdk/js/7/core-classes/role) objects.
 
 ## Usage
 
