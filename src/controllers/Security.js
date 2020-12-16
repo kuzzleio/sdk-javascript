@@ -75,6 +75,7 @@ class SecurityController extends BaseController {
       action: 'searchApiKeys',
       from: options.from,
       size: options.size,
+      lang: options.lang,
       body: query
     };
 
@@ -423,7 +424,7 @@ class SecurityController extends BaseController {
       body,
       action: 'searchUsers'
     };
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 

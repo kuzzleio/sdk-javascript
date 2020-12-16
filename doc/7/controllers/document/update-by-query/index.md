@@ -11,6 +11,15 @@ Updates documents matching the provided search query.
 
 Kuzzle uses the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) syntax.
 
+<SinceBadge version="change-me"/>
+
+This method also supports the [Koncorde Filters DSL](/core/2/guides/cookbooks/realtime-api) to match documents by passing the `lang` argument with the value `koncorde`.  
+Koncorde filters will be translated into an Elasticsearch query.  
+
+::: warning
+Koncorde `bool` operator and `regexp` clause are not supported for search queries.
+:::
+
 An empty or null query will match all documents in the collection.
 
 <br/>
@@ -37,7 +46,7 @@ Additional query options.
 | ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
 | `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
 | `source`          | <pre>boolean</pre><br/>(`false`)| If true, returns the updated document inside the response
-
+| `lang`            | <pre>string</pre>               | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="change-me"/> |
 ## Resolves
 
 Returns an object containing 2 arrays: `successes` and `errors`

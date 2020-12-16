@@ -125,7 +125,7 @@ export class AuthController extends BaseController {
    */
   searchApiKeys(
     query: JSONObject = {},
-    options: { from?: number, size?: number } = {}
+    options: { from?: number, size?: number, lang?: string } = {}
   ): Promise<{
     /**
      * Array of found ApiKeys
@@ -140,6 +140,7 @@ export class AuthController extends BaseController {
       action: 'searchApiKeys',
       from: options.from,
       size: options.size,
+      lang: options.lang,
       body: query
     };
 

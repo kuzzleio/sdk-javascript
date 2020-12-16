@@ -635,6 +635,7 @@ export class DocumentController extends BaseController {
       from?: number;
       size?: number;
       scroll?: string;
+      lang?: string;
       verb?: string;
     } = {}
   ): Promise<SearchResult<DocumentHit>> {
@@ -665,7 +666,7 @@ export class DocumentController extends BaseController {
     else {
       request.body = body;
     }
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 

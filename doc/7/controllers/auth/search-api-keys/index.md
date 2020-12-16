@@ -30,6 +30,15 @@ searchApiKeys([query], [options]);
 
 The search query to apply to API keys content, using [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
 
+<SinceBadge version="change-me"/>
+
+This method also supports the [Koncorde Filters DSL](/core/2/guides/cookbooks/realtime-api) to match documents by passing the `lang` argument with the value `koncorde`.  
+Koncorde filters will be translated into an Elasticsearch query.  
+
+::: warning
+Koncorde `bool` operator and `regexp` clause are not supported for search queries.
+:::
+
 If left empty, the result will return all available API keys of the currently loggued user.
 
 ### options
@@ -40,6 +49,7 @@ Additional query options
 | ---------- | ------------------ | ------------ |
 | `from`     | <pre>number</pre><br/>(`0`)     | Offset of the first document to fetch   |
 | `size`     | <pre>number</pre><br/>(`10`)    | Maximum number of documents to retrieve per page     |
+| `lang`     | <pre>string</pre>               | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="change-me"/> |
 
 ## Resolves
 
