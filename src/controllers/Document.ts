@@ -773,6 +773,40 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
+   /**
+   * Applies a partial update to an existing document.
+   * If the document doesn't already exist, a new document is created.
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Unique document identifier
+   * @param changes Partial changes to apply to the document
+   * @param defaults Fields to add to the document if it gets created
+   * @param options
+   * @returns {Promise<Object>}
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
+   */
+  upsert (
+    index: string,
+    collection: string,
+    _id: string,
+    changes: JSONObject,
+    defaults: JSONObject = {},
+    options: {refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
+  ): Promise<Document> {
+    const request = {
+      index,
+      collection,
+      _id,
+      body: { changes, defaults },
+      action: 'upsert',
+      source: options.source
+    };
+
+    return this.query(request, options)
+      .then(response => response.result);
+  }
+
   /**
    * Validates a document against existing validation rules.
    *
