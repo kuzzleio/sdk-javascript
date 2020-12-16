@@ -1,14 +1,10 @@
 const body = {
-  controller: 'auth',
-  action: 'checkRights',
-  request: {
-    controller: 'document',
-    action: 'create',
-    index: 'nyc-open-data',
-    collection: 'yellow-taxi',
-    body: {
-      'name': 'Melis'
-    }
+  controller: 'document',
+  action: 'create',
+  index: 'nyc-open-data',
+  collection: 'yellow-taxi',
+  body: {
+    'name': 'Melis'
   }
 }
 

@@ -1,19 +1,15 @@
-const request = {
-  controller: 'auth',
-  action: 'checkRights',
-  request: {
-    controller: 'document',
-    action: 'create',
-    index: 'nyc-open-data',
-    collection: 'yellow-taxi',
-    body: {
-      'name': 'Melis'
-    }
+const body = {
+  controller: 'document',
+  action: 'create',
+  index: 'nyc-open-data',
+  collection: 'yellow-taxi',
+  body: {
+    'name': 'Melis'
   }
 }
 
 try {
-  const result = await kuzzle.security.checkRights('foo', request);
+  const result = await kuzzle.security.checkRights('foo', body);
   console.log(result.allowed);
   /*
     true
