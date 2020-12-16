@@ -92,6 +92,27 @@ export class AuthController extends BaseController {
   }
 
   /**
+   * Checks if an API action can be executed by the current user
+   * 
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
+   * @param id User kuid
+   * @param body Request to check
+   */
+  checkRights (
+    _id: string,
+    body: JSONObject
+  ): Promise<boolean> {
+
+    const request = {
+      _id,
+      body,
+      action: 'checkRights'
+    };
+    return this.query(request)
+      .then(response => response.result);
+  }
+
+  /**
    * Deletes an API key for the currently loggued user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
