@@ -1,0 +1,21 @@
+name: Publish
+description: Run Publish
+inputs:
+   NPM_TOKEN:
+     description: Npm token
+     required: true
+     default: ${{ secrets.NPM_TOKEN }}
+runs:
+  using: "composite"
+  steps:
+    - name: Install deps
+      run: npm install
+      shell: bash
+    - name: Run build
+      run: npm run build
+      shell: bash
+    - name: Publish package
+      run: npm publish
+      shell: bash
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.NPM_TOKEN }}

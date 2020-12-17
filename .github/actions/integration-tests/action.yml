@@ -2,14 +2,17 @@ name: Integration Tests
 description: Run Integration Tests
 runs:
   using: "composite"
-  steps: 
-    - run: sudo sysctl -w vm.max_map_count=262144
+  steps:
+    - name: Start Kuzzle stack
+      run: |
+        sudo sysctl -w vm.max_map_count=262144
+        "./.ci/start_kuzzle.sh"
       shell: bash
-    - run: "./.ci/start_kuzzle.sh"
+    - name: Build Kuzzle
+      run: |
+        npm install
+        npm run build
       shell: bash
-    - run: npm install
-      shell: bash
-    - run: npm run build
-      shell: bash
-    - run: npm run test:functional
+    - name: Run functional tests
+      run: npm run test:functional
       shell: bash

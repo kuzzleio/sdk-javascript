@@ -23,4 +23,4 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "10"
-      - uses: ./.github/actions/deploy
+      - uses: ./.github/actions/publish

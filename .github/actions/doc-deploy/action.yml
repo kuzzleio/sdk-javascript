@@ -3,17 +3,24 @@ description: Run Deploy doc
 runs:
   using: "composite"
   steps:
-    - run: sudo apt install python python-pip -y
+    - name: Install pyhton
+      run: sudo apt install python python-pip -y
       shell: bash
-    - run: pip install awscli --upgrade --user
+    - name: Install awscli
+      run: pip install awscli --upgrade --user
       shell: bash
-    - run: npm install --production=false
+    - name: Install Deps
+      run: npm install --production=false
       shell: bash
-    - run: npm run doc-prepare
+    - name: Prepare kuzdoc
+      run: npm run doc-prepare
       shell: bash
-    - run: npm run doc-build
+    - name: Build doc
+      run: npm run doc-build
       shell: bash
-    - run: npm run doc-upload
+    - name: Upload docs
+      run: npm run doc-upload
       shell: bash
-    - run: npm run doc-cloudfront
+    - name: Upload cloudfront
+      run: npm run doc-cloudfront
       shell: bash
