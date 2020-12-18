@@ -6,7 +6,8 @@ title: checkRights
 
 # checkRights
 
-<SinceBadge version="2.8.0"/>
+<SinceBadge version="Kuzzle 2.8.0"/>
+<SinceBadge version="auto-version"/>
 
 Checks if the provided API request can be executed by a user.
 
