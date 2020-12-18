@@ -32,7 +32,7 @@ Additional query options
 | Options           | Type<br/>(default)              | Description                                                                        |
 | ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
 | `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
-| `retryOnConflict` | <pre>int</pre><br/>(`0`)        | The number of times the database layer should retry in case of version conflict    |
+| `retryOnConflict` | <pre>int</pre><br/>(`10`)        | The number of times the database layer should retry in case of version conflict    |
 | `source`          | <pre>boolean</pre><br/>(`false`)| If true, returns the updated document inside the response
 
 
