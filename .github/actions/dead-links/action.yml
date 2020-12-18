@@ -10,7 +10,7 @@ runs:
       run: npm run doc-prepare
       shell: bash
     - name: Install docs repositories
-      run: $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
+      run: npx kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
       shell: bash
     - name: Link kuzdoc
       run: $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
