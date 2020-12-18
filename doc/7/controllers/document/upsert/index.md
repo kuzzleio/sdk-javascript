@@ -6,7 +6,8 @@ title: upsert
 
 # upsert
 
-<SinceBadge version="2.8.0"/>
+<SinceBadge version="Kuzzle 2.8.0"/>
+<SinceBadge version="auto-version" />
 
 Applies partial changes to a document. If the document doesn't already exist, a new document is created.
 
