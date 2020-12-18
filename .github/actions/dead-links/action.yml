@@ -13,7 +13,7 @@ runs:
       run: npx kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
       shell: bash
     - name: Link kuzdoc
-      run: $(npm bin)/kuzdoc framework:link -d /sdk/js/7/ -v 7
+      run: npx kuzdoc framework:link -d /sdk/js/7/ -v 7
       shell: bash
     - name: Install typhoeus
       run: sudo gem install typhoeus
