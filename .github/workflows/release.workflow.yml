@@ -5,7 +5,7 @@ on: [release]
 jobs:
   deploy:
     name: Publish Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules

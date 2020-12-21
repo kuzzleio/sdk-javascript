@@ -1,6 +1,10 @@
-name: Pull request checks
+name: Deployment Doc Dev
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - 6-dev
+      - 7-dev
 
 jobs:
   lint:
@@ -89,11 +93,12 @@ jobs:
            node-version: "12"
        - uses: ./.github/actions/snippet-tests
          with:
-          CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
+           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
-  dead-links:
-    name: Dead links
+  doc-dev:
+    name: Deployment Doc Dev
     runs-on: ubuntu-18.04
+    needs: [lint, unit-tests, integration-tests, docs-tests]
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -107,8 +112,14 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v1
         with:
           node-version: "12"
-      - uses: ./.github/actions/dead-links
-
+      - uses: ./.github/actions/doc-deploy
+        with:
+          REGION: us-west-2
+          S3_BUCKET: docs-next.kuzzle.io
+          CLOUDFRONT_ID: E2ZCCEK9GRB49U
+          FRAMEWORK_BRANCH: dev
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

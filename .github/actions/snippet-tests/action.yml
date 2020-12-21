@@ -1,5 +1,9 @@
 name: Documentation Snippets Tests
 description: Run Documentation Snippets Tests
+inputs:
+  CYPRESS_RECORD_KEY_DOC:
+    description: Cypress project key
+    required: true
 runs:
   using: "composite"
   steps:
@@ -9,4 +13,6 @@ runs:
         npm run build
       shell: bash
     - run: npm run doc-testing
+      env:
+        CYPRESS_RECORD_KEY_DOC: ${{ inputs.CYPRESS_RECORD_KEY_DOC }}
       shell: bash

@@ -6,9 +6,9 @@ on:
       - master
 
 jobs:
-  admin-console-stable:
+  admin-console-master:
     name: Admin Console Master Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules

@@ -1,5 +1,9 @@
 name: Integration Tests
 description: Run Integration Tests
+inputs:
+  CYPRESS_RECORD_KEY_DOC:
+    description: Cypress project key
+    required: true
 runs:
   using: "composite"
   steps:
@@ -15,4 +19,6 @@ runs:
       shell: bash
     - name: Run functional tests
       run: npm run test:functional
+      env:
+        CYPRESS_RECORD_KEY_DOC: ${{ inputs.CYPRESS_RECORD_KEY_DOC }}
       shell: bash
