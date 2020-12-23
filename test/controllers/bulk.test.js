@@ -20,6 +20,7 @@ describe('Bulk Controller', () => {
 
     kuzzle.bulk = new BulkController(kuzzle);
   });
+
   describe('deleteByQuery', () => {
     it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
       kuzzle.query.resolves({ result: { deleted: 3 } });
@@ -104,7 +105,8 @@ describe('Bulk Controller', () => {
               index: 'vietnam',
               collection: 'hochiminh',
               controller: 'bulk',
-              action: 'write'
+              action: 'write',
+              notify: true,
             }, options);
 
           should(result).match({
@@ -147,7 +149,8 @@ describe('Bulk Controller', () => {
               index: 'vietnam',
               collection: 'hochiminh',
               controller: 'bulk',
-              action: 'mWrite'
+              action: 'mWrite',
+              notify: true,
             }, options);
 
           should(result.hits[0]).match({

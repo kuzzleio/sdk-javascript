@@ -61,7 +61,7 @@ export class DocumentController extends BaseController {
     collection: string,
     content: JSONObject,
     _id: string = null,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -96,7 +96,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -128,7 +128,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -159,7 +159,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Array<string>> {
     const request = {
       index,
@@ -190,7 +190,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -221,7 +221,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -261,7 +261,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -323,7 +323,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -376,7 +376,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -474,7 +474,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -540,7 +540,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string, retryOnConflict?: number } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', retryOnConflict?: number } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -595,7 +595,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -698,7 +698,7 @@ export class DocumentController extends BaseController {
     content: JSONObject,
     options: {
       queuable?: boolean,
-      refresh?: string,
+      refresh?: 'wait_for',
       retryOnConflict?: number,
       source?: boolean
     } = {}
@@ -737,7 +737,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: { refresh?: string, source?: boolean } = {}
+    options: { refresh?: 'wait_for', source?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
