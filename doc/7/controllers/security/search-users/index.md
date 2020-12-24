@@ -53,4 +53,10 @@ A [`SearchResult`](sdk/js/7/core-classes/search-result) object containing the re
 
 ## Usage
 
-<<< ./snippets/search-users.js
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+
+<<< ./snippets/search-users-es.js
+
+With the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
+
+<<< ./snippets/search-users-koncorde.js

@@ -71,4 +71,10 @@ Each object of the `hits` array has the following properties:
 
 ## Usage
 
-<<< ./snippets/search-api-keys.js
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+
+<<< ./snippets/search-api-keys-es.js
+
+With the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
+
+<<< ./snippets/search-api-keys-koncorde.js

@@ -70,4 +70,10 @@ Each errored document is an object of the `errors` array with the following prop
 
 ## Usage
 
-<<< ./snippets/update-by-query.js
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+
+<<< ./snippets/update-by-query-es.js
+
+With the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
+
+<<< ./snippets/update-by-query-koncorde.js
