@@ -770,7 +770,8 @@ export class DocumentController extends BaseController {
       collection,
       body: { query, changes },
       action: 'updateByQuery',
-      source: options.source
+      source: options.source,
+      lang: options.lang
     };
 
     return this.query(request, options)
