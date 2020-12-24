@@ -95,17 +95,17 @@ export class AuthController extends BaseController {
    * Checks if an API action can be executed by the current user
    * 
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
-   * @param id User kuid
-   * @param body Request to check
+   * @param kuid User kuid
+   * @param requestPayload Request to check
    */
   checkRights (
-    _id: string,
-    body: JSONObject
+    kuid: string,
+    requestPayload: JSONObject
   ): Promise<boolean> {
 
     const request = {
-      _id,
-      body,
+      _id: kuid,
+      body: requestPayload,
       action: 'checkRights'
     };
     return this.query(request)

@@ -13,17 +13,20 @@ Checks if the provided API request can be executed by a user.
 ---
 
 ```js
-checkRights(_id, body)
+checkRights(kuid, requestPayload)
 ```
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `_id` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
-| `body` | <pre>object</pre> | Contains a `request` |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
+| `requestPayload` | <pre>object</pre> | Contains a [RequestPayload](/core/2/api/payloads/request) |
 
 ## Body properties
 
-- `request`: API request to check
+The body must contain a [RequestPayload](/core/2/api/payloads/request) with at least the following properties:
+
+- `controller`: API controller
+- `action`: API action
 
 ---
 

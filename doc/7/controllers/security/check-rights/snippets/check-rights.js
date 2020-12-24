@@ -1,4 +1,4 @@
-const body = {
+const requestPayload = {
   controller: 'document',
   action: 'create',
   index: 'nyc-open-data',
@@ -9,7 +9,7 @@ const body = {
 }
 
 try {
-  const result = await kuzzle.security.checkRights('foo', body);
+  const result = await kuzzle.security.checkRights('foo', requestPayload);
   console.log(result.allowed);
   /*
     true

@@ -24,7 +24,10 @@ checkRights(kuid, requestPayload)
 
 ## Body properties
 
-- `request`: API request to check
+The body must contain a [RequestPayload](/core/2/api/payloads/request) with at least the following properties:
+
+- `controller`: API controller
+- `action`: API action
 
 ---
 
