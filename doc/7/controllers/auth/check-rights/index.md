@@ -20,7 +20,7 @@ checkRights(kuid, requestPayload)
 | Property | Type | Description |
 |--- |--- |--- |
 | `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
-| `body` | <pre>object</pre> | Contains a `request` |
+| `requestPayload` | <pre>object</pre> | Contains a [RequestPayload](/core/2/api/payloads/request) |
 
 ## Body properties
 
