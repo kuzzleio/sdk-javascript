@@ -14,7 +14,7 @@ Checks if the provided API request can be executed by a user.
 ---
 
 ```js
-checkRights(_id, body)
+checkRights(kuid, requestPayload)
 ```
 
 | Property | Type | Description |
