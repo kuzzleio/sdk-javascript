@@ -39,7 +39,7 @@ try {
         "_id": "znEwbG8BJASM_0-bWU-q",
         "_source": {
           "description": "LoRa permanent API key",
-          "userId": "jared.doe",
+          "userId": "john.doe",
           "expiresAt": 31557600000,
           "ttl": 420000
         }
@@ -48,9 +48,9 @@ try {
         "_id": "zXEwbG8BJASM_0-bWU-q",
         "_source": {
           "description": "LoRa 1 year API key",
-          "userId": "jared.doe",
+          "userId": "john.doe",
           "expiresAt": 31557600000,
-          "ttl": 420000
+          "ttl": 360000
         }
       }
     ]
