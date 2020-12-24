@@ -125,7 +125,8 @@ describe('Document Controller', () => {
               action: 'deleteByQuery',
               index: 'index',
               collection: 'collection',
-              body: {foo: 'bar'}
+              body: {foo: 'bar'},
+              lang: undefined
             }, options);
 
           should(res).be.an.Array();
@@ -638,7 +639,8 @@ describe('Document Controller', () => {
                   bar: 'foo'
                 }
               },
-              source: undefined
+              source: undefined,
+              lang: undefined
             }, options);
 
           should(res).be.equal(result);
@@ -677,7 +679,8 @@ describe('Document Controller', () => {
                   bar: 'foo'
                 }
               },
-              source: true
+              source: true,
+              lang: undefined
             });
 
           should(res).be.equal(result);
