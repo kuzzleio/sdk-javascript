@@ -21,15 +21,12 @@ upsert(index, collection, id, changes, defaults, [options]);
 | `index`      | <pre>string</pre> | Index name                                |
 | `collection` | <pre>string</pre> | Collection name                           |
 | `id`         | <pre>string</pre> | Document ID                               |
-| `changes`    | <pre>object</pre> | Partial content of the document to update |
-| `defaults`   | <pre>object</pre><br/>(`{}`) | Fields to add to the document if it gets created 
-
+| `body`       | <pre>object</pre> | Partial content of the document to update and fields to add to the document if it gets created |
 
 ### Body properties
 
-Additional query options
 
-| Options           | Type<br/>(default)              | Description                                                                        |
+| Argument           | Type<br/>(default)              | Description                                                                        |
 | ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
 | `changes`         | <pre>object</pre>    | partial changes to apply to the document |
 | `defaults` | <pre>object</pre><br/>(`{}`)        | (optional) fields to add to the document if it gets created    |
