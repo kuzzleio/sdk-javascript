@@ -75,7 +75,7 @@ export class AuthController extends BaseController {
    */
   createApiKey(
     description: string,
-    options: { _id?: string, expiresIn?: number, refresh?: string } = {}
+    options: { _id?: string, expiresIn?: number, refresh?: 'wait_for' } = {}
   ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
@@ -100,7 +100,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    */
-  deleteApiKey(id: string, options: { refresh?: string } = {}): Promise<null> {
+  deleteApiKey(id: string, options: { refresh?: 'wait_for' } = {}): Promise<null> {
     const request = {
       action: 'deleteApiKey',
       _id: id,
