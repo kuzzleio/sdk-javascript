@@ -13,7 +13,7 @@ Applies partial changes to a document. If the document doesn't already exist, a 
 
 
 ```js
-update(index, collection, id, document, [options]);
+upsert(index, collection, id, changes, defaults, [options]);
 ```
 
 | Argument     | Type              | Description                               |
