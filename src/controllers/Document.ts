@@ -780,8 +780,7 @@ export class DocumentController extends BaseController {
    * @param index Index name
    * @param collection Collection name
    * @param _id Unique document identifier
-   * @param changes Partial changes to apply to the document
-   * @param defaults Fields to add to the document if it gets created
+   * @param body Partial changes to apply to the document and Fields to add to the document if it gets created (optional)
    * @param options
    * @returns {Promise<Object>}
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
@@ -790,15 +789,14 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    changes: JSONObject,
-    defaults: JSONObject = {},
+    body: JSONObject,
     options: {refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
-      body: { changes, defaults },
+      body,
       action: 'upsert',
       source: options.source
     };

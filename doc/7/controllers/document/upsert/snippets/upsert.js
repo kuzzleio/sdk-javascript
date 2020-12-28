@@ -10,7 +10,7 @@ try {
     'nyc-open-data',
     'yellow-taxi',
     'some-id',
-    { category: 'suv' }
+    { changes: { category: 'suv' } }
   );
 
   console.log(response);

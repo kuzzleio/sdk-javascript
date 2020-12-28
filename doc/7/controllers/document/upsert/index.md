@@ -25,6 +25,15 @@ upsert(index, collection, id, changes, defaults, [options]);
 | `defaults`   | <pre>object</pre><br/>(`{}`) | Fields to add to the document if it gets created 
 
 
+### Body properties
+
+Additional query options
+
+| Options           | Type<br/>(default)              | Description                                                                        |
+| ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `changes`         | <pre>object</pre>    | partial changes to apply to the document |
+| `defaults` | <pre>object</pre><br/>(`{}`)        | (optional) fields to add to the document if it gets created    |
+
 ### Options
 
 Additional query options
