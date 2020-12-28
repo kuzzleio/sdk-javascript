@@ -5,6 +5,7 @@ src/**/*.js.map
 src/Kuzzle.js
 src/KuzzleError.js
 src/controllers/Auth.js
+src/controllers/Bulk.js
 src/controllers/Document.js
 src/controllers/Realtime.js
 src/controllers/Index.js
