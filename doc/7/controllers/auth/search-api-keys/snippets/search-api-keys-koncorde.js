@@ -54,6 +54,7 @@ try {
           "description": "LoRa 1 year API key",
           "userId": "jared.doe",
           "expiresAt": 31557600000,
+          "fingerprint": "f822e42325d86c93cfaf39cb40e860939e784c8e64ee98cb8c614e99213e7695",
           "ttl": 420000
         }
       }
