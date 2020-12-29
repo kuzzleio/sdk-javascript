@@ -48,7 +48,7 @@ class SecurityController extends BaseController {
   checkRights(userId, body) {
     const request = {
       userId: kuid,
-      body,
+      body: requestPayload,
       action: 'checkRights'
     };
     return this.query(request)
