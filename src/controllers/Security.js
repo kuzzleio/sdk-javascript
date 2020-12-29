@@ -52,7 +52,7 @@ class SecurityController extends BaseController {
       action: 'checkRights'
     };
     return this.query(request)
-      .then(response => response.result);
+      .then(response => response.result.allowed);
   }
 
   /**
