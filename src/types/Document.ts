@@ -49,6 +49,11 @@ export class Document {
    */
   _version?: number;
   /**
+   * For upsert: if true, a new document was created,
+   * otherwise the document existed and was updated
+   */
+  created?: boolean;
+  /**
    * Document Content
    */
   _source: DocumentContent;

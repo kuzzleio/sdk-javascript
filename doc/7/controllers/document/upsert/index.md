@@ -13,7 +13,7 @@ Applies partial changes to a document. If the document doesn't already exist, a 
 
 
 ```js
-upsert(index, collection, id, changes, defaults, [options]);
+upsert(index, collection, id, changes, [options]);
 ```
 
 | Argument     | Type              | Description                               |
@@ -21,15 +21,7 @@ upsert(index, collection, id, changes, defaults, [options]);
 | `index`      | <pre>string</pre> | Index name                                |
 | `collection` | <pre>string</pre> | Collection name                           |
 | `id`         | <pre>string</pre> | Document ID                               |
-| `body`       | <pre>object</pre> | Partial content of the document to update and fields to add to the document if it gets created |
-
-### Body properties
-
-
-| Argument           | Type<br/>(default)              | Description                                                                        |
-| ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
-| `changes`         | <pre>object</pre>    | partial changes to apply to the document |
-| `defaults` | <pre>object</pre><br/>(`{}`)        | (optional) fields to add to the document if it gets created    |
+| `changes`       | <pre>object</pre> | Partial content of the document to update |
 
 ### Options
 
@@ -37,6 +29,7 @@ Additional query options
 
 | Options           | Type<br/>(default)              | Description                                                                        |
 | ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `defaults` | <pre>object</pre><br/>(`{}`)        | Fields to add to the document if it gets created |
 | `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
 | `retryOnConflict` | <pre>int</pre><br/>(`10`)        | The number of times the database layer should retry in case of version conflict    |
 | `source`          | <pre>boolean</pre><br/>(`false`)| If true, returns the updated document inside the response

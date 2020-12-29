@@ -776,27 +776,32 @@ export class DocumentController extends BaseController {
   /**
    * Applies a partial update to an existing document.
    * If the document doesn't already exist, a new document is created.
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
    *
    * @param index Index name
    * @param collection Collection name
    * @param _id Unique document identifier
    * @param body Partial changes to apply to the document and Fields to add to the document if it gets created (optional)
    * @param options
-   * @returns {Promise<Object>}
-   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
+   *    - `defaults` Fields to add to the document if it gets created
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `source` If true, returns the updated document inside the response
+   *
+   * @returns Information about the updated document
   */
   upsert (
     index: string,
     collection: string,
     _id: string,
-    body: JSONObject,
-    options: {refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
+    changes: JSONObject,
+    options: {defaults?: JSONObject; refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
-      body,
+      body: changes,
       action: 'upsert',
       source: options.source
     };
