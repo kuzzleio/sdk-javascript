@@ -43,9 +43,9 @@ class SecurityController extends BaseController {
    * Checks if an API action can be executed by the current user
    * 
    * @param {String} userId - User kuid
-   * @param {Object} body - Request to check
+   * @param {Object} requestPayload - Request to check
    */
-  checkRights(kuid requestPayload) {
+  checkRights(kuid, requestPayload) {
     const request = {
       userId: kuid,
       body: requestPayload,

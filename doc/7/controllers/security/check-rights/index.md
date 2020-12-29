@@ -33,15 +33,7 @@ The [RequestPayload](/core/2/api/payloads/request) must contains at least the fo
 
 ## Resolves
 
-The returned result contains the following property:
-
-- `allowed`: a boolean telling whether the provided request would have been allowed or not
-
-```js
-{
-  "allowed": true
-}
-```
+A boolean telling whether the provided request would have been allowed or not
 
 ## Usage
 

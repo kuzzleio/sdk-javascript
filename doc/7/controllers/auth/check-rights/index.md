@@ -20,7 +20,6 @@ checkRights(requestPayload)
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `requestPayload` | <pre>object</pre> | Contains a [RequestPayload](/core/2/api/payloads/request) |
 
 ## `requestPayload`
@@ -34,15 +33,7 @@ The body must contain a [RequestPayload](/core/2/api/payloads/request) with at l
 
 ## Resolves
 
-The returned result contains the following property:
-
-- `allowed`: a boolean telling whether the provided request would have been allowed or not
-
-```js
-{
-  "allowed": true
-}
-```
+A boolean telling whether the provided request would have been allowed or not.
 
 ## Usage
 

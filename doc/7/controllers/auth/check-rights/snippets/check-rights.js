@@ -9,8 +9,8 @@ const requestPayload = {
 }
 
 try {
-  const result = await kuzzle.auth.checkRights('foo', requestPayload);
-  console.log(result.allowed);
+  const result = await kuzzle.auth.checkRights(requestPayload);
+  console.log(result);
   /*
     true
   */
