@@ -70,7 +70,7 @@ Each object of the `hits` array has the following properties:
 
 ## Usage
 
-With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) syntax.
 
 <<< ./snippets/search-api-keys-es.js
 
