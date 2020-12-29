@@ -741,7 +741,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: { refresh?: 'wait_for', source?: boolean, lang?: string} = {}
+    options: { refresh?: 'wait_for', source?: boolean, lang?: string } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
