@@ -70,7 +70,7 @@ Each errored document is an object of the `errors` array with the following prop
 
 ## Usage
 
-With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) syntax.
 
 <<< ./snippets/update-by-query-es.js
 
