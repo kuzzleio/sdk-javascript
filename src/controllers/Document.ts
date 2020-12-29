@@ -160,7 +160,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: string, lang?: string} = {}
+    options: { queuable?: boolean, refresh?: string, lang?: string } = {}
   ): Promise<Array<string>> {
     const request = {
       index,
