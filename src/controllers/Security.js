@@ -45,7 +45,7 @@ class SecurityController extends BaseController {
    * @param {String} userId - User kuid
    * @param {Object} body - Request to check
    */
-  checkRights(userId, body) {
+  checkRights(kuid requestPayload) {
     const request = {
       userId: kuid,
       body: requestPayload,
