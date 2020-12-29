@@ -9,7 +9,7 @@ const requestPayload = {
 }
 
 try {
-  const result = await kuzzle.security.checkRights('foo', requestPayload);
+  const allowed = await kuzzle.security.checkRights('foo', requestPayload);
   console.log(result.allowed);
   /*
     true
