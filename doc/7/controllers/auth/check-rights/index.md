@@ -2,6 +2,7 @@
 code: true
 type: page
 title: checkRights
+description: Checks if an API action can be executed by the current user
 ---
 
 # checkRights
