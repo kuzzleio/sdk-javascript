@@ -4,7 +4,7 @@ const requestPayload = {
   index: 'nyc-open-data',
   collection: 'yellow-taxi',
   body: {
-    'name': 'Melis'
+    name: 'Melis'
   }
 }
 
