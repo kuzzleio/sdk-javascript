@@ -10,7 +10,7 @@ description: Checks if an API action can be executed by the current user
 <SinceBadge version="Kuzzle 2.8.0"/>
 <SinceBadge version="auto-version"/>
 
-Checks if the provided API request can be executed by a user.
+Checks if the provided API request can be executed by the current logged user.
 
 ---
 
