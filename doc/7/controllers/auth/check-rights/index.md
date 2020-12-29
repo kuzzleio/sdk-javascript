@@ -23,7 +23,7 @@ checkRights(requestPayload)
 | `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `requestPayload` | <pre>object</pre> | Contains a [RequestPayload](/core/2/api/payloads/request) |
 
-## Body properties
+## `requestPayload`
 
 The body must contain a [RequestPayload](/core/2/api/payloads/request) with at least the following properties:
 
