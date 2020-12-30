@@ -27,6 +27,10 @@ export interface BaseNotification extends Notification {
    */
   action: string;
   /**
+   * Event type according to API action
+   */
+  event: 'write' | 'delete' | 'publish';
+  /**
    * Index name
    */
   index: string;
