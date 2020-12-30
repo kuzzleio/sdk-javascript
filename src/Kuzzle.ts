@@ -543,7 +543,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       request.refresh = options.refresh;
     }
 
-    if (typeof request.retryOnConflict === 'undefined' && typeof options.retryOnConflict !== 'undefined') {
+    if (request.retryOnConflict === undefined && options.retryOnConflict !== undefined) {
       request.retryOnConflict = options.retryOnConflict;
     }
 
