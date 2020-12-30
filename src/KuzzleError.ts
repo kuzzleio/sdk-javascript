@@ -11,7 +11,7 @@ export class KuzzleError extends Error {
    */
   public status: number;
   /**
-   * Stacktrace
+   * Error message 
    */
   public message: string;
   /**
