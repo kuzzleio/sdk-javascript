@@ -2,6 +2,7 @@
 code: true
 type: page
 title: upsert
+description: Applies partial changes to a document. If the document doesn't already exist, a new document is created.
 ---
 
 # upsert
