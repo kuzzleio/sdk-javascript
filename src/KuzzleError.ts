@@ -13,6 +13,10 @@ export class KuzzleError extends Error {
   /**
    * Stacktrace
    */
+  public message: string;
+  /**
+   * Stacktrace
+   */
   public stack: string;
   /**
    * Kuzzle stacktrace (development mode only)
@@ -52,6 +56,7 @@ export class KuzzleError extends Error {
       this.stack = stack;
     }
 
+    this.message = apiError.message;
     this.id = apiError.id;
     this.code = apiError.code;
 
