@@ -801,7 +801,7 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      body: changes,
+      body: { changes, defaults: options.defaults },
       action: 'upsert',
       source: options.source
     };
