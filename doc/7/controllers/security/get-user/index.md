@@ -30,7 +30,7 @@ getUser(kuid, [options]);
 
 ## Resolves
 
-The retrieved [`User`](sdk/js/6/core-classes/user/introduction) object.
+The retrieved [`User`](sdk/js/7/core-classes/user/introduction) object.
 
 ## Usage
 

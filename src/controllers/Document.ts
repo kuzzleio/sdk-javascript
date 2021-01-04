@@ -152,6 +152,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
    * @returns The deleted documents IDs
    */
@@ -159,13 +160,14 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: string, lang?: string } = {}
   ): Promise<Array<string>> {
     const request = {
       index,
       collection,
       body: query,
-      action: 'deleteByQuery'
+      action: 'deleteByQuery',
+      lang: options.lang
     };
 
     return this.query(request, options)
@@ -635,6 +637,7 @@ export class DocumentController extends BaseController {
       from?: number;
       size?: number;
       scroll?: string;
+      lang?: string;
       verb?: string;
     } = {}
   ): Promise<SearchResult<DocumentHit>> {
@@ -665,7 +668,7 @@ export class DocumentController extends BaseController {
     else {
       request.body = body;
     }
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 
@@ -729,6 +732,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `source` If true, returns the updated document inside the response
+   *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -737,7 +741,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: { refresh?: 'wait_for', source?: boolean } = {}
+    options: { refresh?: 'wait_for', source?: boolean, lang?: string } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -766,7 +770,8 @@ export class DocumentController extends BaseController {
       collection,
       body: { query, changes },
       action: 'updateByQuery',
-      source: options.source
+      source: options.source,
+      lang: options.lang
     };
 
     return this.query(request, options)

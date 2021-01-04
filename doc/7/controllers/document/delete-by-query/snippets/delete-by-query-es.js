@@ -3,9 +3,7 @@ try {
     'nyc-open-data',
     'yellow-taxi',
     {
-      query: {
-        term: { capacity: 7 }
-      }
+      query: { term: { capacity: 7 } }
     }
   );
 
