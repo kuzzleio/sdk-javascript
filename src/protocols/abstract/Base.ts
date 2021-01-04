@@ -131,7 +131,19 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        const error = new KuzzleError(response.error, stack);
+        let error;
+
+        // Wrap API error but directly throw errors that comes from SDK
+        if (response.error.id) {
+          error = new KuzzleError(response.error, stack);
+        }
+        else {
+          // Keep both stacktrace
+          const lines = stack.split('\n');
+          lines[0] = '';
+          response.error.stack += '\n' + lines.join('\n');
+          error = response.error;
+        }
 
         this.emit('queryError', error, request);
 

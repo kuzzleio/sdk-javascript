@@ -1,4 +1,4 @@
-name: security#searchApiKeys
+name: security#searchApiKeys-koncorde
 description: Searches for a user API keys
 hooks:
   before: >
@@ -11,4 +11,4 @@ hooks:
     curl -XDELETE kuzzle:7512/users/john.doe
 template: default
 expected:
-  - Found 2 API keys matching "LoRa"
+  - Found 2 API keys.

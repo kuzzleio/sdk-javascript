@@ -119,22 +119,21 @@ describe('Common Protocol', () => {
     });
 
     it('should fire a "queryError" event and reject if an error occurred', () => {
-      const
-        eventStub = sinon.stub(),
-        response = {
-          error: {
-            message: 'foo-bar'
-          }
-        };
+      const eventStub = sinon.stub();
+      const response = {
+        error: {
+          message: 'foo-bar'
+        }
+      };
 
       protocol.addListener('queryError', eventStub);
 
       return protocol.query({requestId: 'foobar', response: response})
-        .then(() => Promise.reject({message: 'No error'}))
-        .catch(error => {
+        .then(() => Promise.reject(new Error('message')))
+        .catch(err => {
           should(eventStub).be.calledOnce();
-          should(error).be.instanceOf(KuzzleError);
-          should(error.message).be.exactly('foo-bar');
+          should(err).be.eql(response.error);
+          should(err.message).be.exactly('foo-bar');
         });
     });
 
@@ -175,7 +174,8 @@ describe('Common Protocol', () => {
         error: {
           message: 'foo-bar',
           status: 442,
-          stack: 'you are the bug'
+          stack: 'you are the bug',
+          id: 'api.foo.bar'
         }
       };
 
@@ -199,12 +199,13 @@ describe('Common Protocol', () => {
             'some',
             'error'
           ],
-          count: 42
+          count: 42,
+          id: 'api.foo.bar'
         }
       };
 
       return protocol.query({ requestId: 'foobar', response: response })
-        .then(() => Promise.reject({message: 'No error'}))
+        .then(() => Promise.reject(new Error('message')))
         .catch(error => {
           should(error).be.instanceOf(KuzzleError);
           should(error.message).be.eql('foo-bar');

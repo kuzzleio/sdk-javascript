@@ -1,4 +1,4 @@
-name: auth#searchApiKeys
+name: auth#searchApiKeys-es
 description: Searches API keys for the currently loggued user.
 hooks:
   before: >

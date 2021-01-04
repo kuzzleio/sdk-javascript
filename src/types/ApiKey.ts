@@ -1,5 +1,7 @@
 /**
  * ApiKey
+ *
+ * @see https://docs.kuzzle.io/core/2/guides/advanced/api-keys/
  */
 export type ApiKey = {
   /**

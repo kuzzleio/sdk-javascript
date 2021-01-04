@@ -30,6 +30,15 @@ searchApiKeys([query], [options]);
 
 The search query to apply to API keys content, using [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
 
+<SinceBadge version="7.4.8"/>
+
+This method also supports the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) to match documents by passing the `lang` argument with the value `koncorde`.  
+Koncorde filters will be translated into an Elasticsearch query.  
+
+::: warning
+Koncorde `bool` operator and `regexp` clause are not supported for search queries.
+:::
+
 If left empty, the result will return all available API keys of the currently loggued user.
 
 ### options
@@ -40,6 +49,7 @@ Additional query options
 | ---------- | ------------------ | ------------ |
 | `from`     | <pre>number</pre><br/>(`0`)     | Offset of the first document to fetch   |
 | `size`     | <pre>number</pre><br/>(`10`)    | Maximum number of documents to retrieve per page     |
+| `lang`     | <pre>string</pre>               | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 
 ## Resolves
 
@@ -60,4 +70,10 @@ Each object of the `hits` array has the following properties:
 
 ## Usage
 
-<<< ./snippets/search-api-keys.js
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) syntax.
+
+<<< ./snippets/search-api-keys-es.js
+
+With the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
+
+<<< ./snippets/search-api-keys-koncorde.js

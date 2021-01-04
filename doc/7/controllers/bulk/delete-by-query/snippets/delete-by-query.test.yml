@@ -15,6 +15,6 @@ hooks:
     done
 
     curl -XPOST kuzzle:7512/nyc-open-data/yellow-taxi/_refresh
-  after:
+
 template: default
 expected: Successfully deleted 5 documents

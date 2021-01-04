@@ -26,6 +26,14 @@ It can lead to memory leaks if a scroll duration too great is provided, or if to
 You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key.
 :::
 
+<SinceBadge version="7.4.8"/>
+
+This method also supports the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) to match documents by passing the `lang` argument with the value `koncorde`.  
+Koncorde filters will be translated into an Elasticsearch query.  
+
+::: warning
+Koncorde `bool` operator and `regexp` clause are not supported for search queries.
+:::
 
 <br/>
 
@@ -50,6 +58,7 @@ Additional query options
 | `from`     | <pre>number</pre><br/>(`0`)     | Offset of the first document to fetch                                                                                                                                                                             |
 | `size`     | <pre>number</pre><br/>(`10`)    | Maximum number of documents to retrieve per page                                                                                                                                                                  |
 | `scroll`   | <pre>string</pre><br/>(`""`)    | When set, gets a forward-only cursor having its ttl set to the given value (ie `30s`; cf [elasticsearch time limits](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/common-options.html#time-units)) |
+| `lang`     | <pre>string</pre>      | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 | `verb`     | <pre>string</pre>      | (HTTP only) Forces the verb of the route |
 
 #### verb
@@ -61,7 +70,7 @@ You can set the `verb` option to `GET` to force the SDK to use the GET API inste
 
 ### Optional:
 
-- `query`: the search query itself, using the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) syntax.
+- `query`: the search query itself, using the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl.html) or the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
 - `aggregations`: control how the search results should be [aggregated](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/search-aggregations.html)
 - `sort`: contains a list of fields, used to [sort search results](https://www.elastic.co/guide/en/elasticsearch/reference/7.3/search-request-sort.html), in order of importance.
 
@@ -73,4 +82,10 @@ Resolves to a [SearchResult](/sdk/js/7/core-classes/search-result) object.
 
 ## Usage
 
-<<< ./snippets/search.js
+With the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) syntax.
+
+<<< ./snippets/search-es.js
+
+With the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax.
+
+<<< ./snippets/search-koncorde.js

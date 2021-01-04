@@ -64,7 +64,7 @@ Example:
 
 ## Resolves
 
-A [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the newly created user.
+A [`User`](sdk/js/7/core-classes/user/introduction) object containing information about the newly created user.
 
 ## Usage
 

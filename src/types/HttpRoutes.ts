@@ -1,5 +1,8 @@
 /**
  * HTTP routes definition format
+ *
+ * @see https://docs.kuzzle.io/core/2/guides/develop-on-kuzzle/api-controllers/#http-routes
+ *
  * @example
  * {
  *    <controller>: {

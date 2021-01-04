@@ -1,4 +1,4 @@
-name: document#deleteByQuery
+name: document#deleteByQuery-es
 description: Delete documents matching query
 hooks:
   before: |

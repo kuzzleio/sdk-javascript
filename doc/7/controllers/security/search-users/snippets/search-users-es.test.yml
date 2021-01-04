@@ -1,4 +1,4 @@
-name: security#searchUsers
+name: security#searchUsers-es
 description: search users
 hooks:
   before: |
@@ -12,5 +12,9 @@ hooks:
       }' kuzzle:7512/users/user${i}/_create?refresh=wait_for
     done
   after:
+    - curl -f -XDELETE kuzzle:7512/users/user1
+    - curl -f -XDELETE kuzzle:7512/users/user2
+    - curl -f -XDELETE kuzzle:7512/users/user3
+ 
 template: default
 expected: ^Successfully retrieved 3 users$
