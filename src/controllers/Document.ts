@@ -782,7 +782,7 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param _id Unique document identifier
    * @param changes Partial content of the document to update
-   * @param options
+   * @param [options]
    *    - `defaults` Fields to add to the document if it gets created
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
