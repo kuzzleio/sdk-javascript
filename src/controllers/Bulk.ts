@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import { JSONObject } from 'src/types';
+import { JSONObject } from '../types';
 
 export class BulkController extends BaseController {
   constructor (kuzzle) {
