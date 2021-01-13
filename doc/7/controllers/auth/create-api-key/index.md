@@ -2,7 +2,7 @@
 code: true
 type: page
 title: createApiKey
-description: Creates a new API key for the currently loggued user.
+description: Creates a new API key for the currently logged user.
 ---
 
 # createApiKey
@@ -11,7 +11,7 @@ description: Creates a new API key for the currently loggued user.
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Creates a new API key for the currently loggued user.
+Creates a new API key for the currently logged user.
 
 <br />
 
