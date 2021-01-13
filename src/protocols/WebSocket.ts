@@ -21,6 +21,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `port` Kuzzle server port (default: `7512`)
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
+   *    - `pingInterval` Number of milliseconds between two pings (default: `30000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
@@ -30,6 +31,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       port?: number;
       headers?: JSONObject;
       reconnectionDelay?: number;
+      pingInterval?: number;
       /**
        * @deprecated Use `ssl` instead
        */
@@ -88,7 +90,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client.onpong = () => {
-        this.isAlive = true;
+        return resolve();
       }
 
       this.client.onopen = () => {
@@ -159,7 +161,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
       };
       clearTimeout(this.pingTimeout);
-      this.isAlive = false;
     });
   }
 

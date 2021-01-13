@@ -5,18 +5,18 @@ import { KuzzleAbstractProtocol } from './Base';
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected _autoReconnect: boolean;
   protected _reconnectionDelay: number;
+  protected _pingInterval: number;
   protected wasConnected: boolean;
   protected stopRetryingToConnect: boolean;
   protected retrying: boolean;
-  protected pingTimeout: any;
-  protected isAlive: boolean;
-
+  protected pingTimeout: ReturnType<typeof setTimeout>;
 
   constructor (host, options: any = {}, name: string) {
     super(host, options, name);
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
+    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
 
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
@@ -40,13 +40,22 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     return Promise.resolve();
   }
 
+  
+  /**
+   * Terminate the connection if the server does not respond
+   */
+
   heartbeat (client) {
     clearTimeout(this.pingTimeout);
 
     this.pingTimeout = setTimeout(() => {
+      /** 
+       *  Use `WebSocket#terminate()`, which immediately destroys the connection,
+       *  instead of `WebSocket#close()`, which waits for the close timer.
+       */ 
       client.terminate();
-      this.isAlive = false;
-    }, 2000);
+      this.state = 'offline';
+    }, this._pingInterval);
   }
 
   /**
@@ -58,7 +67,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this.state = 'connected';
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
-    this.isAlive = true;
     return Promise.resolve();
   }
 
