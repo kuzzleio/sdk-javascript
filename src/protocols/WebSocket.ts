@@ -87,11 +87,11 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client.onping = () => {
         this.heartbeat(this.client);
-      }
+      };
 
       this.client.onpong = () => {
         return resolve();
-      }
+      };
 
       this.client.onopen = () => {
         this.clientConnected();
