@@ -61,13 +61,12 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   /**
    * Called when the client's connection is established
    */
-  clientConnected (): Promise<any> {
+  clientConnected () {
     super.clientConnected('connected', this.wasConnected);
 
     this.state = 'connected';
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
-    return Promise.resolve();
   }
 
   /**
