@@ -6,6 +6,6 @@ runs:
     - name: Install deps
       run: npm ci --silent
       shell: bash
-    - name: Run tests
+    - name: Run lint
       run: npm run --silent test:lint
       shell: bash

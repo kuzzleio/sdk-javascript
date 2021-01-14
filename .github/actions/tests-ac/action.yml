@@ -14,10 +14,12 @@ runs:
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cd /tmp/admin-console
         npm ci
-        npm install kuzzle-sdk-v${{ inputs.sdk_version }}
+        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@${{ env.GITHUB_WORKSPACE }}
       shell: bash
     - name: Run e2e tests
       run: |
-        cd test/e2e/run-test && npm ci && cd -
+        cd ${{ env.GITHUB_WORKSPACE }}/test/e2e/run-test
+        npm ci
+        cd ${{ env.GITHUB_WORKSPACE }}
         CYPRESS_RETRIES=5 npm run test:e2e
       shell: bash

@@ -1,5 +1,5 @@
-name: Integration Tests
-description: Run Integration Tests
+name: Functional Tests
+description: Run Functional Tests
 inputs:
   CYPRESS_RECORD_KEY_DOC:
     description: Cypress project key
@@ -10,7 +10,7 @@ runs:
     - name: Start Kuzzle stack
       run: |
         sudo sysctl -w vm.max_map_count=262144
-        "./.ci/start_kuzzle.sh"
+        ${{ env.GITHUB_WORKSPACE }}/.ci/start_kuzzle.sh
       shell: bash
     - name: Build Kuzzle
       run: |
@@ -19,6 +19,4 @@ runs:
       shell: bash
     - name: Run functional tests
       run: npm run test:functional
-      env:
-        CYPRESS_RECORD_KEY_DOC: ${{ inputs.CYPRESS_RECORD_KEY_DOC }}
       shell: bash
