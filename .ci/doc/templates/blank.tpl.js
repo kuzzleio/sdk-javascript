@@ -7,7 +7,7 @@ const
   } = require('kuzzle-sdk');
 
 const kuzzle = new Kuzzle(
-  new WebSocket('kuzzle')
+  new WebSocket('kuzzle', { pingInterval: 2000 })
 );
 
 [snippet-code]

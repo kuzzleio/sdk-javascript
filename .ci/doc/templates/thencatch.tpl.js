@@ -9,7 +9,7 @@ const {
 // Instantiates a Kuzzle client
 const
   kuzzle = new Kuzzle(
-    new WebSocket('kuzzle', { autoReconnect: false })
+    new WebSocket('kuzzle', { autoReconnect: false, pingInterval: 2000 })
   );
 
 // Adds a listener to detect any connection problems
