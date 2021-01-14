@@ -61,7 +61,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Creates a new API key for the currently loggued user.
+   * Creates a new API key for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/create-api-key
    *
@@ -110,7 +110,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Deletes an API key for the currently loggued user.
+   * Deletes an API key for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
    *
@@ -130,7 +130,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Searches API keys for the currently loggued user.
+   * Searches API keys for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/search-api-keys
    *
@@ -276,7 +276,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
     return this.query({
@@ -456,7 +456,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   updateSelf (
     content: JSONObject,

@@ -2,7 +2,7 @@
 code: true
 type: page
 title: deleteApiKey
-description: Deletes an API key for the currently loggued user.
+description: Deletes an API key for the currently logged user.
 ---
 
 # deleteApiKey
@@ -11,7 +11,7 @@ description: Deletes an API key for the currently loggued user.
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Deletes an API key for the currently loggued user.
+Deletes an API key for the currently logged user.
 
 <br />
 

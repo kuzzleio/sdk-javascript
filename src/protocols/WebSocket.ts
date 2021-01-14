@@ -83,8 +83,17 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client = new this.WebSocketClient(url, this.options);
 
+      this.client.onping = () => {
+        this.heartbeat(this.client);
+      }
+
+      this.client.onpong = () => {
+        this.isAlive = true;
+      }
+
       this.client.onopen = () => {
         this.clientConnected();
+        this.heartbeat(this.client);
         return resolve();
       };
 
@@ -149,7 +158,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.emit('queryError', error, data);
         }
       };
-
+      clearTimeout(this.pingTimeout);
+      this.isAlive = false;
     });
   }
 

@@ -8,6 +8,9 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected wasConnected: boolean;
   protected stopRetryingToConnect: boolean;
   protected retrying: boolean;
+  protected pingTimeout: any;
+  protected isAlive: boolean;
+
 
   constructor (host, options: any = {}, name: string) {
     super(host, options, name);
@@ -37,15 +40,26 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     return Promise.resolve();
   }
 
+  heartbeat (client) {
+    clearTimeout(this.pingTimeout);
+
+    this.pingTimeout = setTimeout(() => {
+      client.terminate();
+      this.isAlive = false;
+    }, 2000);
+  }
+
   /**
    * Called when the client's connection is established
    */
-  clientConnected () {
+  clientConnected (): Promise<any> {
     super.clientConnected('connected', this.wasConnected);
 
     this.state = 'connected';
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
+    this.isAlive = true;
+    return Promise.resolve();
   }
 
   /**
