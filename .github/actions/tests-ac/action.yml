@@ -10,7 +10,7 @@ runs:
     - name: Start Kuzzle stack
       run: |
         sudo sysctl -w vm.max_map_count=262144
-        ./.ci/start_kuzzle.sh
+        $GITHUB_WORKSPACE/.ci/start_kuzzle.sh
         npm ci
       shell: bash
     - name: Setup Admin console
@@ -18,12 +18,12 @@ runs:
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cd /tmp/admin-console
         npm ci
-        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@${{ env.GITHUB_WORKSPACE }}
+        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@$GITHUB_WORKSPACE
       shell: bash
     - name: Run e2e tests
       run: |
-        cd ${{ env.GITHUB_WORKSPACE }}/test/e2e/run-test
+        cd /tmp/admin-console/test/e2e/run-test
         npm ci
-        cd ${{ env.GITHUB_WORKSPACE }}
+        cd /tmp/admin-console
         CYPRESS_RETRIES=5 npm run test:e2e
       shell: bash

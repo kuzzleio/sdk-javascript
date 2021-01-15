@@ -95,7 +95,7 @@ jobs:
           node-version: "12"
       - uses: ./.github/actions/tests-ac
         with:
-          sdk_version: 7
+          sdk-version: 7
 
   documentation-dead-links:
     name: Dead links

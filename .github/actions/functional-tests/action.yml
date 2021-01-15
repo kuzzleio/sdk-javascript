@@ -10,7 +10,7 @@ runs:
     - name: Start Kuzzle stack
       run: |
         sudo sysctl -w vm.max_map_count=262144
-        ./.ci/start_kuzzle.sh
+        $GITHUB_WORKSPACE/.ci/start_kuzzle.sh
       shell: bash
     - name: Build Kuzzle
       run: |
