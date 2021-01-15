@@ -1,5 +1,10 @@
 name: Test Admin Console
 description: Run Test Admin Console
+inputs:
+  sdk-version:
+    description: Javascript SDK version to use
+    required: true
+
 runs:
   using: "composite"
   steps:
