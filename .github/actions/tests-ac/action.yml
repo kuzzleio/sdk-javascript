@@ -4,7 +4,6 @@ inputs:
   sdk-version:
     description: Javascript SDK version to use
     required: true
-
 runs:
   using: "composite"
   steps:
