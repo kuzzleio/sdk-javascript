@@ -4,6 +4,9 @@ inputs:
   sdk-version:
     description: Javascript SDK version to use
     required: true
+  cypress-key:
+    description: Cypress record key
+    required: true
 runs:
   using: "composite"
   steps:
@@ -24,8 +27,8 @@ runs:
       run: |
         cd /tmp/admin-console/test/e2e/run-test
         npm ci
-        cd ../
-        docker-compose -f stack-v2.yml up -d
         cd /tmp/admin-console
-        CYPRESS_RETRIES=5 npm run test:e2e
+        CYPRESS_RETRIES=5 npm run test:e2e -- --backend=2
+      env:
+        CYPRESS_RECORD_KEY: ${{ inputs.cypress-key }} 
       shell: bash

@@ -93,6 +93,7 @@ jobs:
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
+          cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   documentation-dead-links:
     name: Dead links
@@ -117,7 +118,7 @@ jobs:
       
   documentation-snippet-tests:
      name: Documentation Snippet Tests
-     needs: [documentation-dead-links, unit-tests]
+     needs: [unit-tests]
      runs-on: ubuntu-18.04
      steps:
        - uses: actions/checkout@v2

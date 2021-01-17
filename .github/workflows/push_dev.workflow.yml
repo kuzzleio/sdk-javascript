@@ -96,6 +96,7 @@ jobs:
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
+          cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   documentation-dead-links:
     name: Dead links
@@ -120,7 +121,7 @@ jobs:
       
   documentation-snippet-tests:
      name: Documentation Snippet Tests
-     needs: [documentation-dead-links, unit-tests]
+     needs: [unit-tests]
      runs-on: ubuntu-18.04
      steps:
        - uses: actions/checkout@v2
@@ -145,7 +146,7 @@ jobs:
   documentation-staging:
     name: Deployment Documentation to staging
     runs-on: ubuntu-18.04
-    needs: [functional-tests, admin-console-tests, documentation-snippet-tests]
+    needs: [functional-tests, admin-console-tests, documentation-snippet-tests, documentation-dead-links]
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
