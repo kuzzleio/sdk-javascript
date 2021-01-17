@@ -1,5 +1,5 @@
 name: auth#searchApiKeys-es
-description: Searches API keys for the currently loggued user.
+description: Searches API keys for the currently logged user.
 hooks:
   before: >
     curl --fail -H "Content-type: application/json" -d '{

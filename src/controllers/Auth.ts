@@ -2,6 +2,7 @@ import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
 import { JSONObject, ApiKey } from '../types';
+import { RequestPayload } from 'src/types/RequestPayload';
 
 /**
  * Auth controller
@@ -61,7 +62,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Creates a new API key for the currently loggued user.
+   * Creates a new API key for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/create-api-key
    *
@@ -93,18 +94,17 @@ export class AuthController extends BaseController {
 
   /**
    * Checks if an API action can be executed by the current user
-   * 
+   *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
+   *
    * @param requestPayload Request to check
    */
-  checkRights (
-    requestPayload: JSONObject
-  ): Promise<boolean> {
-
+  checkRights (requestPayload: RequestPayload): Promise<boolean> {
     const request = {
       body: requestPayload,
       action: 'checkRights'
     };
+
     return this.query(request)
       .then(response => response.result.allowed);
   }
@@ -130,7 +130,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Searches API keys for the currently loggued user.
+   * Searches API keys for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/search-api-keys
    *
@@ -276,7 +276,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
     return this.query({
@@ -456,7 +456,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   updateSelf (
     content: JSONObject,

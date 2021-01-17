@@ -2,7 +2,7 @@
 code: true
 type: page
 title: searchApiKeys
-description: Searches API keys for the currently loggued user.
+description: Searches API keys for the currently logged user.
 ---
 
 # searchApiKeys
@@ -11,7 +11,7 @@ description: Searches API keys for the currently loggued user.
 
 <SinceBadge version="Kuzzle 2.1.0" />
 
-Searches API keys for the currently loggued user.
+Searches API keys for the currently logged user.
 
 <br />
 
@@ -39,7 +39,7 @@ Koncorde filters will be translated into an Elasticsearch query.
 Koncorde `bool` operator and `regexp` clause are not supported for search queries.
 :::
 
-If left empty, the result will return all available API keys of the currently loggued user.
+If left empty, the result will return all available API keys of the currently logged user.
 
 ### options
 
