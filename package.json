@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.4.9",
+  "version": "7.5.0",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -30,6 +30,7 @@
     "build": "npm run build-ts && node build.js",
     "build-ts": "tsc --build tsconfig.json",
     "clean": "npm run build-ts | grep TSFILE | cut -d' ' -f 2 | xargs rm",
+    "dev": "node -r ts-node/register ",
     "doc": "docker-compose -f doc/docker-compose.yml up",
     "doc-testing": "bash .ci/test-docs.sh",
     "doc-prepare": "kuzdoc framework:install",
