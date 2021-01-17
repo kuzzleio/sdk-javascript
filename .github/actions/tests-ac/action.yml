@@ -19,6 +19,7 @@ runs:
     - name: Setup Admin console
       run: |
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
+        cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
         npm ci
         npm install kuzzle-sdk-v${{ inputs.sdk-version }}@$GITHUB_DIR
