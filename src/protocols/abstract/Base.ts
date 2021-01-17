@@ -7,8 +7,6 @@ import { PendingRequest } from './PendingRequest';
 import { JSONObject } from '../../types';
 import { RequestPayload } from '../../types/RequestPayload';
 
-const { hilightUserCode } = require('../../utils/stackTrace');
-
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;
   private _host: string;
@@ -146,8 +144,6 @@ Discarded request: ${JSON.stringify(request)}`));
           response.error.stack += '\n' + lines.join('\n');
           error = response.error;
         }
-
-        error.stack = error.stack.split('\n').map(hilightUserCode).join('\n');
 
         this.emit('queryError', error, request);
 
