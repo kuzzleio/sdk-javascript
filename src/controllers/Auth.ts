@@ -2,6 +2,7 @@ import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
 import { JSONObject, ApiKey } from '../types';
+import { RequestPayload } from 'src/types/RequestPayload';
 
 /**
  * Auth controller
@@ -92,7 +93,24 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Deletes an API key for the currently logged user.
+   * Checks if an API action can be executed by the current user
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
+   *
+   * @param requestPayload Request to check
+   */
+  checkRights (requestPayload: RequestPayload): Promise<boolean> {
+    const request = {
+      body: requestPayload,
+      action: 'checkRights'
+    };
+
+    return this.query(request)
+      .then(response => response.result.allowed);
+  }
+
+  /**
+   * Deletes an API key for the currently loggued user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
    *

@@ -49,6 +49,12 @@ export class Document {
    */
   _version?: number;
   /**
+   * If true, a new document was created,
+   * otherwise the document existed and was updated
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
+   */
+  created?: boolean;
+  /**
    * Document Content
    */
   _source: DocumentContent;

@@ -543,6 +543,10 @@ export class Kuzzle extends KuzzleEventEmitter {
       request.refresh = options.refresh;
     }
 
+    if (request.retryOnConflict === undefined && options.retryOnConflict !== undefined) {
+      request.retryOnConflict = options.retryOnConflict;
+    }
+
     if (! request.volatile) {
       request.volatile = this.volatile;
     }
