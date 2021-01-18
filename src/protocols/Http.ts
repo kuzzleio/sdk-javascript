@@ -2,7 +2,8 @@
 
 import staticHttpRoutes from './routes.json';
 import { KuzzleAbstractProtocol } from './abstract/Base';
-import { HttpRoutes, JSONObject, KuzzleRequest } from '../utils/interfaces';
+import { HttpRoutes, JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 /**
  * Http protocol used to connect to a Kuzzle server.
@@ -177,7 +178,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (request: KuzzleRequest, options: JSONObject = {}) {
+  send (request: RequestPayload, options: JSONObject = {}) {
     const route = this.routes[request.controller]
       && this.routes[request.controller][request.action];
 
@@ -296,7 +297,6 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         path = `/${path}`;
       }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
-
       const headers = payload.headers || {};
       headers['Content-Length'] = Buffer.byteLength(payload.body || '');
 
@@ -305,7 +305,13 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         body: payload.body,
         timeout: this._timeout
       })
-        .then(response => JSON.parse(response.body));
+        .then(response => {
+          if (response.statusCode === 431) {
+            throw new Error('Request query string is too large. Try to use the method with the POST verb instead.');
+          }
+
+          return JSON.parse(response.body);
+        });
     }
 
     // Browser implementation, using XMLHttpRequest:

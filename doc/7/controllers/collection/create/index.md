@@ -7,10 +7,10 @@ description: Create a new collection
 
 # create
 
-Creates a new [collection](/core/2/guides/essentials/store-access-data) in the provided index.
+Creates a new [collection](/core/2/guides/main-concepts/data-storage) in the provided index.
 
 You can also provide an optional data mapping that allow you to exploit the full capabilities of our
-persistent data storage layer, [ElasticSearch](https://www.elastic.co/elastic-stack) (check here the [mapping capabilities of ElasticSearch](/core/2/guides/essentials/database-mappings/)).
+persistent data storage layer, [ElasticSearch](https://www.elastic.co/elastic-stack) (check here the [mapping capabilities of ElasticSearch](/core/2/guides/main-concepts/data-storage)).
 
 This method will only update the mapping if the collection already exists.
 
@@ -38,7 +38,7 @@ create(index, collection, [definition], [options]);
 ### definition
 
 An object containings:
- - [collection mappings](/core/2/guides/essentials/database-mappings).
+ - [collection mappings](/core/2/guides/main-concepts/data-storage).
  - Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
 The mapping must have a root field `properties` that contain the mapping definition:
 
@@ -84,7 +84,7 @@ const mappings = {
 };
 ```
 
-More informations about database mappings [here](/core/2/guides/essentials/database-mappings).
+More informations about database mappings [here](/core/2/guides/main-concepts/data-storage).
 
 </DeprecatedBadge>
 

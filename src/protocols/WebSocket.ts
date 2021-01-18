@@ -2,7 +2,8 @@
 
 import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
-import { JSONObject, KuzzleRequest } from '../utils/interfaces';
+import { JSONObject } from '../types';
+import { RequestPayload } from '../types/RequestPayload';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -157,7 +158,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *
    * @param {Object} payload
    */
-  send (request: KuzzleRequest) {
+  send (request: RequestPayload) {
     if (this.client && this.client.readyState === this.client.OPEN) {
       this.client.send(JSON.stringify(request));
     }

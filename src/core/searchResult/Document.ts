@@ -1,5 +1,5 @@
 import { SearchResultBase } from './SearchResultBase';
-import { DocumentHit } from '../../utils/interfaces';
+import { DocumentHit } from '../../types';
 
 export class DocumentSearchResult extends SearchResultBase<DocumentHit> {
   /**

@@ -16,7 +16,7 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **VueJS**. We
 
 - **Node.js** >= 8.0.0 ([install here](https://nodejs.org/en/download/))
 - **Vue CLI** ([install here](https://cli.vuejs.org/guide/installation.html))
-- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
+- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/run-kuzzle))
 
 ## Prepare your environment
 
@@ -115,7 +115,7 @@ You can now add new messages to Kuzzle and receive the creation notification to 
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
-- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
+- learn more about Kuzzle [realtime engine](/core/2/guides/main-concepts/realtime-engine)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/main-concepts/permissions)
+- lean how to use Kuzzle [Admin Console](http://next-console.kuzzle.io) to manage your users and data
 - learn how to perform a [basic authentication](/sdk/js/7/controllers/auth/login)

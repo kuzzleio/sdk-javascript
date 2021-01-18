@@ -1,7 +1,8 @@
 import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
-import { JSONObject, ApiKey } from '../utils/interfaces';
+import { JSONObject, ApiKey } from '../types';
+import { RequestPayload } from 'src/types/RequestPayload';
 
 /**
  * Auth controller
@@ -61,7 +62,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Creates a new API key for the currently loggued user.
+   * Creates a new API key for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/create-api-key
    *
@@ -75,7 +76,7 @@ export class AuthController extends BaseController {
    */
   createApiKey(
     description: string,
-    options: { _id?: string, expiresIn?: number, refresh?: string } = {}
+    options: { _id?: string, expiresIn?: number, refresh?: 'wait_for' } = {}
   ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
@@ -92,6 +93,23 @@ export class AuthController extends BaseController {
   }
 
   /**
+   * Checks if an API action can be executed by the current user
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
+   *
+   * @param requestPayload Request to check
+   */
+  checkRights (requestPayload: RequestPayload): Promise<boolean> {
+    const request = {
+      body: requestPayload,
+      action: 'checkRights'
+    };
+
+    return this.query(request)
+      .then(response => response.result.allowed);
+  }
+
+  /**
    * Deletes an API key for the currently loggued user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
@@ -100,7 +118,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    */
-  deleteApiKey(id: string, options: { refresh?: string } = {}): Promise<null> {
+  deleteApiKey(id: string, options: { refresh?: 'wait_for' } = {}): Promise<null> {
     const request = {
       action: 'deleteApiKey',
       _id: id,
@@ -112,7 +130,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Searches API keys for the currently loggued user.
+   * Searches API keys for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/search-api-keys
    *
@@ -125,7 +143,7 @@ export class AuthController extends BaseController {
    */
   searchApiKeys(
     query: JSONObject = {},
-    options: { from?: number, size?: number } = {}
+    options: { from?: number, size?: number, lang?: string } = {}
   ): Promise<{
     /**
      * Array of found ApiKeys
@@ -140,6 +158,7 @@ export class AuthController extends BaseController {
       action: 'searchApiKeys',
       from: options.from,
       size: options.size,
+      lang: options.lang,
       body: query
     };
 
@@ -257,7 +276,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
     return this.query({
@@ -437,7 +456,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *
-   * @returns Currently loggued User
+   * @returns Currently logged User
    */
   updateSelf (
     content: JSONObject,

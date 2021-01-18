@@ -5,6 +5,7 @@ src/**/*.js.map
 src/Kuzzle.js
 src/KuzzleError.js
 src/controllers/Auth.js
+src/controllers/Bulk.js
 src/controllers/Document.js
 src/controllers/Realtime.js
 src/controllers/Index.js
@@ -18,7 +19,7 @@ src/protocols/abstract/Realtime.js
 src/protocols/Http.js
 src/protocols/WebSocket.js
 src/protocols/index.js
-src/utils/interfaces.js
+src/types/*.js
 src/core/KuzzleEventEmitter.js
 src/core/searchResult/SearchResultBase.js
 src/core/searchResult/Document.js

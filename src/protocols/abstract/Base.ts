@@ -4,7 +4,8 @@ import { KuzzleError } from '../../KuzzleError';
 import { uuidv4 } from '../../utils/uuidv4';
 import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
-import { KuzzleRequest, JSONObject } from '../../utils/interfaces';
+import { JSONObject } from '../../types';
+import { RequestPayload } from '../../types/RequestPayload';
 
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;
@@ -96,7 +97,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
   abstract connect (): Promise<any>
 
-  abstract send (request: KuzzleRequest, options: JSONObject): void
+  abstract send (request: RequestPayload, options: JSONObject): void
 
   /**
    * Called when the client's connection is established
@@ -130,7 +131,19 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        const error = new KuzzleError(response.error, stack);
+        let error;
+
+        // Wrap API error but directly throw errors that comes from SDK
+        if (response.error.id) {
+          error = new KuzzleError(response.error, stack);
+        }
+        else {
+          // Keep both stacktrace
+          const lines = stack.split('\n');
+          lines[0] = '';
+          response.error.stack += '\n' + lines.join('\n');
+          error = response.error;
+        }
 
         this.emit('queryError', error, request);
 

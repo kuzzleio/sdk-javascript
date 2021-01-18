@@ -1,7 +1,7 @@
 import { BaseController } from './Base';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { DocumentSearchResult } from '../core/searchResult/Document';
-import { JSONObject, Document, DocumentHit } from '../utils/interfaces';
+import { JSONObject, Document, DocumentHit } from '../types';
 
 export class DocumentController extends BaseController {
   constructor (kuzzle) {
@@ -61,7 +61,7 @@ export class DocumentController extends BaseController {
     collection: string,
     content: JSONObject,
     _id: string = null,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -96,7 +96,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -128,7 +128,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -152,6 +152,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
    * @returns The deleted documents IDs
    */
@@ -159,13 +160,14 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: string, lang?: string } = {}
   ): Promise<Array<string>> {
     const request = {
       index,
       collection,
       body: query,
-      action: 'deleteByQuery'
+      action: 'deleteByQuery',
+      lang: options.lang
     };
 
     return this.query(request, options)
@@ -190,7 +192,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -221,7 +223,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -261,7 +263,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -323,7 +325,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -376,7 +378,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -474,7 +476,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -540,7 +542,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: string, retryOnConflict?: number } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', retryOnConflict?: number } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -595,7 +597,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: string } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -635,6 +637,7 @@ export class DocumentController extends BaseController {
       from?: number;
       size?: number;
       scroll?: string;
+      lang?: string;
       verb?: string;
     } = {}
   ): Promise<SearchResult<DocumentHit>> {
@@ -665,7 +668,7 @@ export class DocumentController extends BaseController {
     else {
       request.body = body;
     }
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 
@@ -698,7 +701,7 @@ export class DocumentController extends BaseController {
     content: JSONObject,
     options: {
       queuable?: boolean,
-      refresh?: string,
+      refresh?: 'wait_for',
       retryOnConflict?: number,
       source?: boolean
     } = {}
@@ -729,6 +732,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `source` If true, returns the updated document inside the response
+   *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -737,7 +741,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: { refresh?: string, source?: boolean } = {}
+    options: { refresh?: 'wait_for', source?: boolean, lang?: string } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -766,6 +770,44 @@ export class DocumentController extends BaseController {
       collection,
       body: { query, changes },
       action: 'updateByQuery',
+      source: options.source,
+      lang: options.lang
+    };
+
+    return this.query(request, options)
+      .then(response => response.result);
+  }
+
+  /**
+   * Applies a partial update to an existing document.
+   * If the document doesn't already exist, a new document is created.
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/upsert/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Unique document identifier
+   * @param changes Partial content of the document to update
+   * @param [options]
+   *    - `defaults` Fields to add to the document if it gets created
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `source` If true, returns the updated document inside the response
+   *
+   * @returns Information about the updated document
+  */
+  upsert (
+    index: string,
+    collection: string,
+    _id: string,
+    changes: JSONObject,
+    options: {defaults?: JSONObject; refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
+  ): Promise<Document> {
+    const request = {
+      index,
+      collection,
+      _id,
+      body: { changes, defaults: options.defaults },
+      action: 'upsert',
       source: options.source
     };
 

@@ -3,7 +3,7 @@
 /**
  * Standard Kuzzle error.
  *
- * @see https://docs.kuzzle.io/core/2/api/essentials/error-handling/
+ * @see https://docs.kuzzle.io/core/2/api/errors/types/
  */
 export class KuzzleError extends Error {
   /**
@@ -49,10 +49,7 @@ export class KuzzleError extends Error {
     }
 
     if (stack) {
-      const lines = stack.split('\n');
-      lines[0] += apiError.message;
-      lines[3] = ' 🡆  ' + lines[3].trimStart();
-      this.stack = lines.join('\n');
+      this.stack = stack;
     }
 
     this.id = apiError.id;

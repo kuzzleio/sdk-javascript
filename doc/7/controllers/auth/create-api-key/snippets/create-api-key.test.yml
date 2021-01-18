@@ -1,5 +1,5 @@
 name: auth#createApiKey
-description: Creates a new API key for the currently loggued user.
+description: Creates a new API key for the currently logged user.
 hooks:
   before: >
     curl --fail -H "Content-type: application/json" -d '{

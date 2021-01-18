@@ -19,7 +19,7 @@ updateUserMapping(mapping, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `mapping` | <pre>object</pre> | User collection [mapping definition](/core/2/guides/essentials/database-mappings) |
+| `mapping` | <pre>object</pre> | User collection [mapping definition](/core/2/guides/main-concepts/data-storage) |
 | `options` | <pre>object</pre> | Query options |
 
 ### options

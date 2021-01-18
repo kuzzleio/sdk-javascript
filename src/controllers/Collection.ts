@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import { SpecificationsSearchResult } from '../core/searchResult/Specifications';
-import { CollectionMappings, JSONObject } from '../utils/interfaces';
+import { CollectionMappings, JSONObject } from '../types';
 
 export class CollectionController extends BaseController {
   constructor (kuzzle) {
@@ -13,7 +13,7 @@ export class CollectionController extends BaseController {
    * the full capabilities of our persistent data storage layer.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/collection/create/
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage
    *
    * @param index Index name
    * @param collection Collection name
@@ -292,7 +292,7 @@ export class CollectionController extends BaseController {
    * the full capabilities of our persistent data storage layer.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/collection/update/
-   * @see https://docs.kuzzle.io/core/2/guides/essentials/database-mappings/
+   * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage
    *
    * @param index Index name
    * @param collection Collection name

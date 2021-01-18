@@ -40,6 +40,23 @@ class SecurityController extends BaseController {
   }
 
   /**
+   * Checks if an API action can be executed by a user
+   *
+   * @param {String} kuid - User kuid
+   * @param {Object} requestPayload - Request to check
+   */
+  checkRights (kuid, requestPayload) {
+    const request = {
+      userId: kuid,
+      body: requestPayload,
+      action: 'checkRights'
+    };
+
+    return this.query(request)
+      .then(response => response.result.allowed);
+  }
+
+  /**
    * Deletes an user API key.
    *
    * @param {String} userId - User kuid
@@ -75,6 +92,7 @@ class SecurityController extends BaseController {
       action: 'searchApiKeys',
       from: options.from,
       size: options.size,
+      lang: options.lang,
       body: query
     };
 
@@ -423,7 +441,7 @@ class SecurityController extends BaseController {
       body,
       action: 'searchUsers'
     };
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 

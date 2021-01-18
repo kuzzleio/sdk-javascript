@@ -1,0 +1,20 @@
+name: auth#searchApiKeys-koncorde
+description: Searches API keys for the currently logged user.
+hooks:
+  before: >
+    curl --fail -H "Content-type: application/json" -d '{
+      "content": {
+        "profileIds": ["default"]
+      },
+      "credentials": {
+        "local": {
+          "username": "jared.doe",
+          "password": "password"
+        }
+      }
+    }' "kuzzle:7512/users/jared.doe/_create?refresh=wait_for"
+  after:
+    curl -XDELETE kuzzle:7512/users/jared.doe
+template: default
+expected:
+  - Found 2 API keys.

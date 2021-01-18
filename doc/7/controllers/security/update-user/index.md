@@ -19,7 +19,7 @@ updateUser(kuid, body, [options]);
 
 | Property | Type | Description |
 |--- |--- |--- |
-| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | User content |
 | `options` | <pre>object</pre> | Query options |
 
@@ -50,7 +50,7 @@ Example:
 
 ## Resolves
 
-A [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the updated user.
+A [`User`](sdk/js/7/core-classes/user/introduction) object containing information about the updated user.
 
 ## Usage
 

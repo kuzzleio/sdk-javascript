@@ -95,7 +95,8 @@ describe('Auth Controller', () => {
         action: 'searchApiKeys',
         body: { match: {} },
         from: 1,
-        size: 2
+        size: 2,
+        lang: undefined
       });
 
       should(result).be.eql({ hits: [1, 2] });

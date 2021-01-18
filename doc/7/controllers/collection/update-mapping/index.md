@@ -12,9 +12,9 @@ description: Update the collection mapping
 
 __Use [collection:update](/sdk/js/7/controllers/collection/update/) instead.__
 
-You can define the collection [dynamic mapping policy](/core/2/guides/essentials/database-mappings#dynamic-mapping-policy) by setting the `dynamic` field to the desired value.
+You can define the collection [dynamic mapping policy](/core/2/guides/main-concepts/data-storage#mappings-dynamic-policy) by setting the `dynamic` field to the desired value.
 
-You can define [collection additional metadata](/core/2/guides/essentials/database-mappings#collection-metadata) within the `_meta` root field.
+You can define [collection additional metadata](/core/2/guides/main-concepts/data-storage#mappings-metadata) within the `_meta` root field.
 
 <br/>
 
@@ -50,7 +50,7 @@ const mapping = {
 };
 ```
 
-More informations about database mappings [here](/core/2/guides/essentials/database-mappings).
+More informations about database mappings [here](/core/2/guides/main-concepts/data-storage).
 
 ### options
 

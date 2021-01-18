@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import Room from '../core/Room';
-import { Notification, JSONObject } from '../utils/interfaces';
+import { Notification, JSONObject } from '../types';
 
 /**
  * Enum for `scope` option of realtime.subscribe method
@@ -124,7 +124,7 @@ export class RealtimeController extends BaseController {
    *
    * @param index Index name
    * @param collection Collection name
-   * @param filters Optional subscription filters (@see https://docs.kuzzle.io/core/2/guides/cookbooks/realtime-api)
+   * @param filters Optional subscription filters (@see https://docs.kuzzle.io/core/2/api/koncorde-filters-syntax)
    * @param callback Callback function to handle notifications
    * @param options Additional options
    *    - `scope` Subscribe to document entering or leaving the scope. (default: 'all')

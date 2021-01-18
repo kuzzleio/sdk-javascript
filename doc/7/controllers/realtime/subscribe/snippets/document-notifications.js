@@ -9,6 +9,7 @@ function callback (notification) {
     collection: 'yellow-taxi',
     controller: 'document',
     action: 'create',
+    event: 'write',
     protocol: 'websocket',
     scope: 'in',
     result:

@@ -87,7 +87,8 @@ describe('Security Controller', () => {
         userId: 'kuid',
         body: { match: {} },
         from: 1,
-        size: 2
+        size: 2,
+        lang: undefined
       });
 
       should(result).be.eql({ hits: [1, 2] });
@@ -1108,7 +1109,8 @@ describe('Security Controller', () => {
               body: {foo: 'bar'},
               from: undefined,
               size: undefined,
-              scroll: undefined
+              scroll: undefined,
+              lang: undefined
             }, options);
 
           should(res).be.an.instanceOf(UserSearchResult);
@@ -1139,7 +1141,8 @@ describe('Security Controller', () => {
               body: {foo: 'bar'},
               from: 1,
               size: 2,
-              scroll: '10s'
+              scroll: '10s',
+              lang: undefined
             }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(UserSearchResult);

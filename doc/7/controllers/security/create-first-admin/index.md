@@ -19,7 +19,7 @@ createFirstAdmin(kuid, body, [options]);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `kuid` | <pre>string</pre> | Administrator [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid) |
+| `kuid` | <pre>string</pre> | Administrator [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid) |
 | `body` | <pre>object</pre> | Administrator content &amp; credentials |
 | `options` | <pre>object</pre> | Query options |
 
@@ -59,7 +59,7 @@ Example:
 
 ## Resolves
 
-A [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the newly created administrator.
+A [`User`](sdk/js/7/core-classes/user/introduction) object containing information about the newly created administrator.
 
 ## Usage
 

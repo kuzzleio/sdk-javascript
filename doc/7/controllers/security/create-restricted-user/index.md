@@ -10,7 +10,7 @@ description: Creates a new user in Kuzzle, with a preset list of security profil
 Creates a new user in Kuzzle, with a preset list of security profiles.
 
 The list of security profiles attributed to restricted users is fixed, and must be configured in the 
-[Kuzzle configuration file](/core/2/guides/essentials/configuration).
+[Kuzzle configuration file](/core/2/guides/advanced/configuration).
 
 This method allows users with limited rights to create other accounts, but blocks them from creating accounts with unwanted privileges (e.g. an anonymous user creating his own account).
 
@@ -25,7 +25,7 @@ createRestrictedUser(body, [kuid], [options]);
 | Property | Type | Description |
 |--- |--- |--- |
 | `body` | <pre>object</pre> | User content &amp; credentials |
-| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/essentials/user-authentication#kuzzle-user-identifier-kuid). If not provided, a random kuid is automatically generated |
+| `kuid` | <pre>string</pre> | User [kuid](/core/2/guides/main-concepts/authentication#kuzzle-user-identifier-kuid). If not provided, a random kuid is automatically generated |
 | `options` | <pre>object</pre> | Query options |
 
 
@@ -64,7 +64,7 @@ Example:
 
 ## Resolves
 
-A [`User`](sdk/js/6/core-classes/user/introduction) object containing information about the newly created user.
+A [`User`](sdk/js/7/core-classes/user/introduction) object containing information about the newly created user.
 
 ## Usage
 

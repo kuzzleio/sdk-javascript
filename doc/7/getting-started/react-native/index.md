@@ -15,7 +15,7 @@ This section deals with **Kuzzle V2** (+ **Javascript SDK 7**) and **React Nativ
 ## Requirements
 
 - **Node.js** >= 12.0.0 ([install here](https://nodejs.org/en/download/))
-- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/running-kuzzle))
+- **Running Kuzzle V2 Stack** ([instructions here](/core/2/guides/getting-started/run-kuzzle))
 - **Expo CLI** ([install here](https://docs.expo.io/get-started/installation))
 
 "[Expo](https://docs.expo.io/versions/latest/) is a framework and a platform for universal React applications. It is a set of tools and services built around React Native and native platforms that help you develop, build, deploy, and quickly iterate on iOS, Android, and web apps from the same JavaScript/TypeScript codebase."
@@ -196,7 +196,7 @@ You can now add new messages to Kuzzle and receive the creation notification to 
 Now that you're more familiar with Kuzzle, dive even deeper to learn how to leverage its full capabilities:
 
 - discover what this SDK has to offer by browsing other sections of this documentation
-- learn more about Kuzzle [realtime engine](/core/2/guides/essentials/real-time)
-- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/essentials/security)
-- lean how to use Kuzzle [Admin Console](/core/2/guides/essentials/admin-console) to manage your users and data
+- learn more about Kuzzle [realtime engine](/core/2/guides/main-concepts/realtime-engine)
+- follow our guide to learn how to [manage users, and how to set up fine-grained access control](/core/2/guides/main-concepts/permissions)
+- lean how to use Kuzzle [Admin Console](http://next-console.kuzzle.io) to manage your users and data
 - learn how to perform a [basic authentication](/sdk/js/7/controllers/auth/login)

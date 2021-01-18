@@ -1,4 +1,4 @@
-name: document#search
+name: document#search-with-es
 description: Search for documents
 hooks:
   before: |
