@@ -40,24 +40,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     return Promise.resolve();
   }
 
-  
-  /**
-   * Terminate the connection if the server does not respond
-   */
-
-  heartbeat (client) {
-    clearTimeout(this.pingTimeout);
-
-    this.pingTimeout = setTimeout(() => {
-      /** 
-       *  Use `WebSocket#terminate()`, which immediately destroys the connection,
-       *  instead of `WebSocket#close()`, which waits for the close timer.
-       */ 
-      client.terminate();
-      this.state = 'offline';
-    }, this._pingInterval);
-  }
-
   /**
    * Called when the client's connection is established
    */
@@ -75,6 +57,8 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   clientDisconnected () {
     this.clear();
     this.emit('disconnect');
+    clearInterval(this._pingInterval);
+    clearTimeout(this.pingTimeout);
   }
 
   /**

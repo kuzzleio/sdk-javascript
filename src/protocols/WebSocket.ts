@@ -4,6 +4,8 @@ import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
+// import { exec } from 'child_process';
+import * as child from 'child_process';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -85,17 +87,28 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client = new this.WebSocketClient(url, this.options);
 
-      this.client.onping = () => {
-        this.heartbeat(this.client);
-      };
-
-      this.client.onpong = () => {
-        return resolve();
-      };
-
       this.client.onopen = () => {
         this.clientConnected();
-        this.heartbeat(this.client);
+        setInterval(() => { 
+          child.exec(`ping -c 1 ${url}`, null, (err, stdout, stderr) => {
+            if(err) {
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log(stderr);
+            } else {
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log('=================');
+              console.log(stdout);
+            }
+          }), this._pingInterval});
         return resolve();
       };
 
@@ -160,7 +173,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.emit('queryError', error, data);
         }
       };
-      clearTimeout(this.pingTimeout);
     });
   }
 
