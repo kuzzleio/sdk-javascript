@@ -4,8 +4,6 @@ import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
-// import { exec } from 'child_process';
-import * as child from 'child_process';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -24,6 +22,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
    *    - `pingInterval` Number of milliseconds between two pings (default: `30000`)
+   *    - `pongTimeout` Number of milliseconds before the connection terminates if Kuzzle does not respond (default: `10000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
@@ -34,6 +33,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       headers?: JSONObject;
       reconnectionDelay?: number;
       pingInterval?: number;
+      pongTimeout?: number;
       /**
        * @deprecated Use `ssl` instead
        */
@@ -89,26 +89,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client.onopen = () => {
         this.clientConnected();
-        setInterval(() => { 
-          child.exec(`ping -c 1 ${url}`, null, (err, stdout, stderr) => {
-            if(err) {
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log(stderr);
-            } else {
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log('=================');
-              console.log(stdout);
-            }
-          }), this._pingInterval});
+        this.heartbeat(this.client);
         return resolve();
       };
 
@@ -161,10 +142,20 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.onmessage = payload => {
         const data = JSON.parse(payload.data || payload);
 
+        /**
+         * We need to decode the frame and retrieve the opCode
+         * Pongs have an opCode of 0xA
+         */
+        if (data instanceof ArrayBuffer) {
+          const opCode = data[0] & 0x0F;
+            if (opCode == 0xA) {
+            clearTimeout(this.pongTimeoutId);
+          }
+        }
         // for responses, data.room == requestId
         if (data.room) {
           this.emit(data.room, data);
-        }
+        } // check if it's a pong response
         else {
           // @deprecated
           this.emit('discarded', data);
@@ -199,6 +190,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
     super.close();
   }
 }

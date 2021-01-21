@@ -32,8 +32,9 @@ WebSocket protocol connection options.
 | `autoReconnect`     | <pre>boolean</pre><br/>(`true`)  | Automatically reconnect to kuzzle after a `disconnected` event                               |
 | `port`              | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                                                                           |
 | `headers`           | <pre>object</pre>(`{}`)          | Connection custom HTTP headers (e.g. origin, subprotocols, ...)<br/>**(Not supported by browsers)** |
-| `reconnectionDelay` | <pre>number</pre><br/>(`1000`)   | Number of milliseconds between reconnection attempts                                         |
 | `pingInterval` | <pre>number</pre><br/>(`30000`)   | Number of milliseconds between two pings                                         |
+| `pongTimeout`  | <pre>number</pre><br/>(`10000`)  | Number of milliseconds before the connection terminates if Kuzzle does not respond |
+| `reconnectionDelay` | <pre>number</pre><br/>(`1000`)   | Number of milliseconds between reconnection attempts                                         |
 | `sslConnection`     | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server   <DeprecatedBadge version="7.4.0"/>   |
 | `ssl`     | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server. Defaults to `true` for ports 443 and 7443.   |
 
