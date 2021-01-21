@@ -2,7 +2,7 @@ import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
 import { JSONObject, ApiKey } from '../types';
-import { RequestPayload } from 'src/types/RequestPayload';
+import { RequestPayload } from '../types/RequestPayload';
 
 /**
  * Auth controller
@@ -17,7 +17,7 @@ export class AuthController extends BaseController {
    * constructor
    * @param kuzzle
    */
-  constructor (kuzzle) {
+  constructor(kuzzle) {
     super(kuzzle, 'auth');
 
     this._authenticationToken = null;
@@ -30,11 +30,11 @@ export class AuthController extends BaseController {
   /**
    *  Authentication token in use
    */
-  get authenticationToken (): any | null {
+  get authenticationToken(): any | null {
     return this._authenticationToken;
   }
 
-  set authenticationToken (encodedJwt: any) {
+  set authenticationToken(encodedJwt: any) {
     if (encodedJwt === undefined || encodedJwt === null) {
       this._authenticationToken = null;
     }
@@ -50,10 +50,10 @@ export class AuthController extends BaseController {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wishes to verify their token
    */
-  authenticateRequest (request: any) {
-    if ( !this.authenticationToken
+  authenticateRequest(request: any) {
+    if (!this.authenticationToken
       || (request.controller === 'auth'
-      && (request.action === 'checkToken' || request.action === 'login'))
+        && (request.action === 'checkToken' || request.action === 'login'))
     ) {
       return;
     }
@@ -99,7 +99,7 @@ export class AuthController extends BaseController {
    *
    * @param requestPayload Request to check
    */
-  checkRights (requestPayload: RequestPayload): Promise<boolean> {
+  checkRights(requestPayload: RequestPayload): Promise<boolean> {
     const request = {
       body: requestPayload,
       action: 'checkRights'
@@ -175,7 +175,7 @@ export class AuthController extends BaseController {
    *
    * @returns A token validity object
    */
-  checkToken (token?: string): Promise<{
+  checkToken(token?: string): Promise<{
     /**
      * Tell if the token is valid or not
      */
@@ -213,7 +213,7 @@ export class AuthController extends BaseController {
    * @returns An object representing the new credentials.
    *    The content depends on the authentication strategy
    */
-  createMyCredentials (
+  createMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: { queuable?: boolean } = {}
@@ -237,7 +237,7 @@ export class AuthController extends BaseController {
    *
    * @returns A boolean indicating if the credentials exists
    */
-  credentialsExist (
+  credentialsExist(
     strategy: string,
     options: { queuable?: boolean } = {}
   ): Promise<boolean> {
@@ -257,7 +257,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    */
-  deleteMyCredentials (
+  deleteMyCredentials(
     strategy: string,
     options: { queuable?: boolean } = {}
   ): Promise<boolean> {
@@ -278,7 +278,7 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
+  getCurrentUser(options: { queuable?: boolean } = {}): Promise<User> {
     return this.query({
       action: 'getCurrentUser'
     }, options)
@@ -321,7 +321,7 @@ export class AuthController extends BaseController {
    *
    * @returns An array containing user rights objects
    */
-  getMyRights (
+  getMyRights(
     options: { queuable?: boolean } = {}
   ): Promise<Array<{
     /**
@@ -361,7 +361,7 @@ export class AuthController extends BaseController {
    *
    * @returns An array of available strategies names
    */
-  getStrategies (options: { queuable?: boolean } = {}): Promise<Array<string>> {
+  getStrategies(options: { queuable?: boolean } = {}): Promise<Array<string>> {
     return this.query({
       action: 'getStrategies'
     }, options)
@@ -380,10 +380,10 @@ export class AuthController extends BaseController {
    *
    * @returns The encrypted JSON Web Token
    */
-  login (
+  login(
     strategy: string,
     credentials: JSONObject,
-    expiresIn?: string|number
+    expiresIn?: string | number
   ): Promise<string> {
     const request = {
       strategy,
@@ -392,16 +392,16 @@ export class AuthController extends BaseController {
       action: 'login'
     };
 
-    return this.query(request, {queuable: false, verb: 'POST'})
+    return this.query(request, { queuable: false, verb: 'POST' })
       .then(response => {
         this._authenticationToken = new Jwt(response.result.jwt);
 
-        this.kuzzle.emit('loginAttempt', {success: true});
+        this.kuzzle.emit('loginAttempt', { success: true });
 
         return response.result.jwt;
       })
       .catch(err => {
-        this.kuzzle.emit('loginAttempt', {success: false, error: err.message});
+        this.kuzzle.emit('loginAttempt', { success: false, error: err.message });
         throw err;
       });
   }
@@ -411,7 +411,7 @@ export class AuthController extends BaseController {
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/logout
    */
-  logout (): Promise<void> {
+  logout(): Promise<void> {
     return this.query({
       action: 'logout'
     }, { queuable: false })
@@ -433,7 +433,7 @@ export class AuthController extends BaseController {
    * @returns An object representing the updated credentials.
    *    The content depends on the authentication strategy
    */
-  updateMyCredentials (
+  updateMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: { queuable?: boolean } = {}
@@ -458,7 +458,7 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  updateSelf (
+  updateSelf(
     content: JSONObject,
     options: { queuable?: boolean } = {}
   ): Promise<User> {
@@ -482,7 +482,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    */
-  validateMyCredentials (
+  validateMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: { queuable?: boolean } = {}
@@ -507,7 +507,7 @@ export class AuthController extends BaseController {
    * @returns The refreshed token
    */
   refreshToken(
-    options: { queuable?: boolean, expiresIn?: number|string } = {}
+    options: { queuable?: boolean, expiresIn?: number | string } = {}
   ): Promise<{
     /**
      * Token unique ID
