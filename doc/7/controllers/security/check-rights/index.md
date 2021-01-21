@@ -8,7 +8,7 @@ description: Checks if an API action can be executed by a user
 # checkRights
 
 <SinceBadge version="2.8.0"/>
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.5.0"/>
 Checks if the provided API request can be executed by a user.
 
 ---
