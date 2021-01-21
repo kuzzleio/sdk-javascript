@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.5.0",
+  "version": "7.5.1",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -62,7 +62,7 @@
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^4.0.2",
     "https-browserify": "^1.0.0",
-    "kuzdoc": "^1.4.3",
+    "kuzdoc": "^1.4.4",
     "lolex": "^6.0.0",
     "mocha": "8.2.1",
     "mock-require": "^3.0.3",

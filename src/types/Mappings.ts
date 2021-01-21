@@ -6,15 +6,13 @@ export type MappingsProperties = {
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-properties
    */
-  properties?: MappingsProperties,
+  properties?: MappingsProperties | JSONObject,
   /**
    * Dynamic mapping policy
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-dynamic-policy
    */
   dynamic?: 'true' | 'false' | 'strict'
-
-  [property: string]: JSONObject | string;
 }
 
 /**
