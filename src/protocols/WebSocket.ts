@@ -145,17 +145,18 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
          * We need to decode the frame and retrieve the opCode
          * Pongs have an opCode of 0xA
+         * https://tools.ietf.org/html/rfc6455#section-5.5.2
          */
         if (data instanceof ArrayBuffer) {
           const opCode = data[0] & 0x0F;
-            if (opCode == 0xA) {
+            if (opCode === 0xA) {
             clearTimeout(this.pongTimeoutId);
           }
         }
         // for responses, data.room == requestId
         if (data.room) {
           this.emit(data.room, data);
-        } // check if it's a pong response
+        }
         else {
           // @deprecated
           this.emit('discarded', data);
