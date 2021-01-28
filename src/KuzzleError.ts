@@ -1,6 +1,6 @@
 'use strict';
 
-const { hilightUserCode } = require('./utils/stackTrace');
+import { hilightUserCode } from './utils/stackTrace';
 
 /**
  * Standard Kuzzle error.
