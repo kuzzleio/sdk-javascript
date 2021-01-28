@@ -17,21 +17,22 @@ The optional parameter `refresh` can be used with the value `wait_for` in order 
 mDelete(index, collection, ids, [options]);
 ```
 
-| Argument     | Type            | Description                    |
-| ------------ | --------------- | ------------------------------ |
-| `index`      | <pre>string</pre>        | Index name                     |
-| `collection` | <pre>string</pre>        | Collection name                |
+| Argument     | Type                | Description                    |
+|--------------|---------------------|--------------------------------|
+| `index`      | <pre>string</pre>   | Index name                     |
+| `collection` | <pre>string</pre>   | Collection name                |
 | `ids`        | <pre>string[]</pre> | IDs of the documents to delete |
-| `options`    | <pre>object</pre>        | Query options                  |
+| `options`    | <pre>object</pre>   | Query options                  |
 
 ### Options
 
 Additional query options
 
-| Options    | Type<br/>(default)     | Description                                                                        |
-| ---------- | ---------------------- | ---------------------------------------------------------------------------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again       |
-| `refresh`  | `string`<br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
+| Options    | Type<br/>(default)               | Description                                                                              |
+|------------|----------------------------------|------------------------------------------------------------------------------------------|
+| `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again             |
+| `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)       |
+| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/> |
 
 ## Resolves
 
@@ -41,10 +42,10 @@ The `successes` array contain the successfuly deleted document IDs.
 
 Each deletion error is an object of the `errors` array with the following properties:
 
-| Name      | Type              | Description                                            |
-| --------- | ----------------- | ------------------------------------------------------ |
-| `id`  | <pre>string</pre> | Document ID                                      |
-| `reason`  | <pre>string</pre> | Human readable reason |
+| Name     | Type              | Description           |
+|----------|-------------------|-----------------------|
+| `id`     | <pre>string</pre> | Document ID           |
+| `reason` | <pre>string</pre> | Human readable reason |
 
 ## Usage
 

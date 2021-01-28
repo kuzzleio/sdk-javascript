@@ -33,8 +33,9 @@ Additional query options
 | Options           | Type<br/>(default)     | Description                                                                        |
 | ----------------- | ---------------------- | ---------------------------------------------------------------------------------- |
 | `queuable`        | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again       |
-| `refresh`         | `string`<br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
-| `retryOnConflict` | `int`<br/>(`0`)        | The number of times the database layer should retry in case of version conflict    |
+| `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
+| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/> |
+| `retryOnConflict` | <pre>int</pre><br/>(`0`)        | The number of times the database layer should retry in case of version conflict    |
 
 ## Resolves
 

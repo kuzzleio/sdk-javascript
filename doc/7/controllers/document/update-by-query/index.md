@@ -28,13 +28,13 @@ An empty or null query will match all documents in the collection.
 updateByQuery(index, collection, searchQuery, changes, [options])
 ```
 
-| Argument           | Type                                         | Description     |
-| ------------------ | -------------------------------------------- | --------------- |
-| `index`            | <pre>string</pre>                            | Index name      |
-| `collection`       | <pre>string</pre>                            | Collection name |
-| `searchQuery`      | <pre>object</pre> | Query to match  |
-| `changes`          | <pre>object</pre> | Partial changes to apply to the documents |
-| `options`          | <pre>object</pre> | Optional parameters               |
+| Argument      | Type              | Description                               |
+|---------------|-------------------|-------------------------------------------|
+| `index`       | <pre>string</pre> | Index name                                |
+| `collection`  | <pre>string</pre> | Collection name                           |
+| `searchQuery` | <pre>object</pre> | Query to match                            |
+| `changes`     | <pre>object</pre> | Partial changes to apply to the documents |
+| `options`     | <pre>object</pre> | Optional parameters                       |
 
 ---
 
@@ -42,31 +42,32 @@ updateByQuery(index, collection, searchQuery, changes, [options])
 
 Additional query options.
 
-| Options           | Type<br/>(default)              | Description                                                                        |
-| ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
-| `refresh`         | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s) |
-| `source`          | <pre>boolean</pre><br/>(`false`)| If true, returns the updated document inside the response
-| `lang`            | <pre>string</pre>               | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
+| Options   | Type<br/>(default)               | Description                                                                                                                        |
+|-----------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| `refresh` | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                                 |
+| `silent`  | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/>                                           |
+| `source`  | <pre>boolean</pre><br/>(`false`) | If true, returns the updated document inside the response                                                                          |
+| `lang`    | <pre>string</pre>                | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 ## Resolves
 
 Returns an object containing 2 arrays: `successes` and `errors`
 
 Each updated document is an object of the `successes` array with the following properties:
 
-| Property     | Type                                         | Description                      |
-|------------- |--------------------------------------------- |--------------------------------- |
-| `_source`    | <pre>object<String, Object></pre> | Updated document (if `source` option set to true)  |
-| `_id`        | <pre>string</pre>                            | ID of the udated document                   |
-| `_version`   | <pre>number</pre>                           | Version of the document in the persistent data storage |
-| `status`     | <pre>number</pre>                           | HTTP status code |
+| Property   | Type                              | Description                                            |
+|------------|-----------------------------------|--------------------------------------------------------|
+| `_source`  | <pre>object<String, Object></pre> | Updated document (if `source` option set to true)      |
+| `_id`      | <pre>string</pre>                 | ID of the udated document                              |
+| `_version` | <pre>number</pre>                 | Version of the document in the persistent data storage |
+| `status`   | <pre>number</pre>                 | HTTP status code                                       |
 
 Each errored document is an object of the `errors` array with the following properties:
 
-| Property     | Type                                         | Description                      |
-|------------- |--------------------------------------------- |--------------------------------- |
-| `document`   | <pre>object<String, Object></pre> | Document that causes the error   |
-| `status`     | <pre>number</pre>                           | HTTP error status                |
-| `reason`     | <pre>string</pre>                            | Human readable reason |
+| Property   | Type                              | Description                    |
+|------------|-----------------------------------|--------------------------------|
+| `document` | <pre>object<String, Object></pre> | Document that causes the error |
+| `status`   | <pre>number</pre>                 | HTTP error status              |
+| `reason`   | <pre>string</pre>                 | Human readable reason          |
 
 ## Usage
 
