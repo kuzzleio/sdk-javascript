@@ -187,7 +187,7 @@ describe('Common Protocol', () => {
           should(error.status).be.eql(442);
           should(error.stack).match(/you are the bug/);
           should(error.stack).match(/KuzzleAbstractProtocol/);
-          should(error.stack).match(/>    at Context.<anonymous>/);
+          should(error.stack).match(/>\s{4}at Context.<anonymous>/);
         });
     });
 
@@ -214,7 +214,7 @@ describe('Common Protocol', () => {
           should(error.status).be.eql(206);
           should(error.stack).match(/you are the bug/);
           should(error.stack).match(/KuzzleAbstractProtocol/);
-          should(error.stack).match(/>    at Context.<anonymous>/);
+          should(error.stack).match(/>\s{4}at Context.<anonymous>/);
           should(error.errors).be.an.Array();
           should(error.errors.length).eql(2);
           should(error.count).eql(42);
