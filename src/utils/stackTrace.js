@@ -18,7 +18,6 @@ function hilightUserCode (line) {
   if ( line.includes('sdk-javascript/src/') // ignore kuzzle code
     || (line.indexOf('at /') === -1 && line.charAt(line.indexOf('(') + 1) !== '/') // ignore node internal
     || line.includes('node_modules') // ignore dependencies
-    // @todo ignore in browser
   ) {
     return '   ' + line;
   }

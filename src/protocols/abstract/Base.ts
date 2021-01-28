@@ -136,18 +136,17 @@ Discarded request: ${JSON.stringify(request)}`));
         let error;
 
         // Wrap API error but directly throw errors that comes from SDK
-        if (response.error.id) {
-          error = new KuzzleError(response.error, stack);
+        if (response.error.status) {
+          error = new KuzzleError(response.error, stack, this.constructor.name);
         }
         else {
-          // Keep both stacktrace
+          // Keep both stacktrace because the one we captured in "stack" will give
+          // more information (async stacktrace are not very talkative)
           const lines = stack.split('\n');
           lines[0] = '';
           response.error.stack += '\n' + lines.join('\n');
           error = response.error;
         }
-
-        error.stack = error.stack.split('\n').map(hilightUserCode).join('\n');
 
         this.emit('queryError', error, request);
 
