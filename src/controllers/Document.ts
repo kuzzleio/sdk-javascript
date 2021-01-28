@@ -69,7 +69,8 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'create'
+      action: 'create',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -105,7 +106,8 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'createOrReplace'
+      action: 'createOrReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -137,7 +139,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'delete'
+      action: 'delete',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -176,7 +179,8 @@ export class DocumentController extends BaseController {
       collection,
       body: query,
       action: 'deleteByQuery',
-      lang: options.lang
+      lang: options.lang,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -303,7 +307,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreate'
+      action: 'mCreate',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -366,7 +371,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreateOrReplace'
+      action: 'mCreateOrReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -415,8 +421,9 @@ export class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {ids},
-      action: 'mDelete'
+      body: { ids },
+      action: 'mDelete',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -456,7 +463,7 @@ export class DocumentController extends BaseController {
       index,
       collection,
       action: 'mGet',
-      body: { ids }
+      body: { ids },
     };
 
     return this.query(request, options)
@@ -519,7 +526,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mReplace'
+      action: 'mReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -590,8 +598,9 @@ export class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {documents},
-      action: 'mUpdate'
+      body: { documents },
+      action: 'mUpdate',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -626,7 +635,8 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'replace'
+      action: 'replace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -737,7 +747,8 @@ export class DocumentController extends BaseController {
       body: content,
       action: 'update',
       retryOnConflict: options.retryOnConflict,
-      source: options.source
+      source: options.source,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -801,7 +812,8 @@ export class DocumentController extends BaseController {
       body: { query, changes },
       action: 'updateByQuery',
       source: options.source,
-      lang: options.lang
+      lang: options.lang,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -845,7 +857,8 @@ export class DocumentController extends BaseController {
       _id,
       body: { changes, defaults: options.defaults },
       action: 'upsert',
-      source: options.source
+      source: options.source,
+      silent: options.silent,
     };
 
     return this.query(request, options)
