@@ -41,11 +41,11 @@ Additional query options
 
 | Options    | Type<br/>(default)               | Description                                                                                                                        |
 |------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| `lang`     | <pre>string</pre>                | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 | `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again                                                       |
 | `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                                 |
 | `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/>                                           |
 | `source`   | <pre>boolean</pre>               | if set to `true` Kuzzle will return each deleted document body in the response                                                     |
-| `lang`     | <pre>string</pre>                | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 
 ## Resolves
 

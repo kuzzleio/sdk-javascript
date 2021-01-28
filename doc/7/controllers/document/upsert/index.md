@@ -32,8 +32,8 @@ Additional query options
 |-------------------|----------------------------------|------------------------------------------------------------------------------------------|
 | `defaults`        | <pre>object</pre><br/>(`{}`)     | Fields to add to the document if it gets created                                         |
 | `refresh`         | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)       |
-| `silent`          | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/> |
 | `retryOnConflict` | <pre>int</pre><br/>(`10`)        | The number of times the database layer should retry in case of version conflict          |
+| `silent`          | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="change-me"/> |
 | `source`          | <pre>boolean</pre><br/>(`false`) | If true, returns the updated document inside the response                                |
 
 ## Resolves
