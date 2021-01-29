@@ -53,6 +53,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The created document
    */
@@ -61,14 +62,15 @@ export class DocumentController extends BaseController {
     collection: string,
     content: JSONObject,
     _id: string = null,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
       body: content,
-      action: 'create'
+      action: 'create',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -88,6 +90,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The created or replaced document
    */
@@ -96,14 +99,15 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
       body: content,
-      action: 'createOrReplace'
+      action: 'createOrReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -121,6 +125,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The document ID
    */
@@ -128,13 +133,14 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<number> {
     const request = {
       index,
       collection,
       _id,
-      action: 'delete'
+      action: 'delete',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -152,6 +158,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
    * @returns The deleted documents IDs
@@ -160,14 +167,20 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: string, lang?: string } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: string,
+      silent?: boolean,
+      lang?: string
+    } = {}
   ): Promise<Array<string>> {
     const request = {
       index,
       collection,
       body: query,
       action: 'deleteByQuery',
-      lang: options.lang
+      lang: options.lang,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -185,6 +198,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns True if the document exists
    */
@@ -192,7 +206,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -216,6 +230,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The document
    */
@@ -223,7 +238,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -247,6 +262,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -263,7 +279,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -291,7 +307,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreate'
+      action: 'mCreate',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -309,6 +326,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -325,7 +343,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -353,7 +371,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreateOrReplace'
+      action: 'mCreateOrReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -371,6 +390,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -378,7 +398,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -401,8 +421,9 @@ export class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {ids},
-      action: 'mDelete'
+      body: { ids },
+      action: 'mDelete',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -442,7 +463,7 @@ export class DocumentController extends BaseController {
       index,
       collection,
       action: 'mGet',
-      body: { ids }
+      body: { ids },
     };
 
     return this.query(request, options)
@@ -460,6 +481,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -476,7 +498,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -504,7 +526,8 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mReplace'
+      action: 'mReplace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -525,6 +548,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -542,7 +566,12 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', retryOnConflict?: number } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      retryOnConflict?: number
+    } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -569,8 +598,9 @@ export class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      body: {documents},
-      action: 'mUpdate'
+      body: { documents },
+      action: 'mUpdate',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -589,6 +619,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The replaced document
    */
@@ -597,14 +628,15 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
   ): Promise<Document> {
     const request = {
       index,
       collection,
       _id,
       body: content,
-      action: 'replace'
+      action: 'replace',
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -689,6 +721,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *    - `source` If true, returns the updated document inside the response
    *
@@ -702,6 +735,7 @@ export class DocumentController extends BaseController {
     options: {
       queuable?: boolean,
       refresh?: 'wait_for',
+      silent?: boolean,
       retryOnConflict?: number,
       source?: boolean
     } = {}
@@ -713,7 +747,8 @@ export class DocumentController extends BaseController {
       body: content,
       action: 'update',
       retryOnConflict: options.retryOnConflict,
-      source: options.source
+      source: options.source,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -731,6 +766,7 @@ export class DocumentController extends BaseController {
    * @param changes Partial changes to apply to the documents
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `source` If true, returns the updated document inside the response
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *
@@ -741,7 +777,12 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: { refresh?: 'wait_for', source?: boolean, lang?: string } = {}
+    options: {
+      refresh?: 'wait_for',
+      silent?: boolean,
+      source?: boolean,
+      lang?: string
+    } = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -771,7 +812,8 @@ export class DocumentController extends BaseController {
       body: { query, changes },
       action: 'updateByQuery',
       source: options.source,
-      lang: options.lang
+      lang: options.lang,
+      silent: options.silent,
     };
 
     return this.query(request, options)
@@ -790,6 +832,7 @@ export class DocumentController extends BaseController {
    * @param [options]
    *    - `defaults` Fields to add to the document if it gets created
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *    - `source` If true, returns the updated document inside the response
    *
@@ -800,7 +843,13 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     changes: JSONObject,
-    options: {defaults?: JSONObject; refresh?: string, retryOnConflict?: boolean, source?: boolean} = {}
+    options: {
+      defaults?: JSONObject;
+      refresh?: string,
+      silent?: boolean,
+      retryOnConflict?: boolean,
+      source?: boolean
+    } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -808,7 +857,8 @@ export class DocumentController extends BaseController {
       _id,
       body: { changes, defaults: options.defaults },
       action: 'upsert',
-      source: options.source
+      source: options.source,
+      silent: options.silent,
     };
 
     return this.query(request, options)

@@ -44,6 +44,7 @@ describe('Document Controller', () => {
         _source: {foo: 'bar'}
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.create('index', 'collection', {foo: 'bar'}, 'document-id', options)
         .then(res => {
@@ -55,6 +56,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
+              silent: true,
               body: {foo: 'bar'}
             }, options);
 
@@ -72,6 +74,7 @@ describe('Document Controller', () => {
         created: false
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.createOrReplace('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -83,6 +86,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
+              silent: true,
               body: {foo: 'bar'}
             }, options);
 
@@ -94,6 +98,7 @@ describe('Document Controller', () => {
   describe('delete', () => {
     it('should call document/delete query and return a Promise which resolves the id of the deleted document', () => {
       kuzzle.query.resolves({result: {_id: 'document-id'}});
+      options.silent = true;
 
       return kuzzle.document.delete('index', 'collection', 'document-id', options)
         .then(res => {
@@ -104,6 +109,7 @@ describe('Document Controller', () => {
               action: 'delete',
               index: 'index',
               collection: 'collection',
+              silent: true,
               _id: 'document-id'
             }, options);
 
@@ -115,6 +121,7 @@ describe('Document Controller', () => {
   describe('deleteByQuery', () => {
     it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
       kuzzle.query.resolves({result: {ids: ['foo', 'bar', 'baz']}});
+      options.silent = true;
 
       return kuzzle.document.deleteByQuery('index', 'collection', {foo: 'bar'}, options)
         .then(res => {
@@ -126,7 +133,8 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               body: {foo: 'bar'},
-              lang: undefined
+              lang: undefined,
+              silent: true,
             }, options);
 
           should(res).be.an.Array();
@@ -180,6 +188,7 @@ describe('Document Controller', () => {
         total: 1
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.mCreate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -190,6 +199,7 @@ describe('Document Controller', () => {
               action: 'mCreate',
               index: 'index',
               collection: 'collection',
+              silent: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -209,6 +219,7 @@ describe('Document Controller', () => {
         total: 1
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.mCreateOrReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -219,6 +230,7 @@ describe('Document Controller', () => {
               action: 'mCreateOrReplace',
               index: 'index',
               collection: 'collection',
+              silent: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -231,6 +243,7 @@ describe('Document Controller', () => {
     it('should call document/mDelete query and return a Promise which resolves the list of deleted documents ids', () => {
       const result = ['document1', 'document2'];
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.mDelete('index', 'collection', ['document1', 'document2'], options)
         .then(res => {
@@ -241,6 +254,7 @@ describe('Document Controller', () => {
               action: 'mDelete',
               index: 'index',
               collection: 'collection',
+              silent: true,
               body: {ids: ['document1', 'document2']}
             }, options);
 
@@ -291,6 +305,7 @@ describe('Document Controller', () => {
         total: 1
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.mReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -301,6 +316,7 @@ describe('Document Controller', () => {
               action: 'mReplace',
               index: 'index',
               collection: 'collection',
+              silent: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -320,6 +336,7 @@ describe('Document Controller', () => {
         total: 1
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.mUpdate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -330,6 +347,7 @@ describe('Document Controller', () => {
               action: 'mUpdate',
               index: 'index',
               collection: 'collection',
+              silent: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -347,6 +365,7 @@ describe('Document Controller', () => {
         created: false
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.replace('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -358,6 +377,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               _id: 'document-id',
+              silent: true,
               body: {foo: 'bar'}
             }, options);
 
@@ -530,6 +550,7 @@ describe('Document Controller', () => {
         created: false
       };
       kuzzle.query.resolves({result});
+      options.silent = true;
 
       return kuzzle.document.update('index', 'collection', 'document-id', {foo: 'bar'}, options)
         .then(res => {
@@ -543,6 +564,7 @@ describe('Document Controller', () => {
               _id: 'document-id',
               body: {foo: 'bar'},
               retryOnConflict: undefined,
+              silent: true,
               source: undefined
             }, options);
 
@@ -571,7 +593,8 @@ describe('Document Controller', () => {
               _id: 'document-id',
               body: {foo: 'bar'},
               retryOnConflict: true,
-              source: undefined
+              source: undefined,
+              silent: undefined,
             }, { retryOnConflict: true });
 
           should(res).be.equal(result);
@@ -599,7 +622,8 @@ describe('Document Controller', () => {
               _id: 'document-id',
               body: { foo: 'bar' },
               retryOnConflict: undefined,
-              source: true
+              source: true,
+              silent: undefined,
             });
 
           should(res).be.equal(result);
@@ -622,6 +646,8 @@ describe('Document Controller', () => {
       const changes = {
         bar: 'foo'
       };
+      options.silent = true;
+
       return kuzzle.document.updateByQuery('index', 'collection', searchQuery, changes, options)
         .then(res => {
           should(kuzzle.query)
@@ -640,6 +666,7 @@ describe('Document Controller', () => {
                 }
               },
               source: undefined,
+              silent: true,
               lang: undefined
             }, options);
 
@@ -680,7 +707,8 @@ describe('Document Controller', () => {
                 }
               },
               source: true,
-              lang: undefined
+              lang: undefined,
+              silent: undefined,
             });
 
           should(res).be.equal(result);

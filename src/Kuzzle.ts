@@ -539,7 +539,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       request.requestId = uuidv4();
     }
 
-    if (typeof request.refresh === 'undefined' && typeof options.refresh !== 'undefined') {
+    if (request.refresh === undefined && options.refresh !== undefined) {
       request.refresh = options.refresh;
     }
 
