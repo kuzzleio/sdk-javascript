@@ -1,0 +1,22 @@
+name: Functional Tests
+description: Run Functional Tests
+inputs:
+  CYPRESS_RECORD_KEY_DOC:
+    description: Cypress project key
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Start Kuzzle stack
+      run: |
+        sudo sysctl -w vm.max_map_count=262144
+        ./.ci/start_kuzzle.sh
+      shell: bash
+    - name: Build Kuzzle
+      run: |
+        npm install
+        npm run build
+      shell: bash
+    - name: Run functional tests
+      run: npm run test:functional
+      shell: bash

@@ -145,7 +145,11 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           // @deprecated
           this.emit('discarded', data);
 
-          const error = new KuzzleError(data.error);
+          const error = new KuzzleError(
+            data.error,
+            (new Error().stack),
+            this.constructor.name);
+
           this.emit('queryError', error, data);
         }
       };

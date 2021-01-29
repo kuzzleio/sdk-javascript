@@ -1,0 +1,15 @@
+name: Unit Tests
+description: Run Unit Tests
+runs:
+  using: "composite"
+  steps:
+    - name: Run build
+      run: |
+        npm install
+        npm run build
+      shell: bash
+    - name: Run tests
+      run: |
+        npm run test:unit
+        cat ./coverage/lcov.info | ./node_modules/.bin/codecov
+      shell: bash
