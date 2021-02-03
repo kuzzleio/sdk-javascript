@@ -13,6 +13,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private options: any;
   private client: any;
   private lasturl: any;
+  private closeConnection: Function;
+  private sendPing: Function;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -22,7 +24,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
    *    - `pingInterval` Number of milliseconds between two pings (default: `30000`)
-   *    - `pongTimeout` Number of milliseconds before the connection terminates if Kuzzle does not respond (default: `10000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
@@ -33,7 +34,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       headers?: JSONObject;
       reconnectionDelay?: number;
       pingInterval?: number;
-      pongTimeout?: number;
       /**
        * @deprecated Use `ssl` instead
        */
@@ -87,9 +87,47 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client = new this.WebSocketClient(url, this.options);
 
+      /**
+       * Defining behavior depending on the Websocket client type
+       * Which can be the browser or node one.
+       */
+      if (typeof WebSocket !== 'undefined') {
+        this.closeConnection = () => {
+          this.client.close();
+        }
+        this.sendPing = () => {
+          this.client.send('{"p":"1"}');
+        }
+      }
+      else {
+        this.closeConnection = () => {
+          this.client.terminate();
+        }
+        this.sendPing = () => {
+          this.client.ping();
+        }
+        this.client.on('pong', () => {
+          console.log('received pong from kuzzle');
+          clearTimeout(this.pongTimeoutId);
+          console.log('clear timeout node OK');
+        });
+      }
+
       this.client.onopen = () => {
         this.clientConnected();
-        this.heartbeat(this.client);
+        /**
+         * Send pings to the server
+        */ 
+        (() => {
+          this.pingIntervalId = setInterval(() => {
+            console.log('sending ping');
+            this.sendPing();
+            this.pongTimeoutId = setTimeout(() => {
+              this.closeConnection();
+              return;
+            }, this._pongTimeout);
+          }, this._pingInterval);
+        })();
         return resolve();
       };
 
@@ -142,17 +180,11 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.onmessage = payload => {
         const data = JSON.parse(payload.data || payload);
 
-        /**
-         * We need to decode the frame and retrieve the opCode
-         * Pongs have an opCode of 0xA
-         * https://tools.ietf.org/html/rfc6455#section-5.5.2
-         */
-        if (data instanceof ArrayBuffer) {
-          const opCode = data[0] & 0x0F;
-            if (opCode === 0xA) {
-            clearTimeout(this.pongTimeoutId);
-          }
+        if (data && data.p && data.p === '1') {
+          console.log('clearTimeout browser OK');
+          clearTimeout(this.pongTimeoutId);
         }
+
         // for responses, data.room == requestId
         if (data.room) {
           this.emit(data.room, data);
@@ -165,6 +197,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.emit('queryError', error, data);
         }
       };
+      // clearTimeout(this.pongTimeoutId);
     });
   }
 

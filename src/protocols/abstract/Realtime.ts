@@ -1,5 +1,6 @@
 'use strict';
 
+import WebSocketProtocol from '../WebSocket';
 import { KuzzleAbstractProtocol } from './Base';
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
@@ -12,7 +13,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected retrying: boolean;
   protected pongTimeoutId: ReturnType<typeof setTimeout>;
   protected pingIntervalId: ReturnType<typeof setInterval>;
-  private WsPingFrame: Int8Array;
 
   constructor (host, options: any = {}, name: string) {
     super(host, options, name);
@@ -20,21 +20,12 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
     this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 30000;
-    this._pongTimeout = typeof options.pongTimeout === 'number' ? options.pongTimeout : 50;
+
+    this._pongTimeout = this._pingInterval;
 
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
-    
-    /**
-     * Creating a control frame corresponding to a ping.
-     * Pings have an opCode of 0x9
-     * https://tools.ietf.org/html/rfc6455#section-5.5.2
-     */
-    const buffer = new ArrayBuffer(4);
-    this.WsPingFrame = new Int8Array(buffer);
-    // Setting the opCode
-    this.WsPingFrame[4] = 0x9;
   }
 
   get autoReconnect () {
@@ -46,18 +37,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
    */
   get reconnectionDelay (): number {
     return this._reconnectionDelay;
-  }
-
-  /**
-   * Send pings to the server
-   */ 
-  heartbeat(client) {
-    this.pingIntervalId = setInterval(() => {   
-      client.send(this.WsPingFrame);
-      this.pongTimeoutId = setTimeout(() => {
-        client.terminate();
-      }, this._pongTimeout);
-    }, this._pingInterval);
   }
 
   connect (): Promise<any> {
