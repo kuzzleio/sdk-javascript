@@ -107,9 +107,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.client.ping();
         }
         this.client.on('pong', () => {
-          console.log('received pong from kuzzle');
           clearTimeout(this.pongTimeoutId);
-          console.log('clear timeout node OK');
         });
       }
 
@@ -118,16 +116,14 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
          * Send pings to the server
         */ 
-        (() => {
-          this.pingIntervalId = setInterval(() => {
-            console.log('sending ping');
-            this.sendPing();
-            this.pongTimeoutId = setTimeout(() => {
-              this.closeConnection();
-              return;
-            }, this._pongTimeout);
-          }, this._pingInterval);
-        })();
+        this.pingIntervalId = setInterval(() => {
+          this.sendPing();
+          console.log('sending ping');
+          this.pongTimeoutId = setTimeout(() => {
+            this.closeConnection();
+            return;
+          }, this._pongTimeout);
+        }, this._pingInterval);
         return resolve();
       };
 
@@ -181,7 +177,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         const data = JSON.parse(payload.data || payload);
 
         if (data && data.p && data.p === '1') {
-          console.log('clearTimeout browser OK');
           clearTimeout(this.pongTimeoutId);
         }
 
