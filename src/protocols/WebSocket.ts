@@ -118,7 +118,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         */ 
         this.pingIntervalId = setInterval(() => {
           this.sendPing();
-          console.log('sending ping');
           this.pongTimeoutId = setTimeout(() => {
             this.closeConnection();
             return;
@@ -176,8 +175,13 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.onmessage = payload => {
         const data = JSON.parse(payload.data || payload);
 
+        /**
+         * Since Kuzzle 2.10.0
+         * Corresponds to a custom pong response message
+         */
         if (data && data.p && data.p === '1') {
           clearTimeout(this.pongTimeoutId);
+          return;
         }
 
         // for responses, data.room == requestId
@@ -190,9 +194,16 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
           const error = new KuzzleError(data.error);
           this.emit('queryError', error, data);
+          /**
+           * In case you're running a Kuzzle version under 2.10.0
+           * The response from a browser custom ping will be an error
+           * since it does not parse the client message properly.
+           * We need to clear this timeout at each message to keep 
+           * the connection alive if it's the case
+           */
+          clearTimeout(this.pongTimeoutId);
         }
       };
-      // clearTimeout(this.pongTimeoutId);
     });
   }
 

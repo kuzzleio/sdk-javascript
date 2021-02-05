@@ -1,6 +1,5 @@
 'use strict';
 
-import WebSocketProtocol from '../WebSocket';
 import { KuzzleAbstractProtocol } from './Base';
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
@@ -20,7 +19,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
     this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 5000;
-
     this._pongTimeout = this._pingInterval;
 
     this.wasConnected = false;
