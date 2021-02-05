@@ -13,8 +13,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private options: any;
   private client: any;
   private lasturl: any;
-  private closeConnection: any;
-  private sendPing: any;
+  private ping: any;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -92,18 +91,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
        * Which can be the browser or node one.
        */
       if (typeof WebSocket !== 'undefined') {
-        this.closeConnection = () => {
-          this.client.close();
-        };
-        this.sendPing = () => {
-          this.client.send('{"p":"1"}');
+        this.ping = () => {
+          this.client.send('{"p":1}');
         };
       }
       else {
-        this.closeConnection = () => {
-          this.client.terminate();
-        };
-        this.sendPing = () => {
+        this.ping = () => {
           this.client.ping();
         };
         this.client.on('pong', () => {
@@ -117,9 +110,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * Send pings to the server
         */ 
         this.pingIntervalId = setInterval(() => {
-          this.sendPing();
+          this.ping();
           this.pongTimeoutId = setTimeout(() => {
-            this.closeConnection();
+            this.close();
             return;
           }, this._pongTimeout);
         }, this._pingInterval);
@@ -179,7 +172,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * Since Kuzzle 2.10.0
          * Corresponds to a custom pong response message
          */
-        if (data && data.p && data.p === '1') {
+        if (data && data.p && data.p === 1) {
           clearTimeout(this.pongTimeoutId);
           return;
         }
