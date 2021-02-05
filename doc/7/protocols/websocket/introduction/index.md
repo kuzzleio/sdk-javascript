@@ -14,7 +14,7 @@ The WebSocket protocol can be used by an instance of the SDK to communicate with
 
 This protocol allows you to use all the features of Kuzzle, including [real-time notifications](/sdk/js/7/essentials/realtime-notifications).
 
-<SinceBadge version="2.10.0"/>
+<SinceBadge version="change-me"/>
 :::info
 We needed the client to be able to ping Kuzzle to have a keep-alive system.
 Through the browser, that was not possible to send real formatted pings websocket frames since there is no API implemented for that unlike the one of Node.
