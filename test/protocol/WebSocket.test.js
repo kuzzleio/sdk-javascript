@@ -330,10 +330,12 @@ describe('WebSocket networking module', () => {
     websocket.connect();
 
     const payload = { result: null, error: { message: 'Malformed request' } };
-
+    const clearTimeout = sinon.stub(clock, 'clearTimeout');
     clientStub.onmessage({data: JSON.stringify(payload)});
     clock.tick(10);
 
+    should(clearTimeout)
+      .be.calledOnce();
     should(cb)
       .be.calledOnce()
       .be.calledWithMatch(payload);
