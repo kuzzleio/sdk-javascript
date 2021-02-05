@@ -13,8 +13,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private options: any;
   private client: any;
   private lasturl: any;
-  private closeConnection: Function;
-  private sendPing: Function;
+  private closeConnection: any;
+  private sendPing: any;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -94,18 +94,18 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       if (typeof WebSocket !== 'undefined') {
         this.closeConnection = () => {
           this.client.close();
-        }
+        };
         this.sendPing = () => {
           this.client.send('{"p":"1"}');
-        }
+        };
       }
       else {
         this.closeConnection = () => {
           this.client.terminate();
-        }
+        };
         this.sendPing = () => {
           this.client.ping();
-        }
+        };
         this.client.on('pong', () => {
           clearTimeout(this.pongTimeoutId);
         });
@@ -194,15 +194,15 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
           const error = new KuzzleError(data.error);
           this.emit('queryError', error, data);
-          /**
-           * In case you're running a Kuzzle version under 2.10.0
-           * The response from a browser custom ping will be an error
-           * since it does not parse the client message properly.
-           * We need to clear this timeout at each message to keep 
-           * the connection alive if it's the case
-           */
-          clearTimeout(this.pongTimeoutId);
         }
+        /**
+         * In case you're running a Kuzzle version under 2.10.0
+         * The response from a browser custom ping will be an error
+         * since it does not parse the client message properly.
+         * We need to clear this timeout at each message to keep 
+         * the connection alive if it's the case
+         */
+        clearTimeout(this.pongTimeoutId);
       };
     });
   }

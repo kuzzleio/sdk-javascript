@@ -14,8 +14,8 @@ order: 10
 | `connected`  | <pre>boolean</pre>  | Returns `true` if the socket is open |
 | `host`  | <pre>string</pre>  | Kuzzle server host |
 | `pingInterval`  | <pre>number</pre>  | Number of milliseconds between two pings         |
-| `reconnectionDelay`  | <pre>number</pre>  | Number of milliseconds between reconnection attempts         |
 | `port`  | <pre>number</pre>  | Kuzzle server port |
+| `reconnectionDelay`  | <pre>number</pre>  | Number of milliseconds between reconnection attempts         |
 | `ssl`  | <pre>boolean</pre>  | `true` if ssl is active |
 
 ::: info
