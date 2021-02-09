@@ -113,7 +113,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.ping();
           this.pongTimeoutId = setTimeout(() => {
             this.close();
-            return;
           }, this._pongTimeout);
         }, this._pingInterval);
         return resolve();

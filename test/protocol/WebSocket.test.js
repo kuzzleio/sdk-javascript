@@ -358,7 +358,7 @@ describe('WebSocket networking module', () => {
     
     const clearTimeout = sinon.stub(clock, 'clearTimeout');
     
-    clientStub.onmessage({data: JSON.stringify({ p: 1 })});
+    clientStub.onmessage({data: JSON.stringify({ p: 2 })});
     
     should(clearTimeout)
       .be.calledOnce();
