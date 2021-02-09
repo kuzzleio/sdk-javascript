@@ -172,7 +172,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * Since Kuzzle 2.10.0
          * Corresponds to a custom pong response message
          */
-        if (data && data.p && data.p === 1) {
+        if (data && data.p && data.p === 2) {
           clearTimeout(this.pongTimeoutId);
           return;
         }
