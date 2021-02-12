@@ -112,7 +112,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         this.pingIntervalId = setInterval(() => {
           this.ping();
           this.pongTimeoutId = setTimeout(() => {
-            const error: any = new Error(`Connection lost.`);
+            const error: any = new Error('Connection lost.');
             error.status = 503;
             this.clientNetworkError(error);
             this.emit('disconnect');
