@@ -105,24 +105,24 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client.onopen = () => {
-        this.clientConnected().then(() => {
-          this.pingIntervalId = setInterval(() => {
-            this.ping();
-            this.pongTimeoutId = setTimeout(() => {
-              this.client.close();
-            }, this._pongTimeout);
-          }, this._pingInterval);
-        });
+        this.clientConnected();
         /**
          * Send pings to the server
-        */ 
-        
+        */
+        this.pingIntervalId = setInterval(() => {
+          this.ping();
+          this.pongTimeoutId = setTimeout(() => {
+            const error: any = new Error(`Connection lost.`);
+            error.status = 503;
+            this.clientNetworkError(error);
+            clearInterval(this.pingIntervalId);
+            clearTimeout(this.pongTimeoutId);
+          }, this._pongTimeout);
+        }, this._pingInterval);
         return resolve();
       };
 
       this.client.onclose = (closeEvent, message) => {
-        clearInterval(this.pingIntervalId);
-        clearTimeout(this.pongTimeoutId);
         let
           status,
           reason = message;
@@ -143,10 +143,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
         // do not forward a connection close error if no
         // connection has been previously established
-        else if (this.wasConnected) {
+        else if (this.wasConnected && this.state !== 'offline') {
           const error: any = new Error(reason);
           error.status = status;
-
           this.clientNetworkError(error);
         }
       };
