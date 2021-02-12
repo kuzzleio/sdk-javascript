@@ -18,7 +18,7 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
-    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 10000;
+    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
     this._pongTimeout = this._pingInterval;
 
     this.wasConnected = false;
@@ -46,12 +46,13 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   /**
    * Called when the client's connection is established
    */
-  clientConnected () {
+  clientConnected (): Promise<any> {
     super.clientConnected('connected', this.wasConnected);
 
     this.state = 'connected';
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
+    return Promise.resolve();
   }
 
   /**

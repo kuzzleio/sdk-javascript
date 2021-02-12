@@ -105,20 +105,24 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client.onopen = () => {
-        this.clientConnected();
+        this.clientConnected().then(() => {
+          this.pingIntervalId = setInterval(() => {
+            this.ping();
+            this.pongTimeoutId = setTimeout(() => {
+              this.client.close();
+            }, this._pongTimeout);
+          }, this._pingInterval);
+        });
         /**
          * Send pings to the server
         */ 
-        this.pingIntervalId = setInterval(() => {
-          this.ping();
-          this.pongTimeoutId = setTimeout(() => {
-            this.close();
-          }, this._pongTimeout);
-        }, this._pingInterval);
+        
         return resolve();
       };
 
       this.client.onclose = (closeEvent, message) => {
+        clearInterval(this.pingIntervalId);
+        clearTimeout(this.pongTimeoutId);
         let
           status,
           reason = message;
@@ -221,8 +225,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
-    clearInterval(this.pingIntervalId);
-    clearTimeout(this.pongTimeoutId);
     super.close();
   }
 }
