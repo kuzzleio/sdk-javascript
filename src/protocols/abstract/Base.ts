@@ -146,7 +146,7 @@ Discarded request: ${JSON.stringify(request)}`));
           error = response.error;
         }
 
-        this.emit('queryError', error, request);
+        this.emit('queryError', { error, request });
 
         if (request.action !== 'logout' && error.id === 'security.token.invalid') {
           this.emit('tokenExpired');

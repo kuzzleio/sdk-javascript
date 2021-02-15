@@ -28,14 +28,17 @@ describe('Kuzzle protocol methods', () => {
       const
         eventStub = sinon.stub(),
         error = {message: 'foo-bar'},
-        query = {foo: 'bar'};
+        request  = {foo: 'bar'};
       kuzzle.connect();
       kuzzle.addListener('queryError', eventStub);
 
-      kuzzle.protocol.emit('queryError', error, query);
+      kuzzle.protocol.emit('queryError', { error, request });
 
       should(eventStub).be.calledOnce();
-      should(eventStub).be.calledWithMatch({message: 'foo-bar'}, {foo: 'bar'});
+      should(eventStub).be.calledWithMatch({
+        error: { message: 'foo-bar' },
+        request: { foo: 'bar'}
+      });
     });
 
     it('should propagate protocol "tokenExpired" events', () => {

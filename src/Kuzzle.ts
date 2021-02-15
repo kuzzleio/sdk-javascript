@@ -13,6 +13,7 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
+import { clone } from './utils/clone';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
@@ -420,7 +421,9 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
-    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+    this.protocol.addListener('queryError', ({ error, request }) => {
+      this.emit('queryError', { error, request });
+    });
 
     this.protocol.addListener('tokenExpired', () => this.tokenExpired());
 
@@ -454,20 +457,6 @@ export class Kuzzle extends KuzzleEventEmitter {
 
       if (this.autoReplay) {
         this.playQueue();
-      }
-
-      if (this.auth.authenticationToken) {
-        return this.auth.checkToken()
-          .then(res => {
-            // shouldn't obtain an error but let's invalidate the token anyway
-            if (!res.valid) {
-              this.auth.authenticationToken = null;
-            }
-          })
-          .catch(() => {
-            this.auth.authenticationToken = null;
-          })
-          .then(() => this.emit('reconnected'));
       }
 
       this.emit('reconnected');
@@ -526,7 +515,10 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param request
    * @param options - Optional arguments
    */
-  query (request: RequestPayload = {}, options: JSONObject = {}): Promise<ResponsePayload> {
+  query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
+    const request = clone(req);
+    const options = clone(opts);
+
     if (typeof request !== 'object' || Array.isArray(request)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
     }
@@ -590,7 +582,7 @@ export class Kuzzle extends KuzzleEventEmitter {
         });
       }
 
-      this.emit('discarded', {request});
+      this.emit('discarded', { request });
       return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
 Discarded request: ${JSON.stringify(request)}`));
     }

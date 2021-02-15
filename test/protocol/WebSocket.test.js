@@ -313,9 +313,9 @@ describe('WebSocket networking module', () => {
 
     let expectedError;
     websocket.on('discarded', cb);
-    websocket.on('queryError', (error, data) => {
+    websocket.on('queryError', ({ error, request }) => {
       expectedError = error;
-      cb2(error, data);
+      cb2(error, request);
     });
     websocket.connect();
 
