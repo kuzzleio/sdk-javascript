@@ -13,7 +13,6 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
-import { clone } from './utils/clone';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
@@ -516,16 +515,16 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param options - Optional arguments
    */
   query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
-    const request = clone(req);
-    const options = clone(opts);
-
-    if (typeof request !== 'object' || Array.isArray(request)) {
-      throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
+    if (typeof req !== 'object' || Array.isArray(req)) {
+      throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
     }
 
-    if (typeof options !== 'object' || Array.isArray(options)) {
-      throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(options)}`);
+    if (typeof opts !== 'object' || Array.isArray(opts)) {
+      throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(opts)}`);
     }
+
+    const request = { ...req };
+    const options = { ...opts };
 
     if (!request.requestId) {
       request.requestId = uuidv4();

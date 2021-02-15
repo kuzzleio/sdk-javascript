@@ -1,9 +1,8 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  ProtocolMock = require('../mocks/protocol.mock'),
-  generateJwt = require('../mocks/generateJwt.mock'),
-  { Kuzzle } = require('../../src/Kuzzle');
+const should = require('should');
+const sinon = require('sinon');
+const ProtocolMock = require('../mocks/protocol.mock');
+const generateJwt = require('../mocks/generateJwt.mock');
+const { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle protocol methods', () => {
   let kuzzle;
@@ -25,10 +24,10 @@ describe('Kuzzle protocol methods', () => {
 
   describe('#events', () => {
     it('should propagate protocol "queryError" events', () => {
-      const
-        eventStub = sinon.stub(),
-        error = {message: 'foo-bar'},
-        request  = {foo: 'bar'};
+      const eventStub = sinon.stub();
+      const error = { message: 'foo-bar' };
+      const request = { foo: 'bar' };
+
       kuzzle.connect();
       kuzzle.addListener('queryError', eventStub);
 

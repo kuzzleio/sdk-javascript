@@ -1,9 +1,7 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  ProtocolMock = require('../mocks/protocol.mock'),
-  generateJwt = require('../mocks/generateJwt.mock'),
-  { Kuzzle } = require('../../src/Kuzzle');
+const should = require('should');
+const sinon = require('sinon');
+const ProtocolMock = require('../mocks/protocol.mock');
+const { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle connect', () => {
 
