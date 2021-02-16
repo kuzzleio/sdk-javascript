@@ -178,7 +178,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          */
         if (data && data.p && data.p === 2 && Object.keys(data).length === 1) {
           clearTimeout(this.pongTimeoutId);
-          // console.log('Kuzzle after 2.10');
           return;
         }
 
@@ -199,7 +198,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * We need to clear this timeout at each message to keep 
          * the connection alive if it's the case
          */
-        // console.log('Kuzzle before 2.10');
         clearTimeout(this.pongTimeoutId);
       };
     });
