@@ -3,4 +3,8 @@ description: creates user
 hooks:
   after: curl -XDELETE kuzzle:7512/users/jdoe
 template: default
-expected: '^   { profileIds: \[ ''default'' \],$'
+expected:
+  - "User {"
+  - "_id: 'jdoe',"
+  - "content: {"
+  - "profileIds: \\[ \\'default\\' \\],"

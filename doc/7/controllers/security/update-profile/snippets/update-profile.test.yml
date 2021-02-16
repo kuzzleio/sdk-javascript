@@ -20,4 +20,5 @@ hooks:
     - curl -XDELETE kuzzle:7512/profiles/myProfile?refresh=wait_for
     - curl -XDELETE kuzzle:7512/roles/privileged
 template: default
-expected: '^     { roleId: ''privileged'', restrictedTo: \[Array\] } \] }$'
+expected:
+  - "{ roleId: 'privileged', restrictedTo: \\[Array\\] }"

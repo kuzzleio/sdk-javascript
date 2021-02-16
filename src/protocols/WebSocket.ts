@@ -85,7 +85,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client = new this.WebSocketClient(url, this.options);
-
       /**
        * Defining behavior depending on the Websocket client type
        * Which can be the browser or node one.
@@ -144,11 +143,13 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
         // do not forward a connection close error if no
         // connection has been previously established
-        else if (this.wasConnected && this.state !== 'offline') {
+        else if (this.wasConnected) {
           const error: any = new Error(reason);
           error.status = status;
           this.clientNetworkError(error);
         }
+        clearInterval(this.pingIntervalId);
+        clearTimeout(this.pongTimeoutId);
       };
 
       this.client.onerror = error => {
@@ -177,6 +178,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          */
         if (data && data.p && data.p === 2 && Object.keys(data).length === 1) {
           clearTimeout(this.pongTimeoutId);
+          // console.log('Kuzzle after 2.10');
           return;
         }
 
@@ -197,6 +199,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * We need to clear this timeout at each message to keep 
          * the connection alive if it's the case
          */
+        // console.log('Kuzzle before 2.10');
         clearTimeout(this.pongTimeoutId);
       };
     });
