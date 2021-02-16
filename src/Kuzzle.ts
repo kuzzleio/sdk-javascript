@@ -511,8 +511,8 @@ export class Kuzzle extends KuzzleEventEmitter {
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
-   * @param request
-   * @param options - Optional arguments
+   * @param req
+   * @param opts - Optional arguments
    */
   query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
     if (typeof req !== 'object' || Array.isArray(req)) {
