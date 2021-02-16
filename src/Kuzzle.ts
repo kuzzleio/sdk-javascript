@@ -523,8 +523,8 @@ export class Kuzzle extends KuzzleEventEmitter {
       throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(opts)}`);
     }
 
-    const request = { ...req };
-    const options = { ...opts };
+    const request = JSON.parse(JSON.stringify(req));
+    const options = JSON.parse(JSON.stringify(opts));
 
     if (!request.requestId) {
       request.requestId = uuidv4();
