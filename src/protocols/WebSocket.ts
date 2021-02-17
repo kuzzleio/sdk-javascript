@@ -87,7 +87,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client = new this.WebSocketClient(url, this.options);
 
       this.client.onopen = () => {
-        this.clientConnected().then(() =>{
+        this.clientConnected().then(() => {
           /**
            * Defining behavior depending on the Websocket client type
            * Which can be the browser or node one.
