@@ -4,6 +4,10 @@ hooks:
   before: curl -X POST kuzzle:7512/ms/_flushdb
   after:
 template: default
-expected: "\\[ ('[a-i]', ){8}'[a-i]' ]"
+expected:
+  - "\\["
+  - ('[a-i]', )
+  - ('[a-i]', )
+  - ('[a-i]', )
 sdk: js
 version: 6

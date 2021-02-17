@@ -15,7 +15,7 @@ try {
   /*
   User {
     _id: 'john.doe',
-    content:,
+    content:
       { profileIds: [ 'default' ],
         firstName: 'John',
         lastName: 'Doe',

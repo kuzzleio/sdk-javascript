@@ -44,7 +44,7 @@ services:
       - CONFIG_FILE=/mnt/.ci/doc/config.yml
 
   doc-runner-node:
-    image: node:10-alpine
+    image: node:12-alpine
     command: >
       ash -c '
         mkdir -p /var/snippets/node;

@@ -5,15 +5,21 @@ import { KuzzleAbstractProtocol } from './Base';
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected _autoReconnect: boolean;
   protected _reconnectionDelay: number;
+  protected _pingInterval: number;
+  protected _pongTimeout: number;
   protected wasConnected: boolean;
   protected stopRetryingToConnect: boolean;
   protected retrying: boolean;
+  protected pongTimeoutId: ReturnType<typeof setTimeout>;
+  protected pingIntervalId: ReturnType<typeof setInterval>;
 
   constructor (host, options: any = {}, name: string) {
     super(host, options, name);
 
     this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
+    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
+    this._pongTimeout = this._pingInterval;
 
     this.wasConnected = false;
     this.stopRetryingToConnect = false;

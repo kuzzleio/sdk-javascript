@@ -5,11 +5,15 @@ hooks:
   after:
 template: default
 expected:
-  - "\\[ { member: 'bar', score: 4 },"
-  - "  { member: 'foo', score: 13 },"
-  - "  { member: 'baz', score: 300 } ]"
-  - "\\[ { member: 'foo', score: -29 },"
-  - "  { member: 'bar', score: 4 },"
-  - "  { member: 'baz', score: 300 } ]"
+  - "\\["
+  - "{ member: 'bar', score: 4 },"
+  - "{ member: 'foo', score: 13 },"
+  - "{ member: 'baz', score: 300 }"
+  - "\\]"
+  - "\\["
+  - "{ member: 'foo', score: -29 },"
+  - "{ member: 'bar', score: 4 },"
+  - "{ member: 'baz', score: 300 }"
+  - "]"
 sdk: js
 version: 6

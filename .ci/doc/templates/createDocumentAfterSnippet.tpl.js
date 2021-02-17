@@ -5,7 +5,7 @@
 
 // Require a kuzzle instance assigning it to a weird variable to avoid collisions and create the instance.
 const $k = require('kuzzle-sdk');
-const $kInstance = new $k.Kuzzle(new $k.WebSocket('kuzzle'));
+const $kInstance = new $k.Kuzzle(new $k.WebSocket('kuzzle', { pingInterval: 2000 }));
 
 // add a listener to detect any connection problems
 $kInstance.on('networkError', error => {

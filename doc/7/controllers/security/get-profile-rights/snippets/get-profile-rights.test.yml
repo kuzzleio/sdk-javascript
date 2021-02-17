@@ -23,4 +23,4 @@ hooks:
     }' kuzzle:7512/profiles/myProfile/_create
   after: curl -XDELETE kuzzle:7512/profiles/myProfile
 template: default
-expected: "^    value: 'allowed' },$"
+expected: "^    value: 'allowed'$"

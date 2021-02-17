@@ -13,6 +13,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private options: any;
   private client: any;
   private lasturl: any;
+  private ping: any;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -21,6 +22,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `port` Kuzzle server port (default: `7512`)
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
+   *    - `pingInterval` Number of milliseconds between two pings (default: `10000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
@@ -30,6 +32,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       port?: number;
       headers?: JSONObject;
       reconnectionDelay?: number;
+      pingInterval?: number;
       /**
        * @deprecated Use `ssl` instead
        */
@@ -82,9 +85,40 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client = new this.WebSocketClient(url, this.options);
+      /**
+       * Defining behavior depending on the Websocket client type
+       * Which can be the browser or node one.
+       */
+      if (typeof WebSocket !== 'undefined') {
+        this.ping = () => {
+          this.client.send('{"p":1}');
+        };
+      }
+      else {
+        this.ping = () => {
+          this.client.ping();
+        };
+        this.client.on('pong', () => {
+          clearTimeout(this.pongTimeoutId);
+        });
+      }
 
       this.client.onopen = () => {
         this.clientConnected();
+        /**
+         * Send pings to the server
+        */
+        this.pingIntervalId = setInterval(() => {
+          this.ping();
+          this.pongTimeoutId = setTimeout(() => {
+            const error: any = new Error('Connection lost.');
+            error.status = 503;
+            this.clientNetworkError(error);
+            this.emit('disconnect');
+            clearInterval(this.pingIntervalId);
+            clearTimeout(this.pongTimeoutId);
+          }, this._pongTimeout);
+        }, this._pingInterval);
         return resolve();
       };
 
@@ -112,9 +146,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         else if (this.wasConnected) {
           const error: any = new Error(reason);
           error.status = status;
-
           this.clientNetworkError(error);
         }
+        clearInterval(this.pingIntervalId);
+        clearTimeout(this.pongTimeoutId);
       };
 
       this.client.onerror = error => {
@@ -137,6 +172,15 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.onmessage = payload => {
         const data = JSON.parse(payload.data || payload);
 
+        /**
+         * Since Kuzzle 2.10.0
+         * Corresponds to a custom pong response message
+         */
+        if (data && data.p && data.p === 2 && Object.keys(data).length === 1) {
+          clearTimeout(this.pongTimeoutId);
+          return;
+        }
+
         // for responses, data.room == requestId
         if (data.room) {
           this.emit(data.room, data);
@@ -152,8 +196,14 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
           this.emit('queryError', { error, request: data });
         }
+        /**
+         * In case you're running a Kuzzle version under 2.10.0
+         * The response from a browser custom ping will be another payload.
+         * We need to clear this timeout at each message to keep 
+         * the connection alive if it's the case
+         */
+        clearTimeout(this.pongTimeoutId);
       };
-
     });
   }
 
