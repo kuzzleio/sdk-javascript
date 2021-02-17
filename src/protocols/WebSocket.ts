@@ -150,7 +150,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
             (new Error().stack),
             this.constructor.name);
 
-          this.emit('queryError', error, data);
+          this.emit('queryError', { error, request: data });
         }
       };
 
