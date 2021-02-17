@@ -1,4 +1,5 @@
 name: security#getRoleMapping
 description: get roles mapping
 template: default
-expected: '^{ mapping:'
+expected:
+  - "mapping: {"

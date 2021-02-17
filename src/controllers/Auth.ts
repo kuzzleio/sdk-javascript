@@ -110,7 +110,7 @@ export class AuthController extends BaseController {
   }
 
   /**
-   * Deletes an API key for the currently loggued user.
+   * Deletes an API key for the currently logged user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/delete-api-key
    *

@@ -23,4 +23,5 @@ hooks:
     }' kuzzle:7512/profiles/myProfile/_create
   after: curl -XDELETE kuzzle:7512/profiles/myProfile
 template: default
-expected: '^   \[ { roleId: ''admin'', restrictedTo: \[Array\] },$'
+expected:
+- "\\[ { roleId: \\'admin\\', restrictedTo: \\[Array\\] }, { roleId: \\'default\\' } \\]"

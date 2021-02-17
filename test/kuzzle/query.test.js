@@ -191,7 +191,7 @@ describe('Kuzzle query management', () => {
       should(kuzzle.protocol.query).not.be.called();
       should(eventStub)
         .be.calledOnce()
-        .be.calledWith({request});
+        .be.calledWithMatch({ request });
 
       should(kuzzle._offlineQueue.length).be.eql(1);
     });
@@ -217,7 +217,7 @@ describe('Kuzzle query management', () => {
           should(kuzzle._offlineQueue.length).eql(0);
           should(eventStub)
             .be.calledOnce()
-            .be.calledWith({request});
+            .be.calledWithMatch({ request });
         });
     });
 
@@ -233,7 +233,14 @@ describe('Kuzzle query management', () => {
           should(kuzzle.protocol.query)
             .be.not.be.called();
         });
+    });
 
+    it('should clone the original request', async () => {
+      const request = { controller: 'server', action: 'now' };
+
+      await kuzzle.query(request);
+
+      should(request).be.eql({ controller: 'server', action: 'now' });
     });
   });
 });

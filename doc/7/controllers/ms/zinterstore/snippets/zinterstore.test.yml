@@ -5,9 +5,10 @@ hooks:
   after:
 template: default
 expected:
-  - "\\[ { member: 'foo', score: 13 },"
-  - "  { member: 'baz', score: 27.85\\d* } ]"
-  - "\\[ { member: 'baz', score: -272.15 }"
-  - "  { member: 'foo', score: -29 } ]"
+  - "\\["
+  - "{ member: 'foo', score: 13 },"
+  - "{ member: 'baz', score: 27.85\\d* }"
+  - "]"
+  - "\\[ { member: 'baz', score: -272.15 }, { member: 'foo', score: -29 } ]"
 sdk: js
 version: 6

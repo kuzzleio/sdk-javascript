@@ -10,4 +10,5 @@ hooks:
     }' kuzzle:7512/users/john.doe/_create
   after: curl -f -XDELETE kuzzle:7512/users/john.doe
 template: default
-expected: '^     firstName: ''John'',$'
+expected:
+  - "firstName: 'John'"

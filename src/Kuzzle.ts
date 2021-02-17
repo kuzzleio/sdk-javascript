@@ -420,7 +420,9 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.startQueuing();
     }
 
-    this.protocol.addListener('queryError', (err, query) => this.emit('queryError', err, query));
+    this.protocol.addListener('queryError', ({ error, request }) => {
+      this.emit('queryError', { error, request });
+    });
 
     this.protocol.addListener('tokenExpired', () => this.tokenExpired());
 
@@ -454,20 +456,6 @@ export class Kuzzle extends KuzzleEventEmitter {
 
       if (this.autoReplay) {
         this.playQueue();
-      }
-
-      if (this.auth.authenticationToken) {
-        return this.auth.checkToken()
-          .then(res => {
-            // shouldn't obtain an error but let's invalidate the token anyway
-            if (!res.valid) {
-              this.auth.authenticationToken = null;
-            }
-          })
-          .catch(() => {
-            this.auth.authenticationToken = null;
-          })
-          .then(() => this.emit('reconnected'));
       }
 
       this.emit('reconnected');
@@ -523,17 +511,20 @@ export class Kuzzle extends KuzzleEventEmitter {
    *    - volatile (object, default: null):
    *        Additional information passed to notifications to other users
    *
-   * @param request
-   * @param options - Optional arguments
+   * @param req
+   * @param opts - Optional arguments
    */
-  query (request: RequestPayload = {}, options: JSONObject = {}): Promise<ResponsePayload> {
-    if (typeof request !== 'object' || Array.isArray(request)) {
-      throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(request)}`);
+  query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
+    if (typeof req !== 'object' || Array.isArray(req)) {
+      throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
     }
 
-    if (typeof options !== 'object' || Array.isArray(options)) {
-      throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(options)}`);
+    if (typeof opts !== 'object' || Array.isArray(opts)) {
+      throw new Error(`Kuzzle.query: Invalid "options" argument: ${JSON.stringify(opts)}`);
     }
+
+    const request = JSON.parse(JSON.stringify(req));
+    const options = JSON.parse(JSON.stringify(opts));
 
     if (!request.requestId) {
       request.requestId = uuidv4();
@@ -590,7 +581,7 @@ export class Kuzzle extends KuzzleEventEmitter {
         });
       }
 
-      this.emit('discarded', {request});
+      this.emit('discarded', { request });
       return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.
 Discarded request: ${JSON.stringify(request)}`));
     }

@@ -99,6 +99,16 @@ describe('WebSocket networking module', () => {
     should(websocket.stopRetryingToConnect).be.false();
   });
 
+  it('should initialize a ping interval when the connection is established', () => {
+    const setInterval = sinon.stub(clock, 'setInterval');
+
+    websocket.connect();
+    clientStub.onopen();
+
+    should(setInterval)
+      .be.calledOnce();
+  });
+
   it('should call listeners on a "reconnect" event', () => {
     const cb = sinon.stub();
 
@@ -313,23 +323,49 @@ describe('WebSocket networking module', () => {
 
     let expectedError;
     websocket.on('discarded', cb);
-    websocket.on('queryError', (error, data) => {
+    websocket.on('queryError', ({ error, request }) => {
       expectedError = error;
-      cb2(error, data);
+      cb2(error, request);
     });
     websocket.connect();
 
     const payload = { result: null, error: { message: 'Malformed request' } };
-
+    const clearTimeout = sinon.stub(clock, 'clearTimeout');
     clientStub.onmessage({data: JSON.stringify(payload)});
     clock.tick(10);
 
+    should(clearTimeout)
+      .be.calledOnce();
     should(cb)
       .be.calledOnce()
       .be.calledWithMatch(payload);
     should(cb2)
       .be.calledOnce()
       .be.calledWithMatch(expectedError, payload);
+  });
+
+  it('should clear the pongTimeOut when receiving a pong message and return', () => {
+    const
+      cb = sinon.stub(),
+      cb2 = sinon.stub();
+
+    websocket.on('discarded', cb);
+    websocket.on('queryError', (error, data) => {
+      cb2(error, data);
+    });
+    
+    websocket.connect();
+    
+    const clearTimeout = sinon.stub(clock, 'clearTimeout');
+    
+    clientStub.onmessage({data: JSON.stringify({ p: 2 })});
+    
+    should(clearTimeout)
+      .be.calledOnce();
+    should(cb)
+      .be.not.calledOnce();
+    should(cb2)
+      .be.not.calledOnce();
   });
 
   it('should be able to unregister a callback on an event', () => {

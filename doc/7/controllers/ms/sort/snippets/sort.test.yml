@@ -5,7 +5,11 @@ hooks:
   after:
 template: default
 expected:
-  - "\\[ '7', '6', '5', '4', '3', '2', '1' ]"
+  - "\\["
+  - "'7', '6', '5',"
+  - "'4', '3', '2',"
+  - "'1'"
+  - "]"
   - "\\[ 'bar', 'baz', 'foo', 'qux' ]"
 sdk: js
 version: 6
