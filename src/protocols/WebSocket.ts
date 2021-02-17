@@ -87,39 +87,40 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client = new this.WebSocketClient(url, this.options);
 
       this.client.onopen = () => {
-        this.clientConnected();
-        /**
-         * Defining behavior depending on the Websocket client type
-         * Which can be the browser or node one.
-         */
-        if (typeof WebSocket !== 'undefined') {
-          this.ping = () => {
-            this.client.send('{"p":1}');
-          };
-        }
-        else {
-          this.ping = () => {
-            this.client.ping();
-          };
-          this.client.on('pong', () => {
-            clearTimeout(this.pongTimeoutId);
-          });
-        }
-        /**
-        * Send pings to the server
-        */
-        this.pingIntervalId = setInterval(() => {
-          this.ping();
-          this.pongTimeoutId = setTimeout(() => {
-            const error: any = new Error('Connection lost.');
-            error.status = 503;
-            this.clientNetworkError(error);
-            this.emit('disconnect');
-            clearInterval(this.pingIntervalId);
-            clearTimeout(this.pongTimeoutId);
-          }, this._pongTimeout);
-        }, this._pingInterval);
-        return resolve();
+        this.clientConnected().then(() =>{
+          /**
+           * Defining behavior depending on the Websocket client type
+           * Which can be the browser or node one.
+           */
+          if (typeof WebSocket !== 'undefined') {
+            this.ping = () => {
+              this.client.send('{"p":1}');
+            };
+          }
+          else {
+            this.ping = () => {
+              this.client.ping();
+            };
+            this.client.on('pong', () => {
+              clearTimeout(this.pongTimeoutId);
+            });
+          }
+          /**
+          * Send pings to the server
+          */
+          this.pingIntervalId = setInterval(() => {
+            this.ping();
+            this.pongTimeoutId = setTimeout(() => {
+              const error: any = new Error('Connection lost.');
+              error.status = 503;
+              this.clientNetworkError(error);
+              this.emit('disconnect');
+              clearInterval(this.pingIntervalId);
+              clearTimeout(this.pongTimeoutId);
+            }, this._pongTimeout);
+          }, this._pingInterval);
+          return resolve();
+        });
       };
 
       this.client.onclose = (closeEvent, message) => {
