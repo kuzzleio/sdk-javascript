@@ -85,28 +85,28 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client = new this.WebSocketClient(url, this.options);
-      /**
-       * Defining behavior depending on the Websocket client type
-       * Which can be the browser or node one.
-       */
-      if (typeof WebSocket !== 'undefined') {
-        this.ping = () => {
-          this.client.send('{"p":1}');
-        };
-      }
-      else {
-        this.ping = () => {
-          this.client.ping();
-        };
-        this.client.on('pong', () => {
-          clearTimeout(this.pongTimeoutId);
-        });
-      }
 
       this.client.onopen = () => {
         this.clientConnected();
         /**
-         * Send pings to the server
+         * Defining behavior depending on the Websocket client type
+         * Which can be the browser or node one.
+         */
+        if (typeof WebSocket !== 'undefined') {
+          this.ping = () => {
+            this.client.send('{"p":1}');
+          };
+        }
+        else {
+          this.ping = () => {
+            this.client.ping();
+          };
+          this.client.on('pong', () => {
+            clearTimeout(this.pongTimeoutId);
+          });
+        }
+        /**
+        * Send pings to the server
         */
         this.pingIntervalId = setInterval(() => {
           this.ping();
