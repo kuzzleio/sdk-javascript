@@ -52,6 +52,7 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     this.state = 'connected';
     this.wasConnected = true;
     this.stopRetryingToConnect = false;
+
   }
 
   /**
