@@ -88,6 +88,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       this.client.onopen = () => {
         this.clientConnected().then(() => {
+          console.log({state: this.state});
           /**
            * Defining behavior depending on the Websocket client type
            * Which can be the browser or node one.
@@ -109,7 +110,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           * Send pings to the server
           */
           this.pingIntervalId = setInterval(() => {
-            this.ping();
+            if (this.state === 'connected') {
+              this.ping();
+            }
             this.pongTimeoutId = setTimeout(() => {
               const error: any = new Error('Connection lost.');
               error.status = 503;
