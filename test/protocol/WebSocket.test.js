@@ -102,15 +102,11 @@ describe('WebSocket networking module', () => {
   it('should initialize a ping interval when the connection is established', () => {
     const setInterval = sinon.stub(clock, 'setInterval');
 
-    const clientConnected = sinon.stub(websocket, 'clientConnected').resolves();
     websocket.connect();
     clientStub.onopen();
 
-    return clientConnected()
-      .then(() => {
-        should(setInterval)
-          .be.calledOnce();
-      });
+    should(setInterval)
+      .be.calledOnce();
   });
 
   it('should call listeners on a "reconnect" event', () => {
