@@ -6,10 +6,20 @@ export class User {
    * Kuid (Kuzzle unique ID)
    */
   public _id: string;
+
   /**
-   * Custom content
+   * User content
    */
-  public content: JSONObject;
+  public _source: JSONObject;
+
+  /**
+   * User content
+   *
+   * @deprecated
+   */
+  get content (): JSONObject {
+    return this._source;
+  }
 
   private _kuzzle: any;
 
@@ -24,7 +34,7 @@ export class User {
     });
 
     this._id = _id;
-    this.content = content;
+    this._source = content;
   }
 
   private get kuzzle () {
@@ -35,7 +45,7 @@ export class User {
    * Array of profile IDs
    */
   get profileIds (): Array<string> {
-    return this.content.profileIds || [];
+    return this._source.profileIds || [];
   }
 
   /**
