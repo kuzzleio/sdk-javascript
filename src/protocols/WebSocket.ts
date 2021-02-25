@@ -14,10 +14,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private client: any;
   private lasturl: any;
   private ping: any;
-  protected pongTimeoutId: ReturnType<typeof setTimeout>;
-  protected pingIntervalId: ReturnType<typeof setInterval>;
-  protected _pingInterval: number;
-  protected _pongTimeout: number;
+  private pongTimeoutId: ReturnType<typeof setTimeout>;
+  private pingIntervalId: ReturnType<typeof setInterval>;
+  private _pingInterval: number;
+  private _pongTimeout: number;
 
   /**
    * @param host Kuzzle server hostname or IP
