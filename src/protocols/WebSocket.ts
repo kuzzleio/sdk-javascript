@@ -14,6 +14,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private client: any;
   private lasturl: any;
   private ping: any;
+  protected pongTimeoutId: ReturnType<typeof setTimeout>;
+  protected pingIntervalId: ReturnType<typeof setInterval>;
+  protected _pingInterval: number;
+  protected _pongTimeout: number;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -66,6 +70,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
     }
 
+    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
+    this._pongTimeout = this._pingInterval;
     this.client = null;
     this.lasturl = null;
   }
@@ -214,6 +220,25 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
   }
 
+  /**
+   * Overloads the BaseProtocolRealTime class method
+   */
+  clientDisconnected() {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
+    super.clientDisconnected();
+  }
+
+  /**
+   * Overloads the BaseProtocolRealTime class method
+   *
+   * @param {Error} error
+   */
+  clientNetworkError (error) {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
+    super.clientNetworkError(error);
+  }
   /**
    * Closes the connection
    */

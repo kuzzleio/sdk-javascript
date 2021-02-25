@@ -127,6 +127,45 @@ describe('WebSocket networking module', () => {
     should(cb).be.calledOnce();
   });
 
+  // it('should clear pongTimeout and pingInterval on a networkError', () => {
+  //   const cb = sinon.stub();
+  //   const clearTimeout = sinon.stub(clock, 'clearTimeout');
+  //   const clearInterval = sinon.stub(clock, 'clearInterval');
+    
+  //   websocket.retrying = false;
+  //   websocket.addListener('networkError', cb);
+  //   should(websocket.listeners('networkError').length).be.eql(1);
+
+  //   websocket.connect();
+  //   websocket.connect = sinon.stub().rejects();
+  //   clientStub.onopen();
+  //   clientStub.onerror();
+  //   should(clearTimeout)
+  //     .be.calledOnce();
+  //   should(clearInterval)
+  //     .be.calledOnce();
+  // });
+
+  // it('should clear pongTimeout and pingInterval when the connection closes', () => {
+  //   const cb = sinon.stub();
+  //   const clearTimeout = sinon.stub(clock, 'clearTimeout');
+  //   const clearInterval = sinon.stub(clock, 'clearInterval');
+    
+  //   websocket.retrying = false;
+  //   websocket.addListener('disconnect', cb);
+  //   should(websocket.listeners('disconnect').length).be.eql(1);
+
+  //   websocket.connect();
+  //   websocket.connect = sinon.stub().resolves();
+  //   clientStub.onopen();
+  //   clientStub.onclose(1000);
+  //   websocket.close();
+  //   should(clearTimeout)
+  //     .be.calledOnce();
+  //   should(clearInterval)
+  //     .be.calledOnce();
+  // });
+  
   it('should try to reconnect on a connection error with autoReconnect = true', () => {
     const cb = sinon.stub();
 
