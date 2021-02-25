@@ -59,6 +59,8 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
    * Called when the client's connection is closed
    */
   clientDisconnected () {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
     this.clear();
     this.emit('disconnect');
   }
@@ -69,6 +71,8 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
    * @param {Error} error
    */
   clientNetworkError (error) {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
     this.state = 'offline';
     this.clear();
 
