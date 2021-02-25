@@ -221,7 +221,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   }
 
   /**
-   * Overloads the BaseProtocolRealTime class method
+   * @override
    */
   clientDisconnected() {
     clearInterval(this.pingIntervalId);
