@@ -14,6 +14,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private client: any;
   private lasturl: any;
   private ping: any;
+  private pongTimeoutId: ReturnType<typeof setTimeout>;
+  private pingIntervalId: ReturnType<typeof setInterval>;
+  private _pingInterval: number;
+  private _pongTimeout: number;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -66,6 +70,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
     }
 
+    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
+    this._pongTimeout = this._pingInterval;
     this.client = null;
     this.lasturl = null;
   }
@@ -108,16 +114,13 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         * Send pings to the server
         */
         this.pingIntervalId = setInterval(() => {
-          if (this.client.readyState === 1) {
+          if (this.client && this.client.readyState === 1) {
             this.ping();
           }
           this.pongTimeoutId = setTimeout(() => {
             const error: any = new Error('Connection lost.');
             error.status = 503;
             this.clientNetworkError(error);
-            this.emit('disconnect');
-            clearInterval(this.pingIntervalId);
-            clearTimeout(this.pongTimeoutId);
           }, this._pongTimeout);
         }, this._pingInterval);
         return resolve();
@@ -149,8 +152,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           error.status = status;
           this.clientNetworkError(error);
         }
-        clearInterval(this.pingIntervalId);
-        clearTimeout(this.pongTimeoutId);
       };
 
       this.client.onerror = error => {
@@ -219,6 +220,25 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
   }
 
+  /**
+   * @override
+   */
+  clientDisconnected() {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
+    super.clientDisconnected();
+  }
+
+  /**
+   * @override
+   *
+   * @param {Error} error
+   */
+  clientNetworkError (error) {
+    clearInterval(this.pingIntervalId);
+    clearTimeout(this.pongTimeoutId);
+    super.clientNetworkError(error);
+  }
   /**
    * Closes the connection
    */
