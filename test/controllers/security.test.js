@@ -760,6 +760,28 @@ describe('Security Controller', () => {
     });
   });
 
+  describe('getUserStrategies', () => {
+    it('should call security/getUserStrategies query with the user id return a Promise which resolves the list of strategies', () => {
+      const result = {
+        strategies: ['local']
+      };
+      kuzzle.query.resolves({result});
+
+      return kuzzle.security.getUserStrategies('kuid', options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              _id: 'kuid',
+              controller: 'security',
+              action: 'getUserStrategies'
+            }, options);
+
+          should(res).be.eql(result.strategies);
+        });
+    });
+  });
+
   describe('hasCredentials', () => {
     it('should call security/hasCredentials query and return a Promise which resolves a boolean', () => {
       kuzzle.query.resolves({result: true});
