@@ -174,8 +174,8 @@ describe('Auth Controller', () => {
         }
       });
 
-      const jwt = generateJwt();
-      kuzzle.auth.authenticationToken = jwt
+      const token = generateJwt();
+      kuzzle.auth.authenticationToken = token;
 
       kuzzle.cookieAuthentication = false;
 
@@ -187,7 +187,7 @@ describe('Auth Controller', () => {
               controller: 'auth',
               action: 'checkToken',
               body: {
-                token: jwt
+                token
               },
               cookieAuth: false
             }, {queuable: false});
@@ -208,8 +208,8 @@ describe('Auth Controller', () => {
         }
       });
 
-      const jwt = generateJwt();
-      kuzzle.auth.authenticationToken = jwt
+      const token = generateJwt();
+      kuzzle.auth.authenticationToken = token;
 
       kuzzle.cookieAuthentication = true;
 
@@ -429,15 +429,15 @@ describe('Auth Controller', () => {
         .be.rejected()
         .then(() => {
           should(kuzzle.query)
-          .be.calledOnce()
-          .be.calledWith({
-            controller: 'auth',
-            action: 'login',
-            strategy: 'strategy',
-            expiresIn: 'expiresIn',
-            body: credentials,
-            cookieAuth: true
-          }, {queuable: false, verb: 'POST'})
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'login',
+              strategy: 'strategy',
+              expiresIn: 'expiresIn',
+              body: credentials,
+              cookieAuth: true
+            }, {queuable: false, verb: 'POST'});
         });
     });
 
