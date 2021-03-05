@@ -197,7 +197,7 @@ export class AuthController extends BaseController {
     if (token === undefined) {
       cookieAuth = this.kuzzle.cookieAuthentication;
 
-      if (! cookieAuth) {
+      if (! cookieAuth && this.authenticationToken) {
         token = this.authenticationToken.encodedJwt;
       }
     }
