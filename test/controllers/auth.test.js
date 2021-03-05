@@ -16,6 +16,7 @@ describe('Auth Controller', () => {
   beforeEach(() => {
     kuzzle = new KuzzleEventEmitter();
     kuzzle.query = sinon.stub();
+    kuzzle.cookieAuthentication = false;
 
     kuzzle.auth = new AuthController(kuzzle);
   });
@@ -122,7 +123,107 @@ describe('Auth Controller', () => {
               action: 'checkToken',
               body: {
                 token: 'token'
-              }
+              },
+              cookieAuth: false
+            }, {queuable: false});
+          should(res).match({
+            valid: true,
+            state: 'Error message',
+            expiresAt: 42424242
+          });
+        });
+    });
+
+    it('should call auth/checkToken query with cookieAuth false, the token and return a Promise which resolves the token validity', () => {
+      kuzzle.query.resolves({
+        result: {
+          valid: true,
+          state: 'Error message',
+          expiresAt: 42424242
+        }
+      });
+
+      kuzzle.cookieAuthentication = true;
+
+      return kuzzle.auth.checkToken('token', options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'checkToken',
+              body: {
+                token: 'token'
+              },
+              cookieAuth: false
+            }, {queuable: false});
+          should(res).match({
+            valid: true,
+            state: 'Error message',
+            expiresAt: 42424242
+          });
+        });
+    });
+
+    it('should call auth/checkToken query with cookieAuth false, the stored token if no token is given and return a Promise which resolves the token validity', () => {
+      kuzzle.query.resolves({
+        result: {
+          valid: true,
+          state: 'Error message',
+          expiresAt: 42424242
+        }
+      });
+
+      const jwt = generateJwt();
+      kuzzle.auth.authenticationToken = jwt
+
+      kuzzle.cookieAuthentication = false;
+
+      return kuzzle.auth.checkToken(undefined, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'checkToken',
+              body: {
+                token: jwt
+              },
+              cookieAuth: false
+            }, {queuable: false});
+          should(res).match({
+            valid: true,
+            state: 'Error message',
+            expiresAt: 42424242
+          });
+        });
+    });
+
+    it('should call auth/checkToken query with cookieAuth true, token should be undefined and return a Promise which resolves the token validity', () => {
+      kuzzle.query.resolves({
+        result: {
+          valid: true,
+          state: 'Error message',
+          expiresAt: 42424242
+        }
+      });
+
+      const jwt = generateJwt();
+      kuzzle.auth.authenticationToken = jwt
+
+      kuzzle.cookieAuthentication = true;
+
+      return kuzzle.auth.checkToken(undefined, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'checkToken',
+              body: {
+                token: undefined
+              },
+              cookieAuth: true
             }, {queuable: false});
           should(res).match({
             valid: true,
@@ -314,10 +415,53 @@ describe('Auth Controller', () => {
               action: 'login',
               strategy: 'strategy',
               expiresIn: 'expiresIn',
-              body: credentials
+              body: credentials,
+              cookieAuth: false
             }, {queuable: false, verb: 'POST'});
 
           should(res).be.equal(jwt);
+        });
+    });
+
+    it('should call auth/login with cookieAuth query and throw if there is a JWT in the response', () => {
+      kuzzle.cookieAuthentication = true;
+      return should(kuzzle.auth.login('strategy', credentials, 'expiresIn'))
+        .be.rejected()
+        .then(() => {
+          should(kuzzle.query)
+          .be.calledOnce()
+          .be.calledWith({
+            controller: 'auth',
+            action: 'login',
+            strategy: 'strategy',
+            expiresIn: 'expiresIn',
+            body: credentials,
+            cookieAuth: true
+          }, {queuable: false, verb: 'POST'})
+        });
+    });
+
+    it('should call auth/login with cookieAuth query and return a Promise which resolves to undefined', () => {
+      kuzzle.cookieAuthentication = true;
+      kuzzle.query.resolves({
+        result: {
+          _id: 'kuid'
+        }
+      });
+      return kuzzle.auth.login('strategy', credentials, 'expiresIn')
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'login',
+              strategy: 'strategy',
+              expiresIn: 'expiresIn',
+              body: credentials,
+              cookieAuth: true
+            }, {queuable: false, verb: 'POST'});
+
+          should(res).be.undefined();
         });
     });
 
@@ -332,11 +476,43 @@ describe('Auth Controller', () => {
         });
     });
 
+    it('should trigger a "loginAttempt" event once the user is logged in with cookieAuthentication enabled', () => {
+      kuzzle.emit = sinon.stub();
+      kuzzle.cookieAuthentication = true;
+      kuzzle.query.resolves({
+        result: {
+          _id: 'kuid'
+        }
+      });
+
+      return kuzzle.auth.login('strategy', credentials, 'expiresIn')
+        .then(() => {
+          should(kuzzle.emit)
+            .be.calledOnce()
+            .be.calledWith('loginAttempt');
+        });
+    });
+
     it('should construct a new Jwt', () => {
       return kuzzle.auth.login('strategy', credentials, 'expiresIn')
         .then(() => {
           should(kuzzle.auth.authenticationToken).not.be.null();
           should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
+        });
+    });
+
+    it('should not construct a new Jwt when cookieAuthentication is enabled', () => {
+      kuzzle.cookieAuthentication = true;
+
+      kuzzle.query.resolves({
+        result: {
+          _id: 'kuid'
+        }
+      });
+
+      return kuzzle.auth.login('strategy', credentials, 'expiresIn')
+        .then(() => {
+          should(kuzzle.auth.authenticationToken).be.null();
         });
     });
   });
@@ -354,7 +530,8 @@ describe('Auth Controller', () => {
             .be.calledOnce()
             .be.calledWith({
               controller: 'auth',
-              action: 'logout'
+              action: 'logout',
+              cookieAuth: false
             });
 
           should(res).be.undefined();
@@ -438,7 +615,7 @@ describe('Auth Controller', () => {
               strategy: 'strategy',
               body,
               controller: 'auth',
-              action: 'validateMyCredentials'
+              action: 'validateMyCredentials',
             }, options);
 
           should(res).be.exactly(true);
@@ -462,7 +639,8 @@ describe('Auth Controller', () => {
             .be.calledWith({
               controller: 'auth',
               action: 'refreshToken',
-              expiresIn: undefined
+              expiresIn: undefined,
+              cookieAuth: false
             });
 
           should(res).be.eql(tokenResponse);
@@ -471,12 +649,30 @@ describe('Auth Controller', () => {
         });
     });
 
+    it('should call auth/refreshToken query and authenticationToken should be null', () => {
+      kuzzle.cookieAuthentication = true;
+      return kuzzle.auth.refreshToken()
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'auth',
+              action: 'refreshToken',
+              expiresIn: undefined,
+              cookieAuth: true
+            });
+
+          should(res).be.eql(tokenResponse);
+          should(kuzzle.auth.authenticationToken).be.null();
+        });
+    });
+
     it('should set the expiresIn option if one is provided', () => {
       return kuzzle.auth.refreshToken({expiresIn: 'foobar'})
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'auth',
               action: 'refreshToken',
               expiresIn: 'foobar'
