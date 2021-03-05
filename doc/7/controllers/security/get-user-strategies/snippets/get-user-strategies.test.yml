@@ -1,0 +1,20 @@
+name: security#getUserStrategies
+description: get user strategies
+hooks:
+  before: >
+    curl --fail -H "Content-type: application/json" -d '{
+      "content": {
+        "profileIds": [ "default" ],
+        "fullName": "John Doe"
+      },
+      "credentials": {
+        "local": {
+          "username": "jdoe",
+          "password": "password"
+        }
+      }
+    }' kuzzle:7512/users/john.doe/_create
+  after: curl -XDELETE kuzzle:7512/users/john.doe
+template: default
+expected:
+  - "[ 'local' ]"
