@@ -1,6 +1,4 @@
-const response = await kuzzle.security.getUserStrategies('john.doe');
+const strategies = await kuzzle.security.getUserStrategies('john.doe');
 
-console.log(response);
-/*
-[ 'local' ]
- */
+console.log(strategies);
+// [ 'local' ]

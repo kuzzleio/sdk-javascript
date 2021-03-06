@@ -15,6 +15,6 @@ hooks:
       }
     }' kuzzle:7512/users/john.doe/_create
   after: curl -XDELETE kuzzle:7512/users/john.doe
-template: default
+template: catch
 expected:
   - "[ 'local' ]"
