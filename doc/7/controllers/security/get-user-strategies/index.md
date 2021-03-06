@@ -12,7 +12,7 @@ Gets all the available authentication strategies of a user.
 <br />
 
 ```js
-getUserStrategies(kui, [options]);
+getUserStrategies(kuid, [options]);
 ```
 
 <br />
