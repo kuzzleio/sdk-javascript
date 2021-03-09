@@ -41,4 +41,18 @@ describe('User', () => {
         });
     });
   });
+
+  describe('#_source', () => {
+    it('should return the user custom content', () => {
+      user = new User({}, 'foobar', { email: 'foobar@goo.com' });
+
+      should(user._source).be.eql({ email: 'foobar@goo.com' });
+    });
+
+    it('should keep accessors to deprecated "content" getter', () => {
+      user = new User({}, 'foobar', { email: 'foobar@goo.com' });
+
+      should(user.content).be.eql({ email: 'foobar@goo.com' });
+    });
+  });
 });

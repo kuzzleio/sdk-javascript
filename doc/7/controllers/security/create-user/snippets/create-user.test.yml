@@ -6,5 +6,5 @@ template: default
 expected:
   - "User {"
   - "_id: 'jdoe',"
-  - "content: {"
+  - "_source: {"
   - "profileIds: \\[ \\'default\\' \\],"
