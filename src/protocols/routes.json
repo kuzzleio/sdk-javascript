@@ -250,6 +250,10 @@
       "url": "/users/:_id/_rights",
       "verb": "GET"
     },
+    "getUserStrategies": {
+      "url": "/users/:_id/_strategies",
+      "verb": "GET"
+    },
     "searchUsers": {
       "url": "/users/_search",
       "verb": "POST"

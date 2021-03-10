@@ -330,6 +330,14 @@ class SecurityController extends BaseController {
       .then(response => response.result.hits);
   }
 
+  getUserStrategies (_id, options = {}) {
+    return this.query({
+      _id,
+      action: 'getUserStrategies'
+    }, options)
+      .then(response => response.result.strategies);
+  }
+
   hasCredentials (strategy, _id, options = {}) {
     return this.query({
       strategy,
