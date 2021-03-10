@@ -7,11 +7,12 @@ export class Deprecation {
   }
 
   logDeprecation (response) {
-      if(this._deprecationWarning && response.deprecations?.length) {
-        response.deprecations.forEach(deprecation => {
-          console.warn(deprecation.message)
-        });
-      }
-      return response;
+    if (this._deprecationWarning && response.deprecations?.length) {
+      response.deprecations.forEach(deprecation => {
+        // eslint-disable-next-line no-console
+        console.warn(deprecation.message);
+      });
+    }
+    return response;
   }
 }
