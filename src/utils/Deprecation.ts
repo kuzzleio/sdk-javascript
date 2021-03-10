@@ -18,7 +18,7 @@ export class Deprecation {
       for (let index = 0; index < response.deprecations.length; index++) {
         // eslint-disable-next-line no-console
         console.warn(response.deprecations[index].message);        
-      };
+      }
     }
     return response;
   }
