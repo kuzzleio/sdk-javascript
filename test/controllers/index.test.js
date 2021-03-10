@@ -121,7 +121,7 @@ describe('Index Controller', () => {
     });
   });
 
-  describe.only('stats', () => {
+  describe('stats', () => {
     it('should call index/stats query and return a Promise which resolves to an object containing detailed storage statistics', () => {
       const result = {
         indexes: [
