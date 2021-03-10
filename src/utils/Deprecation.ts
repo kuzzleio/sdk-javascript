@@ -6,12 +6,19 @@ export class Deprecation {
     this._deprecationWarning = deprecationWarning;
   }
 
+  /**
+   * Warn the developer that he is using a deprecated action
+   * 
+   * @param response Result of a query to the API
+   * 
+   * @returns Same as response param, just like a middleware
+   */
   logDeprecation (response) {
     if (this._deprecationWarning && response.deprecations?.length) {
-      response.deprecations.forEach(deprecation => {
+      for (let index = 0; index < response.deprecations.length; index++) {
         // eslint-disable-next-line no-console
-        console.warn(deprecation.message);
-      });
+        console.warn(response.deprecations[index].message);        
+      };
     }
     return response;
   }
