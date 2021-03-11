@@ -9,7 +9,11 @@ description: Authenticate a user
 
 Authenticates a user.
 
-If this action is successful, then the [jwt](/sdk/js/7/core-classes/kuzzle/properties) property of this class instance is set to the new authentication token.
+When the SDK is constructed with the option [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor)
+- If this action is successful, then http cookie is set to the new authentication token.
+  
+Otherwise
+- If this action is successful, then the [jwt](/sdk/js/7/core-classes/kuzzle/properties) property of this class instance is set to the new authentication token.
 
 All further requests emitted by this SDK instance will be on behalf of the authenticated user, until either the authenticated token expires, the [logout](/sdk/js/7/controllers/auth/logout) action is called, or the `jwt` property is manually set to another value.
 
@@ -42,7 +46,11 @@ Check the appropriate [authentication plugin](/core/2/guides/write-plugins/integ
 
 ## Resolves
 
-The **login** action returns the encrypted JSON Web Token.
+When the SDK is constructed with the option [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor)
+- The **login** action returns nothing, the token is stored in the cookies.
+  
+Otherwise
+- The **login** action returns the encrypted JSON Web Token.
 
 ## Usage
 
