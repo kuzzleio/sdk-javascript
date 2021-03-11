@@ -380,8 +380,8 @@ export class AuthController extends BaseController {
 
   /**
    * Send login request to kuzzle with credentials
-   * If kuzzle cookieAuthentication is false and login success, store the jwt into kuzzle object
-   * If kuzzle cookieAuthentication true and login success, the token is stored in a cookie
+   * If cookieAuthentication is false and login succeeds, store the jwt into the kuzzle object
+   * If cookieAuthentication is true and login succeeds, the token is stored in a cookie
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/login
    *
