@@ -108,7 +108,7 @@ export class IndexController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    */
-  stats (options: { queuable?: boolean } = {}): Promise<any> {
+  stats (options: { queuable?: boolean } = {}): Promise<JSONObject> {
     return this.query({
       action: 'stats'
     }, options)
