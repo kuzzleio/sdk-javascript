@@ -14,7 +14,7 @@ export class Deprecation {
    * @returns Same as response param, just like a middleware
    */
   logDeprecation (response) {
-    if (this._deprecationWarning && response.deprecations?.length) {
+    if (this._deprecationWarning && response.deprecations && response.deprecations.length) {
       for (let index = 0; index < response.deprecations.length; index++) {
         // eslint-disable-next-line no-console
         console.warn(response.deprecations[index].message);        
