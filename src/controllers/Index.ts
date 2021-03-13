@@ -1,4 +1,5 @@
 import { BaseController } from './Base';
+import { JSONObject } from '../types';
 
 export class IndexController extends BaseController {
 
