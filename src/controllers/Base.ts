@@ -1,4 +1,4 @@
-import { Kuzzle } from 'src/Kuzzle';
+import { Kuzzle } from '../Kuzzle';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
 
