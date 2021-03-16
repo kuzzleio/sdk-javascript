@@ -528,7 +528,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param req
    * @param opts - Optional arguments
    */
-  async query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
+  query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
     if (typeof req !== 'object' || Array.isArray(req)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
     }
@@ -600,9 +600,8 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    const response = await this.protocol.query(request, options) as ResponsePayload;
-
-    return this.deprecationHandler.logDeprecation(response);
+    return this.protocol.query(request, options)
+      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response))
   }
 
   /**
