@@ -5,7 +5,8 @@ export class Deprecation {
   private _deprecationWarning: boolean;
 
   constructor (deprecationWarning: boolean) {
-    this._deprecationWarning = deprecationWarning;
+    this._deprecationWarning =
+      process.env.NODE_ENV !== 'production' ? deprecationWarning : false;
   }
 
   /**
@@ -16,8 +17,7 @@ export class Deprecation {
    * @returns Same as response param, just like a middleware
    */
   logDeprecation (response: ResponsePayload) {
-    if ( process.env.NODE_ENV !== 'production'
-      && this._deprecationWarning
+    if ( this._deprecationWarning
       && response.deprecations
       && response.deprecations.length
     ) {

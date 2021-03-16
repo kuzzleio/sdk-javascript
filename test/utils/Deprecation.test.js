@@ -5,11 +5,12 @@ const { Deprecation } = require('../../src/utils/Deprecation');
 describe('Deprecation', () => {
   let deprecationHandler, response;
   const sandbox = sinon.createSandbox();
+  const NODE_ENV = process.env.NODE_ENV;
 
   beforeEach(()=>{
     sandbox.stub(console, 'warn');
-    deprecationHandler = new Deprecation(true);
     process.env.NODE_ENV = 'development';
+    deprecationHandler = new Deprecation(true);
 
     response = {
       action: 'test',
@@ -73,9 +74,14 @@ describe('Deprecation', () => {
 
   it('should not warn the developer in production', () => {
     process.env.NODE_ENV = 'production';
+    deprecationHandler = new Deprecation(true);
 
     deprecationHandler.logDeprecation(response);
 
     should(console.warn).not.have.been.called();
+  });
+
+  after(() => {
+    process.env.NODE_ENV = NODE_ENV;
   });
 });
