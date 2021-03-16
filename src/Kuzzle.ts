@@ -601,7 +601,7 @@ Discarded request: ${JSON.stringify(request)}`));
     }
 
     return this.protocol.query(request, options)
-      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response))
+      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
   /**
