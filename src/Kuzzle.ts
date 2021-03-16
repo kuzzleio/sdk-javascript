@@ -11,6 +11,7 @@ import { ServerController } from './controllers/Server';
 import { SecurityController } from './controllers/Security';
 import { MemoryStorageController } from './controllers/MemoryStorage';
 
+import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
 import { JSONObject } from './types';
@@ -61,6 +62,10 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Common volatile data that will be sent to all future requests.
    */
   public volatile: JSONObject;
+  /**
+   * Handle deprecation warning in development mode (hidden in production)
+   */
+  public deprecationHandler: Deprecation;
 
   public auth: AuthController;
   public bulk: any;
@@ -164,6 +169,11 @@ export class Kuzzle extends KuzzleEventEmitter {
        * If set to `auto`, the `autoQueue` and `autoReplay` are also set to `true`
        */
       offlineMode?: 'auto';
+      /**
+       * Show deprecation warning in development mode (hidden either way in production)
+       * Default: `true`
+       */
+      deprecationWarning?: boolean;
     } = {}
   ) {
     super();
@@ -207,6 +217,10 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.volatile = typeof options.volatile === 'object'
       ? options.volatile
       : {};
+
+    this.deprecationHandler = new Deprecation(
+      typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
+    );
 
     // controllers
     this.useController(AuthController, 'auth');
@@ -586,7 +600,8 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request, options);
+    return this.protocol.query(request, options)
+      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
   /**

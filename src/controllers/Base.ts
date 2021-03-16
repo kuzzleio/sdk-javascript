@@ -1,9 +1,10 @@
+import { Kuzzle } from '../Kuzzle';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
 
 export class BaseController {
   private _name: string;
-  private _kuzzle: any;
+  private _kuzzle: Kuzzle;
 
   /**
    * @param {Kuzzle} kuzzle - Kuzzle SDK object.
