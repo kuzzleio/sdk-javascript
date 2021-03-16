@@ -600,7 +600,7 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    const response = await this.protocol.query(request, options);
+    const response = await this.protocol.query(request, options) as ResponsePayload;
 
     return this.deprecationHandler.logDeprecation(response);
   }

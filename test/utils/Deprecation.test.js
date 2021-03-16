@@ -9,6 +9,7 @@ describe('Deprecation', () => {
   beforeEach(()=>{
     sandbox.stub(console, 'warn');
     deprecationHandler = new Deprecation(true);
+    process.env.NODE_ENV = 'development';
 
     response = {
       action: 'test',
@@ -28,7 +29,6 @@ describe('Deprecation', () => {
       status: 200,
       volatile: null
     };
-
   });
 
   afterEach(()=>{
@@ -65,6 +65,14 @@ describe('Deprecation', () => {
 
   it('should not warn the developer if there is no deprecation', () => {
     response.deprecations = [];
+
+    deprecationHandler.logDeprecation(response);
+
+    should(console.warn).not.have.been.called();
+  });
+
+  it('should not warn the developer in production', () => {
+    process.env.NODE_ENV = 'production';
 
     deprecationHandler.logDeprecation(response);
 

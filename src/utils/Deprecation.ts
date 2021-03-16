@@ -1,3 +1,5 @@
+import { ResponsePayload } from 'src/types/ResponsePayload';
+
 export class Deprecation {
 
   private _deprecationWarning: boolean;
@@ -7,21 +9,21 @@ export class Deprecation {
   }
 
   /**
-   * Warn the developer that he is using a deprecated action in development mode
+   * Warn the developer that he is using a deprecated action (disabled if NODE_ENV=production)
    * 
    * @param response Result of a query to the API
    * 
    * @returns Same as response param, just like a middleware
    */
-  logDeprecation (response) {
+  logDeprecation (response: ResponsePayload) {
     if ( process.env.NODE_ENV !== 'production'
       && this._deprecationWarning
       && response.deprecations
       && response.deprecations.length
     ) {
-      for (let index = 0; index < response.deprecations.length; index++) {
+      for (const deprecation of response.deprecations) {
         // eslint-disable-next-line no-console
-        console.warn(response.deprecations[index].message);        
+        console.warn(deprecation.message);    
       }
     }
     return response;
