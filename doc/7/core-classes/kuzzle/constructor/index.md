@@ -36,18 +36,19 @@ It can be one of the following available protocols:
 
 Kuzzle SDK instance options.
 
-| Property          | Type<br/>(default)               | Description                                                        |
-| ----------------- | -------------------------------- | ------------------------------------------------------------------ |
-| `autoQueue`       | <pre>boolean</pre><br/>(`false`) | Automatically queue all requests during offline mode               |
-| `autoReplay`      | <pre>boolean</pre><br/>(`false`) | Automatically replay queued requests on a `reconnected` event      |
-| `autoResubscribe` | <pre>boolean</pre><br/>(`true`)  | Automatically renew all subscriptions on a `reconnected` event     |
-| `eventTimeout`    | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored               |
-| `offlineMode`     | <pre>string</pre><br/>(`manual`) | Offline mode configuration. Can be `manual` or `auto`              |
-| `queueTTL`        | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds |
-| `queueMaxSize`    | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                |
-| `replayInterval`  | <pre>number</pre><br/>(`10`)     | Delay between each replayed requests, in milliseconds              |
-| `tokenExpiredInterval` | <pre>number</pre><br/>(`1000`)    | Time (in ms) during which a TokenExpired event is ignored               |
-| `volatile`        | <pre>object</pre><br/>(`{}`)     | Common volatile data, will be sent to all future requests          |
+| Property               | Type<br/>(default)               | Description                                                        |
+| ---------------------- | -------------------------------- | ------------------------------------------------------------------ |
+| `autoQueue`            | <pre>boolean</pre><br/>(`false`) | Automatically queue all requests during offline mode               |
+| `autoReplay`           | <pre>boolean</pre><br/>(`false`) | Automatically replay queued requests on a `reconnected` event      |
+| `autoResubscribe`      | <pre>boolean</pre><br/>(`true`)  | Automatically renew all subscriptions on a `reconnected` event     |
+| `cookieAuth`           | <pre>boolean</pre><br/>(`false`) | Uses cookie to store token                                         |
+| `eventTimeout`         | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored               |
+| `offlineMode`          | <pre>string</pre><br/>(`manual`) | Offline mode configuration. Can be `manual` or `auto`              |
+| `queueTTL`             | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds |
+| `queueMaxSize`         | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                |
+| `replayInterval`       | <pre>number</pre><br/>(`10`)     | Delay between each replayed requests, in milliseconds              |
+| `tokenExpiredInterval` | <pre>number</pre><br/>(`1000`)   | Time (in ms) during which a TokenExpired event is ignored          |
+| `volatile`             | <pre>object</pre><br/>(`{}`)     | Common volatile data, will be sent to all future requests          |
 
 ## Return
 
