@@ -34,7 +34,7 @@ export type ResponsePayload = {
   /**
    * Array of deprecation warnings (hidden if NODE_ENV=production)
    */
-  deprecations?: {
+  deprecations?: Array<{
 
     /**
      * Deprecation description
@@ -45,7 +45,7 @@ export type ResponsePayload = {
      * Deprecated since this version
      */
     version: string;
-  }[];
+  }>;
 
   /**
    * API error
