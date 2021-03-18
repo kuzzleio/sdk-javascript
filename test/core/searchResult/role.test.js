@@ -75,9 +75,9 @@ describe('RoleSearchResult', () => {
       searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
-        .then(result => {
+        .then(res => {
           should(kuzzle.query).not.be.called();
-          should(result).be.Null();
+          should(res).be.Null();
         });
     });
 
@@ -127,9 +127,9 @@ describe('RoleSearchResult', () => {
         request.from = 30;
 
         return searchResult.next()
-          .then(result => {
+          .then(res => {
             should(kuzzle.query).not.be.called();
-            should(result).be.Null();
+            should(res).be.Null();
           });
 
       });

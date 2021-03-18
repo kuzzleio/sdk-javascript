@@ -64,9 +64,9 @@ describe('SpecificationsSearchResult', () => {
       searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
-        .then(result => {
+        .then(res => {
           should(kuzzle.query).not.be.called();
-          should(result).be.Null();
+          should(res).be.Null();
         });
 
     });
@@ -227,9 +227,9 @@ describe('SpecificationsSearchResult', () => {
         request.from = 30;
 
         return searchResult.next()
-          .then(result => {
+          .then(res => {
             should(kuzzle.query).not.be.called();
-            should(result).be.Null();
+            should(res).be.Null();
           });
 
       });
