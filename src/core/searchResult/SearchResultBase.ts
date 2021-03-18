@@ -108,7 +108,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
         scroll: this._request.scroll,
         scrollId: this._result.scrollId
       }, this._options)
-        .then(result => this._buildNextSearchResult(result));
+        .then(({ result }) => this._buildNextSearchResult(result));
     }
     else if (this._request.size && this._request.body.sort) {
       const request = { ...this._request, action: this._searchAction };

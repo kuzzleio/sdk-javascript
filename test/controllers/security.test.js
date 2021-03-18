@@ -1010,7 +1010,7 @@ describe('Security Controller', () => {
 
           should(res).be.an.instanceOf(ProfileSearchResult);
           should(res._options).be.equal(options);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1040,7 +1040,7 @@ describe('Security Controller', () => {
             }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(ProfileSearchResult);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });
@@ -1073,7 +1073,7 @@ describe('Security Controller', () => {
 
           should(res).be.an.instanceOf(RoleSearchResult);
           should(res._options).be.equal(options);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1102,7 +1102,7 @@ describe('Security Controller', () => {
             }, { from: 1, size: 2 });
 
           should(res).be.an.instanceOf(RoleSearchResult);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });
@@ -1137,7 +1137,7 @@ describe('Security Controller', () => {
 
           should(res).be.an.instanceOf(UserSearchResult);
           should(res._options).be.equal(options);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(3);
           should(res.total).be.equal(3);
         });
@@ -1168,7 +1168,7 @@ describe('Security Controller', () => {
             }, { from: 1, scroll: '10s', size: 2 });
 
           should(res).be.an.instanceOf(UserSearchResult);
-          should(res._response).be.equal(result);
+          should(res._result).be.equal(result);
           should(res.fetched).be.equal(2);
           should(res.total).be.equal(3);
         });

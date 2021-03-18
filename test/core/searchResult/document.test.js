@@ -52,7 +52,7 @@ describe('DocumentSearchResult', () => {
       should(searchResult.hits).be.equal(result.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
-      should(searchResult.suggest).be.equal({ suggest1: 'foobar' });
+      should(searchResult.suggest).match({ suggest1: 'foobar' });
 
       should(searchResult._controller).be.equal('document');
       should(searchResult._searchAction).be.equal('search');
@@ -145,6 +145,7 @@ describe('DocumentSearchResult', () => {
         should(searchResult.fetched).be.equal(2);
         should(searchResult._result).be.equal(result);
         should(searchResult.aggregations).equal(result.aggregations);
+
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
