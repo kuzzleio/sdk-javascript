@@ -9,7 +9,7 @@ describe('SpecificationsSearchResult', () => {
   let
     kuzzle,
     request,
-    response,
+    result,
     searchResult;
 
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('SpecificationsSearchResult', () => {
 
   describe('constructor', () => {
     it('should create a SpecificationsSearchResult instance with good properties', () => {
-      response = {
+      result = {
         hits: [
           {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
           {_id: 'index#collection2', _score: 0.6789, _source: {index: 'index', collection: 'collection2'}}
@@ -34,13 +34,13 @@ describe('SpecificationsSearchResult', () => {
         total: 3
       };
 
-      searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+      searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
-      should(searchResult._response).be.equal(response);
+      should(searchResult._result).be.equal(result);
 
-      should(searchResult.hits).be.equal(response.hits);
+      should(searchResult.hits).be.equal(result.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
 
@@ -52,7 +52,7 @@ describe('SpecificationsSearchResult', () => {
 
   describe('next', () => {
     it('should resolve null without calling kuzzle query if all results are already fetched', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
@@ -61,7 +61,7 @@ describe('SpecificationsSearchResult', () => {
         total: 2
       };
 
-      searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+      searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
         .then(result => {
@@ -72,7 +72,7 @@ describe('SpecificationsSearchResult', () => {
     });
 
     it('should reject with an error if neither scroll, nor size/sort, nor size/from parameters are set', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
@@ -81,7 +81,7 @@ describe('SpecificationsSearchResult', () => {
         total: 30
       };
 
-      searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+      searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -100,7 +100,7 @@ describe('SpecificationsSearchResult', () => {
       beforeEach(() => {
         request.scroll = '10s';
 
-        response = {
+        result = {
           scrollId: 'scroll-id',
           hits: [
             {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
@@ -108,7 +108,7 @@ describe('SpecificationsSearchResult', () => {
           ],
           total: 30
         };
-        searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+        searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -129,13 +129,13 @@ describe('SpecificationsSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });
@@ -154,14 +154,14 @@ describe('SpecificationsSearchResult', () => {
         request.size = 2;
         request.body.sort = ['index', {collection: 'asc'}];
 
-        response = {
+        result = {
           hits: [
             {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
             {_id: 'index#collection2', _score: 0.6789, _source: {index: 'index', collection: 'collection2'}}
           ],
           total: 30
         };
-        searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+        searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -186,13 +186,13 @@ describe('SpecificationsSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });
@@ -211,14 +211,14 @@ describe('SpecificationsSearchResult', () => {
         request.size = 2;
         request.from = 2;
 
-        response = {
+        result = {
           hits: [
             {_id: 'index#collection1', _score: 0.9876, _source: {index: 'index', collection: 'collection1'}},
             {_id: 'index#collection2', _score: 0.6789, _source: {index: 'index', collection: 'collection2'}}
           ],
           total: 30
         };
-        searchResult = new SpecificationsSearchResult(kuzzle, request, options, response);
+        searchResult = new SpecificationsSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -252,13 +252,13 @@ describe('SpecificationsSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
           });
       });

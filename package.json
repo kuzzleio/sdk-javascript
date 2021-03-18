@@ -29,7 +29,7 @@
     "test:lint:ts:fix": "eslint ./src --ext .ts --config .eslintrc-ts.json --fix",
     "build": "npm run build-ts && node build.js",
     "build-ts": "tsc --build tsconfig.json",
-    "clean": "npm run build-ts | grep TSFILE | cut -d' ' -f 2 | xargs rm",
+    "clean": "touch index.ts && npm run build-ts | grep TSFILE | cut -d' ' -f 2 | xargs rm",
     "dev": "node -r ts-node/register ",
     "doc": "docker-compose -f doc/docker-compose.yml up",
     "doc-testing": "bash .ci/test-docs.sh",

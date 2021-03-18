@@ -3,13 +3,13 @@ import { SearchResultBase } from './SearchResultBase';
 
 export class RoleSearchResult extends SearchResultBase<Role> {
 
-  constructor (kuzzle, query, options, response) {
-    super(kuzzle, query, options, response);
+  constructor (kuzzle, query, options, result) {
+    super(kuzzle, query, options, result);
 
     this._searchAction = 'searchRoles';
     this._scrollAction = null; // scrollRoles action does not exists in Kuzzle API.
 
-    this.hits = this._response.hits.map(hit => (
+    this.hits = this._result.hits.map(hit => (
       new Role(this._kuzzle, hit._id, hit._source.controllers)
     ));
   }
@@ -27,7 +27,7 @@ export class RoleSearchResult extends SearchResultBase<Role> {
           return null;
         }
 
-        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => (
+        nextSearchResult.hits = nextSearchResult._result.hits.map(hit => (
           new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers)
         ));
 
