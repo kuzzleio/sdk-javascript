@@ -27,12 +27,14 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.IgnorePlugin(/^(http|min-req-promise|package|ws|buffer)$/),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^(http|min-req-promise|package|ws)$/
+    }),
     new webpack.DefinePlugin({
       SDKVERSION: JSON.stringify(version),
       BUILT: true
     }),
-    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
+    new webpack.BannerPlugin('Kuzzle Javascript SDK version ' + version),
   ],
   resolve: {
     fallback: {
