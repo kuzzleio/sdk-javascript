@@ -9,7 +9,7 @@ describe('DocumentSearchResult', () => {
   let
     kuzzle,
     request,
-    response,
+    result,
     searchResult;
 
   beforeEach(() => {
@@ -32,23 +32,27 @@ describe('DocumentSearchResult', () => {
 
   describe('constructor', () => {
     it('should create a DocumentSearchResult instance with good properties', () => {
-      response = {
+      result = {
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
           {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar'}}
         ],
-        total: 3
+        total: 3,
+        suggest: {
+          suggest1: 'foobar'
+        },
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
-      should(searchResult._response).be.equal(response);
+      should(searchResult._result).be.equal(result);
 
-      should(searchResult.hits).be.equal(response.hits);
+      should(searchResult.hits).be.equal(result.hits);
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
+      should(searchResult.suggest).match({ suggest1: 'foobar' });
 
       should(searchResult._controller).be.equal('document');
       should(searchResult._searchAction).be.equal('search');
@@ -58,7 +62,7 @@ describe('DocumentSearchResult', () => {
 
   describe('next', () => {
     it('should resolve null without calling kuzzle query if all results are already fetched', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
@@ -67,18 +71,18 @@ describe('DocumentSearchResult', () => {
         total: 2
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
-        .then(result => {
+        .then(res => {
           should(kuzzle.query).not.be.called();
-          should(result).be.Null();
+          should(res).be.Null();
         });
 
     });
 
     it('should throw an error if neither scroll, nor size/sort, nor size/from parameters are set', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
@@ -87,7 +91,7 @@ describe('DocumentSearchResult', () => {
         total: 30
       };
 
-      searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+      searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -107,7 +111,7 @@ describe('DocumentSearchResult', () => {
       beforeEach(() => {
         request.scroll = '10s';
 
-        response = {
+        result = {
           scrollId: 'scroll-id',
           hits: [
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar'}},
@@ -116,7 +120,7 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -137,14 +141,15 @@ describe('DocumentSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
-        should(searchResult.aggregations).equal(response.aggregations);
+        should(searchResult._result).be.equal(result);
+        should(searchResult.aggregations).equal(result.aggregations);
+
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
             should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
@@ -167,7 +172,7 @@ describe('DocumentSearchResult', () => {
         request.size = 2;
         request.body.sort = ['foo', {bar: 'asc'}, {_id: 'desc'}];
 
-        response = {
+        result = {
           hits: [
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar', bar: 1234}},
             {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar', bar: 2345}}
@@ -175,7 +180,7 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -204,14 +209,14 @@ describe('DocumentSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
-        should(searchResult.aggregations).equal(response.aggregations);
+        should(searchResult._result).be.equal(result);
+        should(searchResult.aggregations).equal(result.aggregations);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
             should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });
@@ -219,15 +224,15 @@ describe('DocumentSearchResult', () => {
 
       it('should reject with an error if the sort is invalid', () => {
         request.body.sort = [];
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
         return should(searchResult.next())
           .be.rejected();
       });
 
       it('should reject if the sort combination does not allow to retrieve all the documents', () => {
-        response.hits = [];
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        result.hits = [];
+        searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
         return should(searchResult.next())
           .be.rejected();
@@ -248,7 +253,7 @@ describe('DocumentSearchResult', () => {
         request.size = 2;
         request.from = 2;
 
-        response = {
+        result = {
           hits: [
             {_id: 'document1', _score: 0.9876, _source: {foo: 'bar', bar: 1234}},
             {_id: 'document2', _score: 0.6789, _source: {foo: 'barbar', bar: 2345}}
@@ -256,7 +261,7 @@ describe('DocumentSearchResult', () => {
           aggregations: 'aggregations',
           total: 30
         };
-        searchResult = new DocumentSearchResult(kuzzle, request, options, response);
+        searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -265,9 +270,9 @@ describe('DocumentSearchResult', () => {
         request.from = 30;
 
         return searchResult.next()
-          .then(result => {
+          .then(res => {
             should(kuzzle.query).not.be.called();
-            should(result).be.Null();
+            should(res).be.Null();
           });
 
       });
@@ -292,14 +297,14 @@ describe('DocumentSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
-        should(searchResult.aggregations).be.equal(response.aggregations);
+        should(searchResult._result).be.equal(result);
+        should(searchResult.aggregations).be.equal(result.aggregations);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
             should(nextSearchResult.hits).be.equal(nextResponse.hits);
             should(nextSearchResult.aggregations).equal(nextResponse.aggregations);
           });

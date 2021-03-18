@@ -46,9 +46,11 @@ export class SearchResultBase<T> implements SearchResult<T> {
   protected _request: RequestPayload;
   protected _kuzzle: Kuzzle;
   protected _options: JSONObject;
-  protected _response: JSONObject;
+  protected _result: JSONObject;
 
   public aggregations?: JSONObject;
+
+  public suggest: JSONObject;
 
   public hits: Array<T>;
 
@@ -60,7 +62,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     kuzzle: Kuzzle,
     request: RequestPayload = {},
     options: JSONObject = {},
-    response: any = {}
+    result: any = {}
   ) {
     Reflect.defineProperty(this, '_kuzzle', {
       value: kuzzle
@@ -71,8 +73,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
     Reflect.defineProperty(this, '_options', {
       value: options
     });
-    Reflect.defineProperty(this, '_response', {
-      value: response
+    Reflect.defineProperty(this, '_result', {
+      value: result
     });
     Reflect.defineProperty(this, '_controller', {
       value: request.controller,
@@ -87,10 +89,11 @@ export class SearchResultBase<T> implements SearchResult<T> {
       writable: true
     });
 
-    this.aggregations = response.aggregations;
-    this.hits = response.hits || [];
+    this.aggregations = result.aggregations;
+    this.hits = result.hits || [];
     this.fetched = this.hits.length;
-    this.total = response.total || 0;
+    this.total = result.total || 0;
+    this.suggest = result.suggest;
   }
 
   next (): Promise<SearchResult<T> | null> {
@@ -103,13 +106,13 @@ export class SearchResultBase<T> implements SearchResult<T> {
         controller: this._request.controller,
         action: this._scrollAction,
         scroll: this._request.scroll,
-        scrollId: this._response.scrollId
+        scrollId: this._result.scrollId
       }, this._options)
-        .then(response => this._buildNextSearchResult(response));
+        .then(({ result }) => this._buildNextSearchResult(result));
     }
     else if (this._request.size && this._request.body.sort) {
       const request = { ...this._request, action: this._searchAction };
-      const hit = this._response.hits[this._response.hits.length - 1];
+      const hit = this._result.hits[this._result.hits.length - 1];
 
       // When sorting only on a non unique field, the search_after will not iterate
       // over all documents having the same values but ES will returns the results
@@ -150,10 +153,10 @@ export class SearchResultBase<T> implements SearchResult<T> {
       }
 
       return this._kuzzle.query(request, this._options)
-        .then(response => this._buildNextSearchResult(response));
+        .then(({ result }) => this._buildNextSearchResult(result));
     }
     else if (this._request.size) {
-      if (this._request.from >= this._response.total) {
+      if (this._request.from >= this._result.total) {
         return Promise.resolve(null);
       }
 
@@ -162,7 +165,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
         action: this._searchAction,
         from: this.fetched
       }, this._options)
-        .then(response => this._buildNextSearchResult(response));
+        .then(({ result }) => this._buildNextSearchResult(result));
     }
 
     return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params'));
@@ -181,10 +184,10 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return this._get(object[key], path);
   }
 
-  protected _buildNextSearchResult (response) {
+  protected _buildNextSearchResult (result) {
     const Constructor: any = this.constructor;
 
-    const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, response.result);
+    const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, result);
     nextSearchResult.fetched += this.fetched;
 
     return nextSearchResult;

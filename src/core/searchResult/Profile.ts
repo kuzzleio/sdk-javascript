@@ -2,12 +2,12 @@ import { Profile } from '../security/Profile';
 import { SearchResultBase } from './SearchResultBase';
 
 export class ProfileSearchResult extends SearchResultBase<Profile> {
-  constructor (kuzzle, request, options, response) {
-    super(kuzzle, request, options, response);
+  constructor (kuzzle, request, options, result) {
+    super(kuzzle, request, options, result);
 
     this._searchAction = 'searchProfiles';
     this._scrollAction = 'scrollProfiles';
-    this.hits = response.hits.map(hit => (
+    this.hits = result.hits.map(hit => (
       new Profile(this._kuzzle, hit._id, hit._source)
     ));
   }
@@ -19,7 +19,7 @@ export class ProfileSearchResult extends SearchResultBase<Profile> {
           return null;
         }
 
-        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => (
+        nextSearchResult.hits = nextSearchResult._result.hits.map(hit => (
           new Profile(nextSearchResult._kuzzle, hit._id, hit._source)
         ));
 

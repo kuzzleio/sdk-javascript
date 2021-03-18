@@ -275,7 +275,7 @@ describe('Collection Controller', () => {
             scroll: 'scroll'
           });
           should(res._options).match({foo: 'bar'});
-          should(res._response).match({
+          should(res._result).match({
             hits: [
               {foo: 'bar'},
               {bar: 'foo'}

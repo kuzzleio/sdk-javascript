@@ -11,9 +11,10 @@ order: 100
 | Property | Type | Description |
 |--- |--- |--- |
 | `aggregations` | <pre>object</pre> | Search aggregations (can be undefined) |
-| `hits` | <pre>object[]</pre> | Page results |
-| `total` | <pre>number</pre> |  Total number of items that _can_ be retrieved |
 | `fetched` | <pre>number</pre> | Number of retrieved items so far |
+| `hits` | <pre>object[]</pre> | Page results |
+| `suggest` | <pre>number</pre> |  [Suggesters](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-suggesters.html) results <SinceBadge version="auto-version"/> |
+| `total` | <pre>number</pre> |  Total number of items that _can_ be retrieved |
 
 ### hits
 
