@@ -77,6 +77,7 @@ export class KuzzleError extends Error {
     // If we have a stacktrace coming from Kuzzle, merge it with
     // the SDK one
     if (apiError.stack) {
+      this.kuzzleStack = apiError.stack;
       this.stack = apiError.stack + '\n';
       this.stack += '          |\n';
       this.stack += '          |\n';
