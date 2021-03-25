@@ -643,7 +643,7 @@ describe('WebSocket networking module', () => {
       /* eslint-disable no-native-reassign */
       /* eslint-disable no-global-assign */
       XMLHttpRequest = XMLHttpRequestSave;
-    })
+    });
 
     it('should send request using websocket client when support for cookie authentication is disabled', async () => {
       for (let action of ['login', 'logout', 'refreshToken']) {
