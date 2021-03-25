@@ -5,6 +5,8 @@ const NodeWS = require('ws');
 
 const { default: WS } = require('../../src/protocols/WebSocket');
 const windowMock = require('../mocks/window.mock');
+const { default: HttpProtocol } = require('../../src/protocols/Http');
+const { web } = require('webpack');
 
 describe('WebSocket networking module', () => {
   let
@@ -568,6 +570,117 @@ describe('WebSocket networking module', () => {
 
       for (const headers of invalidHeaders) {
         should(() => new WS('foobar', {headers})).throw(Error, {message: 'Invalid "headers" option: expected an object'});
+      }
+    });
+  });
+
+  describe('#enableCookieAuthentication', function() {
+    let enableCookieFunc;
+    before(() => {
+      enableCookieFunc = async function () {
+       websocket.enableCookieAuthentication();
+      };
+    });
+
+    afterEach(() => {
+      XMLHttpRequest = undefined;
+    });
+
+    it('should throw when cookie not in a browser', async () => {
+      await should(enableCookieFunc()).be.rejected();
+      await should(websocket.cookieAuthentication).be.false();
+      await should(websocket._httpProtocol).be.undefined();
+    });
+
+    it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
+      XMLHttpRequest = () => {};
+      await should(enableCookieFunc()).not.be.rejectedWith();
+      await should(websocket.cookieAuthentication).be.true();
+      await should(websocket._httpProtocol).not.be.undefined().and.be.instanceof(HttpProtocol);
+      await should(websocket._httpProtocol.host).be.equal(websocket.host);
+      await should(websocket._httpProtocol.port).be.equal(websocket.port);
+      await should(websocket._httpProtocol.ssl).be.equal(websocket.ssl);
+    });
+  });
+
+  describe('#send', function() {
+
+    let 
+      websocket,
+      httpProtocolStub;
+    beforeEach(() => {
+
+      httpProtocolStub = {
+        validateRequest: sinon.stub(),
+        _sendHttpRequest: sinon.stub()
+      };
+
+      httpProtocolStub.validateRequest.returns({
+        method: 'foo',
+        url: 'bar',
+        payload: {
+          requestId: 'foobar'
+        }
+      });
+
+      httpProtocolStub._sendHttpRequest.resolves();
+
+      websocket = new WS('address', {
+        port: 1234,
+        autoReconnect: true,
+        reconnectionDelay: 10
+      });
+
+      websocket.connect();
+    })
+
+    it('should send request using websocket client when support for cookie authentication is disabled', async () => {
+      for (let action of ['login', 'logout', 'refreshToken']) {
+        clientStub.send.resetHistory();
+
+        const request = {
+          controller: 'auth',
+          action,
+        };
+
+        await websocket.send(request);
+        await should(clientStub.send).be.calledOnce().and.calledWithMatch(JSON.stringify(request));
+      }
+    });
+
+    it('should send request using http protocol when support for cookie authentication is enabled', async () => {
+      XMLHttpRequest = () => {}; // Define XMLHttpRequest to fake being in a browser
+      websocket.enableCookieAuthentication();
+      websocket._httpProtocol = httpProtocolStub;
+
+      websocket.close = sinon.stub();
+      websocket.connect = sinon.stub();
+
+      for (let action of ['login', 'logout', 'refreshToken']) {
+        clientStub.send.resetHistory();
+        httpProtocolStub.validateRequest.resetHistory();
+        httpProtocolStub._sendHttpRequest.resetHistory();
+        websocket.close.resetHistory();
+        websocket.connect.resetHistory();
+
+        const request = {
+          controller: 'auth',
+          action,
+        };
+
+        await websocket.send(request);
+        await should(httpProtocolStub.validateRequest).be.calledOnce().and.calledWithMatch(request);
+        await should(httpProtocolStub._sendHttpRequest).be.calledOnce().and.calledWithMatch(
+          'foo',
+          'bar',
+          {
+            requestId: 'foobar'
+          },
+        );
+
+        await should(websocket.close).be.calledOnce();
+        await should(websocket.connect).be.calledOnce();
+        await should(clientStub.send).not.be.called();
       }
     });
   });
