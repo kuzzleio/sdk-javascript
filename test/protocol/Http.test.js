@@ -192,6 +192,30 @@ describe('HTTP networking module', () => {
     });
   });
 
+  describe('#enableCookieAuthentication', function() {
+    let enableCookieFunc;
+    before(() => {
+      enableCookieFunc = async function () {
+        protocol.enableCookieAuthentication();
+      };
+    });
+
+    afterEach(() => {
+      XMLHttpRequest = undefined;
+    });
+
+    it('should throw when cookie not in a browser', async () => {
+      await should(enableCookieFunc()).be.rejected();
+      await should(protocol.cookieAuthentication).be.false();
+    });
+
+    it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
+      XMLHttpRequest = () => {};
+      await should(enableCookieFunc()).not.be.rejectedWith();
+      await should(protocol.cookieAuthentication).be.true();
+    });
+  });
+
   describe('#send', () => {
     beforeEach(() => {
       protocol._sendHttpRequest = sinon.stub().resolves();
