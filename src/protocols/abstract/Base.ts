@@ -13,6 +13,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _name: string;
   private _port: number;
   private _ssl: boolean;
+  private _cookieAuthentication: boolean;
 
   public id: string;
 
@@ -46,6 +47,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
     this.id = uuidv4();
     this.state = 'offline';
+    this._cookieAuthentication = false;
 
     Object.keys(options).forEach(opt => {
       if ( Object.prototype.hasOwnProperty.call(this, opt)
@@ -91,13 +93,28 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     return this.state === 'connected';
   }
 
+  /**
+   * `true` if cookie authentication is enabled
+   */
+  get cookieAuthentication () {
+    return this._cookieAuthentication;
+  }
+
   get pendingRequests () {
     return this._pendingRequests;
   }
-
+  
   abstract connect (): Promise<any>
-
+  
   abstract send (request: RequestPayload, options: JSONObject): void
+
+
+  /**
+   * Called when we want to enable http cookie support
+   */
+  enableCookieAuthentication () {
+    this._cookieAuthentication = true;
+  }
 
   /**
    * Called when the client's connection is established

@@ -173,12 +173,23 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   }
 
   /**
-   * Sends a payload to the connected server
+   * Enable cookie authentication support at protocol level
+   */
+  enableCookieAuthentication () {
+    if (typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
+    }
+
+    super.enableCookieAuthentication();
+  }
+
+  /**
+   * Preprocess and validate the request before sending
    *
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (request: RequestPayload, options: JSONObject = {}) {
+  validateRequest (request: RequestPayload, options: JSONObject = {}) {
     const route = this.routes[request.controller]
       && this.routes[request.controller][request.action];
 
@@ -281,9 +292,27 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       url += '?' + queryString.join('&');
     }
 
-    this._sendHttpRequest(method, url, payload)
-      .then(response => this.emit(payload.requestId, response))
-      .catch(error => this.emit(payload.requestId, {error}));
+    return {
+      method,
+      url,
+      payload
+    };
+  }
+
+  /**
+   * Sends a payload to the connected server
+   *
+   * @param {Object} data
+   * @returns {Promise<any>}
+   */
+  send (request: RequestPayload, options: JSONObject = {}) {
+    const verifiedRequest = this.validateRequest(request, options);
+
+    if (verifiedRequest) {
+      this._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
+        .then(response => this.emit(verifiedRequest.payload.requestId, response))
+        .catch(error => this.emit(verifiedRequest.payload.requestId, {error}));
+    }
   }
 
   _sendHttpRequest (method, path, payload: any = {}) {
@@ -331,7 +360,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       xhr.open(method, url);
 
       // Authorize the reception of cookies
-      xhr.withCredentials = true;
+      xhr.withCredentials = this.cookieAuthentication;
 
       for (const header of Object.keys(payload.headers || {})) {
         xhr.setRequestHeader(header, payload.headers[header]);

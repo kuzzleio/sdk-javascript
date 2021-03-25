@@ -4,6 +4,7 @@ import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
+import HttpProtocol from './Http';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -18,6 +19,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private pingIntervalId: ReturnType<typeof setInterval>;
   private _pingInterval: number;
   private _pongTimeout: number;
+  private _httpProtocol: HttpProtocol;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -209,15 +211,53 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     });
   }
 
+  enableCookieAuthentication () {
+    if (typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
+    }
+
+    super.enableCookieAuthentication();
+    this._httpProtocol = new HttpProtocol(
+      this.host, 
+      {
+        port: this.port,
+        ssl: this.ssl,
+      }
+    );
+    this._httpProtocol.enableCookieAuthentication();
+  }
+
   /**
    * Sends a payload to the connected server
    *
    * @param {Object} payload
    */
-  send (request: RequestPayload) {
-    if (this.client && this.client.readyState === this.client.OPEN) {
-      this.client.send(JSON.stringify(request));
+  send (request: RequestPayload, options: JSONObject = {}) {
+    if (!this.client || this.client.readyState !== this.client.OPEN) {
+      return;
     }
+
+    if ( this.cookieAuthentication
+      && request.controller === 'auth'
+      && ( request.action === 'login'
+        || request.action === 'logout'
+        || request.action === 'refreshToken')
+    ) {
+      const verifiedRequest = this._httpProtocol.validateRequest(request, options);
+
+      if (verifiedRequest) {
+        this._httpProtocol._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
+          .then(response => {
+            this.close();
+            this.connect();
+            this.emit(verifiedRequest.payload.requestId, response);
+          })
+          .catch(error => this.emit(verifiedRequest.payload.requestId, {error}));
+      }
+      return;
+    }
+
+    this.client.send(JSON.stringify(request));
   }
 
   /**
