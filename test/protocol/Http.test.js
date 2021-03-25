@@ -201,6 +201,8 @@ describe('HTTP networking module', () => {
     });
 
     afterEach(() => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
       XMLHttpRequest = undefined;
     });
 
@@ -210,6 +212,8 @@ describe('HTTP networking module', () => {
     });
 
     it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
       XMLHttpRequest = () => {};
       await should(enableCookieFunc()).not.be.rejectedWith();
       await should(protocol.cookieAuthentication).be.true();
