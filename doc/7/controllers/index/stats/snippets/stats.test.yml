@@ -1,0 +1,10 @@
+---
+name: index#stats
+description: Gets detailed storage statistics
+hooks:
+  before: |
+    curl -X POST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after: curl -X DELETE kuzzle:7512/nyc-open-data
+template: catch
+expected: ["documentCount":0]

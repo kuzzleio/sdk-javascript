@@ -120,4 +120,37 @@ describe('Index Controller', () => {
         });
     });
   });
+
+  describe('stats', () => {
+    it('should call index/stats query and return a Promise which resolves to an object containing detailed storage statistics', () => {
+      const result = {
+        indexes: [
+          {
+            name: 'nyc-open-data',
+            size: 42,
+            collections: [
+              {
+                name: 'yellow-taxi',
+                documentCount: 42,
+                size: 42,
+              }
+            ]
+          }
+        ]
+      };
+      kuzzle.query.resolves({result});
+
+      return kuzzle.index.stats(options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'index',
+              action: 'stats'
+            }, options);
+
+          should(res).be.equal(result);
+        });
+    });
+  });
 });

@@ -3,12 +3,12 @@ import { User } from '../security/User';
 
 export class UserSearchResult extends SearchResultBase<User> {
 
-  constructor (kuzzle, query, options, response) {
-    super(kuzzle, query, options, response);
+  constructor (kuzzle, query, options, result) {
+    super(kuzzle, query, options, result);
 
     this._searchAction = 'searchUsers';
     this._scrollAction = 'scrollUsers';
-    this.hits = this._response.hits.map(hit => (
+    this.hits = this._result.hits.map(hit => (
       new User(this._kuzzle, hit._id, hit._source)
     ));
   }
@@ -20,7 +20,7 @@ export class UserSearchResult extends SearchResultBase<User> {
           return null;
         }
 
-        nextSearchResult.hits = nextSearchResult._response.hits.map(hit => (
+        nextSearchResult.hits = nextSearchResult._result.hits.map(hit => (
           new User(nextSearchResult._kuzzle, hit._id, hit._source)
         ));
 

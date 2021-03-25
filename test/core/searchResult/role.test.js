@@ -10,7 +10,7 @@ describe('RoleSearchResult', () => {
   let
     kuzzle,
     request,
-    response,
+    result,
     searchResult;
 
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('RoleSearchResult', () => {
       action: 'searchRoles',
     };
 
-    response = {
+    result = {
       hits: [
         {_id: 'role1', _version: 1, _source: {controllers: {foo: {actions: {bar: true}}}}},
         {_id: 'role2', _version: 3, _source: {controllers: {bar: {actions: {foo: true}}}}}
@@ -35,11 +35,11 @@ describe('RoleSearchResult', () => {
 
   describe('constructor', () => {
     it('should create a RoleSearchResult instance with good properties', () => {
-      searchResult = new RoleSearchResult(kuzzle, request, options, response);
+      searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
-      should(searchResult._response).be.equal(response);
+      should(searchResult._result).be.equal(result);
 
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(30);
@@ -63,7 +63,7 @@ describe('RoleSearchResult', () => {
 
   describe('next', () => {
     it('should resolve null without calling kuzzle query if all results are already fetched', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'role1', _version: 1, _source: {controllers: {foo: {actions: {bar: true}}}}},
@@ -72,19 +72,19 @@ describe('RoleSearchResult', () => {
         total: 2
       };
 
-      searchResult = new RoleSearchResult(kuzzle, request, options, response);
+      searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
-        .then(result => {
+        .then(res => {
           should(kuzzle.query).not.be.called();
-          should(result).be.Null();
+          should(res).be.Null();
         });
     });
 
 
     it('should reject with an error if scrollId parameters is set', () => {
       request.scroll = '10s';
-      searchResult = new RoleSearchResult(kuzzle, request, options, response);
+      searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('only from/size params are allowed for role search');
@@ -92,14 +92,14 @@ describe('RoleSearchResult', () => {
 
     it('should reject with an error if sort parameters is set', () => {
       request.sort = ['foo', { bar: 'asc' }];
-      searchResult = new RoleSearchResult(kuzzle, request, options, response);
+      searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('only from/size params are allowed for role search');
     });
 
     it('should reject with an error if size and from parameters are not set', () => {
-      searchResult = new RoleSearchResult(kuzzle, request, options, response);
+      searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -118,7 +118,7 @@ describe('RoleSearchResult', () => {
         request.size = 2;
         request.from = 2;
 
-        searchResult = new RoleSearchResult(kuzzle, request, options, response);
+        searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -127,9 +127,9 @@ describe('RoleSearchResult', () => {
         request.from = 30;
 
         return searchResult.next()
-          .then(result => {
+          .then(res => {
             should(kuzzle.query).not.be.called();
-            should(result).be.Null();
+            should(res).be.Null();
           });
 
       });
@@ -152,13 +152,13 @@ describe('RoleSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
 
             should(nextSearchResult.hits).be.an.Array();
             should(nextSearchResult.hits.length).be.equal(2);

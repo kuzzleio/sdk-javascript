@@ -10,7 +10,7 @@ describe('ProfileSearchResult', () => {
   let
     kuzzle,
     request,
-    response,
+    result,
     searchResult;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('ProfileSearchResult', () => {
 
   describe('constructor', () => {
     it('should create a ProfileSearchResult instance with good properties', () => {
-      response = {
+      result = {
         hits: [
           {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar']}},
           {_id: 'profile2', _version: 3, _source: {policies: ['foo', 'baz']}}
@@ -35,11 +35,11 @@ describe('ProfileSearchResult', () => {
         total: 3
       };
 
-      searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+      searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
       should(searchResult._request).be.equal(request);
       should(searchResult._options).be.equal(options);
-      should(searchResult._response).be.equal(response);
+      should(searchResult._result).be.equal(result);
 
       should(searchResult.fetched).be.equal(2);
       should(searchResult.total).be.equal(3);
@@ -63,7 +63,7 @@ describe('ProfileSearchResult', () => {
 
   describe('next', () => {
     it('should resolve null without calling kuzzle query if all results are already fetched', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar']}},
@@ -72,18 +72,18 @@ describe('ProfileSearchResult', () => {
         total: 2
       };
 
-      searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+      searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
       return searchResult.next()
-        .then(result => {
+        .then(res => {
           should(kuzzle.query).not.be.called();
-          should(result).be.Null();
+          should(res).be.Null();
         });
 
     });
 
     it('should reject with an error if neither scroll, nor size/sort, nor size/from parameters are set', () => {
-      response = {
+      result = {
         scrollId: 'scroll-id',
         hits: [
           {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar']}},
@@ -92,7 +92,7 @@ describe('ProfileSearchResult', () => {
         total: 30
       };
 
-      searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+      searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next())
         .be.rejectedWith('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params');
@@ -111,7 +111,7 @@ describe('ProfileSearchResult', () => {
       beforeEach(() => {
         request.scroll = '10s';
 
-        response = {
+        result = {
           scrollId: 'scroll-id',
           hits: [
             {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar']}},
@@ -119,7 +119,7 @@ describe('ProfileSearchResult', () => {
           ],
           total: 30
         };
-        searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+        searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -140,13 +140,13 @@ describe('ProfileSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
 
             should(nextSearchResult.hits).be.an.Array();
             should(nextSearchResult.hits.length).be.equal(2);
@@ -175,7 +175,7 @@ describe('ProfileSearchResult', () => {
         request.size = 2;
         request.body.sort = ['foo', {bar: 'asc'}];
 
-        response = {
+        result = {
           hits: [
             {
               _id: 'profile1',
@@ -198,7 +198,7 @@ describe('ProfileSearchResult', () => {
           ],
           total: 30
         };
-        searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+        searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -224,13 +224,13 @@ describe('ProfileSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
 
             should(nextSearchResult.hits).be.an.Array();
             should(nextSearchResult.hits.length).be.equal(2);
@@ -259,14 +259,14 @@ describe('ProfileSearchResult', () => {
         request.size = 2;
         request.from = 2;
 
-        response = {
+        result = {
           hits: [
             {_id: 'profile1', _version: 1, _source: {policies: ['foo', 'bar']}},
             {_id: 'profile2', _version: 3, _source: {policies: ['foo', 'baz']}}
           ],
           total: 30
         };
-        searchResult = new ProfileSearchResult(kuzzle, request, options, response);
+        searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
         kuzzle.query.resolves({result: nextResponse});
       });
@@ -275,9 +275,9 @@ describe('ProfileSearchResult', () => {
         request.from = 30;
 
         return searchResult.next()
-          .then(result => {
+          .then(res => {
             should(kuzzle.query).not.be.called();
-            should(result).be.Null();
+            should(res).be.Null();
           });
 
       });
@@ -300,13 +300,13 @@ describe('ProfileSearchResult', () => {
           });
       });
 
-      it('should set the response and increment the "fetched" property', () => {
+      it('should set the result and increment the "fetched" property', () => {
         should(searchResult.fetched).be.equal(2);
-        should(searchResult._response).be.equal(response);
+        should(searchResult._result).be.equal(result);
         return searchResult.next()
           .then(nextSearchResult => {
             should(nextSearchResult.fetched).be.equal(4);
-            should(nextSearchResult._response).be.equal(nextResponse);
+            should(nextSearchResult._result).be.equal(nextResponse);
 
             should(nextSearchResult.hits).be.an.Array();
             should(nextSearchResult.hits.length).be.equal(2);

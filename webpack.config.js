@@ -1,6 +1,6 @@
-const
-  webpack = require('webpack'),
-  version = require('./package.json').version;
+const webpack = require('webpack');
+
+const { version } = require('./package.json');
 
 module.exports = {
   name: 'browser',
@@ -27,19 +27,21 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.IgnorePlugin(/^(http|min-req-promise|package|ws)$/),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^(http|min-req-promise|package|ws)$/
+    }),
     new webpack.DefinePlugin({
       SDKVERSION: JSON.stringify(version),
       BUILT: true
     }),
-    new webpack.BannerPlugin('Kuzzle javascript SDK version ' + version),
+    new webpack.BannerPlugin('Kuzzle Javascript SDK version ' + version),
   ],
   resolve: {
     fallback: {
-      buffer: require.resolve('buffer'),
-      http: require.resolve('stream-http'),
-      https: require.resolve('https-browserify'),
-      url: require.resolve('url/'),
+      buffer: false,
+      http: false,
+      https: false,
+      url: false,
     }
   },
 };
