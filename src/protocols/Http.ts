@@ -177,7 +177,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    */
   enableCookieSupport () {
     if (typeof XMLHttpRequest === 'undefined') {
-      throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
+      throw new Error('Support for cookie cannot be enabled outside of a browser');
     }
 
     super.enableCookieSupport();
