@@ -573,11 +573,11 @@ describe('WebSocket networking module', () => {
     });
   });
 
-  describe('#enableCookieAuthentication', function() {
+  describe('#enableCookieSupport', function() {
     let enableCookieFunc;
     before(() => {
       enableCookieFunc = async function () {
-        websocket.enableCookieAuthentication();
+        websocket.enableCookieSupport();
       };
     });
 
@@ -587,19 +587,19 @@ describe('WebSocket networking module', () => {
       XMLHttpRequest = undefined;
     });
 
-    it('should throw when cookie not in a browser', async () => {
+    it('should throw when enabling cookie support outside of a browser', async () => {
       await should(enableCookieFunc()).be.rejected();
-      await should(websocket.cookieAuthentication).be.false();
+      await should(websocket.cookieSupport).be.false();
       await should(websocket._httpProtocol).be.undefined();
     });
 
-    it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
+    it('should set cookieSupport to true and construct the HttpProtocol', async () => {
       /* eslint-disable no-native-reassign */
       /* eslint-disable no-global-assign */
       XMLHttpRequest = () => {};
       await should(enableCookieFunc()).not.be.rejectedWith();
-      await should(websocket.cookieAuthentication).be.true();
-      await should(websocket._httpProtocol).not.be.undefined().and.be.instanceof(HttpProtocol);
+      await should(websocket.cookieSupport).be.true();
+      await should(websocket._httpProtocol).not.be.undefined().and.be.an.instanceof(HttpProtocol);
       await should(websocket._httpProtocol.host).be.equal(websocket.host);
       await should(websocket._httpProtocol.port).be.equal(websocket.port);
       await should(websocket._httpProtocol.ssl).be.equal(websocket.ssl);
@@ -663,7 +663,7 @@ describe('WebSocket networking module', () => {
       /* eslint-disable no-native-reassign */
       /* eslint-disable no-global-assign */
       XMLHttpRequest = () => {}; // Define XMLHttpRequest to fake being in a browser
-      websocket.enableCookieAuthentication();
+      websocket.enableCookieSupport();
       websocket._httpProtocol = httpProtocolStub;
 
       websocket.close = sinon.stub();

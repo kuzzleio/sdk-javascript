@@ -192,11 +192,11 @@ describe('HTTP networking module', () => {
     });
   });
 
-  describe('#enableCookieAuthentication', function() {
+  describe('#enableCookieSupport', function() {
     let enableCookieFunc;
     before(() => {
       enableCookieFunc = async function () {
-        protocol.enableCookieAuthentication();
+        protocol.enableCookieSupport();
       };
     });
 
@@ -208,7 +208,7 @@ describe('HTTP networking module', () => {
 
     it('should throw when cookie not in a browser', async () => {
       await should(enableCookieFunc()).be.rejected();
-      await should(protocol.cookieAuthentication).be.false();
+      await should(protocol.cookieSupport).be.false();
     });
 
     it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
@@ -216,7 +216,7 @@ describe('HTTP networking module', () => {
       /* eslint-disable no-global-assign */
       XMLHttpRequest = () => {};
       await should(enableCookieFunc()).not.be.rejectedWith();
-      await should(protocol.cookieAuthentication).be.true();
+      await should(protocol.cookieSupport).be.true();
     });
   });
 
