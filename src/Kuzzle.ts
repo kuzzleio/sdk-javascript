@@ -237,6 +237,14 @@ export class Kuzzle extends KuzzleEventEmitter {
       typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
     );
 
+    this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
+      ? options.cookieAuth
+      : false;
+    
+    if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
+    }
+    
     // controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
