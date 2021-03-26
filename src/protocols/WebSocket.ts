@@ -246,9 +246,15 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       const verifiedRequest = this._httpProtocol.validateRequest(request, options);
 
       if (verifiedRequest) {
+        if (this.client) {
+          this.client.close();
+        }
+        this.client = null;
+        this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
+
         this._httpProtocol._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
-          .then(response => {
-            this.reconnect();
+          .then(async (response) => {
+            await this.connect(); // Reconnection
             this.emit(verifiedRequest.payload.requestId, response);
           })
           .catch(error => this.emit(verifiedRequest.payload.requestId, {error}));
@@ -291,17 +297,5 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     this.client = null;
     this.stopRetryingToConnect = true;
     super.close();
-  }
-
-  /**
-   * Closes and Reopens the connection
-   */
-  reconnect () {
-    if (this.client) {
-      this.client.close();
-    }
-    this.client = null;
-    this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
-    this.connect(); // Reconnect, then the offline queue should replay requests and realtime subscriptions should be renewed
   }
 }
