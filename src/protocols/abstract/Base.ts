@@ -13,7 +13,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _name: string;
   private _port: number;
   private _ssl: boolean;
-  private _cookieAuthentication: boolean;
+  private _cookieSupport: boolean;
 
   public id: string;
 
@@ -47,7 +47,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
     this.id = uuidv4();
     this.state = 'offline';
-    this._cookieAuthentication = false;
+    this._cookieSupport = false;
 
     Object.keys(options).forEach(opt => {
       if ( Object.prototype.hasOwnProperty.call(this, opt)
@@ -96,8 +96,8 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   /**
    * `true` if cookie authentication is enabled
    */
-  get cookieAuthentication () {
-    return this._cookieAuthentication;
+  get cookieSupport () {
+    return this._cookieSupport;
   }
 
   get pendingRequests () {
@@ -112,8 +112,8 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   /**
    * Called when we want to enable http cookie support
    */
-  enableCookieAuthentication () {
-    this._cookieAuthentication = true;
+  enableCookieSupport () {
+    this._cookieSupport = true;
   }
 
   /**

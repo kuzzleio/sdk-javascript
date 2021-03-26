@@ -175,12 +175,12 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   /**
    * Enable cookie authentication support at protocol level
    */
-  enableCookieAuthentication () {
+  enableCookieSupport () {
     if (typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
     }
 
-    super.enableCookieAuthentication();
+    super.enableCookieSupport();
   }
 
   /**
@@ -360,7 +360,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       xhr.open(method, url);
 
       // Authorize the reception of cookies
-      xhr.withCredentials = this.cookieAuthentication;
+      xhr.withCredentials = this.cookieSupport;
 
       for (const header of Object.keys(payload.headers || {})) {
         xhr.setRequestHeader(header, payload.headers[header]);

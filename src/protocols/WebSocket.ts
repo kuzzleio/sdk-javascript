@@ -211,12 +211,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     });
   }
 
-  enableCookieAuthentication () {
+  enableCookieSupport () {
     if (typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
     }
 
-    super.enableCookieAuthentication();
+    super.enableCookieSupport();
     this._httpProtocol = new HttpProtocol(
       this.host, 
       {
@@ -224,7 +224,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         ssl: this.ssl,
       }
     );
-    this._httpProtocol.enableCookieAuthentication();
+    this._httpProtocol.enableCookieSupport();
   }
 
   /**
@@ -237,7 +237,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       return;
     }
 
-    if ( this.cookieAuthentication
+    if ( this.cookieSupport
       && request.controller === 'auth'
       && ( request.action === 'login'
         || request.action === 'logout'

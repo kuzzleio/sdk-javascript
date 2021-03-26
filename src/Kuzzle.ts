@@ -230,7 +230,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       : false;
     
     if (this._cookieAuthentication) {
-      this.protocol.enableCookieAuthentication();
+      this.protocol.enableCookieSupport();
     }
     
     this.deprecationHandler = new Deprecation(
