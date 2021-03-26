@@ -616,11 +616,11 @@ describe('WebSocket networking module', () => {
       XMLHttpRequestSave = XMLHttpRequest;
 
       httpProtocolStub = {
-        validateRequest: sinon.stub(),
+        formatRequest: sinon.stub(),
         _sendHttpRequest: sinon.stub()
       };
 
-      httpProtocolStub.validateRequest.returns({
+      httpProtocolStub.formatRequest.returns({
         method: 'foo',
         url: 'bar',
         payload: {
@@ -670,7 +670,7 @@ describe('WebSocket networking module', () => {
 
       for (let action of ['login', 'logout', 'refreshToken']) {
         clientStub.send.resetHistory();
-        httpProtocolStub.validateRequest.resetHistory();
+        httpProtocolStub.formatRequest.resetHistory();
         httpProtocolStub._sendHttpRequest.resetHistory();
         clientStub.close.resetHistory();
         websocket.clientDisconnected.resetHistory();
@@ -681,7 +681,7 @@ describe('WebSocket networking module', () => {
         };
 
         await websocket.send(request);
-        await should(httpProtocolStub.validateRequest).be.calledOnce().and.calledWithMatch(request);
+        await should(httpProtocolStub.formatRequest).be.calledOnce().and.calledWithMatch(request);
         await should(httpProtocolStub._sendHttpRequest).be.calledOnce().and.calledWithMatch(
           'foo',
           'bar',

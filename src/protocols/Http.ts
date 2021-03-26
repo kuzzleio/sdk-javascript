@@ -184,12 +184,12 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   }
 
   /**
-   * Preprocess and validate the request before sending
+   * Preprocess and format the request
    *
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  validateRequest (request: RequestPayload, options: JSONObject = {}) {
+  formatRequest (request: RequestPayload, options: JSONObject = {}) {
     const route = this.routes[request.controller]
       && this.routes[request.controller][request.action];
 
@@ -306,7 +306,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @returns {Promise<any>}
    */
   send (request: RequestPayload, options: JSONObject = {}) {
-    const verifiedRequest = this.validateRequest(request, options);
+    const verifiedRequest = this.formatRequest(request, options);
 
     if (verifiedRequest) {
       this._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
