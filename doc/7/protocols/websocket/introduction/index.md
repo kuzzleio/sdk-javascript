@@ -38,7 +38,7 @@ Since cookie can only be sent during the Websocket Handshake process at the star
 Here is a list of controller's actions that are impacted by those changes in the Websocket Protocol behaviour when [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) is enabled:
 - [auth:login](/sdk/js/7/controllers/auth/login)
 - [auth:logout](/sdk/js/7/controllers/auth/logout)
-- [auth:refreshToken](/sdk/js/7/controllers/auth/refreshToken)
+- [auth:refreshToken](/sdk/js/7/controllers/auth/refresh-token)
 
 ::: warning
 All the behaviours described above are handled by the SDK, you do not have to implement this yourself.
