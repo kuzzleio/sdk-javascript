@@ -666,15 +666,13 @@ describe('WebSocket networking module', () => {
       websocket.enableCookieSupport();
       websocket._httpProtocol = httpProtocolStub;
 
-      websocket.close = sinon.stub();
-      websocket.connect = sinon.stub();
+      websocket.reconnect = sinon.stub();
 
       for (let action of ['login', 'logout', 'refreshToken']) {
         clientStub.send.resetHistory();
         httpProtocolStub.validateRequest.resetHistory();
         httpProtocolStub._sendHttpRequest.resetHistory();
-        websocket.close.resetHistory();
-        websocket.connect.resetHistory();
+        websocket.reconnect.resetHistory();
 
         const request = {
           controller: 'auth',
@@ -691,8 +689,7 @@ describe('WebSocket networking module', () => {
           },
         );
 
-        await should(websocket.close).be.calledOnce();
-        await should(websocket.connect).be.calledOnce();
+        await should(websocket.reconnect).be.calledOnce();
         await should(clientStub.send).not.be.called();
       }
     });
@@ -712,6 +709,27 @@ describe('WebSocket networking module', () => {
     it('should not be ready if the instance is still connecting', () => {
       websocket.state = 'connecting';
       should(websocket.isReady()).be.false();
+    });
+  });
+
+  describe('#reconnect', function() {
+    it('should emit a disconnect event, then emit a reconnected event', () => {
+      const disconnectedCallback = sinon.stub();
+      const reconnectedCallback = sinon.stub();
+      websocket.addListener('disconnect', disconnectedCallback);
+      websocket.addListener('reconnect', reconnectedCallback);
+      
+      websocket.connect();
+      clientStub.onopen();
+
+      should(websocket.wasConnected).be.true();
+
+      websocket.reconnect();
+      clientStub.onopen();
+
+      should(clientStub.close).be.calledOnce();
+      should(disconnectedCallback).be.calledOnce();
+      should(reconnectedCallback).be.calledOnce();
     });
   });
 });
