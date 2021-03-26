@@ -89,6 +89,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _replayInterval: any;
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
+  private _cookieAuthentication: boolean;
 
   private __proxy__: any;
 
@@ -174,6 +175,12 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Default: `true`
        */
       deprecationWarning?: boolean;
+      /**
+       * If `true` uses cookie to store token
+       * Only supported in a browser
+       * Default: `false`
+       */
+      cookieAuth?: boolean;
     } = {}
   ) {
     super();
@@ -222,6 +229,14 @@ export class Kuzzle extends KuzzleEventEmitter {
       typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
     );
 
+    this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
+      ? options.cookieAuth
+      : false;
+    
+    if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
+    }
+    
     // controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
@@ -304,6 +319,10 @@ export class Kuzzle extends KuzzleEventEmitter {
   set autoReplay (value) {
     this._checkPropertyType('_autoReplay', 'boolean', value);
     this._autoReplay = value;
+  }
+
+  get cookieAuthentication () {
+    return this._cookieAuthentication;
   }
 
   get connected () {
