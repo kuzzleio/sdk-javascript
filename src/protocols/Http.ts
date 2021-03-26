@@ -395,11 +395,10 @@ function getPostRoute (routes) {
 }
 
 function getCorrectRoute (routes) {
-  let
-    shortestRoute = routes[0],
-    getRoute,
-    minLength = routes[0].url.length,
-    sameLength = true;
+  let shortestRoute = routes[0];
+  let getRoute = routes[0];
+  let minLength = routes[0].url.length;
+  let sameLength = true;
 
   for (const route of routes) {
     if (route.url.length !== minLength) {
@@ -416,7 +415,7 @@ function getCorrectRoute (routes) {
     }
   }
 
-  // with same URL size, we keep the GET route
+  // with same URL size, we prefer the GET route
   // with differents URL sizes, we keep the shortest because URL params
   // will be in the query string
   return sameLength ? getRoute : shortestRoute;
