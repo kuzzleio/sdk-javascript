@@ -155,4 +155,13 @@ describe('Kuzzle constructor', () => {
       );
     }).not.throw();
   });
+
+  it('should call protocol.enableCookieSupport', () => {
+    const kuzzle = new Kuzzle(protocolMock, {
+      cookieAuth: true,
+    });
+
+    should(kuzzle.cookieAuthentication).be.true();
+    should(protocolMock.enableCookieSupport).be.called();
+  });
 });
