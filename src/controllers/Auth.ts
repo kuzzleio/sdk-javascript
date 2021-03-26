@@ -51,6 +51,10 @@ export class AuthController extends BaseController {
    * a developer simply wishes to verify their token
    */
   authenticateRequest (request: any) {
+    if (this.kuzzle.cookieAuthentication) {
+      return;
+    }
+
     if ( ! this.authenticationToken
       || (request.controller === 'auth'
         && (request.action === 'checkToken' || request.action === 'login'))
@@ -189,13 +193,19 @@ export class AuthController extends BaseController {
      */
     expiresAt: number
   }> {
-    if (token === undefined && this.authenticationToken) {
-      token = this.authenticationToken.encodedJwt;
-    }
+    let cookieAuth = false;
+    if (token === undefined) {
+      cookieAuth = this.kuzzle.cookieAuthentication;
 
+      if (! cookieAuth && this.authenticationToken) {
+        token = this.authenticationToken.encodedJwt;
+      }
+    }
+    
     return this.query({
       action: 'checkToken',
-      body: { token }
+      body: { token },
+      cookieAuth
     }, { queuable: false })
       .then(response => response.result);
   }
@@ -370,7 +380,8 @@ export class AuthController extends BaseController {
 
   /**
    * Send login request to kuzzle with credentials
-   * If login success, store the jwt into kuzzle object
+   * If cookieAuthentication is false and login succeeds, store the jwt into the kuzzle object
+   * If cookieAuthentication is true and login succeeds, the token is stored in a cookie
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/login
    *
@@ -389,11 +400,21 @@ export class AuthController extends BaseController {
       strategy,
       expiresIn,
       body: credentials,
-      action: 'login'
+      action: 'login',
+      cookieAuth: this.kuzzle.cookieAuthentication
     };
 
     return this.query(request, { queuable: false, verb: 'POST' })
       .then(response => {
+        if (this.kuzzle.cookieAuthentication) {
+          if (response.result.jwt) {
+            throw new Error('Kuzzle support for cookie authentication is disabled or not supported');
+          }
+
+          this.kuzzle.emit('loginAttempt', { success: true });
+          return;
+        }
+
         this._authenticationToken = new Jwt(response.result.jwt);
 
         this.kuzzle.emit('loginAttempt', { success: true });
@@ -413,7 +434,8 @@ export class AuthController extends BaseController {
    */
   logout (): Promise<void> {
     return this.query({
-      action: 'logout'
+      action: 'logout',
+      cookieAuth: this.kuzzle.cookieAuthentication
     }, { queuable: false })
       .then(() => {
         this._authenticationToken = null;
@@ -528,12 +550,15 @@ export class AuthController extends BaseController {
   }> {
     const query = {
       action: 'refreshToken',
-      expiresIn: options.expiresIn
+      expiresIn: options.expiresIn,
+      cookieAuth: this.kuzzle.cookieAuthentication
     };
 
     return this.query(query, options)
       .then(response => {
-        this._authenticationToken = new Jwt(response.result.jwt);
+        if (! this.kuzzle.cookieAuthentication) {
+          this._authenticationToken = new Jwt(response.result.jwt);
+        }
 
         return response.result;
       });

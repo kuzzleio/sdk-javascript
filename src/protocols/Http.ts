@@ -330,6 +330,9 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
       xhr.open(method, url);
 
+      // Authorize the reception of cookies
+      xhr.withCredentials = true;
+
       for (const header of Object.keys(payload.headers || {})) {
         xhr.setRequestHeader(header, payload.headers[header]);
       }
