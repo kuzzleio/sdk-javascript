@@ -70,6 +70,52 @@ describe('HTTP networking module', () => {
         });
     });
 
+    it('should prefer GET routes when multiple routes are available for a same action', async () => {
+      protocol._sendHttpRequest.resolves({
+        result: {
+          foo: {
+            bar: {
+              http: [
+                { path: 'samesize', url: 'samesize', verb: 'OHNOES' },
+                { path: 'samesize', url: 'samesize', verb: 'GET' },
+              ]
+            }
+          }
+        }
+      });
+
+      await protocol.connect();
+
+      should(protocol.routes).match({
+        foo: {
+          bar: { verb: 'GET', url: 'samesize' },
+        }
+      });
+    });
+
+    it('should pick a route at random when no GET route is available', async () => {
+      protocol._sendHttpRequest.resolves({
+        result: {
+          foo: {
+            bar: {
+              http: [
+                { path: 'samesize', url: 'samesize', verb: 'SURE' },
+                { path: 'samesize', url: 'samesize', verb: 'YOU\'RE KEN' },
+              ]
+            }
+          }
+        }
+      });
+
+      await protocol.connect();
+
+      should(protocol.routes).match({
+        foo: {
+          bar: { verb: 'SURE', url: 'samesize' },
+        }
+      });
+    });
+
     it('should fallback to static routes if server:publicApi is restricted', () => {
       protocol._sendHttpRequest.onCall(0).resolves({ error: { status: 401 } });
 
