@@ -243,24 +243,24 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         || request.action === 'logout'
         || request.action === 'refreshToken')
     ) {
-      const verifiedRequest = this._httpProtocol.formatRequest(request, options);
+      const formattedRequest = this._httpProtocol.formatRequest(request, options);
 
-      if (verifiedRequest) {
+      if (formattedRequest) {
         if (this.client) {
           this.client.close();
         }
         this.client = null;
         this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
 
-        this._httpProtocol._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
-          .then((response) => {
+        this._httpProtocol._sendHttpRequest(formattedRequest)
+          .then(response => {
             // Reconnection
             return this.connect()
               .then(() => {
-                this.emit(verifiedRequest.payload.requestId, response);
+                this.emit(formattedRequest.payload.requestId, response);
               });
           })
-          .catch(error => this.emit(verifiedRequest.payload.requestId, {error}));
+          .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
       }
       return;
     }

@@ -113,7 +113,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       return Promise.resolve();
     }
 
-    return this._sendHttpRequest('GET', '/_publicApi')
+    return this._sendHttpRequest({method: 'GET', path: '/_publicApi'})
       .then(({ result, error }) => {
         if (! error) {
           this._routes = this._constructRoutes(result);
@@ -133,7 +133,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         } else if (error.status === 404) {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
-          return this._sendHttpRequest('GET', '/')
+          return this._sendHttpRequest({method: 'GET', path: '/'})
             .then(({ result: res, error: err }) => {
               if (! err) {
                 this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
@@ -294,7 +294,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
     return {
       method,
-      url,
+      path: url,
       payload
     };
   }
@@ -306,16 +306,16 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @returns {Promise<any>}
    */
   send (request: RequestPayload, options: JSONObject = {}) {
-    const verifiedRequest = this.formatRequest(request, options);
+    const formattedRequest = this.formatRequest(request, options);
 
-    if (verifiedRequest) {
-      this._sendHttpRequest(verifiedRequest.method, verifiedRequest.url, verifiedRequest.payload)
-        .then(response => this.emit(verifiedRequest.payload.requestId, response))
-        .catch(error => this.emit(verifiedRequest.payload.requestId, {error}));
+    if (formattedRequest) {
+      this._sendHttpRequest(formattedRequest)
+        .then(response => this.emit(formattedRequest.payload.requestId, response))
+        .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
     }
   }
 
-  _sendHttpRequest (method, path, payload: any = {}) {
+  _sendHttpRequest ({method, path, payload = {headers: undefined, body:undefined}}) {
     if (typeof XMLHttpRequest === 'undefined') {
       // NodeJS implementation, using http.request:
 

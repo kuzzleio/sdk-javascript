@@ -622,7 +622,7 @@ describe('WebSocket networking module', () => {
 
       httpProtocolStub.formatRequest.returns({
         method: 'foo',
-        url: 'bar',
+        path: 'bar',
         payload: {
           requestId: 'foobar'
         }
@@ -682,13 +682,13 @@ describe('WebSocket networking module', () => {
 
         await websocket.send(request);
         await should(httpProtocolStub.formatRequest).be.calledOnce().and.calledWithMatch(request);
-        await should(httpProtocolStub._sendHttpRequest).be.calledOnce().and.calledWithMatch(
-          'foo',
-          'bar',
-          {
+        await should(httpProtocolStub._sendHttpRequest).be.calledOnce().and.calledWithMatch({
+          method: 'foo',
+          path: 'bar',
+          payload: {
             requestId: 'foobar'
           },
-        );
+        });
 
         await should(clientStub.close).be.calledOnce();
         await should(websocket.clientDisconnected).be.calledOnce();
