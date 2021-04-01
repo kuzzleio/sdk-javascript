@@ -25,21 +25,24 @@ That message will call a response from Kuzzle in the form `"{"p":2}"` for the SD
 
 ### Cookie Authentication
 
-Kuzzle does support cookie authentication, meaning that when you're making a request, you can instruct Kuzzle to store the token securely inside a cookie in your browser, instead of returning it in the response.
+Kuzzle supports cookie authentications, meaning that when using this SDK in a browser, you can ask Kuzzle to return authentication tokens in secure cookies, handled by browsers. This means that, when using that option, browser clients will never have access to said tokens, preventing a few common attacks.
 The support for cookie authentication can be enabled, using the [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) option at the SDK initialization.
 
-When you enable the [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) option, it changes how the websocket protocol behave when you're sending requests that can modify the token stored in the cookie.
+When you enable the [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) option, it changes the way the websocket protocol behaves when you're sending requests that should otherwise return authentication tokens in their response payload.
 
-When such a request is sent, the Websocket Protocol will use the [HTTP Protocol](/sdk/js/7/protocols/http/introduction) instead, because cookies can only be set through HTTP Request in a browser, for every other requests the default behaviour is used and the request is sent through websocket.
+When a request susceptible of changing an authentication cookie is about to be sent, the WebSocket Protocol send it using the [HTTP Protocol](/sdk/js/7/protocols/http/introduction) instead, to allow browsers to apply the received cookie. 
 
-On top of that, when a request that can modifies the stored token in the cookie is sent, the Websocket Protocol will disconnect itself from Kuzzle, send the request through HTTP, wait for the response then reconnect itself to Kuzzle.
-Since cookie can only be sent during the Websocket Handshake process at the start of a new websocket connection, every requests having to modify the token stored in the cookie should be followed by a reconnection to ensure that Kuzzle is using the new updated token for the next requests.
+If a new cookie is received from Kuzzle that way, the WebSocket connection is automatically renewed.
 
-Here is a list of controller's actions that are impacted by those changes in the Websocket Protocol behaviour when [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) is enabled:
+::: info
+Cookies can only be applied to WebSocket connections during the connection handshake (upgrade from HTTP to WebSocket), and they stay valid as long as the connection is active, and as long as the cookie hasn't expired. 
+:::
+
+Here is a list of controller's actions that are affected by this behavior, when the [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) option is enabled:
 - [auth:login](/sdk/js/7/controllers/auth/login)
 - [auth:logout](/sdk/js/7/controllers/auth/logout)
 - [auth:refreshToken](/sdk/js/7/controllers/auth/refresh-token)
 
-::: warning
-All the behaviours described above are handled by the SDK, you do not have to implement this yourself.
+::: info
+The behaviors described above are automatically handled by the SDK, you do not need to implement this yourself.
 :::
