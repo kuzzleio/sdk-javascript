@@ -237,35 +237,38 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       return;
     }
 
-    if ( this.cookieSupport
-      && request.controller === 'auth'
-      && ( request.action === 'login'
-        || request.action === 'logout'
-        || request.action === 'refreshToken')
+    if (! this.cookieSupport
+      || request.controller !== 'auth'
+      || ( request.action !== 'login'
+        && request.action !== 'logout'
+        && request.action !== 'refreshToken')
     ) {
-      const formattedRequest = this._httpProtocol.formatRequest(request, options);
-
-      if (formattedRequest) {
-        if (this.client) {
-          this.client.close();
-        }
-        this.client = null;
-        this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
-
-        this._httpProtocol._sendHttpRequest(formattedRequest)
-          .then(response => {
-            // Reconnection
-            return this.connect()
-              .then(() => {
-                this.emit(formattedRequest.payload.requestId, response);
-              });
-          })
-          .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
-      }
+      this.client.send(JSON.stringify(request));
       return;
     }
 
-    this.client.send(JSON.stringify(request));
+    const formattedRequest = this._httpProtocol.formatRequest(request, options);
+
+    if (!formattedRequest) {
+      return;
+    }
+
+    if (this.client) {
+      this.client.close();
+    }
+    this.client = null;
+    this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
+
+    this._httpProtocol._sendHttpRequest(formattedRequest)
+      .then(response => {
+        // Reconnection
+        return this.connect()
+          .then(() => {
+            this.emit(formattedRequest.payload.requestId, response);
+          });
+      })
+      .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
+    
   }
 
   /**
