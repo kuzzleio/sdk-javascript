@@ -257,6 +257,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.close();
     }
     this.client = null;
+    this.emit('websocketRenewalStart'); // Notify that the websocket is going to renew his connection with Kuzzle
     this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
 
     this._httpProtocol._sendHttpRequest(formattedRequest)
@@ -265,6 +266,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         return this.connect()
           .then(() => {
             this.emit(formattedRequest.payload.requestId, response);
+            this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
           });
       })
       .catch(error => this.emit(formattedRequest.payload.requestId, {error}));

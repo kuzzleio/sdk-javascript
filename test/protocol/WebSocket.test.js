@@ -665,15 +665,24 @@ describe('WebSocket networking module', () => {
       XMLHttpRequest = () => {}; // Define XMLHttpRequest to fake being in a browser
       websocket.enableCookieSupport();
       websocket._httpProtocol = httpProtocolStub;
-
-      websocket.clientDisconnected = sinon.stub();
+      
+      websocket.connect = sinon.stub().resolves();
+      websocket.clientDisconnected = sinon.stub().resolves();
+      const onRenewalStart = sinon.stub();
+      const onRenewalDone = sinon.stub();
+      websocket.addListener('websocketRenewalStart', onRenewalStart);
+      websocket.addListener('websocketRenewalDone', onRenewalDone);
 
       for (let action of ['login', 'logout', 'refreshToken']) {
         clientStub.send.resetHistory();
         httpProtocolStub.formatRequest.resetHistory();
         httpProtocolStub._sendHttpRequest.resetHistory();
         clientStub.close.resetHistory();
+        websocket.connect.resetHistory();
         websocket.clientDisconnected.resetHistory();
+        onRenewalStart.resetHistory();
+        onRenewalDone.resetHistory();
+        websocket.client = clientStub;
 
         const request = {
           controller: 'auth',
@@ -693,6 +702,10 @@ describe('WebSocket networking module', () => {
         await should(clientStub.close).be.calledOnce();
         await should(websocket.clientDisconnected).be.calledOnce();
         await should(clientStub.send).not.be.called();
+
+        await should(onRenewalStart).be.calledOnce();
+        await should(websocket.connect).be.calledOnce();
+        await should(onRenewalDone).be.calledOnce();
       }
     });
   });

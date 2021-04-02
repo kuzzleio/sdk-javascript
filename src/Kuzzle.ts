@@ -231,8 +231,25 @@ export class Kuzzle extends KuzzleEventEmitter {
     
     if (this._cookieAuthentication) {
       this.protocol.enableCookieSupport();
-      options.offlineMode = 'auto'; // Enable offline queue and replay
-      this.autoResubscribe = true; // Enable auto resubscription
+      let autoQueueState;
+      let autoReplayState;
+      let autoResbuscribeState;
+  
+      this.protocol.addListener('websocketRenewalStart', () => {
+        autoQueueState = this.autoQueue;
+        autoReplayState = this.autoReplay;
+        autoResbuscribeState = this.autoResubscribe;
+  
+        this.autoQueue = true;
+        this.autoReplay = true;
+        this.autoResubscribe = true;
+      });
+  
+      this.protocol.addListener('websocketRenewalDone', () => {
+        this.autoQueue = autoQueueState;
+        this.autoReplay = autoReplayState;
+        this.autoResubscribe = autoResbuscribeState;
+      });
     }
     
     this.deprecationHandler = new Deprecation(
