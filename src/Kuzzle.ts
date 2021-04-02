@@ -87,6 +87,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _queueMaxSize: any;
   private _queueTTL: any;
   private _replayInterval: any;
+  private _requestTimeout: any;
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
   private _cookieAuthentication: boolean;
@@ -161,6 +162,11 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Default: `10`
        */
       replayInterval?: number;
+      /**
+       * Time (in ms) during which a request will still be waited to be resolved
+       * Default: `10000`
+       */
+      requestTimeout?: number;
       /**
        * Time (in ms) during which a TokenExpired event is ignored
        * Default: `1000`
@@ -271,6 +277,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._replayInterval = typeof options.replayInterval === 'number'
       ? options.replayInterval
       : 10;
+    this._requestTimeout = typeof options.requestTimeout === 'number'
+      ? options.requestTimeout
+      : 10000;
     this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number'
       ? options.tokenExpiredInterval
       : 1000;
@@ -400,6 +409,15 @@ export class Kuzzle extends KuzzleEventEmitter {
   set replayInterval (value) {
     this._checkPropertyType('_replayInterval', 'number', value);
     this._replayInterval = value;
+  }
+
+  get requestTimeout () {
+    return this._requestTimeout;
+  }
+
+  set requestTimeout (value) {
+    this._checkPropertyType('_requestTimeout', 'number', value);
+    this._requestTimeout = value;
   }
 
   get sslConnection () {
@@ -600,6 +618,10 @@ export class Kuzzle extends KuzzleEventEmitter {
       queuable = queuable && this.queueFilter(request);
     }
 
+    const requestTimeout = typeof options.timeout === 'number'
+      ? options.timeout
+      : this._requestTimeout;
+
     if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
@@ -609,7 +631,8 @@ export class Kuzzle extends KuzzleEventEmitter {
             resolve,
             reject,
             request,
-            ts: Date.now()
+            ts: Date.now(),
+            timeout: requestTimeout
           });
         });
       }
@@ -619,8 +642,10 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request, options)
-      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
+    return this._timeoutRequest(
+      requestTimeout,
+      {request, options}
+    ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
   /**
@@ -748,9 +773,14 @@ Discarded request: ${JSON.stringify(request)}`));
       uniqueQueue = {},
       dequeuingProcess = () => {
         if (this.offlineQueue.length > 0) {
-          this.protocol.query(this.offlineQueue[0].request)
+          
+          this._timeoutRequest(
+            this.offlineQueue[0].timeout,
+            {request: this.offlineQueue[0].request}
+          )
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
+
           this.emit('offlineQueuePop', this.offlineQueue.shift());
 
           setTimeout(() => {
@@ -791,5 +821,22 @@ Discarded request: ${JSON.stringify(request)}`));
     }
 
     dequeuingProcess();
+  }
+
+  /**
+   * Sends a request with a timeout
+   */
+  private _timeoutRequest(delay, {request, options = {}}) {
+    const timeout = new Promise((resolve, reject) => {
+      const id = setTimeout(() => {
+        clearTimeout(id);
+        reject(`Request timed out after ${delay} ms`);
+      }, delay);
+    });
+
+    return Promise.race([
+      timeout,
+      this.protocol.query(request, options)
+    ]);
   }
 }
