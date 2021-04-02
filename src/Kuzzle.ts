@@ -231,15 +231,12 @@ export class Kuzzle extends KuzzleEventEmitter {
     
     if (this._cookieAuthentication) {
       this.protocol.enableCookieSupport();
+      options.offlineMode = 'auto'; // Enable offline queue and replay
     }
     
     this.deprecationHandler = new Deprecation(
       typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
     );
-
-    this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
-      ? options.cookieAuth
-      : false;
     
     if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
