@@ -38,6 +38,8 @@ If a new cookie is received from Kuzzle that way, the WebSocket connection is au
 Cookies can only be applied to WebSocket connections during the connection handshake (upgrade from HTTP to WebSocket), and they stay valid as long as the connection is active, and as long as the cookie hasn't expired. 
 :::
 
+![websocket cookie authentication](./websocket-cookie-authentication.png)
+
 Here is a list of controller's actions that are affected by this behavior, when the [cookieAuth](/sdk/js/7/core-classes/kuzzle/constructor) option is enabled:
 - [auth:login](/sdk/js/7/controllers/auth/login)
 - [auth:logout](/sdk/js/7/controllers/auth/logout)
