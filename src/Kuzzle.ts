@@ -232,6 +232,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._cookieAuthentication) {
       this.protocol.enableCookieSupport();
       options.offlineMode = 'auto'; // Enable offline queue and replay
+      this.autoResubscribe = true; // Enable auto resubscription
     }
     
     this.deprecationHandler = new Deprecation(
