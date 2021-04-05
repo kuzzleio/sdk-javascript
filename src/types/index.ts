@@ -13,3 +13,6 @@ export * from './Notification';
 export * from './ProfilePolicy';
 
 export * from './RoleRightsDefinition';
+
+// ResponsePayload and RequestPayload are not exported to not interfer with
+// kuzzle package types
