@@ -10,6 +10,7 @@ describe('Kuzzle queue', () => {
   beforeEach(() => {
     const protocol = new ProtocolMock('somewhere');
     kuzzle = new Kuzzle(protocol);
+    kuzzle._timeoutRequest = sinon.stub().resolves();
   });
 
   describe('#flushQueue', () => {
@@ -26,7 +27,7 @@ describe('Kuzzle queue', () => {
     let query;
 
     beforeEach(() => {
-      query = { request: { requestId: 'alfen', action: 'action', controller: 'controller' } };
+      query = { request: { requestId: 'alfen', action: 'action', controller: 'controller' }, timeout: 10000 };
 
       kuzzle.protocol.isReady.returns(true);
       kuzzle._cleanQueue = sinon.stub();
@@ -56,7 +57,12 @@ describe('Kuzzle queue', () => {
 
       kuzzle.playQueue();
 
-      should(kuzzle.protocol.query).be.calledWith(query.request);
+      should(kuzzle._timeoutRequest).be.calledWith(
+        10000,
+        {
+          request: query.request,
+        }
+      );
     });
 
     it('should emit offlineQueuePop event', () => {
@@ -81,9 +87,9 @@ describe('Kuzzle queue', () => {
 
       // Wait queries to be dequeued
       setTimeout(() => {
-        should(kuzzle.protocol.query).be.calledTwice();
-        should(kuzzle.protocol.query.getCall(0).args[0]).be.eql(query2.request);
-        should(kuzzle.protocol.query.getCall(1).args[0]).be.eql(query.request);
+        should(kuzzle._timeoutRequest).be.calledTwice();
+        should(kuzzle._timeoutRequest.getCall(0).args[1].request).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(1).args[1].request).be.eql(query.request);
         done();
       }, 100);
     });
@@ -102,9 +108,9 @@ describe('Kuzzle queue', () => {
 
       // Wait queries to be dequeued
       setTimeout(() => {
-        should(kuzzle.protocol.query).be.calledTwice();
-        should(kuzzle.protocol.query.getCall(0).args[0]).be.eql(query2.request);
-        should(kuzzle.protocol.query.getCall(1).args[0]).be.eql(query.request);
+        should(kuzzle._timeoutRequest).be.calledTwice();
+        should(kuzzle._timeoutRequest.getCall(0).args[1].request).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(1).args[1].request).be.eql(query.request);
         done();
       }, 100);
     });
