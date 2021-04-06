@@ -5,6 +5,7 @@ const NodeWS = require('ws');
 
 const { default: WS } = require('../../src/protocols/WebSocket');
 const windowMock = require('../mocks/window.mock');
+const { default: HttpProtocol } = require('../../src/protocols/Http');
 
 describe('WebSocket networking module', () => {
   let
@@ -568,6 +569,143 @@ describe('WebSocket networking module', () => {
 
       for (const headers of invalidHeaders) {
         should(() => new WS('foobar', {headers})).throw(Error, {message: 'Invalid "headers" option: expected an object'});
+      }
+    });
+  });
+
+  describe('#enableCookieSupport', function() {
+    let enableCookieFunc;
+    before(() => {
+      enableCookieFunc = async function () {
+        websocket.enableCookieSupport();
+      };
+    });
+
+    afterEach(() => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = undefined;
+    });
+
+    it('should throw when enabling cookie support outside of a browser', async () => {
+      await should(enableCookieFunc()).be.rejected();
+      await should(websocket.cookieSupport).be.false();
+      await should(websocket._httpProtocol).be.undefined();
+    });
+
+    it('should set cookieSupport to true and construct the HttpProtocol', async () => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = () => {};
+      await should(enableCookieFunc()).not.be.rejectedWith();
+      await should(websocket.cookieSupport).be.true();
+      await should(websocket._httpProtocol).not.be.undefined().and.be.an.instanceof(HttpProtocol);
+      await should(websocket._httpProtocol.host).be.equal(websocket.host);
+      await should(websocket._httpProtocol.port).be.equal(websocket.port);
+      await should(websocket._httpProtocol.ssl).be.equal(websocket.ssl);
+    });
+  });
+
+  describe('#send', function() {
+
+    let
+      XMLHttpRequestSave,
+      httpProtocolStub;
+    beforeEach(() => {
+
+      XMLHttpRequestSave = XMLHttpRequest;
+
+      httpProtocolStub = {
+        formatRequest: sinon.stub(),
+        _sendHttpRequest: sinon.stub()
+      };
+
+      httpProtocolStub.formatRequest.returns({
+        method: 'foo',
+        path: 'bar',
+        payload: {
+          requestId: 'foobar'
+        }
+      });
+
+      httpProtocolStub._sendHttpRequest.resolves();
+
+      websocket = new WS('address', {
+        port: 1234,
+        autoReconnect: true,
+        reconnectionDelay: 10
+      });
+
+      websocket.connect();
+    });
+
+    afterEach(() => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = XMLHttpRequestSave;
+    });
+
+    it('should send request using websocket client when support for cookie authentication is disabled', async () => {
+      for (let action of ['login', 'logout', 'refreshToken']) {
+        clientStub.send.resetHistory();
+
+        const request = {
+          controller: 'auth',
+          action,
+        };
+
+        await websocket.send(request);
+        await should(clientStub.send).be.calledOnce().and.calledWithMatch(JSON.stringify(request));
+      }
+    });
+
+    it('should send request using http protocol when support for cookie authentication is enabled', async () => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = () => {}; // Define XMLHttpRequest to fake being in a browser
+      websocket.enableCookieSupport();
+      websocket._httpProtocol = httpProtocolStub;
+      
+      websocket.connect = sinon.stub().resolves();
+      websocket.clientDisconnected = sinon.stub().resolves();
+      const onRenewalStart = sinon.stub();
+      const onRenewalDone = sinon.stub();
+      websocket.addListener('websocketRenewalStart', onRenewalStart);
+      websocket.addListener('websocketRenewalDone', onRenewalDone);
+
+      for (let action of ['login', 'logout', 'refreshToken']) {
+        clientStub.send.resetHistory();
+        httpProtocolStub.formatRequest.resetHistory();
+        httpProtocolStub._sendHttpRequest.resetHistory();
+        clientStub.close.resetHistory();
+        websocket.connect.resetHistory();
+        websocket.clientDisconnected.resetHistory();
+        onRenewalStart.resetHistory();
+        onRenewalDone.resetHistory();
+        websocket.client = clientStub;
+
+        const request = {
+          controller: 'auth',
+          action,
+        };
+
+        await websocket.send(request);
+        await should(httpProtocolStub.formatRequest).be.calledOnce().and.calledWithMatch(request);
+        await should(httpProtocolStub._sendHttpRequest).be.calledOnce().and.calledWithMatch({
+          method: 'foo',
+          path: 'bar',
+          payload: {
+            requestId: 'foobar'
+          },
+        });
+
+        await should(clientStub.close).be.calledOnce();
+        await should(websocket.clientDisconnected).be.calledOnce();
+        await should(clientStub.send).not.be.called();
+
+        await should(onRenewalStart).be.calledOnce();
+        await should(websocket.connect).be.calledOnce();
+        await should(onRenewalDone).be.calledOnce();
       }
     });
   });

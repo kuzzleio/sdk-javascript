@@ -113,7 +113,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       return Promise.resolve();
     }
 
-    return this._sendHttpRequest('GET', '/_publicApi')
+    return this._sendHttpRequest({method: 'GET', path: '/_publicApi'})
       .then(({ result, error }) => {
         if (! error) {
           this._routes = this._constructRoutes(result);
@@ -133,7 +133,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         } else if (error.status === 404) {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
-          return this._sendHttpRequest('GET', '/')
+          return this._sendHttpRequest({method: 'GET', path: '/'})
             .then(({ result: res, error: err }) => {
               if (! err) {
                 this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
@@ -173,12 +173,23 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   }
 
   /**
-   * Sends a payload to the connected server
+   * Enable cookie authentication support at protocol level
+   */
+  enableCookieSupport () {
+    if (typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie cannot be enabled outside of a browser');
+    }
+
+    super.enableCookieSupport();
+  }
+
+  /**
+   * Preprocess and format the request
    *
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (request: RequestPayload, options: JSONObject = {}) {
+  formatRequest (request: RequestPayload, options: JSONObject = {}) {
     const route = this.routes[request.controller]
       && this.routes[request.controller][request.action];
 
@@ -281,12 +292,30 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       url += '?' + queryString.join('&');
     }
 
-    this._sendHttpRequest(method, url, payload)
-      .then(response => this.emit(payload.requestId, response))
-      .catch(error => this.emit(payload.requestId, {error}));
+    return {
+      method,
+      path: url,
+      payload
+    };
   }
 
-  _sendHttpRequest (method, path, payload: any = {}) {
+  /**
+   * Sends a payload to the connected server
+   *
+   * @param {Object} data
+   * @returns {Promise<any>}
+   */
+  send (request: RequestPayload, options: JSONObject = {}) {
+    const formattedRequest = this.formatRequest(request, options);
+
+    if (formattedRequest) {
+      this._sendHttpRequest(formattedRequest)
+        .then(response => this.emit(formattedRequest.payload.requestId, response))
+        .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
+    }
+  }
+
+  _sendHttpRequest ({method, path, payload = {headers: undefined, body:undefined}}) {
     if (typeof XMLHttpRequest === 'undefined') {
       // NodeJS implementation, using http.request:
 
@@ -331,7 +360,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       xhr.open(method, url);
 
       // Authorize the reception of cookies
-      xhr.withCredentials = true;
+      xhr.withCredentials = this.cookieSupport;
 
       for (const header of Object.keys(payload.headers || {})) {
         xhr.setRequestHeader(header, payload.headers[header]);

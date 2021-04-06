@@ -155,4 +155,19 @@ describe('Kuzzle constructor', () => {
       );
     }).not.throw();
   });
+
+  it('should call protocol.enableCookieSupport', () => {
+    /* eslint-disable no-native-reassign */
+    /* eslint-disable no-global-assign */
+    XMLHttpRequest = () => {}; // Faking being in a browser, otherwise kuzzle will throw that cookie are not supported    
+    const kuzzle = new Kuzzle(protocolMock, {
+      cookieAuth: true,
+    });
+
+    should(kuzzle.cookieAuthentication).be.true();
+    should(protocolMock.enableCookieSupport).be.calledOnce();
+    /* eslint-disable no-native-reassign */
+    /* eslint-disable no-global-assign */
+    XMLHttpRequest = undefined; // Reset it to undefined
+  });
 });

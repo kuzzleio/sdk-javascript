@@ -14,6 +14,7 @@ class ProtocolMock extends KuzzleEventEmitter {
     this.connectCalled = false;
 
     this.close = sinon.stub();
+    this.enableCookieSupport = sinon.stub().returns();
     this.query = sinon.stub().resolves();
     this.playQueue = sinon.stub();
     this.flushQueue = sinon.stub();
@@ -49,6 +50,7 @@ class ProtocolMock extends KuzzleEventEmitter {
       }
     });
   }
+
 
   disconnect () {
     this.state = 'offline';
