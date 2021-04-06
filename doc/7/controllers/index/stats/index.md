@@ -8,7 +8,7 @@ description: Gets detailed storage statistics
 # stats
 
 <SinceBadge version="Kuzzle 2.10.0"/>
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.6.0"/>
 
 Gets detailed storage usage statistics.
 
