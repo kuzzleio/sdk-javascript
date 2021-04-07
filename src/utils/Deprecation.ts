@@ -1,4 +1,4 @@
-import { ResponsePayload } from 'src/types/ResponsePayload';
+import { ResponsePayload } from '../types/ResponsePayload';
 
 export class Deprecation {
 
