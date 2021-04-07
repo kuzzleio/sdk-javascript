@@ -70,6 +70,52 @@ describe('HTTP networking module', () => {
         });
     });
 
+    it('should prefer GET routes when multiple routes are available for a same action', async () => {
+      protocol._sendHttpRequest.resolves({
+        result: {
+          foo: {
+            bar: {
+              http: [
+                { path: 'samesize', url: 'samesize', verb: 'OHNOES' },
+                { path: 'samesize', url: 'samesize', verb: 'GET' },
+              ]
+            }
+          }
+        }
+      });
+
+      await protocol.connect();
+
+      should(protocol.routes).match({
+        foo: {
+          bar: { verb: 'GET', url: 'samesize' },
+        }
+      });
+    });
+
+    it('should pick a route at random when no GET route is available', async () => {
+      protocol._sendHttpRequest.resolves({
+        result: {
+          foo: {
+            bar: {
+              http: [
+                { path: 'samesize', url: 'samesize', verb: 'SURE' },
+                { path: 'samesize', url: 'samesize', verb: 'YOU\'RE KEN' },
+              ]
+            }
+          }
+        }
+      });
+
+      await protocol.connect();
+
+      should(protocol.routes).match({
+        foo: {
+          bar: { verb: 'SURE', url: 'samesize' },
+        }
+      });
+    });
+
     it('should fallback to static routes if server:publicApi is restricted', () => {
       protocol._sendHttpRequest.onCall(0).resolves({ error: { status: 401 } });
 
@@ -192,6 +238,34 @@ describe('HTTP networking module', () => {
     });
   });
 
+  describe('#enableCookieSupport', function() {
+    let enableCookieFunc;
+    before(() => {
+      enableCookieFunc = async function () {
+        protocol.enableCookieSupport();
+      };
+    });
+
+    afterEach(() => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = undefined;
+    });
+
+    it('should throw when cookie not in a browser', async () => {
+      await should(enableCookieFunc()).be.rejected();
+      await should(protocol.cookieSupport).be.false();
+    });
+
+    it('should set cookieAuthentication to true and construct the HttpProtocol', async () => {
+      /* eslint-disable no-native-reassign */
+      /* eslint-disable no-global-assign */
+      XMLHttpRequest = () => {};
+      await should(enableCookieFunc()).not.be.rejectedWith();
+      await should(protocol.cookieSupport).be.true();
+    });
+  });
+
   describe('#send', () => {
     beforeEach(() => {
       protocol._sendHttpRequest = sinon.stub().resolves();
@@ -219,19 +293,21 @@ describe('HTTP networking module', () => {
         try {
           should(protocol._sendHttpRequest).be.calledOnce();
 
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(protocol._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            controller: 'foo',
-            action: 'bar',
-            index: 'index',
-            collection: 'collection',
-            meta: 'meta',
-            body: JSON.stringify({foo: 'bar'})
+          should(protocol._sendHttpRequest.firstCall).be.calledWithMatch({
+            method: 'VERB',
+            path: '/foo/bar',
+            payload: {
+              requestId: 'requestId',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              controller: 'foo',
+              action: 'bar',
+              index: 'index',
+              collection: 'collection',
+              meta: 'meta',
+              body: JSON.stringify({foo: 'bar'})
+            }
           });
 
           done();
@@ -254,18 +330,19 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(protocol._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              authorization: 'Bearer fake-jwt'
-            },
-            controller: 'foo',
-            action: 'bar'
-          });
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'VERB',
+              path: '/foo/bar',
+              payload: {
+                requestId: 'requestId',
+                headers: {
+                  authorization: 'Bearer fake-jwt'
+                },
+                controller: 'foo',
+                action: 'bar'
+              }
+            });
 
           done();
         }
@@ -289,18 +366,19 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(protocol._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            headers: {
-              'x-kuzzle-volatile': '{"some":"volatile-data"}'
-            },
-            controller: 'foo',
-            action: 'bar'
-          });
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'VERB',
+              path: '/foo/bar',
+              payload: {
+                requestId: 'requestId',
+                headers: {
+                  'x-kuzzle-volatile': '{"some":"volatile-data"}'
+                },
+                controller: 'foo',
+                action: 'bar'
+              }
+            });
 
           done();
         }
@@ -322,10 +400,11 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
-          should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal(`/foo?foo=bar&baz=${encodeURIComponent('oh,an,array')}`);
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'GET',
+              path: `/foo?foo=bar&baz=${encodeURIComponent('oh,an,array')}`
+            });
           done();
         }
         catch (error) {
@@ -346,10 +425,11 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('GET');
-          should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal(`/foo?foo=${encodeURIComponent('{"foofoo":{"barbar":"bar"}}')}&${encodeURIComponent('&baz')}=${encodeURIComponent('oh,an,array')}`);
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'GET',
+              path: `/foo?foo=${encodeURIComponent('{"foofoo":{"barbar":"bar"}}')}&${encodeURIComponent('&baz')}=${encodeURIComponent('oh,an,array')}`
+            });
           done();
         }
         catch (error) {
@@ -369,11 +449,11 @@ describe('HTTP networking module', () => {
       };
 
       protocol.on('requestId', () => {
-        should(protocol._sendHttpRequest).be.calledOnce();
-
-        should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1])
-          .be.equal(`/foo/bar?${encodeURIComponent('foo?lol')}=${encodeURIComponent('bar&baz')}`);
+        should(protocol._sendHttpRequest).be.calledOnce()
+          .and.be.calledWithMatch({
+            method: 'VERB',
+            path: `/foo/bar?${encodeURIComponent('foo?lol')}=${encodeURIComponent('bar&baz')}`
+          });
 
         done();
       });
@@ -393,12 +473,11 @@ describe('HTTP networking module', () => {
       };
 
       protocol.on('requestId', () => {
-        should(protocol._sendHttpRequest).be.calledOnce();
-
-        should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-        should(protocol._sendHttpRequest.firstCall.args[1])
-          .be.equal(`/foo/bar/${encodeURIComponent('baz&qux')}`);
-
+        should(protocol._sendHttpRequest).be.calledOnce()
+          .and.be.calledWithMatch({
+            method: 'VERB',
+            path: `/foo/bar/${encodeURIComponent('baz&qux')}`
+          });
         done();
       });
 
@@ -456,13 +535,15 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-          should(protocol._sendHttpRequest.firstCall.args[1]).be.equal('/foo/bar');
-          should(protocol._sendHttpRequest.firstCall.args[2]).match({
-            requestId: 'requestId',
-            controller: 'foo',
-            action: 'bar'
-          });
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              path: '/foo/bar',
+              payload: {
+                requestId: 'requestId',
+                controller: 'foo',
+                action: 'bar'
+              }
+            });
 
           done();
         } catch (error) {
@@ -484,10 +565,11 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal(`/foo/bar?foo=${encodeURIComponent('bar,baz,qux')}&qux=123`);
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'VERB',
+              path: `/foo/bar?foo=${encodeURIComponent('bar,baz,qux')}&qux=123`,
+            });
         }
         catch (error) {
           return done(error);
@@ -511,10 +593,11 @@ describe('HTTP networking module', () => {
 
       protocol.on('requestId', () => {
         try {
-          should(protocol._sendHttpRequest).be.calledOnce();
-          should(protocol._sendHttpRequest.firstCall.args[0]).be.equal('VERB');
-          should(protocol._sendHttpRequest.firstCall.args[1])
-            .be.equal(`/foo/bar?${encodeURIComponent('?bar')}&qux=123`);
+          should(protocol._sendHttpRequest).be.calledOnce()
+            .and.be.calledWithMatch({
+              method: 'VERB',
+              path: `/foo/bar?${encodeURIComponent('?bar')}&qux=123`
+            });
         }
         catch (error) {
           return done(error);
@@ -565,7 +648,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should call http.request with empty body', () => {
-      protocol._sendHttpRequest('VERB', '/foo/bar');
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar'});
 
       should(httpRequestStub).be.calledOnce();
       should(httpRequestStub).be.calledWith(
@@ -580,7 +663,7 @@ describe('HTTP networking module', () => {
 
     it('should call http.request with a body', () => {
       const body = 'http request body';
-      protocol._sendHttpRequest('VERB', '/foo/bar', {body});
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar', payload: {body}});
 
       should(httpRequestStub).be.calledOnce();
       should(httpRequestStub).be.calledWith(
@@ -595,7 +678,7 @@ describe('HTTP networking module', () => {
 
     it('should call http.request with configured timeout', () => {
       protocol.timeout = 42000;
-      protocol._sendHttpRequest('VERB', '/foo/bar');
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar'});
 
       should(httpRequestStub).be.calledOnce();
       should(httpRequestStub).be.calledWith(
@@ -610,7 +693,7 @@ describe('HTTP networking module', () => {
 
     it('should call http.request with a body and some headers', () => {
       const body = 'http request body';
-      protocol._sendHttpRequest('VERB', '/foo/bar', {body, headers: {foo: 'bar'}});
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar', payload: {body, headers: {foo: 'bar'}}});
 
       should(httpRequestStub).be.calledOnce();
       should(httpRequestStub).be.calledWith(
@@ -626,7 +709,7 @@ describe('HTTP networking module', () => {
     it('should reject the request in case of error', () => {
       httpRequestStub.rejects('My HTTP Error');
 
-      return protocol._sendHttpRequest('VERB', '/foo/bar')
+      return protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar'})
         .then(() => Promise.reject('No error'))
         .catch(err => {
           should(err).be.an.instanceof(Error);
@@ -635,7 +718,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should resolve with the backend response', () => {
-      return protocol._sendHttpRequest(protocol, 'VERB', '/foo/bar')
+      return protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar'})
         .then(res => {
           should(res).be.an.Object();
           should(res.status).be.equal(mockResponseBody.status);
@@ -672,7 +755,7 @@ describe('HTTP networking module', () => {
     });
 
     it('should call XMLHttpRequest with empty body', () => {
-      protocol._sendHttpRequest('VERB', '/foo/bar');
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar'});
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
@@ -695,7 +778,7 @@ describe('HTTP networking module', () => {
 
     it('should call XMLHttpRequest with a body', () => {
       const body = 'http request body';
-      protocol._sendHttpRequest('VERB', '/foo/bar', {body});
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar', payload: {body}});
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');
@@ -708,7 +791,7 @@ describe('HTTP networking module', () => {
 
     it('should call XMLHttpRequest with a body and some headers', () => {
       const body = 'http request body';
-      protocol._sendHttpRequest('VERB', '/foo/bar', {body, headers: {foo: 'bar'}});
+      protocol._sendHttpRequest({method: 'VERB', path: '/foo/bar', payload: {body, headers: {foo: 'bar'}}});
 
       should(xhrStub.open).be.calledOnce();
       should(xhrStub.open).be.calledWith('VERB', 'http://address:1234/foo/bar');

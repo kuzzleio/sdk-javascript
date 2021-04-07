@@ -4,6 +4,7 @@ import { KuzzleError } from '../KuzzleError';
 import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
+import HttpProtocol from './Http';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -18,6 +19,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private pingIntervalId: ReturnType<typeof setInterval>;
   private _pingInterval: number;
   private _pongTimeout: number;
+  private _httpProtocol: HttpProtocol;
 
   /**
    * @param host Kuzzle server hostname or IP
@@ -209,15 +211,66 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     });
   }
 
+  enableCookieSupport () {
+    if (typeof XMLHttpRequest === 'undefined') {
+      throw new Error('Support for cookie cannot be enabled outside of a browser');
+    }
+
+    super.enableCookieSupport();
+    this._httpProtocol = new HttpProtocol(
+      this.host, 
+      {
+        port: this.port,
+        ssl: this.ssl,
+      }
+    );
+    this._httpProtocol.enableCookieSupport();
+  }
+
   /**
    * Sends a payload to the connected server
    *
    * @param {Object} payload
    */
-  send (request: RequestPayload) {
-    if (this.client && this.client.readyState === this.client.OPEN) {
-      this.client.send(JSON.stringify(request));
+  send (request: RequestPayload, options: JSONObject = {}) {
+    if (!this.client || this.client.readyState !== this.client.OPEN) {
+      return;
     }
+
+    if (! this.cookieSupport
+      || request.controller !== 'auth'
+      || ( request.action !== 'login'
+        && request.action !== 'logout'
+        && request.action !== 'refreshToken')
+    ) {
+      this.client.send(JSON.stringify(request));
+      return;
+    }
+
+    const formattedRequest = this._httpProtocol.formatRequest(request, options);
+
+    if (!formattedRequest) {
+      return;
+    }
+
+    this.emit('websocketRenewalStart'); // Notify that the websocket is going to renew his connection with Kuzzle
+    if (this.client) {
+      this.client.close();
+    }
+    this.client = null;
+    this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
+
+    this._httpProtocol._sendHttpRequest(formattedRequest)
+      .then(response => {
+        // Reconnection
+        return this.connect()
+          .then(() => {
+            this.emit(formattedRequest.payload.requestId, response);
+            this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
+          });
+      })
+      .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
+    
   }
 
   /**

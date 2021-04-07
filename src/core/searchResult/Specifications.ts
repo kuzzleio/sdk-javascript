@@ -3,8 +3,8 @@ import { JSONObject } from '../../types';
 
 export class SpecificationsSearchResult extends SearchResultBase<JSONObject> {
 
-  constructor (kuzzle, query, options, response) {
-    super(kuzzle, query, options, response);
+  constructor (kuzzle, query, options, result) {
+    super(kuzzle, query, options, result);
 
     this._controller = 'collection';
     this._searchAction = 'searchSpecifications';

@@ -32,9 +32,26 @@ export type ResponsePayload = {
   _id?: string;
 
   /**
+   * Array of deprecation warnings (hidden if NODE_ENV=production)
+   */
+  deprecations?: Array<{
+
+    /**
+     * Deprecation description
+     */
+    message: string;
+
+    /**
+     * Deprecated since this version
+     */
+    version: string;
+  }>;
+
+  /**
    * API error
    */
   error?: {
+
     /**
      * Error human readable identifier
      */

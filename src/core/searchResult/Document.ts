@@ -6,10 +6,10 @@ export class DocumentSearchResult extends SearchResultBase<DocumentHit> {
    * @param {Kuzzle} kuzzle
    * @param {object} query
    * @param {object} options
-   * @param {object} response
+   * @param {object} result
    */
-  constructor (kuzzle, query, options, response) {
-    super(kuzzle, query, options, response);
+  constructor (kuzzle, query, options, result) {
+    super(kuzzle, query, options, result);
 
     this._searchAction = 'search';
     this._scrollAction = 'scroll';

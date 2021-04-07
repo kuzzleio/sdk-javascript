@@ -1,4 +1,5 @@
 import { BaseController } from './Base';
+import { JSONObject } from '../types';
 
 export class IndexController extends BaseController {
 
@@ -98,5 +99,20 @@ export class IndexController extends BaseController {
 
     return this.query(request, options)
       .then(response => response.result.deleted);
+  }
+
+  /**
+   * Returns detailed storage usage statistics.
+   *
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/index/stats/
+   *
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   */
+  stats (options: { queuable?: boolean } = {}): Promise<JSONObject> {
+    return this.query({
+      action: 'stats'
+    }, options)
+      .then(response => response.result);
   }
 }

@@ -11,6 +11,7 @@ import { ServerController } from './controllers/Server';
 import { SecurityController } from './controllers/Security';
 import { MemoryStorageController } from './controllers/MemoryStorage';
 
+import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
 import { JSONObject } from './types';
@@ -61,6 +62,10 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Common volatile data that will be sent to all future requests.
    */
   public volatile: JSONObject;
+  /**
+   * Handle deprecation warning in development mode (hidden in production)
+   */
+  public deprecationHandler: Deprecation;
 
   public auth: AuthController;
   public bulk: any;
@@ -171,6 +176,11 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Default: `false`
        */
       cookieAuth?: boolean;
+      /**
+       * Show deprecation warning in development mode (hidden either way in production)
+       * Default: `true`
+       */
+      deprecationWarning?: boolean;
     } = {}
   ) {
     super();
@@ -218,6 +228,33 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
       ? options.cookieAuth
       : false;
+    
+    if (this._cookieAuthentication) {
+      this.protocol.enableCookieSupport();
+      let autoQueueState;
+      let autoReplayState;
+      let autoResbuscribeState;
+  
+      this.protocol.addListener('websocketRenewalStart', () => {
+        autoQueueState = this.autoQueue;
+        autoReplayState = this.autoReplay;
+        autoResbuscribeState = this.autoResubscribe;
+  
+        this.autoQueue = true;
+        this.autoReplay = true;
+        this.autoResubscribe = true;
+      });
+  
+      this.protocol.addListener('websocketRenewalDone', () => {
+        this.autoQueue = autoQueueState;
+        this.autoReplay = autoReplayState;
+        this.autoResubscribe = autoResbuscribeState;
+      });
+    }
+    
+    this.deprecationHandler = new Deprecation(
+      typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
+    );
     
     if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
@@ -605,7 +642,8 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request, options);
+    return this.protocol.query(request, options)
+      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
   /**

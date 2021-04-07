@@ -242,5 +242,14 @@ describe('Kuzzle query management', () => {
 
       should(request).be.eql({ controller: 'server', action: 'now' });
     });
+
+    it('should call logDeprecation with the response', async () => {
+      kuzzle.deprecationHandler.logDeprecation = sinon.stub().returns(response);
+      await kuzzle.query(query);
+
+      should(kuzzle.deprecationHandler.logDeprecation)
+        .be.calledOnce()
+        .be.calledWith(response);
+    });
   });
 });

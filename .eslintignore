@@ -27,3 +27,5 @@ src/core/searchResult/Profile.js
 src/core/searchResult/Role.js
 src/core/searchResult/Specifications.js
 src/core/searchResult/User.js
+src/utils/Deprecation.js
+src/utils/interfaces.js

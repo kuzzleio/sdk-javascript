@@ -12,11 +12,13 @@ All SDK methods return a promise, that can be rejected with a `KuzzleError` valu
 
 [KuzzleError](/sdk/js/7/core-classes/kuzzle-error/introduction) objects inherit the standard `Error` object, and add the following properties to it:
 
-| Property | Type              | Description                                                                                |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------ |
-| `status` | <pre>number</pre> | Status following [HTTP Standards](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) |
-| `stack`  | <pre>string</pre> | Error stacktrace (Only in development mode)   | `id`  | <pre>string</pre> | Error unique identifier                    |
-| `code`  | <pre>string</pre> | Error unique code                    |
+| Property      | Type              | Description                                  |
+|---------------|-------------------|----------------------------------------------|
+| `kuzzleStack` | <pre>string</pre> | Kuzzle stacktrace (only in development mode) |
+| `status`      | <pre>number</pre> | Error status code                            |
+| `id`          | <pre>string</pre> | Error unique identifier                      |
+| `code`        | <pre>string</pre> | Error unique code                            |
+
 
 
 You can find a detailed list of possible errors messages and statuses in the [documentation API](/core/2/api/errors/types).
