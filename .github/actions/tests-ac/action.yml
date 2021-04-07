@@ -13,8 +13,7 @@ runs:
     - name: Start Kuzzle stack
       run: |
         sudo sysctl -w vm.max_map_count=262144
-        npm i -g npm
-        npm ci
+        yarn
       shell: bash
     - name: Setup Admin console
       run: |
@@ -22,10 +21,9 @@ runs:
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
-        npm ci
-        npm uninstall kuzzle-sdk-v${{ inputs.sdk-version }}
-        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@"$GITHUB_DIR"
-        cd ./node_modules/kuzzle-sdk-v${{ inputs.sdk-version }} && npm run build
+        yarn
+        yarn add kuzzle-sdk-v${{ inputs.sdk-version }}@"$GITHUB_DIR"
+        cd ./node_modules/kuzzle-sdk-v${{ inputs.sdk-version }} && yarn build
       shell: bash
     - name: Run e2e tests
       run: |
