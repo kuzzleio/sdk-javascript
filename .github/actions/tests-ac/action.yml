@@ -28,7 +28,7 @@ runs:
     - name: Run e2e tests
       run: |
         cd /tmp/admin-console/test/e2e/run-test
-        npm ci
+        yarn
         cd /tmp/admin-console
         CYPRESS_RETRIES=5 npm run test:e2e -- --backend=2
       env:
