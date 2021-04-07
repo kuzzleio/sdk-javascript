@@ -17,12 +17,12 @@ runs:
     - name: Setup Admin console
       run: |
         export GITHUB_DIR=$(pwd)
-        yarn
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
-        yarn
-        yarn add kuzzle-sdk-v${{ inputs.sdk-version }}@$GITHUB_DIR
+        npm ci
+        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@"$GITHUB_DIR"
+        cd ./node_modules/kuzzle-sdk-v${{ inputs.sdk-version }} && npm run build
       shell: bash
     - name: Run e2e tests
       run: |
