@@ -13,6 +13,7 @@ runs:
     - name: Start Kuzzle stack
       run: |
         sudo sysctl -w vm.max_map_count=262144
+        npm i -g npm
         npm ci
       shell: bash
     - name: Setup Admin console
@@ -22,6 +23,7 @@ runs:
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
         npm ci
+        npm uninstall kuzzle-sdk-v${{ inputs.sdk-version }}
         npm install kuzzle-sdk-v${{ inputs.sdk-version }}@"$GITHUB_DIR"
         cd ./node_modules/kuzzle-sdk-v${{ inputs.sdk-version }} && npm run build
       shell: bash
