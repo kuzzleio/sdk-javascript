@@ -15,7 +15,7 @@ runs:
         sudo sysctl -w vm.max_map_count=262144
         yarn
         mkdir -p /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
-        yarn build-ts | grep TSFILE | cut -d' ' -f 2 | xargs cp /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
+        yarn build-ts | grep TSFILE | cut -d' ' -f 2 | xargs cp -t /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
       shell: bash
     - name: Setup Admin console
       run: |
