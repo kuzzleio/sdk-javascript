@@ -12,22 +12,23 @@ runs:
   steps:
     - name: Start Kuzzle stack
       run: |
-        export GITHUB_DIR=$(pwd)
         sudo sysctl -w vm.max_map_count=262144
-        npm ci
+        yarn
+        yarn build
       shell: bash
     - name: Setup Admin console
       run: |
+        export SDK_DIR="$(pwd)"
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
-        npm ci
-        npm install kuzzle-sdk-v${{ inputs.sdk-version }}@$GITHUB_DIR
+        yarn
+        yarn add kuzzle-sdk-v${{ inputs.sdk-version }}@"$SDK_DIR"
       shell: bash
     - name: Run e2e tests
       run: |
         cd /tmp/admin-console/test/e2e/run-test
-        npm ci
+        yarn
         cd /tmp/admin-console
         CYPRESS_RETRIES=5 npm run test:e2e -- --backend=2
       env:
