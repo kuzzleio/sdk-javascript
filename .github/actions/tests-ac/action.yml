@@ -18,7 +18,7 @@ runs:
         yarn build-ts | grep TSFILE | cut -d' ' -f 2 | xargs -I '{}' cp '{}' /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
         yarn clean
         yarn build
-        cp ./dist /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
+        cp -r ./dist /tmp/kuzzle-sdk-v${{ inputs.sdk-version }}
       shell: bash
     - name: Setup Admin console
       run: |
