@@ -1,36 +1,35 @@
 import { DocumentSearchResult } from './Document';
 import { KuzzleEventEmitter } from '../KuzzleEventEmitter';
-import { Observer } from '../Observer';
+import { RealtimeDocument } from '../RealtimeDocument';
 import { Kuzzle } from '../../Kuzzle';
 import { RequestPayload } from '../../types/RequestPayload';
-import { ResponsePayload } from '../../types/ResponsePayload';
 import { JSONObject } from '../../types';
-import { ObserversHandler } from '../ObserversHandler';
+import { RealtimeDocumentsHandler } from '../RealtimeDocumentsHandler';
 
-export class ObserverSearchResult extends DocumentSearchResult {
+export class RealtimeDocumentSearchResult extends DocumentSearchResult {
   private eventEmitter: KuzzleEventEmitter;
-  private observersHandlers: ObserversHandler[];
+  private realtimeDocumentsHandlers: RealtimeDocumentsHandler[];
   private _notifyOnly: boolean;
   private handlerIndex: number;
 
-  hits: Array<Observer>;
+  hits: Array<RealtimeDocument>;
 
   constructor (
     kuzzle: Kuzzle,
     request: RequestPayload,
     options: JSONObject,
     result: JSONObject,
-    observersHandlers: ObserversHandler[],
+    realtimeDocumentsHandlers: RealtimeDocumentsHandler[],
     notifyOnly: boolean,
   ) {
     if (request.aggs || request.aggregations) {
-      throw new Error('Aggregations are not supported for observers');
+      throw new Error('Aggregations are not supported for realtimeDocuments');
     }
 
     super(kuzzle, request, options, result);
 
-    this.observersHandlers = observersHandlers;
-    this.handlerIndex = this.observersHandlers.length - 1;
+    this.realtimeDocumentsHandlers = realtimeDocumentsHandlers;
+    this.handlerIndex = this.realtimeDocumentsHandlers.length - 1;
     this._notifyOnly = notifyOnly;
 
     this.eventEmitter = new KuzzleEventEmitter();
@@ -39,24 +38,24 @@ export class ObserverSearchResult extends DocumentSearchResult {
     this.hits = [];
 
     this.hits = hits.map(document => {
-      const observer = new Observer(document, { notifyOnly });
+      const realtimeDocument = new RealtimeDocument(document, { notifyOnly });
 
-      observer.on('change', changes => {
-        this.emit('change', observer._id, changes);
+      realtimeDocument.on('change', changes => {
+        this.emit('change', realtimeDocument._id, changes);
       });
 
-      observer.on('delete', () => {
-        this.emit('delete', observer._id,);
+      realtimeDocument.on('delete', () => {
+        this.emit('delete', realtimeDocument._id,);
       });
 
-      observer.on('error', error => {
-        this.emit('error', observer._id, error);
+      realtimeDocument.on('error', error => {
+        this.emit('error', realtimeDocument._id, error);
       });
 
-      return observer;
+      return realtimeDocument;
     });
 
-    this.observersHandlers.push(new ObserversHandler(
+    this.realtimeDocumentsHandlers.push(new RealtimeDocumentsHandler(
       kuzzle,
       request.index,
       request.collection,
@@ -64,35 +63,35 @@ export class ObserverSearchResult extends DocumentSearchResult {
   }
 
   set notifyOnly (value) {
-    this.hits.forEach(observer => observer.notifyOnly = value);
+    this.hits.forEach(realtimeDocument => realtimeDocument.notifyOnly = value);
   }
 
   get notifyOnly () {
     return this._notifyOnly;
   }
 
-  next (): Promise<ObserverSearchResult> {
+  next (): Promise<RealtimeDocumentSearchResult> {
     return super.next() as any;
   }
 
   start (): Promise<void> {
-    return this.observersHandlers[this.handlerIndex].start();
+    return this.realtimeDocumentsHandlers[this.handlerIndex].start();
   }
 
    stop (): Promise<void> {
-    return this.observersHandlers[this.handlerIndex].stop();
+    return this.realtimeDocumentsHandlers[this.handlerIndex].stop();
   }
 
   /**
    * @internal
    */
-   protected _buildNextSearchResult (result: JSONObject): Promise<ObserverSearchResult> {
-    const nextSearchResult = new ObserverSearchResult(
+   protected _buildNextSearchResult (result: JSONObject): Promise<RealtimeDocumentSearchResult> {
+    const nextSearchResult = new RealtimeDocumentSearchResult(
       this._kuzzle,
       this._request,
       this._options,
       result,
-      this.observersHandlers,
+      this.realtimeDocumentsHandlers,
       this._notifyOnly);
 
     nextSearchResult.fetched += this.fetched;

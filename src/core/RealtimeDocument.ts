@@ -1,7 +1,7 @@
 import { JSONObject, DocumentNotification } from '../types';
 import { KuzzleEventEmitter } from './KuzzleEventEmitter';
 
-export class Observer extends KuzzleEventEmitter {
+export class RealtimeDocument extends KuzzleEventEmitter {
   notifyOnly: boolean;
   enabled: boolean;
   deleted: boolean;

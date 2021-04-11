@@ -1,27 +1,27 @@
 import { Kuzzle } from '../Kuzzle';
 import { DocumentNotification } from '../types';
-import { Observer } from './Observer';
+import { RealtimeDocument } from './RealtimeDocument';
 
-export class ObserversHandler {
+export class RealtimeDocumentsHandler {
   private kuzzle: Kuzzle;
   private room: string;
 
   index: string;
   collection: string;
-  observers: Observer[];
+  realtimeDocuments: RealtimeDocument[];
   listening: boolean;
 
-  constructor (kuzzle: Kuzzle, index: string, collection: string, observers: Observer[]) {
+  constructor (kuzzle: Kuzzle, index: string, collection: string, realtimeDocuments: RealtimeDocument[]) {
     this.kuzzle = kuzzle;
-    this.observers = observers;
+    this.realtimeDocuments = realtimeDocuments;
     this.index = index;
     this.collection = collection;
 
-    for (const observer of this.observers) {
-      observer.on('delete', () => {
-        const index = this.observers.indexOf(observer);
+    for (const realtimeDocument of this.realtimeDocuments) {
+      realtimeDocument.on('delete', () => {
+        const index = this.realtimeDocuments.indexOf(realtimeDocument);
 
-        this.observers.splice(index, index);
+        this.realtimeDocuments.splice(index, index);
       })
     }
   }
@@ -31,7 +31,7 @@ export class ObserversHandler {
       return Promise.resolve();
     }
 
-    const ids = this.observers.map(({ _id }) => _id);
+    const ids = this.realtimeDocuments.map(({ _id }) => _id);
     const filters = {
       ids: { values: ids }
     };
@@ -41,14 +41,14 @@ export class ObserversHandler {
       this.collection,
       filters,
       (notification: DocumentNotification) => {
-        const observer = this.observers
+        const realtimeDocument = this.realtimeDocuments
           .find(({ _id }) => _id === notification.result._id);
 
-        if (! observer) {
-          throw Error(`Receive notification for unknown observer "${notification.result._id}"`);
+        if (! realtimeDocument) {
+          throw Error(`Receive notification for unknown realtimeDocument "${notification.result._id}"`);
         }
 
-        observer.applyChanges(notification);
+        realtimeDocument.applyChanges(notification);
       },
       { subscribeToSelf: true }
     )
@@ -56,8 +56,8 @@ export class ObserversHandler {
         this.room = room;
         this.listening = true;
 
-        for (const observer of this.observers) {
-          observer.enabled = true;
+        for (const realtimeDocument of this.realtimeDocuments) {
+          realtimeDocument.enabled = true;
         }
       });
   }
@@ -72,8 +72,8 @@ export class ObserversHandler {
         this.room = null;
         this.listening = false;
 
-        for (const observer of this.observers) {
-          observer.enabled = false;
+        for (const realtimeDocument of this.realtimeDocuments) {
+          realtimeDocument.enabled = false;
         }
       });
   }
