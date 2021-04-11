@@ -10,6 +10,7 @@ import { RealtimeController } from './controllers/Realtime';
 import { ServerController } from './controllers/Server';
 import { SecurityController } from './controllers/Security';
 import { MemoryStorageController } from './controllers/MemoryStorage';
+import { ObserveController } from './controllers/ObserveController';
 
 import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
@@ -76,6 +77,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   public realtime: RealtimeController;
   public security: any;
   public server: any;
+  public observe: ObserveController;
 
   private _protectedEvents: any;
   private _offlineQueue: any;
@@ -232,11 +234,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
       ? options.cookieAuth
       : false;
-    
+
     if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
     }
-    
+
     // controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
@@ -247,6 +249,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.useController(RealtimeController, 'realtime');
     this.useController(SecurityController, 'security');
     this.useController(ServerController, 'server');
+    this.useController(ObserveController, 'observe');
 
     // offline queue
     this._offlineQueue = [];

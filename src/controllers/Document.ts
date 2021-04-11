@@ -228,8 +228,6 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *
    * @returns The document
@@ -238,7 +236,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: { queuable?: boolean } = {}
   ): Promise<Document> {
     const request = {
       index,

@@ -5,9 +5,12 @@ import { Kuzzle } from '../../Kuzzle';
 import { RequestPayload } from '../../types/RequestPayload';
 import { ResponsePayload } from '../../types/ResponsePayload';
 import { JSONObject } from '../../types';
+import { ObserversHandler } from '../ObserversHandler';
 
-class ObserverSearchResult extends DocumentSearchResult {
+export class ObserverSearchResult extends DocumentSearchResult {
   private eventEmitter: KuzzleEventEmitter;
+  private observersHandlers: ObserversHandler[];
+  private _notifyOnly: boolean;
 
   hits: Array<Observer>;
 
@@ -15,21 +18,26 @@ class ObserverSearchResult extends DocumentSearchResult {
     kuzzle: Kuzzle,
     request: RequestPayload,
     options: JSONObject,
-    response: ResponsePayload
+    result: JSONObject,
+    observersHandlers: ObserversHandler[],
+    notifyOnly: boolean,
   ) {
-    super(kuzzle, request, options, response);
-
-    this.eventEmitter = new KuzzleEventEmitter();
-
     if (request.aggs || request.aggregations) {
       throw new Error('Aggregations are not supported for observers');
     }
+
+    super(kuzzle, request, options, result);
+
+    this.observersHandlers = observersHandlers;
+    this._notifyOnly = notifyOnly;
+
+    this.eventEmitter = new KuzzleEventEmitter();
 
     const hits = this.hits;
     this.hits = [];
 
     this.hits = hits.map(document => {
-      const observer = new Observer(kuzzle, request.index, request.collection, document);
+      const observer = new Observer(document, { notifyOnly });
 
       observer.on('change', changes => {
         this.emit('change', observer._id, changes);
@@ -45,30 +53,62 @@ class ObserverSearchResult extends DocumentSearchResult {
 
       return observer;
     });
+
+    this.observersHandlers.push(new ObserversHandler(
+      kuzzle,
+      request.index,
+      request.collection,
+      this.hits));
   }
 
   set notifyOnly (value) {
     this.hits.forEach(observer => observer.notifyOnly = value);
   }
 
-  start () {
-    return Promise.all(this.hits.map(observer => observer.start()))
-      .then(() => this);
+  get notifyOnly () {
+    return this._notifyOnly;
   }
 
-  stop () {
-    return Promise.all(this.hits.map(observer => observer.stop()))
-      .then(() => this);
+  next (): Promise<ObserverSearchResult> {
+    return super.next() as any;
   }
 
-  _buildNextSearchResult (response) {
-    const Constructor: any = this.constructor;
+  /**
+   * @internal
+   */
+  start (): Promise<void> {
+    return Promise.all(
+      this.observersHandlers.map(observerHandler => observerHandler.start())
+    )
+    .then(() => {});
+  }
 
-    const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, response.result);
+  /**
+   * @internal
+   */
+   stop (): Promise<void> {
+    return Promise.all(
+      this.observersHandlers.map(observerHandler => observerHandler.stop())
+    )
+    .then(() => {});
+  }
+
+  /**
+   * @internal
+   */
+   protected _buildNextSearchResult (result: JSONObject): Promise<ObserverSearchResult> {
+    const nextSearchResult = new ObserverSearchResult(
+      this._kuzzle,
+      this._request,
+      this._options,
+      result,
+      this.observersHandlers,
+      this._notifyOnly);
 
     nextSearchResult.fetched += this.fetched;
 
-    return nextSearchResult.start();
+    return nextSearchResult.start()
+      .then(() => nextSearchResult);
   }
 
   /**
@@ -82,5 +122,3 @@ class ObserverSearchResult extends DocumentSearchResult {
     return this.eventEmitter.on(event, listener);
   }
 }
-
-module.exports = ObserverSearchResult;
