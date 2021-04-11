@@ -41,4 +41,12 @@ export class Observer extends KuzzleEventEmitter {
       this.emit('change', documentChanges);
     }
   }
+
+  start () {
+    this.enabled = true;
+  }
+
+  stop () {
+    this.enabled = false;
+  }
 }

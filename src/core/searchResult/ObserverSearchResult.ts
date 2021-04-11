@@ -11,6 +11,7 @@ export class ObserverSearchResult extends DocumentSearchResult {
   private eventEmitter: KuzzleEventEmitter;
   private observersHandlers: ObserversHandler[];
   private _notifyOnly: boolean;
+  private handlerIndex: number;
 
   hits: Array<Observer>;
 
@@ -29,6 +30,7 @@ export class ObserverSearchResult extends DocumentSearchResult {
     super(kuzzle, request, options, result);
 
     this.observersHandlers = observersHandlers;
+    this.handlerIndex = this.observersHandlers.length - 1;
     this._notifyOnly = notifyOnly;
 
     this.eventEmitter = new KuzzleEventEmitter();
@@ -73,24 +75,12 @@ export class ObserverSearchResult extends DocumentSearchResult {
     return super.next() as any;
   }
 
-  /**
-   * @internal
-   */
   start (): Promise<void> {
-    return Promise.all(
-      this.observersHandlers.map(observerHandler => observerHandler.start())
-    )
-    .then(() => {});
+    return this.observersHandlers[this.handlerIndex].start();
   }
 
-  /**
-   * @internal
-   */
    stop (): Promise<void> {
-    return Promise.all(
-      this.observersHandlers.map(observerHandler => observerHandler.stop())
-    )
-    .then(() => {});
+    return this.observersHandlers[this.handlerIndex].stop();
   }
 
   /**

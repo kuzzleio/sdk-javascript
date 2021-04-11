@@ -1,0 +1,10 @@
+name: observe#get
+description: Get a document from kuzzle as observer
+hooks:
+  before: |
+    curl -XDELETE kuzzle:7512/nyc-open-data
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: default
+expected: "_id: 'some-id'"
