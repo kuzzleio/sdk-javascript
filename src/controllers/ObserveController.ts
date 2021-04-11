@@ -1,22 +1,21 @@
 import { BaseController } from './Base';
-import { Observer } from '../core/Observer';
-import { ObserverSearchResult } from '../core/searchResult/ObserverSearchResult';
-import { SearchResult } from '../core/searchResult/SearchResultBase';
-import { DocumentNotification, JSONObject } from '../types';
-import { ObserversHandler } from '../core/ObserversHandler';
+import { RealtimeDocument } from '../core/RealtimeDocument';
+import { RealtimeDocumentSearchResult } from '../core/searchResult/RealtimeDocumentSearchResult';
+import { JSONObject } from '../types';
+import { RealtimeDocumentsHandler } from '../core/RealtimeDocumentsHandler';
 import { uuidv4 } from '../utils/uuidv4';
 
 export class ObserveController extends BaseController {
-  private observersHandlers: Map<string, ObserversHandler[]>;
+  private realtimeDocumentsHandlers: Map<string, RealtimeDocumentsHandler[]>;
 
   constructor (kuzzle) {
     super(kuzzle, 'observe');
 
-    this.observersHandlers = new Map();
+    this.realtimeDocumentsHandlers = new Map();
   }
 
   /**
-   * Gets a document and return an observer.
+   * Gets a realtime document.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/get/
    *
@@ -25,36 +24,36 @@ export class ObserveController extends BaseController {
    * @param _id Document ID
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `reference` Optionnal string to identify the returned observer
-   *    - `notifyOnly` If true, the returned observer will not mutate it's own content
+   *    - `reference` Optionnal string to identify the returned realtime document
+   *    - `notifyOnly` If true, the returned realtime document will not mutate it's own content
    *
-   * @returns The document as observer
+   * @returns The document as realtime document
    */
    get (
     index: string,
     collection: string,
     _id: string,
     options: { queuable?: boolean, reference?: string, notifyOnly?: boolean } = {}
-  ): Promise<Observer> {
+  ): Promise<RealtimeDocument> {
     return this.kuzzle.document.get(index, collection, _id, options)
       .then(document => {
         const reference = options.reference || uuidv4();
-        const observer = new Observer(document, { notifyOnly: options.notifyOnly });
-        const handler = new ObserversHandler(
+        const realtimeDocument = new RealtimeDocument(document, { notifyOnly: options.notifyOnly });
+        const handler = new RealtimeDocumentsHandler(
           this.kuzzle,
           index,
           collection,
-          [observer]);
+          [realtimeDocument]);
 
-        this.observersHandlers.set(reference, [handler]);
+        this.realtimeDocumentsHandlers.set(reference, [handler]);
 
         return handler.start()
-          .then(() => observer);
+          .then(() => realtimeDocument);
       });
   }
 
   /**
-   * Gets multiple documents and return observers.
+   * Gets multiple realtime documents.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-get/
    *
@@ -64,8 +63,8 @@ export class ObserveController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `verb` (HTTP only) Forces the verb of the route
-   *    - `reference` Optionnal string to identify the returned observers
-   *    - `notifyOnly` If true, the returned observer will not mutate it's own content
+   *    - `reference` Optionnal string to identify the returned realtime documents
+   *    - `notifyOnly` If true, the returned realtimeDocument will not mutate it's own content
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -76,9 +75,9 @@ export class ObserveController extends BaseController {
     options: { queuable?: boolean, verb?: string, reference?: string, notifyOnly?: boolean } = {}
   ): Promise<{
     /**
-     * Array of successfully retrieved documents as observers
+     * Array of successfully retrieved documents as realtimeDocuments
      */
-    successes: Array<Observer>;
+    successes: Array<RealtimeDocument>;
     /**
      * Array of the IDs of not found documents.
      */
@@ -91,23 +90,23 @@ export class ObserveController extends BaseController {
         _errors = errors;
 
         const reference = options.reference || uuidv4();
-        const observers = successes.map(document => {
-          return new Observer(document, { notifyOnly: options.notifyOnly });
+        const realtimeDocuments = successes.map(document => {
+          return new RealtimeDocument(document, { notifyOnly: options.notifyOnly });
         });
-        const handler = new ObserversHandler(
+        const handler = new RealtimeDocumentsHandler(
           this.kuzzle,
           index,
           collection,
-          observers);
+          realtimeDocuments);
 
-        this.observersHandlers.set(reference, [handler]);
+        this.realtimeDocumentsHandlers.set(reference, [handler]);
 
         return handler.start()
-          .then(() => ({ successes: observers, errors }));
+          .then(() => ({ successes: realtimeDocuments, errors }));
       });
   }
   /**
-   * Searches documents and return observers.
+   * Searches documents.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/observe/search/
    *
@@ -120,10 +119,10 @@ export class ObserveController extends BaseController {
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `verb` (HTTP only) Forces the verb of the route
-   *    - `reference` Optionnal string to identify the returned observers
-   *    - `notifyOnly` If true, the returned observer will not mutate it's own content
+   *    - `reference` Optionnal string to identify the returned realtimeDocuments
+   *    - `notifyOnly` If true, the returned realtimeDocument will not mutate it's own content
    *
-   * @returns A SearchResult
+   * @returns A RealtimeDocumentSearchResult
    */
    search (
     index: string,
@@ -139,19 +138,19 @@ export class ObserveController extends BaseController {
       reference?: string;
       notifyOnly?: boolean;
     } = {}
-  ): Promise<ObserverSearchResult> {
+  ): Promise<RealtimeDocumentSearchResult> {
     const documentController: any = this.kuzzle.document;
 
     return documentController._search(index, collection, query, options)
       .then(({ response, request }) => {
         const reference = options.reference || uuidv4();
-        this.observersHandlers.set(reference, []);
+        this.realtimeDocumentsHandlers.set(reference, []);
 
-        const searchResult = new ObserverSearchResult(this.kuzzle,
+        const searchResult = new RealtimeDocumentSearchResult(this.kuzzle,
           request,
           options,
           response.result,
-          this.observersHandlers.get(reference),
+          this.realtimeDocumentsHandlers.get(reference),
           options.notifyOnly);
 
         return searchResult.start()
@@ -159,28 +158,32 @@ export class ObserveController extends BaseController {
       });
   }
 
-  /**
-   * Cleans a set of observers or every active observers.
-   */
-  cleanObservers (reference?: string): Promise<void> {
-    if (reference) {
-      const handlers = this.observersHandlers.get(reference);
+  getHandlers (reference: string): RealtimeDocumentsHandler[] {
+    const handlers = this.realtimeDocumentsHandlers.get(reference);
 
-      if (! reference) {
-        throw new Error(`Unknown observers reference "${reference}"`);
-      }
-
-      return this.stopObservers(handlers);
+    if (! reference) {
+      throw new Error(`Unknown realtimeDocuments reference "${reference}"`);
     }
 
-    const promises = Object.values(this.observersHandlers)
-        .map(handlers => this.stopObservers(handlers));
+    return handlers;
+  }
+
+  /**
+   * Cleans a set of realtimeDocuments or every active realtimeDocuments.
+   */
+  cleanRealtimeDocuments (reference?: string): Promise<void> {
+    if (reference) {
+      return this.stopRealtimeDocuments(this.getHandlers(reference));
+    }
+
+    const promises = Object.values(this.realtimeDocumentsHandlers)
+        .map(handlers => this.stopRealtimeDocuments(handlers));
 
     return Promise.all(promises)
       .then(() => {});
   }
 
-  private stopObservers (handlers: ObserversHandler[]) {
+  private stopRealtimeDocuments (handlers: RealtimeDocumentsHandler[]) {
     const promises = handlers.map(handler => handler.stop());
 
     return Promise.all(promises)
