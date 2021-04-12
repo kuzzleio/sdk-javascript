@@ -27,7 +27,7 @@ export class RealtimeDocumentsHandler {
   }
 
   start (): Promise<void> {
-    if (this.listening) {
+    if (this.listening || this.realtimeDocuments.length === 0) {
       return Promise.resolve();
     }
 

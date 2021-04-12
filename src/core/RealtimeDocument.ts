@@ -38,7 +38,7 @@ export class RealtimeDocument extends KuzzleEventEmitter {
         Object.assign(this._source, documentChanges);
       }
 
-      this.emit('change', documentChanges);
+      this.emit('change', notification);
     }
   }
 
