@@ -1,14 +1,15 @@
-import { RoleRightsDefinition } from '../../types';
+import { JSONObject, RoleRightsDefinition } from '../../types';
 
 export class Role {
   /**
    * Role unique ID
    */
-  public _id: string;
+  _id: string;
+
   /**
    * List of rights on controllers/actions
    */
-  public controllers: RoleRightsDefinition;
+  controllers: RoleRightsDefinition;
 
   private _kuzzle: any;
 
@@ -27,6 +28,16 @@ export class Role {
 
   protected get kuzzle () {
     return this._kuzzle;
+  }
+
+  /**
+   * Serialize the instance
+   */
+  serialize (): JSONObject {
+    return {
+      _id: this._id,
+      controllers: this.controllers,
+    };
   }
 }
 
