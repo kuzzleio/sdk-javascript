@@ -263,6 +263,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -279,7 +280,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -327,6 +328,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -343,7 +345,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -391,6 +393,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `strict` If true, an error will occur if a document was not deleted
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -398,7 +401,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -482,6 +485,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `strict` If true, an error will occur if a document was not replaced
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -498,7 +502,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -550,6 +554,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -570,7 +575,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: 'wait_for',
       silent?: boolean,
-      retryOnConflict?: number
+      retryOnConflict?: number,
+      strict?: boolean,
     } = {}
   ): Promise<{
     /**
