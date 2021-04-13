@@ -5,21 +5,19 @@ export class User {
   /**
    * Kuid (Kuzzle unique ID)
    */
-  public _id: string;
+  _id: string;
 
   /**
    * User content
    */
-  public _source: JSONObject;
+  _source: JSONObject;
 
   /**
    * User content
    *
-   * @deprecated
+   * @deprecated Use User._source instead
    */
-  get content (): JSONObject {
-    return this._source;
-  }
+  content: JSONObject
 
   private _kuzzle: any;
 
@@ -31,6 +29,13 @@ export class User {
   constructor (kuzzle, _id = null, content = {}) {
     Reflect.defineProperty(this, '_kuzzle', {
       value: kuzzle
+    });
+
+    Reflect.defineProperty(this, 'content', {
+      enumerable: true,
+      get () {
+        return this._source;
+      }
     });
 
     this._id = _id;
@@ -59,6 +64,15 @@ export class User {
     return this.kuzzle.security.mGetProfiles(this.profileIds);
   }
 
+  /**
+   * Serialize the instance
+   */
+  serialize (): JSONObject {
+    return {
+      _id: this._id,
+      _source: this._source,
+    };
+  }
 }
 
 module.exports = { User };

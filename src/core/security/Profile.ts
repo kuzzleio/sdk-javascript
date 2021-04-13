@@ -1,22 +1,21 @@
 import { Role } from './Role';
-import { ProfilePolicy } from '../../types';
+import { JSONObject, ProfilePolicy } from '../../types';
 
 export class Profile {
   /**
    * Profile unique ID
    */
-  public _id: string;
+  _id: string;
 
   /**
    * Maximum number of requests per second and per node with this profile
    */
-  public rateLimit: number;
+  rateLimit: number;
 
   /**
    * Array of policies
    */
-  public policies: Array<ProfilePolicy>;
-
+  policies: Array<ProfilePolicy>;
 
   private _kuzzle: any;
 
@@ -50,5 +49,16 @@ export class Profile {
     return this.kuzzle.security.mGetRoles(
       this.policies.map(policy => policy.roleId),
       options);
+  }
+
+  /**
+   * Serialize the instance
+   */
+  serialize (): JSONObject {
+    return {
+      _id: this._id,
+      rateLimit: this.rateLimit,
+      policies: this.policies,
+    };
   }
 }
