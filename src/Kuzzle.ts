@@ -164,7 +164,8 @@ export class Kuzzle extends KuzzleEventEmitter {
       replayInterval?: number;
       /**
        * Time (in ms) during which a request will still be waited to be resolved
-       * Default: `10000`
+       * Set it to `-1` if you want to wait indefinitely.
+       * Default: `-1`
        */
       requestTimeout?: number;
       /**
@@ -279,7 +280,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       : 10;
     this._requestTimeout = typeof options.requestTimeout === 'number'
       ? options.requestTimeout
-      : 10000;
+      : -1;
     this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number'
       ? options.tokenExpiredInterval
       : 1000;
@@ -827,6 +828,11 @@ Discarded request: ${JSON.stringify(request)}`));
    * Sends a request with a timeout
    */
   private _timeoutRequest(delay, {request, options = {}}) {
+    // No timeout
+    if (delay === -1) {
+      return this.protocol.query(request, options)
+    }
+
     const timeout = new Promise((resolve, reject) => {
       const id = setTimeout(() => {
         clearTimeout(id);
