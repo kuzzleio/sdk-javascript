@@ -20,6 +20,7 @@ export class CollectionController extends BaseController {
    * @param definition Collection mappings and settings
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   create (
     index: string,
@@ -35,7 +36,7 @@ export class CollectionController extends BaseController {
        */
       settings?: JSONObject
     } | CollectionMappings,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -57,11 +58,12 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   deleteSpecifications (
     index: string,
     collection: string,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -81,11 +83,12 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   exists (
     index: string,
     collection: string,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<boolean> {
     return this.query({
       index,
@@ -105,11 +108,12 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   refresh (
     index: string,
     collection: string,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<void> {
     return this.query({
       index,
@@ -129,11 +133,16 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `includeKuzzleMeta` If true, the returned mappings will contain Kuzzle metadata
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   getMapping (
     index: string,
     collection: string,
-    options: { includeKuzzleMeta?: boolean, queuable?: boolean } = {}
+    options: {
+      includeKuzzleMeta?: boolean,
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<CollectionMappings> {
     const request = {
       index,
@@ -155,13 +164,14 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The specifications
    */
   getSpecifications (
     index: string,
     collection: string,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -179,6 +189,7 @@ export class CollectionController extends BaseController {
    * @param index Index name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing the collection list
    */
@@ -194,6 +205,7 @@ export class CollectionController extends BaseController {
        * @deprecated
        */
       size?: number;
+      timeout?: number
     } = {}
   ): Promise<{
     /**
@@ -236,6 +248,7 @@ export class CollectionController extends BaseController {
    *    - `from` Offset of the first document to fetch
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   searchSpecifications (
     query: JSONObject = {},
@@ -244,6 +257,7 @@ export class CollectionController extends BaseController {
       from?: number;
       size?: number;
       scroll?: string;
+      timeout?: number;
     } = {}
   ): Promise<SpecificationsSearchResult> {
     const request = {
@@ -271,6 +285,7 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   truncate (
     index: string,
@@ -299,6 +314,7 @@ export class CollectionController extends BaseController {
    * @param definition Collection mappings and settings
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   update (
     index: string,
@@ -353,6 +369,7 @@ export class CollectionController extends BaseController {
    * @param specifications Specifications to update
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The updated specifications
    */
@@ -382,6 +399,7 @@ export class CollectionController extends BaseController {
    * @param specifications Specifications to validate
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object which contain information about the specifications validity.
    */
@@ -389,7 +407,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<{
     valid: boolean;
     details: Array<string>;
@@ -411,10 +429,13 @@ export class CollectionController extends BaseController {
    *
    * @param index Index name
    * @param collection Collection name
+   * @param options Additional options
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   delete (
     index: string,
-    collection: string
+    collection: string,
+    options: { timeout?: number } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -422,7 +443,7 @@ export class CollectionController extends BaseController {
       action: 'delete'
     };
 
-    return this.query(request)
+    return this.query(request, options)
       .then(() => undefined);
   }
 }
