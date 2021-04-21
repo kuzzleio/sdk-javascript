@@ -70,10 +70,11 @@ export class RealtimeController extends BaseController {
    * @param roomId Subscription room ID
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A number represensting active connections using the same provided subscription room.
    */
-  count (roomId: string, options: { queuable?: boolean } = {}): Promise<number> {
+  count (roomId: string, options: { queuable?: boolean, timeout?: number } = {}): Promise<number> {
     return this.query({
       action: 'count',
       body: { roomId }
@@ -95,12 +96,17 @@ export class RealtimeController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `_id` Additional unique ID (will be put in the `_id` property of the notification)
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   publish (
     index: string,
     collection: string,
     message: JSONObject,
-    options: { queuable?: boolean, _id?: string } = {}
+    options: {
+      queuable?: boolean,
+      _id?: string,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -131,6 +137,7 @@ export class RealtimeController extends BaseController {
    *    - `users` Subscribe to users entering or leaving the room. (default: 'none')
    *    - `subscribeToSelf` Subscribe to notifications fired by our own queries. (default: true)
    *    - `volatile` Subscription information sent alongside notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A string containing the room ID
    */
@@ -156,6 +163,7 @@ export class RealtimeController extends BaseController {
        * Subscription information sent alongside notifications
        */
       volatile?: JSONObject;
+      timeout?: number;
     } = {}
   ): Promise<string> {
     const room = new Room(this, index, collection, filters, callback, options);
@@ -176,10 +184,11 @@ export class RealtimeController extends BaseController {
    * @param roomId Subscription room ID
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   unsubscribe (
     roomId: string,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<void> {
     const request = {
       action: 'unsubscribe',
