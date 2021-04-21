@@ -23,7 +23,7 @@ query(request, [options]);
 
 | Argument  | Type              | Description            |
 | --------- | ----------------- | ---------------------- |
-| `request` | <pre>object</pre> | API request    |
+| `request` | <pre>object</pre> | API request            |
 | `options` | <pre>object</pre> | Optional query options |
 
 ### request
@@ -45,9 +45,10 @@ The following properties are the most common.
 
 Additional query options
 
-| Property   | Type<br/>(default)              | Description                       |
-| ---------- | ------------------------------- | --------------------------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | Make this request queuable or not |
+| Property   | Type<br/>(default)              | Description                                                                                                           |
+| ---------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `queuable` | <pre>boolean</pre><br/>(`true`) | Make this request queuable or not                                                                                     |
+| `timeout`  | <pre>number</pre><br/>(`-1`)    | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 
