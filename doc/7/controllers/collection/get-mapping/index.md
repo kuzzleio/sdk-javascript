@@ -27,10 +27,11 @@ getMapping(index, collection, [options]);
 
 Additional query options
 
-| Property   | Type<br/>(default)              | Description                                                                  |
-| ---------- | ------------------------------- | ---------------------------------------------------------------------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
+| Property            | Type<br/>(default)              | Description                                                                                                              |
+| ------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `queuable`          | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again                                             |
 | `includeKuzzleMeta` | <pre>boolean</pre><br/>(`true`) | If true, the returned mappings will contain [Kuzzle metadata](/core/2/guides/main-concepts/data-storage#kuzzle-metadata) |
+| `timeout`           | <pre>number</pre><br/>(`-1`)    | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely    |
 
 ## Resolves
 
