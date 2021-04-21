@@ -20,6 +20,7 @@ export class BulkController extends BaseController {
   * @param options - Additional options
   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+  *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
   *
   * @returns The number of deleted documents
   */
@@ -27,7 +28,11 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: { queuable?: boolean, refresh?: 'wait_for' } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -50,6 +55,7 @@ export class BulkController extends BaseController {
    * @param bulkData - Array of documents detailing the bulk operations to perform, following ElasticSearch Bulk API
    * @param options - Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -57,7 +63,7 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     bulkData: Array<JSONObject>,
-    options: { queuable?: boolean } = {}
+    options: { queuable?: boolean, timeout?: number } = {}
   ): Promise<{
     /**
      * Array of successfully executed actions
@@ -128,6 +134,7 @@ export class BulkController extends BaseController {
    *    - `notify` If true, Kuzzle will trigger realtime notifications
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing the document creation result
    */
@@ -136,7 +143,12 @@ export class BulkController extends BaseController {
     collection: string,
     document: JSONObject,
     id?: string,
-    options: { queuable?: boolean, notify?: boolean, refresh?: 'wait_for' } = {}
+    options: {
+      queuable?: boolean,
+      notify?: boolean,
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
   ): Promise<Document> {
     return this.query({
       index,
@@ -161,6 +173,7 @@ export class BulkController extends BaseController {
    *    - `notify` If true, Kuzzle will trigger realtime notifications
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -177,7 +190,12 @@ export class BulkController extends BaseController {
        */
       _source: JSONObject;
     }>,
-    options: { queuable?: boolean, notify?: boolean, refresh?: 'wait_for' } = {}
+    options: { 
+      queuable?: boolean,
+      notify?: boolean,
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
   ): Promise<{
     /**
      * Array of successfully created/replaced documents
