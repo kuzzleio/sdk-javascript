@@ -36,7 +36,10 @@ export class CollectionController extends BaseController {
        */
       settings?: JSONObject
     } | CollectionMappings,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -63,7 +66,10 @@ export class CollectionController extends BaseController {
   deleteSpecifications (
     index: string,
     collection: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -88,7 +94,10 @@ export class CollectionController extends BaseController {
   exists (
     index: string,
     collection: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       index,
@@ -113,7 +122,10 @@ export class CollectionController extends BaseController {
   refresh (
     index: string,
     collection: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     return this.query({
       index,
@@ -171,7 +183,10 @@ export class CollectionController extends BaseController {
   getSpecifications (
     index: string,
     collection: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -197,6 +212,7 @@ export class CollectionController extends BaseController {
     index: string,
     options: {
       queuable?: boolean;
+      timeout?: number
       /**
        * @deprecated
        */
@@ -205,7 +221,6 @@ export class CollectionController extends BaseController {
        * @deprecated
        */
       size?: number;
-      timeout?: number
     } = {}
   ): Promise<{
     /**
@@ -290,7 +305,10 @@ export class CollectionController extends BaseController {
   truncate (
     index: string,
     collection: string,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     const request = {
       index,
@@ -330,7 +348,10 @@ export class CollectionController extends BaseController {
        */
       settings?: JSONObject
     } | CollectionMappings,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     return this.query({
       index,
@@ -348,7 +369,9 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     mappings: CollectionMappings,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -377,7 +400,10 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -407,7 +433,10 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<{
     valid: boolean;
     details: Array<string>;
@@ -435,7 +464,9 @@ export class CollectionController extends BaseController {
   delete (
     index: string,
     collection: string,
-    options: { timeout?: number } = {}
+    options: {
+      timeout?: number
+    } = {}
   ): Promise<void> {
     const request = {
       index,
