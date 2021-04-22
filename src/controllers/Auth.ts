@@ -81,7 +81,12 @@ export class AuthController extends BaseController {
    */
   createApiKey(
     description: string,
-    options: { _id?: string, expiresIn?: number, refresh?: 'wait_for' } = {}
+    options: {
+      _id?: string,
+      expiresIn?: number,
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
   ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
@@ -103,9 +108,15 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
    *
    * @param requestPayload Request to check
-   * @options Additional Options
+   * @param options Additional Options
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  checkRights (requestPayload: RequestPayload, options: { timeout?: number } = {}): Promise<boolean> {
+  checkRights (
+    requestPayload: RequestPayload,
+    options: {
+      timeout?: number
+    } = {}
+  ): Promise<boolean> {
     const request = {
       body: requestPayload,
       action: 'checkRights'
@@ -125,7 +136,13 @@ export class AuthController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  deleteApiKey(id: string, options: { refresh?: 'wait_for', timeout?: number } = {}): Promise<null> {
+  deleteApiKey(
+    id: string,
+    options: {
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
+  ): Promise<null> {
     const request = {
       action: 'deleteApiKey',
       _id: id,
@@ -190,7 +207,12 @@ export class AuthController extends BaseController {
    *
    * @returns A token validity object
    */
-  checkToken (token?: string, options: { timeout?: number } = {}): Promise<{
+  checkToken (
+    token?: string,
+    options: {
+      timeout?: number
+    } = {}
+  ): Promise<{
     /**
      * Tell if the token is valid or not
      */
@@ -217,7 +239,7 @@ export class AuthController extends BaseController {
       action: 'checkToken',
       body: { token },
       cookieAuth
-    }, { queuable: false })
+    }, { queuable: false, ...options })
       .then(response => response.result);
   }
 
@@ -238,7 +260,10 @@ export class AuthController extends BaseController {
   createMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -262,7 +287,10 @@ export class AuthController extends BaseController {
    */
   credentialsExist (
     strategy: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -283,7 +311,10 @@ export class AuthController extends BaseController {
    */
   deleteMyCredentials (
     strategy: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -303,7 +334,7 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  getCurrentUser (options: { queuable?: boolean, timeout?: number } = {}): Promise<User> {
+  getCurrentUser (options: {queuable?: boolean, timeout?: number } = {}): Promise<User> {
     return this.query({
       action: 'getCurrentUser'
     }, options)
@@ -328,7 +359,10 @@ export class AuthController extends BaseController {
    */
   getMyCredentials(
     strategy: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -349,7 +383,10 @@ export class AuthController extends BaseController {
    * @returns An array containing user rights objects
    */
   getMyRights (
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Array<{
     /**
      * Controller on wich the rights are applied
@@ -389,7 +426,12 @@ export class AuthController extends BaseController {
    *
    * @returns An array of available strategies names
    */
-  getStrategies (options: { queuable?: boolean, timeout?: number } = {}): Promise<Array<string>> {
+  getStrategies (
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<Array<string>> {
     return this.query({
       action: 'getStrategies'
     }, options)
@@ -477,7 +519,10 @@ export class AuthController extends BaseController {
   updateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -502,7 +547,10 @@ export class AuthController extends BaseController {
    */
   updateSelf (
     content: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean, 
+      timeout?: number
+    } = {}
   ): Promise<User> {
     return this.query({
       body: content,
@@ -528,7 +576,10 @@ export class AuthController extends BaseController {
   validateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
