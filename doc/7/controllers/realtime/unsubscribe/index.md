@@ -26,9 +26,10 @@ unsubscribe(roomId, [options]);
 
 Additional query options
 
-| Option     | Type<br/>(default)           | Description                       |
-| ---------- | ---------------------------- | --------------------------------- |
-| `queuable` | <pre>bool</pre><br/>(`true`) | Make this request queuable or not |
+| Option     | Type<br/>(default)           | Description                                                                                                           |
+| ---------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `queuable` | <pre>bool</pre><br/>(`true`) | Make this request queuable or not                                                                                     |
+| `timeout`  | <pre>number</pre><br/>       | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 
