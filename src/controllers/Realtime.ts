@@ -74,7 +74,13 @@ export class RealtimeController extends BaseController {
    *
    * @returns A number represensting active connections using the same provided subscription room.
    */
-  count (roomId: string, options: { queuable?: boolean, timeout?: number } = {}): Promise<number> {
+  count (
+    roomId: string,
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<number> {
     return this.query({
       action: 'count',
       body: { roomId }
@@ -188,7 +194,10 @@ export class RealtimeController extends BaseController {
    */
   unsubscribe (
     roomId: string,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<void> {
     const request = {
       action: 'unsubscribe',
