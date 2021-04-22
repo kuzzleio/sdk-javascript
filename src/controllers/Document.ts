@@ -29,7 +29,10 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     body?: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -960,7 +963,10 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     content: JSONObject,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       index,
