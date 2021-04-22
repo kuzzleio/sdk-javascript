@@ -17,7 +17,13 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  create (index: string, options: { queuable?: boolean, timeout?: number } = {}): Promise<void> {
+  create (
+    index: string,
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<void> {
     const request = {
       index,
       action: 'create'
@@ -36,7 +42,13 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  delete (index: string, options: { queuable?: boolean, timeout?: number } = {}): Promise<void> {
+  delete (
+    index: string,
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<void> {
     const request = {
       index,
       action: 'delete'
@@ -55,7 +67,13 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  exists (index: string, options: { queuable?: boolean, timeout?: number } = {}): Promise<boolean> {
+  exists (
+    index: string,
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<boolean> {
     return this.query({
       index,
       action : 'exists'
@@ -72,7 +90,12 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  list (options: { queuable?: boolean, timeout?: number } = {}): Promise<Array<string>> {
+  list (
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<Array<string>> {
     return this.query({
       action: 'list'
     }, options)
@@ -93,7 +116,10 @@ export class IndexController extends BaseController {
    */
   mDelete (
     indexes: Array<string>,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Array<string>> {
     const request = {
       action: 'mDelete',
@@ -115,7 +141,12 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  stats (options: { queuable?: boolean, timeout?: number } = {}): Promise<JSONObject> {
+  stats (
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<JSONObject> {
     return this.query({
       action: 'stats'
     }, options)
