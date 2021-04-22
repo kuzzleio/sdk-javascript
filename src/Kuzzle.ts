@@ -830,7 +830,7 @@ Discarded request: ${JSON.stringify(request)}`));
   private _timeoutRequest(delay, {request, options = {}}) {
     // No timeout
     if (delay === -1) {
-      return this.protocol.query(request, options)
+      return this.protocol.query(request, options);
     }
 
     const timeout = new Promise((resolve, reject) => {
