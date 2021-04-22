@@ -21,7 +21,7 @@ describe('Kuzzle query management', () => {
 
     it('should resolve the response when a response is obtained before the configured request timeout', async () => {
       kuzzle.protocol.query = async () => { // Simulate that we are waiting the response to a query
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           setTimeout(
             () => {
               resolve('foo');
@@ -32,11 +32,11 @@ describe('Kuzzle query management', () => {
       };
       const response = kuzzle._timeoutRequest(5000, {request: {foo: 'bar'}, options: {bar: 'baz'}});
       await should(response).be.resolvedWith('foo');
-    })
+    });
 
     it('should reject if a response could not be obtained before the configured request timeout', async () => {
       kuzzle.protocol.query = async () => { // Simulate that we are waiting the response to a query
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           setTimeout(
             () => {
               resolve('foo');
@@ -47,7 +47,7 @@ describe('Kuzzle query management', () => {
       };
       const promise = kuzzle._timeoutRequest(5000, {request: {foo: 'bar'}, options: {bar: 'baz'}});
       await should(promise).be.rejected();
-    })
+    });
   });
 
   describe('#query', () => {
