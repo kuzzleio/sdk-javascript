@@ -122,7 +122,7 @@ export class AuthController extends BaseController {
       action: 'checkRights'
     };
 
-    return this.query(request,  options)
+    return this.query(request, options)
       .then(response => response.result.allowed);
   }
 
