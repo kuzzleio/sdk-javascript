@@ -31,7 +31,7 @@ Additional query options
 | ---------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again                                          |
 | `verb`     | <pre>string</pre>               | (HTTP only) Forces the verb of the route                                                                              |
-| `timeout`  | <pre>number</pre><br/>(`-1`)    | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| `timeout`  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 #### verb
 
