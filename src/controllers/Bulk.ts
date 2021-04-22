@@ -63,7 +63,10 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     bulkData: Array<JSONObject>,
-    options: { queuable?: boolean, timeout?: number } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<{
     /**
      * Array of successfully executed actions
