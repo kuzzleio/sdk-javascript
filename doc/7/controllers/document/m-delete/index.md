@@ -18,7 +18,7 @@ mDelete(index, collection, ids, [options]);
 ```
 
 | Argument     | Type                | Description                    |
-|--------------|---------------------|--------------------------------|
+| ------------ | ------------------- | ------------------------------ |
 | `index`      | <pre>string</pre>   | Index name                     |
 | `collection` | <pre>string</pre>   | Collection name                |
 | `ids`        | <pre>string[]</pre> | IDs of the documents to delete |
@@ -28,11 +28,12 @@ mDelete(index, collection, ids, [options]);
 
 Additional query options
 
-| Options    | Type<br/>(default)               | Description                                                                              |
-|------------|----------------------------------|------------------------------------------------------------------------------------------|
-| `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again             |
-| `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)       |
-| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/> |
+| Options    | Type<br/>(default)               | Description                                                                                                           |
+| ---------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again                                          |
+| `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                    |
+| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/>                                  |
+| `timeout`  | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 
@@ -43,7 +44,7 @@ The `successes` array contain the successfuly deleted document IDs.
 Each deletion error is an object of the `errors` array with the following properties:
 
 | Name     | Type              | Description           |
-|----------|-------------------|-----------------------|
+| -------- | ----------------- | --------------------- |
 | `id`     | <pre>string</pre> | Document ID           |
 | `reason` | <pre>string</pre> | Human readable reason |
 
