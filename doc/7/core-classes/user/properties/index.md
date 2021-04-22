@@ -12,8 +12,8 @@ order: 10
 | Property  | Type              | Description                                                   |
 |-----------|-------------------|---------------------------------------------------------------|
 | `_id`     | <pre>string</pre> | User ID (kuid)                                                |
-| `_source` | <pre>object</pre> | User internal content <SinceBadge since="auto-version"/>      |
-| `content` | <pre>object</pre> | User internal content <DeprecatedBadge since="auto-version"/> |
+| `_source` | <pre>object</pre> | User internal content <SinceBadge since="7.6.0"/>      |
+| `content` | <pre>object</pre> | User internal content <DeprecatedBadge since="7.6.0"/> |
 
 ### _source
 

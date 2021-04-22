@@ -300,6 +300,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -320,7 +321,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: 'wait_for',
       silent?: boolean,
-      timeout?: number
+      timeout?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -370,6 +372,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -390,7 +393,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: 'wait_for',
       silent?: boolean,
-      timeout?: number
+      timeout?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -440,6 +444,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `strict` If true, an error will occur if a document was not deleted
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -451,7 +456,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: 'wait_for',
       silent?: boolean,
-      timeout?: number
+      timeout?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -542,6 +548,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `strict` If true, an error will occur if a document was not replaced
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -562,7 +569,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: 'wait_for',
       silent?: boolean,
-      timeout?: number
+      timeout?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -616,6 +624,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -638,6 +647,7 @@ export class DocumentController extends BaseController {
       silent?: boolean,
       retryOnConflict?: number,
       timeout?: number
+      strict?: boolean,
     } = {}
   ): Promise<{
     /**

@@ -178,16 +178,16 @@ export class Kuzzle extends KuzzleEventEmitter {
        */
       offlineMode?: 'auto';
       /**
-       * Show deprecation warning in development mode (hidden either way in production)
-       * Default: `true`
-       */
-      deprecationWarning?: boolean;
-      /**
        * If `true` uses cookie to store token
        * Only supported in a browser
        * Default: `false`
        */
       cookieAuth?: boolean;
+      /**
+       * Show deprecation warning in development mode (hidden either way in production)
+       * Default: `true`
+       */
+      deprecationWarning?: boolean;
     } = {}
   ) {
     super();
@@ -232,13 +232,36 @@ export class Kuzzle extends KuzzleEventEmitter {
       ? options.volatile
       : {};
 
-    this.deprecationHandler = new Deprecation(
-      typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
-    );
-
     this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
       ? options.cookieAuth
       : false;
+    
+    if (this._cookieAuthentication) {
+      this.protocol.enableCookieSupport();
+      let autoQueueState;
+      let autoReplayState;
+      let autoResbuscribeState;
+  
+      this.protocol.addListener('websocketRenewalStart', () => {
+        autoQueueState = this.autoQueue;
+        autoReplayState = this.autoReplay;
+        autoResbuscribeState = this.autoResubscribe;
+  
+        this.autoQueue = true;
+        this.autoReplay = true;
+        this.autoResubscribe = true;
+      });
+  
+      this.protocol.addListener('websocketRenewalDone', () => {
+        this.autoQueue = autoQueueState;
+        this.autoReplay = autoReplayState;
+        this.autoResubscribe = autoResbuscribeState;
+      });
+    }
+    
+    this.deprecationHandler = new Deprecation(
+      typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
+    );
     
     if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');

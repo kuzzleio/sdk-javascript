@@ -8,7 +8,7 @@ description: Gets all the available authentication strategies of a user
 # getUserStrategies
 
 <SinceBadge version="Kuzzle 2.9.0"/>
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.6.0"/>
 
 Gets all the available authentication strategies of a user.
 

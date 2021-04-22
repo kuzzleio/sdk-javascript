@@ -41,9 +41,9 @@ Kuzzle SDK instance options.
 | `autoQueue`            | <pre>boolean</pre><br/>(`false`) | Automatically queue all requests during offline mode                                                                          |
 | `autoReplay`           | <pre>boolean</pre><br/>(`false`) | Automatically replay queued requests on a `reconnected` event                                                                 |
 | `autoResubscribe`      | <pre>boolean</pre><br/>(`true`)  | Automatically renew all subscriptions on a `reconnected` event                                                                |
-| `cookieAuth`           | <pre>boolean</pre><br/>(`false`) | Uses cookie to store token                                                                                                    |
-| `eventTimeout`         | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored                                                                          |
+| `cookieAuth`           | <pre>boolean</pre><br/>(`false`) | Uses cookie to store token, this option set `offlineMode` to `auto` and `autoResubscribe` to `true`                           |
 | `deprecationWarning`   | <pre>boolean</pre><br />(`true`) | Show deprecation warning in development (hidden either way in production)                                                     |
+| `eventTimeout`         | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored                                                                          |
 | `offlineMode`          | <pre>string</pre><br/>(`manual`) | Offline mode configuration. Can be `manual` or `auto`                                                                         |
 | `queueTTL`             | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds                                                            |
 | `queueMaxSize`         | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                                                                           |
