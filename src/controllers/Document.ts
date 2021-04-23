@@ -613,7 +613,7 @@ export class DocumentController extends BaseController {
       .then(response => response.result);
   }
 
-    /**
+  /**
    * Applies partial updates to multiple documents.
    * 
    * If a document doesn't already exist, a new document is created.
