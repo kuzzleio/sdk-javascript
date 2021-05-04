@@ -12,7 +12,8 @@ try {
     },
     {
       _id: 'some-other-id',
-      changes: { category: 'limousine' }
+      changes: { category: 'limousine' },
+      default: { capacity: 8 }
     }
   ];
 
@@ -28,14 +29,12 @@ try {
       [ { _id: 'some-id',
           _source: { _kuzzle_info: [Object], category: 'sedan' },
           _version: 2,
-          result: 'updated',
           created: false,
           status: 200 },
         { _id: 'some-other-id',
-          _source: { _kuzzle_info: [Object], category: 'limousine' },
-          _version: 2,
-          result: 'updated',
-          created: false,
+          _source: { _kuzzle_info: [Object], category: 'limousine', capacity: 8 },
+          _version: 1,
+          created: true,
           status: 200 } ],
     errors: [] }
   */

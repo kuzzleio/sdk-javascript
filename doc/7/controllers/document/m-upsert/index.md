@@ -7,6 +7,9 @@ description: Update documents
 
 # mUpsert
 
+<SinceBadge version="Kuzzle 2.11.0"/>
+<SinceBadge version="auto-version"/>
+
 Applies partial changes to multiple documents. If a document doesn't already exist, a new document is created.
 
 You can set the `retryOnConflict` optional argument (with a retry count), to tell Kuzzle to retry the failing updates the specified amount of times before rejecting the request with an error.
@@ -23,6 +26,33 @@ mUpsert(index, collection, documents, [options]);
 | `collection` | <pre>string</pre>   | Collection name              |
 | `documents`  | <pre>object[]</pre> | Array of documents to update |
 | `options`    | <pre>object</pre>   | Query options                |
+
+
+### documents
+
+`documents` is an array of object which each object represents a document. Fields `_id` and `changes` is always mandatory while `default` is optional.
+Example:
+
+```js
+[
+  {
+    "_id": "<documentId>",
+    "changes": {
+      // document partial changes
+    },
+    "default": {
+      // optional: document fields to add to the "update" part if the document
+      // is created
+    }
+  },
+  {
+    "_id": "<anotherDocumentId>",
+    "changes": {
+      // document partial changes
+    },
+  }
+]
+```
 
 ### Options
 
