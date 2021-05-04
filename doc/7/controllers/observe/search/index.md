@@ -7,33 +7,8 @@ description: Search for documents
 
 # search
 
-Searches documents.
+Searches for documents.
 
-There is a limit to how many documents can be returned by a single search query.
-That limit is by default set at 10000 documents, and you can't get over it even with the from and size pagination options.
-
-:::info
-When processing a large number of documents (i.e. more than 1000), it is advised to paginate the results using [SearchResult.next](/sdk/js/7/core-classes/search-result/next) rather than increasing the size parameter.
-:::
-
-::: warning
-When using a cursor with the `scroll` option, Elasticsearch has to duplicate the transaction log to keep the same result during the entire scroll session.  
-It can lead to memory leaks if a scroll duration too great is provided, or if too many scroll sessions are open simultaneously.  
-:::
-
-::: info
-<SinceBadge version="Kuzzle 2.2.0"/>
-You can restrict the scroll session maximum duration under the `services.storage.maxScrollDuration` configuration key.
-:::
-
-<SinceBadge version="7.4.8"/>
-
-This method also supports the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) to match documents by passing the `lang` argument with the value `koncorde`.  
-Koncorde filters will be translated into an Elasticsearch query.  
-
-::: warning
-Koncorde `bool` operator and `regexp` clause are not supported for search queries.
-:::
 
 <br/>
 

@@ -26,11 +26,11 @@ get(index, collection, id, [options]);
 
 Additional query options
 
-| Options      | Type<br/>(default)               | Description                                                                  |
-|--------------|----------------------------------|------------------------------------------------------------------------------|
-| `queuable`   | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again |
-| `notifyOnly` | <pre>boolean</pre><br/>(`false`) | If true, the returned observer will not mutate it's own content              |
-| `reference`  | <pre>string</pre><br/>           | Optionnal string to identify the returned observer                           |
+| Options     | Type<br/>(default)              | Description                                                                           |
+|-------------|---------------------------------|---------------------------------------------------------------------------------------|
+| `queuable`  | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again          |
+| `mutate`    | <pre>boolean</pre><br/>(`true`) | If false, the realtime document will not mutate it's own content but only emit events |
+| `reference` | <pre>string</pre><br/>          | Optionnal string to identify the realtime document                                    |
 
 ## Resolves
 

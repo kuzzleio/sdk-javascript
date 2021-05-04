@@ -25,7 +25,7 @@ export class ObserveController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `reference` Optionnal string to identify the returned realtime document
-   *    - `notifyOnly` If true, the returned realtime document will not mutate it's own content
+   *    - `mutate` If true, the returned realtime document will not mutate it's own content
    *
    * @returns The document as realtime document
    */
@@ -33,12 +33,12 @@ export class ObserveController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, reference?: string, notifyOnly?: boolean } = {}
+    options: { queuable?: boolean, reference?: string, mutate?: boolean } = {}
   ): Promise<RealtimeDocument> {
     return this.kuzzle.document.get(index, collection, _id, options)
       .then(document => {
         const reference = options.reference || uuidv4();
-        const realtimeDocument = new RealtimeDocument(document, { notifyOnly: options.notifyOnly });
+        const realtimeDocument = new RealtimeDocument(document, { mutate: options.mutate });
         const handler = new RealtimeDocumentsHandler(
           this.kuzzle,
           index,
@@ -64,7 +64,7 @@ export class ObserveController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `verb` (HTTP only) Forces the verb of the route
    *    - `reference` Optionnal string to identify the returned realtime documents
-   *    - `notifyOnly` If true, the returned realtimeDocument will not mutate it's own content
+   *    - `mutate` If false, the realtime document will not mutate it's own content but only emit events
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -72,7 +72,7 @@ export class ObserveController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, verb?: string, reference?: string, notifyOnly?: boolean } = {}
+    options: { queuable?: boolean, verb?: string, reference?: string, mutate?: boolean } = {}
   ): Promise<{
     /**
      * Array of successfully retrieved documents as realtimeDocuments
@@ -87,7 +87,7 @@ export class ObserveController extends BaseController {
       .then(({ successes, errors }) => {
         const reference = options.reference || uuidv4();
         const realtimeDocuments = successes.map(document => {
-          return new RealtimeDocument(document, { notifyOnly: options.notifyOnly });
+          return new RealtimeDocument(document, { mutate: options.mutate });
         });
         const handler = new RealtimeDocumentsHandler(
           this.kuzzle,
@@ -117,7 +117,7 @@ export class ObserveController extends BaseController {
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `verb` (HTTP only) Forces the verb of the route
    *    - `reference` Optionnal string to identify the returned realtimeDocuments
-   *    - `notifyOnly` If true, the returned realtimeDocument will not mutate it's own content
+   *    - `mutate` If false, the realtime document will not mutate it's own content but only emit events
    *
    * @returns A RealtimeDocumentSearchResult
    */
@@ -133,7 +133,7 @@ export class ObserveController extends BaseController {
       lang?: string;
       verb?: string;
       reference?: string;
-      notifyOnly?: boolean;
+      mutate?: boolean;
     } = {}
   ): Promise<RealtimeDocumentSearchResult> {
     const documentController: any = this.kuzzle.document;
@@ -149,7 +149,7 @@ export class ObserveController extends BaseController {
           options,
           response.result,
           this.realtimeDocumentsHandlers.get(reference),
-          options.notifyOnly);
+          options.mutate);
 
         return searchResult.start()
           .then(() => searchResult);

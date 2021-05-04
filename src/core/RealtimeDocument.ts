@@ -1,8 +1,8 @@
-import { JSONObject, DocumentNotification } from '../types';
+import { JSONObject } from '../types';
 import { KuzzleEventEmitter } from './KuzzleEventEmitter';
 
 export class RealtimeDocument extends KuzzleEventEmitter {
-  notifyOnly: boolean;
+  mutate: boolean;
   enabled: boolean;
   deleted: boolean;
 
@@ -12,7 +12,7 @@ export class RealtimeDocument extends KuzzleEventEmitter {
 
   constructor (
     document: JSONObject,
-    options: { notifyOnly?: boolean } = {}
+    options: { mutate?: boolean } = {}
   ) {
     super();
 
@@ -20,15 +20,7 @@ export class RealtimeDocument extends KuzzleEventEmitter {
     this._source = document._source;
     this._score = document._score;
 
-    this.notifyOnly = options.notifyOnly || false;
-    this.enabled = false;
-  }
-
-  start () {
-    this.enabled = true;
-  }
-
-  stop () {
+    this.mutate = options.mutate || true;
     this.enabled = false;
   }
 }

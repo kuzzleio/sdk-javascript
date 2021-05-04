@@ -87,7 +87,7 @@ export class RealtimeDocumentsHandler {
     else {
       const documentChanges = notification.result._source;
 
-      if (! realtimeDocument.notifyOnly) {
+      if (realtimeDocument.mutate) {
         Object.assign(realtimeDocument._source, documentChanges);
       }
 

@@ -9,7 +9,7 @@ import { RealtimeDocumentsHandler } from '../RealtimeDocumentsHandler';
 export class RealtimeDocumentSearchResult extends DocumentSearchResult {
   private eventEmitter: KuzzleEventEmitter;
   private realtimeDocumentsHandlers: RealtimeDocumentsHandler[];
-  private _notifyOnly: boolean;
+  private _mutate: boolean;
   private handlerIndex: number;
 
   hits: Array<RealtimeDocument>;
@@ -20,7 +20,7 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
     options: JSONObject,
     result: JSONObject,
     realtimeDocumentsHandlers: RealtimeDocumentsHandler[],
-    notifyOnly: boolean,
+    mutate: boolean,
   ) {
     if (request.aggs || request.aggregations) {
       throw new Error('Aggregations are not supported for realtimeDocuments');
@@ -30,7 +30,7 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
 
     this.realtimeDocumentsHandlers = realtimeDocumentsHandlers;
     this.handlerIndex = this.realtimeDocumentsHandlers.length - 1;
-    this._notifyOnly = notifyOnly;
+    this._mutate = mutate;
 
     this.eventEmitter = new KuzzleEventEmitter();
 
@@ -38,7 +38,7 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
     this.hits = [];
 
     this.hits = hits.map(document => {
-      const realtimeDocument = new RealtimeDocument(document, { notifyOnly });
+      const realtimeDocument = new RealtimeDocument(document, { mutate });
 
       realtimeDocument.on('updated', changes => {
         this.emit('updated', realtimeDocument._id, changes);
@@ -59,13 +59,13 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
         this.hits));
   }
 
-  set notifyOnly (value) {
-    this._notifyOnly = value;
-    this.hits.forEach(realtimeDocument => realtimeDocument.notifyOnly = value);
+  set mutate (value) {
+    this._mutate = value;
+    this.hits.forEach(realtimeDocument => realtimeDocument.mutate = value);
   }
 
-  get notifyOnly () {
-    return this._notifyOnly;
+  get mutate () {
+    return this._mutate;
   }
 
   next (): Promise<RealtimeDocumentSearchResult> {
@@ -90,7 +90,7 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
       this._options,
       result,
       this.realtimeDocumentsHandlers,
-      this._notifyOnly);
+      this._mutate);
 
     nextSearchResult.fetched += this.fetched;
 
