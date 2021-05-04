@@ -24,24 +24,6 @@ export class RealtimeDocument extends KuzzleEventEmitter {
     this.enabled = false;
   }
 
-  applyChanges (notification: DocumentNotification): void {
-    if (notification.event === 'delete') {
-      this.enabled = false;
-      this.deleted = true;
-
-      this.emit('delete');
-    }
-    else {
-      const documentChanges = notification.result._source;
-
-      if (! this.notifyOnly) {
-        Object.assign(this._source, documentChanges);
-      }
-
-      this.emit('change', notification);
-    }
-  }
-
   start () {
     this.enabled = true;
   }

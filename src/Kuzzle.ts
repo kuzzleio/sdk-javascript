@@ -10,7 +10,7 @@ import { RealtimeController } from './controllers/Realtime';
 import { ServerController } from './controllers/Server';
 import { SecurityController } from './controllers/Security';
 import { MemoryStorageController } from './controllers/MemoryStorage';
-import { ObserveController } from './controllers/ObserveController';
+import { ObserveController } from './controllers/Observe';
 
 import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';

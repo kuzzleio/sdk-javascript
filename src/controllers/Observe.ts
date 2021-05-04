@@ -83,12 +83,8 @@ export class ObserveController extends BaseController {
      */
     errors: Array<string>;
   }> {
-    let _errors;
-
     return this.kuzzle.document.mGet(index, collection, ids, options)
       .then(({ successes, errors }) => {
-        _errors = errors;
-
         const reference = options.reference || uuidv4();
         const realtimeDocuments = successes.map(document => {
           return new RealtimeDocument(document, { notifyOnly: options.notifyOnly });
@@ -99,6 +95,7 @@ export class ObserveController extends BaseController {
           collection,
           realtimeDocuments);
 
+        // @todo clean handlers or reject if exists
         this.realtimeDocumentsHandlers.set(reference, [handler]);
 
         return handler.start()
@@ -144,6 +141,7 @@ export class ObserveController extends BaseController {
     return documentController._search(index, collection, query, options)
       .then(({ response, request }) => {
         const reference = options.reference || uuidv4();
+        // @todo clean handlers or reject if exists
         this.realtimeDocumentsHandlers.set(reference, []);
 
         const searchResult = new RealtimeDocumentSearchResult(this.kuzzle,

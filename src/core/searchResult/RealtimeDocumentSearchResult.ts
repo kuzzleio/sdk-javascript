@@ -40,29 +40,27 @@ export class RealtimeDocumentSearchResult extends DocumentSearchResult {
     this.hits = hits.map(document => {
       const realtimeDocument = new RealtimeDocument(document, { notifyOnly });
 
-      realtimeDocument.on('change', changes => {
-        this.emit('change', realtimeDocument._id, changes);
+      realtimeDocument.on('updated', changes => {
+        this.emit('updated', realtimeDocument._id, changes);
       });
 
-      realtimeDocument.on('delete', () => {
-        this.emit('delete', realtimeDocument._id,);
-      });
-
-      realtimeDocument.on('error', error => {
-        this.emit('error', realtimeDocument._id, error);
+      realtimeDocument.on('deleted', () => {
+        this.emit('deleted', realtimeDocument._id);
       });
 
       return realtimeDocument;
     });
 
-    this.realtimeDocumentsHandlers.push(new RealtimeDocumentsHandler(
-      kuzzle,
-      request.index,
-      request.collection,
-      this.hits));
+    this.realtimeDocumentsHandlers.push(
+      new RealtimeDocumentsHandler(
+        kuzzle,
+        request.index,
+        request.collection,
+        this.hits));
   }
 
   set notifyOnly (value) {
+    this._notifyOnly = value;
     this.hits.forEach(realtimeDocument => realtimeDocument.notifyOnly = value);
   }
 

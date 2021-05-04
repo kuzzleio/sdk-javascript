@@ -4,7 +4,7 @@ import { RealtimeDocument } from './RealtimeDocument';
 
 export class RealtimeDocumentsHandler {
   private kuzzle: Kuzzle;
-  private room: string;
+  private room: string = null;
 
   index: string;
   collection: string;
@@ -16,14 +16,6 @@ export class RealtimeDocumentsHandler {
     this.realtimeDocuments = realtimeDocuments;
     this.index = index;
     this.collection = collection;
-
-    for (const realtimeDocument of this.realtimeDocuments) {
-      realtimeDocument.on('delete', () => {
-        const index = this.realtimeDocuments.indexOf(realtimeDocument);
-
-        this.realtimeDocuments.splice(index, index);
-      })
-    }
   }
 
   start (): Promise<void> {
@@ -48,7 +40,7 @@ export class RealtimeDocumentsHandler {
           throw Error(`Receive notification for unknown realtimeDocument "${notification.result._id}"`);
         }
 
-        realtimeDocument.applyChanges(notification);
+        this.applyChanges(realtimeDocument, notification);
       },
       { subscribeToSelf: true }
     )
@@ -77,4 +69,30 @@ export class RealtimeDocumentsHandler {
         }
       });
   }
+
+  private applyChanges (
+    realtimeDocument: RealtimeDocument,
+    notification: DocumentNotification
+  ): void {
+    if (notification.event === 'delete') {
+      realtimeDocument.enabled = false;
+      realtimeDocument.deleted = true;
+
+      const index = this.realtimeDocuments.indexOf(realtimeDocument);
+
+      this.realtimeDocuments.splice(index, index);
+
+      realtimeDocument.emit('deleted');
+    }
+    else {
+      const documentChanges = notification.result._source;
+
+      if (! realtimeDocument.notifyOnly) {
+        Object.assign(realtimeDocument._source, documentChanges);
+      }
+
+      realtimeDocument.emit('updated', notification);
+    }
+  }
+
 }
