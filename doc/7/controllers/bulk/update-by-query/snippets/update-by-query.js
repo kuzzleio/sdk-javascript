@@ -6,7 +6,7 @@ try {
       match: {
         capacity: 4
       }
-    }, 
+    },
     { capacity: 42 });
   console.log(result);
   /**
