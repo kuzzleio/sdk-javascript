@@ -30,7 +30,7 @@ mUpsert(index, collection, documents, [options]);
 
 ### documents
 
-`documents` is an array of object which each object represents a document. Fields `_id` and `changes` is always mandatory while `default` is optional.
+`documents` is an array of object which each object representing a document. Fields `_id` and `changes` is always mandatory while `default` is optional.
 Example:
 
 ```js
