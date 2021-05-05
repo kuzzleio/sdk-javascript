@@ -3,7 +3,6 @@ const doc2 = { capacity: 7 };
 
 try {
   await kuzzle.document.create('nyc-open-data', 'yellow-taxi', doc1, 'some-id');
-  await kuzzle.document.create('nyc-open-data', 'yellow-taxi', doc2, 'some-other-id');
 
   const documents = [
     {
