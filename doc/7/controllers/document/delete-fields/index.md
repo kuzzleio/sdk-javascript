@@ -29,12 +29,13 @@ deleteFields (index, collection, id, fields, [options]);
 
 Additional query options
 
-| Options    | Type<br/>(default)               | Description                                                                          |
-| ---------- | -------------------------------- | ------------------------------------------------------------------------------------ |
-| `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again         |
-| `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)   |
-| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/> |
-| `source`   | <pre>boolean</pre><br/>(`false`) | If `true`, then the response will contain the updated document                       |
+| Options    | Type<br/>(default)               | Description                                                                                                           |
+| ---------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `queuable` | <pre>boolean</pre><br/>(`true`)  | If true, queues the request during downtime, until connected to Kuzzle again                                          |
+| `refresh`  | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                    |
+| `silent`   | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/>                                  |
+| `source`   | <pre>boolean</pre><br/>(`false`) | If `true`, then the response will contain the updated document                                                        |
+| `timeout`  | <pre>number</pre>                | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 
