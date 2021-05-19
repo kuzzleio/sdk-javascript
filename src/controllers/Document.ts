@@ -200,6 +200,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `source` If true, the response will contain the updated document
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The updated document
    */
@@ -213,6 +214,7 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       source?: boolean,
+      timeout?: number,
     } = {}
   ): Promise<Document> {
     const request = {
