@@ -59,9 +59,7 @@ describe('Kuzzle queue', () => {
 
       should(kuzzle._timeoutRequest).be.calledWith(
         10000,
-        {
-          request: query.request,
-        }
+        query.request
       );
     });
 
@@ -88,8 +86,8 @@ describe('Kuzzle queue', () => {
       // Wait queries to be dequeued
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
-        should(kuzzle._timeoutRequest.getCall(0).args[1].request).be.eql(query2.request);
-        should(kuzzle._timeoutRequest.getCall(1).args[1].request).be.eql(query.request);
+        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
       }, 100);
     });
@@ -109,8 +107,8 @@ describe('Kuzzle queue', () => {
       // Wait queries to be dequeued
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
-        should(kuzzle._timeoutRequest.getCall(0).args[1].request).be.eql(query2.request);
-        should(kuzzle._timeoutRequest.getCall(1).args[1].request).be.eql(query.request);
+        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
       }, 100);
     });
