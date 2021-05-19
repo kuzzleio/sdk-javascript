@@ -17,6 +17,7 @@ import { proxify } from './utils/proxify';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
+import { RequestTimeoutError } from './RequestTimeoutError';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -87,7 +88,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _queueMaxSize: any;
   private _queueTTL: any;
   private _replayInterval: any;
-  private _requestTimeout: any;
+  private _requestTimeout: number;
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
   private _cookieAuthentication: boolean;
@@ -656,7 +657,7 @@ export class Kuzzle extends KuzzleEventEmitter {
             reject,
             request,
             ts: Date.now(),
-            timeout: requestTimeout
+            timeout: requestTimeout,
           });
         });
       }
@@ -668,7 +669,8 @@ Discarded request: ${JSON.stringify(request)}`));
 
     return this._timeoutRequest(
       requestTimeout,
-      {request, options}
+      request,
+      options
     ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
@@ -800,7 +802,7 @@ Discarded request: ${JSON.stringify(request)}`));
           
           this._timeoutRequest(
             this.offlineQueue[0].timeout,
-            {request: this.offlineQueue[0].request}
+            this.offlineQueue[0].request,
           )
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
@@ -849,17 +851,21 @@ Discarded request: ${JSON.stringify(request)}`));
 
   /**
    * Sends a request with a timeout
+   * 
+   * @param delay Delay before the request is rejected if not resolved
+   * @param request Request object
+   * @param options Request options
+   * @returns Resolved request or a TimedOutError
    */
-  private _timeoutRequest(delay, {request, options = {}}) {
+  private _timeoutRequest(delay: number, request:JSONObject, options:JSONObject = {}) {
     // No timeout
     if (delay === -1) {
       return this.protocol.query(request, options);
     }
 
     const timeout = new Promise((resolve, reject) => {
-      const id = setTimeout(() => {
-        clearTimeout(id);
-        reject(`Request timed out after ${delay} ms`);
+      setTimeout(() => {
+        reject(new RequestTimeoutError(request, delay));
       }, delay);
     });
 
