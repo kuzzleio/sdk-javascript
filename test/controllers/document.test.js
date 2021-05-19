@@ -124,7 +124,10 @@ describe('Document Controller', () => {
       kuzzle.query.resolves({result: {_id: 'document-id', _source: {foo: 'bar'}}});
       options.silent = true;
 
-      return kuzzle.document.deleteFields('index', 'collection', 'document-id', ['bar'], {...options, source: true})
+      const optionsCopy = Object.assign({}, options);
+      optionsCopy.source = true;
+
+      return kuzzle.document.deleteFields('index', 'collection', 'document-id', ['bar'], optionsCopy)
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
@@ -137,10 +140,10 @@ describe('Document Controller', () => {
               body: {fields: ['bar']},
               silent: true,
               source: true,
-            }, {...options, source: true});
+            }, optionsCopy);
 
-            should(res._id).be.equal('document-id');
-            should(res._source.foo).be.equal('bar');
+          should(res._id).be.equal('document-id');
+          should(res._source.foo).be.equal('bar');
         });
     });
   });
