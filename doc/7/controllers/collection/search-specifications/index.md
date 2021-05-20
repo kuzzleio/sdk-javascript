@@ -56,7 +56,7 @@ const body = {
 | `from`     | <pre>number</pre><br/>(`0`)     | Offset of the first document                                                                                          |
 | `size`     | <pre>number</pre><br/>(`10`)    | Maximum number of documents returned                                                                                  |
 | `scroll`   | <pre>string</pre><br/>          | Maximum duration for scroll session                                                                                   |
-| `timeout`  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 - `size` controls the maximum number of documents returned in the response
 - `from` is usually used with the `size` argument, and defines the offset from the first result you want to fetch

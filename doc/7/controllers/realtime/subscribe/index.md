@@ -40,7 +40,7 @@ Additional subscription options.
 | `users`           | <pre>string</pre><br/>(`none`)  | Subscribe to users entering or leaving the room</br>Possible values: `all`, `in`, `out`, `none`                       |
 | `subscribeToSelf` | <pre>boolean</pre><br/>(`true`) | Subscribe to notifications fired by our own queries                                                                   |
 | `volatile`        | <pre>object</pre><br/>(`null`)  | subscription information, used in [user join/leave notifications](/core/2/guides/main-concepts/api#volatile-data)     |
-| `timeout`         | <pre>number</pre><br/>          | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)         | <pre>number</pre><br/>          | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 

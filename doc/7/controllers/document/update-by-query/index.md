@@ -48,7 +48,7 @@ Additional query options.
 | `refresh` | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                                 |
 | `silent`  | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/>                                               |
 | `source`  | <pre>boolean</pre><br/>(`false`) | If true, returns the updated document inside the response                                                                          |
-| `timeout` | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely              |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout) | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely              |
 ## Resolves
 
 Returns an object containing 2 arrays: `successes` and `errors`

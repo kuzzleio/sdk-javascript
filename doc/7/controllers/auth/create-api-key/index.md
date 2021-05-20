@@ -35,7 +35,7 @@ Additional query options
 | `expiresIn` | <pre>string/number</pre><br />(`-1`) | Expiration duration                                                                                                   |
 | `_id`       | <pre>string</pre><br />(`null`)      | API key unique ID                                                                                                     |
 | `refresh`   | <pre>boolean</pre><br />(`false`)    | If set to `wait_for`, Kuzzle will not respond until the API key is indexed                                            |
-| `timeout`   | <pre>number</pre><br/>(`-1`)         | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)   | <pre>number</pre><br/>(`-1`)         | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 **Notes**:
 - `expiresIn`:

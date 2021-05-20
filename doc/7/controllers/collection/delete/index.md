@@ -29,7 +29,7 @@ Additional query options
 
 | Options   | Type<br/>(default)           | Description                                                                                                           |
 | --------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `timeout` | <pre>number</pre><br/>(`-1`) | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout) | <pre>number</pre><br/>(`-1`) | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 ## Resolves
 
 Resolves if the collection is successfully deleted.
