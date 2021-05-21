@@ -857,7 +857,7 @@ Discarded request: ${JSON.stringify(request)}`));
    * @param options Request options
    * @returns Resolved request or a TimedOutError
    */
-  private _timeoutRequest(delay: number, request:JSONObject, options:JSONObject = {}) {
+  private _timeoutRequest(delay: number, request:RequestPayload, options:JSONObject = {}) {
     // No timeout
     if (delay === -1) {
       return this.protocol.query(request, options);
