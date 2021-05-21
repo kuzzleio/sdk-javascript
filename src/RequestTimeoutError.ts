@@ -9,11 +9,11 @@ export class RequestTimeoutError extends Error {
   /**
    * Delay after which the request has timedout
    */
-  public delay: number;
+  delay: number;
   /**
    * The request that has been rejected
    */
-  public request: RequestPayload;
+  request: RequestPayload;
 
   constructor(request: RequestPayload, delay: number) {
     super(`Request timed out after ${delay} ms`);
