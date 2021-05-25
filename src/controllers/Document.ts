@@ -208,7 +208,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    fields: Array<string>,
+    fields: string[],
     options: {
       queuable?: boolean,
       refresh?: 'wait_for',
