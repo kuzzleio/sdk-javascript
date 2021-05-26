@@ -5,6 +5,7 @@ import { BaseProtocolRealtime } from './abstract/Realtime';
 import { JSONObject } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
 import HttpProtocol from './Http';
+import * as DisconnectionOrigin from './DisconnectionOrigin';
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -145,7 +146,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
 
         if (status === 1000) {
-          this.clientDisconnected();
+          this.clientDisconnected(DisconnectionOrigin.NETWORK_CONNECTION_CLOSED);
         }
         // do not forward a connection close error if no
         // connection has been previously established
@@ -266,7 +267,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       this.client.close();
     }
     this.client = null;
-    this.clientDisconnected(); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
+    this.clientDisconnected(DisconnectionOrigin.WEBSOCKET_AUTH_RENEWAL); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
 
     this._httpProtocol._sendHttpRequest(formattedRequest)
       .then(response => {
@@ -284,10 +285,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * @override
    */
-  clientDisconnected() {
+  clientDisconnected(origin: string) {
     clearInterval(this.pingIntervalId);
     clearTimeout(this.pongTimeoutId);
-    super.clientDisconnected();
+    super.clientDisconnected(origin);
   }
 
   /**
