@@ -6,6 +6,7 @@ const NodeWS = require('ws');
 const { default: WS } = require('../../src/protocols/WebSocket');
 const windowMock = require('../mocks/window.mock');
 const { default: HttpProtocol } = require('../../src/protocols/Http');
+const DisconnectionOrigin = require('../../src/protocols/DisconnectionOrigin');
 
 describe('WebSocket networking module', () => {
   let
@@ -160,6 +161,7 @@ describe('WebSocket networking module', () => {
     websocket.connect = sinon.stub().resolves();
     clientStub.onopen();
     clientStub.onclose(1000);
+    should(cb).be.calledOnce().and.be.calledWith({origin: DisconnectionOrigin.NETWORK_CONNECTION_CLOSED });
     websocket.close();
     should(clearTimeout)
       .be.calledOnce();
@@ -188,6 +190,7 @@ describe('WebSocket networking module', () => {
 
   it('should not try to reconnect on a connection error with autoReconnect = false', () => {
     const cb = sinon.stub();
+    const disconnectCB = sinon.stub();
 
     websocket = new WS('address', {
       port: 1234,
@@ -196,6 +199,7 @@ describe('WebSocket networking module', () => {
     });
 
     websocket.retrying = false;
+    websocket.addListener('disconnect', disconnectCB);
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);
 
@@ -205,6 +209,7 @@ describe('WebSocket networking module', () => {
     clock.tick(10);
 
     should(cb).be.calledOnce();
+    should(disconnectCB).be.calledOnce().and.be.calledWith({ origin: DisconnectionOrigin.NETWORK_ERROR });
     should(websocket.retrying).be.false();
     should(websocket.connect).not.be.called();
 
@@ -276,7 +281,7 @@ describe('WebSocket networking module', () => {
     clientStub.onclose(1000);
 
     clock.tick(10);
-    should(cb).be.calledOnce();
+    should(cb).be.calledOnce().and.be.calledWith({ origin: DisconnectionOrigin.NETWORK_CONNECTION_CLOSED });
     should(websocket.listeners('disconnect').length).be.eql(1);
     websocket.clear.should.be.calledOnce();
   });
@@ -724,7 +729,7 @@ describe('WebSocket networking module', () => {
         });
 
         await should(clientStub.close).be.calledOnce();
-        await should(websocket.clientDisconnected).be.calledOnce();
+        await should(websocket.clientDisconnected).be.calledOnce().and.calledWith(DisconnectionOrigin.WEBSOCKET_AUTH_RENEWAL);
         await should(clientStub.send).not.be.called();
 
         await should(onRenewalStart).be.calledOnce();
