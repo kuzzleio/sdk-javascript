@@ -146,7 +146,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
 
         if (status === 1000) {
-          this.clientDisconnected(DisconnectionOrigin.NETWORK_CONNECTION_CLOSED);
+          this.clientDisconnected(DisconnectionOrigin.USER_CONNECTION_CLOSED);
         }
         // do not forward a connection close error if no
         // connection has been previously established

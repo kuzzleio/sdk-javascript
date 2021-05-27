@@ -55,7 +55,7 @@ class ProtocolMock extends KuzzleEventEmitter {
 
   disconnect () {
     this.state = 'offline';
-    this.emit('disconnect', {origin: DisconnectionOrigin.NETWORK_CONNECTION_CLOSED });
+    this.emit('disconnect', {origin: DisconnectionOrigin.USER_CONNECTION_CLOSED });
   }
 
   send (request) {
