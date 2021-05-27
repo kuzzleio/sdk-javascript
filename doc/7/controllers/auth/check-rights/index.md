@@ -18,9 +18,10 @@ Checks if the provided API request can be executed by the current logged user.
 checkRights(requestPayload)
 ```
 
-| Property | Type | Description |
-|--- |--- |--- |
-| `requestPayload` | <pre>object</pre> | Contains a [RequestPayload](/core/2/api/payloads/request) |
+| Property         | Type                         | Description                                                                                                           |
+| ---------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `requestPayload` | <pre>object</pre>            | Contains a [RequestPayload](/core/2/api/payloads/request)                                                             |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## `requestPayload`
 

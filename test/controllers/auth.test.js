@@ -118,7 +118,7 @@ describe('Auth Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'auth',
               action: 'checkToken',
               body: {
@@ -149,7 +149,7 @@ describe('Auth Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'auth',
               action: 'checkToken',
               body: {
@@ -183,7 +183,7 @@ describe('Auth Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'auth',
               action: 'checkToken',
               body: {
@@ -217,7 +217,7 @@ describe('Auth Controller', () => {
         .then(res => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
+            .be.calledWithMatch({
               controller: 'auth',
               action: 'checkToken',
               body: {
@@ -417,7 +417,7 @@ describe('Auth Controller', () => {
               expiresIn: 'expiresIn',
               body: credentials,
               cookieAuth: false
-            }, {queuable: false, verb: 'POST'});
+            }, {queuable: false, verb: 'POST', timeout: -1});
 
           should(res).be.equal(jwt);
         });
@@ -437,7 +437,7 @@ describe('Auth Controller', () => {
               expiresIn: 'expiresIn',
               body: credentials,
               cookieAuth: true
-            }, {queuable: false, verb: 'POST'});
+            }, {queuable: false, verb: 'POST', timeout: -1});
         });
     });
 
@@ -459,7 +459,7 @@ describe('Auth Controller', () => {
               expiresIn: 'expiresIn',
               body: credentials,
               cookieAuth: true
-            }, {queuable: false, verb: 'POST'});
+            }, {queuable: false, verb: 'POST', timeout: -1 });
 
           should(res).be.undefined();
         });

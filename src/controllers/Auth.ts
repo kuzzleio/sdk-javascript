@@ -75,12 +75,18 @@ export class AuthController extends BaseController {
    *    - `_id` API key unique ID
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `expiresIn` Expiration duration
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The created API key
    */
   createApiKey(
     description: string,
-    options: { _id?: string, expiresIn?: number, refresh?: 'wait_for' } = {}
+    options: {
+      _id?: string,
+      expiresIn?: number,
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
   ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
@@ -102,14 +108,21 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
    *
    * @param requestPayload Request to check
+   * @param options Additional Options
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  checkRights (requestPayload: RequestPayload): Promise<boolean> {
+  checkRights (
+    requestPayload: RequestPayload,
+    options: {
+      timeout?: number
+    } = {}
+  ): Promise<boolean> {
     const request = {
       body: requestPayload,
       action: 'checkRights'
     };
 
-    return this.query(request)
+    return this.query(request, options)
       .then(response => response.result.allowed);
   }
 
@@ -121,8 +134,15 @@ export class AuthController extends BaseController {
    * @param id API key ID
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  deleteApiKey(id: string, options: { refresh?: 'wait_for' } = {}): Promise<null> {
+  deleteApiKey(
+    id: string,
+    options: {
+      refresh?: 'wait_for',
+      timeout?: number
+    } = {}
+  ): Promise<null> {
     const request = {
       action: 'deleteApiKey',
       _id: id,
@@ -142,12 +162,18 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `from` Offset of the first document to fetch
    *    - `size` Maximum number of documents to retrieve per page
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A search result object
    */
   searchApiKeys(
     query: JSONObject = {},
-    options: { from?: number, size?: number, lang?: string } = {}
+    options: {
+      from?: number,
+      size?: number,
+      lang?: string,
+      timeout?: number
+    } = {}
   ): Promise<{
     /**
      * Array of found ApiKeys
@@ -176,10 +202,17 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-token
    *
    * @param token The jwt token to check (default to current SDK token)
+   * @param options Additional Options
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A token validity object
    */
-  checkToken (token?: string): Promise<{
+  checkToken (
+    token?: string,
+    options: {
+      timeout?: number
+    } = {}
+  ): Promise<{
     /**
      * Tell if the token is valid or not
      */
@@ -206,7 +239,7 @@ export class AuthController extends BaseController {
       action: 'checkToken',
       body: { token },
       cookieAuth
-    }, { queuable: false })
+    }, { queuable: false, ...options })
       .then(response => response.result);
   }
 
@@ -219,6 +252,7 @@ export class AuthController extends BaseController {
    * @param credentials Name of the strategy to use
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object representing the new credentials.
    *    The content depends on the authentication strategy
@@ -226,7 +260,10 @@ export class AuthController extends BaseController {
   createMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -244,12 +281,16 @@ export class AuthController extends BaseController {
    * @param strategy Name of the strategy to use
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A boolean indicating if the credentials exists
    */
   credentialsExist (
     strategy: string,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -266,10 +307,14 @@ export class AuthController extends BaseController {
    * @param strategy Name of the strategy to use
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   deleteMyCredentials (
     strategy: string,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -285,10 +330,11 @@ export class AuthController extends BaseController {
    *
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns Currently logged User
    */
-  getCurrentUser (options: { queuable?: boolean } = {}): Promise<User> {
+  getCurrentUser (options: {queuable?: boolean, timeout?: number } = {}): Promise<User> {
     return this.query({
       action: 'getCurrentUser'
     }, options)
@@ -306,13 +352,17 @@ export class AuthController extends BaseController {
    * @param strategy Name of the strategy to use
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object representing the credentials for the provided authentication strategy.
    *    Its content depends on the authentication strategy.
    */
   getMyCredentials(
     strategy: string,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -328,11 +378,15 @@ export class AuthController extends BaseController {
    *
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An array containing user rights objects
    */
   getMyRights (
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Array<{
     /**
      * Controller on wich the rights are applied
@@ -368,10 +422,16 @@ export class AuthController extends BaseController {
    *
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An array of available strategies names
    */
-  getStrategies (options: { queuable?: boolean } = {}): Promise<Array<string>> {
+  getStrategies (
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
+  ): Promise<Array<string>> {
     return this.query({
       action: 'getStrategies'
     }, options)
@@ -404,7 +464,7 @@ export class AuthController extends BaseController {
       cookieAuth: this.kuzzle.cookieAuthentication
     };
 
-    return this.query(request, { queuable: false, verb: 'POST' })
+    return this.query(request, { queuable: false, verb: 'POST', timeout: -1 })
       .then(response => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
@@ -436,7 +496,7 @@ export class AuthController extends BaseController {
     return this.query({
       action: 'logout',
       cookieAuth: this.kuzzle.cookieAuthentication
-    }, { queuable: false })
+    }, { queuable: false, timeout: -1 })
       .then(() => {
         this._authenticationToken = null;
       });
@@ -451,6 +511,7 @@ export class AuthController extends BaseController {
    * @param credentials Updated credentials
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object representing the updated credentials.
    *    The content depends on the authentication strategy
@@ -458,7 +519,10 @@ export class AuthController extends BaseController {
   updateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -477,12 +541,16 @@ export class AuthController extends BaseController {
    * @param {object} content - User custom information
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns Currently logged User
    */
   updateSelf (
     content: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean, 
+      timeout?: number
+    } = {}
   ): Promise<User> {
     return this.query({
       body: content,
@@ -503,11 +571,15 @@ export class AuthController extends BaseController {
    * @param credentials Credentials to validate
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   validateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -525,11 +597,16 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `expiresIn` Expiration duration
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The refreshed token
    */
   refreshToken(
-    options: { queuable?: boolean, expiresIn?: number | string } = {}
+    options: { 
+      queuable?: boolean,
+      expiresIn?: number | string,
+      timeout?: number
+    } = {}
   ): Promise<{
     /**
      * Token unique ID
