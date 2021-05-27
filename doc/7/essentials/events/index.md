@@ -32,6 +32,22 @@ Triggered when Kuzzle discards a request, typically if no connection is establis
 
 Triggered when the current session has been unexpectedly disconnected.
 
+<SinceBadge version="auto-version"/>
+**Callback arguments:**
+
+`@param {object} context`
+
+| Property | Type              | Description                                |
+| -------- | ----------------- | ------------------------------------------ |
+| `origin` | <pre>string</pre> | Indicate what is causing the disconnection |
+
+**Origins**
+
+| Name                     | Description                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `websocket/auth-renewal` | The websocket protocol si reconnecting to renew the token. See [Websocket Cookie Authentication](sdk/js/7/protocols/websocket/introduction#cookie-authentication). |
+| `user/connection-closed` | The disconnection is done by the user.                                                                                                                             |
+| `network/error`          | An network error occured and caused a disconnection.                                                                                                               |
 ## loginAttempt
 
 Triggered when a login attempt completes, either with a success or a failure result.
@@ -75,8 +91,8 @@ Triggered whenever a request is added to the offline queue.
 
 `@param {object} data`
 
-| Property  | Type              | Description                                                        |
-| --------- | ----------------- | ------------------------------------------------------------------ |
+| Property  | Type              | Description                                                         |
+| --------- | ----------------- | ------------------------------------------------------------------- |
 | `request` | <pre>object</pre> | [Request](/core/2/guides/main-concepts/querying) added to the queue |
 
 ## queryError
