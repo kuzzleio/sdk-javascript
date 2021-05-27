@@ -509,6 +509,30 @@ describe('WebSocket networking module', () => {
       });
   });
 
+  describe('#connect', () => {
+    it('connect should call the connect method of the HttpProtocol when cookieSupport is true', async () => {
+      websocket._cookieSupport = true;
+      websocket._httpProtocol = {
+        connect: sinon.stub().resolves()
+      };
+      websocket._connect = sinon.stub().resolves();
+      await websocket.connect();
+      await should(websocket._httpProtocol.connect).be.called();
+      await should(websocket._connect).be.called();
+    });
+
+    it('connect should not call the connect method of the HttpProtocol when cookieSupport is false', async () => {
+      websocket._cookieSupport = false;
+      websocket._httpProtocol = {
+        connect: sinon.stub().resolves()
+      };
+      websocket._connect = sinon.stub().resolves();
+      await websocket.connect();
+      await should(websocket._httpProtocol.connect).not.be.called();
+      await should(websocket._connect).be.called();
+    });
+  });
+
   describe('#constructor', () => {
     it('should throw if an invalid host is provided', () => {
       const invalidHosts = [undefined, null, 123, false, true, [], {}, ''];

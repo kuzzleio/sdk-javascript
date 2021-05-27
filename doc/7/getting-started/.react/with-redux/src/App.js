@@ -104,8 +104,8 @@ class App extends Component {
         {/* snippet:end  */}
         {/* snippet:start:13  */}
         <div>
-          {[...messages].reverse().map(message => (
-            <p key={messages.indexOf(message)}>{message.text}</p>
+          {[...messages].reverse().map((message, index) => (
+            <p key={index}>{message.text}</p>
           ))}
         </div>
         {/* snippet:end  */}

@@ -81,7 +81,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * Connect to the websocket server
    */
-  connect (): Promise<void> {
+  _connect (): Promise<void> {
     return new Promise((resolve, reject) => {
       const url = `${this.ssl ? 'wss' : 'ws'}://${this.host}:${this.port}`;
 
@@ -209,6 +209,14 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         clearTimeout(this.pongTimeoutId);
       };
     });
+  }
+
+  connect (): Promise<void> {
+    if (this.cookieSupport) {
+      return this._httpProtocol.connect()
+        .then(() => this._connect());
+    }
+    return this._connect();
   }
 
   enableCookieSupport () {
