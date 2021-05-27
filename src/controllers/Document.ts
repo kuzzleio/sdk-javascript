@@ -212,6 +212,50 @@ export class DocumentController extends BaseController {
   }
 
   /**
+   * Deletes fields of an existing document.
+   *
+   * @see https://docs.kuzzle.io/core/2/api/controllers/document/delete-fields/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Document ID
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `source` If true, the response will contain the updated document
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The updated document
+   */
+  deleteFields(
+    index: string,
+    collection: string,
+    _id: string,
+    fields: string[],
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      source?: boolean,
+      timeout?: number,
+    } = {}
+  ): Promise<Document> {
+    const request = {
+      index,
+      collection,
+      _id,
+      body: { fields },
+      action: 'deleteFields',
+      silent: options.silent,
+      source: options.source,
+    };
+  
+    return this.query(request, options)
+      .then(response => response.result);
+  }
+
+  /**
    * Checks if the given document exists.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/exists/
