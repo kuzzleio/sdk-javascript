@@ -86,6 +86,11 @@ describe('Kuzzle getters', () => {
     should(kuzzle.replayInterval).be.equal('foo-bar');
   });
 
+  it('should get "requestTimeout" property from private _requestTimeout one', () => {
+    kuzzle._requestTimeout = 'foo-bar';
+    should(kuzzle._requestTimeout).be.equal('foo-bar');
+  });
+
   it('should get "sslConnection" property from protocol instance', () => {
     kuzzle.protocol.sslConnection = 'foo-bar';
     should(kuzzle.sslConnection).be.equal('foo-bar');

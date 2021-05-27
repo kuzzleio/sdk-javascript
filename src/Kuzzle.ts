@@ -17,6 +17,7 @@ import { proxify } from './utils/proxify';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
+import { RequestTimeoutError } from './RequestTimeoutError';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -87,6 +88,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _queueMaxSize: any;
   private _queueTTL: any;
   private _replayInterval: any;
+  private _requestTimeout: number;
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
   private _cookieAuthentication: boolean;
@@ -161,6 +163,12 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Default: `10`
        */
       replayInterval?: number;
+      /**
+       * Time (in ms) during which a request will still be waited to be resolved
+       * Set it to `-1` if you want to wait indefinitely.
+       * Default: `-1`
+       */
+      requestTimeout?: number;
       /**
        * Time (in ms) during which a TokenExpired event is ignored
        * Default: `1000`
@@ -294,6 +302,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._replayInterval = typeof options.replayInterval === 'number'
       ? options.replayInterval
       : 10;
+    this._requestTimeout = typeof options.requestTimeout === 'number'
+      ? options.requestTimeout
+      : -1;
     this._tokenExpiredInterval = typeof options.tokenExpiredInterval === 'number'
       ? options.tokenExpiredInterval
       : 1000;
@@ -425,6 +436,15 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._replayInterval = value;
   }
 
+  get requestTimeout () {
+    return this._requestTimeout;
+  }
+
+  set requestTimeout (value) {
+    this._checkPropertyType('_requestTimeout', 'number', value);
+    this._requestTimeout = value;
+  }
+
   get sslConnection () {
     return this.protocol.sslConnection;
   }
@@ -501,8 +521,8 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit('networkError', error);
     });
 
-    this.protocol.addListener('disconnect', () => {
-      this.emit('disconnected');
+    this.protocol.addListener('disconnect', context => {
+      this.emit('disconnected', context);
     });
 
     this.protocol.addListener('reconnect', () => {
@@ -623,6 +643,10 @@ export class Kuzzle extends KuzzleEventEmitter {
       queuable = queuable && this.queueFilter(request);
     }
 
+    const requestTimeout = typeof options.timeout === 'number'
+      ? options.timeout
+      : this._requestTimeout;
+
     if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
@@ -632,7 +656,8 @@ export class Kuzzle extends KuzzleEventEmitter {
             resolve,
             reject,
             request,
-            ts: Date.now()
+            ts: Date.now(),
+            timeout: requestTimeout,
           });
         });
       }
@@ -642,8 +667,11 @@ export class Kuzzle extends KuzzleEventEmitter {
 Discarded request: ${JSON.stringify(request)}`));
     }
 
-    return this.protocol.query(request, options)
-      .then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
+    return this._timeoutRequest(
+      requestTimeout,
+      request,
+      options
+    ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
   }
 
   /**
@@ -771,9 +799,14 @@ Discarded request: ${JSON.stringify(request)}`));
       uniqueQueue = {},
       dequeuingProcess = () => {
         if (this.offlineQueue.length > 0) {
-          this.protocol.query(this.offlineQueue[0].request)
+          
+          this._timeoutRequest(
+            this.offlineQueue[0].timeout,
+            this.offlineQueue[0].request,
+          )
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
+
           this.emit('offlineQueuePop', this.offlineQueue.shift());
 
           setTimeout(() => {
@@ -814,5 +847,31 @@ Discarded request: ${JSON.stringify(request)}`));
     }
 
     dequeuingProcess();
+  }
+
+  /**
+   * Sends a request with a timeout
+   * 
+   * @param delay Delay before the request is rejected if not resolved
+   * @param request Request object
+   * @param options Request options
+   * @returns Resolved request or a TimedOutError
+   */
+  private _timeoutRequest(delay: number, request: RequestPayload, options: JSONObject = {}) {
+    // No timeout
+    if (delay === -1) {
+      return this.protocol.query(request, options);
+    }
+
+    const timeout = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new RequestTimeoutError(request, delay));
+      }, delay);
+    });
+
+    return Promise.race([
+      timeout,
+      this.protocol.query(request, options)
+    ]);
   }
 }

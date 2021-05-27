@@ -1,6 +1,7 @@
 const
   sinon = require('sinon'),
-  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
+  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter'),
+  DisconnectionOrigin = require('../../src/protocols/DisconnectionOrigin');
 
 class ProtocolMock extends KuzzleEventEmitter {
 
@@ -54,7 +55,7 @@ class ProtocolMock extends KuzzleEventEmitter {
 
   disconnect () {
     this.state = 'offline';
-    this.emit('disconnect');
+    this.emit('disconnect', {origin: DisconnectionOrigin.USER_CONNECTION_CLOSED });
   }
 
   send (request) {

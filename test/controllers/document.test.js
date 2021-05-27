@@ -118,6 +118,36 @@ describe('Document Controller', () => {
     });
   });
 
+  
+  describe('deleteFields', () => {
+    it('should call document/deleteFields query and return a Promise which resolves the updated document', () => {
+      kuzzle.query.resolves({result: {_id: 'document-id', _source: {foo: 'bar'}}});
+      options.silent = true;
+
+      const optionsCopy = Object.assign({}, options);
+      optionsCopy.source = true;
+
+      return kuzzle.document.deleteFields('index', 'collection', 'document-id', ['bar'], optionsCopy)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWithMatch({
+              controller: 'document',
+              action: 'deleteFields',
+              index: 'index',
+              collection: 'collection',
+              _id: 'document-id',
+              body: {fields: ['bar']},
+              silent: true,
+              source: true,
+            }, optionsCopy);
+
+          should(res._id).be.equal('document-id');
+          should(res._source.foo).be.equal('bar');
+        });
+    });
+  });
+
   describe('deleteByQuery', () => {
     it('should call document/deleteByQuery query and return a Promise which resolves the list of deleted document ids', () => {
       kuzzle.query.resolves({result: {ids: ['foo', 'bar', 'baz']}});

@@ -32,6 +32,7 @@ Additional query options
 | `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
 | `from`     | <pre>number</pre> <br/>(`0`)    | Offset of the first result <DeprecatedBadge version="7.1.4"/>                |
 | `size`     | <pre>number</pre> <br/>(`10`)   | Maximum number of returned results <DeprecatedBadge version="7.1.4"/>     |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout) | <pre>number</pre><br/>(`-1`) | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 

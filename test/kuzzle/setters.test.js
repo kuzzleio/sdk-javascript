@@ -146,6 +146,19 @@ describe('Kuzzle setters', () => {
     });
   });
 
+  describe('#requestTimeout', () => {
+    it('should throw if not a number', () => {
+      should(function() {
+        kuzzle.requestTimeout = 'foo-bar';
+      }).throw();
+    });
+
+    it('should set private _requestTimeout property', () => {
+      kuzzle.requestTimeout = 1234;
+      should(kuzzle._requestTimeout).be.equal(1234);
+    });
+  });
+
   describe('#flushQueue', () => {
     it('flush the offline queue', () => {
       kuzzle._offlineQueue.push({ foo: 'bar' });

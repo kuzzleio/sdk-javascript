@@ -29,7 +29,7 @@ updateByQuery(index, collection, searchQuery, changes, [options])
 ```
 
 | Argument      | Type              | Description                               |
-|---------------|-------------------|-------------------------------------------|
+| ------------- | ----------------- | ----------------------------------------- |
 | `index`       | <pre>string</pre> | Index name                                |
 | `collection`  | <pre>string</pre> | Collection name                           |
 | `searchQuery` | <pre>object</pre> | Query to match                            |
@@ -43,11 +43,12 @@ updateByQuery(index, collection, searchQuery, changes, [options])
 Additional query options.
 
 | Options   | Type<br/>(default)               | Description                                                                                                                        |
-|-----------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| --------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `lang`    | <pre>string</pre>                | Specify the query language to use. By default, it's `elasticsearch` but `koncorde` can also be used. <SinceBadge version="7.4.8"/> |
 | `refresh` | <pre>string</pre><br/>(`""`)     | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                                 |
-| `silent`  | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/>                                           |
+| `silent`  | <pre>boolean</pre><br/>(`false`) | If `true`, then Kuzzle will not generate notifications <SinceBadge version="7.5.3"/>                                               |
 | `source`  | <pre>boolean</pre><br/>(`false`) | If true, returns the updated document inside the response                                                                          |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout) | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely              |
 ## Resolves
 
 Returns an object containing 2 arrays: `successes` and `errors`
@@ -55,7 +56,7 @@ Returns an object containing 2 arrays: `successes` and `errors`
 Each updated document is an object of the `successes` array with the following properties:
 
 | Property   | Type                              | Description                                            |
-|------------|-----------------------------------|--------------------------------------------------------|
+| ---------- | --------------------------------- | ------------------------------------------------------ |
 | `_source`  | <pre>object<String, Object></pre> | Updated document (if `source` option set to true)      |
 | `_id`      | <pre>string</pre>                 | ID of the udated document                              |
 | `_version` | <pre>number</pre>                 | Version of the document in the persistent data storage |
@@ -64,7 +65,7 @@ Each updated document is an object of the `successes` array with the following p
 Each errored document is an object of the `errors` array with the following properties:
 
 | Property   | Type                              | Description                    |
-|------------|-----------------------------------|--------------------------------|
+| ---------- | --------------------------------- | ------------------------------ |
 | `document` | <pre>object<String, Object></pre> | Document that causes the error |
 | `status`   | <pre>number</pre>                 | HTTP error status              |
 | `reason`   | <pre>string</pre>                 | Human readable reason          |

@@ -21,6 +21,7 @@ export class DocumentController extends BaseController {
    * @param query Query to match
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The number of matching documents
    */
@@ -28,7 +29,10 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     body?: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -54,6 +58,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The created document
    */
@@ -62,7 +67,12 @@ export class DocumentController extends BaseController {
     collection: string,
     content: JSONObject,
     _id: string = null,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -91,6 +101,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The created or replaced document
    */
@@ -99,7 +110,12 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -126,6 +142,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The document ID
    */
@@ -133,7 +150,12 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<number> {
     const request = {
       index,
@@ -160,6 +182,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The deleted documents IDs
    */
@@ -171,7 +194,8 @@ export class DocumentController extends BaseController {
       queuable?: boolean,
       refresh?: string,
       silent?: boolean,
-      lang?: string
+      lang?: string,
+      timeout?: number
     } = {}
   ): Promise<Array<string>> {
     const request = {
@@ -188,6 +212,50 @@ export class DocumentController extends BaseController {
   }
 
   /**
+   * Deletes fields of an existing document.
+   *
+   * @see https://docs.kuzzle.io/core/2/api/controllers/document/delete-fields/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Document ID
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `source` If true, the response will contain the updated document
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The updated document
+   */
+  deleteFields(
+    index: string,
+    collection: string,
+    _id: string,
+    fields: string[],
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      source?: boolean,
+      timeout?: number,
+    } = {}
+  ): Promise<Document> {
+    const request = {
+      index,
+      collection,
+      _id,
+      body: { fields },
+      action: 'deleteFields',
+      silent: options.silent,
+      source: options.source,
+    };
+  
+    return this.query(request, options)
+      .then(response => response.result);
+  }
+
+  /**
    * Checks if the given document exists.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/exists/
@@ -199,6 +267,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns True if the document exists
    */
@@ -206,7 +275,12 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -231,6 +305,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The document
    */
@@ -238,7 +313,12 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -263,6 +343,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -280,7 +361,13 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number,
+      strict?: boolean
+    } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -328,6 +415,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -345,7 +433,13 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number,
+      strict?: boolean
+    } = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -393,6 +487,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not deleted
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -401,7 +496,13 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number,
+      strict?: boolean
+    } = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -444,6 +545,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `verb` (HTTP only) Forces the verb of the route
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -451,7 +553,11 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: { queuable?: boolean, verb?: string } = {}
+    options: {
+      queuable?: boolean,
+      verb?: string,
+      timeout?: number
+    } = {}
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -485,6 +591,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not replaced
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -502,7 +609,13 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean, strict?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number,
+      strict?: boolean
+    } = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -554,6 +667,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -576,6 +690,7 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       retryOnConflict?: number,
+      timeout?: number
       strict?: boolean,
     } = {}
   ): Promise<{
@@ -626,6 +741,7 @@ export class DocumentController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The replaced document
    */
@@ -634,7 +750,12 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: { queuable?: boolean, refresh?: 'wait_for', silent?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -663,6 +784,7 @@ export class DocumentController extends BaseController {
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `verb` (HTTP only) Forces the verb of the route
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A SearchResult
    */
@@ -677,6 +799,7 @@ export class DocumentController extends BaseController {
       scroll?: string;
       lang?: string;
       verb?: string;
+      timeout?: number;
     } = {}
   ): Promise<SearchResult<DocumentHit>> {
     return this._search(index, collection, query, options)
@@ -730,6 +853,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *    - `source` If true, returns the updated document inside the response
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The replaced document
    */
@@ -743,7 +867,8 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       retryOnConflict?: number,
-      source?: boolean
+      source?: boolean,
+      timeout?: number
     } = {}
   ): Promise<Document> {
     const request = {
@@ -775,6 +900,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `source` If true, returns the updated document inside the response
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -787,7 +913,8 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       source?: boolean,
-      lang?: string
+      lang?: string,
+      timeout?: number
     } = {}
   ): Promise<{
     /**
@@ -854,7 +981,8 @@ export class DocumentController extends BaseController {
       refresh?: string,
       silent?: boolean,
       retryOnConflict?: boolean,
-      source?: boolean
+      source?: boolean,
+      timeout?: number
     } = {}
   ): Promise<Document> {
     const request = {
@@ -881,6 +1009,7 @@ export class DocumentController extends BaseController {
    * @param content Document content
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns True if the document is valid
    */
@@ -888,7 +1017,10 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     content: JSONObject,
-    options: { queuable?: boolean } = {}
+    options: {
+      queuable?: boolean,
+      timeout?: number
+    } = {}
   ): Promise<boolean> {
     return this.query({
       index,

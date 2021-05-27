@@ -6,6 +6,50 @@ const
   { Kuzzle } = require('../../src/Kuzzle');
 
 describe('Kuzzle query management', () => {
+  describe('#_timeoutRequest', () => {
+    beforeEach(() => {
+      const protocol = new ProtocolMock('somewhere');
+
+      kuzzle = new Kuzzle(protocol);
+    });
+
+    it('should call protocol.query', async () => {
+      await kuzzle._timeoutRequest(10, {foo: 'bar'}, {bar: 'baz'});
+      should(kuzzle.protocol.query).be.calledOnce();
+      should(kuzzle.protocol.query).be.calledWith({foo: 'bar'}, {bar: 'baz'});
+    });
+
+    it('should resolve the response when a response is obtained before the configured request timeout', async () => {
+      kuzzle.protocol.query = async () => { // Simulate that we are waiting the response to a query
+        return new Promise((resolve) => {
+          setTimeout(
+            () => {
+              resolve('foo');
+            },
+            10
+          );
+        });
+      };
+      const response = kuzzle._timeoutRequest(100, {foo: 'bar'}, {bar: 'baz'});
+      await should(response).be.resolvedWith('foo');
+    });
+
+    it('should reject if a response could not be obtained before the configured request timeout', async () => {
+      kuzzle.protocol.query = async () => { // Simulate that we are waiting the response to a query
+        return new Promise((resolve) => {
+          setTimeout(
+            () => {
+              resolve('foo');
+            },
+            100
+          );
+        });
+      };
+      const promise = kuzzle._timeoutRequest(10, {foo: 'bar'}, {bar: 'baz'});
+      await should(promise).be.rejected();
+    });
+  });
+
   describe('#query', () => {
     const
       query = {
@@ -25,35 +69,43 @@ describe('Kuzzle query management', () => {
       const protocol = new ProtocolMock('somewhere');
 
       kuzzle = new Kuzzle(protocol);
-      kuzzle.protocol.query.resolves(response);
+      kuzzle._timeoutRequest = sinon.stub().resolves(response);
     });
 
     it('should generate a valid request object with no "options" argument and no callback', () => {
       kuzzle.query(query);
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWith({
-        action: 'action',
-        body: {some: 'query'},
-        collection: 'collection',
-        controller: 'controller',
-        index: 'index',
-        volatile: { sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
-        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      });
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWith(
+        kuzzle._requestTimeout,
+        {
+          action: 'action',
+          body: {some: 'query'},
+          collection: 'collection',
+          controller: 'controller',
+          index: 'index',
+          volatile: { sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
+          requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+        },
+        {}
+      );
     });
 
     it('should generate a valid request object', () => {
       kuzzle.query(query, {foo: 'bar', baz: 'yolo'});
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWith({
-        action: 'action',
-        body: {some: 'query'},
-        collection: 'collection',
-        controller: 'controller',
-        index: 'index',
-        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
-        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      });
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWith(
+        kuzzle._requestTimeout,
+        {
+          action: 'action',
+          body: {some: 'query'},
+          collection: 'collection',
+          controller: 'controller',
+          index: 'index',
+          volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
+          requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+        },
+        {foo: 'bar', baz: 'yolo'}
+      );
     });
 
     it('should return the good response from Kuzzle', () => {
@@ -63,22 +115,26 @@ describe('Kuzzle query management', () => {
 
     it('should manage arguments properly if no options are provided', () => {
       kuzzle.query(query);
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWith({
-        action: 'action',
-        body: {some: 'query'},
-        collection: 'collection',
-        controller: 'controller',
-        index: 'index',
-        volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
-        requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      });
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWith(
+        kuzzle._requestTimeout,
+        {
+          action: 'action',
+          body: {some: 'query'},
+          collection: 'collection',
+          controller: 'controller',
+          index: 'index',
+          volatile: {sdkInstanceId: kuzzle.protocol.id, sdkName: kuzzle.sdkName},
+          requestId: sinon.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+        },
+        {}
+      );
     });
 
     it('should not define optional members if none was provided', () => {
       kuzzle.query({controller: 'foo', action: 'bar'});
-      should(kuzzle.protocol.query).be.calledWithMatch({collection: undefined});
-      should(kuzzle.protocol.query).be.calledWithMatch({index: undefined});
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {collection: undefined});
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {index: undefined});
     });
 
     it('should throw an error if the "request" argument if maformed', () => {
@@ -116,8 +172,8 @@ describe('Kuzzle query management', () => {
 
       kuzzle.volatile = volatile;
       kuzzle.query();
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWithMatch({volatile: kuzzle.volatile});
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {volatile: kuzzle.volatile});
     });
 
     it('should copy request local volatile over kuzzle object ones', () => {
@@ -129,8 +185,8 @@ describe('Kuzzle query management', () => {
       kuzzle.volatile = volatile;
 
       kuzzle.query({body: {some: 'query'}, volatile: {foo: 'foo'}});
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWithMatch({volatile: {foo: 'foo', baz: volatile.baz}});
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout,{volatile: {foo: 'foo', baz: volatile.baz}});
     });
 
     it('should allow to override "sdkInstanceId" and "sdkName" volatile data', () => {
@@ -143,27 +199,30 @@ describe('Kuzzle query management', () => {
       };
       kuzzle.query({body: {some: 'query'}, volatile});
 
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWithMatch({
-        volatile: {
-          sdkInstanceId: 'req-sdk-instance-id',
-          sdkName: 'req-sdk-version'
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWithMatch(
+        kuzzle._requestTimeout,
+        {
+          volatile: {
+            sdkInstanceId: 'req-sdk-instance-id',
+            sdkName: 'req-sdk-version'
+          }
         }
-      });
+      );
     });
 
     it('should handle option "refresh" properly', () => {
       kuzzle.query({refresh: 'wait_for'});
-      should(kuzzle.protocol.query).be.calledWithMatch({refresh: 'wait_for'});
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {refresh: 'wait_for'});
 
       kuzzle.query({refresh: false});
-      should(kuzzle.protocol.query).be.calledWithMatch({refresh: false});
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {refresh: false});
     });
 
     it('should not generate a new request ID if one is already defined', () => {
       kuzzle.query({body: {some: 'query'}, requestId: 'foobar'});
-      should(kuzzle.protocol.query).be.calledOnce();
-      should(kuzzle.protocol.query).be.calledWithMatch({requestId: 'foobar'});
+      should(kuzzle._timeoutRequest).be.calledOnce();
+      should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {requestId: 'foobar'});
     });
 
     it('should set jwt except for auth/checkToken', () => {
@@ -173,9 +232,9 @@ describe('Kuzzle query management', () => {
       kuzzle.query({controller: 'foo', action: 'bar'}, {});
       kuzzle.query({controller: 'auth', action: 'checkToken'}, {});
 
-      should(kuzzle.protocol.query).be.calledTwice();
-      should(kuzzle.protocol.query.firstCall.args[0].jwt).be.exactly(jwt);
-      should(kuzzle.protocol.query.secondCall.args[0].jwt).be.undefined();
+      should(kuzzle._timeoutRequest).be.calledTwice();
+      should(kuzzle._timeoutRequest.firstCall.args[1].jwt).be.exactly(jwt);
+      should(kuzzle._timeoutRequest.secondCall.args[1].jwt).be.undefined();
     });
 
     it('should queue the request if queing and queuable', () => {
@@ -188,7 +247,7 @@ describe('Kuzzle query management', () => {
 
       kuzzle.query(request, {});
 
-      should(kuzzle.protocol.query).not.be.called();
+      should(kuzzle._timeoutRequest).not.be.called();
       should(eventStub)
         .be.calledOnce()
         .be.calledWithMatch({ request });
@@ -212,7 +271,7 @@ describe('Kuzzle query management', () => {
           throw new Error('no error');
         })
         .catch(() => {
-          should(kuzzle.protocol.query)
+          should(kuzzle._timeoutRequest)
             .not.be.called();
           should(kuzzle._offlineQueue.length).eql(0);
           should(eventStub)
@@ -230,7 +289,7 @@ describe('Kuzzle query management', () => {
           throw new Error('no error');
         })
         .catch(() => {
-          should(kuzzle.protocol.query)
+          should(kuzzle._timeoutRequest)
             .be.not.be.called();
         });
     });

@@ -17,13 +17,13 @@ subscribe(index, collection, filters, callback, [options]);
 
 <br/>
 
-| Arguments    | Type                | Description                                                   |
-| ------------ | ------------------- | ------------------------------------------------------------- |
-| `index`      | <pre>string</pre>   | Index name                                                    |
-| `collection` | <pre>string</pre>   | Collection name                                               |
+| Arguments    | Type                | Description                                                                     |
+| ------------ | ------------------- | ------------------------------------------------------------------------------- |
+| `index`      | <pre>string</pre>   | Index name                                                                      |
+| `collection` | <pre>string</pre>   | Collection name                                                                 |
 | `filters`    | <pre>object</pre>   | Set of filters following [Koncorde syntax](/core/2/api/koncorde-filters-syntax) |
-| `callback`   | <pre>function</pre> | Callback function to handle notifications                     |
-| `options`    | <pre>object</pre>   | Query options                                                 |
+| `callback`   | <pre>function</pre> | Callback function to handle notifications                                       |
+| `options`    | <pre>object</pre>   | Query options                                                                   |
 
 ### callback
 
@@ -34,12 +34,13 @@ The callback will receive the [notifications object](/sdk/js/7/essentials/realti
 
 Additional subscription options.
 
-| Property          | Type<br/>(default)              | Description                                                                                              |
-| ----------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `scope`           | <pre>string</pre><br/>(`all`)   | Subscribe to document entering or leaving the scope</br>Possible values: `all`, `in`, `out`, `none`      |
-| `users`           | <pre>string</pre><br/>(`none`)  | Subscribe to users entering or leaving the room</br>Possible values: `all`, `in`, `out`, `none`          |
-| `subscribeToSelf` | <pre>boolean</pre><br/>(`true`) | Subscribe to notifications fired by our own queries                                                      |
-| `volatile`        | <pre>object</pre><br/>(`null`)  | subscription information, used in [user join/leave notifications](/core/2/guides/main-concepts/api#volatile-data) |
+| Property          | Type<br/>(default)              | Description                                                                                                           |
+| ----------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `scope`           | <pre>string</pre><br/>(`all`)   | Subscribe to document entering or leaving the scope</br>Possible values: `all`, `in`, `out`, `none`                   |
+| `users`           | <pre>string</pre><br/>(`none`)  | Subscribe to users entering or leaving the room</br>Possible values: `all`, `in`, `out`, `none`                       |
+| `subscribeToSelf` | <pre>boolean</pre><br/>(`true`) | Subscribe to notifications fired by our own queries                                                                   |
+| `volatile`        | <pre>object</pre><br/>(`null`)  | subscription information, used in [user join/leave notifications](/core/2/guides/main-concepts/api#volatile-data)     |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)         | <pre>number</pre><br/>          | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 ## Resolves
 
