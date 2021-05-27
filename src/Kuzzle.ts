@@ -501,7 +501,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit('networkError', error);
     });
 
-    this.protocol.addListener('disconnect', (context) => {
+    this.protocol.addListener('disconnect', context => {
       this.emit('disconnected', context);
     });
 
