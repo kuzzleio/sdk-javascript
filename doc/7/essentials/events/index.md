@@ -32,7 +32,7 @@ Triggered when Kuzzle discards a request, typically if no connection is establis
 
 Triggered when the current session has been unexpectedly disconnected.
 
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.7.0"/>
 **Callback arguments:**
 
 `@param {object} context`
