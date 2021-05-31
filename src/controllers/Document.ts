@@ -729,6 +729,81 @@ export class DocumentController extends BaseController {
   }
 
   /**
+   * Applies partial updates to multiple documents.
+   * 
+   * If a document doesn't already exist, a new document is created.
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-upsert/
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param documents Documents to update
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `silent` If true, then Kuzzle will not generate notifications
+   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *
+   * @returns An object containing 2 arrays: "successes" and "errors"
+   */
+  mUpsert (
+    index: string,
+    collection: string,
+    documents: Array<{
+      /**
+       * Document ID
+       */
+      _id: string;
+      /**
+       * Partial content of the document to update
+       */
+      changes: JSONObject;
+      /**
+       * Fields to add to the document if it gets created
+       */
+      default: JSONObject
+    }>,
+    options: {
+      queuable?: boolean,
+      refresh?: 'wait_for',
+      silent?: boolean,
+      retryOnConflict?: number,
+    } = {}
+  ): Promise<{
+    /**
+     * Array of successfully updated documents
+     */
+    successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
+    errors: Array<{
+      /**
+       * Document that cause the error
+       */
+      document: Document;
+      /**
+       * HTTP error status
+       */
+      status: number;
+      /**
+       * Human readable reason
+       */
+      reason: string;
+    }>;
+  }> {
+    const request = {
+      index,
+      collection,
+      body: { documents },
+      action: 'mUpsert',
+      silent: options.silent,
+    };
+
+    return this.query(request, options)
+      .then(response => response.result);
+  }
+
+  /**
    * Replaces the content of an existing document.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/replace/
