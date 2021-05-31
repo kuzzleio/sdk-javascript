@@ -8,7 +8,7 @@ description: Updates documents matching query
 # updateByQuery
 
 <SinceBadge version="Kuzzle 2.11.0"/>
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.7.1"/>
 
 Updates documents matching the provided search query.
 

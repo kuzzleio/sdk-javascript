@@ -8,7 +8,7 @@ description: Update documents
 # mUpsert
 
 <SinceBadge version="Kuzzle 2.11.0"/>
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.7.1"/>
 
 Applies partial changes to multiple documents. If a document doesn't already exist, a new document is created.
 
