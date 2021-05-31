@@ -73,6 +73,10 @@
     "mWrite": {
       "verb": "POST",
       "url": "/:index/:collection/_mWrite"
+    },
+    "updateByQuery": {
+      "url": "/:index/:collection/_bulk/_query",
+      "verb": "PATCH"
     }
   },
   "document": {
@@ -123,6 +127,10 @@
     "mUpdate": {
       "url": "/:index/:collection/_mUpdate",
       "verb": "PUT"
+    },
+    "mUpsert": {
+      "url": "/:index/:collection/_mUpsert",
+      "verb": "POST"
     },
     "replace": {
       "url": "/:index/:collection/:_id/_replace",
