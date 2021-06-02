@@ -45,7 +45,7 @@ Kuzzle SDK instance options.
 | `deprecationWarning`   | <pre>boolean</pre><br />(`true`) | Show deprecation warning in development (hidden either way in production)                                                     |
 | `eventTimeout`         | <pre>number</pre><br/>(`200`)    | Time (in ms) during which a similar event is ignored                                                                          |
 | `offlineMode`          | <pre>string</pre><br/>(`manual`) | Offline mode configuration. Can be `manual` or `auto`                                                                         |
-| `queueTTL`             | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds                                                            |
+| `queueTTL`             | <pre>number</pre><br/>(`120000`) | Time a queued request is kept during offline mode, in milliseconds. Set it to `0` to keep queued requests indefinitely        |
 | `queueMaxSize`         | <pre>number</pre><br/>(`500`)    | Number of maximum requests kept during offline mode                                                                           |
 | `replayInterval`       | <pre>number</pre><br/>(`10`)     | Delay between each replayed requests, in milliseconds                                                                         |
 | `requestTimeout`       | <pre>number</pre><br/>           | Default time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
