@@ -777,7 +777,8 @@ Discarded request: ${JSON.stringify(request)}`));
         this.offlineQueue
           .splice(0, lastDocumentIndex + 1)
           .forEach(droppedRequest => {
-            this.emit('offlineQueuePop', droppedRequest.query);
+            this.emit('offlineQueuePop', droppedRequest.request);
+            droppedRequest.reject(new Error('Query aborted: queued time exceeded the queueTTL option value'));
           });
       }
     }
@@ -786,7 +787,8 @@ Discarded request: ${JSON.stringify(request)}`));
       this.offlineQueue
         .splice(0, this.offlineQueue.length - this.queueMaxSize)
         .forEach(droppedRequest => {
-          this.emit('offlineQueuePop', droppedRequest.query);
+          this.emit('offlineQueuePop', droppedRequest.request);
+          droppedRequest.reject(new Error('Query aborted: too many queued requests (see the queueMaxSize option)'));
         });
     }
   }
@@ -807,7 +809,7 @@ Discarded request: ${JSON.stringify(request)}`));
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
 
-          this.emit('offlineQueuePop', this.offlineQueue.shift());
+          this.emit('offlineQueuePop', this.offlineQueue.shift().request);
 
           setTimeout(() => {
             dequeuingProcess();
