@@ -65,7 +65,9 @@ Default value: `500`
 
 ### queueTTL
 
-A writable `number` defining the time in milliseconds a queued request is kept in the `offlineQueue`.
+A writable `number` defining the time in milliseconds a queued request is kept in the `offlineQueue`.  
+
+Setting this parameter to `0` disables this behavior, and prevents the SDK from expiring queued requests.
 
 Default value: `120000`
 
