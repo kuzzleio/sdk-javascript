@@ -100,18 +100,17 @@ jobs:
       if: type = pull_request AND branch =~ /^6-(dev|stable)$/
       language: node_js
       node_js: 10
-      script:
-        if [ $TRAVIS_BRANCH = "6-stable" ];
+      script: if [ $TRAVIS_BRANCH = "6-stable" ];
         then
-          sudo sysctl -w vm.max_map_count=262144
-          ./.ci/start_kuzzle_v1.sh
-          npm install
-          git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
-          cd /tmp/admin-console
-          npm ci
-          npm install kuzzle-sdk-v6@$TRAVIS_BUILD_DIR
-          cd test/e2e/run-test && npm ci && cd -
-          CYPRESS_RETRIES=5 npm run test:e2e
+        sudo sysctl -w vm.max_map_count=262144
+        ./.ci/start_kuzzle_v1.sh
+        npm install
+        git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
+        cd /tmp/admin-console
+        npm ci
+        npm install kuzzle-sdk-v6@$TRAVIS_BUILD_DIR
+        cd test/e2e/run-test && npm ci && cd -
+        CYPRESS_RETRIES=5 npm run test:e2e
         fi
 
     - stage: Tests
@@ -122,6 +121,7 @@ jobs:
 
       before_script:
         - npm ci
+        - npm i --save-dev kuzdoc
         - npm run doc-prepare
         - $(npm bin)/kuzdoc iterate-repos:install --repos_path doc/framework/.repos/
         - $(npm bin)/kuzdoc framework:link -d /sdk/js/6/ -v 6
@@ -150,6 +150,7 @@ jobs:
       install:
         - pip install awscli --upgrade --user
         - npm ci
+        - npm i --save-dev kuzdoc
 
       script:
         - npm run doc-prepare
@@ -186,6 +187,7 @@ jobs:
       install:
         - pip install awscli --upgrade --user
         - npm ci
+        - npm i --save-dev kuzdoc
 
       script:
         - npm run doc-prepare
