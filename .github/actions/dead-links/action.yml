@@ -4,7 +4,7 @@ runs:
   using: "composite"
   steps:
     - name: Install deps
-      run: npm ci
+      run: npm ci --production=false
       shell: bash
     - name: Install latest minor of Kuzdoc
       run: npm i --save-dev kuzdoc
