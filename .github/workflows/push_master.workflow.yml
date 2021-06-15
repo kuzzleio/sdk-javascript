@@ -28,51 +28,51 @@ jobs:
       - uses: ./.github/actions/es-lint
 
   unit-tests:
-     name: Unit Tests
-     runs-on: ubuntu-18.04
-     needs: [lint]
-     steps:
-       - uses: actions/checkout@v2
-       - name: Cache node modules
-         uses: actions/cache@v2
-         env:
-           cache-name: cache-node-modules
-         with:
-           path: ~/.npm
-           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-           restore-keys: |
-             ${{ runner.os }}-build-${{ env.cache-name }}-
-             ${{ runner.os }}-build-
-             ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
-         with:
-           node-version: "12"
-       - uses: ./.github/actions/unit-tests
+    name: Unit Tests
+    runs-on: ubuntu-18.04
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1.4.4
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/unit-tests
 
   functional-tests:
-     name: Functional Tests
-     runs-on: ubuntu-18.04
-     needs: [unit-tests]
-     steps:
-       - uses: actions/checkout@v2
-         with:
-          submodules: 'recursive'
-       - name: Cache node modules
-         uses: actions/cache@v2
-         env:
-           cache-name: cache-node-modules
-         with:
-           path: ~/.npm
-           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-           restore-keys: |
-             ${{ runner.os }}-build-${{ env.cache-name }}-
-             ${{ runner.os }}-build-
-             ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
-         with:
-           node-version: "12"
-       - uses: ./.github/actions/functional-tests
-         with:
+    name: Functional Tests
+    runs-on: ubuntu-18.04
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1.4.4
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/functional-tests
+        with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   # admin-console-tests:
@@ -100,49 +100,52 @@ jobs:
   #         sdk-version: 7
   #         cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-  # documentation-dead-links:
-  #   name: Dead links
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - uses: actions/setup-node@v1.4.4
-  #       with:
-  #         node-version: "12"
-  #     - uses: ./.github/actions/dead-links
+  documentation-dead-links:
+    name: Dead links
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1.4.4
+        with:
+          node-version: "12"
+      - uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - uses: ./.github/actions/dead-links
 
   documentation-snippet-tests:
-     name: Documentation Snippet Tests
-     needs: [unit-tests]
-     runs-on: ubuntu-18.04
-     steps:
-       - uses: actions/checkout@v2
-       - name: Cache node modules
-         uses: actions/cache@v2
-         env:
-           cache-name: cache-node-modules
-         with:
-           path: ~/.npm
-           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-           restore-keys: |
-             ${{ runner.os }}-build-${{ env.cache-name }}-
-             ${{ runner.os }}-build-
-             ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
-         with:
-           node-version: "12"
-       - uses: ./.github/actions/snippet-tests
-         with:
+    name: Documentation Snippet Tests
+    needs: [unit-tests]
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1.4.4
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/snippet-tests
+        with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   documentation-production:
@@ -196,8 +199,8 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "12.x"
+          registry-url: "https://registry.npmjs.org"
       - run: npm install
       - run: npm publish
         env:
