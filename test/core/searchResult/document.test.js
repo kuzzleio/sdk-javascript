@@ -135,7 +135,7 @@ describe('DocumentSearchResult', () => {
                 action: 'scroll',
                 scroll: '10s',
                 scrollId: 'scroll-id'
-              }, options);
+              });
             should(nextSearchResult).not.be.equal(searchResult);
             should(nextSearchResult).be.instanceOf(DocumentSearchResult);
           });
