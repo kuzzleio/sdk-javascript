@@ -49,7 +49,7 @@ class Jwt {
   }
 
   get expired () {
-    return Date.now() > this.expiresAt;
+    return Math.round(Date.now() / 1000) > this.expiresAt;
   }
 
   _decode () {

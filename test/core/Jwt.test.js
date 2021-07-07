@@ -15,7 +15,7 @@ describe('Jwt', () => {
   describe('#constructor', () => {
     it('should construct a Jwt instance and decode the payload', () => {
       const
-        expiresAt = Date.now() + 3600 * 1000,
+        expiresAt = Math.round(Date.now() / 1000) + 3600 * 1000,
         encodedJwt = generateJwt('user-gordon', expiresAt);
 
       authenticationToken = new Jwt(encodedJwt);
@@ -41,7 +41,7 @@ describe('Jwt', () => {
 
   describe('#get expired', () => {
     it('should return a boolean according to expiresAt', () => {
-      const encodedJwt = generateJwt('user-gordon', Date.now() - 1000);
+      const encodedJwt = generateJwt('user-gordon', Math.round(Date.now() / 1000) - 1000);
 
       authenticationToken = new Jwt(encodedJwt);
 
