@@ -72,51 +72,51 @@ jobs:
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
-  # admin-console-tests:
-  #   name: Admin Console Tests
-  #   runs-on: ubuntu-18.04
-  #   needs: [unit-tests]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "12"
-  #     - uses: ./.github/actions/tests-ac
-  #       with:
-  #         sdk-version: 7
-  #         cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
+  admin-console-tests:
+    name: Admin Console Tests
+    runs-on: ubuntu-18.04
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/tests-ac
+        with:
+          sdk-version: 7
+          cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-  # documentation-dead-links:
-  #   name: Dead links
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - uses: actions/setup-node@v1.4.4
-  #       with:
-  #         node-version: "12"
-  #     - uses: ./.github/actions/dead-links
+  documentation-dead-links:
+    name: Dead links
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1.4.4
+        with:
+          node-version: "12"
+      - uses: ./.github/actions/dead-links
 
   documentation-snippet-tests:
      name: Documentation Snippet Tests
