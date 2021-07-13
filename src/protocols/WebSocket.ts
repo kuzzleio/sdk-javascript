@@ -204,7 +204,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
          * In case you're running a Kuzzle version under 2.10.0
          * The response from a browser custom ping will be another payload.
-         * We need to clear this timeout at each message to keep 
+         * We need to clear this timeout at each message to keep
          * the connection alive if it's the case
          */
         clearTimeout(this.pongTimeoutId);
@@ -227,7 +227,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
     super.enableCookieSupport();
     this._httpProtocol = new HttpProtocol(
-      this.host, 
+      this.host,
       {
         port: this.port,
         ssl: this.ssl,
@@ -279,7 +279,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           });
       })
       .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
-    
+
   }
 
   /**
