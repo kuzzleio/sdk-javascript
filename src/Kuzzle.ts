@@ -563,21 +563,24 @@ export class Kuzzle extends KuzzleEventEmitter {
    * "reconnectionError" event when:
    *   - the SDK cannot re-authenticate using the authenticator function
    *   - the authenticator function is not set
+   *
+   * This method never returns a rejected promise.
    */
   private async tryReAuthenticate (): Promise<boolean> {
     try {
       const { valid } = await this.auth.checkToken();
 
-      if (! valid && this.authenticator) {
-        await this.authenticate();
+      if (valid) {
+        return true;
       }
-      else if (! valid && ! this.authenticator) {
-        this.emit('reconnectionError', {
-          error: new Error('SDK is not authenticated after reconnection and no "authenticator" function is defined.')
-        });
 
-        return false;
+      if (! this.authenticator) {
+        throw new Error('No "authenticator" function is defined.');
       }
+
+      await this.authenticate();
+
+      return true;
     }
     catch (err) {
       this.emit('reconnectionError', {
@@ -586,8 +589,6 @@ export class Kuzzle extends KuzzleEventEmitter {
 
       return false;
     }
-
-    return true;
   }
 
   /**
