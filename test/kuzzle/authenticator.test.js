@@ -119,15 +119,6 @@ describe('Kuzzle authenticator function mecanisms', () => {
       should(reconnectionErrorSpy).not.be.called();
     });
 
-    it('should emit "reconnectionError" if the token is not valid and no "authenticator" is set', async () => {
-      kuzzle.authenticator = null;
-
-      const ret = await kuzzle.tryReAuthenticate();
-
-      should(ret).be.false();
-      should(reconnectionErrorSpy).be.called();
-    });
-
     it('should emit "reconnectionError" if the "authenticator" function fail', async () => {
       kuzzle.authenticate.rejects('auth fail');
 

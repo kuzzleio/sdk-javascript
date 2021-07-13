@@ -574,10 +574,6 @@ export class Kuzzle extends KuzzleEventEmitter {
         return true;
       }
 
-      if (! this.authenticator) {
-        throw new Error('No "authenticator" function is defined.');
-      }
-
       await this.authenticate();
 
       return true;
