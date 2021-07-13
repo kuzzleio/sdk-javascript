@@ -32,7 +32,6 @@ const events = [
   'offlineQueuePop',
   'queryError',
   'reconnected',
-  'resubscribe',
   'reconnectionError',
   'tokenExpired'
 ];
@@ -597,8 +596,8 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @returns The authentication token
    */
   async authenticate (): Promise<string> {
-    if (! this.authenticator) {
-      throw new Error('No "authenticator" function is defined.');
+    if (typeof this.authenticator !== 'function') {
+      throw new Error('The "authenticator" property must be a function.');
     }
 
     await this.authenticator();
