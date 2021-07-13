@@ -11,6 +11,33 @@ order: 400
 The Kuzzle SDK provides a set of properties that helps your application to be resilient to the loss of network connection
 during its lifespan.
 
+## Authentication after reconnection
+
+When the SDK reconnect, the authentication token may not be valid anymore.
+
+It's possible to set the [authenticator](/sdk/js/7/core-classes/kuzzle/properties#authenticator) function to allows the SDK to re-authenticate after a successful reconnection.
+
+<details><summary>Example to automatically re-authenticate on reconnection</summary>
+
+```js
+const { Kuzzle, WebSocket } = require('kuzzle');
+
+const kuzzle = new Kuzzle(new WebSocket('localhost'), { autoResubscribe: true });
+
+kuzzle.authenticator = async () => {
+  await kuzzle.auth.login('local', { username: 'test', password: 'test' });
+};
+
+await kuzzle.connect();
+await kuzzle.authenticate();
+
+await kuzzle.realtime.subscribe('test', 'test', {}, () => {
+  console.log('Received');
+});
+```
+
+</details>
+
 ## Contructor options and properties
 
 These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/7/core-classes/kuzzle/constructor#arguments).
@@ -76,6 +103,10 @@ Default value: `120000`
 A read-only `number` specifying the time in milliseconds between different reconnection attempts.
 
 Default value: *Depends on the Protocol*
+
+### reconnectionError
+
+Emitted when the SDK reconnect to Kuzzle and does not have a valid authentication token or can't renew it with the [authenticator](/sdk/js/7/core-classes/kuzzle/properties#authenticator) function.
 
 ## Methods
 
