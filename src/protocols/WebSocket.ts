@@ -215,7 +215,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * We need to clear this timeout at each message to keep 
          * the connection alive if it's the case
          */
-         this.waitForPong = false;
+        this.waitForPong = false;
       };
     });
   }
