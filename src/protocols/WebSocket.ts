@@ -16,10 +16,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private client: any;
   private lasturl: any;
   private ping: any;
-  private pongTimeoutId: ReturnType<typeof setTimeout>;
+  private waitForPong: boolean;
   private pingIntervalId: ReturnType<typeof setInterval>;
   private _pingInterval: number;
-  private _pongTimeout: number;
   private _httpProtocol: HttpProtocol;
 
   /**
@@ -74,7 +73,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
 
     this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
-    this._pongTimeout = this._pingInterval;
     this.client = null;
     this.lasturl = null;
   }
@@ -108,7 +106,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.client.ping();
         };
         this.client.on('pong', () => {
-          clearTimeout(this.pongTimeoutId);
+          this.waitForPong = false;
         });
       }
       this.client.onopen = () => {
@@ -116,15 +114,25 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
         * Send pings to the server
         */
+        this.waitForPong = false; // Reset when connection established
         this.pingIntervalId = setInterval(() => {
-          if (this.client && this.client.readyState === 1) {
+          // If the connection is established and we are not waiting for a pong we ping Kuzzle
+          if (this.client &&
+              this.client.readyState === this.client.OPEN &&
+              !this.waitForPong
+          ) {
             this.ping();
+            this.waitForPong = true;
+            return;
           }
-          this.pongTimeoutId = setTimeout(() => {
+
+          // If we were waiting for a pong that never occured before the next ping cycle we throw an error
+          if (this.waitForPong) {
             const error: any = new Error('Connection lost.');
             error.status = 503;
+            this.waitForPong = false;
             this.clientNetworkError(error);
-          }, this._pongTimeout);
+          }
         }, this._pingInterval);
         return resolve();
       };
@@ -182,7 +190,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * Corresponds to a custom pong response message
          */
         if (data && data.p && data.p === 2 && Object.keys(data).length === 1) {
-          clearTimeout(this.pongTimeoutId);
+          this.waitForPong = false;
           return;
         }
 
@@ -207,7 +215,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * We need to clear this timeout at each message to keep 
          * the connection alive if it's the case
          */
-        clearTimeout(this.pongTimeoutId);
+         this.waitForPong = false;
       };
     });
   }
@@ -287,7 +295,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    */
   clientDisconnected(origin: string) {
     clearInterval(this.pingIntervalId);
-    clearTimeout(this.pongTimeoutId);
+    this.pingIntervalId = null;
     super.clientDisconnected(origin);
   }
 
@@ -298,7 +306,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    */
   clientNetworkError (error) {
     clearInterval(this.pingIntervalId);
-    clearTimeout(this.pongTimeoutId);
+    this.pingIntervalId = null;
     super.clientNetworkError(error);
   }
   /**
@@ -313,6 +321,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
+    clearInterval(this.pingIntervalId);
+    this.pingIntervalId = null;
     super.close();
   }
 }
