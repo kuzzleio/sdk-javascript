@@ -142,10 +142,11 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
+
     clientStub.onopen();
     clientStub.onerror();
     should(clearInterval)
-      .be.calledOnce();
+      .be.calledTwice();
   });
 
   it('should clear pingInterval when the connection closes', () => {
@@ -161,7 +162,7 @@ describe('WebSocket networking module', () => {
     clientStub.onclose(1000);
     should(cb).be.calledOnce().and.be.calledWith({origin: DisconnectionOrigin.USER_CONNECTION_CLOSED });
     should(clearInterval)
-      .be.calledOnce();
+      .be.calledTwice();
   });
   
   it('should try to reconnect on a connection error with autoReconnect = true', () => {
