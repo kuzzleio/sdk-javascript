@@ -105,7 +105,11 @@ describe('WebSocket networking module', () => {
     const setInterval = sinon.stub(clock, 'setInterval');
 
     websocket.connect();
+    websocket.waitForPong = true;
     clientStub.onopen();
+
+    should(websocket.waitForPong)
+      .be.false();
 
     should(setInterval)
       .be.calledOnce();
@@ -380,7 +384,7 @@ describe('WebSocket networking module', () => {
       .be.calledWithMatch(expectedError, payload);
   });
 
-  it('should clear the pongTimeOut when receiving a pong message and return', () => {
+  it('should set the waitForPong to false when receiving a pong message and return', () => {
     const
       cb = sinon.stub(),
       cb2 = sinon.stub();
