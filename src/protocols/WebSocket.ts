@@ -130,6 +130,11 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           if (this.waitForPong) {
             const error: any = new Error('Connection lost.');
             error.status = 503;
+            /**
+             * Ensure that the websocket connection is closed because if the connection was fine but Kuzzle could not respond in time
+             * a new connection will be created if `autoReconnect=true` and there would 2 opened websocket connection.
+             */
+            this.client.close(); 
             this.waitForPong = false;
             this.clientNetworkError(error);
           }
