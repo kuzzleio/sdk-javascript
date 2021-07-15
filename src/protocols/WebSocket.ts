@@ -114,7 +114,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
         * Send pings to the server
         */
-        this.waitForPong = false; // Reset when connection established
+        clearInterval(this.pingIntervalId);
+        this.waitForPong = false; // Reset when connection is established
         this.pingIntervalId = setInterval(() => {
           // If the connection is established and we are not waiting for a pong we ping Kuzzle
           if (this.client &&
