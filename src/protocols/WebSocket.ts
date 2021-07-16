@@ -129,7 +129,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
           // If we were waiting for a pong that never occured before the next ping cycle we throw an error
           if (this.waitForPong) {
-            const error: any = new Error('Connection lost.');
+            const error: any = new Error('Kuzzle does\'nt respond to ping. Connection lost.');
             error.status = 503;
             /**
              * Ensure that the websocket connection is closed because if the connection was fine but Kuzzle could not respond in time
