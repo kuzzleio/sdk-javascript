@@ -44,7 +44,7 @@ The `authenticator` property can be set to a function returning a promise.
 
 This function will be called after a successful reconnection if the current authentication token is not valid anymore.  
 
-This function has to authenticate the SDK (by setting the `jwt` property). It can be a call to [auth.login](/sdk/js/7/controllers/auth/login) for example.
+This function has to authenticate the SDK. It can be a call to [auth.login](/sdk/js/7/controllers/auth/login) for example.
 
 ```js
 kuzzle.authenticator = async () => {
@@ -52,7 +52,7 @@ kuzzle.authenticator = async () => {
 }
 ```
 
-If the `authenticator` function fail, then the `reconnected` event is never emitted and a `reconnectionError` event is emitted.
+If the `authenticator` function fail to authenticate the SDK, then the `reconnected` event is never emitted and a `reconnectionError` event is emitted.
 
 ### offlineQueueLoader
 

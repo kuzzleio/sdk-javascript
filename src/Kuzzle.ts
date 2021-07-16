@@ -536,9 +536,9 @@ export class Kuzzle extends KuzzleEventEmitter {
         this.stopQueuing();
       }
 
-      // If the SDK was authenticated, check if the token is still valid and try
+      // If an authenticator was set, check if the token is still valid and try
       // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
-      if (this.jwt && ! await this.tryReAuthenticate()) {
+      if (this.authenticator && ! await this.tryReAuthenticate()) {
         this.disconnect();
 
         return;
@@ -592,18 +592,18 @@ export class Kuzzle extends KuzzleEventEmitter {
    *
    * @returns The authentication token
    */
-  async authenticate (): Promise<string> {
+  async authenticate (): Promise<void> {
     if (typeof this.authenticator !== 'function') {
       throw new Error('The "authenticator" property must be a function.');
     }
 
     await this.authenticator();
 
-    if (! this.jwt) {
-      throw new Error('The "authenticator" function did not authenticate the SDK. ("jwt" is not set)');
-    }
+    const { valid } = await this.auth.checkToken();
 
-    return this.jwt;
+    if (! valid) {
+      throw new Error('The "authenticator" function failed to authenticate the SDK.');
+    }
   }
 
   /**

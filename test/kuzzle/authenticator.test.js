@@ -6,7 +6,6 @@ const { Kuzzle } = require('../../src/Kuzzle');
 describe('Kuzzle authenticator function mecanisms', () => {
   let kuzzle;
   let protocol;
-  let validJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
   beforeEach(() => {
     protocol = new ProtocolMock('somewhere');
@@ -23,7 +22,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
     let promise;
 
     beforeEach(() => {
-      kuzzle.jwt = validJwt;
+      kuzzle.authenticator = async () => {};
 
       sinon.stub(kuzzle, 'tryReAuthenticate').resolves(true);
       sinon.stub(kuzzle, 'disconnect');
@@ -32,7 +31,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
       kuzzle.on('reconnected', reconnectedSpy);
     });
 
-    it('should try to re-authenticate when reconnecting if a JWT was set', async () => {
+    it('should try to re-authenticate when reconnecting if an authenticator was set', async () => {
       promise = new Promise(_resolve => {
         resolve = _resolve;
       });
@@ -69,12 +68,12 @@ describe('Kuzzle authenticator function mecanisms', () => {
       return promise;
     });
 
-    it('should not try to authenticate if the SDK was not authenticated', async () => {
+    it('should not try to authenticate if no authenticator was set', async () => {
+      kuzzle.authenticator = null;
       promise = new Promise(_resolve => {
         resolve = _resolve;
       });
       await kuzzle.connect();
-      kuzzle.jwt = null;
 
       protocol.emit('reconnect');
 
@@ -131,18 +130,18 @@ describe('Kuzzle authenticator function mecanisms', () => {
 
   describe('#authenticate', () => {
     beforeEach(() => {
-      kuzzle.authenticator = async () => {
-        kuzzle.jwt = validJwt;
-      };
+      kuzzle.authenticator = async () => {};
+
+      sinon.stub(kuzzle.auth, 'checkToken').resolves({ valid: true });
 
       sinon.spy(kuzzle, 'authenticator');
     });
 
     it('should execute the "authenticator"', async () => {
-      const token = await kuzzle.authenticate();
+      await kuzzle.authenticate();
 
       should(kuzzle.authenticator).be.calledOnce();
-      should(token).be.eql(validJwt);
+      should(kuzzle.auth.checkToken).be.calledOnce();
     });
 
     it('should throw an error if the "authenticator" is not set', () => {
@@ -151,8 +150,8 @@ describe('Kuzzle authenticator function mecanisms', () => {
       should(kuzzle.authenticate()).be.rejected();
     });
 
-    it('should throw an error if the "authenticator" does not set the JWT', () => {
-      kuzzle.authenticator = async () => {};
+    it('should throw an error if the "authenticator" does not authenticate the SDK', () => {
+      kuzzle.auth.checkToken.resolves({ valid: false });
 
       should(kuzzle.authenticate()).be.rejected();
     });

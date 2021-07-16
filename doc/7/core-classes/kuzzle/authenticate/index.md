@@ -15,10 +15,6 @@ Authenticate the SDK by using the function set in the [authenticator](/sdk/js/7/
 authenticate();
 ```
 
-## Resolves
-
-Resolves to the authentication token.
-
 ## Usage
 
 <<< ./snippets/authenticate.js
