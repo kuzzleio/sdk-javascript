@@ -118,9 +118,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         this.waitForPong = false; // Reset when connection is established
         this.pingIntervalId = setInterval(() => {
           // If the connection is established and we are not waiting for a pong we ping Kuzzle
-          if (this.client &&
-              this.client.readyState === this.client.OPEN &&
-              !this.waitForPong
+          if ( this.client
+            && this.client.readyState === this.client.OPEN
+            && ! this.waitForPong
           ) {
             this.ping();
             this.waitForPong = true;
@@ -135,7 +135,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
              * Ensure that the websocket connection is closed because if the connection was fine but Kuzzle could not respond in time
              * a new connection will be created if `autoReconnect=true` and there would 2 opened websocket connection.
              */
-            this.client.close(); 
+            this.client.close();
             this.waitForPong = false;
             this.clientNetworkError(error);
           }
@@ -218,7 +218,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
          * In case you're running a Kuzzle version under 2.10.0
          * The response from a browser custom ping will be another payload.
-         * We need to clear this timeout at each message to keep 
+         * We need to clear this timeout at each message to keep
          * the connection alive if it's the case
          */
         this.waitForPong = false;
@@ -241,7 +241,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
     super.enableCookieSupport();
     this._httpProtocol = new HttpProtocol(
-      this.host, 
+      this.host,
       {
         port: this.port,
         ssl: this.ssl,
@@ -293,7 +293,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           });
       })
       .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
-    
+
   }
 
   /**
