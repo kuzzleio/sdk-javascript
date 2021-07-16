@@ -28,7 +28,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `port` Kuzzle server port (default: `7512`)
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
-   *    - `pingInterval` Number of milliseconds between two pings (default: `10000`)
+   *    - `pingInterval` Number of milliseconds between two pings (default: `2000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
