@@ -23,7 +23,8 @@ runs:
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
         yarn
-        yarn add kuzzle-sdk-v${{ inputs.sdk-version }}@"$SDK_DIR"
+        yarn add kuzzle-sdk-v7.6.1@"$SDK_DIR"
+        yarn build
       shell: bash
     - name: Run e2e tests
       run: |

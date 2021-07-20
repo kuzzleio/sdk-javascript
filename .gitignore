@@ -15,6 +15,7 @@ node_modules/
 coverage/
 
 doc/framework
+.vuepress
 dead_links.json
 
 # Cypress debug
