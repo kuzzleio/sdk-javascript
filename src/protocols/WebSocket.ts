@@ -16,10 +16,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   private client: any;
   private lasturl: any;
   private ping: any;
-  private pongTimeoutId: ReturnType<typeof setTimeout>;
+  private waitForPong: boolean;
   private pingIntervalId: ReturnType<typeof setInterval>;
   private _pingInterval: number;
-  private _pongTimeout: number;
   private _httpProtocol: HttpProtocol;
 
   /**
@@ -29,7 +28,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *    - `port` Kuzzle server port (default: `7512`)
    *    - `headers` Connection custom HTTP headers (Not supported by browsers)
    *    - `reconnectionDelay` Number of milliseconds between reconnection attempts (default: `1000`)
-   *    - `pingInterval` Number of milliseconds between two pings (default: `10000`)
+   *    - `pingInterval` Number of milliseconds between two pings (default: `2000`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    */
   constructor(
@@ -74,7 +73,6 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
 
     this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
-    this._pongTimeout = this._pingInterval;
     this.client = null;
     this.lasturl = null;
   }
@@ -108,7 +106,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.client.ping();
         };
         this.client.on('pong', () => {
-          clearTimeout(this.pongTimeoutId);
+          this.waitForPong = false;
         });
       }
       this.client.onopen = () => {
@@ -116,15 +114,31 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
         * Send pings to the server
         */
+        clearInterval(this.pingIntervalId);
+        this.waitForPong = false; // Reset when connection is established
         this.pingIntervalId = setInterval(() => {
-          if (this.client && this.client.readyState === 1) {
+          // If the connection is established and we are not waiting for a pong we ping Kuzzle
+          if ( this.client
+            && this.client.readyState === this.client.OPEN
+            && ! this.waitForPong
+          ) {
             this.ping();
+            this.waitForPong = true;
+            return;
           }
-          this.pongTimeoutId = setTimeout(() => {
-            const error: any = new Error('Connection lost.');
+
+          // If we were waiting for a pong that never occured before the next ping cycle we throw an error
+          if (this.waitForPong) {
+            const error: any = new Error('Kuzzle does\'nt respond to ping. Connection lost.');
             error.status = 503;
+            /**
+             * Ensure that the websocket connection is closed because if the connection was fine but Kuzzle could not respond in time
+             * a new connection will be created if `autoReconnect=true` and there would 2 opened websocket connection.
+             */
+            this.client.close();
+            this.waitForPong = false;
             this.clientNetworkError(error);
-          }, this._pongTimeout);
+          }
         }, this._pingInterval);
         return resolve();
       };
@@ -182,7 +196,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * Corresponds to a custom pong response message
          */
         if (data && data.p && data.p === 2 && Object.keys(data).length === 1) {
-          clearTimeout(this.pongTimeoutId);
+          this.waitForPong = false;
           return;
         }
 
@@ -204,10 +218,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         /**
          * In case you're running a Kuzzle version under 2.10.0
          * The response from a browser custom ping will be another payload.
-         * We need to clear this timeout at each message to keep 
+         * We need to clear this timeout at each message to keep
          * the connection alive if it's the case
          */
-        clearTimeout(this.pongTimeoutId);
+        this.waitForPong = false;
       };
     });
   }
@@ -227,7 +241,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
     super.enableCookieSupport();
     this._httpProtocol = new HttpProtocol(
-      this.host, 
+      this.host,
       {
         port: this.port,
         ssl: this.ssl,
@@ -279,7 +293,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           });
       })
       .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
-    
+
   }
 
   /**
@@ -287,7 +301,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    */
   clientDisconnected(origin: string) {
     clearInterval(this.pingIntervalId);
-    clearTimeout(this.pongTimeoutId);
+    this.pingIntervalId = null;
     super.clientDisconnected(origin);
   }
 
@@ -298,7 +312,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    */
   clientNetworkError (error) {
     clearInterval(this.pingIntervalId);
-    clearTimeout(this.pongTimeoutId);
+    this.pingIntervalId = null;
     super.clientNetworkError(error);
   }
   /**
@@ -313,6 +327,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     }
     this.client = null;
     this.stopRetryingToConnect = true;
+    clearInterval(this.pingIntervalId);
+    this.pingIntervalId = null;
     super.close();
   }
 }

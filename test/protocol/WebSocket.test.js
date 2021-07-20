@@ -105,7 +105,11 @@ describe('WebSocket networking module', () => {
     const setInterval = sinon.stub(clock, 'setInterval');
 
     websocket.connect();
+    websocket.waitForPong = true;
     clientStub.onopen();
+
+    should(websocket.waitForPong)
+      .be.false();
 
     should(setInterval)
       .be.calledOnce();
@@ -129,9 +133,8 @@ describe('WebSocket networking module', () => {
     should(cb).be.calledOnce();
   });
 
-  it('should clear pongTimeout and pingInterval on a networkError', () => {
+  it('should clear pingInterval on a networkError', () => {
     const cb = sinon.stub();
-    const clearTimeout = sinon.stub(clock, 'clearTimeout');
     const clearInterval = sinon.stub(clock, 'clearInterval');
     
     websocket.retrying = false;
@@ -139,18 +142,15 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners('networkError').length).be.eql(1);
 
     websocket.connect();
-    websocket.connect = sinon.stub().rejects();
+
     clientStub.onopen();
     clientStub.onerror();
-    should(clearTimeout)
-      .be.calledOnce();
     should(clearInterval)
-      .be.calledOnce();
+      .be.calledTwice();
   });
 
-  it('should clear pongTimeout and pingInterval when the connection closes', () => {
+  it('should clear pingInterval when the connection closes', () => {
     const cb = sinon.stub();
-    const clearTimeout = sinon.stub(clock, 'clearTimeout');
     const clearInterval = sinon.stub(clock, 'clearInterval');
     
     websocket.retrying = false;
@@ -158,15 +158,11 @@ describe('WebSocket networking module', () => {
     should(websocket.listeners('disconnect').length).be.eql(1);
 
     websocket.connect();
-    websocket.connect = sinon.stub().resolves();
     clientStub.onopen();
     clientStub.onclose(1000);
     should(cb).be.calledOnce().and.be.calledWith({origin: DisconnectionOrigin.USER_CONNECTION_CLOSED });
-    websocket.close();
-    should(clearTimeout)
-      .be.calledOnce();
     should(clearInterval)
-      .be.calledOnce();
+      .be.calledTwice();
   });
   
   it('should try to reconnect on a connection error with autoReconnect = true', () => {
@@ -375,12 +371,12 @@ describe('WebSocket networking module', () => {
     websocket.connect();
 
     const payload = { result: null, error: { message: 'Malformed request' } };
-    const clearTimeout = sinon.stub(clock, 'clearTimeout');
+    websocket.waitForPong = true;
     clientStub.onmessage({data: JSON.stringify(payload)});
     clock.tick(10);
 
-    should(clearTimeout)
-      .be.calledOnce();
+    should(websocket.waitForPong)
+      .be.false();
     should(cb)
       .be.calledOnce()
       .be.calledWithMatch(payload);
@@ -389,7 +385,7 @@ describe('WebSocket networking module', () => {
       .be.calledWithMatch(expectedError, payload);
   });
 
-  it('should clear the pongTimeOut when receiving a pong message and return', () => {
+  it('should set the waitForPong to false when receiving a pong message and return', () => {
     const
       cb = sinon.stub(),
       cb2 = sinon.stub();
@@ -400,13 +396,11 @@ describe('WebSocket networking module', () => {
     });
     
     websocket.connect();
-    
-    const clearTimeout = sinon.stub(clock, 'clearTimeout');
-    
+    websocket.waitForPong = true;
     clientStub.onmessage({data: JSON.stringify({ p: 2 })});
     
-    should(clearTimeout)
-      .be.calledOnce();
+    should(websocket.waitForPong)
+      .be.false();
     should(cb)
       .be.not.calledOnce();
     should(cb2)
@@ -473,6 +467,7 @@ describe('WebSocket networking module', () => {
 
   it('should properly close a connection when asked', () => {
     const cb = sinon.stub();
+    const clearInterval = sinon.stub(clock, 'clearInterval');
 
     websocket.on('foobar', cb);
     websocket.addListener('connect', cb);
@@ -492,6 +487,8 @@ describe('WebSocket networking module', () => {
     should(websocket.client).be.null();
     should(clientStub.close.called).be.true();
     should(websocket.wasConnected).be.false();
+    should(clearInterval)
+      .be.calledOnce();
   });
 
   it('should reject with a proper error if onerror is called with an event (browser)', () => {
