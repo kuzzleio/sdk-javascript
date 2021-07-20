@@ -140,7 +140,7 @@ jobs:
           echo "::set-output name=repo::$(echo $GITHUB_REPOSITORY | cut -d/ -f 2)"
       - uses: convictional/trigger-workflow-and-wait@v1.3.0
         with:
-         owner: kuzzleio
+          owner: kuzzleio
           repo: documentation
           github_token: ${{ secrets.ACCESS_TOKEN_CI }}
           workflow_file_name: child_repo.workflow.yml
