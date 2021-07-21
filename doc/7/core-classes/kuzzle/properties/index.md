@@ -8,12 +8,12 @@ order: 10
 
 # Read-only properties
 
-| Property name        | Type     | Description          |
-| -------------------- | -------- | ---------------------|
-| `authenticated` | <pre>boolean</pre> | Returns `true` if the SDK holds a valid token |
-| `connected` | <pre>boolean</pre> | Returns `true` if the SDK is currently connected to a Kuzzle server. |
-| `offlineQueue` | <pre>object[]</pre> | Contains the queued requests during offline mode   |
-| `protocol` | <pre>Protocol</pre> | Protocol used by the SDK |
+| Property name   | Type                | Description                                                          |
+|-----------------|---------------------|----------------------------------------------------------------------|
+| `authenticated` | <pre>boolean</pre>  | Returns `true` if the SDK holds a valid token                        |
+| `connected`     | <pre>boolean</pre>  | Returns `true` if the SDK is currently connected to a Kuzzle server. |
+| `offlineQueue`  | <pre>object[]</pre> | Contains the queued requests during offline mode                     |
+| `protocol`      | <pre>Protocol</pre> | Protocol used by the SDK                                             |
 
 ### connected
 
@@ -24,18 +24,35 @@ See the associated documentation:
 
 # Writable properties
 
-| Property name        | Type     | Description          |
-| -------------------- | -------- | ---------------------|
-| `autoQueue` | <pre>boolean</pre> | If `true`, automatically queues all requests during offline mode |
-| `autoReplay` | <pre>boolean</pre> | If `true`, automatically replays queued requests on a `reconnected` event |
-| `autoResubscribe` | <pre>boolean</pre> | If `true`, automatically renews all subscriptions on a `reconnected` event |
-| `jwt` | <pre>string</pre> | Authentication token |
-| `offlineQueueLoader` | <pre>function</pre> | Called before dequeuing requests after exiting offline mode, to add items at the beginning of the offline queue  |
-| `queueFilter` | <pre>function</pre> | Custom function called during offline mode to filter queued requests on-the-fly |
-| `queueMaxSize` | <pre>number</pre>  | Number of maximum requests kept during offline mode|
-| `queueTTL` | <pre>number</pre>  | Time a queued request is kept during offline mode, in milliseconds |
-| `replayInterval` | <pre>number</pre>  | Delay between each replayed requests |
-| `volatile` | <pre>object</pre> | Common volatile data, will be sent to all future requests |
+| Property name        | Type                | Description                                                                                                     |
+|----------------------|---------------------|-----------------------------------------------------------------------------------------------------------------|
+| `authenticator`      | <pre>function</pre> | Authenticator function to authenticate the SDK. (After called, the `jwt` property of the SDK has to be set.)    |
+| `autoQueue`          | <pre>boolean</pre>  | If `true`, automatically queues all requests during offline mode                                                |
+| `autoReplay`         | <pre>boolean</pre>  | If `true`, automatically replays queued requests on a `reconnected` event                                       |
+| `autoResubscribe`    | <pre>boolean</pre>  | If `true`, automatically renews all subscriptions on a `reconnected` event                                      |
+| `jwt`                | <pre>string</pre>   | Authentication token                                                                                            |
+| `offlineQueueLoader` | <pre>function</pre> | Called before dequeuing requests after exiting offline mode, to add items at the beginning of the offline queue |
+| `queueFilter`        | <pre>function</pre> | Custom function called during offline mode to filter queued requests on-the-fly                                 |
+| `queueMaxSize`       | <pre>number</pre>   | Number of maximum requests kept during offline mode                                                             |
+| `queueTTL`           | <pre>number</pre>   | Time a queued request is kept during offline mode, in milliseconds                                              |
+| `replayInterval`     | <pre>number</pre>   | Delay between each replayed requests                                                                            |
+| `volatile`           | <pre>object</pre>   | Common volatile data, will be sent to all future requests                                                       |
+
+### authenticator
+
+The `authenticator` property can be set to a function returning a promise.
+
+This function will be called after a successful reconnection if the current authentication token is not valid anymore.  
+
+This function has to authenticate the SDK. It can be a call to [auth.login](/sdk/js/7/controllers/auth/login) for example.
+
+```js
+kuzzle.authenticator = async () => {
+  await kuzzle.auth.login('local', { username: 'user', password: 'pass' });
+}
+```
+
+If the `authenticator` function fail to authenticate the SDK, then the `reconnected` event is never emitted and a `reconnectionError` event is emitted.
 
 ### offlineQueueLoader
 
@@ -49,11 +66,11 @@ Promise<Object[]> offlineQueueLoader()
 
 The returned (or resolved) array must contain objects, each with the following properties:
 
-| Property | Type | Description |
-|---|---|---|
-| `query` | <pre>object</pre> | Object representing the request that is about to be sent to Kuzzle, following the [Kuzzle API](/core/2/guides/main-concepts/querying) format |
-| `reject` | <pre>function</pre> | A [Promise.reject](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject) function |
-| `resolve` | <pre>function</pre> | A [Promise.resolve](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve) function |
+| Property  | Type                | Description                                                                                                                                  |
+|-----------|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `query`   | <pre>object</pre>   | Object representing the request that is about to be sent to Kuzzle, following the [Kuzzle API](/core/2/guides/main-concepts/querying) format |
+| `reject`  | <pre>function</pre> | A [Promise.reject](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject) function                 |
+| `resolve` | <pre>function</pre> | A [Promise.resolve](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve) function               |
 
 ### queueFilter
 

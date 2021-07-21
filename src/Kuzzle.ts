@@ -32,6 +32,7 @@ const events = [
   'offlineQueuePop',
   'queryError',
   'reconnected',
+  'reconnectionError',
   'tokenExpired'
 ];
 
@@ -42,41 +43,46 @@ export class Kuzzle extends KuzzleEventEmitter {
   /**
    * Protocol used by the SDK to communicate with Kuzzle.
    */
-  public protocol: any;
+  protocol: any;
   /**
    * If true, automatically renews all subscriptions on a reconnected event.
    */
-  public autoResubscribe: boolean;
+  autoResubscribe: boolean;
   /**
    * Timeout before sending again a similar event.
    */
-  public eventTimeout: number;
+  eventTimeout: number;
   /**
    * SDK version.
    */
-  public sdkVersion: string;
+  sdkVersion: string;
   /**
    * SDK name (e.g: `js@7.4.2`).
    */
-  public sdkName: string;
+  sdkName: string;
   /**
    * Common volatile data that will be sent to all future requests.
    */
-  public volatile: JSONObject;
+  volatile: JSONObject;
   /**
    * Handle deprecation warning in development mode (hidden in production)
    */
-  public deprecationHandler: Deprecation;
+  deprecationHandler: Deprecation;
+  /**
+   * Authenticator function called after a reconnection if the SDK is no longer
+   * authenticated.
+   */
+  authenticator: () => Promise<void> = null;
 
-  public auth: AuthController;
-  public bulk: any;
-  public collection: CollectionController;
-  public document: DocumentController;
-  public index: IndexController;
-  public ms: any;
-  public realtime: RealtimeController;
-  public security: any;
-  public server: any;
+  auth: AuthController;
+  bulk: any;
+  collection: CollectionController;
+  document: DocumentController;
+  index: IndexController;
+  ms: any;
+  realtime: RealtimeController;
+  security: any;
+  server: any;
 
   private _protectedEvents: any;
   private _offlineQueue: any;
@@ -236,38 +242,38 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._cookieAuthentication = typeof options.cookieAuth === 'boolean'
       ? options.cookieAuth
       : false;
-    
+
     if (this._cookieAuthentication) {
       this.protocol.enableCookieSupport();
       let autoQueueState;
       let autoReplayState;
       let autoResbuscribeState;
-  
+
       this.protocol.addListener('websocketRenewalStart', () => {
         autoQueueState = this.autoQueue;
         autoReplayState = this.autoReplay;
         autoResbuscribeState = this.autoResubscribe;
-  
+
         this.autoQueue = true;
         this.autoReplay = true;
         this.autoResubscribe = true;
       });
-  
+
       this.protocol.addListener('websocketRenewalDone', () => {
         this.autoQueue = autoQueueState;
         this.autoReplay = autoReplayState;
         this.autoResubscribe = autoResbuscribeState;
       });
     }
-    
+
     this.deprecationHandler = new Deprecation(
       typeof options.deprecationWarning === 'boolean' ? options.deprecationWarning : true
     );
-    
+
     if (this._cookieAuthentication && typeof XMLHttpRequest === 'undefined') {
       throw new Error('Support for cookie authentication with cookieAuth option is not supported outside a browser');
     }
-    
+
     // controllers
     this.useController(AuthController, 'auth');
     this.useController(BulkController, 'bulk');
@@ -525,9 +531,17 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit('disconnected', context);
     });
 
-    this.protocol.addListener('reconnect', () => {
+    this.protocol.addListener('reconnect', async () => {
       if (this.autoQueue) {
         this.stopQueuing();
+      }
+
+      // If an authenticator was set, check if the token is still valid and try
+      // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
+      if (this.authenticator && ! await this.tryReAuthenticate()) {
+        this.disconnect();
+
+        return;
       }
 
       if (this.autoReplay) {
@@ -540,6 +554,56 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
     return this.protocol.connect();
+  }
+
+  /**
+   * Try to re-authenticate the SDK if the current token is invalid.
+   *
+   * If the token is invalid, this method will return false and emit a
+   * "reconnectionError" event when:
+   *   - the SDK cannot re-authenticate using the authenticator function
+   *   - the authenticator function is not set
+   *
+   * This method never returns a rejected promise.
+   */
+  private async tryReAuthenticate (): Promise<boolean> {
+    try {
+      const { valid } = await this.auth.checkToken();
+
+      if (valid) {
+        return true;
+      }
+
+      await this.authenticate();
+
+      return true;
+    }
+    catch (err) {
+      this.emit('reconnectionError', {
+        error: new Error(`Failed to authenticate the SDK after reconnection: ${err}`)
+      });
+
+      return false;
+    }
+  }
+
+  /**
+   * Use the "authenticator" function to authenticate the SDK.
+   *
+   * @returns The authentication token
+   */
+  async authenticate (): Promise<void> {
+    if (typeof this.authenticator !== 'function') {
+      throw new Error('The "authenticator" property must be a function.');
+    }
+
+    await this.authenticator();
+
+    const { valid } = await this.auth.checkToken();
+
+    if (! valid) {
+      throw new Error('The "authenticator" function failed to authenticate the SDK.');
+    }
   }
 
   /**
@@ -801,7 +865,7 @@ Discarded request: ${JSON.stringify(request)}`));
       uniqueQueue = {},
       dequeuingProcess = () => {
         if (this.offlineQueue.length > 0) {
-          
+
           this._timeoutRequest(
             this.offlineQueue[0].timeout,
             this.offlineQueue[0].request,
@@ -853,7 +917,7 @@ Discarded request: ${JSON.stringify(request)}`));
 
   /**
    * Sends a request with a timeout
-   * 
+   *
    * @param delay Delay before the request is rejected if not resolved
    * @param request Request object
    * @param options Request options

@@ -30,6 +30,7 @@ describe('Kuzzle listeners management', () => {
       'offlineQueuePop',
       'queryError',
       'reconnected',
+      'reconnectionError',
       'tokenExpired'
     ];
 
