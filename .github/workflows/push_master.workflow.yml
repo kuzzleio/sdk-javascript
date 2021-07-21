@@ -75,34 +75,10 @@ jobs:
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
-  # admin-console-tests:
-  #   name: Admin Console Tests
-  #   runs-on: ubuntu-18.04
-  #   needs: [unit-tests]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Cache node modules
-  #       uses: actions/cache@v2
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: "12"
-  #     - uses: ./.github/actions/tests-ac
-  #       with:
-  #         sdk-version: 7
-  #         cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-  documentation-dead-links:
-    name: Dead links
+  admin-console-tests:
+    name: Admin Console Tests
     runs-on: ubuntu-18.04
+    needs: [unit-tests]
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -116,13 +92,13 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v1
         with:
           node-version: "12"
-      - uses: webfactory/ssh-agent@v0.5.2
+      - uses: ./.github/actions/tests-ac
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-      - uses: ./.github/actions/dead-links
+          sdk-version: 7
+          cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
   documentation-snippet-tests:
     name: Documentation Snippet Tests
@@ -154,29 +130,23 @@ jobs:
     needs: [functional-tests, documentation-snippet-tests]
     steps:
       - uses: actions/checkout@v2
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v1
+        fetch-depth: 0
+      - name: Extract references from context
+        shell: bash
+        id: extract-refs
+        run: |
+          echo "::set-output name=version::$(git describe --abbrev=0 --tags | cut -d. -f 1)"
+          echo "::set-output name=repo::$(echo $GITHUB_REPOSITORY | cut -d/ -f 2)"
+      - uses: convictional/trigger-workflow-and-wait@v1.3.0
         with:
-          node-version: "12"
-      - uses: ./.github/actions/doc-deploy
-        with:
-          REGION: us-west-2
-          S3_BUCKET: docs.kuzzle.io
-          CLOUDFRONT_ID: E3D6RP0POLCJMM
-          FRAMEWORK_BRANCH: master
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+          owner: kuzzleio
+          repo: documentation
+          github_token: ${{ secrets.ACCESS_TOKEN_CI }}
+          workflow_file_name: child_repo.workflow.yml
+          ref: master
+          inputs: '{"repo_name": "${{ steps.extract-refs.outputs.repo }}", "branch": "${{ github.head_ref }}", "version": "${{ steps.extract-refs.outputs.version }}"}'
+  
   npm-deploy:
     name: Publish Package to NPM.js
     runs-on: ubuntu-18.04

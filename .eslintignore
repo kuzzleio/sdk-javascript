@@ -4,6 +4,7 @@ src/**/*.js.map
 
 src/Kuzzle.js
 src/KuzzleError.js
+src/RequestTimeoutError.js
 src/controllers/Auth.js
 src/controllers/Bulk.js
 src/controllers/Document.js
@@ -16,6 +17,7 @@ src/core/security/Profile.js
 src/core/security/Role.js
 src/protocols/abstract/Base.js
 src/protocols/abstract/Realtime.js
+src/protocols/DisconnectionOrigin.js
 src/protocols/Http.js
 src/protocols/WebSocket.js
 src/protocols/index.js
