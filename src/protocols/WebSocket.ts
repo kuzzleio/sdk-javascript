@@ -92,6 +92,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
 
       this.client = new this.WebSocketClient(url, this.options);
+
       /**
        * Defining behavior depending on the Websocket client type
        * Which can be the browser or node one.
@@ -105,41 +106,17 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         this.ping = () => {
           this.client.ping();
         };
+
         this.client.on('pong', () => {
           this.waitForPong = false;
         });
       }
+
       this.client.onopen = () => {
         this.clientConnected();
-        /**
-        * Send pings to the server
-        */
-        clearInterval(this.pingIntervalId);
-        this.waitForPong = false; // Reset when connection is established
-        this.pingIntervalId = setInterval(() => {
-          // If the connection is established and we are not waiting for a pong we ping Kuzzle
-          if ( this.client
-            && this.client.readyState === this.client.OPEN
-            && ! this.waitForPong
-          ) {
-            this.ping();
-            this.waitForPong = true;
-            return;
-          }
 
-          // If we were waiting for a pong that never occured before the next ping cycle we throw an error
-          if (this.waitForPong) {
-            const error: any = new Error('Kuzzle does\'nt respond to ping. Connection lost.');
-            error.status = 503;
-            /**
-             * Ensure that the websocket connection is closed because if the connection was fine but Kuzzle could not respond in time
-             * a new connection will be created if `autoReconnect=true` and there would 2 opened websocket connection.
-             */
-            this.client.close();
-            this.waitForPong = false;
-            this.clientNetworkError(error);
-          }
-        }, this._pingInterval);
+        this.setupPingPong();
+
         return resolve();
       };
 
@@ -201,7 +178,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
 
         // for responses, data.room == requestId
-        if (data.room) {
+        if (data.type === 'TokenExpired') {
+          this.emit('tokenExpired');
+        }
+        else if (data.room) {
           this.emit(data.room, data);
         }
         else {
@@ -299,7 +279,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * @override
    */
-  clientDisconnected(origin: string) {
+  clientDisconnected (origin: string) {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.clientDisconnected(origin);
@@ -315,6 +295,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     this.pingIntervalId = null;
     super.clientNetworkError(error);
   }
+
   /**
    * Closes the connection
    */
@@ -330,5 +311,40 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.close();
+  }
+
+  private setupPingPong () {
+    clearInterval(this.pingIntervalId);
+
+    // Reset when connection is established
+    this.waitForPong = false;
+
+    this.pingIntervalId = setInterval(() => {
+      // If the connection is established and we are not waiting for a pong we ping Kuzzle
+      if ( this.client
+        && this.client.readyState === this.client.OPEN
+        && ! this.waitForPong
+      ) {
+        this.ping();
+        this.waitForPong = true;
+
+        return;
+      }
+
+      // If we were waiting for a pong that never occured before the next ping cycle we throw an error
+      if (this.waitForPong) {
+        const error: any = new Error('Kuzzle does\'nt respond to ping. Connection lost.');
+        error.status = 503;
+
+        /**
+         * Ensure that the websocket connection is closed because if the connection
+         * was fine but Kuzzle could not respond in time a new connection will be
+         * created if `autoReconnect=true` and there would 2 opened websocket connection.
+         */
+        this.client.close();
+        this.waitForPong = false;
+        this.clientNetworkError(error);
+      }
+    }, this._pingInterval);
   }
 }

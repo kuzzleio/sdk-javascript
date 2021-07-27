@@ -31,6 +31,7 @@ const events = [
   'offlineQueuePush',
   'offlineQueuePop',
   'queryError',
+  'reAuthenticated',
   'reconnected',
   'reconnectionError',
   'tokenExpired'
@@ -769,7 +770,13 @@ Discarded request: ${JSON.stringify(request)}`));
    * On token expiration, reset jwt and unsubscribe all rooms.
    * Throttles to avoid duplicate event triggers.
    */
-  tokenExpired() {
+  async tokenExpired () {
+    if (this.authenticator && await this.tryReAuthenticate()) {
+      this.emit('reAuthenticated');
+
+      return;
+    }
+
     const now = Date.now();
 
     if ((now - this._lastTokenExpired) < this.tokenExpiredInterval) {
