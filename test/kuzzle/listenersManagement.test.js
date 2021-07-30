@@ -29,9 +29,10 @@ describe('Kuzzle listeners management', () => {
       'offlineQueuePush',
       'offlineQueuePop',
       'queryError',
+      'reAuthenticated',
       'reconnected',
       'reconnectionError',
-      'tokenExpired'
+      'tokenExpired',
     ];
 
     should(function() {

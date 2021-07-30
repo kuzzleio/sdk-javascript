@@ -99,6 +99,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
   private _cookieAuthentication: boolean;
+  private _reconnectInProgress: boolean;
 
   private __proxy__: any;
 
@@ -324,6 +325,8 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this._lastTokenExpired = null;
 
+    this._reconnectInProgress = false;
+
     return proxify(this, {
       seal: true,
       name: 'kuzzle',
@@ -532,29 +535,40 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit('disconnected', context);
     });
 
-    this.protocol.addListener('reconnect', async () => {
-      if (this.autoQueue) {
-        this.stopQueuing();
-      }
-
-      // If an authenticator was set, check if the token is still valid and try
-      // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
-      if (this.authenticator && ! await this.tryReAuthenticate()) {
-        this.disconnect();
-
-        return;
-      }
-
-      if (this.autoReplay) {
-        this.playQueue();
-      }
-
-      this.emit('reconnected');
-    });
+    this.protocol.addListener('reconnect', this._reconnect.bind(this));
 
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
     return this.protocol.connect();
+  }
+
+  async _reconnect() {
+    if (this._reconnectInProgress) {
+      return;
+    }
+
+    this._reconnectInProgress = true;
+
+    if (this.autoQueue) {
+      this.stopQueuing();
+    }
+
+    // If an authenticator was set, check if the token is still valid and try
+    // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
+    if (this.authenticator && ! await this.tryReAuthenticate()) {
+      this._reconnectInProgress = false;
+      this.disconnect();
+      
+      return;
+    }
+    
+    if (this.autoReplay) {
+      this.playQueue();
+    }
+    
+    this.emit('reconnected');
+
+    this._reconnectInProgress = false;
   }
 
   /**

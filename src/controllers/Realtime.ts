@@ -63,7 +63,7 @@ export class RealtimeController extends BaseController {
     this.kuzzle.on('reAuthenticated', () => {
       this.saveSubscriptions();
       this.resubscribe();
-    })
+    });
   }
 
   /**
