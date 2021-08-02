@@ -272,8 +272,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
             this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
           });
       })
-      .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
-
+      .catch(error => {
+        this.emit(formattedRequest.payload.requestId, {error});
+        this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
+      });
   }
 
   /**
