@@ -581,6 +581,9 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
+    this.protocol.addListener('websocketRenewalStart', () => { this._reconnectInProgress = true; });
+    this.protocol.addListener('websocketRenewalDone', () => { this._reconnectInProgress = false; });
+
     return this.protocol.connect();
   }
 
