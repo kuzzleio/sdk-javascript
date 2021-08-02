@@ -589,8 +589,6 @@ export class Kuzzle extends KuzzleEventEmitter {
       return;
     }
 
-    this._reconnectInProgress = true;
-
     if (this.autoQueue) {
       this.stopQueuing();
     }
@@ -601,7 +599,6 @@ export class Kuzzle extends KuzzleEventEmitter {
       && this.authenticator 
       && ! await this.tryReAuthenticate()
     ) {
-      this._reconnectInProgress = false;
       this._loggedIn = false;
       this.disconnect();
       
@@ -613,8 +610,6 @@ export class Kuzzle extends KuzzleEventEmitter {
     }
     
     this.emit('reconnected');
-
-    this._reconnectInProgress = false;
   }
 
   /**
@@ -628,6 +623,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * This method never returns a rejected promise.
    */
   private async tryReAuthenticate (): Promise<boolean> {
+    this._reconnectInProgress = true;
     try {
       const { valid } = await this.auth.checkToken();
 
@@ -645,6 +641,8 @@ export class Kuzzle extends KuzzleEventEmitter {
       });
 
       return false;
+    } finally {
+      this._reconnectInProgress = false;
     }
   }
 
@@ -833,6 +831,9 @@ Discarded request: ${JSON.stringify(request)}`));
    * Throttles to avoid duplicate event triggers.
    */
   async tokenExpired () {
+    if (this._reconnectInProgress) {
+      return;
+    }
 
     if (this._loggedIn && this.authenticator && await this.tryReAuthenticate()) {
       this.emit('reAuthenticated');
