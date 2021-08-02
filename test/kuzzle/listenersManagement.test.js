@@ -25,6 +25,7 @@ describe('Kuzzle listeners management', () => {
       'discarded',
       'disconnected',
       'loginAttempt',
+      'logoutAttempt',
       'networkError',
       'offlineQueuePush',
       'offlineQueuePop',
