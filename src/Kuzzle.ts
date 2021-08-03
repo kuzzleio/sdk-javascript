@@ -703,6 +703,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Disconnects from Kuzzle and invalidate this instance.
    */
   disconnect () {
+    this._loggedIn = false;
     this.protocol.close();
   }
 

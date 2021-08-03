@@ -304,12 +304,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    */
   close () {
     this.state = 'offline';
-    this.removeAllListeners();
     this.wasConnected = false;
     if (this.client) {
-      this.client.onclose = undefined; // Remove the listener that will emit disconnected / networkError event before closing
-      this.client.close(1000);
+      this.client.close(1000); // Close with 1000 will trigger the `disconnect`
     }
+    // Remove all listerner after closing the connection, this way the `disconnect` can be emitted when calling close.
+    this.removeAllListeners();
     this.client = null;
     this.stopRetryingToConnect = true;
     clearInterval(this.pingIntervalId);
