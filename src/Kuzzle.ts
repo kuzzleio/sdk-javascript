@@ -838,7 +838,6 @@ Discarded request: ${JSON.stringify(request)}`));
       return;
     }
 
-    console.log(this._loggedIn);
     if (this._loggedIn && this.authenticator && await this.tryReAuthenticate()) {
       this.emit('reAuthenticated');
 
