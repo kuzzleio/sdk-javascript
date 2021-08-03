@@ -591,11 +591,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._reconnectInProgress) {
       return;
     }
-
+    
     if (this.autoQueue) {
       this.stopQueuing();
     }
-
+  
     // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
     // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
     if ( this._loggedIn
@@ -838,6 +838,7 @@ Discarded request: ${JSON.stringify(request)}`));
       return;
     }
 
+    console.log(this._loggedIn);
     if (this._loggedIn && this.authenticator && await this.tryReAuthenticate()) {
       this.emit('reAuthenticated');
 

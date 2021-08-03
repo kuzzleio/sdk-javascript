@@ -258,7 +258,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
     this.emit('websocketRenewalStart'); // Notify that the websocket is going to renew his connection with Kuzzle
     if (this.client) {
-      this.client.close();
+      this.client.onclose = undefined; // Remove the listener that will emit disconnected / networkError event before closing
+      this.client.close(1000);
     }
     this.client = null;
     this.clientDisconnected(DisconnectionOrigin.WEBSOCKET_AUTH_RENEWAL); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
@@ -306,7 +307,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     this.removeAllListeners();
     this.wasConnected = false;
     if (this.client) {
-      this.client.close();
+      this.client.onclose = undefined; // Remove the listener that will emit disconnected / networkError event before closing
+      this.client.close(1000);
     }
     this.client = null;
     this.stopRetryingToConnect = true;
@@ -343,7 +345,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
          * was fine but Kuzzle could not respond in time a new connection will be
          * created if `autoReconnect=true` and there would 2 opened websocket connection.
          */
-        this.client.close();
+        clearInterval(this.pingIntervalId);
+        this.client.onclose = undefined; // Remove the listener that will emit disconnected / networkError event before closing
+        this.client.close(1000);
         this.waitForPong = false;
         this.clientNetworkError(error);
       }
