@@ -157,7 +157,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
 
       protocol.emit('reconnect');
 
-      // We need a timeout since the listener on "reconnect" even is async
+      // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
         should(kuzzle.tryReAuthenticate).not.be.called();
         should(reconnectedSpy).be.calledOnce();
