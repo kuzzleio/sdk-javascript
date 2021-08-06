@@ -195,6 +195,7 @@ describe('WebSocket networking module', () => {
     });
 
     websocket.retrying = false;
+    websocket.isReady = sinon.stub().returns(true);
     websocket.addListener('disconnect', disconnectCB);
     websocket.addListener('networkError', cb);
     should(websocket.listeners('networkError').length).be.eql(1);

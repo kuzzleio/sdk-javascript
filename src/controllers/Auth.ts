@@ -468,7 +468,9 @@ export class AuthController extends BaseController {
       .then(response => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
-            throw new Error('Kuzzle support for cookie authentication is disabled or not supported');
+            const err = new Error('Kuzzle support for cookie authentication is disabled or not supported');
+            this.kuzzle.emit('loginAttempt', { success: false, error: err.message });
+            throw err;
           }
 
           this.kuzzle.emit('loginAttempt', { success: true });
@@ -499,6 +501,7 @@ export class AuthController extends BaseController {
     }, { queuable: false, timeout: -1 })
       .then(() => {
         this._authenticationToken = null;
+        this.kuzzle.emit('logoutAttempt', { success: true });
       });
   }
 

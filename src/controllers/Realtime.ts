@@ -60,6 +60,10 @@ export class RealtimeController extends BaseController {
     this.kuzzle.on('disconnected', () => this.saveSubscriptions());
     this.kuzzle.on('networkError', () => this.saveSubscriptions());
     this.kuzzle.on('reconnected', () => this.resubscribe());
+    this.kuzzle.on('reAuthenticated', () => {
+      this.saveSubscriptions();
+      this.resubscribe();
+    });
   }
 
   /**
