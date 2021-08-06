@@ -10,7 +10,7 @@
     "test": "node_modules/.bin/cypress run --record --key $CYPRESS_RECORD_KEY_DOC"
   },
   "dependencies": {
-    "cypress": "^3.8.1",
+    "cypress": "^8.1.0",
     "expo": "^35.0.0",
     "expo-cli": "^3.11.5",
     "kuzzle-sdk": "^7.0.0",
