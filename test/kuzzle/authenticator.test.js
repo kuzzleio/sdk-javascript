@@ -16,6 +16,102 @@ describe('Kuzzle authenticator function mecanisms', () => {
     sinon.restore();
   });
 
+  describe('connected listener', () => {
+    let resolve;
+    let promise;
+
+    beforeEach(() => {
+      kuzzle.auth.checkToken = sinon.stub().resolves(true);
+    });
+
+    it('should check the validity of the token at connection to know if we are already logged in', async () => {
+      promise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+
+      kuzzle.auth.checkToken.resolves({ valid: true });
+
+      should(kuzzle._loggedIn).be.false();
+      kuzzle.emit('connected');
+
+      setTimeout(() => {
+        should(kuzzle.auth.checkToken).be.calledOnce();
+        should(kuzzle._loggedIn).be.true();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+  });
+
+  describe('loginAttempt listener', () => {
+    let resolve;
+    let promise;
+
+    beforeEach(() => {
+      kuzzle.auth.checkToken = sinon.stub().resolves(true);
+    });
+
+    it('should set _loggedIn to true on successful login attempt', async () => {
+      promise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+
+      should(kuzzle._loggedIn).be.false();
+      kuzzle.emit('loginAttempt', { success: true });
+
+      setTimeout(() => {
+        should(kuzzle.auth.checkToken).not.be.calledOnce();
+        should(kuzzle._loggedIn).be.true();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+
+    it('should verify the stored token when the login attempt has failed', async () => {
+      promise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+
+      kuzzle.auth.checkToken.resolves({ valid: true });
+
+      should(kuzzle._loggedIn).be.false();
+      kuzzle.emit('loginAttempt', { success: false, err: new Error('foo') });
+
+      setTimeout(() => {
+        should(kuzzle.auth.checkToken).be.calledOnce();
+        should(kuzzle._loggedIn).be.true();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+  });
+
+  describe('logoutAttempt listener', () => {
+    let resolve;
+    let promise;
+
+
+    it('should set _loggedIn to false on logout', async () => {
+      promise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+
+      kuzzle._loggedIn = true;
+      kuzzle.emit('logoutAttempt', { success: true });
+
+      setTimeout(() => {
+        should(kuzzle.auth.checkToken).not.be.calledOnce();
+        should(kuzzle._loggedIn).be.false();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+  });
+
   describe('reconnect listener', () => {
     let reconnectedSpy;
     let resolve;
@@ -31,17 +127,39 @@ describe('Kuzzle authenticator function mecanisms', () => {
       kuzzle.on('reconnected', reconnectedSpy);
     });
 
-    it('should try to re-authenticate when reconnecting if an authenticator was set', async () => {
+    it('should try to re-authenticate when reconnecting if an authenticator was set we were logged in', async () => {
       promise = new Promise(_resolve => {
         resolve = _resolve;
       });
       await kuzzle.connect();
 
+      kuzzle._loggedIn = true;
+
       protocol.emit('reconnect');
 
-      // We need a timeout since the listener on "reconnect" even is async
+      // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
         should(kuzzle.tryReAuthenticate).be.calledOnce();
+        should(reconnectedSpy).be.calledOnce();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+
+    it('should not try to re-authenticate when reconnecting if we were not logged in', async () => {
+      promise = new Promise(_resolve => {
+        resolve = _resolve;
+      });
+      await kuzzle.connect();
+
+      kuzzle._loggedIn = false;
+
+      protocol.emit('reconnect');
+
+      // We need a timeout since the listener on "reconnect" event is asynchronous
+      setTimeout(() => {
+        should(kuzzle.tryReAuthenticate).not.be.called();
         should(reconnectedSpy).be.calledOnce();
         resolve();
       }, 1);
@@ -54,6 +172,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
         resolve = _resolve;
       });
       await kuzzle.connect();
+      kuzzle._loggedIn = true;
       kuzzle.tryReAuthenticate.resolves(false);
 
       protocol.emit('reconnect');
@@ -74,6 +193,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
         resolve = _resolve;
       });
       await kuzzle.connect();
+      kuzzle._loggedIn = true;
 
       protocol.emit('reconnect');
 

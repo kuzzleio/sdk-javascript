@@ -27,10 +27,12 @@ const events = [
   'discarded',
   'disconnected',
   'loginAttempt',
+  'logoutAttempt',
   'networkError',
   'offlineQueuePush',
   'offlineQueuePop',
   'queryError',
+  'reAuthenticated',
   'reconnected',
   'reconnectionError',
   'tokenExpired'
@@ -98,6 +100,8 @@ export class Kuzzle extends KuzzleEventEmitter {
   private _tokenExpiredInterval: any;
   private _lastTokenExpired: any;
   private _cookieAuthentication: boolean;
+  private _reconnectInProgress: boolean;
+  private _loggedIn: boolean;
 
   private __proxy__: any;
 
@@ -323,6 +327,48 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this._lastTokenExpired = null;
 
+    this._reconnectInProgress = false;
+
+    this._loggedIn = false;
+
+    this.on('loginAttempt', async status => {
+      if (status.success) {
+        this._loggedIn = true;
+        return;
+      }
+      
+      /**
+       * In case of login failure we need to be sure that the stored token is still valid
+       */
+      try {
+        const response = await this.auth.checkToken();
+        this._loggedIn = response.valid;
+      } catch {
+        this._loggedIn = false;
+      }
+    });
+
+    /**
+     * When successfuly logged out
+     */
+    this.on('logoutAttempt', status => {
+      if (status.success) {
+        this._loggedIn = false;
+      }
+    });
+
+    /**
+     * On connection we need to verify if the token is still valid to know if we are still "logged in"
+     */
+    this.on('connected', async () => {
+      try {
+        const { valid } = await this.auth.checkToken();
+        this._loggedIn = valid;
+      } catch {
+        this._loggedIn = false;
+      }
+    });
+
     return proxify(this, {
       seal: true,
       name: 'kuzzle',
@@ -531,29 +577,42 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit('disconnected', context);
     });
 
-    this.protocol.addListener('reconnect', async () => {
-      if (this.autoQueue) {
-        this.stopQueuing();
-      }
-
-      // If an authenticator was set, check if the token is still valid and try
-      // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
-      if (this.authenticator && ! await this.tryReAuthenticate()) {
-        this.disconnect();
-
-        return;
-      }
-
-      if (this.autoReplay) {
-        this.playQueue();
-      }
-
-      this.emit('reconnected');
-    });
+    this.protocol.addListener('reconnect', this._reconnect.bind(this));
 
     this.protocol.addListener('discarded', data => this.emit('discarded', data));
 
+    this.protocol.addListener('websocketRenewalStart', () => { this._reconnectInProgress = true; });
+    this.protocol.addListener('websocketRenewalDone', () => { this._reconnectInProgress = false; });
+
     return this.protocol.connect();
+  }
+
+  async _reconnect() {
+    if (this._reconnectInProgress) {
+      return;
+    }
+    
+    if (this.autoQueue) {
+      this.stopQueuing();
+    }
+  
+    // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
+    // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
+    if ( this._loggedIn
+      && this.authenticator 
+      && ! await this.tryReAuthenticate()
+    ) {
+      this._loggedIn = false;
+      this.disconnect();
+      
+      return;
+    }
+    
+    if (this.autoReplay) {
+      this.playQueue();
+    }
+    
+    this.emit('reconnected');
   }
 
   /**
@@ -567,6 +626,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * This method never returns a rejected promise.
    */
   private async tryReAuthenticate (): Promise<boolean> {
+    this._reconnectInProgress = true;
     try {
       const { valid } = await this.auth.checkToken();
 
@@ -584,6 +644,8 @@ export class Kuzzle extends KuzzleEventEmitter {
       });
 
       return false;
+    } finally {
+      this._reconnectInProgress = false;
     }
   }
 
@@ -600,6 +662,8 @@ export class Kuzzle extends KuzzleEventEmitter {
     await this.authenticator();
 
     const { valid } = await this.auth.checkToken();
+
+    this._loggedIn = valid;
 
     if (! valid) {
       throw new Error('The "authenticator" function failed to authenticate the SDK.');
@@ -639,6 +703,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Disconnects from Kuzzle and invalidate this instance.
    */
   disconnect () {
+    this._loggedIn = false;
     this.protocol.close();
   }
 
@@ -769,7 +834,17 @@ Discarded request: ${JSON.stringify(request)}`));
    * On token expiration, reset jwt and unsubscribe all rooms.
    * Throttles to avoid duplicate event triggers.
    */
-  tokenExpired() {
+  async tokenExpired () {
+    if (this._reconnectInProgress) {
+      return;
+    }
+
+    if (this._loggedIn && this.authenticator && await this.tryReAuthenticate()) {
+      this.emit('reAuthenticated');
+
+      return;
+    }
+
     const now = Date.now();
 
     if ((now - this._lastTokenExpired) < this.tokenExpiredInterval) {

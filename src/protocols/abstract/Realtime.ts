@@ -66,6 +66,10 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
    * @param {Error} error
    */
   clientNetworkError (error) {
+    // Only emit disconnect once, if the connection was ready before
+    if (this.isReady()) {
+      this.emit('disconnect', { origin: DisconnectionOrigin.NETWORK_ERROR });
+    }
     this.state = 'offline';
     this.clear();
 
@@ -94,9 +98,6 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
         this.retrying = false;
         this.connect().catch(err => this.clientNetworkError(err));
       }, this.reconnectionDelay);
-    }
-    else {
-      this.emit('disconnect', { origin: DisconnectionOrigin.NETWORK_ERROR });
     }
   }
 
