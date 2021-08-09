@@ -429,6 +429,13 @@ export class Kuzzle extends KuzzleEventEmitter {
 
   set jwt (encodedJwt) {
     this.auth.authenticationToken = encodedJwt;
+
+    if (! encodedJwt) {
+      this._loggedIn = false;
+      return;
+    }
+
+    this._loggedIn = true;
   }
 
   get offlineQueue () {
@@ -599,7 +606,6 @@ export class Kuzzle extends KuzzleEventEmitter {
     // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
     // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
     if ( this._loggedIn
-      && this.authenticator 
       && ! await this.tryReAuthenticate()
     ) {
       this._loggedIn = false;
@@ -632,6 +638,14 @@ export class Kuzzle extends KuzzleEventEmitter {
 
       if (valid) {
         return true;
+      }
+
+      /**
+       * Check if there is an authenticator after verifying if the token is still valid,
+       * like so API Keys can be used even if there is no authenticator since they will be still valid.
+       */
+      if (! this.authenticator) {
+        return false;
       }
 
       await this.authenticate();
@@ -839,10 +853,13 @@ Discarded request: ${JSON.stringify(request)}`));
       return;
     }
 
-    if (this._loggedIn && this.authenticator && await this.tryReAuthenticate()) {
-      this.emit('reAuthenticated');
+    if (this._loggedIn) {
+      if (await this.tryReAuthenticate()) {
+        this.emit('reAuthenticated');
 
-      return;
+        return;
+      }
+      this._loggedIn = false;
     }
 
     const now = Date.now();
