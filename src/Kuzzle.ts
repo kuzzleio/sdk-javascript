@@ -863,8 +863,7 @@ Discarded request: ${JSON.stringify(request)}`));
 
     this._lastTokenExpired = now;
 
-    this._loggedIn = false;
-    this.auth.authenticationToken = null;
+    this.jwt = null;
     this.emit('tokenExpired');
   }
 
