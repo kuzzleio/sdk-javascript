@@ -52,11 +52,19 @@ describe('Kuzzle protocol methods', () => {
 
     it('should empty the jwt when a "tokenExpired" events is triggered', () => {
       kuzzle.jwt = generateJwt();
+
+      should(kuzzle._loggedIn).be.true();
+
       kuzzle.connect();
+      kuzzle.tryReAuthenticate = sinon.stub().resolves(false);
 
       kuzzle.protocol.emit('tokenExpired');
 
-      should(kuzzle.jwt).be.null();
+      setTimeout(() => {
+        should(kuzzle.tryReAuthenticate).be.calledOnce();
+        should(kuzzle._loggedIn).be.false();
+        should(kuzzle.jwt).be.null();
+      }, 1);
     });
   });
 });
