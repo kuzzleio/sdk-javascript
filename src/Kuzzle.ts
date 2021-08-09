@@ -430,12 +430,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   set jwt (encodedJwt) {
     this.auth.authenticationToken = encodedJwt;
 
-    if (! encodedJwt) {
-      this._loggedIn = false;
-      return;
-    }
-
-    this._loggedIn = true;
+    this._loggedIn = encodedJwt ? true : false;
   }
 
   get offlineQueue () {
