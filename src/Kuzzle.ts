@@ -853,13 +853,10 @@ Discarded request: ${JSON.stringify(request)}`));
       return;
     }
 
-    if (this._loggedIn) {
-      if (await this.tryReAuthenticate()) {
-        this.emit('reAuthenticated');
+    if (this._loggedIn && await this.tryReAuthenticate()) {
+      this.emit('reAuthenticated');
 
-        return;
-      }
-      this._loggedIn = false;
+      return;
     }
 
     const now = Date.now();
@@ -871,6 +868,8 @@ Discarded request: ${JSON.stringify(request)}`));
 
     this._lastTokenExpired = now;
 
+    this._loggedIn = false;
+    this.auth.authenticationToken = null;
     this.emit('tokenExpired');
   }
 
