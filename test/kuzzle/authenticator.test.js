@@ -2,6 +2,7 @@ const should = require('should');
 const sinon = require('sinon');
 const ProtocolMock = require('../mocks/protocol.mock');
 const { Kuzzle } = require('../../src/Kuzzle');
+const generateJwt = require('../mocks/generateJwt.mock');
 
 describe('Kuzzle authenticator function mecanisms', () => {
   let kuzzle;
@@ -14,6 +15,20 @@ describe('Kuzzle authenticator function mecanisms', () => {
 
   afterEach(() => {
     sinon.restore();
+  });
+
+  describe('jwt property', () => {
+    it('should set the SDK property _loggedIn when setting the JWT property', () => {
+      kuzzle.jwt = generateJwt();
+
+      should(kuzzle._loggedIn).be.true();
+    });
+
+    it('should set the SDK property _loggedIn when setting the JWT property to null or undefined', () => {
+      kuzzle.jwt = null;
+
+      should(kuzzle._loggedIn).be.false();
+    });
   });
 
   describe('connected listener', () => {
@@ -226,6 +241,17 @@ describe('Kuzzle authenticator function mecanisms', () => {
       const ret = await kuzzle.tryReAuthenticate();
 
       should(ret).be.true();
+      should(kuzzle.authenticate).not.be.called();
+      should(reconnectionErrorSpy).not.be.called();
+    });
+
+    it('should returns false if the token is not valid and there is no authenticator', async () => {
+      kuzzle.auth.checkToken.resolves({ valid: false });
+      kuzzle.authenticator = null;
+
+      const ret = await kuzzle.tryReAuthenticate();
+
+      should(ret).be.false();
       should(kuzzle.authenticate).not.be.called();
       should(reconnectionErrorSpy).not.be.called();
     });
