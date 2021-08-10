@@ -226,8 +226,13 @@ export class RealtimeController extends BaseController {
    * Called when kuzzle is disconnected
    */
   private saveSubscriptions () {
-    for (const roomId of this._subscriptions.keys()) {
-      for (const room of this._subscriptions.get(roomId)) {
+    /**
+     * Use forEach instead of iterating over Map.keys() because the Webpack 
+     * transpilation is producing bad code leading to a loop not iterating.
+     */
+    this._subscriptions.forEach((rooms, roomId) => {
+
+      for (const room of rooms) {
         room.removeListeners();
 
         if (room.autoResubscribe) {
@@ -239,15 +244,20 @@ export class RealtimeController extends BaseController {
       }
 
       this._subscriptions.delete(roomId);
-    }
+
+    });
   }
 
   /**
    * Called on kuzzle reconnection
    */
   private resubscribe () {
-    for (const roomId of this._subscriptionsOff.keys()) {
-      for (const room of this._subscriptionsOff.get(roomId)) {
+    /**
+     * Use forEach instead of iterating over Map.keys() because the Webpack 
+     * transpilation is producing bad code leading to a loop not iterating.
+     */
+    this._subscriptionsOff.forEach((rooms, roomId) => {
+      for (const room of rooms) {
         if (!this._subscriptions.has(roomId)) {
           this._subscriptions.set(roomId, []);
         }
@@ -258,18 +268,22 @@ export class RealtimeController extends BaseController {
       }
 
       this._subscriptionsOff.delete(roomId);
-    }
+    });
   }
 
   /**
    * Called when a token expire
    */
   private removeSubscriptions() {
-    for (const roomId of this._subscriptions.keys()) {
-      for (const room of this._subscriptions.get(roomId)) {
+    /**
+     * Use forEach instead of iterating over Map.keys() because the Webpack 
+     * transpilation is producing bad code leading to a loop not iterating.
+     */
+    this._subscriptionsOff.forEach((rooms, roomId) => {
+      for (const room of rooms) {
         room.removeListeners();
       }
-    }
+    });
 
     this._subscriptions = new Map();
     this._subscriptionsOff = new Map();
