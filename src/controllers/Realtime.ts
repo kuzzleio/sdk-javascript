@@ -279,7 +279,7 @@ export class RealtimeController extends BaseController {
      * Use forEach instead of iterating over Map.keys() because the Webpack 
      * transpilation is producing bad code leading to a loop not iterating.
      */
-    this._subscriptionsOff.forEach((rooms, roomId) => {
+    this._subscriptionsOff.forEach((rooms) => {
       for (const room of rooms) {
         room.removeListeners();
       }
