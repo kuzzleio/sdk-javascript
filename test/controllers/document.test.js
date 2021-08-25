@@ -118,7 +118,7 @@ describe('Document Controller', () => {
     });
   });
 
-  
+
   describe('deleteFields', () => {
     it('should call document/deleteFields query and return a Promise which resolves the updated document', () => {
       kuzzle.query.resolves({result: {_id: 'document-id', _source: {foo: 'bar'}}});
@@ -262,6 +262,38 @@ describe('Document Controller', () => {
               collection: 'collection',
               silent: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
+            }, options);
+
+          should(res).be.equal(result);
+        });
+    });
+  });
+
+  describe('upsert', () => {
+    it('should call document/upsert query and return a Promise which resolves Kuzzle result', () => {
+      const result = {
+        _id: 'document-1629897817507',
+        _version: 1,
+        created: true
+      };
+      kuzzle.query.resolves({result});
+      options.silent = true;
+      options.default = { def: 'default' };
+      options.source = true;
+
+      return kuzzle.document.upsert('index', 'collection', 'some-id', { changes: 'changes' }, options)
+        .then(res => {
+          should(kuzzle.query)
+            .be.calledOnce()
+            .be.calledWith({
+              controller: 'document',
+              action: 'upsert',
+              index: 'index',
+              collection: 'collection',
+              _id: 'some-id',
+              silent: true,
+              source: true,
+              body: { changes: { changes: 'changes' }, default: { def: 'default' } },
             }, options);
 
           should(res).be.equal(result);
