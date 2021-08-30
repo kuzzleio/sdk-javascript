@@ -118,7 +118,14 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       return Promise.resolve();
     }
 
-    return this._sendHttpRequest(this.formatRequest({ method: 'GET', path: '/_publicApi' }))
+    const publicApiRequest = {
+      method: 'GET',
+      path: '/_publicApi',
+      payload: {
+        headers: this._defaultHeaders,
+      }
+    };
+    return this._sendHttpRequest(publicApiRequest)
       .then(({ result, error }) => {
         if (! error) {
           this._routes = this._constructRoutes(result);
@@ -138,7 +145,14 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         } else if (error.status === 404) {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
-          return this._sendHttpRequest(this.formatRequest({ method: 'GET', path: '/' }))
+          const serverInfoRequest = {
+            method: 'GET',
+            path: '/',
+            payload: {
+              headers: this._defaultHeaders,
+            }
+          };
+          return this._sendHttpRequest(serverInfoRequest)
             .then(({ result: res, error: err }) => {
               if (! err) {
                 this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
@@ -199,7 +213,6 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       && this.routes[request.controller][request.action];
 
     if (! route) {
-      console.log(this.routes)
       const error = new Error(`No URL found for "${request.controller}:${request.action}".`);
       this.emit(request.requestId, { status: 400, error });
       return;
@@ -322,7 +335,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     }
   }
 
-  _sendHttpRequest ({ method, path, payload = { headers: undefined, body: undefined }}) {
+  _sendHttpRequest ({ method, path, payload }: {
+    method: string,
+    path: string,
+    payload: JSONObject
+  }) {
     if (typeof XMLHttpRequest === 'undefined') {
       // NodeJS implementation, using http.request:
 
@@ -333,12 +350,12 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         path = `/${path}`;
       }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
-      const headers = payload.headers || {};
-      headers['Content-Length'] = Buffer.byteLength(payload.body || '');
+      const headers = payload && payload.headers || {};
+      headers['Content-Length'] = Buffer.byteLength(payload && payload.body || '');
 
       return httpClient.request(url, method, {
-        headers,
-        body: payload.body,
+        body: payload && payload.body,
+        headers: headers,
         timeout: this._timeout
       })
         .then(response => {
@@ -369,8 +386,8 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       // Authorize the reception of cookies
       xhr.withCredentials = this.cookieSupport;
 
-      for (const header of Object.keys(payload.headers || {})) {
-        xhr.setRequestHeader(header, payload.headers[header]);
+      for (const [header, value] of Object.entries(payload && payload.headers || {})) {
+        xhr.setRequestHeader(header, value as string);
       }
 
       xhr.onload = () => {
@@ -383,7 +400,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         }
       };
 
-      xhr.send(payload.body);
+      xhr.send(payload && payload.body);
     });
   }
 
