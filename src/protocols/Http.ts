@@ -14,11 +14,13 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   private _routes: HttpRoutes;
   private _timeout: number;
   private _customRoutes: HttpRoutes;
+  private _defaultHeaders: JSONObject;
 
   /**
    * @param host Kuzzle server hostname or IP
    * @param options Http connection options
    *    - `customRoutes` Add custom routes
+   *    - `headers` Default headers sent with each HTTP request (default: `{}`)
    *    - `port` Kuzzle server port (default: `7512`)
    *    - `ssl` Use SSL to connect to Kuzzle server. Default `false` unless port is 443 or 7443.
    *    - `timeout` Connection timeout in milliseconds (default: `0`)
@@ -33,7 +35,8 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       sslConnection?: boolean;
       ssl?: boolean;
       customRoutes?: HttpRoutes;
-      timeout?: number
+      timeout?: number,
+      headers?: JSONObject,
     } = {}
   ) {
     super(host, options, 'http');
@@ -47,6 +50,8 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     this._timeout = options.timeout || 0;
 
     this._customRoutes = options.customRoutes || {};
+
+    this._defaultHeaders = options.headers || {};
 
     for (const controller of Object.keys(this._customRoutes)) {
       const definition = this._customRoutes[controller];
@@ -113,7 +118,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       return Promise.resolve();
     }
 
-    return this._sendHttpRequest({method: 'GET', path: '/_publicApi'})
+    return this._sendHttpRequest(this.formatRequest({ method: 'GET', path: '/_publicApi' }))
       .then(({ result, error }) => {
         if (! error) {
           this._routes = this._constructRoutes(result);
@@ -133,7 +138,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         } else if (error.status === 404) {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
-          return this._sendHttpRequest({method: 'GET', path: '/'})
+          return this._sendHttpRequest(this.formatRequest({ method: 'GET', path: '/' }))
             .then(({ result: res, error: err }) => {
               if (! err) {
                 this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
@@ -194,6 +199,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       && this.routes[request.controller][request.action];
 
     if (! route) {
+      console.log(this.routes)
       const error = new Error(`No URL found for "${request.controller}:${request.action}".`);
       this.emit(request.requestId, { status: 400, error });
       return;
@@ -207,7 +213,8 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       collection: undefined,
       controller: undefined,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...this._defaultHeaders,
       },
       index: undefined,
       meta: undefined,
@@ -311,11 +318,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     if (formattedRequest) {
       this._sendHttpRequest(formattedRequest)
         .then(response => this.emit(formattedRequest.payload.requestId, response))
-        .catch(error => this.emit(formattedRequest.payload.requestId, {error}));
+        .catch(error => this.emit(formattedRequest.payload.requestId, { error }));
     }
   }
 
-  _sendHttpRequest ({method, path, payload = {headers: undefined, body:undefined}}) {
+  _sendHttpRequest ({ method, path, payload = { headers: undefined, body: undefined }}) {
     if (typeof XMLHttpRequest === 'undefined') {
       // NodeJS implementation, using http.request:
 
