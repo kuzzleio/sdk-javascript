@@ -19,7 +19,7 @@ Http(host, [options]);
 <br/>
 
 | Argument  | Type              | Description                  |
-| --------- | ----------------- | ---------------------------- |
+|-----------|-------------------|------------------------------|
 | `host`    | <pre>string</pre> | Kuzzle server hostname or IP |
 | `options` | <pre>object</pre> | Http connection options      |
 
@@ -27,13 +27,14 @@ Http(host, [options]);
 
 Http protocol connection options.
 
-| Property        | Type<br/>(default)               | Description                         |
-| --------------- | -------------------------------- | ----------------------------------- |
-| `port`          | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                  |
-| `sslConnection`     | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server   <DeprecatedBadge version="7.4.0"/>   |
-| `ssl`     | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server. Defaults to `true` for ports 443 and 7443.   |
-| `customRoutes` | <pre>object</pre><br/>(`{}`) | Add custom routes <SinceBadge version="6.2.0"/> |
-| `timeout` | <pre>number</pre><br/>(`0`) | Connection timeout in milliseconds (`0` means no timeout)<SinceBadge version="6.2.1"/> |
+| Property        | Type<br/>(default)               | Description                                                                            |
+|-----------------|----------------------------------|----------------------------------------------------------------------------------------|
+| `customRoutes`  | <pre>object</pre><br/>(`{}`)     | Add custom routes <SinceBadge version="6.2.0"/>                                        |
+| `headers`       | <pre>object</pre><br/>(`{}`)     | Default headers sent with each HTTP request <SinceBadge version="auto-version"/>       |
+| `port`          | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                                                                     |
+| `sslConnection` | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server <DeprecatedBadge version="7.4.0"/>               |
+| `ssl`           | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server. Defaults to `true` for ports 443 and 7443.        |
+| `timeout`       | <pre>number</pre><br/>(`0`)      | Connection timeout in milliseconds (`0` means no timeout) <SinceBadge version="6.2.1"/> |
 
 **Note:**
 

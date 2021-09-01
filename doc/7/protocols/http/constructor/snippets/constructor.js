@@ -12,8 +12,13 @@ const customRoutes = {
   }
 };
 
+const headers = {
+  'Accept-Encoding': 'gzip, deflate'
+};
+
 const options = {
   customRoutes,
+  headers,
   sslConnection: false
 };
 
