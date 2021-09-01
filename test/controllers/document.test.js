@@ -5,7 +5,7 @@ const { DocumentController } = require('../../src/controllers/Document');
 const { DocumentSearchResult } = require('../../src/core/searchResult/Document');
 
 describe('Document Controller', () => {
-  const options = {opt: 'in'};
+  let options;
   let kuzzle;
 
   beforeEach(() => {
@@ -13,6 +13,7 @@ describe('Document Controller', () => {
       query: sinon.stub().resolves()
     };
     kuzzle.document = new DocumentController(kuzzle);
+    options = { opt: 'in' };
   });
 
   describe('count', () => {
