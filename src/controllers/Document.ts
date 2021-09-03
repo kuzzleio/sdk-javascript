@@ -397,6 +397,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mCreate',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -469,6 +470,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mCreateOrReplace',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -528,6 +530,7 @@ export class DocumentController extends BaseController {
       body: { ids },
       action: 'mDelete',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -645,6 +648,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mReplace',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -722,6 +726,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mUpdate',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -742,6 +747,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -767,6 +773,7 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       retryOnConflict?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -797,6 +804,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mUpsert',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
