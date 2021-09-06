@@ -30,7 +30,7 @@ Http protocol connection options.
 | Property        | Type<br/>(default)               | Description                                                                            |
 |-----------------|----------------------------------|----------------------------------------------------------------------------------------|
 | `customRoutes`  | <pre>object</pre><br/>(`{}`)     | Add custom routes <SinceBadge version="6.2.0"/>                                        |
-| `headers`       | <pre>object</pre><br/>(`{}`)     | Default headers sent with each HTTP request <SinceBadge version="auto-version"/>       |
+| `headers`       | <pre>object</pre><br/>(`{}`)     | Default headers sent with each HTTP request <SinceBadge version="7.7.5"/>       |
 | `port`          | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                                                                     |
 | `sslConnection` | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server <DeprecatedBadge version="7.4.0"/>               |
 | `ssl`           | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server. Defaults to `true` for ports 443 and 7443.        |
