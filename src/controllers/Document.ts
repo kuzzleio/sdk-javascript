@@ -250,7 +250,7 @@ export class DocumentController extends BaseController {
       silent: options.silent,
       source: options.source,
     };
-  
+
     return this.query(request, options)
       .then(response => response.result);
   }
@@ -397,6 +397,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mCreate',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -469,6 +470,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mCreateOrReplace',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -528,6 +530,7 @@ export class DocumentController extends BaseController {
       body: { ids },
       action: 'mDelete',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -645,6 +648,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mReplace',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -722,6 +726,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mUpdate',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -730,7 +735,7 @@ export class DocumentController extends BaseController {
 
   /**
    * Applies partial updates to multiple documents.
-   * 
+   *
    * If a document doesn't already exist, a new document is created.
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/document/m-upsert/
    *
@@ -742,6 +747,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -767,6 +773,7 @@ export class DocumentController extends BaseController {
       refresh?: 'wait_for',
       silent?: boolean,
       retryOnConflict?: number,
+      strict?: boolean
     } = {}
   ): Promise<{
     /**
@@ -797,6 +804,7 @@ export class DocumentController extends BaseController {
       body: { documents },
       action: 'mUpsert',
       silent: options.silent,
+      strict: options.strict,
     };
 
     return this.query(request, options)
@@ -1038,7 +1046,7 @@ export class DocumentController extends BaseController {
    * @param _id Unique document identifier
    * @param changes Partial content of the document to update
    * @param [options]
-   *    - `defaults` Fields to add to the document if it gets created
+   *    - `default` Fields to add to the document if it gets created
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
@@ -1052,7 +1060,7 @@ export class DocumentController extends BaseController {
     _id: string,
     changes: JSONObject,
     options: {
-      defaults?: JSONObject;
+      default?: JSONObject;
       refresh?: string,
       silent?: boolean,
       retryOnConflict?: boolean,
@@ -1064,7 +1072,7 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      body: { changes, defaults: options.defaults },
+      body: { changes, default: options.default },
       action: 'upsert',
       source: options.source,
       silent: options.silent,
