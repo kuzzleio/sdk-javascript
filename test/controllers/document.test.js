@@ -220,6 +220,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       options.silent = true;
+      options.strict = true;
 
       return kuzzle.document.mCreate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -231,6 +232,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               silent: true,
+              strict: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -251,6 +253,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       options.silent = true;
+      options.strict = true;
 
       return kuzzle.document.mCreateOrReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -262,6 +265,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               silent: true,
+              strict: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -307,6 +311,7 @@ describe('Document Controller', () => {
       const result = ['document1', 'document2'];
       kuzzle.query.resolves({result});
       options.silent = true;
+      options.strict = true;
 
       return kuzzle.document.mDelete('index', 'collection', ['document1', 'document2'], options)
         .then(res => {
@@ -318,6 +323,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               silent: true,
+              strict: true,
               body: {ids: ['document1', 'document2']}
             }, options);
 
@@ -369,6 +375,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       options.silent = true;
+      options.strict = true;
 
       return kuzzle.document.mReplace('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -380,6 +387,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               silent: true,
+              strict: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
@@ -400,6 +408,7 @@ describe('Document Controller', () => {
       };
       kuzzle.query.resolves({result});
       options.silent = true;
+      options.strict = true;
 
       return kuzzle.document.mUpdate('index', 'collection', [{_id: 'document-id', body: {foo: 'bar'}}], options)
         .then(res => {
@@ -411,6 +420,7 @@ describe('Document Controller', () => {
               index: 'index',
               collection: 'collection',
               silent: true,
+              strict: true,
               body: {documents: [{_id: 'document-id', body: {foo: 'bar'}}]}
             }, options);
 
