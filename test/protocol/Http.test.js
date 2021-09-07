@@ -828,6 +828,28 @@ describe('HTTP networking module', () => {
     });
   });
 
+  describe('#_formatRequest', () => {
+    it('should inject default headers', () => {
+      protocol._routes = {
+        server: {
+          now: { verb: 'get', url: '/_now' }
+        }
+      };
+      protocol._defaultHeaders = {
+        'Accept-Encoding': 'gzip, deflate',
+      };
+      const request = { controller: 'server', action: 'now' };
+      const formattedRequest = protocol.formatRequest(request);
+
+      should(formattedRequest.payload).match({
+        headers: {
+          'Accept-Encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        }
+      });
+    });
+  });
+
   describe('#isReady', () => {
     it('should be ready if the instance is ready', () => {
       protocol.state = 'ready';
