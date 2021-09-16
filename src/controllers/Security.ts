@@ -1,30 +1,36 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.SecurityController = void 0;
-const Base_1 = require('./Base');
-const Role_1 = require('../core/security/Role');
-const Role_2 = require('../core/searchResult/Role');
-const Profile_1 = require('../core/security/Profile');
-const Profile_2 = require('../core/searchResult/Profile');
-const User_1 = require('../core/security/User');
-const User_2 = require('../core/searchResult/User');
-class SecurityController extends Base_1.BaseController {
+import { BaseController } from './Base';
+import { Role } from '../core/security/Role';
+import { RoleSearchResult } from '../core/searchResult/Role';
+import { Profile } from '../core/security/Profile';
+import { ProfileSearchResult } from '../core/searchResult/Profile';
+import { User } from '../core/security/User';
+import { UserSearchResult } from '../core/searchResult/User';
+
+export class SecurityController extends BaseController {
   /**
-     * @param {Kuzzle} kuzzle
-     */
-  constructor(kuzzle) {
+   * @param {Kuzzle} kuzzle
+   */
+  constructor (kuzzle) {
     super(kuzzle, 'security');
   }
+
   /**
-     * Creates a new API key for a user.
-     *
-     * @param {String} userId - User kuid
-     * @param {String} description - API key description
-     * @param {Object} [options] - { _id, expiresIn, refresh }
-     *
-     * @returns {Promise.<Object>} ApiKey { _id, _source }
-     */
-  createApiKey(userId, description, options = {}) {
+   * Creates a new API key for a user.
+   *
+   * @param {String} userId - User kuid
+   * @param {String} description - API key description
+   * @param {Object} [options] - { _id, expiresIn, refresh }
+   *
+   * @returns {Promise.<Object>} ApiKey { _id, _source }
+   */
+  createApiKey(
+    userId,
+    description,
+    options: {
+      expiresIn?: string | number,
+      _id?: string,
+      refresh?: 'wait_for',
+    } = {}) {
     const request = {
       userId,
       action: 'createApiKey',
@@ -35,53 +41,71 @@ class SecurityController extends Base_1.BaseController {
         description
       }
     };
+
     return this.query(request)
       .then(response => response.result);
   }
+
   /**
-     * Checks if an API action can be executed by a user
-     *
-     * @param {String} kuid - User kuid
-     * @param {Object} requestPayload - Request to check
-     */
-  checkRights(kuid, requestPayload) {
+   * Checks if an API action can be executed by a user
+   *
+   * @param {String} kuid - User kuid
+   * @param {Object} requestPayload - Request to check
+   */
+  checkRights (kuid, requestPayload) {
     const request = {
       userId: kuid,
       body: requestPayload,
       action: 'checkRights'
     };
+
     return this.query(request)
       .then(response => response.result.allowed);
   }
+
   /**
-     * Deletes an user API key.
-     *
-     * @param {String} userId - User kuid
-     * @param {String} id - API key ID
-     * @param {Object} [options] - { refresh }
-     *
-     * @returns {Promise}
-     */
-  deleteApiKey(userId, id, options = {}) {
+   * Deletes an user API key.
+   *
+   * @param {String} userId - User kuid
+   * @param {String} id - API key ID
+   * @param {Object} [options] - { refresh }
+   *
+   * @returns {Promise}
+   */
+  deleteApiKey(
+    userId,
+    id,
+    options: {
+      refresh?: 'wait_for',
+    } = {}) {
     const request = {
       userId,
       action: 'deleteApiKey',
       _id: id,
       refresh: options.refresh
     };
-    return this.query(request)
-      .then(() => { });
+
+    return this.query(request);
   }
+
   /**
-     * Searches for a user API key.
-     *
-     * @param {String} userId - User kuid
-     * @param {Object} [query] - Search query
-     * @param {Object} [options] - { from, size }
-     *
-     * @returns {Promise.<object[]>} - { hits, total }
-     */
-  searchApiKeys(userId, query = {}, options = {}) {
+   * Searches for a user API key.
+   *
+   * @param {String} userId - User kuid
+   * @param {Object} [query] - Search query
+   * @param {Object} [options] - { from, size }
+   *
+   * @returns {Promise.<object[]>} - { hits, total }
+   */
+  searchApiKeys(
+    userId,
+    query = {},
+    options: {
+      from?: number,
+      size?: number,
+      lang?: string,
+    } = {}
+  ) {
     const request = {
       userId,
       action: 'searchApiKeys',
@@ -90,10 +114,12 @@ class SecurityController extends Base_1.BaseController {
       lang: options.lang,
       body: query
     };
+
     return this.query(request)
       .then(response => response.result);
   }
-  createCredentials(strategy, _id, body, options = {}) {
+
+  createCredentials (strategy, _id, body, options = {}) {
     return this.query({
       _id,
       strategy,
@@ -102,26 +128,46 @@ class SecurityController extends Base_1.BaseController {
     }, options)
       .then(response => response.result);
   }
-  createFirstAdmin(_id, body, options = {}) {
+
+  createFirstAdmin (
+    _id,
+    body,
+    options: {
+      reset?: boolean,
+    } = {}
+  ) {
     const request = {
       _id,
       body,
       action: 'createFirstAdmin',
       reset: options.reset
     };
+
     return this.query(request, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  createOrReplaceProfile(_id, body, options = {}) {
+
+  createOrReplaceProfile (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'createOrReplaceProfile'
     };
+
     return this.query(request, options)
-      .then(response => new Profile_1.Profile(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
-  createOrReplaceRole(_id, body, options = {}) {
+
+  createOrReplaceRole (
+    _id,
+    body,
+    options: {
+      force?: boolean,
+    } = {}
+  ) {
     const request = {
       _id,
       body,
@@ -129,30 +175,39 @@ class SecurityController extends Base_1.BaseController {
       force: options.force ? true : null
     };
     return this.query(request, options)
-      .then(response => new Role_1.Role(this.kuzzle, response.result._id, response.result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
-  createProfile(_id, body, options = {}) {
+
+  createProfile (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'createProfile'
     };
+
     return this.query(request, options)
-      .then(response => new Profile_1.Profile(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
-  createRestrictedUser(body, _id = null, options = {}) {
+
+  createRestrictedUser (body, _id = null, options = {}) {
     if (!body.content) {
       body.content = {};
     }
+
     const request = {
       _id,
       body,
       action: 'createRestrictedUser'
     };
+
     return this.query(request, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  createRole(_id, body, options = {}) {
+
+  createRole (_id, body, options: { force?: boolean, } = {}) {
     const request = {
       _id,
       body,
@@ -160,27 +215,32 @@ class SecurityController extends Base_1.BaseController {
       force: options.force ? true : null
     };
     return this.query(request, options)
-      .then(response => new Role_1.Role(this.kuzzle, response.result._id, response.result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
-  createUser(_id, body, options = {}) {
+
+  createUser (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'createUser'
     };
+
     return this.query(request, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  deleteCredentials(strategy, _id, options = {}) {
+
+  deleteCredentials (strategy, _id, options = {}) {
     const request = {
       strategy,
       _id,
       action: 'deleteCredentials'
     };
+
     return this.query(request, options)
       .then(response => response.result);
   }
-  deleteProfile(_id, options = {}) {
+
+  deleteProfile (_id, options = {}) {
     const request = {
       _id,
       action: 'deleteProfile'
@@ -188,7 +248,8 @@ class SecurityController extends Base_1.BaseController {
     return this.query(request, options)
       .then(response => response.result);
   }
-  deleteRole(_id, options = {}) {
+
+  deleteRole (_id, options = {}) {
     const request = {
       _id,
       action: 'deleteRole'
@@ -196,7 +257,8 @@ class SecurityController extends Base_1.BaseController {
     return this.query(request, options)
       .then(response => response.result);
   }
-  deleteUser(_id, options = {}) {
+
+  deleteUser (_id, options = {}) {
     const request = {
       _id,
       action: 'deleteUser'
@@ -204,20 +266,23 @@ class SecurityController extends Base_1.BaseController {
     return this.query(request, options)
       .then(response => response.result);
   }
-  getAllCredentialFields(options = {}) {
+
+  getAllCredentialFields (options = {}) {
     return this.query({
       action: 'getAllCredentialFields'
     }, options)
       .then(response => response.result);
   }
-  getCredentialFields(strategy, options = {}) {
+
+  getCredentialFields (strategy, options = {}) {
     return this.query({
       strategy,
       action: 'getCredentialFields'
     }, options)
       .then(response => response.result);
   }
-  getCredentials(strategy, _id, options = {}) {
+
+  getCredentials (strategy, _id, options = {}) {
     return this.query({
       strategy,
       _id,
@@ -225,7 +290,8 @@ class SecurityController extends Base_1.BaseController {
     }, options)
       .then(response => response.result);
   }
-  getCredentialsById(strategy, _id, options = {}) {
+
+  getCredentialsById (strategy, _id, options = {}) {
     return this.query({
       strategy,
       _id,
@@ -233,64 +299,77 @@ class SecurityController extends Base_1.BaseController {
     }, options)
       .then(response => response.result);
   }
-  getProfile(_id, options = {}) {
-    return this.query({ _id, action: 'getProfile' }, options)
-      .then(response => new Profile_1.Profile(this.kuzzle, response.result._id, response.result._source));
+
+  getProfile (_id, options = {}) {
+    return this.query({_id, action: 'getProfile'}, options)
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
-  getProfileMapping(options = {}) {
+
+  getProfileMapping (options = {}) {
     return this.query({
       action: 'getProfileMapping'
     }, options)
       .then(response => response.result);
   }
-  getProfileRights(_id, options = {}) {
+
+  getProfileRights (_id, options = {}) {
     return this.query({
       _id,
       action: 'getProfileRights'
     }, options)
       .then(response => response.result.hits);
   }
-  getRole(_id, options = {}) {
+
+  getRole (_id, options = {}) {
     return this.query({
       _id,
       action: 'getRole'
     }, options)
-      .then(response => new Role_1.Role(this.kuzzle, response.result._id, response.result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
-  getRoleMapping(options = {}) {
+
+  getRoleMapping (options = {}) {
     return this.query({
       action: 'getRoleMapping'
     }, options)
       .then(response => response.result);
   }
-  getUser(_id, options = {}) {
+
+  getUser (_id, options = {}) {
     return this.query({
       _id,
       action: 'getUser'
     }, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  getUserMapping(options = {}) {
+
+  getUserMapping (options = {}) {
     return this.query({
       action: 'getUserMapping'
     }, options)
       .then(response => response.result);
   }
-  getUserRights(_id, options = {}) {
+
+  getUserRights (_id, options = {}) {
     return this.query({
       _id,
       action: 'getUserRights'
     }, options)
       .then(response => response.result.hits);
   }
-  getUserStrategies(_id, options = {}) {
+
+  getUserStrategies (_id, options = {}) {
     return this.query({
       _id,
       action: 'getUserStrategies'
     }, options)
       .then(response => response.result.strategies);
   }
-  hasCredentials(strategy, _id, options = {}) {
+
+  hasCredentials (strategy, _id, options = {}) {
     return this.query({
       strategy,
       _id,
@@ -298,65 +377,79 @@ class SecurityController extends Base_1.BaseController {
     }, options)
       .then(response => response.result);
   }
-  mDeleteProfiles(ids, options = {}) {
+
+  mDeleteProfiles (ids, options = {}) {
     const request = {
       action: 'mDeleteProfiles',
-      body: { ids }
+      body: {ids}
     };
+
     return this.query(request, options)
       .then(response => response.result);
   }
-  mDeleteRoles(ids, options = {}) {
+
+  mDeleteRoles (ids, options = {}) {
     const request = {
       action: 'mDeleteRoles',
-      body: { ids }
+      body: {ids}
     };
+
     return this.query(request, options)
       .then(response => response.result);
   }
-  mDeleteUsers(ids, options = {}) {
+
+  mDeleteUsers (ids, options = {}) {
     const request = {
       action: 'mDeleteUsers',
-      body: { ids }
+      body: {ids}
     };
+
     return this.query(request, options)
       .then(response => response.result);
   }
-  mGetProfiles(ids, options = {}) {
-    return this.query({ action: 'mGetProfiles', body: { ids } }, options)
-      .then(response => response.result.hits.map(hit => new Profile_1.Profile(this.kuzzle, hit._id, hit._source)));
+
+  mGetProfiles (ids, options = {}) {
+    return this.query({action: 'mGetProfiles', body: {ids}}, options)
+      .then(response => response.result.hits.map(
+        hit => new Profile(this.kuzzle, hit._id, hit._source)));
   }
-  mGetUsers(ids, options = {}) {
+
+  mGetUsers (ids, options = {}) {
     const request = {
       action: 'mGetUsers',
-      body: { ids }
+      body: {ids}
     };
+
     return this.query(request, options)
-      .then(response => response.result.hits.map(hit => new User_1.User(this.kuzzle, hit._id, hit._source)));
+      .then(response => response.result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source)));
   }
-  mGetRoles(ids, options = {}) {
+
+  mGetRoles (ids, options = {}) {
     return this.query({
       action: 'mGetRoles',
-      body: { ids }
+      body: {ids}
     }, options)
-      .then(response => response.result.hits.map(hit => new Role_1.Role(this.kuzzle, hit._id, hit._source.controllers)));
+      .then(response => response.result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
   }
+
   refresh(collection) {
     return this.query({
       collection,
       action: 'refresh'
     });
   }
-  replaceUser(_id, body, options = {}) {
+
+  replaceUser (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'replaceUser'
     };
     return this.query(request, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  searchProfiles(body, options = {}) {
+
+  searchProfiles (body, options= {}) {
     const request = {
       body,
       action: 'searchProfiles'
@@ -364,10 +457,12 @@ class SecurityController extends Base_1.BaseController {
     for (const opt of ['from', 'size', 'scroll']) {
       request[opt] = options[opt];
     }
+
     return this.query(request, options)
-      .then(response => new Profile_2.ProfileSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => new ProfileSearchResult(this.kuzzle, request, options, response.result));
   }
-  searchRoles(body, options = {}) {
+
+  searchRoles (body, options = {}) {
     const request = {
       body,
       action: 'searchRoles'
@@ -375,10 +470,12 @@ class SecurityController extends Base_1.BaseController {
     for (const opt of ['from', 'size']) {
       request[opt] = options[opt];
     }
+
     return this.query(request, options)
-      .then(response => new Role_2.RoleSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => new RoleSearchResult(this.kuzzle, request, options, response.result));
   }
-  searchUsers(body, options = {}) {
+
+  searchUsers (body, options = {}) {
     const request = {
       body,
       action: 'searchUsers'
@@ -386,10 +483,12 @@ class SecurityController extends Base_1.BaseController {
     for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
+
     return this.query(request, options)
-      .then(response => new User_2.UserSearchResult(this.kuzzle, request, options, response.result));
+      .then(response => new UserSearchResult(this.kuzzle, request, options, response.result));
   }
-  updateCredentials(strategy, _id, body, options = {}) {
+
+  updateCredentials (strategy, _id, body, options = {}) {
     return this.query({
       strategy,
       _id,
@@ -398,56 +497,68 @@ class SecurityController extends Base_1.BaseController {
     }, options)
       .then(response => response.result);
   }
-  updateProfile(_id, body, options = {}) {
+
+  updateProfile (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'updateProfile'
     };
+
     return this.query(request, options)
-      .then(response => new Profile_1.Profile(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new Profile(
+        this.kuzzle,
+        response.result._id,
+        response.result._source));
   }
-  updateProfileMapping(body, options = {}) {
+
+  updateProfileMapping (body, options = {}) {
     return this.query({
       body,
       action: 'updateProfileMapping'
     }, options)
       .then(response => response.result);
   }
-  updateRole(_id, body, options = {}) {
+
+  updateRole (_id, body, options: { force?: boolean, } = {}) {
     const request = {
       _id,
       body,
       action: 'updateRole',
       force: options.force ? true : null
     };
+
     return this.query(request, options)
-      .then(response => new Role_1.Role(this.kuzzle, response.result._id, response.result._source.controllers));
+      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
   }
-  updateRoleMapping(body, options = {}) {
+
+  updateRoleMapping (body, options = {}) {
     return this.query({
       body,
       action: 'updateRoleMapping'
     }, options)
       .then(response => response.result);
   }
-  updateUser(_id, body, options = {}) {
+
+  updateUser (_id, body, options = {}) {
     const request = {
       _id,
       body,
       action: 'updateUser'
     };
     return this.query(request, options)
-      .then(response => new User_1.User(this.kuzzle, response.result._id, response.result._source));
+      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
-  updateUserMapping(body, options = {}) {
+
+  updateUserMapping (body, options = {}) {
     return this.query({
       body,
       action: 'updateUserMapping'
     }, options)
       .then(response => response.result);
   }
-  validateCredentials(strategy, _id, body, options = {}) {
+
+  validateCredentials (strategy, _id, body, options = {}) {
     return this.query({
       _id,
       strategy,
@@ -457,5 +568,3 @@ class SecurityController extends Base_1.BaseController {
       .then(response => response.result);
   }
 }
-exports.SecurityController = SecurityController;
-//# sourceMappingURL=Security.js.map
