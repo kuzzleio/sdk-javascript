@@ -41,6 +41,7 @@ src/controllers/Index.js
 src/controllers/Collection.js
 src/controllers/Base.js
 src/controllers/Realtime.js
+src/controllers/Security.js
 src/core/security/User.js
 src/core/security/Profile.js
 src/core/security/Role.js
