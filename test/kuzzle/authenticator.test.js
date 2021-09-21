@@ -245,7 +245,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
       should(reconnectionErrorSpy).not.be.called();
     });
 
-    it('should returns false if the token is not valid and there is no authenticator', async () => {
+    it('should returns false if the token is not valid and there is no authenticator and emit a reconnectionError', async () => {
       kuzzle.auth.checkToken.resolves({ valid: false });
       kuzzle.authenticator = null;
 
@@ -253,7 +253,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
 
       should(ret).be.false();
       should(kuzzle.authenticate).not.be.called();
-      should(reconnectionErrorSpy).not.be.called();
+      should(reconnectionErrorSpy).be.called();
     });
 
     it('should call "authenticate" if the token is not valid', async () => {

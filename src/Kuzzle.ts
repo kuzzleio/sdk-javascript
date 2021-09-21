@@ -640,6 +640,9 @@ export class Kuzzle extends KuzzleEventEmitter {
        * like so API Keys can be used even if there is no authenticator since they will be still valid.
        */
       if (! this.authenticator) {
+        this.emit('reconnectionError', {
+          error: new Error('Could not re-authenticate: "authenticator" property is not set.')
+        });
         return false;
       }
 
