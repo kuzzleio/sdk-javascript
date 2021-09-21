@@ -1,12 +1,12 @@
-const { BaseController } = require('./Base');
-const { Role } = require('../core/security/Role');
-const { RoleSearchResult } = require('../core/searchResult/Role');
-const { Profile } = require('../core/security/Profile');
-const { ProfileSearchResult } = require('../core/searchResult/Profile');
-const { User } = require('../core/security/User');
-const { UserSearchResult } = require('../core/searchResult/User');
+import { BaseController } from './Base';
+import { Role } from '../core/security/Role';
+import { RoleSearchResult } from '../core/searchResult/Role';
+import { Profile } from '../core/security/Profile';
+import { ProfileSearchResult } from '../core/searchResult/Profile';
+import { User } from '../core/security/User';
+import { UserSearchResult } from '../core/searchResult/User';
 
-class SecurityController extends BaseController {
+export class SecurityController extends BaseController {
   /**
    * @param {Kuzzle} kuzzle
    */
@@ -23,7 +23,14 @@ class SecurityController extends BaseController {
    *
    * @returns {Promise.<Object>} ApiKey { _id, _source }
    */
-  createApiKey(userId, description, options = {}) {
+  createApiKey(
+    userId,
+    description,
+    options: {
+      expiresIn?: string | number,
+      _id?: string,
+      refresh?: 'wait_for',
+    } = {}) {
     const request = {
       userId,
       action: 'createApiKey',
@@ -65,7 +72,12 @@ class SecurityController extends BaseController {
    *
    * @returns {Promise}
    */
-  deleteApiKey(userId, id, options = {}) {
+  deleteApiKey(
+    userId,
+    id,
+    options: {
+      refresh?: 'wait_for',
+    } = {}) {
     const request = {
       userId,
       action: 'deleteApiKey',
@@ -73,8 +85,7 @@ class SecurityController extends BaseController {
       refresh: options.refresh
     };
 
-    return this.query(request)
-      .then(() => {});
+    return this.query(request);
   }
 
   /**
@@ -86,7 +97,15 @@ class SecurityController extends BaseController {
    *
    * @returns {Promise.<object[]>} - { hits, total }
    */
-  searchApiKeys(userId, query = {}, options = {}) {
+  searchApiKeys(
+    userId,
+    query = {},
+    options: {
+      from?: number,
+      size?: number,
+      lang?: string,
+    } = {}
+  ) {
     const request = {
       userId,
       action: 'searchApiKeys',
@@ -110,7 +129,13 @@ class SecurityController extends BaseController {
       .then(response => response.result);
   }
 
-  createFirstAdmin (_id, body, options = {}) {
+  createFirstAdmin (
+    _id,
+    body,
+    options: {
+      reset?: boolean,
+    } = {}
+  ) {
     const request = {
       _id,
       body,
@@ -136,7 +161,13 @@ class SecurityController extends BaseController {
         response.result._source));
   }
 
-  createOrReplaceRole (_id, body, options = {}) {
+  createOrReplaceRole (
+    _id,
+    body,
+    options: {
+      force?: boolean,
+    } = {}
+  ) {
     const request = {
       _id,
       body,
@@ -176,7 +207,7 @@ class SecurityController extends BaseController {
       .then(response => new User(this.kuzzle, response.result._id, response.result._source));
   }
 
-  createRole (_id, body, options = {}) {
+  createRole (_id, body, options: { force?: boolean, } = {}) {
     const request = {
       _id,
       body,
@@ -489,7 +520,7 @@ class SecurityController extends BaseController {
       .then(response => response.result);
   }
 
-  updateRole (_id, body, options = {}) {
+  updateRole (_id, body, options: { force?: boolean, } = {}) {
     const request = {
       _id,
       body,
@@ -537,5 +568,3 @@ class SecurityController extends BaseController {
       .then(response => response.result);
   }
 }
-
-module.exports = { SecurityController };

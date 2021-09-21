@@ -83,7 +83,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   index: IndexController;
   ms: any;
   realtime: RealtimeController;
-  security: any;
+  security: SecurityController;
   server: any;
 
   private _protectedEvents: any;
