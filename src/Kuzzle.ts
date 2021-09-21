@@ -641,7 +641,7 @@ export class Kuzzle extends KuzzleEventEmitter {
        */
       if (! this.authenticator) {
         this.emit('reconnectionError', {
-          error: new Error('Could not reauthenticate: undefined authenticator property')
+          error: new Error('Could not re-authenticate: "authenticator" property is not set.')
         });
         return false;
       }
