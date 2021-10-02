@@ -454,7 +454,7 @@ export class SecurityController extends BaseController {
       body,
       action: 'searchProfiles'
     };
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ['from', 'size', 'scroll', 'lang']) {
       request[opt] = options[opt];
     }
 
@@ -467,7 +467,7 @@ export class SecurityController extends BaseController {
       body,
       action: 'searchRoles'
     };
-    for (const opt of ['from', 'size']) {
+    for (const opt of ['from', 'size', 'lang']) {
       request[opt] = options[opt];
     }
 

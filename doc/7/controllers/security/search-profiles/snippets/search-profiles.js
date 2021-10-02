@@ -1,6 +1,8 @@
 try {
   const results = await kuzzle.security.searchProfiles({
-    roles: [ 'default' ]
+    query: {
+      term: { 'policies.roleId': 'default' }
+    }
   });
 
   console.log(results);

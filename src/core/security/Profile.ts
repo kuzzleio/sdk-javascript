@@ -1,7 +1,10 @@
 import { Role } from './Role';
 import { JSONObject, ProfilePolicy } from '../../types';
+import { Kuzzle } from '../../Kuzzle';
 
 export class Profile {
+  private _kuzzle: Kuzzle;
+
   /**
    * Profile unique ID
    */
@@ -17,14 +20,15 @@ export class Profile {
    */
   policies: Array<ProfilePolicy>;
 
-  private _kuzzle: any;
+  // Other properties
+  [property: string]: any;
 
   /**
    *
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle, _id = null, content = null) {
+  constructor (kuzzle: Kuzzle, _id: string = null, content: JSONObject = {}) {
     Reflect.defineProperty(this, '_kuzzle', {
       value: kuzzle
     });
@@ -32,6 +36,14 @@ export class Profile {
     this._id = _id;
     this.rateLimit = content && content.rateLimit ? content.rateLimit : 0;
     this.policies = content && content.policies ? content.policies : [];
+
+    for (const [key, value] of Object.entries(content)) {
+      if (this[key]) {
+        continue;
+      }
+
+      this[key] = value;
+    }
   }
 
   protected get kuzzle () {
