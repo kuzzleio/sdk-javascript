@@ -454,8 +454,8 @@ export class SecurityController extends BaseController {
       body,
       action: 'searchProfiles'
     };
-    for (const opt of ['from', 'size', 'scroll', 'lang']) {
-      request[opt] = options[opt];
+    for (const [key, value] of Object.entries(options)) {
+      request[key] = value;
     }
 
     return this.query(request, options)
@@ -467,8 +467,8 @@ export class SecurityController extends BaseController {
       body,
       action: 'searchRoles'
     };
-    for (const opt of ['from', 'size', 'lang']) {
-      request[opt] = options[opt];
+    for (const [key, value] of Object.entries(options)) {
+      request[key] = value;
     }
 
     return this.query(request, options)

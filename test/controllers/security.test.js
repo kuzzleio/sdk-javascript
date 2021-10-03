@@ -1003,9 +1003,7 @@ describe('Security Controller', () => {
               controller: 'security',
               action: 'searchProfiles',
               body: {roles: ['foo', 'bar']},
-              from: undefined,
-              size: undefined,
-              scroll: undefined
+              opt: 'in'
             }, options);
 
           should(res).be.an.instanceOf(ProfileSearchResult);
@@ -1067,8 +1065,7 @@ describe('Security Controller', () => {
               controller: 'security',
               action: 'searchRoles',
               body: {controllers: ['foo', 'bar']},
-              from: undefined,
-              size: undefined
+              opt: 'in',
             }, options);
 
           should(res).be.an.instanceOf(RoleSearchResult);
