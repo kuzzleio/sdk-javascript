@@ -22,13 +22,13 @@ export class SomeController {
 export class SomeController {
   helloWorld (
     name: string,
-    options: SomeControllerHelloWorldArgs = {}
+    options: ArgsSomeControllerHelloWorld = {}
   ): string {
     return name;
   }
 }
 
-interface SomeControllerHelloWorldArgs extends ArgsDefault {
+interface ArgsSomeControllerHelloWorld extends ArgsDefault {
   age?: number;
 }
 
