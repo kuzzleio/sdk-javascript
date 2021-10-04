@@ -12,4 +12,4 @@ hooks:
       curl -XDELETE kuzzle:7512/profiles/profile${i}
     done
 template: default
-expected: '.*Profile.*_id.*rateLimit.*policies.*'
+expected: Successfully retrieved 3 profiles
