@@ -1,9 +1,8 @@
 import { Jwt } from '../core/Jwt';
 import { BaseController } from './Base';
 import { User } from '../core/security/User';
-import { JSONObject, ApiKey } from '../types';
+import { JSONObject, ApiKey, ArgsDefault } from '../types';
 import { RequestPayload } from '../types/RequestPayload';
-
 /**
  * Auth controller
  *
@@ -81,12 +80,7 @@ export class AuthController extends BaseController {
    */
   createApiKey(
     description: string,
-    options: {
-      _id?: string,
-      expiresIn?: number,
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerCreateApiKey = {}
   ): Promise<ApiKey> {
     const request = {
       action: 'createApiKey',
@@ -98,7 +92,7 @@ export class AuthController extends BaseController {
       }
     };
 
-    return this.query(request)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -113,9 +107,7 @@ export class AuthController extends BaseController {
    */
   checkRights (
     requestPayload: RequestPayload,
-    options: {
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerCheckRights = {}
   ): Promise<boolean> {
     const request = {
       body: requestPayload,
@@ -138,10 +130,7 @@ export class AuthController extends BaseController {
    */
   deleteApiKey(
     id: string,
-    options: {
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerDeleteApiKey = {}
   ): Promise<null> {
     const request = {
       action: 'deleteApiKey',
@@ -149,7 +138,7 @@ export class AuthController extends BaseController {
       refresh: options.refresh
     };
 
-    return this.query(request)
+    return this.query(request, options)
       .then(() => null);
   }
 
@@ -168,12 +157,7 @@ export class AuthController extends BaseController {
    */
   searchApiKeys(
     query: JSONObject = {},
-    options: {
-      from?: number,
-      size?: number,
-      lang?: string,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerSearchApiKeys = {}
   ): Promise<{
     /**
      * Array of found ApiKeys
@@ -192,7 +176,7 @@ export class AuthController extends BaseController {
       body: query
     };
 
-    return this.query(request)
+    return this.query(request, options)
       .then(response => response.result);
   }
 
@@ -209,9 +193,7 @@ export class AuthController extends BaseController {
    */
   checkToken (
     token?: string,
-    options: {
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerCheckToken = {}
   ): Promise<{
     /**
      * Tell if the token is valid or not
@@ -260,10 +242,7 @@ export class AuthController extends BaseController {
   createMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerCreateMyCredentials = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -287,10 +266,7 @@ export class AuthController extends BaseController {
    */
   credentialsExist (
     strategy: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerCredentialsExist = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -311,10 +287,7 @@ export class AuthController extends BaseController {
    */
   deleteMyCredentials (
     strategy: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerDeleteMyCredentials = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -334,7 +307,7 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  getCurrentUser (options: {queuable?: boolean, timeout?: number } = {}): Promise<User> {
+  getCurrentUser (options: ArgsAuthControllerGetCurrentUser = {}): Promise<User> {
     return this.query({
       action: 'getCurrentUser'
     }, options)
@@ -359,10 +332,7 @@ export class AuthController extends BaseController {
    */
   getMyCredentials(
     strategy: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerGetMyCredentials = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -383,10 +353,7 @@ export class AuthController extends BaseController {
    * @returns An array containing user rights objects
    */
   getMyRights (
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerGetMyRights = {}
   ): Promise<Array<{
     /**
      * Controller on wich the rights are applied
@@ -427,10 +394,7 @@ export class AuthController extends BaseController {
    * @returns An array of available strategies names
    */
   getStrategies (
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerGetStrategies = {}
   ): Promise<Array<string>> {
     return this.query({
       action: 'getStrategies'
@@ -522,10 +486,7 @@ export class AuthController extends BaseController {
   updateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerUpdateMyCredentials = {}
   ): Promise<JSONObject> {
     return this.query({
       strategy,
@@ -550,10 +511,7 @@ export class AuthController extends BaseController {
    */
   updateSelf (
     content: JSONObject,
-    options: {
-      queuable?: boolean, 
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerUpdateSelf = {}
   ): Promise<User> {
     return this.query({
       body: content,
@@ -579,10 +537,7 @@ export class AuthController extends BaseController {
   validateMyCredentials (
     strategy: string,
     credentials: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerValidateMyCredentials = {}
   ): Promise<boolean> {
     return this.query({
       strategy,
@@ -605,11 +560,7 @@ export class AuthController extends BaseController {
    * @returns The refreshed token
    */
   refreshToken(
-    options: { 
-      queuable?: boolean,
-      expiresIn?: number | string,
-      timeout?: number
-    } = {}
+    options: ArgsAuthControllerRefreshToken = {}
   ): Promise<{
     /**
      * Token unique ID
@@ -643,4 +594,60 @@ export class AuthController extends BaseController {
         return response.result;
       });
   }
+}
+
+export interface ArgsAuthControllerCreateApiKey extends ArgsDefault {
+    _id?: string;
+    expiresIn?: number;
+    refresh?: 'wait_for';
+}
+
+export interface ArgsAuthControllerCheckRights extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerDeleteApiKey extends ArgsDefault {
+    refresh?: 'wait_for';
+}
+
+export interface ArgsAuthControllerSearchApiKeys extends ArgsDefault {
+    from?: number;
+    size?: number;
+    lang?: string;
+}
+
+export interface ArgsAuthControllerCheckToken extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerCreateMyCredentials extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerCredentialsExist extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerDeleteMyCredentials extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerGetCurrentUser extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerGetMyCredentials extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerGetMyRights extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerGetStrategies extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerUpdateMyCredentials extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerUpdateSelf extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerValidateMyCredentials extends ArgsDefault {
+}
+
+export interface ArgsAuthControllerRefreshToken extends ArgsDefault {
+    expiresIn?: number | string;
 }

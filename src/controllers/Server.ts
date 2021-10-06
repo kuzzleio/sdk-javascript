@@ -1,10 +1,11 @@
-const { BaseController } = require('./Base');
+import { BaseController } from './Base';
+import { ArgsDefault } from '../types';
 
 /**
  * @class ServerController
  * @property {Kuzzle} kuzzle - The Kuzzle SDK Instance
  */
-class ServerController extends BaseController {
+export class ServerController extends BaseController {
 
   /**
    * @param {Kuzzle} kuzzle - The Kuzzle SDK Instance
@@ -19,7 +20,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Boolean>}
    */
-  adminExists (options) {
+  adminExists (options: ArgsServerControllerAdminExists) {
     return this.query({
       action: 'adminExists'
     }, options)
@@ -33,7 +34,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
-  getAllStats (options) {
+  getAllStats (options: ArgsServerControllerGetAllStats) {
     return this.query({
       action: 'getAllStats'
     }, options)
@@ -46,7 +47,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
-  getConfig (options) {
+  getConfig (options: ArgsServerControllerGetConfig) {
     return this.query({
       action: 'getConfig'
     }, options)
@@ -59,7 +60,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
-  getLastStats (options) {
+  getLastStats (options: ArgsServerControllerGetLastStats) {
     return this.query({
       action: 'getLastStats'
     }, options)
@@ -74,7 +75,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
-  getStats(startTime, stopTime, options) {
+  getStats (startTime: number | string, stopTime: number | string, options: ArgsServerControllerGetStats) {
     return this.query({
       action: 'getStats',
       startTime,
@@ -89,7 +90,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Object>}
    */
-  info (options) {
+  info (options: ArgsServerControllerInfo) {
     return this.query({
       action: 'info'
     }, options)
@@ -102,7 +103,7 @@ class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true)}
    * @returns {Promise<Number>}
    */
-  now (options) {
+  now (options: ArgsServerControllerNow) {
     return this.query({
       action: 'now'
     }, options)
@@ -110,4 +111,23 @@ class ServerController extends BaseController {
   }
 }
 
-module.exports = { ServerController };
+export interface ArgsServerControllerAdminExists extends ArgsDefault {
+}
+
+export interface ArgsServerControllerGetAllStats extends ArgsDefault {
+}
+
+export interface ArgsServerControllerGetConfig extends ArgsDefault {
+}
+
+export interface ArgsServerControllerGetLastStats extends ArgsDefault {
+}
+
+export interface ArgsServerControllerGetStats extends ArgsDefault {
+}
+
+export interface ArgsServerControllerInfo extends ArgsDefault {
+}
+
+export interface ArgsServerControllerNow extends ArgsDefault {
+}
