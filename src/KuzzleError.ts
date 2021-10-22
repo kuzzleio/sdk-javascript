@@ -30,6 +30,35 @@ export class KuzzleError extends Error {
   public code: number;
 
   /**
+   * API controller name
+   */
+  public controller?: string;
+
+  /**
+   * API action name
+   */
+  public action?: string;
+
+  /**
+   * KuzzleRequest volatile data
+   */
+  public volatile?: Object;
+
+  /**
+   * Index name
+   */
+  public index?: string;
+
+  /**
+   * Collection name
+   */
+  public collection?: string;
+
+  /**
+   * request id
+   */
+  public requestId?: string;
+  /**
    * Associated errors
    * (PartialError only)
    */
@@ -60,13 +89,21 @@ export class KuzzleError extends Error {
     >    at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
-  constructor (apiError, sdkStack: string, protocol: string) {
+  constructor (apiError, sdkStack: string, protocol: string, request?) {
     super(apiError.message);
-
     this.status = apiError.status;
 
     this.id = apiError.id;
     this.code = apiError.code;
+  
+    if (request) {
+      this.controller = request.controller;
+      this.collection = request.collection;
+      this.action  = request.action;
+      this.index = request.index;
+      this.volatile = request.volatile;
+      this.requestId = request.requestId;
+    }
 
     // PartialError
     if (this.status === 206) {

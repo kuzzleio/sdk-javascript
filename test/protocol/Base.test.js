@@ -191,7 +191,7 @@ describe('Common Protocol', () => {
         });
     });
 
-    it.only('should reject an error with more context', () => {
+    it('should reject an error with more context', () => {
       const response = {
         error: {
           status: 404,

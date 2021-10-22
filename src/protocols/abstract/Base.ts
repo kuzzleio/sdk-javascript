@@ -6,6 +6,7 @@ import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
 import { JSONObject } from '../../types';
 import { RequestPayload } from '../../types/RequestPayload';
+import { FILE } from 'dns';
 
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;
@@ -148,11 +149,11 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        let error;
+        let error: KuzzleError;
 
         // Wrap API error but directly throw errors that comes from SDK
         if (response.error.status) {
-          error = new KuzzleError(response.error, stack, this.constructor.name);
+          error = new KuzzleError(response.error, stack, this.constructor.name, request);
         }
         else {
           // Keep both stacktrace because the one we captured in "stack" will give
