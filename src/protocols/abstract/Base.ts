@@ -6,7 +6,6 @@ import { KuzzleEventEmitter } from '../../core/KuzzleEventEmitter';
 import { PendingRequest } from './PendingRequest';
 import { JSONObject } from '../../types';
 import { RequestPayload } from '../../types/RequestPayload';
-import { FILE } from 'dns';
 
 export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   private _pendingRequests: Map<string, PendingRequest>;

@@ -42,7 +42,7 @@ export class KuzzleError extends Error {
   /**
    * KuzzleRequest volatile data
    */
-  public volatile?: Object;
+  public volatile?: Record<string, unknown>;
 
   /**
    * Index name
@@ -99,7 +99,7 @@ export class KuzzleError extends Error {
     if (request) {
       this.controller = request.controller;
       this.collection = request.collection;
-      this.action  = request.action;
+      this.action = request.action;
       this.index = request.index;
       this.volatile = request.volatile;
       this.requestId = request.requestId;
@@ -118,6 +118,11 @@ export class KuzzleError extends Error {
       this.stack = apiError.stack + '\n';
       this.stack += '          |\n';
       this.stack += '          |\n';
+      this.stack += `          Status: ${this.status}\n`;
+
+      this.stack += !this.controller ? '' : `          Controller: ${this.controller}\n`;
+      this.stack += !this.action ? '' : `          Action: ${this.action}\n`;
+
       this.stack += `          ${protocol}\n`;
       this.stack += '          |\n';
       this.stack += '          |\n';
