@@ -1,4 +1,4 @@
-name: Deployment Doc Prod
+name: Push to main branch
 
 on:
   push:
@@ -125,7 +125,7 @@ jobs:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   documentation-production:
-    name: Deployment Doc Prod
+    name: Deploy Doc to PROD
     runs-on: ubuntu-18.04
     needs: [functional-tests, documentation-snippet-tests]
     steps:
@@ -138,6 +138,7 @@ jobs:
         run: |
           echo "::set-output name=version::$(git describe --abbrev=0 --tags | cut -d. -f 1)"
           echo "::set-output name=repo::$(echo $GITHUB_REPOSITORY | cut -d/ -f 2)"
+          echo "::set-output name=branch::$(echo $GITHUB_REF | cut -d/ -f 3)"
       - uses: convictional/trigger-workflow-and-wait@v1.3.0
         with:
           owner: kuzzleio
@@ -145,8 +146,8 @@ jobs:
           github_token: ${{ secrets.ACCESS_TOKEN_CI }}
           workflow_file_name: child_repo.workflow.yml
           ref: master
-          inputs: '{"repo_name": "${{ steps.extract-refs.outputs.repo }}", "branch": "${{ github.head_ref }}", "version": "${{ steps.extract-refs.outputs.version }}"}'
-  
+          inputs: '{"repo_name": "${{ steps.extract-refs.outputs.repo }}", "branch": "${{ steps.extract-refs.outputs.branch }}", "version": "${{ steps.extract-refs.outputs.version }}"}'
+
   npm-deploy:
     name: Publish Package to NPM.js
     runs-on: ubuntu-18.04
