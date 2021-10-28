@@ -1,6 +1,7 @@
 'use strict';
 
 import { hilightUserCode } from './utils/stackTrace';
+import { RequestPayload } from './types/RequestPayload';
 
 /**
  * Standard Kuzzle error.
@@ -58,6 +59,12 @@ export class KuzzleError extends Error {
    * request id
    */
   public requestId?: string;
+
+  /**
+   * Document unique identifier
+   */
+  public _id?: string;
+
   /**
    * Associated errors
    * (PartialError only)
@@ -89,7 +96,7 @@ export class KuzzleError extends Error {
     >    at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
-  constructor (apiError, sdkStack: string, protocol: string, request?) {
+  constructor (apiError, sdkStack: string, protocol: string, request?: RequestPayload) {
     super(apiError.message);
     this.status = apiError.status;
 
@@ -103,6 +110,7 @@ export class KuzzleError extends Error {
       this.index = request.index;
       this.volatile = request.volatile;
       this.requestId = request.requestId;
+      this._id = request._id;
     }
 
     // PartialError
@@ -120,8 +128,7 @@ export class KuzzleError extends Error {
       this.stack += '          |\n';
       this.stack += `          Status: ${this.status}\n`;
 
-      this.stack += !this.controller ? '' : `          Controller: ${this.controller}\n`;
-      this.stack += !this.action ? '' : `          Action: ${this.action}\n`;
+      this.stack += !this.controller && !this.action ? '' : `          Http: ${this.controller}:${this.action}\n`;
 
       this.stack += `          ${protocol}\n`;
       this.stack += '          |\n';

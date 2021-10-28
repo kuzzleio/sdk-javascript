@@ -132,7 +132,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
     this.clear();
   }
 
-  query (request, options) {
+  query (request: RequestPayload, options) {
     if (!this.isReady()) {
       this.emit('discarded', request);
       return Promise.reject(new Error(`Unable to execute request: not connected to a Kuzzle server.

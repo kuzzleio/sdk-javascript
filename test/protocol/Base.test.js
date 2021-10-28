@@ -191,7 +191,7 @@ describe('Common Protocol', () => {
         });
     });
 
-    it('should reject an error with more context', () => {
+    it('should reject an error with more context', async () => {
       const response = {
         error: {
           status: 404,
@@ -207,7 +207,7 @@ describe('Common Protocol', () => {
         controller: 'foo',
         action: 'bar',
         index: 'test',
-        volatile: new Object(),
+        volatile: {},
         collection: 'toto',
         response: response,
       };
@@ -230,6 +230,8 @@ describe('Common Protocol', () => {
           should(error.stack).match(/NotFoundError: API action "foo":"bar" not found/);
           should(error.stack).match(/KuzzleAbstractProtocol/);
           should(error.stack).match(/>\s{4}at Context.<anonymous>/);
+          should(error.stack).match(/Http: foo:bar/);
+          should(error.stack).match(/Status: 404/);
         });
     });
 
