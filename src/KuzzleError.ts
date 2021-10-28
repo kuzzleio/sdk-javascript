@@ -88,7 +88,6 @@ export class KuzzleError extends Error {
           at Funnel.processRequest (/home/aschen/projets/kuzzleio/kuzzle/lib/api/funnel.js:423:34)
               |
               |
-              Http: foo:bar
               HttpProtocol
               |
               |
