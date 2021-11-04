@@ -126,9 +126,6 @@ export class KuzzleError extends Error {
       this.stack = apiError.stack + '\n';
       this.stack += '          |\n';
       this.stack += '          |\n';
-
-      this.stack += !this.controller && !this.action ? '' : `          Http: ${this.controller}:${this.action}\n`;
-
       this.stack += `          ${protocol}\n`;
       this.stack += '          |\n';
       this.stack += '          |\n';
