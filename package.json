@@ -2,7 +2,7 @@
   "name": "kuzzle-sdk",
   "version": "7.7.5",
   "description": "Official Javascript SDK for Kuzzle",
-  "author": "The Kuzzle Team <support@kuzzle.io",
+  "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
     "type": "git",
     "url": "https://github.com/kuzzleio/sdk-javascript.git"
