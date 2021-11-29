@@ -1,7 +1,6 @@
 import { Kuzzle } from '../Kuzzle';
 import { RealtimeDocument } from './RealtimeDocument';
 import { Document, DocumentNotification, JSONObject } from '../types';
-import { SearchResult } from './searchResult/SearchResultBase';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
 
 class CollectionSubscription extends Set<string> {
@@ -34,17 +33,29 @@ export class Observer {
     this.sdk = sdk;
   }
 
-  stop (index: string, collection: string, document: { _id: string }) {
-    const urn = documentUrn(index, collection, document._id);
-    const rtDocument = this.documents.get(urn);
-
-    if (! rtDocument) {
-      return;
-    }
-
+  stop (index: string, collection: string, documents?: Array<{ _id: string }>) {
     const subscription = this.collections.get(collectionUrn(index, collection));
 
-    subscription.delete(document._id);
+    if (! documents) {
+      for (const documentId of subscription.values()) {
+        this.documents.delete(documentUrn(index, collection, documentId));
+      }
+
+      this.collections.delete(collectionUrn(index, collection))
+
+      return this.sdk.realtime.unsubscribe(subscription.roomId);
+    }
+
+    for (const document of documents) {
+      const urn = documentUrn(index, collection, document._id);
+      const rtDocument = this.documents.get(urn);
+
+      if (! rtDocument) {
+        continue;
+      }
+
+      subscription.delete(document._id);
+    }
 
     return this.resubscribe(index, collection);
   }
@@ -69,7 +80,7 @@ export class Observer {
    *
    * @param index Index name
    * @param collection Collection name
-   * @param _id Document ID
+   * @param id Document ID
    *
    * @returns The realtime document
    */

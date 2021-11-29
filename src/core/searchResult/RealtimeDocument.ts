@@ -5,12 +5,6 @@ import { Observer } from '../Observer';
 export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> {
   private observer: Observer;
 
-  /**
-   * @param {Kuzzle} kuzzle
-   * @param {object} request
-   * @param {object} options
-   * @param {object} result
-   */
   constructor (kuzzle, request, options, result, observer: Observer) {
     super(kuzzle, request, options, result);
 
