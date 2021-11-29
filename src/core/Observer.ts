@@ -3,9 +3,26 @@ import { RealtimeDocument } from './RealtimeDocument';
 import { Document, DocumentNotification, JSONObject } from '../types';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
 
-class CollectionSubscription extends Set<string> {
+/**
+ * Class based on a Set<string> that holds the observed documents IDs of
+ * a specific collection.
+ */
+class ObservedDocuments extends Set<string> {
+  /**
+   * Room ID for the realtime subscription on the collection of observed documents
+   */
   public roomId: string = null;
 
+  /**
+   * Gets documents IDs
+   */
+  ids () {
+    return this.values();
+  }
+
+  /**
+   * Gets Koncorde filters for observed documents
+   */
   get filters () {
     return {
       ids: { values: Array.from(this.values()) }
@@ -24,26 +41,58 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
   return `${index}:${collection}`;
 }
 
+/**
+ * The Observer class allows to manipulate realtime documents.
+ *
+ * A RealtimeDocument is like a normal Document from Kuzzle except that it is
+ * connected to the realtime engine and it's content will change with changes
+ * occuring on the database.
+ *
+ * Realtime documents are resources that should be disposed either with the
+ * stop() or the dispose() method otherwise subscriptions will never be
+ * terminated, documents will be keep into memory and you will end with a
+ * memory leak.
+ */
 export class Observer {
-  private collections = new Map<CollectionUrn, CollectionSubscription>();
+  /**
+   * Map used to keep track of the observed documents ids by collections.
+   */
+  private documentsBycollections = new Map<CollectionUrn, ObservedDocuments>();
+
+  /**
+   * Map containing the list of realtime documents managed by this observer.
+   *
+   * This map is used to update realtime documents content when notifications
+   * are received.
+   */
   private documents = new Map<DocumentUrn, RealtimeDocument>();
   private sdk: Kuzzle;
 
   constructor (sdk: Kuzzle) {
-    this.sdk = sdk;
+    Reflect.defineProperty(this, 'sdk', {
+      value: sdk
+    });
   }
 
-  stop (index: string, collection: string, documents?: Array<{ _id: string }>) {
-    const subscription = this.collections.get(collectionUrn(index, collection));
+  /**
+   * Stop observing a list of documents or all the realtime documents
+   * of a collection.
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param documents Array of documents (optional)
+   */
+  stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<void> {
+    const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
 
     if (! documents) {
-      for (const documentId of subscription.values()) {
-        this.documents.delete(documentUrn(index, collection, documentId));
+      for (const id of observedDocuments.ids()) {
+        this.documents.delete(documentUrn(index, collection, id));
       }
 
-      this.collections.delete(collectionUrn(index, collection))
+      this.documentsBycollections.delete(collectionUrn(index, collection))
 
-      return this.sdk.realtime.unsubscribe(subscription.roomId);
+      return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
     }
 
     for (const document of documents) {
@@ -54,22 +103,25 @@ export class Observer {
         continue;
       }
 
-      subscription.delete(document._id);
+      observedDocuments.delete(document._id);
     }
 
     return this.resubscribe(index, collection);
   }
 
+  /**
+   * Unsubscribe from every collections and clear all the realtime documents.
+   */
   dispose () {
     const promises = [];
 
-    for (const subscription of this.collections.values()) {
+    for (const subscription of this.documentsBycollections.values()) {
       if (subscription.roomId) {
         promises.push(this.sdk.realtime.unsubscribe(subscription.roomId));
       }
     }
 
-    this.collections.clear();
+    this.documentsBycollections.clear();
     this.documents.clear();
 
     return Promise.all(promises);
@@ -129,6 +181,23 @@ export class Observer {
       .then(() => ({ successes: rtDocuments, errors: _errors }));
   }
 
+  /**
+   * Searches for documents and returns a SearchResult containing realtime
+   * documents.
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param searchBody Search query
+   * @param options Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `from` Offset of the first document to fetch
+   *    - `size` Maximum number of documents to retrieve per page
+   *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
+   *    - `verb` (HTTP only) Forces the verb of the route
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns A SearchResult containing realtime documents
+   */
   search (
     index: string,
     collection: string,
@@ -155,6 +224,15 @@ export class Observer {
       });
   }
 
+  /**
+   * Retrieve a realtime document from a document
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param document Document to observe
+   *
+   * @returns A realtime document
+   */
   observe (
     index: string,
     collection: string,
@@ -166,16 +244,23 @@ export class Observer {
       .then(() => rtDocument);
   }
 
+  /**
+   * Adds a document and retrieve managed realtime document
+   *
+   * @internal
+   *
+   * Use observe() to retrieve a realtime document.
+   */
   addDocument (index: string, collection: string, document: Document): RealtimeDocument {
     const rtDocument = new RealtimeDocument(document);
 
     const urn = collectionUrn(index, collection);
 
-    if (! this.collections.has(urn)) {
-      this.collections.set(urn, new CollectionSubscription());
+    if (! this.documentsBycollections.has(urn)) {
+      this.documentsBycollections.set(urn, new ObservedDocuments());
     }
 
-    const subscription = this.collections.get(urn);
+    const subscription = this.documentsBycollections.get(urn);
 
     subscription.add(document._id);
 
@@ -184,11 +269,15 @@ export class Observer {
     return rtDocument;
   }
 
-  resubscribe (index: string, collection: string) {
-    let _roomId;
-
-    const subscription = this.collections.get(collectionUrn(index, collection));
-
+  /**
+   * Renew a collection subscription with filters according to the list of
+   * currently managed documents.
+   *@
+   * @internal
+   */
+  resubscribe (index: string, collection: string): Promise<void> {
+    const subscription = this.documentsBycollections.get(collectionUrn(index, collection));
+    // @todo do not resubscribe if no documents
     return this.sdk.realtime.subscribe(
       index,
       collection,
@@ -196,20 +285,20 @@ export class Observer {
       this.notificationHandler.bind(this)
     )
       .then(roomId => {
-        _roomId = roomId;
+        const oldRoomId = subscription.roomId;
 
-        if (subscription.roomId) {
-          return this.sdk.realtime.unsubscribe(subscription.roomId);
+        subscription.roomId = roomId;
+
+        if (oldRoomId) {
+          return this.sdk.realtime.unsubscribe(oldRoomId);
         }
-
-        return null;
-      })
-      .then(() => {
-        subscription.roomId = _roomId;
       });
   }
 
-  private notificationHandler (notification: DocumentNotification) {
+  /**
+   * Handler method to process notification and update realtime documents content.
+   */
+  private notificationHandler (notification: DocumentNotification): Promise<void> {
     const { index, collection, result } = notification;
 
     const urn = documentUrn(index, collection, result._id);

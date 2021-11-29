@@ -11,7 +11,9 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
     this._searchAction = 'search';
     this._scrollAction = 'scroll';
 
-    this.observer = observer;
+    Reflect.defineProperty(this, 'observer', {
+      value: observer
+    });
   }
 
   start (): Promise<RealtimeDocumentSearchResult> {
@@ -27,6 +29,10 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
 
     return this.observer.resubscribe(index, collection)
       .then(() => this);
+  }
+
+  next (): Promise<RealtimeDocumentSearchResult> {
+    return super.next() as any;
   }
 
   protected _buildNextSearchResult (result: RealtimeDocumentSearchResult) {
