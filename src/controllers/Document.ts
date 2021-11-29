@@ -860,7 +860,7 @@ export class DocumentController extends BaseController {
    *
    * @param index Index name
    * @param collection Collection name
-   * @param query Search query
+   * @param searchBody Search query
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `from` Offset of the first document to fetch
@@ -874,7 +874,7 @@ export class DocumentController extends BaseController {
   search (
     index: string,
     collection: string,
-    query: JSONObject = {},
+    searchBody: JSONObject = {},
     options: {
       queuable?: boolean;
       from?: number;
@@ -885,7 +885,7 @@ export class DocumentController extends BaseController {
       timeout?: number;
     } = {}
   ): Promise<SearchResult<DocumentHit>> {
-    return this._search(index, collection, query, options)
+    return this._search(index, collection, searchBody, options)
       .then(({ response, request, opts }) => (
         new DocumentSearchResult(this.kuzzle, request, opts, response.result)
       ));
