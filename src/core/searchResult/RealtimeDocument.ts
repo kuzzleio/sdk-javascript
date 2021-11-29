@@ -20,9 +20,22 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
     this.observer = observer;
   }
 
-  protected _buildNextSearchResult (result: RealtimeDocumentSearchResult) {
+  start (): Promise<RealtimeDocumentSearchResult> {
     const { index, collection } = this._request;
 
+    const rtDocuments = [];
+
+    for (const hit of this.hits) {
+      rtDocuments.push(this.observer.addDocument(index, collection, hit));
+    }
+
+    this.hits = rtDocuments;
+
+    return this.observer.resubscribe(index, collection)
+      .then(() => this);
+  }
+
+  protected _buildNextSearchResult (result: RealtimeDocumentSearchResult) {
     const nextSearchResult = new RealtimeDocumentSearchResult(
       this._kuzzle,
       this._request,
@@ -32,13 +45,6 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
 
     nextSearchResult.fetched += this.fetched;
 
-    const rtDocuments = [];
-    for (const hit of nextSearchResult.hits) {
-      rtDocuments.push(this.observer.addDocument(index, collection, hit));
-    }
-    nextSearchResult.hits = rtDocuments;
-
-    return this.observer.resubscribe(index, collection)
-      .then(() => nextSearchResult);
+    return this.start();
   }
 }

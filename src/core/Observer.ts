@@ -130,27 +130,18 @@ export class Observer {
       verb?: string;
       timeout?: number;
     } = {}
-  ): Promise<SearchResult<RealtimeDocument>> {
-    let result;
-
+  ): Promise<RealtimeDocumentSearchResult> {
     return this.sdk.document['_search'](index, collection, searchBody, options)
       .then(({ response, request, opts }) => {
-        result = new RealtimeDocumentSearchResult(
+        const result = new RealtimeDocumentSearchResult(
           this.sdk,
           request,
           opts,
           response.result,
           this);
 
-        const rtDocuments = [];
-        for (const hit of result.hits) {
-          rtDocuments.push(this.addDocument(index, collection, hit));
-        }
-        result.hits = rtDocuments;
-
-        return this.resubscribe(index, collection)
-      })
-      .then(() => result);
+        return result.start();
+      });
   }
 
   observe (
