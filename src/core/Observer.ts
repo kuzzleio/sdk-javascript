@@ -44,7 +44,7 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
 /**
  * The Observer class allows to manipulate realtime documents.
  *
- * A {@linkcode RealtimeDocument} is like a normal document from Kuzzle except that it is
+ * A RealtimeDocument is like a normal document from Kuzzle except that it is
  * connected to the realtime engine and it's content will change with changes
  * occuring on the database.
  *
@@ -65,8 +65,6 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
  * A good frontend practice is to instantiate one observer for the actual page
  * and/or component(s) displaying realtime documents and to dispose them when
  * they are not displayed anymore.
- *
- * @module Observer
  */
 export class Observer {
   /**
@@ -103,24 +101,16 @@ export class Observer {
   }
 
   /**
-   * Stop observing a list of documents or all the documents of a collection.
+   * Stop observing documents and release associated ressources.
+   *
+   * Can be used either with:
+   *  - a list of documents from a collection: stop observing those documents
+   *  - a collection: stop observing all documents in the collection
    *
    * @param index Index name
    * @param collection Collection name
    * @param documents Array of documents
    *
-   * @category dispose realtime documents
-   *
-   * @example
-   *
-   * ```js
-   * const docs = await observer.mGet('nyc-open-data', 'yellow-taxi', ['foobar', 'barfoo']);
-   *
-   * await observer.stop('nyc-open-data', 'yellow-taxi', docs);
-   *
-   * // Or stop observing every documents of a collection
-   * await observer.stop('nyc-open-data', 'yellow-taxi');
-   * ```
    */
   stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<void> {
     const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));

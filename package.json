@@ -46,7 +46,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "min-req-promise": "^1.0.1",
-    "typedoc": "^0.22.10",
     "ws": "^7.4.6"
   },
   "devDependencies": {
