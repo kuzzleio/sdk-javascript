@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import { JSONObject } from '../types';
+import { JSONObject, ArgsDefault } from '../types';
 
 export class IndexController extends BaseController {
 
@@ -19,10 +19,7 @@ export class IndexController extends BaseController {
    */
   create (
     index: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerCreate = {}
   ): Promise<void> {
     const request = {
       index,
@@ -44,10 +41,7 @@ export class IndexController extends BaseController {
    */
   delete (
     index: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerDelete = {}
   ): Promise<void> {
     const request = {
       index,
@@ -69,10 +63,7 @@ export class IndexController extends BaseController {
    */
   exists (
     index: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerExists = {}
   ): Promise<boolean> {
     return this.query({
       index,
@@ -91,10 +82,7 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   list (
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerList = {}
   ): Promise<Array<string>> {
     return this.query({
       action: 'list'
@@ -116,10 +104,7 @@ export class IndexController extends BaseController {
    */
   mDelete (
     indexes: Array<string>,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerMDelete = {}
   ): Promise<Array<string>> {
     const request = {
       action: 'mDelete',
@@ -142,14 +127,29 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   stats (
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsIndexControllerStats = {}
   ): Promise<JSONObject> {
     return this.query({
       action: 'stats'
     }, options)
       .then(response => response.result);
   }
+}
+
+export interface ArgsIndexControllerCreate extends ArgsDefault {
+}
+
+export interface ArgsIndexControllerDelete extends ArgsDefault {
+}
+
+export interface ArgsIndexControllerExists extends ArgsDefault {
+}
+
+export interface ArgsIndexControllerList extends ArgsDefault {
+}
+
+export interface ArgsIndexControllerMDelete extends ArgsDefault {
+}
+
+export interface ArgsIndexControllerStats extends ArgsDefault {
 }

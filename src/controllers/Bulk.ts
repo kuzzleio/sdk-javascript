@@ -1,5 +1,5 @@
 import { BaseController } from './Base';
-import { JSONObject } from '../types';
+import { JSONObject, ArgsDefault } from '../types';
 
 export class BulkController extends BaseController {
   constructor (kuzzle) {
@@ -28,11 +28,7 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsBulkControllerDeleteByQuery = {}
   ): Promise<number> {
     const request = {
       index,
@@ -63,10 +59,7 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     bulkData: Array<JSONObject>,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsBulkControllerImport = {}
   ): Promise<{
     /**
      * Array of successfully executed actions
@@ -144,10 +137,7 @@ export class BulkController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: {
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsBulkControllerUpdateByQuery = {}
   ): Promise<number> {
     const request = {
       index,
@@ -182,12 +172,7 @@ export class BulkController extends BaseController {
     collection: string,
     document: JSONObject,
     id?: string,
-    options: {
-      queuable?: boolean,
-      notify?: boolean,
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
     return this.query({
       index,
@@ -229,12 +214,7 @@ export class BulkController extends BaseController {
        */
       _source: JSONObject;
     }>,
-    options: { 
-      queuable?: boolean,
-      notify?: boolean,
-      refresh?: 'wait_for',
-      timeout?: number
-    } = {}
+    options: ArgsBulkControllerMWrite = {}
   ): Promise<{
     /**
      * Array of successfully created/replaced documents
@@ -267,4 +247,25 @@ export class BulkController extends BaseController {
     }, options)
       .then(response => response.result);
   }
+}
+
+export interface ArgsBulkControllerDeleteByQuery extends ArgsDefault {
+    refresh?: 'wait_for';
+}
+
+export interface ArgsBulkControllerImport extends ArgsDefault {
+}
+
+export interface ArgsBulkControllerUpdateByQuery extends ArgsDefault {
+    refresh?: 'wait_for';
+}
+
+export interface ArgsBulkControllerWrite extends ArgsDefault {
+    notify?: boolean;
+    refresh?: 'wait_for';
+}
+
+export interface ArgsBulkControllerMWrite extends ArgsDefault {
+    notify?: boolean;
+    refresh?: 'wait_for';
 }

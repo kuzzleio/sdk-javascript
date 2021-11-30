@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import Room from '../core/Room';
-import { Notification, JSONObject } from '../types';
+import { Notification, JSONObject, ArgsDefault } from '../types';
 
 /**
  * Enum for `scope` option of realtime.subscribe method
@@ -80,10 +80,7 @@ export class RealtimeController extends BaseController {
    */
   count (
     roomId: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsRealtimeControllerCount = {}
   ): Promise<number> {
     return this.query({
       action: 'count',
@@ -112,11 +109,7 @@ export class RealtimeController extends BaseController {
     index: string,
     collection: string,
     message: JSONObject,
-    options: {
-      queuable?: boolean,
-      _id?: string,
-      timeout?: number
-    } = {}
+    options: ArgsRealtimeControllerPublish = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -156,25 +149,7 @@ export class RealtimeController extends BaseController {
     collection: string,
     filters: JSONObject,
     callback: (notification: Notification) => void | Promise<void>,
-    options: {
-      /**
-       * Subscribe to document entering or leaving the scope. (default: 'all')
-       */
-      scope?: ScopeOption;
-      /**
-       * Subscribe to users entering or leaving the room. (default: 'none')
-       */
-      users?: UserOption;
-      /**
-       * Subscribe to notifications fired by our own queries. (default: true)
-       */
-      subscribeToSelf?: boolean;
-      /**
-       * Subscription information sent alongside notifications
-       */
-      volatile?: JSONObject;
-      timeout?: number;
-    } = {}
+    options: ArgsRealtimeControllerSubscribe = {}
   ): Promise<string> {
     const room = new Room(this, index, collection, filters, callback, options);
 
@@ -198,10 +173,7 @@ export class RealtimeController extends BaseController {
    */
   unsubscribe (
     roomId: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsRealtimeControllerUnsubscribe = {}
   ): Promise<void> {
     const request = {
       action: 'unsubscribe',
@@ -288,4 +260,21 @@ export class RealtimeController extends BaseController {
     this._subscriptions = new Map();
     this._subscriptionsOff = new Map();
   }
+}
+
+export interface ArgsRealtimeControllerCount extends ArgsDefault {
+}
+
+export interface ArgsRealtimeControllerPublish extends ArgsDefault {
+    _id?: string;
+}
+
+export interface ArgsRealtimeControllerSubscribe extends ArgsDefault {
+    scope?: ScopeOption;
+    users?: UserOption;
+    subscribeToSelf?: boolean;
+    volatile?: JSONObject;
+}
+
+export interface ArgsRealtimeControllerUnsubscribe extends ArgsDefault {
 }

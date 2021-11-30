@@ -1,7 +1,7 @@
 import { BaseController } from './Base';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { DocumentSearchResult } from '../core/searchResult/Document';
-import { JSONObject, Document, DocumentHit } from '../types';
+import { JSONObject, Document, DocumentHit, ArgsDefault } from '../types';
 
 export class DocumentController extends BaseController {
   constructor (kuzzle) {
@@ -29,10 +29,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     body?: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerCount = {}
   ): Promise<number> {
     const request = {
       index,
@@ -67,12 +64,7 @@ export class DocumentController extends BaseController {
     collection: string,
     content: JSONObject,
     _id: string = null,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerCreate = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -110,12 +102,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerCreateOrReplace = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -150,12 +137,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerDelete = {}
   ): Promise<number> {
     const request = {
       index,
@@ -190,13 +172,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: {
-      queuable?: boolean,
-      refresh?: string,
-      silent?: boolean,
-      lang?: string,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerDeleteByQuery = {}
   ): Promise<Array<string>> {
     const request = {
       index,
@@ -233,13 +209,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     fields: string[],
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      source?: boolean,
-      timeout?: number,
-    } = {}
+    options: ArgsDocumentControllerDeleteFields = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -275,12 +245,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerExists = {}
   ): Promise<boolean> {
     const request = {
       index,
@@ -313,12 +278,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerGet = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -361,13 +321,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number,
-      strict?: boolean
-    } = {}
+    options: ArgsDocumentControllerMCreate = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -434,13 +388,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number,
-      strict?: boolean
-    } = {}
+    options: ArgsDocumentControllerMCreateOrReplace = {}
   ): Promise<{
     /**
      * Array of successfully created documents
@@ -498,13 +446,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number,
-      strict?: boolean
-    } = {}
+    options: ArgsDocumentControllerMDelete = {}
   ): Promise<{
     /**
      * Array of successfully deleted documents IDS
@@ -556,11 +498,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: Array<string>,
-    options: {
-      queuable?: boolean,
-      verb?: string,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerMGet = {}
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -612,13 +550,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number,
-      strict?: boolean
-    } = {}
+    options: ArgsDocumentControllerMReplace = {}
   ): Promise<{
     /**
      * Array of successfully replaced documents
@@ -689,14 +621,7 @@ export class DocumentController extends BaseController {
        */
       body: JSONObject;
     }>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      retryOnConflict?: number,
-      timeout?: number
-      strict?: boolean,
-    } = {}
+    options: ArgsDocumentControllerMUpdate = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -768,13 +693,7 @@ export class DocumentController extends BaseController {
        */
       default: JSONObject
     }>,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      retryOnConflict?: number,
-      strict?: boolean
-    } = {}
+    options: ArgsDocumentControllerMUpsert = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -833,12 +752,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerReplace = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -875,15 +789,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     searchBody: JSONObject = {},
-    options: {
-      queuable?: boolean;
-      from?: number;
-      size?: number;
-      scroll?: string;
-      lang?: string;
-      verb?: string;
-      timeout?: number;
-    } = {}
+    options: ArgsDocumentControllerSearch = {}
   ): Promise<SearchResult<DocumentHit>> {
     return this._search(index, collection, searchBody, options)
       .then(({ response, request, opts }) => (
@@ -945,14 +851,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: JSONObject,
-    options: {
-      queuable?: boolean,
-      refresh?: 'wait_for',
-      silent?: boolean,
-      retryOnConflict?: number,
-      source?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerUpdate = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -992,13 +891,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: {
-      refresh?: 'wait_for',
-      silent?: boolean,
-      source?: boolean,
-      lang?: string,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerUpdateByQuery = {}
   ): Promise<{
     /**
      * Array of successfully updated documents
@@ -1059,14 +952,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     changes: JSONObject,
-    options: {
-      default?: JSONObject;
-      refresh?: string,
-      silent?: boolean,
-      retryOnConflict?: boolean,
-      source?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerUpsert = {}
   ): Promise<Document> {
     const request = {
       index,
@@ -1100,10 +986,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     content: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsDocumentControllerValidate = {}
   ): Promise<boolean> {
     return this.query({
       index,
@@ -1113,4 +996,124 @@ export class DocumentController extends BaseController {
     }, options)
       .then(response => response.result);
   }
+}
+
+export interface ArgsDocumentControllerCount extends ArgsDefault {
+}
+
+export interface ArgsDocumentControllerCreate extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerCreateOrReplace extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerDelete extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerDeleteByQuery extends ArgsDefault {
+    refresh?: string;
+    silent?: boolean;
+    lang?: string;
+}
+
+export interface ArgsDocumentControllerDeleteFields extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    source?: boolean;
+}
+
+export interface ArgsDocumentControllerExists extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerGet extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerMCreate extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerMCreateOrReplace extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerMDelete extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerMGet extends ArgsDefault {
+    verb?: string;
+}
+
+export interface ArgsDocumentControllerMReplace extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerMUpdate extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    retryOnConflict?: number;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerMUpsert extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    retryOnConflict?: number;
+    strict?: boolean;
+}
+
+export interface ArgsDocumentControllerReplace extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+}
+
+export interface ArgsDocumentControllerSearch extends ArgsDefault {
+    from?: number;
+    size?: number;
+    scroll?: string;
+    lang?: string;
+    verb?: string;
+}
+
+export interface ArgsDocumentControllerUpdate extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    retryOnConflict?: number;
+    source?: boolean;
+}
+
+export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
+    refresh?: 'wait_for';
+    silent?: boolean;
+    source?: boolean;
+    lang?: string;
+}
+
+export interface ArgsDocumentControllerUpsert extends ArgsDefault {
+    default?: JSONObject;
+    refresh?: string;
+    silent?: boolean;
+    retryOnConflict?: boolean;
+    source?: boolean;
+}
+
+export interface ArgsDocumentControllerValidate extends ArgsDefault {
 }

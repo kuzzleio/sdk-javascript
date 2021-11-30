@@ -2,6 +2,7 @@ import { Kuzzle } from '../Kuzzle';
 import { RealtimeDocument } from './RealtimeDocument';
 import { Document, DocumentNotification, JSONObject } from '../types';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
+import { ArgsDocumentControllerGet } from 'src/controllers/Document';
 
 /**
  * Class based on a Set<string> that holds the observed documents IDs of
@@ -167,11 +168,17 @@ export class Observer {
    * @param index Index name
    * @param collection Collection name
    * @param id Document ID
+   * @param options Additional options
    *
    * @returns The realtime document
    */
-  get (index: string, collection: string, id: string): Promise<RealtimeDocument> {
-    return this.sdk.document.get(index, collection, id)
+  get (
+    index: string,
+    collection: string,
+    id: string,
+    options: ArgsDocumentControllerGet = {}
+  ): Promise<RealtimeDocument> {
+    return this.sdk.document.get(index, collection, id, options)
       .then(document => this.observe(index, collection, document));
   }
 
