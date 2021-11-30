@@ -1,11 +1,22 @@
-import { SearchResultBase } from './SearchResultBase';
-import { DocumentHit } from '../../types';
+import { DocumentHit, JSONObject } from '../../types';
 import { Observer } from '../Observer';
+import { Kuzzle } from '../../Kuzzle';
+import { RequestPayload } from '../../types/RequestPayload';
+import { SearchResultBase } from './SearchResultBase';
 
+/**
+ * Represents a SearchResult containing realtime documents.
+ */
 export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> {
   private observer: Observer;
 
-  constructor (kuzzle, request, options, result, observer: Observer) {
+  constructor (
+    kuzzle: Kuzzle,
+    request: RequestPayload,
+    options: JSONObject,
+    result: JSONObject,
+    observer: Observer,
+  ) {
     super(kuzzle, request, options, result);
 
     this._searchAction = 'search';
@@ -16,6 +27,11 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
     });
   }
 
+  /**
+   * Start observing documents
+   *
+   * @internal
+   */
   start (): Promise<RealtimeDocumentSearchResult> {
     const { index, collection } = this._request;
 

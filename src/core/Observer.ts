@@ -44,18 +44,35 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
 /**
  * The Observer class allows to manipulate realtime documents.
  *
- * A RealtimeDocument is like a normal Document from Kuzzle except that it is
+ * A {@linkcode RealtimeDocument} is like a normal document from Kuzzle except that it is
  * connected to the realtime engine and it's content will change with changes
  * occuring on the database.
+ *
+ * They can be retrieved using methods with the same syntax as in the Document
+ * Controller:
+ *
+ * ```js
+ * const docs = await observer.get('montenegro', 'budva', 'foobar');
+ *
+ * const result = await observer.search('montenegro', 'budva', { query: { exists: 'beaches' } });
+ * ```
  *
  * Realtime documents are resources that should be disposed either with the
  * stop() or the dispose() method otherwise subscriptions will never be
  * terminated, documents will be keep into memory and you will end with a
  * memory leak.
+ *
+ * A good frontend practice is to instantiate one observer for the actual page
+ * and/or component(s) displaying realtime documents and to dispose them when
+ * they are not displayed anymore.
+ *
+ * @module Observer
  */
 export class Observer {
   /**
    * Map used to keep track of the observed documents ids by collections.
+   *
+   * @internal
    */
   private documentsBycollections = new Map<CollectionUrn, ObservedDocuments>();
 
@@ -64,10 +81,21 @@ export class Observer {
    *
    * This map is used to update realtime documents content when notifications
    * are received.
+   *
+   * @internal
    */
   private documents = new Map<DocumentUrn, RealtimeDocument>();
+
+  /**
+   * @internal
+   */
   private sdk: Kuzzle;
 
+  /**
+   * Instantiate a new Observer
+   *
+   * @param sdk SDK instance
+   */
   constructor (sdk: Kuzzle) {
     Reflect.defineProperty(this, 'sdk', {
       value: sdk
@@ -75,12 +103,24 @@ export class Observer {
   }
 
   /**
-   * Stop observing a list of documents or all the realtime documents
-   * of a collection.
+   * Stop observing a list of documents or all the documents of a collection.
    *
    * @param index Index name
    * @param collection Collection name
-   * @param documents Array of documents (optional)
+   * @param documents Array of documents
+   *
+   * @category dispose realtime documents
+   *
+   * @example
+   *
+   * ```js
+   * const docs = await observer.mGet('nyc-open-data', 'yellow-taxi', ['foobar', 'barfoo']);
+   *
+   * await observer.stop('nyc-open-data', 'yellow-taxi', docs);
+   *
+   * // Or stop observing every documents of a collection
+   * await observer.stop('nyc-open-data', 'yellow-taxi');
+   * ```
    */
   stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<void> {
     const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
@@ -111,6 +151,8 @@ export class Observer {
 
   /**
    * Unsubscribe from every collections and clear all the realtime documents.
+   *
+   * @category dispose realtime documents
    */
   dispose () {
     const promises = [];
@@ -130,6 +172,8 @@ export class Observer {
   /**
    * Gets a realtime document
    *
+   * @category to get realtime documents
+   *
    * @param index Index name
    * @param collection Collection name
    * @param id Document ID
@@ -144,6 +188,8 @@ export class Observer {
   /**
    *
    * Gets multiple realtime documents.
+   *
+   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -184,6 +230,8 @@ export class Observer {
   /**
    * Searches for documents and returns a SearchResult containing realtime
    * documents.
+   *
+   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -226,6 +274,8 @@ export class Observer {
 
   /**
    * Retrieve a realtime document from a document
+   *
+   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -272,12 +322,19 @@ export class Observer {
   /**
    * Renew a collection subscription with filters according to the list of
    * currently managed documents.
-   *@
+   *
    * @internal
    */
   resubscribe (index: string, collection: string): Promise<void> {
     const subscription = this.documentsBycollections.get(collectionUrn(index, collection));
-    // @todo do not resubscribe if no documents
+
+    // Do not resubscribe if there is no documents
+    if (subscription.size === 0) {
+      return subscription.roomId
+        ? this.sdk.realtime.unsubscribe(subscription.roomId)
+        : Promise.resolve();
+    }
+
     return this.sdk.realtime.subscribe(
       index,
       collection,
@@ -297,6 +354,8 @@ export class Observer {
 
   /**
    * Handler method to process notification and update realtime documents content.
+   *
+   * @internal
    */
   private notificationHandler (notification: DocumentNotification): Promise<void> {
     const { index, collection, result } = notification;
