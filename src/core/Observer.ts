@@ -7,6 +7,8 @@ import { ArgsDocumentControllerGet } from 'src/controllers/Document';
 /**
  * Class based on a Set<string> that holds the observed documents IDs of
  * a specific collection.
+ *
+ * @internal
  */
 class ObservedDocuments extends Set<string> {
   /**
@@ -111,9 +113,10 @@ export class Observer {
    * @param index Index name
    * @param collection Collection name
    * @param documents Array of documents
+   * @internal
    *
    */
-  stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<void> {
+  stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<Observer> {
     const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
 
     if (! documents) {
@@ -123,7 +126,7 @@ export class Observer {
 
       this.documentsBycollections.delete(collectionUrn(index, collection))
 
-      return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
+      return Promise.resolve(this);
     }
 
     for (const document of documents) {
@@ -137,7 +140,7 @@ export class Observer {
       observedDocuments.delete(document._id);
     }
 
-    return this.resubscribe(index, collection);
+    return Promise.resolve(this);
   }
 
   /**
