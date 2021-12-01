@@ -108,26 +108,39 @@ export class Observer {
    *
    * Can be used either with:
    *  - a list of documents from a collection: stop observing those documents
-   *  - a collection: stop observing all documents in the collection
+   *  - an index and collection: stop observing all documents in the collection
    *
    * @param index Index name
    * @param collection Collection name
    * @param documents Array of documents
-   * @internal
    *
    */
-  stop (index: string, collection: string, documents?: Array<{ _id: string }>): Promise<Observer> {
-    const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
-
-    if (! documents) {
-      for (const id of observedDocuments.ids()) {
-        this.documents.delete(documentUrn(index, collection, id));
-      }
-
-      this.documentsBycollections.delete(collectionUrn(index, collection))
-
-      return Promise.resolve(this);
+  stop (
+    index?: string,
+    collection?: string,
+    documents?: Array<{ _id: string }>
+  ): Promise<void> {
+    if (index && collection && documents) {
+      return this.disposeDocuments(index, collection, documents);
     }
+
+    if (index && collection) {
+      return this.disposeCollection(index, collection);
+    }
+
+    if (index) {
+      throw new Error('Missing "collection" argument"');
+    }
+
+    return this.disposeAll();
+  }
+
+  private disposeDocuments (
+    index: string,
+    collection: string,
+    documents: Array<{ _id: string }>
+  ): Promise<void> {
+    const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
 
     for (const document of documents) {
       const urn = documentUrn(index, collection, document._id);
@@ -140,15 +153,27 @@ export class Observer {
       observedDocuments.delete(document._id);
     }
 
-    return Promise.resolve(this);
+    return this.resubscribe(index, collection);
+  }
+
+  private disposeCollection (index: string, collection: string): Promise<void> {
+    const observedDocuments = this.documentsBycollections.get(collectionUrn(index, collection));
+
+    for (const id of observedDocuments.ids()) {
+      this.documents.delete(documentUrn(index, collection, id));
+    }
+
+    this.documentsBycollections.delete(collectionUrn(index, collection))
+
+    return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
   }
 
   /**
    * Unsubscribe from every collections and clear all the realtime documents.
    *
-   * @category dispose realtime documents
+   * @internal
    */
-  dispose () {
+  private disposeAll (): Promise<void> {
     const promises = [];
 
     for (const subscription of this.documentsBycollections.values()) {
@@ -160,13 +185,11 @@ export class Observer {
     this.documentsBycollections.clear();
     this.documents.clear();
 
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => {});
   }
 
   /**
    * Gets a realtime document
-   *
-   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -188,8 +211,6 @@ export class Observer {
   /**
    *
    * Gets multiple realtime documents.
-   *
-   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -230,8 +251,6 @@ export class Observer {
   /**
    * Searches for documents and returns a SearchResult containing realtime
    * documents.
-   *
-   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name
@@ -274,8 +293,6 @@ export class Observer {
 
   /**
    * Retrieve a realtime document from a document
-   *
-   * @category to get realtime documents
    *
    * @param index Index name
    * @param collection Collection name

@@ -3,11 +3,10 @@ require('ts-node/register')
 /* Script Arguments ==================================================== */
 
 const filePath = process.argv[2];
-const className = process.argv[3];
-const outDir = process.argv[4];
+const outDir = process.argv[3];
 
-if (! filePath || ! className || ! outDir) {
-  console.log(`Usage: node ${process.argv[1]} <file path> <class name> <out dir>`);
+if (! filePath || ! outDir) {
+  console.log(`Usage: node ${process.argv[1]} <file path> <out dir>`);
 }
 
 /* ===================================================================== */

@@ -71,6 +71,10 @@ export class ClassExtractor extends EventEmitter {
     for (const method of classDeclaration.getMethods()) {
       const jsDoc = method.getChildrenOfKind(SyntaxKind.JSDocComment)[0];
 
+      if (! jsDoc) {
+        continue;
+      }
+
       const name = method.getName();
 
       const description = this.formatText(jsDoc.getComment());
