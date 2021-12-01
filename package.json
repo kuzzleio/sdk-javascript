@@ -37,11 +37,11 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "lodash": "^4.17.21",
     "min-req-promise": "^1.0.1",
     "ws": "^8.2.2"
   },
   "devDependencies": {
+    "lodash": "^4.17.21",
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
     "@types/node": "^16.9.4",
