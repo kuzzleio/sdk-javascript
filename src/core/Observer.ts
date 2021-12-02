@@ -2,7 +2,7 @@ import { Kuzzle } from '../Kuzzle';
 import { RealtimeDocument } from './RealtimeDocument';
 import { Document, DocumentNotification, JSONObject } from '../types';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
-import { ArgsDocumentControllerGet } from 'src/controllers/Document';
+import { ArgsDocumentControllerGet, ArgsDocumentControllerMGet, ArgsDocumentControllerSearch } from 'src/controllers/Document';
 
 /**
  * Class based on a Set<string> that holds the observed documents IDs of
@@ -64,6 +64,10 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
  * stop() or the dispose() method otherwise subscriptions will never be
  * terminated, documents will be keep into memory and you will end with a
  * memory leak.
+ *
+ * ```js
+ * await observer.dispose('nyc-open-data', 'yellow-taxi');
+ * ```
  *
  * A good frontend practice is to instantiate one observer for the actual page
  * and/or component(s) displaying realtime documents and to dispose them when
@@ -215,13 +219,15 @@ export class Observer {
    * @param index Index name
    * @param collection Collection name
    * @param ids Document IDs
+   * @param options Additional options
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
   mGet (
     index: string,
     collection: string,
-    ids: string[]
+    ids: string[],
+    options: ArgsDocumentControllerMGet = {},
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -235,7 +241,7 @@ export class Observer {
     const rtDocuments = [];
     let _errors;
 
-    return this.sdk.document.mGet(index, collection, ids)
+    return this.sdk.document.mGet(index, collection, ids, options)
       .then(({ successes, errors }) => {
         _errors = errors;
 
@@ -256,12 +262,6 @@ export class Observer {
    * @param collection Collection name
    * @param searchBody Search query
    * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `from` Offset of the first document to fetch
-   *    - `size` Maximum number of documents to retrieve per page
-   *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
-   *    - `verb` (HTTP only) Forces the verb of the route
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A SearchResult containing realtime documents
    */
@@ -269,14 +269,7 @@ export class Observer {
     index: string,
     collection: string,
     searchBody: JSONObject = {},
-    options: {
-      from?: number;
-      size?: number;
-      scroll?: string;
-      lang?: string;
-      verb?: string;
-      timeout?: number;
-    } = {}
+    options: ArgsDocumentControllerSearch = {}
   ): Promise<RealtimeDocumentSearchResult> {
     return this.sdk.document['_search'](index, collection, searchBody, options)
       .then(({ response, request, opts }) => {
