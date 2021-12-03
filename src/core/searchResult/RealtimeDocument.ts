@@ -28,7 +28,9 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
   }
 
   /**
-   * Start observing documents
+   * Start observing documents.
+   *
+   * This method is called automatically.
    *
    * @internal
    */
