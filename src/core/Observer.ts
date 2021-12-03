@@ -167,7 +167,7 @@ export class Observer {
       this.documents.delete(documentUrn(index, collection, id));
     }
 
-    this.documentsBycollections.delete(collectionUrn(index, collection))
+    this.documentsBycollections.delete(collectionUrn(index, collection));
 
     return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
   }
@@ -189,6 +189,7 @@ export class Observer {
     this.documentsBycollections.clear();
     this.documents.clear();
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return Promise.all(promises).then(() => {});
   }
 
@@ -271,6 +272,7 @@ export class Observer {
     searchBody: JSONObject = {},
     options: ArgsDocumentControllerSearch = {}
   ): Promise<RealtimeDocumentSearchResult> {
+    // eslint-disable-next-line dot-notation
     return this.sdk.document['_search'](index, collection, searchBody, options)
       .then(({ response, request, opts }) => {
         const result = new RealtimeDocumentSearchResult(
