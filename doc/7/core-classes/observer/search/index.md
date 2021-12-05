@@ -13,7 +13,7 @@ Searches for documents and returns a SearchResult containing realtime
 documents.
 
 ::: info
-This method use the [Document.search](/sdk/js/7/controllers/document/search) method under the hood to retrieve documents.
+This method uses the [Document.search](/sdk/js/7/controllers/document/search) method under the hood to retrieve documents.
 :::
 
 ## Arguments

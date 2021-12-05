@@ -12,7 +12,7 @@ description: Observer get method
 Gets a realtime document
 
 ::: info
-This method use the [Document.get](/sdk/js/7/controllers/document/get) method under the hood to retrieve document.
+This method uses the [Document.get](/sdk/js/7/controllers/document/get) method under the hood to retrieve document.
 :::
 
 ## Arguments
