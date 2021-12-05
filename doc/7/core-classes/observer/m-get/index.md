@@ -13,7 +13,7 @@ description: Observer mGet method
 Gets multiple realtime documents.
 
 ::: info
-This method use the [Document.mGet](/sdk/js/7/controllers/document/m-get) method under the hood to retrieve documents.
+This method uses the [Document.mGet](/sdk/js/7/controllers/document/m-get) method under the hood to retrieve documents.
 :::
 
 ## Arguments

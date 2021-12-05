@@ -26,7 +26,7 @@ const result = await observer.search('nyc-open-data', 'yellow-taxi', {
 });
 ```
 
-Realtime documents are resources that should be disposed with the [Observer.dispose](/sdk/js/7/core-classes/observer/dispose) method otherwise subscriptions will never be terminated, documents will be keep into memory and you will end with amemory leak.
+Realtime documents are resources that should be disposed via the [Observer.dispose](/sdk/js/7/core-classes/observer/dispose) method otherwise subscriptions will never be terminated, documents will be kept into memory, which might lead to a memory leak.
 
 ```js
 await observer.dispose('nyc-open-data', 'yellow-taxi');
