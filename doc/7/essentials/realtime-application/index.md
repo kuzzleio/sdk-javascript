@@ -92,3 +92,12 @@ The Observer instance also keep a realtime subscription opened for each collecti
 Those ressources must be disposed with the [Observer.stop](/sdk/js/7/core-classes/observer/stop) otherwise your application will suffer from a memory leak.
 
 A good practice is to instantiate one observer per page or component using realtime documents and to call the [Observer.stop](/sdk/js/7/core-classes/observer/stop) without any arguments when the page or component is not displayed anymore.
+
+```js
+const observer = new Observer(sdk);
+
+let realtimeResult = await observer.search('nyc-open-data', 'yellow-taxi', { query }, options);
+
+// Dispose ressources for all managed realtime documents of this collection
+await observer.stop('nyc-open-data', 'yellow-taxi');
+```

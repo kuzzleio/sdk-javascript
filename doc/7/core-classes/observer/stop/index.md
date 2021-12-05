@@ -35,7 +35,7 @@ const observer = new Observer(sdk);
 
 const taxis = await observer.mGet('nyc-open-data', 'yellow-taxi', ['foo', 'bar']);
 
-await observer.dispose('nyc-open-data', 'yellow-taxi', taxis);
+await observer.stop('nyc-open-data', 'yellow-taxi', taxis);
 ```
 
 **Stop observing every documents of a collection:**
@@ -44,7 +44,7 @@ const observer = new Observer(sdk);
 
 let result = await observer.search('nyc-open-data', 'red-bus', {});
 
-await observer.dispose('nyc-open-data', 'red-bus');
+await observer.stop('nyc-open-data', 'red-bus');
 ```
 
 **Stop observing every documents:**
@@ -55,5 +55,5 @@ const taxis = await observer.mGet('nyc-open-data', 'yellow-taxi', ['foo', 'bar']
 
 let result = await observer.search('nyc-open-data', 'red-bus', {});
 
-await observer.dispose();
+await observer.stop();
 ```
