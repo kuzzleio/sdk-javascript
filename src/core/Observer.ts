@@ -368,7 +368,7 @@ export class Observer {
   }
 
   /**
-   * Handler method to process notification and update realtime documents content.
+   * Handler method to process notifications and update realtime documents content.
    *
    * @internal
    */
