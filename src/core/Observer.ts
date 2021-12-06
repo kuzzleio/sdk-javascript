@@ -36,10 +36,16 @@ class ObservedDocuments extends Set<string> {
 type DocumentUrn = string;
 type CollectionUrn = string;
 
+/**
+ * Provide an Uniform Resource Locator given an index, a collection and a document
+ */
 function documentUrn (index: string, collection: string, id: string): DocumentUrn {
   return `${index}:${collection}:${id}`;
 }
 
+/**
+ * Provide an Uniform Resource Locator given an index and a collection
+ */
 function collectionUrn (index: string, collection: string): CollectionUrn {
   return `${index}:${collection}`;
 }
@@ -79,7 +85,7 @@ export class Observer {
    *
    * @internal
    */
-  private documentsByCollections = new Map<CollectionUrn, ObservedDocuments>();
+  private documentsByCollection = new Map<CollectionUrn, ObservedDocuments>();
 
   /**
    * Map containing the list of realtime documents managed by this observer.
@@ -144,7 +150,7 @@ export class Observer {
     collection: string,
     documents: Array<{ _id: string }>
   ): Promise<void> {
-    const observedDocuments = this.documentsByCollections.get(collectionUrn(index, collection));
+    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
 
     for (const document of documents) {
       this.documents.delete(documentUrn(index, collection, document._id));
@@ -153,20 +159,20 @@ export class Observer {
     }
 
     if (observedDocuments.size === 0) {
-      this.documentsByCollections.delete(collectionUrn(index, collection));
+      this.documentsByCollection.delete(collectionUrn(index, collection));
     }
 
     return this.resubscribe(index, collection);
   }
 
   private disposeCollection (index: string, collection: string): Promise<void> {
-    const observedDocuments = this.documentsByCollections.get(collectionUrn(index, collection));
+    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
 
     for (const id of observedDocuments.ids) {
       this.documents.delete(documentUrn(index, collection, id));
     }
 
-    this.documentsByCollections.delete(collectionUrn(index, collection));
+    this.documentsByCollection.delete(collectionUrn(index, collection));
 
     return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
   }
@@ -179,13 +185,13 @@ export class Observer {
   private disposeAll (): Promise<void> {
     const promises = [];
 
-    for (const subscription of this.documentsByCollections.values()) {
+    for (const subscription of this.documentsByCollection.values()) {
       if (subscription.roomId) {
         promises.push(this.sdk.realtime.unsubscribe(subscription.roomId));
       }
     }
 
-    this.documentsByCollections.clear();
+    this.documentsByCollection.clear();
     this.documents.clear();
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -317,11 +323,11 @@ export class Observer {
 
     const urn = collectionUrn(index, collection);
 
-    if (! this.documentsByCollections.has(urn)) {
-      this.documentsByCollections.set(urn, new ObservedDocuments());
+    if (! this.documentsByCollection.has(urn)) {
+      this.documentsByCollection.set(urn, new ObservedDocuments());
     }
 
-    const observedDocuments = this.documentsByCollections.get(urn);
+    const observedDocuments = this.documentsByCollection.get(urn);
 
     observedDocuments.add(document._id);
 
@@ -337,7 +343,7 @@ export class Observer {
    * @internal
    */
   resubscribe (index: string, collection: string): Promise<void> {
-    const subscription = this.documentsByCollections.get(collectionUrn(index, collection));
+    const subscription = this.documentsByCollection.get(collectionUrn(index, collection));
 
     if (! subscription) {
       return Promise.resolve();
@@ -392,11 +398,11 @@ export class Observer {
 
     this.documents.delete(documentUrn(index, collection, rtDocument._id));
 
-    const observedDocuments = this.documentsByCollections.get(collectionUrn(index, collection));
+    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
     observedDocuments.delete(result._id);
 
     if (observedDocuments.size === 0) {
-      this.documentsByCollections.delete(collectionUrn(index, collection));
+      this.documentsByCollection.delete(collectionUrn(index, collection));
     }
 
     return this.resubscribe(index, collection);

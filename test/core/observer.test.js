@@ -96,7 +96,7 @@ describe('Observer', () => {
 
       await observer.disposeDocuments('index', 'collection', [doc1]);
 
-      const observedDocuments = observer.documentsByCollections.get('index:collection');
+      const observedDocuments = observer.documentsByCollection.get('index:collection');
       should(observedDocuments.ids).be.eql(['doc2']);
       should(observer.documents.has('index:collection:doc1')).be.false();
       should(observer.resubscribe).be.calledWith('index', 'collection');
@@ -109,7 +109,7 @@ describe('Observer', () => {
 
       await observer.disposeDocuments('index', 'collection', [doc1, doc2]);
 
-      should(observer.documentsByCollections.has('index:collection')).be.false();
+      should(observer.documentsByCollection.has('index:collection')).be.false();
     });
   });
 
@@ -117,12 +117,12 @@ describe('Observer', () => {
     it('should delete documents and unsubscribe', async () => {
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
-      observer.documentsByCollections.get('index:collection').roomId = 'roomId';
+      observer.documentsByCollection.get('index:collection').roomId = 'roomId';
 
       await observer.disposeCollection('index', 'collection');
 
       should(observer.documents.size).be.eql(0);
-      should(observer.documentsByCollections.has('index:collection')).be.false();
+      should(observer.documentsByCollection.has('index:collection')).be.false();
       should(sdk.realtime.unsubscribe).be.calledWith('roomId');
     });
   });
@@ -132,13 +132,13 @@ describe('Observer', () => {
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
       observer.addDocument('index', 'collection2', doc2);
-      observer.documentsByCollections.get('index:collection').roomId = 'roomId';
-      observer.documentsByCollections.get('index:collection2').roomId = 'roomId2';
+      observer.documentsByCollection.get('index:collection').roomId = 'roomId';
+      observer.documentsByCollection.get('index:collection2').roomId = 'roomId2';
 
       await observer.disposeAll();
 
       should(observer.documents.size).be.eql(0);
-      should(observer.documentsByCollections.size).be.eql(0);
+      should(observer.documentsByCollection.size).be.eql(0);
       should(sdk.realtime.unsubscribe)
         .be.calledWith('roomId')
         .be.calledWith('roomId2');
@@ -222,7 +222,7 @@ describe('Observer', () => {
     it('should add the document to the managed docs and return a realtime doc', () => {
       const rtDoc = observer.addDocument('index', 'collection', doc1);
 
-      const observedDocuments = observer.documentsByCollections.get('index:collection');
+      const observedDocuments = observer.documentsByCollection.get('index:collection');
       should(observedDocuments.ids).be.eql(['doc1']);
       should(observedDocuments.filters).be.eql({ ids: { values: ['doc1'] } });
 
@@ -240,7 +240,7 @@ describe('Observer', () => {
     it('should subscribe to new filters and then unsubscribe old roomId', async () => {
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
-      const observedDocuments = observer.documentsByCollections.get('index:collection');
+      const observedDocuments = observer.documentsByCollection.get('index:collection');
       observedDocuments.roomId = 'oldRoomId';
 
       await observer.resubscribe('index', 'collection');
@@ -323,7 +323,7 @@ describe('Observer', () => {
       });
       should(observer.documents.has('index:collection:doc1')).be.false();
 
-      const observedDocuments = observer.documentsByCollections.get('index:collection');
+      const observedDocuments = observer.documentsByCollection.get('index:collection');
       should(observedDocuments.ids).be.eql(['doc2']);
 
       should(observer.resubscribe).be.calledWith('index', 'collection');
@@ -333,7 +333,7 @@ describe('Observer', () => {
 
       await observer.notificationHandler(notification);
 
-      should(observer.documentsByCollections.has('index:collection')).be.false();
+      should(observer.documentsByCollection.has('index:collection')).be.false();
     });
 
     it('should do nothing on publish event', () => {
