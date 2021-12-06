@@ -79,7 +79,7 @@ export class Observer {
    *
    * @internal
    */
-  private documentsByCollections = new Map<CollectionUrn, ObservedDocuments>();
+  private documentsByCollection = new Map<CollectionUrn, ObservedDocuments>();
 
   /**
    * Map containing the list of realtime documents managed by this observer.
