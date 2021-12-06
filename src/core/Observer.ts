@@ -48,7 +48,7 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
  * The Observer class allows to manipulate realtime documents.
  *
  * A RealtimeDocument is like a normal document from Kuzzle except that it is
- * connected to the realtime engine and it's content will change with changes
+ * connected to the realtime engine and its content will change with changes
  * occuring on the database.
  *
  * They can be retrieved using methods with the same syntax as in the Document
