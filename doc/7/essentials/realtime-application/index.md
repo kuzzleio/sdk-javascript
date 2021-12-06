@@ -59,9 +59,9 @@ const doc = await observer.get('nyc-open-data', 'yellow-taxi', 'aschen');
 ### Retrieve realtime documents
 
 Realtime documents can be retrieved by using one of those methods:
- - [Observer.get](/sdk/js/7/core-classes/observer/get): Get one document (same syntax as [Document.get](/sdk/js/7/core-classes/document/get))
- - [Observer.mGet](/sdk/js/7/core-classes/observer/m-get): Get many documents (same syntax as [Document.mGet](/sdk/js/7/core-classes/document/m-get))
- - [Observer.search](/sdk/js/7/core-classes/observer/search): Search for documents (same syntax as [Document.search](/sdk/js/7/core-classes/document/search))
+ - [Observer.get](/sdk/js/7/core-classes/observer/get): Get one document (same syntax as [Document.get](/sdk/js/7/controllers/document/get))
+ - [Observer.mGet](/sdk/js/7/core-classes/observer/m-get): Get many documents (same syntax as [Document.mGet](/sdk/js/7/controllers/document/m-get))
+ - [Observer.search](/sdk/js/7/core-classes/observer/search): Search for documents (same syntax as [Document.search](/sdk/js/7/ccontrollers/document/search))
  - [Observer.observe](/sdk/js/7/core-classes/observer/observe): Retrieve a realtime document from a "normal" document
 
 The `get`, `mGet` and `search` method are using the Document controller under the hood. Just replace call to the document controller by call to an Observer:
