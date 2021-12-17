@@ -15,3 +15,7 @@ export * from './ProfilePolicy';
 export * from './RoleRightsDefinition';
 
 export * from './ArgsDefault';
+
+export * from './mRequests';
+
+export * from './mResponses';
