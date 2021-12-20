@@ -7,7 +7,7 @@ description: Observer observe method
 
 # observe
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 Retrieve a realtime document from a document
 

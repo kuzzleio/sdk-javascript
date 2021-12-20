@@ -7,7 +7,7 @@ description: Observer mGet method
 
 # mGet
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 
 Gets multiple realtime documents.

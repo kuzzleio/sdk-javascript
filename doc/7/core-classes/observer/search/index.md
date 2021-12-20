@@ -7,7 +7,7 @@ description: Observer search method
 
 # search
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 Searches for documents and returns a SearchResult containing realtime
 documents.

@@ -8,7 +8,7 @@ order: 0
 
 # Observer
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 The `Observer` class allows to manipulate realtime documents.
 A `RealtimeDocument` is like a normal document from Kuzzle except that it is
