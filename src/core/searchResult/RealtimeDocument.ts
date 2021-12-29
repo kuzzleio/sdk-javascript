@@ -53,7 +53,7 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
     return super.next() as any;
   }
 
-  protected _buildNextSearchResult (result: RealtimeDocumentSearchResult) {
+  protected _buildNextSearchResult (result: JSONObject) {
     const nextSearchResult = new RealtimeDocumentSearchResult(
       this._kuzzle,
       this._request,
@@ -63,6 +63,6 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
 
     nextSearchResult.fetched += this.fetched;
 
-    return this.start();
+    return nextSearchResult.start();
   }
 }
