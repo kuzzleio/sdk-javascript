@@ -45,7 +45,7 @@ export class RealtimeDocumentSearchResult extends SearchResultBase<DocumentHit> 
 
     this.hits = rtDocuments;
 
-    return this.observer.resubscribe(index, collection)
+    return this.observer.watchCollection(index, collection)
       .then(() => this);
   }
 

@@ -18,10 +18,15 @@ import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
 import { RequestTimeoutError } from './RequestTimeoutError';
+import { BaseProtocolRealtime } from './protocols/abstract/Realtime';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
 
+/**
+ * We should rework events to have a single generic error event
+ * @todo v8
+ */
 const events = [
   'connected',
   'discarded',
@@ -45,7 +50,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   /**
    * Protocol used by the SDK to communicate with Kuzzle.
    */
-  protocol: any;
+  protocol: KuzzleAbstractProtocol;
   /**
    * If true, automatically renews all subscriptions on a reconnected event.
    */
@@ -336,7 +341,7 @@ export class Kuzzle extends KuzzleEventEmitter {
         this._loggedIn = true;
         return;
       }
-      
+
       /**
        * In case of login failure we need to be sure that the stored token is still valid
        */
@@ -390,12 +395,14 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get autoReconnect () {
-    return this.protocol.autoReconnect;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.protocol.autoReconnect = value;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    protocol.autoReconnect = value;
   }
 
   get autoReplay () {
@@ -478,7 +485,8 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get reconnectionDelay () {
-    return this.protocol.reconnectionDelay;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.reconnectionDelay;
   }
 
   get replayInterval () {
@@ -593,11 +601,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._reconnectInProgress) {
       return;
     }
-    
+
     if (this.autoQueue) {
       this.stopQueuing();
     }
-  
+
     // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
     // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
     if ( this._loggedIn
@@ -605,14 +613,14 @@ export class Kuzzle extends KuzzleEventEmitter {
     ) {
       this._loggedIn = false;
       this.disconnect();
-      
+
       return;
     }
-    
+
     if (this.autoReplay) {
       this.playQueue();
     }
-    
+
     this.emit('reconnected');
   }
 
@@ -751,7 +759,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (options && options.queuable === false) {
       queuable = false;
     }
-    
+
     if (this.queueFilter) {
       queuable = queuable && this.queueFilter(request);
     }
@@ -767,7 +775,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       }
       request[key] = value;
     }
-    
+
     if (request.refresh === undefined && options.refresh !== undefined) {
       request.refresh = options.refresh;
     }
