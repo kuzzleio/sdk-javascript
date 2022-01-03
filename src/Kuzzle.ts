@@ -747,6 +747,27 @@ export class Kuzzle extends KuzzleEventEmitter {
       request.requestId = uuidv4();
     }
 
+    let queuable = true;
+    if (options && options.queuable === false) {
+      queuable = false;
+    }
+    
+    if (this.queueFilter) {
+      queuable = queuable && this.queueFilter(request);
+    }
+
+    const requestTimeout = typeof options.timeout === 'number'
+      ? options.timeout
+      : this._requestTimeout;
+
+    for (const [key, value] of Object.entries(options)) {
+      // Ignore common SDK option
+      if (['queuable', 'timeout'].includes(key)) {
+        continue;
+      }
+      request[key] = value;
+    }
+    
     if (request.refresh === undefined && options.refresh !== undefined) {
       request.refresh = options.refresh;
     }
@@ -774,19 +795,6 @@ export class Kuzzle extends KuzzleEventEmitter {
     request.volatile.sdkName = request.volatile.sdkName || this.sdkName;
 
     this.auth.authenticateRequest(request);
-
-    let queuable = true;
-    if (options && options.queuable === false) {
-      queuable = false;
-    }
-
-    if (this.queueFilter) {
-      queuable = queuable && this.queueFilter(request);
-    }
-
-    const requestTimeout = typeof options.timeout === 'number'
-      ? options.timeout
-      : this._requestTimeout;
 
     if (this._queuing) {
       if (queuable) {

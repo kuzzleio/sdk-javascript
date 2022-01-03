@@ -1,6 +1,6 @@
 import { BaseController } from './Base';
 import { SpecificationsSearchResult } from '../core/searchResult/Specifications';
-import { CollectionMappings, JSONObject } from '../types';
+import { CollectionMappings, JSONObject, ArgsDefault } from '../types';
 
 export class CollectionController extends BaseController {
   constructor (kuzzle) {
@@ -36,10 +36,7 @@ export class CollectionController extends BaseController {
        */
       settings?: JSONObject
     } | CollectionMappings,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerCreate = {}
   ): Promise<void> {
     const request = {
       index,
@@ -66,10 +63,7 @@ export class CollectionController extends BaseController {
   deleteSpecifications (
     index: string,
     collection: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerDeleteSpecifications = {}
   ): Promise<void> {
     const request = {
       index,
@@ -94,10 +88,7 @@ export class CollectionController extends BaseController {
   exists (
     index: string,
     collection: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerExists = {}
   ): Promise<boolean> {
     return this.query({
       index,
@@ -122,10 +113,7 @@ export class CollectionController extends BaseController {
   refresh (
     index: string,
     collection: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerRefresh = {}
   ): Promise<void> {
     return this.query({
       index,
@@ -150,11 +138,7 @@ export class CollectionController extends BaseController {
   getMapping (
     index: string,
     collection: string,
-    options: {
-      includeKuzzleMeta?: boolean,
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerGetMapping = {}
   ): Promise<CollectionMappings> {
     const request = {
       index,
@@ -183,10 +167,7 @@ export class CollectionController extends BaseController {
   getSpecifications (
     index: string,
     collection: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerGetSpecifications = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -210,18 +191,7 @@ export class CollectionController extends BaseController {
    */
   list (
     index: string,
-    options: {
-      queuable?: boolean;
-      timeout?: number
-      /**
-       * @deprecated
-       */
-      from?: number;
-      /**
-       * @deprecated
-       */
-      size?: number;
-    } = {}
+    options: ArgsCollectionControllerList = {}
   ): Promise<{
     /**
      *  Types of returned collections.
@@ -267,13 +237,7 @@ export class CollectionController extends BaseController {
    */
   searchSpecifications (
     query: JSONObject = {},
-    options: {
-      queuable?: boolean;
-      from?: number;
-      size?: number;
-      scroll?: string;
-      timeout?: number;
-    } = {}
+    options: ArgsCollectionControllerSearchSpecifications = {}
   ): Promise<SpecificationsSearchResult> {
     const request = {
       body: query,
@@ -305,10 +269,7 @@ export class CollectionController extends BaseController {
   truncate (
     index: string,
     collection: string,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerTruncate = {}
   ): Promise<void> {
     const request = {
       index,
@@ -348,10 +309,7 @@ export class CollectionController extends BaseController {
        */
       settings?: JSONObject
     } | CollectionMappings,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerUpdate = {}
   ): Promise<void> {
     return this.query({
       index,
@@ -369,9 +327,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     mappings: CollectionMappings,
-    options: {
-      queuable?: boolean,
-    } = {}
+    options: ArgsCollectionControllerUpdateMapping = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -400,10 +356,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerUpdateSpecifications = {}
   ): Promise<JSONObject> {
     return this.query({
       index,
@@ -433,10 +386,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: {
-      queuable?: boolean,
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerValidateSpecifications = {}
   ): Promise<{
     valid: boolean;
     details: Array<string>;
@@ -464,9 +414,7 @@ export class CollectionController extends BaseController {
   delete (
     index: string,
     collection: string,
-    options: {
-      timeout?: number
-    } = {}
+    options: ArgsCollectionControllerDelete = {}
   ): Promise<void> {
     const request = {
       index,
@@ -477,4 +425,52 @@ export class CollectionController extends BaseController {
     return this.query(request, options)
       .then(() => undefined);
   }
+}
+
+export interface ArgsCollectionControllerCreate extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerDeleteSpecifications extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerExists extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerRefresh extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerGetMapping extends ArgsDefault {
+    includeKuzzleMeta?: boolean;
+}
+
+export interface ArgsCollectionControllerGetSpecifications extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerList extends ArgsDefault {
+    from?: number;
+    size?: number;
+}
+
+export interface ArgsCollectionControllerSearchSpecifications extends ArgsDefault {
+    from?: number;
+    size?: number;
+    scroll?: string;
+}
+
+export interface ArgsCollectionControllerTruncate extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerUpdate extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerUpdateMapping extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerUpdateSpecifications extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerValidateSpecifications extends ArgsDefault {
+}
+
+export interface ArgsCollectionControllerDelete extends ArgsDefault {
 }

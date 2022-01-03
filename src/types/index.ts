@@ -13,3 +13,5 @@ export * from './Notification';
 export * from './ProfilePolicy';
 
 export * from './RoleRightsDefinition';
+
+export * from './ArgsDefault';
