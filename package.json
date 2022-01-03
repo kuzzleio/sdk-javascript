@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.7.6",
+  "version": "7.8.0",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -41,6 +41,7 @@
     "ws": "^8.2.2"
   },
   "devDependencies": {
+    "lodash": "^4.17.21",
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
     "@types/node": "^16.9.4",
@@ -65,6 +66,7 @@
     "should-sinon": "0.0.6",
     "sinon": "^11.1.2",
     "stream-http": "^3.2.0",
+    "ts-morph": "^12.2.0",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3",
     "url": "^0.11.0",
