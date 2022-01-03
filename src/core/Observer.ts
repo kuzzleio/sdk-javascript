@@ -2,7 +2,11 @@ import { Kuzzle } from '../Kuzzle';
 import { RealtimeDocument } from './RealtimeDocument';
 import { Document, DocumentNotification, JSONObject } from '../types';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
-import { ArgsDocumentControllerGet, ArgsDocumentControllerMGet, ArgsDocumentControllerSearch } from 'src/controllers/Document';
+import {
+  ArgsDocumentControllerGet,
+  ArgsDocumentControllerMGet,
+  ArgsDocumentControllerSearch,
+} from '../controllers/Document';
 
 /**
  * Class based on a Set<string> that holds the observed documents IDs of
