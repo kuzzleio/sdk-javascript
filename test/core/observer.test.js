@@ -60,7 +60,7 @@ describe('Observer', () => {
       observer = new Observer(sdk);
 
       should(observer.mode).be.eql('pulling');
-      should(observer.options.pullingDelay).be.eql(5000)
+      should(observer.options.pullingDelay).be.eql(5000);
     });
 
     it('should save the SDK instance', () => {
