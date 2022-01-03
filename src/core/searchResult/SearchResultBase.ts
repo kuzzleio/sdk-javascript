@@ -159,11 +159,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
       if (this._request.from >= this._result.total) {
         return Promise.resolve(null);
       }
-      console.log({
-        ...this._request,
-        action: this._searchAction,
-        from: this.fetched
-      })
+
       return this._kuzzle.query({
         ...this._request,
         action: this._searchAction,

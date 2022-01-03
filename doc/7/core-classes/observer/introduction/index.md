@@ -35,3 +35,9 @@ await observer.stop('nyc-open-data', 'yellow-taxi');
 A good frontend practice is to instantiate one observer for the actual page
 and/or component(s) displaying realtime documents and to dispose them when
 they are not displayed anymore.
+
+## Using HTTP protocol
+
+If the SDK is using the HTTP protocol, then documents are retrieved through the [document.mGet](/sdk/js/7/controllers/document/m-get) method every specified interval (default is 5 sec).
+
+This interval can be modified with the `pullingDelay` option of the constructor.

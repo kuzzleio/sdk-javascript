@@ -413,7 +413,11 @@ export class Observer {
   private startPulling (): Promise<void> {
     return this.clearPullingTimer()
       .then(() => {
-        setInterval(this.pullingHandler.bind(this), this.options.pullingDelay);
+        if (this.documentsByCollection.size !== 0) {
+          this.pullingTimer = setInterval(
+            this.pullingHandler.bind(this),
+            this.options.pullingDelay);
+        }
       });
   }
 
@@ -471,7 +475,7 @@ export class Observer {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return Promise.all(promises).then(() => {});
+    return Promise.all(promises).then(() => {}).catch(() => {});
   }
 
   private clearPullingTimer (): Promise<void> {
