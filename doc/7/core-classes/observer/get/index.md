@@ -7,7 +7,7 @@ description: Observer get method
 
 # get
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 Gets a realtime document
 

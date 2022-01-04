@@ -7,7 +7,7 @@ description: Observer stop method
 
 # stop
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.0" />
 
 Stop observing documents and release associated ressources.
 Can be used either with:
