@@ -407,10 +407,10 @@ export class Observer {
   watchCollection (index: string, collection: string) {
     return this.mode === 'realtime'
       ? this.resubscribe(index, collection)
-      : this.startPulling();
+      : this.restartPulling();
   }
 
-  private startPulling (): Promise<void> {
+  private restartPulling (): Promise<void> {
     return this.clearPullingTimer()
       .then(() => {
         if (this.documentsByCollection.size !== 0) {

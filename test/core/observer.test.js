@@ -291,15 +291,15 @@ describe('Observer', () => {
     it('should call resubscribe (mode pulling)', async () => {
       sdk.protocol.name = 'http';
       observer = new Observer(sdk);
-      sinon.stub(observer, 'startPulling').resolves();
+      sinon.stub(observer, 'restartPulling').resolves();
 
       await observer.watchCollection('index', 'collection');
 
-      should(observer.startPulling).be.calledOnce();
+      should(observer.restartPulling).be.calledOnce();
     });
   });
 
-  describe('#startPulling', () => {
+  describe('#restartPulling', () => {
 
     beforeEach(() => {
       sdk.protocol.name = 'http';
@@ -311,7 +311,7 @@ describe('Observer', () => {
     it('should clear timer and start interval', done => {
       observer.addDocument('index', 'collection', doc1);
 
-      observer.startPulling();
+      observer.restartPulling();
 
       setTimeout(() => {
         should(observer.clearPullingTimer).be.calledOnce();
@@ -322,7 +322,7 @@ describe('Observer', () => {
     });
 
     it('should not start the timer if there is no documents', done => {
-      observer.startPulling();
+      observer.restartPulling();
 
       setTimeout(() => {
         should(observer.clearPullingTimer).be.calledOnce();
