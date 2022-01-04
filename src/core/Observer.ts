@@ -471,7 +471,7 @@ export class Observer {
           // This handler ensure we don't have any unhandledRejection error
         });
 
-      promises.push(promise)
+      promises.push(promise);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
