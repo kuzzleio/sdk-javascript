@@ -20,6 +20,7 @@ runs:
       run: |
         export SDK_DIR="$(pwd)"
         yarn build
+        find . -name "*.ts" | xargs rm
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
