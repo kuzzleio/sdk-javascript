@@ -10,28 +10,21 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Start Kuzzle stack
-      run: |
-        sudo sysctl -w vm.max_map_count=262144
-        yarn
-        yarn build
-      shell: bash
     - name: Setup Admin console
       run: |
+        sudo sysctl -w vm.max_map_count=262144
         export SDK_DIR="$(pwd)"
         git clone -b 4-dev https://github.com/kuzzleio/kuzzle-admin-console /tmp/admin-console
         cp -f ./cypress.json /tmp/admin-console/cypress.json
         cd /tmp/admin-console
-        yarn
-        yarn add kuzzle-sdk-v7.6.1@"$SDK_DIR"
-        yarn build
+        npm i kuzzle-sdk-v7@"$SDK_DIR"
       shell: bash
     - name: Run e2e tests
       run: |
         cd /tmp/admin-console/test/e2e/run-test
-        yarn
+        npm i
         cd /tmp/admin-console
         CYPRESS_RETRIES=5 npm run test:e2e -- --backend=2
       env:
-        CYPRESS_RECORD_KEY: ${{ inputs.cypress-key }} 
+        CYPRESS_RECORD_KEY: ${{ inputs.cypress-key }}
       shell: bash
