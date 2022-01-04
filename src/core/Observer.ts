@@ -436,40 +436,40 @@ export class Observer {
         observedDocuments.collection,
         observedDocuments.ids
       )
-      .then(({ successes, errors }) => {
-        for (const document of successes) {
-          const urn = documentUrn(
-            observedDocuments.index,
-            observedDocuments.collection,
-            document._id);
+        .then(({ successes, errors }) => {
+          for (const document of successes) {
+            const urn = documentUrn(
+              observedDocuments.index,
+              observedDocuments.collection,
+              document._id);
 
-          const rtDocument = this.documents.get(urn);
-          Object.assign(rtDocument._source, document._source);
-        }
-
-        for (const deletedDocumentId of errors) {
-          const urn = documentUrn(
-            observedDocuments.index,
-            observedDocuments.collection,
-            deletedDocumentId);
-
-          const rtDocument = this.documents.get(urn);
-
-          rtDocument.deleted = true;
-
-          this.documents.delete(urn);
-
-          observedDocuments.delete(deletedDocumentId);
-
-          if (observedDocuments.size === 0) {
-            this.documentsByCollection.delete(collectionUrn(observedDocuments.index, observedDocuments.collection));
+            const rtDocument = this.documents.get(urn);
+            Object.assign(rtDocument._source, document._source);
           }
-        }
-      })
-      .catch(() => {
-        // A `queryError` event is already emitted by the protocol
-        // This handler ensure we don't have any unhandledRejection error
-      });
+
+          for (const deletedDocumentId of errors) {
+            const urn = documentUrn(
+              observedDocuments.index,
+              observedDocuments.collection,
+              deletedDocumentId);
+
+            const rtDocument = this.documents.get(urn);
+
+            rtDocument.deleted = true;
+
+            this.documents.delete(urn);
+
+            observedDocuments.delete(deletedDocumentId);
+
+            if (observedDocuments.size === 0) {
+              this.documentsByCollection.delete(collectionUrn(observedDocuments.index, observedDocuments.collection));
+            }
+          }
+        })
+        .catch(() => {
+          // A `queryError` event is already emitted by the protocol
+          // This handler ensure we don't have any unhandledRejection error
+        });
 
       promises.push(promise)
     }
