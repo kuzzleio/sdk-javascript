@@ -153,7 +153,7 @@ export class Observer {
    * Either through the realtime notifications system or by pulling documents
    * with the document.mGet method (HTTP protocol)
    */
-  public mode: 'realtime' | 'pulling';
+  public readonly mode: 'realtime' | 'pulling';
 
   /**
    * Instantiate a new Observer
