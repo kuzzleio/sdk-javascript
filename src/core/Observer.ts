@@ -475,7 +475,7 @@ export class Observer {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    return Promise.all(promises).then(() => {}).catch(() => {});
+    return Promise.all(promises).then(() => {});
   }
 
   private clearPullingTimer (): Promise<void> {
