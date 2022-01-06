@@ -141,7 +141,7 @@ describe('Observer', () => {
     it('should delete documents and clear timer (mode pulling)', async () => {
       sdk.protocol.name = 'http';
       observer = new Observer(sdk);
-      sinon.stub(observer, 'clearPullingTimer').resolves();
+      sinon.stub(observer, 'clearPullingTimer');
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
       observer.documentsByCollection.get('index:collection').roomId = 'roomId';
@@ -174,7 +174,7 @@ describe('Observer', () => {
     it('should delete documents and unsubscribe (mode pulling)', async () => {
       sdk.protocol.name = 'http';
       observer = new Observer(sdk);
-      sinon.stub(observer, 'clearPullingTimer').resolves();
+      sinon.stub(observer, 'clearPullingTimer');
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
       observer.addDocument('index', 'collection2', doc2);
@@ -291,7 +291,7 @@ describe('Observer', () => {
     it('should call resubscribe (mode pulling)', async () => {
       sdk.protocol.name = 'http';
       observer = new Observer(sdk);
-      sinon.stub(observer, 'restartPulling').resolves();
+      sinon.stub(observer, 'restartPulling');
 
       await observer.watchCollection('index', 'collection');
 

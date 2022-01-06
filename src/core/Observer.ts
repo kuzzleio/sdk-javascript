@@ -231,9 +231,13 @@ export class Observer {
 
     this.documentsByCollection.delete(collectionUrn(index, collection));
 
-    return this.mode === 'realtime'
-      ? this.sdk.realtime.unsubscribe(observedDocuments.roomId)
-      : this.clearPullingTimer();
+    if (this.mode === 'realtime') {
+      return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
+    }
+
+    this.clearPullingTimer();
+
+    return Promise.resolve();
   }
 
   /**
@@ -404,21 +408,24 @@ export class Observer {
    *
    * @internal
    */
-  watchCollection (index: string, collection: string) {
-    return this.mode === 'realtime'
-      ? this.resubscribe(index, collection)
-      : this.restartPulling();
+  watchCollection (index: string, collection: string): Promise<void> {
+    if (this.mode === 'realtime') {
+      return this.resubscribe(index, collection);
+    }
+
+    this.restartPulling();
+
+    return Promise.resolve();
   }
 
-  private restartPulling (): Promise<void> {
-    return this.clearPullingTimer()
-      .then(() => {
-        if (this.documentsByCollection.size !== 0) {
-          this.pullingTimer = setInterval(
-            this.pullingHandler.bind(this),
-            this.options.pullingDelay);
-        }
-      });
+  private restartPulling (): void {
+    this.clearPullingTimer();
+
+    if (this.documentsByCollection.size !== 0) {
+      this.pullingTimer = setInterval(
+        this.pullingHandler.bind(this),
+        this.options.pullingDelay);
+    }
   }
 
   /**
@@ -478,12 +485,10 @@ export class Observer {
     return Promise.all(promises).then(() => {});
   }
 
-  private clearPullingTimer (): Promise<void> {
+  private clearPullingTimer (): void {
     if (this.pullingTimer) {
       clearInterval(this.pullingTimer);
     }
-
-    return Promise.resolve();
   }
 
   /**
