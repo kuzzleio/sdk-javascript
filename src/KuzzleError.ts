@@ -1,6 +1,7 @@
 'use strict';
 
 import { hilightUserCode } from './utils/stackTrace';
+import { RequestPayload } from './types/RequestPayload';
 
 /**
  * Standard Kuzzle error.
@@ -28,6 +29,41 @@ export class KuzzleError extends Error {
    * Code
    */
   public code: number;
+
+  /**
+   * API controller name
+   */
+  public controller?: string;
+
+  /**
+   * API action name
+   */
+  public action?: string;
+
+  /**
+   * KuzzleRequest volatile data
+   */
+  public volatile?: Record<string, unknown>;
+
+  /**
+   * Index name
+   */
+  public index?: string;
+
+  /**
+   * Collection name
+   */
+  public collection?: string;
+
+  /**
+   * request id
+   */
+  public requestId?: string;
+
+  /**
+   * Document unique identifier
+   */
+  public _id?: string;
 
   /**
    * Associated errors
@@ -60,13 +96,22 @@ export class KuzzleError extends Error {
     >    at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
-  constructor (apiError, sdkStack: string, protocol: string) {
+  constructor (apiError, sdkStack: string, protocol: string, request?: RequestPayload) {
     super(apiError.message);
-
     this.status = apiError.status;
 
     this.id = apiError.id;
     this.code = apiError.code;
+  
+    if (request) {
+      this.controller = request.controller;
+      this.collection = request.collection;
+      this.action = request.action;
+      this.index = request.index;
+      this.volatile = request.volatile;
+      this.requestId = request.requestId;
+      this._id = request._id;
+    }
 
     // PartialError
     if (this.status === 206) {
