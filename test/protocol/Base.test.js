@@ -211,26 +211,26 @@ describe('Common Protocol', () => {
         collection: 'toto',
         response: response,
       };
-      try {
-        await protocol.query(request);
-        throw new Error('error protocol query'); 
-      } catch (error) {
-        should(error).be.instanceOf(KuzzleError);
-        should(error.message).be.equal('API action "foo":"bar" not found');
-        should(error.status).be.equal(404);
-        should(error.id).be.equal('api.process.action_not_found');
-        should(error.code).be.equal(33685509);
-        should(error.kuzzleStack).be.equal('NotFoundError: API action "foo":"bar" not found');
-        should(error.controller).be.equal('foo');
-        should(error.action).be.equal('bar');
-        should(error.volatile).be.a.Object();
-        should(error.index).be.equal('test');
-        should(error.collection).be.equal('toto');
-        should(error.requestId).be.equal('foobar');
-        should(error.stack).match(/NotFoundError: API action "foo":"bar" not found/);
-        should(error.stack).match(/KuzzleAbstractProtocol/);
-        should(error.stack).match(/>\s{4}at Context.<anonymous>/);
-      } 
+
+      return protocol.query(request)
+        .then(() => Promise.reject({ message: 'No error' }))
+        .catch(error => {
+          should(error).be.instanceOf(KuzzleError);
+          should(error.message).be.equal('API action "foo":"bar" not found');
+          should(error.status).be.equal(404);
+          should(error.id).be.equal('api.process.action_not_found');
+          should(error.code).be.equal(33685509);
+          should(error.kuzzleStack).be.equal('NotFoundError: API action "foo":"bar" not found');
+          should(error.controller).be.equal('foo');
+          should(error.action).be.equal('bar');
+          should(error.volatile).be.a.Object();
+          should(error.index).be.equal('test');
+          should(error.collection).be.equal('toto');
+          should(error.requestId).be.equal('foobar');
+          should(error.stack).match(/NotFoundError: API action "foo":"bar" not found/);
+          should(error.stack).match(/KuzzleAbstractProtocol/);
+          should(error.stack).match(/>\s{4}at Context.<anonymous>/);
+        });
     });
 
     it('should keep internal errors on PartialErrors', () => {
