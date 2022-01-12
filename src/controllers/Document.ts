@@ -1,7 +1,22 @@
 import { BaseController } from './Base';
-import { SearchResult } from '../core/searchResult/SearchResultBase';
 import { DocumentSearchResult } from '../core/searchResult/Document';
-import { JSONObject, Document, DocumentHit, ArgsDefault } from '../types';
+import {
+  JSONObject,
+  Document,
+  mCreateResponse,
+  ArgsDefault,
+  mCreateRequest,
+  mCreateOrReplaceRequest,
+  mCreateOrReplaceResponse,
+  mDeleteRequest,
+  mDeleteResponse,
+  mReplaceRequest,
+  mReplaceResponse,
+  mUpdateRequest,
+  mUpdateResponse,
+  DocumentHit,
+} from '../types';
+import { SearchResult } from '../core/searchResult/SearchResultBase';
 
 export class DocumentController extends BaseController {
   constructor (kuzzle) {
@@ -311,40 +326,9 @@ export class DocumentController extends BaseController {
   mCreate (
     index: string,
     collection: string,
-    documents: Array<{
-      /**
-       * Optional document ID
-       */
-      _id?: string;
-      /**
-       * Document content
-       */
-      body: JSONObject;
-    }>,
+    documents: mCreateRequest,
     options: ArgsDocumentControllerMCreate = {}
-  ): Promise<{
-    /**
-     * Array of successfully created documents
-     */
-    successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: Document;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mCreateResponse> {
     const request = {
       index,
       collection,
@@ -378,40 +362,9 @@ export class DocumentController extends BaseController {
   mCreateOrReplace (
     index: string,
     collection: string,
-    documents: Array<{
-      /**
-       * Document ID
-       */
-      _id: string;
-      /**
-       * Document content
-       */
-      body: JSONObject;
-    }>,
+    documents: mCreateOrReplaceRequest,
     options: ArgsDocumentControllerMCreateOrReplace = {}
-  ): Promise<{
-    /**
-     * Array of successfully created documents
-     */
-    successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: Document;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mCreateOrReplaceResponse> {
     const request = {
       index,
       collection,
@@ -445,27 +398,9 @@ export class DocumentController extends BaseController {
   mDelete (
     index: string,
     collection: string,
-    ids: Array<string>,
+    ids: mDeleteRequest,
     options: ArgsDocumentControllerMDelete = {}
-  ): Promise<{
-    /**
-     * Array of successfully deleted documents IDS
-     */
-    successes: Array<string>;
-    /**
-     * Array of failed deletion
-     */
-    errors: Array<{
-      /**
-       * Document ID
-       */
-      id: string;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mDeleteResponse> {
     const request = {
       index,
       collection,
@@ -540,40 +475,9 @@ export class DocumentController extends BaseController {
   mReplace (
     index: string,
     collection: string,
-    documents: Array<{
-      /**
-       * Document ID
-       */
-      _id: string;
-      /**
-       * Document content
-       */
-      body: JSONObject;
-    }>,
+    documents: mReplaceRequest,
     options: ArgsDocumentControllerMReplace = {}
-  ): Promise<{
-    /**
-     * Array of successfully replaced documents
-     */
-    successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: Document;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mReplaceResponse> {
     const request = {
       index,
       collection,
@@ -611,40 +515,9 @@ export class DocumentController extends BaseController {
   mUpdate (
     index: string,
     collection: string,
-    documents: Array<{
-      /**
-       * Document ID
-       */
-      _id: string;
-      /**
-       * Document content
-       */
-      body: JSONObject;
-    }>,
+    documents: mUpdateRequest,
     options: ArgsDocumentControllerMUpdate = {}
-  ): Promise<{
-    /**
-     * Array of successfully updated documents
-     */
-    successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: Document;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mUpdateResponse> {
     const request = {
       index,
       collection,
@@ -679,44 +552,9 @@ export class DocumentController extends BaseController {
   mUpsert (
     index: string,
     collection: string,
-    documents: Array<{
-      /**
-       * Document ID
-       */
-      _id: string;
-      /**
-       * Partial content of the document to update
-       */
-      changes: JSONObject;
-      /**
-       * Fields to add to the document if it gets created
-       */
-      default: JSONObject
-    }>,
+    documents: mUpdateRequest,
     options: ArgsDocumentControllerMUpsert = {}
-  ): Promise<{
-    /**
-     * Array of successfully updated documents
-     */
-    successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: Document;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<mUpdateResponse> {
     const request = {
       index,
       collection,
