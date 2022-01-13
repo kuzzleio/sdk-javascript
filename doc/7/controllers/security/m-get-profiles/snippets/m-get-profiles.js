@@ -5,7 +5,7 @@ try {
     'profile3'
   ]);
 
-  console.log(response);
+  console.log(`Successfully retrieved ${response.length} profiles`);
   /*
   [ Profile {
       _id: 'profile1',

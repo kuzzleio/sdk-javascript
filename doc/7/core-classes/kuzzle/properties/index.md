@@ -14,6 +14,8 @@ order: 10
 | `connected`     | <pre>boolean</pre>  | Returns `true` if the SDK is currently connected to a Kuzzle server. |
 | `offlineQueue`  | <pre>object[]</pre> | Contains the queued requests during offline mode                     |
 | `protocol`      | <pre>Protocol</pre> | Protocol used by the SDK                                             |
+| `events`        | <pre>string[]</pre> | List of every events emitted by the SDK                              |
+
 
 ### connected
 
@@ -42,7 +44,7 @@ See the associated documentation:
 
 The `authenticator` property can be set to a function returning a promise.
 
-This function will be called after a successful reconnection if the current authentication token is not valid anymore.  
+This function will be called after a successful reconnection if the current authentication token is not valid anymore.
 
 This function has to authenticate the SDK. It can be a call to [auth.login](/sdk/js/7/controllers/auth/login) for example.
 

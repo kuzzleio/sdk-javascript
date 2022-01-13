@@ -38,7 +38,7 @@ describe('Kuzzle listeners management', () => {
 
     should(function() {
       kuzzle.addListener('foo', sinon.stub());
-    }).throw('[foo] is not a known event. Known events: ' + knownEvents.toString());
+    }).throw('[foo] is not a known event. Known events: ' + knownEvents.join(', '));
 
     let i;
     for (i = 0; i < knownEvents.length; i++) {
