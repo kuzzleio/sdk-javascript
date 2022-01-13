@@ -153,7 +153,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     options: ArgsDocumentControllerDelete = {}
-  ): Promise<number> {
+  ): Promise<string> {
     const request = {
       index,
       collection,
