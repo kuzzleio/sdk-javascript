@@ -1,6 +1,5 @@
 import { Kuzzle } from '../../Kuzzle';
 import { JSONObject } from '../../types';
-import { BatchController } from './BatchController';
 import { InstrumentablePromise } from './InstrumentablePromise';
 
 /**
@@ -104,11 +103,6 @@ export class BatchWriter {
     createOrReplace: new BatchBuffer(),
   };
 
-  /**
-   * Document Controller overload
-   */
-  public document: BatchController;
-
   get addCreate () {
     // @todo implements the send of buffer if approaching the limit
     return this.buffers.create.add.bind(this.buffers.create);
@@ -138,22 +132,16 @@ export class BatchWriter {
     return this.buffers.createOrReplace.add.bind(this.buffers.createOrReplace);
   }
 
-  /**
-   * @param sdk Connected SDK
-   * @param options.interval Timer interval in ms (50). Actions will be executed every {interval} ms
-   * @param options.maxWriteBufferSize Max write buffer size (200). (Should match "limits.documentsWriteCount")
-   * @param options.maxReadBufferSize Max read buffer size. (Should match "limits.documentsReadCount")
-   */
   constructor (
     sdk: Kuzzle,
-    { interval = 50, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
+    { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
   ) {
     this.sdk = sdk;
     this.interval = interval;
     this.maxWriteBufferSize = maxWriteBufferSize;
     this.maxReadBufferSize = maxReadBufferSize;
 
-    this.document = new BatchController(this.sdk, this);
+    this.begin();
   }
 
   /**
@@ -195,7 +183,7 @@ export class BatchWriter {
   /**
    * Execute pending actions from the buffers and stop the timer.
    */
-  async end () {
+  async dispose () {
     await this.execute();
 
     clearInterval(this.timer);

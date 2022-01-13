@@ -15,13 +15,13 @@ import { deepCompare, omit } from '../../utils/object';
  *
  * This class replace the following methods and will execute them by batch using
  * m* actions:
- *  - create
- *  - replace
- *  - createOrReplace
- *  - update
- *  - get
- *  - exists
- *  - delete
+ *  - create => mCreate
+ *  - replace => mReplace
+ *  - createOrReplace => mCreateOrReplace
+ *  - update => mUpdate
+ *  - get => mGet
+ *  - exists => mGet
+ *  - delete => mDelete
  *
  * The m* actions returns the successes in the same order as in the request so
  * since we have the index of the single document inside the array of documents
@@ -32,10 +32,27 @@ import { deepCompare, omit } from '../../utils/object';
 export class BatchController extends DocumentController {
   private writer: BatchWriter;
 
-  constructor (sdk: Kuzzle, writer: BatchWriter) {
+  /**
+   * @param sdk Connected SDK
+   * @param options.interval Timer interval in ms (10). Actions will be executed every {interval} ms
+   * @param options.maxWriteBufferSize Max write buffer size (200). (Should match "limits.documentsWriteCount")
+   * @param options.maxReadBufferSize Max read buffer size. (Should match "limits.documentsReadCount")
+   */
+  constructor (
+    sdk: Kuzzle,
+    { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
+  ) {
     super(sdk);
 
-    this.writer = writer;
+    this.writer = new BatchWriter(sdk, {
+      interval,
+      maxWriteBufferSize,
+      maxReadBufferSize
+    });
+  }
+
+  async dispose () {
+    await this.writer.dispose();
   }
 
   async create (

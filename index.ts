@@ -21,6 +21,7 @@ export * from './src/core/searchResult/Specifications';
 export * from './src/core/searchResult/User';
 export * from './src/core/Observer';
 export * from './src/core/RealtimeDocument';
+export * from './src/core/batchWriter';
 
 export * from './src/types';
 
