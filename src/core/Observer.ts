@@ -146,7 +146,7 @@ export class Observer {
   /**
    * @internal
    */
-  private pullingTimer: NodeJS.Timeout;
+  private pullingTimer: any;
 
   /**
    * Method to refresh documents.
