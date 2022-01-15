@@ -9,6 +9,7 @@ import {
 import { JSONObject, Document } from '../../types';
 import { BatchWriter } from './BatchWriter';
 import { deepCompare, omit } from '../../utils/object';
+import { KuzzleError } from '../../KuzzleError';
 
 /**
  * Overload of the document controller.
@@ -150,7 +151,10 @@ export class BatchController extends DocumentController {
     const document = successes.find(({ _id }) => _id === id);
 
     if (! document) {
-      throw new Error(`Document "${index}":"${collection}":"${id}" not found`);
+      throw new KuzzleError({
+        message: `Document "${index}":"${collection}":"${id}" not found`,
+        id: 'services.storage.not_found',
+      });
     }
 
     return document;
