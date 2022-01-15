@@ -22,11 +22,11 @@ function debug (message, obj) {
   }
 
   // eslint-disable-next-line no-console
-  console.debug(message);
+  console.log(message);
 
   if (obj) {
     // eslint-disable-next-line no-console
-    console.debug(JSON.stringify(obj));
+    console.log(JSON.stringify(obj));
   }
 }
 
