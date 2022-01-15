@@ -24,14 +24,16 @@ for (const event of kuzzle.events) {
 
 ## Print Request and Response
 
+<SinceBadge version="auto-version"/>
+
 You can print every request sent to Kuzzle and every response sent back to the SDK by activating the debug mode.
 
 In Node.js, the `DEBUG` environment variable should contains the `kuzzle-sdk` string.
 
-```js
+```bash
 export DEBUG=kuzzle-sdk
 
-// Run your program
+# Run your program
 ```
 
 In the Browser, you need to add the `debugKuzzleSdk` search param in the URL.
