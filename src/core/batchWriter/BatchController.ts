@@ -8,7 +8,7 @@ import {
 } from '../../controllers/Document';
 import { JSONObject, Document } from '../../types';
 import { BatchWriter } from './BatchWriter';
-import { deepCompare, omit } from '../../utils/object';
+import { omit } from '../../utils/object';
 import { KuzzleError } from '../../KuzzleError';
 
 /**
@@ -72,7 +72,7 @@ export class BatchController extends DocumentController {
         const responseDoc = omit(e.document._source, ['_kuzzle_info']);
         const originDoc = content;
 
-        return deepCompare(responseDoc, originDoc);
+        return JSON.stringify(responseDoc) === JSON.stringify(originDoc);
       });
 
       if (error) {
