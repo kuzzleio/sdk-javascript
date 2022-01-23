@@ -19,6 +19,10 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
   public state: string;
 
+  get sslConnection (): boolean {
+    return this._ssl;
+  }
+
   constructor (host: string, options: JSONObject = {}, name: string = undefined) {
     super();
 
@@ -103,9 +107,9 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   get pendingRequests () {
     return this._pendingRequests;
   }
-  
+
   abstract connect (): Promise<any>
-  
+
   abstract send (request: RequestPayload, options: JSONObject): void
 
 

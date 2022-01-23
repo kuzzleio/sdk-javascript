@@ -18,6 +18,7 @@ import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
 import { RequestTimeoutError } from './RequestTimeoutError';
+import { BaseProtocolRealtime } from './protocols/abstract/Realtime';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -403,12 +404,14 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get autoReconnect () {
-    return this.protocol.autoReconnect;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.protocol.autoReconnect = value;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    protocol.autoReconnect = value;
   }
 
   get autoReplay () {
@@ -498,7 +501,8 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get reconnectionDelay () {
-    return this.protocol.reconnectionDelay;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.reconnectionDelay;
   }
 
   get replayInterval () {
