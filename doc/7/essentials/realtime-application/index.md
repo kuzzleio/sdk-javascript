@@ -29,7 +29,7 @@ They are automatically connected to the realtime engine, and their content (`_so
 
 You can therefor directly use them as props for your frontend components for example.
 
-::: warn
+::: warning
 There is a limit on how many realtime documents a single observer instance can manage. This limit is set by collection and by default it's 100 documents per collection. You can increase this limit in Kuzzle configuration under the `limits.subscriptionConditionsCount` key.
 :::
 
