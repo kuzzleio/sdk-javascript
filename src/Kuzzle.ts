@@ -844,7 +844,7 @@ Discarded request: ${JSON.stringify(request)}`));
       request,
       options
     ).then((response: ResponsePayload) => {
-      debug('RESPONSE',response);
+      debug('RESPONSE', response);
 
       return this.deprecationHandler.logDeprecation(response);
     });
