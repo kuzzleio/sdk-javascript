@@ -352,8 +352,7 @@ export class Kuzzle extends KuzzleEventEmitter {
        * In case of login failure we need to be sure that the stored token is still valid
        */
       try {
-        const response = await this.auth.checkToken();
-        this._loggedIn = response.valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -373,8 +372,7 @@ export class Kuzzle extends KuzzleEventEmitter {
      */
     this.on('connected', async () => {
       try {
-        const { valid } = await this.auth.checkToken();
-        this._loggedIn = valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -653,7 +651,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private async tryReAuthenticate (): Promise<boolean> {
     this._reconnectInProgress = true;
     try {
-      const { valid } = await this.auth.checkToken();
+      const valid = await this.isAuthenticated();
 
       if (valid) {
         return true;
@@ -697,13 +695,24 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     await this.authenticator();
 
-    const { valid } = await this.auth.checkToken();
+    const valid = await this.isAuthenticated();
 
     this._loggedIn = valid;
 
     if (! valid) {
       throw new Error('The "authenticator" function failed to authenticate the SDK.');
     }
+  }
+
+  /**
+   * Check wether the user is authenticated or not
+   * by verifiying if a token is present and still valid
+   * and if the token doesn't belong to the anonymous user.
+   */
+  async isAuthenticated() {
+    const { valid, kuid } = await this.auth.checkToken();
+
+    return valid && kuid !== '-1';
   }
 
   /**
