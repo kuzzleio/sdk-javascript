@@ -24,7 +24,7 @@ for (const event of kuzzle.events) {
 
 ## Print Request and Response
 
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.8.3"/>
 
 You can print every request sent to Kuzzle and every response sent back to the SDK by activating the debug mode.
 

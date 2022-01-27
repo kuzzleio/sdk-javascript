@@ -104,7 +104,7 @@ await observer.stop('nyc-open-data', 'yellow-taxi');
 
 ### HTTP support for realtime documents
 
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.8.3"/>
 
 If the SDK is using the HTTP protocol, then the realtime controller cannot be used.
 

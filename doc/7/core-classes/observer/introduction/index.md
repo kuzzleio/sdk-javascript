@@ -38,7 +38,7 @@ they are not displayed anymore.
 
 ## Using HTTP protocol
 
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.8.3"/>
 
 If the SDK is using the HTTP protocol, then documents are retrieved through the [document.mGet](/sdk/js/7/controllers/document/m-get) method every specified interval (default is 5 sec).
 
