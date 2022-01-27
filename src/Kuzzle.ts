@@ -14,6 +14,7 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
+import { debug } from './utils/debug';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
@@ -823,7 +824,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
-        this.emit('offlineQueuePush', {request});
+
+        this.emit('offlineQueuePush', { request });
+
         return new Promise((resolve, reject) => {
           this.offlineQueue.push({
             resolve,
@@ -844,7 +847,11 @@ Discarded request: ${JSON.stringify(request)}`));
       requestTimeout,
       request,
       options
-    ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
+    ).then((response: ResponsePayload) => {
+      debug('RESPONSE', response);
+
+      return this.deprecationHandler.logDeprecation(response);
+    });
   }
 
   /**
@@ -1044,6 +1051,8 @@ Discarded request: ${JSON.stringify(request)}`));
    * @returns Resolved request or a TimedOutError
    */
   private _timeoutRequest(delay: number, request: RequestPayload, options: JSONObject = {}) {
+    debug('REQUEST', request);
+
     // No timeout
     if (delay === -1) {
       return this.protocol.query(request, options);
