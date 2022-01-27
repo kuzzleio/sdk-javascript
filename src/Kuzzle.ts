@@ -14,29 +14,15 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
+import { debug } from './utils/debug';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
 import { RequestTimeoutError } from './RequestTimeoutError';
+import { BaseProtocolRealtime } from './protocols/abstract/Realtime';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
-
-const events = [
-  'connected',
-  'discarded',
-  'disconnected',
-  'loginAttempt',
-  'logoutAttempt',
-  'networkError',
-  'offlineQueuePush',
-  'offlineQueuePop',
-  'queryError',
-  'reAuthenticated',
-  'reconnected',
-  'reconnectionError',
-  'tokenExpired'
-];
 
 export class Kuzzle extends KuzzleEventEmitter {
   // We need to define any string key because users can register new controllers
@@ -45,46 +31,72 @@ export class Kuzzle extends KuzzleEventEmitter {
   /**
    * Protocol used by the SDK to communicate with Kuzzle.
    */
-  protocol: any;
+  public protocol: any;
+
   /**
    * If true, automatically renews all subscriptions on a reconnected event.
    */
-  autoResubscribe: boolean;
+  public autoResubscribe: boolean;
+
   /**
    * Timeout before sending again a similar event.
    */
-  eventTimeout: number;
+  public eventTimeout: number;
+
   /**
    * SDK version.
    */
-  sdkVersion: string;
+  public sdkVersion: string;
+
   /**
    * SDK name (e.g: `js@7.4.2`).
    */
-  sdkName: string;
+  public sdkName: string;
+
   /**
    * Common volatile data that will be sent to all future requests.
    */
-  volatile: JSONObject;
+  public volatile: JSONObject;
+
   /**
    * Handle deprecation warning in development mode (hidden in production)
    */
-  deprecationHandler: Deprecation;
+  public deprecationHandler: Deprecation;
+
   /**
    * Authenticator function called after a reconnection if the SDK is no longer
    * authenticated.
    */
-  authenticator: () => Promise<void> = null;
+  public authenticator: () => Promise<void> = null;
 
-  auth: AuthController;
-  bulk: any;
-  collection: CollectionController;
-  document: DocumentController;
-  index: IndexController;
-  ms: any;
-  realtime: RealtimeController;
-  security: SecurityController;
-  server: any;
+  /**
+   * List of every events emitted by the SDK.
+   */
+  public events = [
+    'connected',
+    'discarded',
+    'disconnected',
+    'loginAttempt',
+    'logoutAttempt',
+    'networkError',
+    'offlineQueuePush',
+    'offlineQueuePop',
+    'queryError',
+    'reAuthenticated',
+    'reconnected',
+    'reconnectionError',
+    'tokenExpired',
+  ];
+
+  public auth: AuthController;
+  public bulk: any;
+  public collection: CollectionController;
+  public document: DocumentController;
+  public index: IndexController;
+  public ms: any;
+  public realtime: RealtimeController;
+  public security: SecurityController;
+  public server: any;
 
   private _protectedEvents: any;
   private _offlineQueue: any;
@@ -336,13 +348,12 @@ export class Kuzzle extends KuzzleEventEmitter {
         this._loggedIn = true;
         return;
       }
-      
+
       /**
        * In case of login failure we need to be sure that the stored token is still valid
        */
       try {
-        const response = await this.auth.checkToken();
-        this._loggedIn = response.valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -362,8 +373,7 @@ export class Kuzzle extends KuzzleEventEmitter {
      */
     this.on('connected', async () => {
       try {
-        const { valid } = await this.auth.checkToken();
-        this._loggedIn = valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -376,8 +386,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     }) as Kuzzle;
   }
 
+  /**
+   * Returns `true` if the SDK holds a valid token
+   */
   get authenticated () {
-    return this.auth.authenticationToken && !this.auth.authenticationToken.expired;
+    return Boolean(this.auth.authenticationToken && ! this.auth.authenticationToken.expired);
   }
 
   get autoQueue () {
@@ -390,12 +403,14 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get autoReconnect () {
-    return this.protocol.autoReconnect;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.protocol.autoReconnect = value;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    protocol.autoReconnect = value;
   }
 
   get autoReplay () {
@@ -407,10 +422,17 @@ export class Kuzzle extends KuzzleEventEmitter {
     this._autoReplay = value;
   }
 
+  /**
+   * Returns `true` if the SDK is using the cookie authentication mode.
+   * (Web only)
+   */
   get cookieAuthentication () {
     return this._cookieAuthentication;
   }
 
+  /**
+   * Returns `true` if the SDK is currently connected to a Kuzzle server.
+   */
   get connected () {
     return this.protocol.connected;
   }
@@ -478,7 +500,8 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get reconnectionDelay () {
-    return this.protocol.reconnectionDelay;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.reconnectionDelay;
   }
 
   get replayInterval () {
@@ -517,7 +540,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   * Emit an event to all registered listeners
   * An event cannot be emitted multiple times before a timeout has been reached.
   */
-  emit (eventName, ...payload) {
+  emit (eventName: string, ...payload) {
     const
       now = Date.now(),
       protectedEvent = this._protectedEvents[eventName];
@@ -593,11 +616,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._reconnectInProgress) {
       return;
     }
-    
+
     if (this.autoQueue) {
       this.stopQueuing();
     }
-  
+
     // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
     // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
     if ( this._loggedIn
@@ -605,14 +628,14 @@ export class Kuzzle extends KuzzleEventEmitter {
     ) {
       this._loggedIn = false;
       this.disconnect();
-      
+
       return;
     }
-    
+
     if (this.autoReplay) {
       this.playQueue();
     }
-    
+
     this.emit('reconnected');
   }
 
@@ -629,7 +652,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private async tryReAuthenticate (): Promise<boolean> {
     this._reconnectInProgress = true;
     try {
-      const { valid } = await this.auth.checkToken();
+      const valid = await this.isAuthenticated();
 
       if (valid) {
         return true;
@@ -673,13 +696,24 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     await this.authenticator();
 
-    const { valid } = await this.auth.checkToken();
+    const valid = await this.isAuthenticated();
 
     this._loggedIn = valid;
 
     if (! valid) {
       throw new Error('The "authenticator" function failed to authenticate the SDK.');
     }
+  }
+
+  /**
+   * Check wether the user is authenticated or not
+   * by verifiying if a token is present and still valid
+   * and if the token doesn't belong to the anonymous user.
+   */
+  async isAuthenticated() {
+    const { valid, kuid } = await this.auth.checkToken();
+
+    return valid && kuid !== '-1';
   }
 
   /**
@@ -690,8 +724,8 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param {function} listener - callback to invoke each time an event is fired
    */
   addListener (event, listener) {
-    if (events.indexOf(event) === -1) {
-      throw new Error(`[${event}] is not a known event. Known events: ${events.toString()}`);
+    if (this.events.indexOf(event) === -1) {
+      throw new Error(`[${event}] is not a known event. Known events: ${this.events.join(', ')}`);
     }
 
     return this._superAddListener(event, listener);
@@ -751,7 +785,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (options && options.queuable === false) {
       queuable = false;
     }
-    
+
     if (this.queueFilter) {
       queuable = queuable && this.queueFilter(request);
     }
@@ -767,7 +801,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       }
       request[key] = value;
     }
-    
+
     if (request.refresh === undefined && options.refresh !== undefined) {
       request.refresh = options.refresh;
     }
@@ -799,7 +833,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
-        this.emit('offlineQueuePush', {request});
+
+        this.emit('offlineQueuePush', { request });
+
         return new Promise((resolve, reject) => {
           this.offlineQueue.push({
             resolve,
@@ -820,7 +856,11 @@ Discarded request: ${JSON.stringify(request)}`));
       requestTimeout,
       request,
       options
-    ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
+    ).then((response: ResponsePayload) => {
+      debug('RESPONSE', response);
+
+      return this.deprecationHandler.logDeprecation(response);
+    });
   }
 
   /**
@@ -1020,6 +1060,8 @@ Discarded request: ${JSON.stringify(request)}`));
    * @returns Resolved request or a TimedOutError
    */
   private _timeoutRequest(delay: number, request: RequestPayload, options: JSONObject = {}) {
+    debug('REQUEST', request);
+
     // No timeout
     if (delay === -1) {
       return this.protocol.query(request, options);

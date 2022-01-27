@@ -17,7 +17,7 @@ export class User {
    *
    * @deprecated Use User._source instead
    */
-  content: JSONObject
+  content: JSONObject;
 
   private _kuzzle: any;
 

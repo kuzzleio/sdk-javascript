@@ -61,3 +61,7 @@ src/core/searchResult/Specifications.js
 src/core/searchResult/User.js
 src/utils/Deprecation.js
 src/utils/interfaces.js
+src/controllers/Server.js
+src/core/Observer.js
+src/core/RealtimeDocument.js
+src/core/searchResult/RealtimeDocument.js

@@ -101,3 +101,13 @@ let realtimeResult = await observer.search('nyc-open-data', 'yellow-taxi', { que
 // Dispose ressources for all managed realtime documents of this collection
 await observer.stop('nyc-open-data', 'yellow-taxi');
 ```
+
+### HTTP support for realtime documents
+
+<SinceBadge version="7.8.3"/>
+
+If the SDK is using the HTTP protocol, then the realtime controller cannot be used.
+
+Instead, the [document.mGet](/sdk/js/7/controllers/document/m-get) method will be used every 5 seconds to retrieve documents from Kuzzle.
+
+The pulling delay can be modified using the `pullingDelay` option of the constructor.

@@ -12,6 +12,17 @@ An event system allows to be notified when the SDK status changes. These events 
 
 The API for interacting with events is described by our [KuzzleEventEmitter](/sdk/js/7/core-classes/kuzzle-event-emitter) class documentation.
 
+::: info
+You can listen to every events on the SDK by using the events property:
+
+```js
+for (const event of kuzzle.events) {
+  kuzzle.on(event, (...args) =>  console.log(event, ...args));
+}
+```
+
+:::
+
 **Note:** listeners are called in the order of their insertion.
 
 # Emitted Events
