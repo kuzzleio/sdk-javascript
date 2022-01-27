@@ -206,7 +206,11 @@ export class AuthController extends BaseController {
     /**
      * Token expiration timestamp
      */
-    expiresAt: number
+    expiresAt: number,
+    /**
+     * KUID of the user that the token belongs to
+     */
+    kuid: string
   }> {
     let cookieAuth = false;
     if (token === undefined) {
