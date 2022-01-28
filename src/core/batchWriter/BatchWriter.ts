@@ -1,6 +1,6 @@
 import { Kuzzle } from '../../Kuzzle';
 import { JSONObject } from '../../types';
-import { InstrumentablePromise } from './InstrumentablePromise';
+import { InstrumentablePromise } from '../InstrumentablePromise';
 
 export type DocumentsBuffer = {
   documents: Array<{ _id: string, body: JSONObject }>,
