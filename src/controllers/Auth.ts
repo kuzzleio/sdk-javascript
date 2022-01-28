@@ -49,7 +49,7 @@ export class AuthController extends BaseController {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wishes to verify their token
    */
-  authenticateRequest (request: any) {
+  authenticateRequest (request: RequestPayload) {
     if (this.kuzzle.cookieAuthentication) {
       return;
     }
@@ -206,7 +206,11 @@ export class AuthController extends BaseController {
     /**
      * Token expiration timestamp
      */
-    expiresAt: number
+    expiresAt: number,
+    /**
+     * KUID of the user that the token belongs to
+     */
+    kuid: string
   }> {
     let cookieAuth = false;
     if (token === undefined) {
@@ -216,7 +220,7 @@ export class AuthController extends BaseController {
         token = this.authenticationToken.encodedJwt;
       }
     }
-    
+
     return this.query({
       action: 'checkToken',
       body: { token },

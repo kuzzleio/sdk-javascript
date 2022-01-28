@@ -9,7 +9,7 @@ description: Searches security profiles, optionally returning only those linked 
 
 Searches security profiles.
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.8.3" />
 <SinceBadge version="Kuzzle 2.14.1" />
 
 Support for search using a search query with the `query` property.
@@ -33,8 +33,8 @@ searchProfiles([body], [options]);
 ### body
 | Property | Type | Description |
 | --- | --- | --- |
-| `roles` | <pre>array&lt;string&gt;</pre> | Role identifiers <DeprecatedBadge version="auto-version"/>|
-| `query` | <pre>object</pre> | Search query using the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) or the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax. <SinceBadge version="auto-version"/>|
+| `roles` | <pre>array&lt;string&gt;</pre> | Role identifiers <DeprecatedBadge version="7.8.3"/>|
+| `query` | <pre>object</pre> | Search query using the [ElasticSearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl.html) or the [Koncorde Filters DSL](/core/2/api/koncorde-filters-syntax) syntax. <SinceBadge version="7.8.3"/>|
 
 If the body is left empty, the result will return all available profiles.
 

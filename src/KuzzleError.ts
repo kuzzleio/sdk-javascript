@@ -120,7 +120,7 @@ export class KuzzleError extends Error {
     }
 
     // PartialError
-    if (this.status === 206) {
+    if (apiError.errors) {
       this.errors = apiError.errors;
       this.count = apiError.count;
     }

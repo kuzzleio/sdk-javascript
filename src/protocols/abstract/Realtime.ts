@@ -4,25 +4,22 @@ import { KuzzleAbstractProtocol } from './Base';
 import * as DisconnectionOrigin from '../DisconnectionOrigin';
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
-  protected _autoReconnect: boolean;
   protected _reconnectionDelay: number;
   protected wasConnected: boolean;
   protected stopRetryingToConnect: boolean;
   protected retrying: boolean;
 
+  public autoReconnect: boolean;
+
   constructor (host, options: any = {}, name: string) {
     super(host, options, name);
 
-    this._autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
+    this.autoReconnect = typeof options.autoReconnect === 'boolean' ? options.autoReconnect : true;
     this._reconnectionDelay = typeof options.reconnectionDelay === 'number' ? options.reconnectionDelay : 1000;
 
     this.wasConnected = false;
     this.stopRetryingToConnect = false;
     this.retrying = false;
-  }
-
-  get autoReconnect () {
-    return this._autoReconnect;
   }
 
   /**
@@ -52,7 +49,7 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
 
   /**
    * Called when the client's connection is closed
-   * 
+   *
    * @param {string} origin String that describe what is causing the disconnection
    */
   clientDisconnected (origin: string) {

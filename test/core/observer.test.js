@@ -44,6 +44,9 @@ describe('Observer', () => {
       realtime: {
         subscribe: sinon.stub().resolves(roomId),
         unsubscribe: sinon.stub().resolves(),
+      },
+      protocol: {
+        name: 'websocket'
       }
     };
 
@@ -51,6 +54,15 @@ describe('Observer', () => {
   });
 
   describe('#constructor', () => {
+    it('should choose pulling mode with HTTP protocol', () => {
+      sdk.protocol.name = 'http';
+
+      observer = new Observer(sdk);
+
+      should(observer.mode).be.eql('pulling');
+      should(observer.options.pullingDelay).be.eql(5000);
+    });
+
     it('should save the SDK instance', () => {
       observer = new Observer(sdk);
 
@@ -89,8 +101,8 @@ describe('Observer', () => {
   });
 
   describe('#disposeDocuments', () => {
-    it('should delete documents and resubscribe', async () => {
-      sinon.stub(observer, 'resubscribe').resolves();
+    it('should delete documents and watch collection', async () => {
+      sinon.stub(observer, 'watchCollection').resolves();
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
 
@@ -99,11 +111,11 @@ describe('Observer', () => {
       const observedDocuments = observer.documentsByCollection.get('index:collection');
       should(observedDocuments.ids).be.eql(['doc2']);
       should(observer.documents.has('index:collection:doc1')).be.false();
-      should(observer.resubscribe).be.calledWith('index', 'collection');
+      should(observer.watchCollection).be.calledWith('index', 'collection');
     });
 
     it('should remove observedDocuments if there is no more documents', async () => {
-      sinon.stub(observer, 'resubscribe').resolves();
+      sinon.stub(observer, 'watchCollection').resolves();
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
 
@@ -114,7 +126,7 @@ describe('Observer', () => {
   });
 
   describe('#disposeCollection', () => {
-    it('should delete documents and unsubscribe', async () => {
+    it('should delete documents and unsubscribe (mode realtime)', async () => {
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
       observer.documentsByCollection.get('index:collection').roomId = 'roomId';
@@ -125,10 +137,25 @@ describe('Observer', () => {
       should(observer.documentsByCollection.has('index:collection')).be.false();
       should(sdk.realtime.unsubscribe).be.calledWith('roomId');
     });
+
+    it('should delete documents and clear timer (mode pulling)', async () => {
+      sdk.protocol.name = 'http';
+      observer = new Observer(sdk);
+      sinon.stub(observer, 'clearPullingTimer');
+      observer.addDocument('index', 'collection', doc1);
+      observer.addDocument('index', 'collection', doc2);
+      observer.documentsByCollection.get('index:collection').roomId = 'roomId';
+
+      await observer.disposeCollection('index', 'collection');
+
+      should(observer.documents.size).be.eql(0);
+      should(observer.documentsByCollection.has('index:collection')).be.false();
+      should(observer.clearPullingTimer).be.called();
+    });
   });
 
   describe('#disposeAll', () => {
-    it('should delete documents and unsubscribe', async () => {
+    it('should delete documents and unsubscribe (mode realtime)', async () => {
       observer.addDocument('index', 'collection', doc1);
       observer.addDocument('index', 'collection', doc2);
       observer.addDocument('index', 'collection2', doc2);
@@ -142,6 +169,22 @@ describe('Observer', () => {
       should(sdk.realtime.unsubscribe)
         .be.calledWith('roomId')
         .be.calledWith('roomId2');
+    });
+
+    it('should delete documents and unsubscribe (mode pulling)', async () => {
+      sdk.protocol.name = 'http';
+      observer = new Observer(sdk);
+      sinon.stub(observer, 'clearPullingTimer');
+      observer.addDocument('index', 'collection', doc1);
+      observer.addDocument('index', 'collection', doc2);
+      observer.addDocument('index', 'collection2', doc2);
+
+      await observer.disposeAll();
+
+      should(observer.documents.size).be.eql(0);
+      should(observer.documentsByCollection.size).be.eql(0);
+      should(observer.clearPullingTimer).be.calledOnce();
+      should(sdk.realtime.unsubscribe).not.be.called();
     });
   });
 
@@ -158,8 +201,8 @@ describe('Observer', () => {
   });
 
   describe('#mGet', () => {
-    it('should use Document.mGet, add documents and resubscribe', async () => {
-      sinon.stub(observer, 'resubscribe').resolves();
+    it('should use Document.mGet, add documents and watchCollection', async () => {
+      sinon.stub(observer, 'watchCollection').resolves();
       sinon.stub(observer, 'addDocument')
         .onCall(0).returns(rtDoc1)
         .onCall(1).returns(rtDoc2);
@@ -176,7 +219,7 @@ describe('Observer', () => {
         .be.calledTwice()
         .be.calledWith('index', 'collection', doc1)
         .be.calledWith('index', 'collection', doc2);
-      should(observer.resubscribe).be.calledWith('index', 'collection');
+      should(observer.watchCollection).be.calledWith('index', 'collection');
       should(successes).be.eql([rtDoc1, rtDoc2]);
       should(errors).be.eql([error1]);
     });
@@ -184,7 +227,7 @@ describe('Observer', () => {
 
   describe('#search', () => {
     it('should use Document.search then build and start search result', async () => {
-      sinon.stub(observer, 'resubscribe').resolves();
+      sinon.stub(observer, 'watchCollection').resolves();
       sinon.stub(observer, 'addDocument')
         .onCall(0).returns(rtDoc1)
         .onCall(1).returns(rtDoc2);
@@ -200,20 +243,20 @@ describe('Observer', () => {
         .be.calledTwice()
         .be.calledWith('index', 'collection', doc1)
         .be.calledWith('index', 'collection', doc2);
-      should(observer.resubscribe).be.calledWith('index', 'collection');
+      should(observer.watchCollection).be.calledWith('index', 'collection');
       should(result.hits).be.eql([rtDoc1, rtDoc2]);
     });
   });
 
   describe('#observe', () => {
-    it('should add the document and call resubscribe', async () => {
-      sinon.stub(observer, 'resubscribe').resolves();
+    it('should add the document and call watchCollection', async () => {
+      sinon.stub(observer, 'watchCollection').resolves();
       sinon.stub(observer, 'addDocument').returns(rtDoc1);
 
       const rtDoc = await observer.observe('index', 'collection', doc1);
 
       should(observer.addDocument).be.calledWith('index', 'collection', doc1);
-      should(observer.resubscribe).be.calledWith('index', 'collection');
+      should(observer.watchCollection).be.calledWith('index', 'collection');
       should(rtDoc).be.eql(rtDoc1);
     });
   });
@@ -233,6 +276,108 @@ describe('Observer', () => {
         deleted: false,
       });
       should(rtDoc).be.eql(internalRtDoc);
+    });
+  });
+
+  describe('#watchCollection', () => {
+    it('should call resubscribe (mode realtime)', async () => {
+      sinon.stub(observer, 'resubscribe').resolves();
+
+      await observer.watchCollection('index', 'collection');
+
+      should(observer.resubscribe).be.calledWith('index', 'collection');
+    });
+
+    it('should call resubscribe (mode pulling)', async () => {
+      sdk.protocol.name = 'http';
+      observer = new Observer(sdk);
+      sinon.stub(observer, 'restartPulling');
+
+      await observer.watchCollection('index', 'collection');
+
+      should(observer.restartPulling).be.calledOnce();
+    });
+  });
+
+  describe('#restartPulling', () => {
+
+    beforeEach(() => {
+      sdk.protocol.name = 'http';
+      observer = new Observer(sdk, { pullingDelay: 1 });
+      sinon.spy(observer, 'clearPullingTimer');
+      sinon.stub(observer, 'pullingHandler').resolves();
+    });
+
+    it('should clear timer and start interval', done => {
+      observer.addDocument('index', 'collection', doc1);
+
+      observer.restartPulling();
+
+      setTimeout(() => {
+        should(observer.clearPullingTimer).be.calledOnce();
+        should(observer.pullingHandler).be.called();
+        observer.stop();
+        done();
+      }, 3);
+    });
+
+    it('should not start the timer if there is no documents', done => {
+      observer.restartPulling();
+
+      setTimeout(() => {
+        should(observer.clearPullingTimer).be.calledOnce();
+        should(observer.pullingHandler).not.be.called();
+        done();
+      }, 3);
+    });
+  });
+
+  describe('#pullingHandler', () => {
+    it('should do nothing if there is no observed documents', async () => {
+      await observer.pullingHandler();
+
+      should(sdk.document.mGet).not.be.called();
+    });
+
+    it('should use mGet method to retrieve documents in each collections', async () => {
+      const rt1 = observer.addDocument('index', 'collection1', doc1);
+      const rt2 = observer.addDocument('index', 'collection2', doc2);
+      sdk.document.mGet.onCall(0).resolves({
+        successes: [{
+          _id: 'doc1',
+          _source: { age: 41 },
+        }],
+        errors: [],
+      });
+      sdk.document.mGet.onCall(1).resolves({
+        successes: [{
+          _id: 'doc2',
+          _source: { age: 42 },
+        }],
+        errors: [],
+      });
+
+      await observer.pullingHandler();
+
+      should(sdk.document.mGet)
+        .be.calledWith('index', 'collection1', ['doc1'])
+        .be.calledWith('index', 'collection2', ['doc2']);
+      should(rt1._source.age).be.eql(41);
+      should(rt2._source.age).be.eql(42);
+    });
+
+    it('should use set the delete flag', async () => {
+      const rt1 = observer.addDocument('index', 'collection1', doc1);
+      sdk.document.mGet.resolves({
+        successes: [],
+        errors: ['doc1'],
+      });
+
+      await observer.pullingHandler();
+
+      should(sdk.document.mGet)
+        .be.calledWith('index', 'collection1', ['doc1']);
+      should(rt1.deleted).be.true();
     });
   });
 

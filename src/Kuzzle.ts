@@ -14,10 +14,12 @@ import { MemoryStorageController } from './controllers/MemoryStorage';
 import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
+import { debug } from './utils/debug';
 import { JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
 import { RequestTimeoutError } from './RequestTimeoutError';
+import { BaseProtocolRealtime } from './protocols/abstract/Realtime';
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -351,8 +353,7 @@ export class Kuzzle extends KuzzleEventEmitter {
        * In case of login failure we need to be sure that the stored token is still valid
        */
       try {
-        const response = await this.auth.checkToken();
-        this._loggedIn = response.valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -372,8 +373,7 @@ export class Kuzzle extends KuzzleEventEmitter {
      */
     this.on('connected', async () => {
       try {
-        const { valid } = await this.auth.checkToken();
-        this._loggedIn = valid;
+        this._loggedIn = await this.isAuthenticated();
       } catch {
         this._loggedIn = false;
       }
@@ -403,12 +403,14 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get autoReconnect () {
-    return this.protocol.autoReconnect;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.autoReconnect;
   }
 
   set autoReconnect (value) {
     this._checkPropertyType('autoReconnect', 'boolean', value);
-    this.protocol.autoReconnect = value;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    protocol.autoReconnect = value;
   }
 
   get autoReplay () {
@@ -498,7 +500,8 @@ export class Kuzzle extends KuzzleEventEmitter {
   }
 
   get reconnectionDelay () {
-    return this.protocol.reconnectionDelay;
+    const protocol = this.protocol as BaseProtocolRealtime;
+    return protocol.reconnectionDelay;
   }
 
   get replayInterval () {
@@ -649,7 +652,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   private async tryReAuthenticate (): Promise<boolean> {
     this._reconnectInProgress = true;
     try {
-      const { valid } = await this.auth.checkToken();
+      const valid = await this.isAuthenticated();
 
       if (valid) {
         return true;
@@ -693,13 +696,24 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     await this.authenticator();
 
-    const { valid } = await this.auth.checkToken();
+    const valid = await this.isAuthenticated();
 
     this._loggedIn = valid;
 
     if (! valid) {
       throw new Error('The "authenticator" function failed to authenticate the SDK.');
     }
+  }
+
+  /**
+   * Check wether the user is authenticated or not
+   * by verifiying if a token is present and still valid
+   * and if the token doesn't belong to the anonymous user.
+   */
+  async isAuthenticated() {
+    const { valid, kuid } = await this.auth.checkToken();
+
+    return valid && kuid !== '-1';
   }
 
   /**
@@ -819,7 +833,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this._queuing) {
       if (queuable) {
         this._cleanQueue();
-        this.emit('offlineQueuePush', {request});
+
+        this.emit('offlineQueuePush', { request });
+
         return new Promise((resolve, reject) => {
           this.offlineQueue.push({
             resolve,
@@ -840,7 +856,11 @@ Discarded request: ${JSON.stringify(request)}`));
       requestTimeout,
       request,
       options
-    ).then((response: ResponsePayload) => this.deprecationHandler.logDeprecation(response));
+    ).then((response: ResponsePayload) => {
+      debug('RESPONSE', response);
+
+      return this.deprecationHandler.logDeprecation(response);
+    });
   }
 
   /**
@@ -1040,6 +1060,8 @@ Discarded request: ${JSON.stringify(request)}`));
    * @returns Resolved request or a TimedOutError
    */
   private _timeoutRequest(delay: number, request: RequestPayload, options: JSONObject = {}) {
+    debug('REQUEST', request);
+
     // No timeout
     if (delay === -1) {
       return this.protocol.query(request, options);

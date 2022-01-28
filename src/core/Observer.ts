@@ -16,6 +16,16 @@ import {
  */
 class ObservedDocuments extends Set<string> {
   /**
+   * Index name
+   */
+  public index: string;
+
+  /**
+   * Collection name
+   */
+  public collection: string;
+
+  /**
    * Room ID for the realtime subscription on the collection of observed documents
    */
   public roomId: string = null;
@@ -35,6 +45,13 @@ class ObservedDocuments extends Set<string> {
       ids: { values: Array.from(this.values()) }
     };
   }
+
+  constructor (index: string, collection: string) {
+    super();
+
+    this.index = index;
+    this.collection = collection;
+  }
 }
 
 type DocumentUrn = string;
@@ -53,6 +70,15 @@ function documentUrn (index: string, collection: string, id: string): DocumentUr
 function collectionUrn (index: string, collection: string): CollectionUrn {
   return `${index}:${collection}`;
 }
+
+export type ObserverOptions = {
+  /**
+   * Refresh delay in ms when the SDK is using the HTTP protocol.
+   *
+   * @default 5000
+   */
+  pullingDelay: number,
+};
 
 /**
  * The Observer class allows to manipulate realtime documents.
@@ -76,12 +102,16 @@ function collectionUrn (index: string, collection: string): CollectionUrn {
  * memory leak.
  *
  * ```js
- * await observer.dispose('nyc-open-data', 'yellow-taxi');
+ * await observer.stop('nyc-open-data', 'yellow-taxi');
  * ```
  *
  * A good frontend practice is to instantiate one observer for the actual page
  * and/or component(s) displaying realtime documents and to dispose them when
  * they are not displayed anymore.
+ *
+ * If the SDK is using the HTTP protocol, then documents are retrieved through the
+ * document.mGet method every specified interval (default is 5 sec). This interval
+ * can be modified with the `pullingDelay` option of the constructor.
  */
 export class Observer {
   /**
@@ -107,14 +137,37 @@ export class Observer {
   private sdk: Kuzzle;
 
   /**
+   * @internal
+   */
+  private options: ObserverOptions = {
+    pullingDelay: 5000,
+  };
+
+  /**
+   * @internal
+   */
+  private pullingTimer: any;
+
+  /**
+   * Method to refresh documents.
+   * Either through the realtime notifications system or by pulling documents
+   * with the document.mGet method (HTTP protocol)
+   */
+  public readonly mode: 'realtime' | 'pulling';
+
+  /**
    * Instantiate a new Observer
    *
    * @param sdk SDK instance
    */
-  constructor (sdk: Kuzzle) {
+  constructor (sdk: Kuzzle, options?: ObserverOptions) {
     Reflect.defineProperty(this, 'sdk', {
       value: sdk
     });
+
+    this.options = { ...this.options, ...options };
+
+    this.mode = this.sdk.protocol.name === 'http' ? 'pulling' : 'realtime';
   }
 
   /**
@@ -166,7 +219,7 @@ export class Observer {
       this.documentsByCollection.delete(collectionUrn(index, collection));
     }
 
-    return this.resubscribe(index, collection);
+    return this.watchCollection(index, collection);
   }
 
   private disposeCollection (index: string, collection: string): Promise<void> {
@@ -178,7 +231,13 @@ export class Observer {
 
     this.documentsByCollection.delete(collectionUrn(index, collection));
 
-    return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
+    if (this.mode === 'realtime') {
+      return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
+    }
+
+    this.clearPullingTimer();
+
+    return Promise.resolve();
   }
 
   /**
@@ -189,10 +248,14 @@ export class Observer {
   private disposeAll (): Promise<void> {
     const promises = [];
 
-    for (const subscription of this.documentsByCollection.values()) {
-      if (subscription.roomId) {
-        promises.push(this.sdk.realtime.unsubscribe(subscription.roomId));
+    for (const observedDocuments of this.documentsByCollection.values()) {
+      if (observedDocuments.roomId) {
+        promises.push(this.sdk.realtime.unsubscribe(observedDocuments.roomId));
       }
+    }
+
+    if (this.mode === 'pulling') {
+      promises.push(this.clearPullingTimer());
     }
 
     this.documentsByCollection.clear();
@@ -259,7 +322,7 @@ export class Observer {
           rtDocuments.push(this.addDocument(index, collection, document));
         }
 
-        return this.resubscribe(index, collection);
+        return this.watchCollection(index, collection);
       })
       .then(() => ({ successes: rtDocuments, errors: _errors }));
   }
@@ -311,7 +374,7 @@ export class Observer {
   ): Promise<RealtimeDocument> {
     const rtDocument = this.addDocument(index, collection, document);
 
-    return this.resubscribe(index, collection)
+    return this.watchCollection(index, collection)
       .then(() => rtDocument);
   }
 
@@ -328,7 +391,7 @@ export class Observer {
     const urn = collectionUrn(index, collection);
 
     if (! this.documentsByCollection.has(urn)) {
-      this.documentsByCollection.set(urn, new ObservedDocuments());
+      this.documentsByCollection.set(urn, new ObservedDocuments(index, collection));
     }
 
     const observedDocuments = this.documentsByCollection.get(urn);
@@ -341,35 +404,123 @@ export class Observer {
   }
 
   /**
+   * Start subscription or pulling on the collection
+   *
+   * @internal
+   */
+  watchCollection (index: string, collection: string): Promise<void> {
+    if (this.mode === 'realtime') {
+      return this.resubscribe(index, collection);
+    }
+
+    this.restartPulling();
+
+    return Promise.resolve();
+  }
+
+  private restartPulling (): void {
+    this.clearPullingTimer();
+
+    if (this.documentsByCollection.size !== 0) {
+      this.pullingTimer = setInterval(
+        this.pullingHandler.bind(this),
+        this.options.pullingDelay);
+    }
+  }
+
+  /**
+   * Use the document.mGet method to pull documents from observed collections
+   * and update internal realtime documents.
+   *
+   * This method never returns a rejected promise.
+   */
+  private pullingHandler (): Promise<void> {
+    const promises = [];
+
+    for (const observedDocuments of this.documentsByCollection.values()) {
+      const promise = this.sdk.document.mGet(
+        observedDocuments.index,
+        observedDocuments.collection,
+        observedDocuments.ids
+      )
+        .then(({ successes, errors }) => {
+          for (const document of successes) {
+            const urn = documentUrn(
+              observedDocuments.index,
+              observedDocuments.collection,
+              document._id);
+
+            const rtDocument = this.documents.get(urn);
+            Object.assign(rtDocument._source, document._source);
+          }
+
+          for (const deletedDocumentId of errors) {
+            const urn = documentUrn(
+              observedDocuments.index,
+              observedDocuments.collection,
+              deletedDocumentId);
+
+            const rtDocument = this.documents.get(urn);
+
+            rtDocument.deleted = true;
+
+            this.documents.delete(urn);
+
+            observedDocuments.delete(deletedDocumentId);
+
+            if (observedDocuments.size === 0) {
+              this.documentsByCollection.delete(collectionUrn(observedDocuments.index, observedDocuments.collection));
+            }
+          }
+        })
+        .catch(() => {
+          // A `queryError` event is already emitted by the protocol
+          // This handler ensure we don't have any unhandledRejection error
+        });
+
+      promises.push(promise);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    return Promise.all(promises).then(() => {});
+  }
+
+  private clearPullingTimer (): void {
+    if (this.pullingTimer) {
+      clearInterval(this.pullingTimer);
+    }
+  }
+
+  /**
    * Renew a collection subscription with filters according to the list of
    * currently managed documents.
    *
    * @internal
    */
-  resubscribe (index: string, collection: string): Promise<void> {
-    const subscription = this.documentsByCollection.get(collectionUrn(index, collection));
+  private resubscribe (index: string, collection: string): Promise<void> {
+    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
 
-    if (! subscription) {
+    if (! observedDocuments) {
       return Promise.resolve();
     }
 
     // Do not resubscribe if there is no documents
-    if (subscription.size === 0) {
-      return subscription.roomId
-        ? this.sdk.realtime.unsubscribe(subscription.roomId)
+    if (observedDocuments.size === 0) {
+      return observedDocuments.roomId
+        ? this.sdk.realtime.unsubscribe(observedDocuments.roomId)
         : Promise.resolve();
     }
 
     return this.sdk.realtime.subscribe(
       index,
       collection,
-      subscription.filters,
+      observedDocuments.filters,
       this.notificationHandler.bind(this)
     )
       .then(roomId => {
-        const oldRoomId = subscription.roomId;
+        const oldRoomId = observedDocuments.roomId;
 
-        subscription.roomId = roomId;
+        observedDocuments.roomId = roomId;
 
         if (oldRoomId) {
           return this.sdk.realtime.unsubscribe(oldRoomId);

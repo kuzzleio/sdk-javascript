@@ -29,7 +29,7 @@ They are automatically connected to the realtime engine, and their content (`_so
 
 You can therefor directly use them as props for your frontend components for example.
 
-::: warn
+::: warning
 There is a limit on how many realtime documents a single observer instance can manage. This limit is set by collection and by default it's 100 documents per collection. You can increase this limit in Kuzzle configuration under the `limits.subscriptionConditionsCount` key.
 :::
 
@@ -101,3 +101,13 @@ let realtimeResult = await observer.search('nyc-open-data', 'yellow-taxi', { que
 // Dispose ressources for all managed realtime documents of this collection
 await observer.stop('nyc-open-data', 'yellow-taxi');
 ```
+
+### HTTP support for realtime documents
+
+<SinceBadge version="7.8.3"/>
+
+If the SDK is using the HTTP protocol, then the realtime controller cannot be used.
+
+Instead, the [document.mGet](/sdk/js/7/controllers/document/m-get) method will be used every 5 seconds to retrieve documents from Kuzzle.
+
+The pulling delay can be modified using the `pullingDelay` option of the constructor.
