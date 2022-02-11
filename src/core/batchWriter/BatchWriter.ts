@@ -139,7 +139,11 @@ export class BatchWriter {
     }
   }
 
-  private async sendCreateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
+  private async sendWriteBuffer (
+    mAction: any,
+    buffer: BatchBuffer,
+    options: JSONObject = {},
+  ) {
     const promises = [];
 
     for (const [index, collectionBuffer] of buffer.indexes.entries()) {
@@ -150,7 +154,7 @@ export class BatchWriter {
         }
 
         promises.push(
-          this.sdk.document.mCreate(index, collection, documents as any, { ...options })
+          this.sdk.document[mAction](index, collection, documents as any, { ...options })
             .then(promise.resolve)
             .catch(promise.reject)
         );
@@ -158,69 +162,22 @@ export class BatchWriter {
     }
 
     await Promise.all(promises);
+  }
+
+  private sendCreateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
+    return this.sendWriteBuffer('mCreate', buffer, options);
   }
 
   private async sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
-    const promises = [];
-
-    for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
-        if (documents.length === 0) {
-          promise.resolve();
-          continue;
-        }
-
-        promises.push(
-          this.sdk.document.mUpdate(index, collection, documents as any, { ...options })
-            .then(promise.resolve)
-            .catch(promise.reject)
-        );
-      }
-    }
-
-    await Promise.all(promises);
+    return this.sendWriteBuffer('mUpdate', buffer, options);
   }
 
   private async sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
-    const promises = [];
-
-    for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
-        if (documents.length === 0) {
-          promise.resolve();
-          continue;
-        }
-
-        promises.push(
-          this.sdk.document.mReplace(index, collection, documents as any, { ...options })
-            .then(promise.resolve)
-            .catch(promise.reject)
-        );
-      }
-    }
-
-    await Promise.all(promises);
+    return this.sendWriteBuffer('mReplace', buffer, options);
   }
 
   private async sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
-    const promises = [];
-
-    for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
-        if (documents.length === 0) {
-          promise.resolve();
-          continue;
-        }
-
-        promises.push(
-          this.sdk.document.mCreateOrReplace(index, collection, documents as any, { ...options })
-            .then(promise.resolve)
-            .catch(promise.reject)
-        );
-      }
-    }
-
-    await Promise.all(promises);
+    return this.sendWriteBuffer('mCreateOrReplace', buffer, options);
   }
 
   private async sendGetBuffer (buffer: BatchBuffer) {
