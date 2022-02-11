@@ -1,67 +1,6 @@
 import { Kuzzle } from '../../Kuzzle';
 import { JSONObject } from '../../types';
-import { InstrumentablePromise } from '../InstrumentablePromise';
-
-export type DocumentsBuffer = {
-  documents: Array<{ _id: string, body: JSONObject }>,
-  promise: InstrumentablePromise,
-  options: JSONObject,
-};
-
-/**
- * Map of index and collections with documents, options and associated promise
- *
- * Map<index, Map<collection, DocumentsBuffer>>
- */
-export type IndexBuffer = Map<string, Map<string, DocumentsBuffer>>;
-
-export class BatchBuffer {
-  public indexes: IndexBuffer = new Map<string, Map<string, DocumentsBuffer>>();
-
-  /**
-   * Add a document to the buffer of a specific collection
-   *
-   * @param index Index name
-   * @param collection Collection name
-   * @param body Document content
-   * @param _id Document ID
-   * @param options Option object passed to the m* action
-   *
-   * @returns An object containing the result index in the array of results and a promise resolving to the array of results
-   */
-  add (
-    index: string,
-    collection: string,
-    body: JSONObject,
-    _id?: string,
-    options?: JSONObject
-  ): { idx: number, promise: InstrumentablePromise } {
-    if (! this.indexes.has(index)) {
-      this.indexes.set(index, new Map<string, DocumentsBuffer>());
-    }
-
-    if (! this.indexes.get(index).has(collection)) {
-      this.indexes.get(index).set(collection, {
-        documents: [],
-        promise: new InstrumentablePromise(),
-        options,
-      });
-    }
-
-    const buffer = this.indexes.get(index).get(collection);
-
-    const idx = buffer.documents.length;
-
-    buffer.options = { ...buffer.options, ...options };
-
-    buffer.documents.push({ _id, body });
-
-    return {
-      idx,
-      promise: buffer.promise,
-    };
-  }
-}
+import { BatchBuffer } from './BatchBuffer';
 
 /**
  * This class handle buffers for every supported API action of the document controller:
@@ -73,6 +12,8 @@ export class BatchBuffer {
  *
  * If the interval is too big, buffers may contain too much documents for Kuzzle limits.
  * (e.g. "limits.documentsWriteCount" is 200 by default)
+ *
+ * @internal
  */
 export class BatchWriter {
   private timer: any;
@@ -141,8 +82,6 @@ export class BatchWriter {
     this.interval = interval;
     this.maxWriteBufferSize = maxWriteBufferSize;
     this.maxReadBufferSize = maxReadBufferSize;
-
-    this.begin();
   }
 
   /**
@@ -188,6 +127,7 @@ export class BatchWriter {
     await this.execute();
 
     clearInterval(this.timer);
+    this.timer = null;
   }
 
   /**

@@ -50,6 +50,8 @@ export class BatchController extends DocumentController {
       maxWriteBufferSize,
       maxReadBufferSize
     });
+
+    this.writer.begin();
   }
 
   async dispose () {
