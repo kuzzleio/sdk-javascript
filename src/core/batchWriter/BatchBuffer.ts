@@ -4,7 +4,7 @@ import { InstrumentablePromise } from '../InstrumentablePromise';
 /**
  * @internal
  */
- export type DocumentsBuffer = {
+export type DocumentsBuffer = {
   documents: Array<{ _id: string, body: JSONObject }>,
   promise: InstrumentablePromise,
   options: JSONObject,
