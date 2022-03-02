@@ -1,4 +1,3 @@
-const sinon = require('sinon');
 const should = require('should');
 
 const { BatchBuffer } = require('../../../src/core/batchWriter/BatchBuffer');

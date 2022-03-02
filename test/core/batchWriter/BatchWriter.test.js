@@ -102,7 +102,7 @@ describe('BatchWriter', () => {
     beforeEach(() => {
       writer.sdk.document.mCreate
         .onCall(0).resolves('mCreate1')
-        .onCall(1).resolves('mCreate2')
+        .onCall(1).resolves('mCreate2');
     });
 
     it('should execute a mCreate action per collection and resolve with the result', async () => {
@@ -173,7 +173,7 @@ describe('BatchWriter', () => {
       ];
       writer.sdk.document.mGet
         .onCall(0).resolves({ successes: mGetResults1 })
-        .onCall(1).resolves({ successes: mGetResults2 })
+        .onCall(1).resolves({ successes: mGetResults2 });
     });
 
     it('should execute a mGet action per collection and resolve with the result', async () => {
