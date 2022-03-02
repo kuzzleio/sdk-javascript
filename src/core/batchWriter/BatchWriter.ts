@@ -218,13 +218,13 @@ export class BatchWriter {
           this.sdk.document.mGet(index, collection, ids)
             .then(({ successes }) => {
               const successesId = successes.map(({ _id }) => _id);
-              const exists = new Array(ids.length);
+              const existences = new Array(ids.length);
 
-              for (let i = 0; i < exists.length; i++) {
-                exists[i] = successesId.includes(ids[i]);
+              for (let i = 0; i < existences.length; i++) {
+                existences[i] = successesId.includes(ids[i]);
               }
 
-              promise.resolve({ successes: exists });
+              promise.resolve(existences);
             })
             .catch(promise.reject)
         );

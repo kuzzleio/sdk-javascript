@@ -16,6 +16,7 @@ describe('BatchWriter', () => {
         mCreate: sinon.stub().resolves(),
         mCreateOrReplace: sinon.stub().resolves(),
         mGet: sinon.stub().resolves(),
+        mDelete: sinon.stub().resolves(),
       }
     };
 
@@ -132,7 +133,7 @@ describe('BatchWriter', () => {
     beforeEach(() => {
       writer.sdk.document.mGet
         .onCall(0).resolves('mGet1')
-        .onCall(1).resolves('mGet2')
+        .onCall(1).resolves('mGet2');
     });
 
     it('should execute a mGet action per collection and resolve with the result', async () => {
@@ -168,8 +169,7 @@ describe('BatchWriter', () => {
         { _id: 'aschen' },
       ];
       mGetResults2 = [
-        { _id: 'dana' },
-        { _id: 'aschen' },
+        { _id: 'ugo' },
       ];
       writer.sdk.document.mGet
         .onCall(0).resolves({ successes: mGetResults1 })
@@ -183,8 +183,8 @@ describe('BatchWriter', () => {
 
       await writer.sendExistsBuffer(writer.buffers.exists);
 
-      should(await tbilisi.promise.promise).be.eql({ successes: ['dana', 'aschen'] });
-      should(await colombo.promise.promise).be.eql({ successes: ['ugo'] });
+      should(await tbilisi.promise.promise).be.eql([true, true]);
+      should(await colombo.promise.promise).be.eql([true]);
       should(writer.sdk.document.mGet)
         .be.calledWith('city', 'tbilisi', ['dana', 'aschen'])
         .be.calledWith('city', 'colombo', ['ugo']);
@@ -193,14 +193,14 @@ describe('BatchWriter', () => {
     it('should only resolve existing documents', async () => {
       const tbilisi = writer.buffers.exists.add('city', 'tbilisi', undefined, 'dana');
       writer.buffers.exists.add('city', 'tbilisi', undefined, 'aschen');
-      writer.sdk.document.mGet.resolves({
+      writer.sdk.document.mGet.onCall(0).resolves({
         successes: [{ _id: 'dana' }],
         errors: [{ _id: 'aschen' }]
       });
 
       await writer.sendExistsBuffer(writer.buffers.exists);
 
-      should(await tbilisi.promise.promise).be.eql({ successes: ['dana'] });
+      should(await tbilisi.promise.promise).be.eql([true, false]);
     });
 
     it('should resolve the promise with the error', async () => {
@@ -208,6 +208,36 @@ describe('BatchWriter', () => {
       const tbilisi = writer.buffers.exists.add('city', 'tbilisi', undefined, 'dana');
 
       await writer.sendExistsBuffer(writer.buffers.exists);
+      should(tbilisi.promise.promise).be.rejectedWith('error');
+    });
+  });
+
+  describe('sendDeleteBuffer', () => {
+    beforeEach(() => {
+      writer.sdk.document.mDelete
+        .onCall(0).resolves('mDelete1')
+        .onCall(1).resolves('mDelete2');
+    });
+
+    it('should execute a mGet action per collection and resolve with the result', async () => {
+      const tbilisi = writer.buffers.delete.add('city', 'tbilisi', undefined, 'dana');
+      writer.buffers.delete.add('city', 'tbilisi', undefined, 'aschen');
+      const colombo = writer.buffers.delete.add('city', 'colombo', undefined, 'ugo');
+
+      await writer.sendDeleteBuffer(writer.buffers.delete);
+
+      should(await tbilisi.promise.promise).be.eql('mDelete1');
+      should(await colombo.promise.promise).be.eql('mDelete2');
+      should(writer.sdk.document.mDelete)
+        .be.calledWith('city', 'tbilisi', ['dana', 'aschen'])
+        .be.calledWith('city', 'colombo', ['ugo']);
+    });
+
+    it('should resolve the promise with the error', async () => {
+      writer.sdk.document.mDelete.rejects('error');
+      const tbilisi = writer.buffers.delete.add('city', 'tbilisi', undefined, 'dana');
+
+      await writer.sendDeleteBuffer(writer.buffers.delete);
       should(tbilisi.promise.promise).be.rejectedWith('error');
     });
   });

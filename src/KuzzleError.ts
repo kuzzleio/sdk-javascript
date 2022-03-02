@@ -141,10 +141,12 @@ export class KuzzleError extends Error {
     }
 
     // Append the SDK stacktrace
-    this.stack += sdkStack
-      .split('\n')
-      .map(hilightUserCode)
-      .slice(1)
-      .join('\n');
+    if (sdkStack) {
+      this.stack += sdkStack
+        .split('\n')
+        .map(hilightUserCode)
+        .slice(1)
+        .join('\n');
+    }
   }
 }

@@ -45,7 +45,7 @@ export class BatchController extends DocumentController {
   ) {
     super(sdk);
 
-    this.writer = new BatchWriter(sdk, {
+    this.writer = this.createWriter(sdk, {
       interval,
       maxWriteBufferSize,
       maxReadBufferSize
@@ -165,9 +165,9 @@ export class BatchController extends DocumentController {
   async exists (index: string, collection: string, id: string): Promise<boolean> {
     const { idx, promise } = this.writer.addExists(index, collection, undefined, id);
 
-    const { successes } = await promise.promise;
+    const existences = await promise.promise;
 
-    return successes[idx];
+    return existences[idx];
   }
 
   async delete (index: string, collection: string, id: string): Promise<string> {
@@ -182,5 +182,12 @@ export class BatchController extends DocumentController {
     }
 
     return successes[idx];
+  }
+
+  /**
+   * Used in function tests.
+   */
+  private createWriter (sdk: Kuzzle, options: JSONObject) {
+    return new BatchWriter(sdk, options);
   }
 }
