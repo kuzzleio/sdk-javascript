@@ -24,6 +24,9 @@ import { KuzzleError } from '../../KuzzleError';
  *  - exists => mGet
  *  - delete => mDelete
  *
+ * This will significantly increase performances.
+ * The drawback is that standard API errors will not be available. (Except for the `services.storage.not_found` error).
+ *
  * The m* actions returns the successes in the same order as in the request so
  * since we have the index of the single document inside the array of documents
  * sent to the action, we can retrieve the corresponding result in the array of
@@ -54,10 +57,29 @@ export class BatchController extends DocumentController {
     this.writer.begin();
   }
 
+  /**
+   * Dispose the instance.
+   *
+   * This method has to be called to destroy the underlaying timer sending batch requests.
+   */
   async dispose () {
     await this.writer.dispose();
   }
 
+  /**
+   * See sdk.document.create method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param content Document content
+   * @param _id Optional document ID
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The created document
+   */
   async create (
     index: string,
     collection: string,
@@ -85,6 +107,20 @@ export class BatchController extends DocumentController {
     return successes[idx];
   }
 
+  /**
+   * See document.replace method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param id Document ID
+   * @param content Document content
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The replaced document
+   */
   async replace (
     index: string,
     collection: string,
@@ -105,6 +141,19 @@ export class BatchController extends DocumentController {
     return successes[idx];
   }
 
+  /**
+   * See document.createOrReplace method
+   * @param index Index name
+   * @param collection Collection name
+   * @param id Document ID
+   * @param content Document content
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The created or replaced document
+   */
   async createOrReplace (
     index: string,
     collection: string,
@@ -125,6 +174,22 @@ export class BatchController extends DocumentController {
     return successes[idx];
   }
 
+  /**
+   * See document.update method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param id Document ID
+   * @param content Document content
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.retryOnConflict Number of times the database layer should retry in case of version conflict
+   * @param options.source If true, returns the updated document inside the response
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The replaced document
+   */
   async update (
     index: string,
     collection: string,
@@ -145,6 +210,20 @@ export class BatchController extends DocumentController {
     return successes[idx];
   }
 
+  /**
+   * See document.get method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Document ID
+   * @param options Additional options
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The document
+   */
   async get (index: string, collection: string, id: string): Promise<Document> {
     const { promise } = this.writer.addGet(index, collection, undefined, id);
 
@@ -162,6 +241,20 @@ export class BatchController extends DocumentController {
     return document;
   }
 
+  /**
+   * See document.exists method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Document ID
+   * @param options Additional options
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns True if the document exists
+   */
   async exists (index: string, collection: string, id: string): Promise<boolean> {
     const { idx, promise } = this.writer.addExists(index, collection, undefined, id);
 
@@ -170,6 +263,20 @@ export class BatchController extends DocumentController {
     return existences[idx];
   }
 
+  /**
+   * See document.delete method
+   *
+   * @param index Index name
+   * @param collection Collection name
+   * @param _id Document ID
+   * @param options Additional options
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The document ID
+   */
   async delete (index: string, collection: string, id: string): Promise<string> {
     const { idx, promise } = this.writer.addDelete(index, collection, undefined, id);
 
@@ -186,6 +293,7 @@ export class BatchController extends DocumentController {
 
   /**
    * Used in function tests.
+   * @internal
    */
   private createWriter (sdk: Kuzzle, options: JSONObject) {
     return new BatchWriter(sdk, options);

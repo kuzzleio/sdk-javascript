@@ -66,11 +66,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param content Document content
    * @param _id Optional document ID
-   * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The created document
    */
@@ -104,11 +103,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param id Document ID
    * @param content Document content
-   * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The created or replaced document
    */
@@ -141,10 +139,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The document ID
    */
@@ -249,10 +247,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns True if the document exists
    */
@@ -282,10 +280,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param _id Document ID
    * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The document
    */
@@ -577,11 +575,10 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param id Document ID
    * @param content Document content
-   * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The replaced document
    */
@@ -674,13 +671,12 @@ export class DocumentController extends BaseController {
    * @param collection Collection name
    * @param id Document ID
    * @param content Document content
-   * @param options Additional options
-   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-   *    - `silent` If true, then Kuzzle will not generate notifications
-   *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
-   *    - `source` If true, returns the updated document inside the response
-   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.queuable If true, queues the request during downtime, until connected to Kuzzle again
+   * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   * @param options.silent If true, then Kuzzle will not generate notifications
+   * @param options.retryOnConflict Number of times the database layer should retry in case of version conflict
+   * @param options.source If true, returns the updated document inside the response
+   * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns The replaced document
    */
