@@ -2,7 +2,6 @@ import { InstrumentablePromise } from '../../core/InstrumentablePromise';
 import { RequestPayload } from '../../types/RequestPayload';
 
 export class PendingRequest extends InstrumentablePromise {
-  public promise: any;
   public request: RequestPayload;
 
   constructor (request: RequestPayload) {

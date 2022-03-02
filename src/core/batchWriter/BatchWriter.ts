@@ -168,15 +168,15 @@ export class BatchWriter {
     return this.sendWriteBuffer('mCreate', buffer, options);
   }
 
-  private async sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
+  private sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
     return this.sendWriteBuffer('mUpdate', buffer, options);
   }
 
-  private async sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
+  private sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
     return this.sendWriteBuffer('mReplace', buffer, options);
   }
 
-  private async sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
+  private sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' }) {
     return this.sendWriteBuffer('mCreateOrReplace', buffer, options);
   }
 
