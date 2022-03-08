@@ -5,10 +5,29 @@ on:
     branches:
       - 7-dev
 
+env:
+  NODE_LTS_MAINTENANCE_VERSION: "lts/fermium"
+  NODE_LTS_CURRENT_VERSION: "lts/gallium"
+  NODE_LTS_ACTIVE_VERSION: "lts/*"  # The latest LTS version
+
 jobs:
+  prepare-matrix:
+    name: Forge Node LTS Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-matrix
+        run: |
+          echo "::set-output name=matrix::{\"node-version\": [\"$NODE_LTS_MAINTENANCE_VERSION\", \"$NODE_LTS_CURRENT_VERSION\", \"$NODE_LTS_ACTIVE_VERSION\"]}"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+  
   lint:
     name: Lint
     runs-on: ubuntu-18.04
+    needs: [prepare-matrix]
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -22,15 +41,18 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/es-lint
 
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-18.04
-    needs: [lint]
+    needs: [lint, prepare-matrix]
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -44,15 +66,18 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/unit-tests
 
   functional-tests:
     name: Functional Tests
     runs-on: ubuntu-18.04
-    needs: [unit-tests]
+    needs: [unit-tests, prepare-matrix]
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node-version }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -68,9 +93,9 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/functional-tests
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
@@ -78,7 +103,10 @@ jobs:
   admin-console-tests:
     name: Admin Console Tests
     runs-on: ubuntu-18.04
-    needs: [unit-tests]
+    needs: [unit-tests, prepare-matrix]
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.prepare-matrix.outputs.matrix).node-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -94,7 +122,7 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
@@ -117,9 +145,9 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: ${{ env.NODE_LTS_ACTIVE_VERSION }}
       - uses: ./.github/actions/snippet-tests
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
