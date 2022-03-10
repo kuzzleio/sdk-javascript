@@ -1,4 +1,4 @@
-const mapping = {
+const mappings = {
   dynamic: 'false',
   _meta: {
     area: 'Panipokhari'
@@ -9,7 +9,7 @@ const mapping = {
 };
 
 try {
-  await kuzzle.collection.update('nyc-open-data', 'yellow-taxi', mapping);
+  await kuzzle.collection.update('nyc-open-data', 'yellow-taxi', { mappings });
 
   console.log('Success');
 } catch (error) {
