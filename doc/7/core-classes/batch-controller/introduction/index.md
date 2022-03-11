@@ -12,7 +12,7 @@ order: 0
 
 This class is an overload of the document controller and can be switched "as-is" in your code.
 
-It allows to group API action by batches to significantly increase performances.
+It allows to group API actions into batches to significantly increase performances.
 
 The following methods will be executed by batch using
 m* actions:
@@ -29,12 +29,12 @@ Standard API errors will not be available.
 Except for the `services.storage.not_found` error.
 :::
 
-By default, the BatchController send a batch of document every 10ms. This can be configured when instantiating the BatchController through the `options.interval` constructor parameter.
+By default, the BatchController sends a batch of documents every 10ms. This can be configured when instantiating the BatchController through the `options.interval` constructor parameter.
 
 ::: info
-Depending on your load, you may want to increase the timer interval to execute bigger batch.
-A bigger interval will also mean more time between two batch and potentialy degraded performances.
-The default value of 10ms offer a good balance between batch size and maximum delay between two batch and should be suitable for most situations.
+Depending on your workload, you may want to increase the timer interval to execute bigger batches.
+A bigger interval will also mean more time between two batches and potentially degraded performances.
+The default value of 10ms offers a good balance between batch size and maximum delay between two batches and should be suitable for most situations.
 :::
 
 **Example:**

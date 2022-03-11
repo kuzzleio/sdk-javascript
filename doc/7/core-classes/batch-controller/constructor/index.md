@@ -11,7 +11,7 @@ description: BatchController constructor method
 
 Instantiate a new BatchController.
 
-Each instance will start a timer to periodicaly send batch requests.
+Each instance will start a timer to periodically send batch requests.
 
 ## Arguments
 

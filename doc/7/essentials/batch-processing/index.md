@@ -17,17 +17,17 @@ Most of the methods of the Document controller have a batch alternative:
  - exists => mGet
  - delete => mDelete
 
-Those methods can be used to process batches of document at once and increase performances.
+Those methods can be used to process batches of documents at once and increase performances.
 
 ## BatchController
 
 Although the m* methods offer very good performances when handling documents, they will need a refactor of the code and architecture.
 
-Instead the [BatchController](/sdk/js/7/core-classes/batch-controller/introduction) provide a consistent way to deal with documents per batch.
+Instead the [BatchController](/sdk/js/7/core-classes/batch-controller/introduction) provides a consistent way to deal with documents per batch.
 
-It overloads the original DocumentController but methods will be executed by batch at a fixed interval.
+It overloads the original DocumentController but methods will be executed in batch at a fixed interval.
 
-The BatchController is usable without modifying the original code, just by substituing the original calls to `document.*` to `batch.*`
+The BatchController is usable without modifying the original code, just by replacing the original calls to `document.*` to `batch.*`
 
 **Example:**
 
