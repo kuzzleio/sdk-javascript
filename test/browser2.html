@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kuzzle Javascript SDK</title>
+    <script src="../dist/kuzzle.js"></script>
+  </head>
+  <body>
+    <h1>
+      Kuzzle Javascript SDK
+    </h1>
+    <script type="application/javascript">
+      (async function () {
+        window.kuzzle = new KuzzleSDK.Kuzzle(new KuzzleSDK.WebSocket('localhost'))
+
+        await window.kuzzle.connect()
+
+        setInterval(async () => {
+          console.log('Send')
+          await window.kuzzle.index.list();
+        }, 1000)
+      })();
+    </script>
+  </body>
+</html>
