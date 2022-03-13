@@ -62,6 +62,7 @@ The Observer controller can be used with [strong typing](/sdk/js/7/essentials/st
 ```js
 const doc = await observer.get<DeviceContent>('nyc-open-data', 'yellow-taxi', 'aschen');
 ```
+
 :::
 
 ### Retrieve realtime documents

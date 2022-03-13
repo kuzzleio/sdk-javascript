@@ -6,7 +6,7 @@ import {
   ArgsDocumentControllerUpdate,
   DocumentController
 } from '../../controllers/Document';
-import { JSONObject, Document } from '../../types';
+import { JSONObject, KDocContentGeneric, KDoc } from '../../types';
 import { BatchWriter } from './BatchWriter';
 import { omit } from '../../utils/object';
 import { KuzzleError } from '../../KuzzleError';
@@ -80,13 +80,13 @@ export class BatchController extends DocumentController {
    *
    * @returns The created document
    */
-  async create (
+  async create<TKDocContent extends KDocContentGeneric> (
     index: string,
     collection: string,
-    content: JSONObject,
+    content: Partial<TKDocContent>,
     _id?: string,
     options?: ArgsDocumentControllerCreate
-  ): Promise<Document> {
+  ): Promise<KDoc<TKDocContent>> {
     const { idx, promise } = this.writer.addCreate(index, collection, content, _id, options);
 
     const { successes, errors } = await promise.promise;
@@ -121,13 +121,13 @@ export class BatchController extends DocumentController {
    *
    * @returns The replaced document
    */
-  async replace (
+  async replace<TKDocContent extends KDocContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: JSONObject,
+    content: Partial<TKDocContent>,
     options?: ArgsDocumentControllerReplace
-  ): Promise<Document> {
+  ): Promise<KDoc<TKDocContent>> {
     const { idx, promise } = this.writer.addReplace(index, collection, content, _id, options);
 
     const { successes, errors } = await promise.promise;
@@ -154,13 +154,13 @@ export class BatchController extends DocumentController {
    *
    * @returns The created or replaced document
    */
-  async createOrReplace (
+  async createOrReplace<TKDocContent extends KDocContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: JSONObject,
+    content: Partial<TKDocContent>,
     options?: ArgsDocumentControllerCreateOrReplace
-  ): Promise<Document> {
+  ): Promise<KDoc<TKDocContent>> {
     const { idx, promise } = this.writer.addCreateOrReplace(index, collection, content, _id, options);
 
     const { successes, errors } = await promise.promise;
@@ -190,13 +190,13 @@ export class BatchController extends DocumentController {
    *
    * @returns The replaced document
    */
-  async update (
+  async update<TKDocContent extends KDocContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: JSONObject,
+    content: Partial<TKDocContent>,
     options?: ArgsDocumentControllerUpdate
-  ): Promise<Document> {
+  ): Promise<KDoc<TKDocContent>> {
     const { idx, promise } = this.writer.addUpdate(index, collection, content, _id, options);
 
     const { successes, errors } = await promise.promise;
@@ -224,7 +224,11 @@ export class BatchController extends DocumentController {
    *
    * @returns The document
    */
-  async get (index: string, collection: string, id: string): Promise<Document> {
+  async get<TKDocContent extends KDocContentGeneric> (
+    index: string,
+    collection: string,
+    id: string
+  ): Promise<KDoc<TKDocContent>> {
     const { promise } = this.writer.addGet(index, collection, undefined, id);
 
     const { successes } = await promise.promise;
