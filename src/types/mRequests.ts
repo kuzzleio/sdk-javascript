@@ -1,5 +1,4 @@
 import { KDocContentGeneric } from './KDoc';
-import { JSONObject } from './JSONObject';
 
 export type mCreateRequest<TKDocContent extends KDocContentGeneric> = Array<{
   /**

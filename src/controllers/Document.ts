@@ -2,7 +2,6 @@ import { BaseController } from './Base';
 import { DocumentSearchResult } from '../core/searchResult/Document';
 import {
   JSONObject,
-  Document,
   mCreateResponse,
   ArgsDefault,
   mCreateRequest,
@@ -14,7 +13,6 @@ import {
   mReplaceResponse,
   mUpdateRequest,
   mUpdateResponse,
-  DocumentHit,
   KDocContentGeneric,
   KDoc,
   KHit,
