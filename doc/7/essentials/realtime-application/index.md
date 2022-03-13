@@ -56,6 +56,14 @@ const doc = await observer.get('nyc-open-data', 'yellow-taxi', 'aschen');
 */
 ```
 
+::: info
+The Observer controller can be used with [strong typing](/sdk/js/7/essentials/strong-typing) like the Document controller.
+
+```js
+const doc = await observer.get<DeviceContent>('nyc-open-data', 'yellow-taxi', 'aschen');
+```
+:::
+
 ### Retrieve realtime documents
 
 Realtime documents can be retrieved by using one of those methods:

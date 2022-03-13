@@ -1,4 +1,4 @@
-import { JSONObject } from '../types';
+import { KDocContentGeneric } from '../types';
 
 /**
  * Represents a realtime document that will mutate it's content in realtime
@@ -6,7 +6,7 @@ import { JSONObject } from '../types';
  *
  * Use the `Observer` class to manipulate such documents.
  */
-export class RealtimeDocument {
+export class RealtimeDocument<TKDocContent extends KDocContentGeneric> {
   /**
    * Document ID
    */
@@ -17,14 +17,14 @@ export class RealtimeDocument {
    *
    * This will be updated when the content changes in the database
    */
-  public _source: JSONObject;
+  public _source: TKDocContent;
 
   /**
    * Indicate if the document has been deleted in the database
    */
   public deleted: boolean;
 
-  constructor ({ _id, _source }: { _id: string, _source: JSONObject }) {
+  constructor ({ _id, _source }: { _id: string, _source: TKDocContent }) {
     this._id = _id;
     this._source = _source;
     this.deleted = false;
