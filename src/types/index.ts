@@ -19,3 +19,5 @@ export * from './ArgsDefault';
 export * from './mRequests';
 
 export * from './mResponses';
+
+export * from './KDoc';

@@ -1,7 +1,7 @@
 import { SearchResultBase } from './SearchResultBase';
-import { DocumentHit } from '../../types';
+import { KDocContentGeneric, KHit } from '../../types';
 
-export class DocumentSearchResult extends SearchResultBase<DocumentHit> {
+export class DocumentSearchResult<TKDocContent extends KDocContentGeneric> extends SearchResultBase<KHit<TKDocContent>> {
   /**
    * @param {Kuzzle} kuzzle
    * @param {object} query

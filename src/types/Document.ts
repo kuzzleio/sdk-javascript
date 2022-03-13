@@ -1,32 +1,19 @@
 import { JSONObject } from './JSONObject';
+import { KDocKuzzleInfo } from './KDoc';
 
 /**
  * Kuzzle metadata
- * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#kuzzle-metadata
+ *
+ * @deprecated Use "KDocKuzzleInfo"
  */
 export interface DocumentMetadata {
-  _kuzzle_info?: {
-    /**
-     * Kuid of the user who created the document
-     */
-    author?: string,
-    /**
-     * Creation date in micro-timestamp
-     */
-    createdAt?: number,
-    /**
-     * Kuid of the user who last updated the document
-     */
-    updater?: string | null,
-    /**
-     * Update date in micro-timestamp
-     */
-    updatedAt?: number | null
-  }
+  _kuzzle_info?: Partial<KDocKuzzleInfo>
 }
 
 /**
  * Represents the `_source` property of the document
+ *
+ * @deprecated Create an interface extending "KDocContent"
  */
 export interface DocumentContent extends DocumentMetadata {
   [key: string]: JSONObject | any,
@@ -35,9 +22,7 @@ export interface DocumentContent extends DocumentMetadata {
 /**
  * Kuzzle document
  *
- * @property _id
- * @property _version
- * @property _source
+ * @deprecated Use "KDoc" interface
  */
 export class Document {
   /**
@@ -65,10 +50,7 @@ export class Document {
 /**
  * Document retrieved from a search
  *
- * @property _id
- * @property _version
- * @property _source
- * @property _score
+ * @deprecated Use "KHit"
  */
 export interface DocumentHit extends Document {
   /**
