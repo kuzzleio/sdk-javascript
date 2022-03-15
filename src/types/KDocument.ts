@@ -3,7 +3,7 @@ import { JSONObject } from './JSONObject';
 /**
  * Represents Kuzzle Metadata.
  */
-export interface KDocKuzzleInfo {
+export interface KDocumentKuzzleInfo {
   /**
    * Kuid of the user who created the document
    */
@@ -28,14 +28,14 @@ export interface KDocKuzzleInfo {
 /**
  * Base interface for a Kuzzle document content
  */
-export interface KDocContent {
-  _kuzzle_info: KDocKuzzleInfo;
+export interface KDocumentContent {
+  _kuzzle_info: KDocumentKuzzleInfo;
 }
 
 /**
  * Generic kuzzle document content
  */
-export interface KDocContentGeneric extends KDocContent, JSONObject {
+export interface KDocumentContentGeneric extends KDocumentContent, JSONObject {
 }
 
 /**
@@ -43,7 +43,7 @@ export interface KDocContentGeneric extends KDocContent, JSONObject {
  *
  * Type argument represents the document content in the "_source" property
  */
-export interface KDoc<TKDocContent extends KDocContent> {
+export interface KDocument<TKDocumentContent extends KDocumentContent> {
   /**
    * Unique ID
    */
@@ -52,7 +52,7 @@ export interface KDoc<TKDocContent extends KDocContent> {
   /**
    * Content
    */
-  _source: TKDocContent;
+  _source: TKDocumentContent;
 
   created?: boolean;
 
@@ -62,7 +62,7 @@ export interface KDoc<TKDocContent extends KDocContent> {
 /**
  * Represents a Kuzzle document retrieved from search
  */
-export interface KHit<TKDocContent extends KDocContent> extends KDoc<TKDocContent> {
+export interface KHit<TKDocumentContent extends KDocumentContent> extends KDocument<TKDocumentContent> {
   /**
    * Elasticsearch relevance score
    */

@@ -1,4 +1,4 @@
-import { JSONObject, KDocContentGeneric, KHit } from '../../types';
+import { JSONObject, KDocumentContentGeneric, KHit } from '../../types';
 import { Observer } from '../Observer';
 import { Kuzzle } from '../../Kuzzle';
 import { RequestPayload } from '../../types/RequestPayload';
@@ -7,7 +7,7 @@ import { SearchResultBase } from './SearchResultBase';
 /**
  * Represents a SearchResult containing realtime documents.
  */
-export class RealtimeDocumentSearchResult<TKDocContent extends KDocContentGeneric> extends SearchResultBase<KHit<TKDocContent>> {
+export class RealtimeDocumentSearchResult<TKDocumentContent extends KDocumentContentGeneric> extends SearchResultBase<KHit<TKDocumentContent>> {
   private observer: Observer;
 
   constructor (
@@ -54,7 +54,7 @@ export class RealtimeDocumentSearchResult<TKDocContent extends KDocContentGeneri
   }
 
   protected _buildNextSearchResult (result: JSONObject) {
-    const nextSearchResult = new RealtimeDocumentSearchResult<TKDocContent>(
+    const nextSearchResult = new RealtimeDocumentSearchResult<TKDocumentContent>(
       this._kuzzle,
       this._request,
       this._options,

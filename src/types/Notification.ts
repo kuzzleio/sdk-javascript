@@ -1,5 +1,5 @@
 import { JSONObject } from './JSONObject';
-import { KDoc, KDocContentGeneric } from '.';
+import { KDocument, KDocumentContentGeneric } from '.';
 
 /**
  * Enum for notification types
@@ -66,7 +66,7 @@ export interface DocumentNotification extends BaseNotification {
   /**
    * Updated document that triggered the notification
    */
-  result: KDoc<KDocContentGeneric>;
+  result: KDocument<KDocumentContentGeneric>;
   /**
    * State of the document regarding the scope (`in` or `out`)
    */

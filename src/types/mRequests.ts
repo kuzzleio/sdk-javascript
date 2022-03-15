@@ -1,6 +1,6 @@
-import { KDocContentGeneric } from './KDoc';
+import { KDocumentContentGeneric } from './KDocument';
 
-export type mCreateRequest<TKDocContent extends KDocContentGeneric> = Array<{
+export type mCreateRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -9,10 +9,10 @@ export type mCreateRequest<TKDocContent extends KDocContentGeneric> = Array<{
   /**
    * Document content
    */
-  body: Partial<TKDocContent>;
+  body: Partial<TKDocumentContent>;
 }>;
 
-export type mCreateOrReplaceRequest<TKDocContent extends KDocContentGeneric> = Array<{
+export type mCreateOrReplaceRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -21,13 +21,13 @@ export type mCreateOrReplaceRequest<TKDocContent extends KDocContentGeneric> = A
   /**
    * Document content
    */
-  body: Partial<TKDocContent>;
+  body: Partial<TKDocumentContent>;
 }>;
 
-export type mReplaceRequest<TKDocContent extends KDocContentGeneric> = mCreateOrReplaceRequest<TKDocContent>;
-export type mUpdateRequest<TKDocContent extends KDocContentGeneric> = mCreateOrReplaceRequest<TKDocContent>;
+export type mReplaceRequest<TKDocumentContent extends KDocumentContentGeneric> = mCreateOrReplaceRequest<TKDocumentContent>;
+export type mUpdateRequest<TKDocumentContent extends KDocumentContentGeneric> = mCreateOrReplaceRequest<TKDocumentContent>;
 
-export type mUpsertRequest<TKDocContent extends KDocContentGeneric> = Array<{
+export type mUpsertRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -36,12 +36,12 @@ export type mUpsertRequest<TKDocContent extends KDocContentGeneric> = Array<{
   /**
    * Document partial changes
    */
-  changes: Partial<TKDocContent>;
+  changes: Partial<TKDocumentContent>;
 
   /**
    * Document fields to add to the "update" part if the document is created
    */
-  default?: Partial<TKDocContent>;
+  default?: Partial<TKDocumentContent>;
 }>;
 
 export type mDeleteRequest = string[];

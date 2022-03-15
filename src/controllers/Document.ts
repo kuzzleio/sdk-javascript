@@ -13,8 +13,8 @@ import {
   mReplaceResponse,
   mUpdateRequest,
   mUpdateResponse,
-  KDocContentGeneric,
-  KDoc,
+  KDocumentContentGeneric,
+  KDocument,
   KHit,
 } from '../types';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
@@ -74,13 +74,13 @@ export class DocumentController extends BaseController {
    *
    * @returns The created document
    */
-  create<TKDocContent extends KDocContentGeneric> (
+  create<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    content: Partial<TKDocContent>,
+    content: Partial<TKDocumentContent>,
     _id: string = null,
     options: ArgsDocumentControllerCreate = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -111,13 +111,13 @@ export class DocumentController extends BaseController {
    *
    * @returns The created or replaced document
    */
-  createOrReplace<TKDocContent extends KDocContentGeneric> (
+  createOrReplace<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: Partial<TKDocContent>,
+    content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerCreateOrReplace = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -218,13 +218,13 @@ export class DocumentController extends BaseController {
    *
    * @returns The updated document
    */
-  deleteFields<TKDocContent extends KDocContentGeneric> (
+  deleteFields<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
     fields: string[],
     options: ArgsDocumentControllerDeleteFields = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -288,12 +288,12 @@ export class DocumentController extends BaseController {
    *
    * @returns The document
    */
-  get<TKDocContent extends KDocContentGeneric> (
+  get<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
     options: ArgsDocumentControllerGet = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -322,10 +322,10 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mCreate<TKDocContent extends KDocContentGeneric> (
+  mCreate<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mCreateRequest<TKDocContent>,
+    documents: mCreateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreate = {}
   ): Promise<mCreateResponse> {
     const request = {
@@ -358,10 +358,10 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mCreateOrReplace<TKDocContent extends KDocContentGeneric> (
+  mCreateOrReplace<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mCreateOrReplaceRequest<TKDocContent>,
+    documents: mCreateOrReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreateOrReplace = {}
   ): Promise<mCreateOrReplaceResponse> {
     const request = {
@@ -428,7 +428,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mGet<TKDocContent extends KDocContentGeneric> (
+  mGet<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     ids: string[],
@@ -437,7 +437,7 @@ export class DocumentController extends BaseController {
     /**
      * Array of successfully retrieved documents
      */
-    successes: KDoc<TKDocContent>[];
+    successes: KDocument<TKDocumentContent>[];
     /**
      * Array of the IDs of not found documents.
      */
@@ -471,10 +471,10 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mReplace<TKDocContent extends KDocContentGeneric> (
+  mReplace<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mReplaceRequest<TKDocContent>,
+    documents: mReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMReplace = {}
   ): Promise<mReplaceResponse> {
     const request = {
@@ -511,10 +511,10 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mUpdate<TKDocContent extends KDocContentGeneric> (
+  mUpdate<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mUpdateRequest<TKDocContent>,
+    documents: mUpdateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpdate = {}
   ): Promise<mUpdateResponse> {
     const request = {
@@ -548,10 +548,10 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mUpsert<TKDocContent extends KDocContentGeneric> (
+  mUpsert<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mUpdateRequest<TKDocContent>,
+    documents: mUpdateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
     const request = {
@@ -583,13 +583,13 @@ export class DocumentController extends BaseController {
    *
    * @returns The replaced document
    */
-  replace<TKDocContent extends KDocContentGeneric> (
+  replace<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: Partial<TKDocContent>,
+    content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerReplace = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -621,12 +621,12 @@ export class DocumentController extends BaseController {
    *
    * @returns A SearchResult
    */
-  search<TKDocContent extends KDocContentGeneric> (
+  search<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     searchBody: JSONObject = {},
     options: ArgsDocumentControllerSearch = {}
-  ): Promise<SearchResult<KHit<TKDocContent>>> {
+  ): Promise<SearchResult<KHit<TKDocumentContent>>> {
     return this._search(index, collection, searchBody, options)
       .then(({ response, request, opts }) => (
         new DocumentSearchResult(this.kuzzle, request, opts, response.result)
@@ -681,13 +681,13 @@ export class DocumentController extends BaseController {
    *
    * @returns The replaced document
    */
-  update<TKDocContent extends KDocContentGeneric> (
+  update<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    content: Partial<TKDocContent>,
+    content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdate = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -721,7 +721,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  updateByQuery<TKDocContent extends KDocContentGeneric> (
+  updateByQuery<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     query: JSONObject,
@@ -731,7 +731,7 @@ export class DocumentController extends BaseController {
     /**
      * Array of successfully updated documents
      */
-    successes: KDoc<TKDocContent>[];
+    successes: KDocument<TKDocumentContent>[];
     /**
      * Array of failed creation
      */
@@ -739,7 +739,7 @@ export class DocumentController extends BaseController {
       /**
        * Document that cause the error
        */
-      document: KDoc<TKDocContent>;
+      document: KDocument<TKDocumentContent>;
       /**
        * HTTP error status
        */
@@ -782,13 +782,13 @@ export class DocumentController extends BaseController {
    *
    * @returns Information about the updated document
   */
-  upsert<TKDocContent extends KDocContentGeneric> (
+  upsert<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     _id: string,
-    changes: Partial<TKDocContent>,
+    changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpsert = {}
-  ): Promise<KDoc<TKDocContent>> {
+  ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
       collection,
@@ -817,10 +817,10 @@ export class DocumentController extends BaseController {
    *
    * @returns True if the document is valid
    */
-  validate<TKDocContent extends KDocContentGeneric> (
+  validate<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    content: TKDocContent,
+    content: TKDocumentContent,
     options: ArgsDocumentControllerValidate = {}
   ): Promise<boolean> {
     return this.query({

@@ -1,6 +1,6 @@
 import { Kuzzle } from '../Kuzzle';
 import { RealtimeDocument } from './RealtimeDocument';
-import { DocumentNotification, JSONObject, KDoc, KDocContentGeneric } from '../types';
+import { DocumentNotification, JSONObject, KDocument, KDocumentContentGeneric } from '../types';
 import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
 import {
   ArgsDocumentControllerGet,
@@ -129,7 +129,7 @@ export class Observer {
    *
    * @internal
    */
-  private documents = new Map<DocumentUrn, RealtimeDocument<KDocContentGeneric>>();
+  private documents = new Map<DocumentUrn, RealtimeDocument<KDocumentContentGeneric>>();
 
   /**
    * @internal
@@ -275,14 +275,14 @@ export class Observer {
    *
    * @returns The realtime document
    */
-  get<TKDocContent extends KDocContentGeneric> (
+  get<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     id: string,
     options: ArgsDocumentControllerGet = {}
-  ): Promise<RealtimeDocument<TKDocContent>> {
-    return this.sdk.document.get<TKDocContent>(index, collection, id, options)
-      .then(document => this.observe<TKDocContent>(index, collection, document));
+  ): Promise<RealtimeDocument<TKDocumentContent>> {
+    return this.sdk.document.get<TKDocumentContent>(index, collection, id, options)
+      .then(document => this.observe<TKDocumentContent>(index, collection, document));
   }
 
   /**
@@ -296,7 +296,7 @@ export class Observer {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mGet<TKDocContent extends KDocContentGeneric> (
+  mGet<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     ids: string[],
@@ -305,7 +305,7 @@ export class Observer {
     /**
      * Array of successfully retrieved documents
      */
-    successes: RealtimeDocument<TKDocContent>[];
+    successes: RealtimeDocument<TKDocumentContent>[];
     /**
      * Array of the IDs of not found documents.
      */
@@ -338,16 +338,16 @@ export class Observer {
    *
    * @returns A SearchResult containing realtime documents
    */
-  search<TKDocContent extends KDocContentGeneric> (
+  search<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
     searchBody: JSONObject = {},
     options: ArgsDocumentControllerSearch = {}
-  ): Promise<RealtimeDocumentSearchResult<TKDocContent>> {
+  ): Promise<RealtimeDocumentSearchResult<TKDocumentContent>> {
     // eslint-disable-next-line dot-notation
     return this.sdk.document['_search'](index, collection, searchBody, options)
       .then(({ response, request, opts }) => {
-        const result = new RealtimeDocumentSearchResult<TKDocContent>(
+        const result = new RealtimeDocumentSearchResult<TKDocumentContent>(
           this.sdk,
           request,
           opts,
@@ -367,11 +367,11 @@ export class Observer {
    *
    * @returns A realtime document
    */
-  observe<TKDocContent extends KDocContentGeneric> (
+  observe<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    document: KDoc<TKDocContent>,
-  ): Promise<RealtimeDocument<TKDocContent>> {
+    document: KDocument<TKDocumentContent>,
+  ): Promise<RealtimeDocument<TKDocumentContent>> {
     const rtDocument = this.addDocument(index, collection, document);
 
     return this.watchCollection(index, collection)
@@ -385,11 +385,11 @@ export class Observer {
    *
    * Use observe() to retrieve a realtime document.
    */
-  addDocument<TKDocContent extends KDocContentGeneric> (
+  addDocument<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    document: KDoc<TKDocContent>
-  ): RealtimeDocument<TKDocContent> {
+    document: KDocument<TKDocumentContent>
+  ): RealtimeDocument<TKDocumentContent> {
     const rtDocument = new RealtimeDocument(document);
 
     const urn = collectionUrn(index, collection);

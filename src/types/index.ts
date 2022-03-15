@@ -20,4 +20,4 @@ export * from './mRequests';
 
 export * from './mResponses';
 
-export * from './KDoc';
+export * from './KDocument';

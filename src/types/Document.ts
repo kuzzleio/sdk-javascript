@@ -1,19 +1,19 @@
 import { JSONObject } from './JSONObject';
-import { KDocKuzzleInfo } from './KDoc';
+import { KDocumentKuzzleInfo } from './KDocument';
 
 /**
  * Kuzzle metadata
  *
- * @deprecated Use "KDocKuzzleInfo"
+ * @deprecated Use "KDocumentKuzzleInfo"
  */
 export interface DocumentMetadata {
-  _kuzzle_info?: Partial<KDocKuzzleInfo>
+  _kuzzle_info?: Partial<KDocumentKuzzleInfo>
 }
 
 /**
  * Represents the `_source` property of the document
  *
- * @deprecated Create an interface extending "KDocContent"
+ * @deprecated Create an interface extending "KDocumentContent"
  */
 export interface DocumentContent extends DocumentMetadata {
   [key: string]: JSONObject | any,
@@ -22,7 +22,7 @@ export interface DocumentContent extends DocumentMetadata {
 /**
  * Kuzzle document
  *
- * @deprecated Use "KDoc" interface
+ * @deprecated Use "KDocument" interface
  */
 export class Document {
   /**
