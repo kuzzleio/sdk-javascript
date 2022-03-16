@@ -2,6 +2,7 @@
 
 import { hilightUserCode } from './utils/stackTrace';
 import { RequestPayload } from './types/RequestPayload';
+import { JSONObject } from './types';
 
 /**
  * Standard Kuzzle error.
@@ -81,7 +82,7 @@ export class KuzzleError extends Error {
    * The SDK stack is needed alongside the protocol used.
    * Those information will allow to construct a enhanced stacktrace:
    *
-   * BadRequestError: lol
+   * BadRequestError: Trololol
           at new BadRequestError (/home/aschen/projets/kuzzleio/kuzzle/lib/kerror/errors/badRequestError.ts:26:5)
     >    at BaseController.handler [as sayHello] (/home/aschen/projets/kuzzleio/kuzzle/test.js:9:15)
           at doAction (/home/aschen/projets/kuzzleio/kuzzle/lib/api/funnel.js:759:47)
@@ -96,13 +97,18 @@ export class KuzzleError extends Error {
     >    at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
-  constructor (apiError, sdkStack: string, protocol: string, request?: RequestPayload) {
+  constructor (
+    apiError: { message: string, status?: number, id?: string, code?: number, errors?: JSONObject[], count?: number, stack?: string },
+    sdkStack?: string,
+    protocol?: string,
+    request?: RequestPayload,
+  ) {
     super(apiError.message);
-    this.status = apiError.status;
 
+    this.status = apiError.status;
     this.id = apiError.id;
     this.code = apiError.code;
-  
+
     if (request) {
       this.controller = request.controller;
       this.collection = request.collection;
@@ -135,10 +141,12 @@ export class KuzzleError extends Error {
     }
 
     // Append the SDK stacktrace
-    this.stack += sdkStack
-      .split('\n')
-      .map(hilightUserCode)
-      .slice(1)
-      .join('\n');
+    if (sdkStack) {
+      this.stack += sdkStack
+        .split('\n')
+        .map(hilightUserCode)
+        .slice(1)
+        .join('\n');
+    }
   }
 }
