@@ -1,6 +1,6 @@
-import { JSONObject } from './JSONObject';
+import { KDocumentContentGeneric } from './KDocument';
 
-export type mCreateRequest = {
+export type mCreateRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -9,10 +9,10 @@ export type mCreateRequest = {
   /**
    * Document content
    */
-  body: JSONObject;
-};
+  body: Partial<TKDocumentContent>;
+}>;
 
-export type mCreateOrReplaceRequest = {
+export type mCreateOrReplaceRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -21,13 +21,13 @@ export type mCreateOrReplaceRequest = {
   /**
    * Document content
    */
-  body: JSONObject;
-};
+  body: Partial<TKDocumentContent>;
+}>;
 
-export type mReplaceRequest = mCreateOrReplaceRequest;
-export type mUpdateRequest = mCreateOrReplaceRequest;
+export type mReplaceRequest<TKDocumentContent extends KDocumentContentGeneric> = mCreateOrReplaceRequest<TKDocumentContent>;
+export type mUpdateRequest<TKDocumentContent extends KDocumentContentGeneric> = mCreateOrReplaceRequest<TKDocumentContent>;
 
-export type mUpsertRequest = {
+export type mUpsertRequest<TKDocumentContent extends KDocumentContentGeneric> = Array<{
   /**
    * Document unique identifier
    */
@@ -36,12 +36,12 @@ export type mUpsertRequest = {
   /**
    * Document partial changes
    */
-  changes: JSONObject;
+  changes: Partial<TKDocumentContent>;
 
   /**
    * Document fields to add to the "update" part if the document is created
    */
-  default?: JSONObject;
-};
+  default?: Partial<TKDocumentContent>;
+}>;
 
 export type mDeleteRequest = string[];

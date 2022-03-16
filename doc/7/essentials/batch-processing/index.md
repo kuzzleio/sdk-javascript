@@ -29,6 +29,16 @@ It overloads the original DocumentController but methods will be executed in bat
 
 The BatchController is usable without modifying the original code, just by replacing the original calls to `document.*` to `batch.*`
 
+::: info
+The BatchController can be used with [strong typing](/sdk/js/7/essentials/strong-typing) like the Document controller.
+
+```js
+const doc = await batch.get<DeviceContent>('nyc-open-data', 'yellow-taxi', 'aschen');
+```
+
+:::
+
+
 **Example:**
 
 ```js
