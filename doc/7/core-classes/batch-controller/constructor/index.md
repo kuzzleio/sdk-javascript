@@ -7,7 +7,7 @@ description: BatchController constructor method
 
 # constructor
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.9.0" />
 
 Instantiate a new BatchController.
 

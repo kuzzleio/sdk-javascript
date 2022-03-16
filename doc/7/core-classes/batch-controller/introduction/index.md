@@ -8,7 +8,7 @@ order: 0
 
 # BatchController
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.9.0" />
 
 This class is an overload of the document controller and can be switched "as-is" in your code.
 

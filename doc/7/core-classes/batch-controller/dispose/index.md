@@ -7,7 +7,7 @@ description: BatchController dispose method
 
 # dispose
 
-<SinceBadge version="auto-version" />
+<SinceBadge version="7.9.0" />
 
 Dispose the instance.
 
