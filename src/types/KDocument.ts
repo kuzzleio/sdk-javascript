@@ -29,7 +29,7 @@ export interface KDocumentKuzzleInfo {
  * Base interface for a Kuzzle document content
  */
 export interface KDocumentContent {
-  _kuzzle_info: KDocumentKuzzleInfo;
+  _kuzzle_info?: KDocumentKuzzleInfo;
 }
 
 /**

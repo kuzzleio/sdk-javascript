@@ -7,6 +7,8 @@ description: BaseController Properties
 
 # Properties
 
+<SinceBadge version="7.9.0"/>
+
 | Property name        | Type     | Description          |
 | -------------------- | -------- | --------------------------------------- |
 | `name`               | <pre>string</pre> | Controller name    |

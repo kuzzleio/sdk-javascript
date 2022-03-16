@@ -8,6 +8,8 @@ order: 600
 
 # Batch Processing
 
+<SinceBadge version="7.9.0"/>
+
 Most of the methods of the Document controller have a batch alternative:
  - create => mCreate
  - replace => mReplace
@@ -35,7 +37,6 @@ The BatchController can be used with [strong typing](/sdk/js/7/essentials/strong
 ```js
 const doc = await batch.get<DeviceContent>('nyc-open-data', 'yellow-taxi', 'aschen');
 ```
-
 :::
 
 
