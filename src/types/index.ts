@@ -21,3 +21,5 @@ export * from './mRequests';
 export * from './mResponses';
 
 export * from './KDocument';
+
+export * from './RequestPayload';
