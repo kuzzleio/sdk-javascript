@@ -837,17 +837,17 @@ export interface ArgsDocumentControllerCount extends ArgsDefault {
 }
 
 export interface ArgsDocumentControllerCreate extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
 export interface ArgsDocumentControllerCreateOrReplace extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
 export interface ArgsDocumentControllerDelete extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
@@ -858,35 +858,35 @@ export interface ArgsDocumentControllerDeleteByQuery extends ArgsDefault {
 }
 
 export interface ArgsDocumentControllerDeleteFields extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     source?: boolean;
 }
 
 export interface ArgsDocumentControllerExists extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
 export interface ArgsDocumentControllerGet extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
 export interface ArgsDocumentControllerMCreate extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMCreateOrReplace extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMDelete extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     strict?: boolean;
 }
@@ -896,27 +896,27 @@ export interface ArgsDocumentControllerMGet extends ArgsDefault {
 }
 
 export interface ArgsDocumentControllerMReplace extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMUpdate extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     retryOnConflict?: number;
     strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMUpsert extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     retryOnConflict?: number;
     strict?: boolean;
 }
 
 export interface ArgsDocumentControllerReplace extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
 }
 
@@ -929,14 +929,14 @@ export interface ArgsDocumentControllerSearch extends ArgsDefault {
 }
 
 export interface ArgsDocumentControllerUpdate extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     retryOnConflict?: number;
     source?: boolean;
 }
 
 export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
     silent?: boolean;
     source?: boolean;
     lang?: string;
