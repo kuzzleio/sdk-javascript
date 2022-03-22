@@ -559,14 +559,14 @@ export class SecurityController extends BaseController {
 export interface ArgsSecurityControllerCreateApiKey extends ArgsDefault {
     expiresIn?: string | number;
     _id?: string;
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
-export interface ArgsSecurityControllerCheckRights extends ArgsDefault {    
+export interface ArgsSecurityControllerCheckRights extends ArgsDefault {
 }
 
 export interface ArgsSecurityControllerDeleteApiKey extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsSecurityControllerSearchApiKeys extends ArgsDefault {

@@ -603,14 +603,14 @@ export class AuthController extends BaseController {
 export interface ArgsAuthControllerCreateApiKey extends ArgsDefault {
     _id?: string;
     expiresIn?: number;
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsAuthControllerCheckRights extends ArgsDefault {
 }
 
 export interface ArgsAuthControllerDeleteApiKey extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsAuthControllerSearchApiKeys extends ArgsDefault {
