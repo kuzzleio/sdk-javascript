@@ -164,19 +164,19 @@ export class BatchWriter {
     await Promise.all(promises);
   }
 
-  private sendCreateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false( }) {
+  private sendCreateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
     return this.sendWriteBuffer('mCreate', buffer, options);
   }
 
-  private sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false( }) {
+  private sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
     return this.sendWriteBuffer('mUpdate', buffer, options);
   }
 
-  private sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false( }) {
+  private sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
     return this.sendWriteBuffer('mReplace', buffer, options);
   }
 
-  private sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false( }) {
+  private sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
     return this.sendWriteBuffer('mCreateOrReplace', buffer, options);
   }
 
