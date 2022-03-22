@@ -12,6 +12,8 @@ The SDK exposes numerous types to help Typescript developer to maintain a safer 
 
 ## Kuzzle Document (KDocument)
 
+<SinceBadge version="7.9.0"/>
+
 The Document controller methods can be used with an explicit type that represents the content of the manipulated document.
 
 Document content must be defined by extending the `KDocumentContent` interface.

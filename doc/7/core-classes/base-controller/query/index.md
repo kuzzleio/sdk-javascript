@@ -7,7 +7,9 @@ description: Wrapper around the Kuzzle.query method
 
 # query
 
-Base method used to send queries to a Kuzzle controller, following the [API Documentation](/core/2/api).  
+<SinceBadge version="7.9.0"/>
+
+Base method used to send queries to a Kuzzle controller, following the [API Documentation](/core/2/api).
 
 This method injects the controller name into the the request and forwards it to the original [Kuzzle.query](/sdk/js/7/core-classes/kuzzle/query) method.
 
