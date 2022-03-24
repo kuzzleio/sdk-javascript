@@ -227,7 +227,7 @@ jobs:
 
   npm-deploy:
     name: Publish Package to NPM.js
-    if: github.event_name != 'pull_request' && github.ref === 'refs/heads/master'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-18.04
     needs: [functional-tests, documentation-snippet-tests]
     steps:
