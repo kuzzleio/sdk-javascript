@@ -725,7 +725,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject,
-    changes: JSONObject,
+    changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdateByQuery = {}
   ): Promise<{
     /**
@@ -787,7 +787,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     changes: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerUpsert = {}
+    options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
@@ -942,8 +942,8 @@ export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
     lang?: string;
 }
 
-export interface ArgsDocumentControllerUpsert extends ArgsDefault {
-    default?: JSONObject;
+export interface ArgsDocumentControllerUpsert<TKDocumentContent> extends ArgsDefault {
+    default?: Partial<TKDocumentContent>;
     refresh?: string;
     silent?: boolean;
     retryOnConflict?: boolean;
