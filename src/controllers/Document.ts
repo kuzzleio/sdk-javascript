@@ -16,6 +16,7 @@ import {
   KDocumentContentGeneric,
   KDocument,
   KHit,
+  mUpsertRequest,
 } from '../types';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 
@@ -551,7 +552,7 @@ export class DocumentController extends BaseController {
   mUpsert<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mUpdateRequest<TKDocumentContent>,
+    documents: mUpsertRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
     const request = {
