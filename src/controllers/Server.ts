@@ -27,6 +27,17 @@ export class ServerController extends BaseController {
       .then(response => response.result.exists);
   }
 
+  /**
+   * Returns the Kuzzle capabilities
+   * @param {Object} options - {queuable: Boolean(true)}
+   * @returns {Promise<Object>}
+   */
+  capabilities (options: ArgsServerControllerGetAllStats) {
+    return this.query({
+      action: 'capabilities'
+    }, options)
+      .then(response => response.result);
+  }
 
   /**
    * Returns all stored statistics frames
