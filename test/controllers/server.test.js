@@ -135,7 +135,7 @@ describe('Server Controller', () => {
         version: '<current kuzzle version>',
       };
     
-    it('should call query with the right arguments and return Promise which resolves the capabilities', () => {
+    it('should call query with the right arguments and return Promise which resolves the capabilities', async () => {
       kuzzle.query.resolves({ result });
 
       return kuzzle.server.capabilities()
@@ -155,7 +155,7 @@ describe('Server Controller', () => {
         });
     });
 
-    it('should reject the promise if an error occurs', () => {
+    it('should reject the promise if an error occurs', async () => {
       const error = new Error('foobar error');
       error.status = 412;
       kuzzle.query.rejects(error);
