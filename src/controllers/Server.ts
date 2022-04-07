@@ -30,6 +30,7 @@ export class ServerController extends BaseController {
   /**
    * Returns the Kuzzle capabilities
    * @param {Object} options - {queuable: Boolean(true)}
+   * @example https://docs.kuzzle.io/core/2/api/controllers/server/capabilities/#response
    * @returns {Promise<Object>}
    */
   capabilities (options: ArgsServerControllerGetAllStats) {

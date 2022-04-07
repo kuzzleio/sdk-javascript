@@ -138,28 +138,31 @@ describe('Server Controller', () => {
     it('should call query with the right arguments and return Promise which resolves the capabilities', async () => {
       kuzzle.query.resolves({ result });
 
-      return kuzzle.server.capabilities()
-        .then(res => {
-          should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectQuery, {});
-          should(res).match(result);
-        })
-        .then(() => {
-          kuzzle.query.resetHistory();
-          return kuzzle.server.capabilities({queuable: false});
-        })
-        .then(res => {
-          should(kuzzle.query).be.calledOnce();
-          should(kuzzle.query).be.calledWith(expectQuery, {queuable: false});
-          should(res).match(result);
-        });
+      let res = await kuzzle.server.capabilities();
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectQuery, {});
+      should(res).match(result);
+
+      kuzzle.query.resetHistory();
+      res = await kuzzle.server.capabilities({queuable: false});
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectQuery, {queuable: false});
+      should(res).match(result);
     });
 
     it('should reject the promise if an error occurs', async () => {
       const error = new Error('foobar error');
       error.status = 412;
       kuzzle.query.rejects(error);
-      return should(kuzzle.server.capabilities()).be.rejectedWith({status: 412, message: 'foobar error'});
+
+      try {
+        await kuzzle.server.capabilities();
+      }
+      catch (err) {
+        should(err).be.match({status: 412, message: 'foobar error'});
+      }
     });
   });
 
