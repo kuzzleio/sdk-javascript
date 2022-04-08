@@ -16,6 +16,7 @@ import {
   KDocumentContentGeneric,
   KDocument,
   KHit,
+  mUpsertRequest,
 } from '../types';
 import { SearchResult } from '../core/searchResult/SearchResultBase';
 
@@ -551,7 +552,7 @@ export class DocumentController extends BaseController {
   mUpsert<TKDocumentContent extends KDocumentContentGeneric> (
     index: string,
     collection: string,
-    documents: mUpdateRequest<TKDocumentContent>,
+    documents: mUpsertRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
     const request = {
@@ -725,7 +726,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject,
-    changes: JSONObject,
+    changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdateByQuery = {}
   ): Promise<{
     /**
@@ -787,7 +788,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     changes: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerUpsert = {}
+    options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       index,
@@ -942,8 +943,8 @@ export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
     lang?: string;
 }
 
-export interface ArgsDocumentControllerUpsert extends ArgsDefault {
-    default?: JSONObject;
+export interface ArgsDocumentControllerUpsert<TKDocumentContent> extends ArgsDefault {
+    default?: Partial<TKDocumentContent>;
     refresh?: string;
     silent?: boolean;
     retryOnConflict?: boolean;
