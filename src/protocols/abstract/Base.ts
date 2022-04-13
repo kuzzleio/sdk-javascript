@@ -152,7 +152,6 @@ Discarded request: ${JSON.stringify(request)}`));
       this._pendingRequests.delete(request.requestId);
 
       if (response.error) {
-        console.log(response.error)
         let error: KuzzleError;
 
         // Wrap API error but directly throw errors that comes from SDK
