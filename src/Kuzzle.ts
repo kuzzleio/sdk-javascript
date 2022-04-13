@@ -96,7 +96,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   public ms: any;
   public realtime: RealtimeController;
   public security: SecurityController;
-  public server: any;
+  public server: ServerController;
 
   private _protectedEvents: any;
   private _offlineQueue: any;

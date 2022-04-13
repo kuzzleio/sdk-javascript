@@ -113,6 +113,59 @@ describe('Server Controller', () => {
     });
   });
 
+  describe('#capabilities', () => {
+    const
+      expectQuery = {
+        controller: 'server',
+        action: 'capabilities'
+      },
+      result = {
+        limits: {
+          concurrentRequests: 100,
+          documentsFetchCount: 10000,
+          documentsWriteCount: 200,
+          loginsPerSecond: 50,
+          requestsBufferSize: 50000,
+          requestsBufferWarningThreshold: 5000,
+          subscriptionConditionsCount: 100,
+          subscriptionRooms: 1000000,
+          subscriptionDocumentTTL: 259200000
+        },
+        plugins: {},
+        version: '<current kuzzle version>',
+      };
+    
+    it('should call query with the right arguments and return Promise which resolves the capabilities', async () => {
+      kuzzle.query.resolves({ result });
+
+      let res = await kuzzle.server.capabilities();
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectQuery, {});
+      should(res).match(result);
+
+      kuzzle.query.resetHistory();
+      res = await kuzzle.server.capabilities({queuable: false});
+
+      should(kuzzle.query).be.calledOnce();
+      should(kuzzle.query).be.calledWith(expectQuery, {queuable: false});
+      should(res).match(result);
+    });
+
+    it('should reject the promise if an error occurs', async () => {
+      const error = new Error('foobar error');
+      error.status = 412;
+      kuzzle.query.rejects(error);
+
+      try {
+        await kuzzle.server.capabilities();
+      }
+      catch (err) {
+        should(err).be.match({status: 412, message: 'foobar error'});
+      }
+    });
+  });
+
   describe('#getConfig', () => {
     const
       expectedQuery = {

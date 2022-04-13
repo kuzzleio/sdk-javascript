@@ -31,3 +31,4 @@ export * from './src/controllers/Collection';
 export * from './src/controllers/Document';
 export * from './src/controllers/Index';
 export * from './src/controllers/Realtime';
+export * from './src/controllers/Server';

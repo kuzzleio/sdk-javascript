@@ -250,22 +250,22 @@ export class BulkController extends BaseController {
 }
 
 export interface ArgsBulkControllerDeleteByQuery extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsBulkControllerImport extends ArgsDefault {
 }
 
 export interface ArgsBulkControllerUpdateByQuery extends ArgsDefault {
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsBulkControllerWrite extends ArgsDefault {
     notify?: boolean;
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
 
 export interface ArgsBulkControllerMWrite extends ArgsDefault {
     notify?: boolean;
-    refresh?: 'wait_for';
+    refresh?: 'wait_for' | 'false';
 }
