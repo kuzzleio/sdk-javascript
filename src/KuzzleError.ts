@@ -78,6 +78,11 @@ export class KuzzleError extends Error {
   public count?: number;
 
   /**
+   * Placeholders used to construct the error message
+   */
+  public props?: string[];
+
+  /**
    * This class represents a Kuzzle API error.
    * The SDK stack is needed alongside the protocol used.
    * Those information will allow to construct a enhanced stacktrace:
@@ -98,7 +103,7 @@ export class KuzzleError extends Error {
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
   constructor (
-    apiError: { message: string, status?: number, id?: string, code?: number, errors?: JSONObject[], count?: number, stack?: string },
+    apiError: { message: string, status?: number, id?: string, code?: number, errors?: JSONObject[], count?: number, stack?: string, props?: string[] },
     sdkStack?: string,
     protocol?: string,
     request?: RequestPayload,
@@ -108,6 +113,7 @@ export class KuzzleError extends Error {
     this.status = apiError.status;
     this.id = apiError.id;
     this.code = apiError.code;
+    this.props = apiError.props;
 
     if (request) {
       this.controller = request.controller;
