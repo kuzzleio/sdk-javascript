@@ -5,3 +5,5 @@ title: Role
 description: Role class documentation
 order: 510
 ---
+
+<RedirectToFirstChild />
