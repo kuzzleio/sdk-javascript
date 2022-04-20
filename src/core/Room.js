@@ -84,7 +84,7 @@ class Room {
         this.callback(data);
       }
       catch (error) {
-        this.emit('callbackError', { error, room: data });
+        this.kuzzle.emit('callbackError', { error, room: data });
       }
     }
   }
