@@ -337,7 +337,7 @@ describe('Room', () => {
     it('should emit an event on callback error', () => {
       room.kuzzle.emit = sinon.stub();
 
-      const callbackError = new Error("callbackTestError");
+      const callbackError = new Error('callbackTestError');
       cb.throws(callbackError);
 
       room.subscribeToSelf = true;
