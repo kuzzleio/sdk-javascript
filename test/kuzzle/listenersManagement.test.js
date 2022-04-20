@@ -34,6 +34,7 @@ describe('Kuzzle listeners management', () => {
       'reconnected',
       'reconnectionError',
       'tokenExpired',
+      'callbackError',
     ];
 
     should(function() {
