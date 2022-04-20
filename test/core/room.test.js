@@ -1,12 +1,12 @@
 const
-Room = require('../../src/core/Room'),
+  Room = require('../../src/core/Room'),
   { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter'),
   sinon = require('sinon'),
   should = require('should');
 
 describe('Room', () => {
   const
-  eventEmitter = new KuzzleEventEmitter(),
+    eventEmitter = new KuzzleEventEmitter(),
     options = {opt: 'in'};
 
   let controller;
@@ -33,7 +33,7 @@ describe('Room', () => {
   describe('constructor', () => {
     it('should create a Room instance with good properties', () => {
       const
-      body = {foo: 'bar'},
+        body = {foo: 'bar'},
         cb = sinon.stub();
 
       controller.kuzzle.autoResubscribe = 'default';
@@ -86,14 +86,14 @@ describe('Room', () => {
 
     it('should handle autoResubscribe option', () => {
       const
-      body = {foo: 'bar'},
+        body = {foo: 'bar'},
         cb = sinon.stub();
 
       controller.kuzzle.autoResubscribe = 'default';
 
       const
-      room1 = new Room(
-        controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
+        room1 = new Room(
+          controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
         room2 = new Room(
           controller, 'index', 'collection', body, cb,
           {autoResubscribe: false}),
@@ -108,12 +108,12 @@ describe('Room', () => {
 
     it('should handle subscribeToSelf option', () => {
       const
-      body = {foo: 'bar'},
+        body = {foo: 'bar'},
         cb = sinon.stub();
 
       const
-      room1 = new Room(
-        controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
+        room1 = new Room(
+          controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
         room2 = new Room(
           controller, 'index', 'collection', body, cb,
           {subscribeToSelf: false}),
@@ -141,13 +141,13 @@ describe('Room', () => {
 
     it('should call realtime/subscribe action with subscribe filters and return a promise that resolve the roomId and channel', () => {
       const
-      opts = {
-        opt: 'in',
-        scope: 'in',
-        state: 'done',
-        users: 'all',
-        volatile: {bar: 'foo'}
-      },
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
         room = new Room(controller, 'index', 'collection', body, cb, opts);
@@ -174,13 +174,13 @@ describe('Room', () => {
 
     it('should set "id" and "channel" properties', () => {
       const
-      opts = {
-        opt: 'in',
-        scope: 'in',
-        state: 'done',
-        users: 'all',
-        volatile: {bar: 'foo'}
-      },
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
         room = new Room(controller, 'index', 'collection', body, cb, opts);
@@ -194,13 +194,13 @@ describe('Room', () => {
 
     it('should call _channelListener while receiving data on the current channel', () => {
       const
-      opts = {
-        opt: 'in',
-        scope: 'in',
-        state: 'done',
-        users: 'all',
-        volatile: {bar: 'foo'}
-      },
+        opts = {
+          opt: 'in',
+          scope: 'in',
+          state: 'done',
+          users: 'all',
+          volatile: {bar: 'foo'}
+        },
         body = {foo: 'bar'},
         cb = sinon.stub(),
         room = new Room(controller, 'index', 'collection', body, cb, opts);
@@ -249,7 +249,7 @@ describe('Room', () => {
 
   describe('_channelListener', () => {
     let
-    cb,
+      cb,
       room;
 
     beforeEach(() => {
@@ -276,27 +276,6 @@ describe('Room', () => {
       should(cb)
         .be.calledOnce()
         .be.calledWith(data);
-    });
-
-    it('should emit an event on callback error', () => {
-      room.kuzzle.emit = sinon.stub();
-
-      const callbackError = new Error("callbackTestError");
-      cb.throws(callbackError);
-
-      room.subscribeToSelf = true;
-
-      const data = {foo: 'bar'};
-
-      room._channelListener(data);
-
-      should(cb)
-        .be.calledOnce()
-        .be.calledWith(data);
-
-      should(room.kuzzle.emit)
-        .be.calledOnce()
-        .be.calledWithMatch('callbackError');
     });
 
     it('should call the callback if subscribeToSelf option is FALSE and the notification message comes from another user', () => {
