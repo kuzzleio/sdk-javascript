@@ -86,6 +86,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     'reconnected',
     'reconnectionError',
     'tokenExpired',
+    'callbackError',
   ];
 
   public auth: AuthController;
