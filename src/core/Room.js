@@ -84,9 +84,9 @@ class Room {
 
       if (typeof result === 'object' && typeof result.then === 'function') {
         result
-          .catch(error => {
+          .catch(error =>
             this.kuzzle.emit('callbackError', { error, notification: data })
-          });
+          );
       }
     }
   }
