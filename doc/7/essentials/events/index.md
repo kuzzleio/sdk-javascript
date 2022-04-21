@@ -118,13 +118,13 @@ Triggered whenever Kuzzle responds with an error
 
 ## callbackError
 
-Triggered whenever a callback on an event throw an error
+Triggered whenever the notification handler's callback returns a rejected promise
 
 **Callback arguments:**
 
 `@param {Error} error - Error details`
 
-`@param {Room} room - Room containing the callback`
+`@param {Notification} notification - Notification of the handler`
 
 ## reconnected
 
