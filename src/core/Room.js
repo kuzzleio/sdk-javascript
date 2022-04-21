@@ -80,14 +80,14 @@ class Room {
       data.volatile && data.volatile.sdkInstanceId === this.kuzzle.protocol.id;
 
     if (this.subscribeToSelf || !fromSelf) {
-      Promise.resolve(this.callback(data))
-        .then(
-          res => {
-            console.log("all good, ", res);
-          },
-          error => {
+      const result = this.callback(data);
+
+      if (typeof result === 'object' && typeof result.then === 'function') {
+        result
+          .catch(error => {
             this.kuzzle.emit('callbackError', { error, notification: data })
           });
+      }
     }
   }
 }
