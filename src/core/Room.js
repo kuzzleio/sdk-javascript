@@ -83,10 +83,8 @@ class Room {
       const result = this.callback(data);
 
       if (typeof result === 'object' && typeof result.then === 'function') {
-        result
-          .catch(error =>
-            this.kuzzle.emit('callbackError', { error, notification: data })
-          );
+        result.catch(error =>
+          this.kuzzle.emit('callbackError', { error, notification: data }));
       }
     }
   }
