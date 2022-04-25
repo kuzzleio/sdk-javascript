@@ -1,13 +1,11 @@
-const
-  Room = require('../../src/core/Room'),
-  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter'),
-  sinon = require('sinon'),
-  should = require('should');
+const Room = require('../../src/core/Room');
+const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
+const sinon = require('sinon');
+const should = require('should');
 
 describe('Room', () => {
-  const
-    eventEmitter = new KuzzleEventEmitter(),
-    options = {opt: 'in'};
+  const eventEmitter = new KuzzleEventEmitter();
+  const options = {opt: 'in'};
 
   let controller;
 
@@ -22,7 +20,8 @@ describe('Room', () => {
           eventEmitter.removeListener(evt, listener);
         },
         tokenExpired: sinon.stub(),
-        protocol: new KuzzleEventEmitter()
+        protocol: new KuzzleEventEmitter(),
+        emit: sinon.stub(),
       },
       tokenExpired: sinon.stub()
     };
@@ -32,9 +31,8 @@ describe('Room', () => {
 
   describe('constructor', () => {
     it('should create a Room instance with good properties', () => {
-      const
-        body = {foo: 'bar'},
-        cb = sinon.stub();
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
 
       controller.kuzzle.autoResubscribe = 'default';
 
@@ -86,14 +84,14 @@ describe('Room', () => {
 
     it('should handle autoResubscribe option', () => {
       const
-        body = {foo: 'bar'},
+      body = {foo: 'bar'},
         cb = sinon.stub();
 
       controller.kuzzle.autoResubscribe = 'default';
 
       const
-        room1 = new Room(
-          controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
+      room1 = new Room(
+        controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
         room2 = new Room(
           controller, 'index', 'collection', body, cb,
           {autoResubscribe: false}),
@@ -108,12 +106,12 @@ describe('Room', () => {
 
     it('should handle subscribeToSelf option', () => {
       const
-        body = {foo: 'bar'},
+      body = {foo: 'bar'},
         cb = sinon.stub();
 
       const
-        room1 = new Room(
-          controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
+      room1 = new Room(
+        controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
         room2 = new Room(
           controller, 'index', 'collection', body, cb,
           {subscribeToSelf: false}),
@@ -140,17 +138,16 @@ describe('Room', () => {
     });
 
     it('should call realtime/subscribe action with subscribe filters and return a promise that resolve the roomId and channel', () => {
-      const
-        opts = {
-          opt: 'in',
-          scope: 'in',
-          state: 'done',
-          users: 'all',
-          volatile: {bar: 'foo'}
-        },
-        body = {foo: 'bar'},
-        cb = sinon.stub(),
-        room = new Room(controller, 'index', 'collection', body, cb, opts);
+      const opts = {
+        opt: 'in',
+        scope: 'in',
+        state: 'done',
+        users: 'all',
+        volatile: {bar: 'foo'}
+      };
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
+      const room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       return room.subscribe()
         .then(res => {
@@ -173,17 +170,16 @@ describe('Room', () => {
     });
 
     it('should set "id" and "channel" properties', () => {
-      const
-        opts = {
-          opt: 'in',
-          scope: 'in',
-          state: 'done',
-          users: 'all',
-          volatile: {bar: 'foo'}
-        },
-        body = {foo: 'bar'},
-        cb = sinon.stub(),
-        room = new Room(controller, 'index', 'collection', body, cb, opts);
+      const opts = {
+        opt: 'in',
+        scope: 'in',
+        state: 'done',
+        users: 'all',
+        volatile: {bar: 'foo'}
+      };
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
+      const room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       return room.subscribe()
         .then(() => {
@@ -193,17 +189,16 @@ describe('Room', () => {
     });
 
     it('should call _channelListener while receiving data on the current channel', () => {
-      const
-        opts = {
-          opt: 'in',
-          scope: 'in',
-          state: 'done',
-          users: 'all',
-          volatile: {bar: 'foo'}
-        },
-        body = {foo: 'bar'},
-        cb = sinon.stub(),
-        room = new Room(controller, 'index', 'collection', body, cb, opts);
+      const opts = {
+        opt: 'in',
+        scope: 'in',
+        state: 'done',
+        users: 'all',
+        volatile: {bar: 'foo'}
+      };
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
+      const room = new Room(controller, 'index', 'collection', body, cb, opts);
 
       room._channelListener = sinon.stub();
 
@@ -248,9 +243,8 @@ describe('Room', () => {
   });
 
   describe('_channelListener', () => {
-    let
-      cb,
-      room;
+    let cb;
+    let room;
 
     beforeEach(() => {
       cb = sinon.stub();
@@ -334,25 +328,19 @@ describe('Room', () => {
       should(controller.kuzzle.tokenExpired).be.called();
     });
 
-    it('should emit an event on callback error', () => {
-      room.kuzzle.emit = sinon.stub();
-
-      const callbackError = new Error('callbackTestError');
-      cb.throws(callbackError);
-
-      room.subscribeToSelf = true;
-
+    it('should emit an event on callback promise rejection', async () => {
       const data = {foo: 'bar'};
+      const callbackError = new Error('callbackPromiseRejection');
 
-      room._channelListener(data);
+      cb.rejects(callbackError);
+
+      await room._channelListener(data);
 
       should(cb)
         .be.calledOnce()
         .be.calledWith(data);
 
-      should(room.kuzzle.emit)
-        .be.calledOnce()
-        .be.calledWithMatch('callbackError');
+      should(controller.kuzzle.emit).be.called();
     });
   });
 });
