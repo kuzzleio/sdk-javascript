@@ -90,14 +90,12 @@ class Room {
         ) {
           callbackResponse
             .catch(error => {
-              console.log("3");
-              this.kuzzle.emit('callbackError', { error, notification: data })
+              this.kuzzle.emit('callbackError', { error, notification: data });
             });
         }
       }
       catch (error) {
-        console.log("error");
-        this.kuzzle.emit('callbackError', { error, notification: data })
+        this.kuzzle.emit('callbackError', { error, notification: data });
       }
     }
   }

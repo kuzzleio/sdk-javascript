@@ -83,21 +83,19 @@ describe('Room', () => {
     });
 
     it('should handle autoResubscribe option', () => {
-      const
-      body = {foo: 'bar'},
-        cb = sinon.stub();
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
 
       controller.kuzzle.autoResubscribe = 'default';
 
-      const
-      room1 = new Room(
-        controller, 'index', 'collection', body, cb, {autoResubscribe: true}),
-        room2 = new Room(
-          controller, 'index', 'collection', body, cb,
-          {autoResubscribe: false}),
-        room3 = new Room(
-          controller, 'index', 'collection', body, cb,
-          {autoResubscribe: 'foobar'});
+      const room1 = new Room(
+        controller, 'index', 'collection', body, cb, {autoResubscribe: true});
+      const room2 = new Room(
+        controller, 'index', 'collection', body, cb,
+        {autoResubscribe: false});
+      const room3 = new Room(
+        controller, 'index', 'collection', body, cb,
+        {autoResubscribe: 'foobar'});
 
       should(room1.autoResubscribe).be.a.Boolean().and.be.True();
       should(room2.autoResubscribe).be.a.Boolean().and.be.False();
@@ -105,19 +103,17 @@ describe('Room', () => {
     });
 
     it('should handle subscribeToSelf option', () => {
-      const
-      body = {foo: 'bar'},
-        cb = sinon.stub();
+      const body = {foo: 'bar'};
+      const cb = sinon.stub();
 
-      const
-      room1 = new Room(
-        controller, 'index', 'collection', body, cb, {subscribeToSelf: true}),
-        room2 = new Room(
-          controller, 'index', 'collection', body, cb,
-          {subscribeToSelf: false}),
-        room3 = new Room(
-          controller, 'index', 'collection', body, cb,
-          {subscribeToSelf: 'foobar'});
+      const room1 = new Room(
+        controller, 'index', 'collection', body, cb, {subscribeToSelf: true});
+      const room2 = new Room(
+        controller, 'index', 'collection', body, cb,
+        {subscribeToSelf: false});
+      const room3 = new Room(
+        controller, 'index', 'collection', body, cb,
+        {subscribeToSelf: 'foobar'});
 
       should(room1.subscribeToSelf).be.a.Boolean().and.be.True();
       should(room2.subscribeToSelf).be.a.Boolean().and.be.False();
