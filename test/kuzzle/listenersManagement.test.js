@@ -21,6 +21,7 @@ describe('Kuzzle listeners management', () => {
 
   it('should only listen to allowed events', () => {
     const knownEvents = [
+      'callbackError',
       'connected',
       'discarded',
       'disconnected',
@@ -34,7 +35,6 @@ describe('Kuzzle listeners management', () => {
       'reconnected',
       'reconnectionError',
       'tokenExpired',
-      'callbackError',
     ];
 
     should(function() {

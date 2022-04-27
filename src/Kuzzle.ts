@@ -73,6 +73,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * List of every events emitted by the SDK.
    */
   public events = [
+    'callbackError',
     'connected',
     'discarded',
     'disconnected',
@@ -86,7 +87,6 @@ export class Kuzzle extends KuzzleEventEmitter {
     'reconnected',
     'reconnectionError',
     'tokenExpired',
-    'callbackError',
   ];
 
   public auth: AuthController;

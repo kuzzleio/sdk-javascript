@@ -83,7 +83,7 @@ class Room {
       try {
         const callbackResponse = this.callback(data);
 
-        if (callbackResponse !== null
+        if ( callbackResponse !== null
           && typeof callbackResponse === 'object'
           && typeof callbackResponse.then === 'function'
           && typeof callbackResponse.catch === 'function'

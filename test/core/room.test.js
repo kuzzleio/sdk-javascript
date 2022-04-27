@@ -1,7 +1,8 @@
-const Room = require('../../src/core/Room');
-const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
 const sinon = require('sinon');
 const should = require('should');
+
+const Room = require('../../src/core/Room');
+const { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
 
 describe('Room', () => {
   const eventEmitter = new KuzzleEventEmitter();
@@ -336,7 +337,9 @@ describe('Room', () => {
         .be.calledOnce()
         .be.calledWith(data);
 
-      should(controller.kuzzle.emit).be.called();
+      should(controller.kuzzle.emit)
+        .be.calledOnce()
+        .be.calledWithMatch('callbackError');
     });
   });
 });
