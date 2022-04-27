@@ -339,7 +339,7 @@ describe('Room', () => {
 
       should(controller.kuzzle.emit)
         .be.calledOnce()
-        .be.calledWithMatch('callbackError');
+        .be.calledWithMatch('callbackError', { error: callbackError });
     });
   });
 });
