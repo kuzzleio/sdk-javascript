@@ -7,5 +7,5 @@ runs:
       run: npm ci --silent
       shell: bash
     - name: Run lint
-      run: npm run --silent test:lint
+      run: npm run test:lint
       shell: bash
