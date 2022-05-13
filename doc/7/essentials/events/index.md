@@ -116,6 +116,16 @@ Triggered whenever Kuzzle responds with an error
 
 `@param {object} request - Request that caused the error`
 
+## callbackError
+
+Triggered whenever the notification handler's callback returns a rejected promise
+
+**Callback arguments:**
+
+`@param {Error} error - Error details`
+
+`@param {Notification} notification - Notification of the handler`
+
 ## reconnected
 
 Triggered when the current session has reconnected to Kuzzle after a disconnection, and only if `autoReconnect` is set to `true`.
