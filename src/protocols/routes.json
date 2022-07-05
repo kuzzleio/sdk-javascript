@@ -118,7 +118,7 @@
     },
     "update": {
       "url": "/:index/:collection/:_id/_update",
-      "verb": "PUT"
+      "verb": "PATCH"
     },
     "updateByQuery": {
       "url": "/:index/:collection/_query",
