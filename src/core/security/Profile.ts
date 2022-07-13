@@ -1,6 +1,6 @@
-import { Role } from './Role';
-import { JSONObject, ProfilePolicy } from '../../types';
-import { Kuzzle } from '../../Kuzzle';
+import { Role } from "./Role";
+import { JSONObject, ProfilePolicy } from "../../types";
+import { Kuzzle } from "../../Kuzzle";
 
 export class Profile {
   private _kuzzle: Kuzzle;
@@ -28,9 +28,9 @@ export class Profile {
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle: Kuzzle, _id: string = null, content: JSONObject = {}) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle
+  constructor(kuzzle: Kuzzle, _id: string = null, content: JSONObject = {}) {
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: kuzzle,
     });
 
     this._id = _id;
@@ -46,27 +46,28 @@ export class Profile {
     }
   }
 
-  protected get kuzzle () {
+  protected get kuzzle() {
     return this._kuzzle;
   }
 
   /**
    * Gets the associated roles definitions from the API.
    */
-  getRoles (options = {}): Promise<Array<Role>> {
+  getRoles(options = {}): Promise<Array<Role>> {
     if (!this.policies || this.policies.length === 0) {
       return Promise.resolve([]);
     }
 
     return this.kuzzle.security.mGetRoles(
-      this.policies.map(policy => policy.roleId),
-      options);
+      this.policies.map((policy) => policy.roleId),
+      options
+    );
   }
 
   /**
    * Serialize the instance
    */
-  serialize (): JSONObject {
+  serialize(): JSONObject {
     return {
       _id: this._id,
       rateLimit: this.rateLimit,

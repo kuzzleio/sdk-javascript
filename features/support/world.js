@@ -1,13 +1,9 @@
-const
-  { setWorldConstructor } = require('cucumber'),
-  {
-    Kuzzle,
-    WebSocket
-  } = require('../../index');
+const { setWorldConstructor } = require("cucumber"),
+  { Kuzzle, WebSocket } = require("../../index");
 
 class World {
-  constructor () {
-    this.kuzzle = new Kuzzle(new WebSocket('localhost', { port: 7512 }));
+  constructor() {
+    this.kuzzle = new Kuzzle(new WebSocket("localhost", { port: 7512 }));
 
     this.index = null;
     this.collection = null;
@@ -21,11 +17,10 @@ class World {
     this.error = null;
     this.notifications = [];
 
-    this.callback = notification => {
+    this.callback = (notification) => {
       this.notifications.push(notification);
     };
   }
-
 }
 
 setWorldConstructor(World);

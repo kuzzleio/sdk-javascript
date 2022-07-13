@@ -1,29 +1,29 @@
-import { BaseController } from './Base';
-import { JSONObject, ArgsDefault } from '../types';
+import { BaseController } from "./Base";
+import { JSONObject, ArgsDefault } from "../types";
 
 export class BulkController extends BaseController {
-  constructor (kuzzle) {
-    super(kuzzle, 'bulk');
+  constructor(kuzzle) {
+    super(kuzzle, "bulk");
   }
 
   /**
-  * Directly deletes every documents matching the search query without:
-  *  - applying max documents write limit
-  *  - fetching deleted documents
-  *  - triggering realtime notifications
-  *
-  * @see https://docs.kuzzle.io/core/2/api/controllers/bulk/delete-by-query/
-  *
-  * @param index - Index name
-  * @param collection - Collection name
-  * @param query - Query matching documents to delete
-  * @param options - Additional options
-  *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
-  *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
-  *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
-  *
-  * @returns The number of deleted documents
-  */
+   * Directly deletes every documents matching the search query without:
+   *  - applying max documents write limit
+   *  - fetching deleted documents
+   *  - triggering realtime notifications
+   *
+   * @see https://docs.kuzzle.io/core/2/api/controllers/bulk/delete-by-query/
+   *
+   * @param index - Index name
+   * @param collection - Collection name
+   * @param query - Query matching documents to delete
+   * @param options - Additional options
+   *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
+   *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *
+   * @returns The number of deleted documents
+   */
   deleteByQuery(
     index: string,
     collection: string,
@@ -34,11 +34,12 @@ export class BulkController extends BaseController {
       index,
       collection,
       body: query,
-      action: 'deleteByQuery'
+      action: "deleteByQuery",
     };
 
-    return this.query(request, options)
-      .then(response => response.result.deleted);
+    return this.query(request, options).then(
+      (response) => response.result.deleted
+    );
   }
 
   /**
@@ -55,7 +56,7 @@ export class BulkController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  import (
+  import(
     index: string,
     collection: string,
     bulkData: Array<JSONObject>,
@@ -77,7 +78,7 @@ export class BulkController extends BaseController {
          * HTTP status code for that action
          */
         status: string;
-      }
+      };
     }>;
     /**
      * Array of failed actions
@@ -103,18 +104,20 @@ export class BulkController extends BaseController {
          * Human readable error message
          */
         reason: string;
-      }
+      };
     }>;
   }> {
-    return this.query({
-      index,
-      collection,
-      action: 'import',
-      body: {
-        bulkData
-      }
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        index,
+        collection,
+        action: "import",
+        body: {
+          bulkData,
+        },
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -143,11 +146,12 @@ export class BulkController extends BaseController {
       index,
       collection,
       body: { query, changes },
-      action: 'updateByQuery'
+      action: "updateByQuery",
     };
 
-    return this.query(request, options)
-      .then(response => response.result.updated);
+    return this.query(request, options).then(
+      (response) => response.result.updated
+    );
   }
 
   /**
@@ -167,22 +171,24 @@ export class BulkController extends BaseController {
    *
    * @returns An object containing the document creation result
    */
-  write (
+  write(
     index: string,
     collection: string,
     document: JSONObject,
     id?: string,
     options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
-    return this.query({
-      index,
-      collection,
-      _id: id,
-      action: 'write',
-      body: document,
-      notify: options.notify,
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        index,
+        collection,
+        _id: id,
+        action: "write",
+        body: document,
+        notify: options.notify,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -201,7 +207,7 @@ export class BulkController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mWrite (
+  mWrite(
     index: string,
     collection: string,
     documents: Array<{
@@ -238,34 +244,35 @@ export class BulkController extends BaseController {
       reason: string;
     }>;
   }> {
-    return this.query({
-      index,
-      collection,
-      action: 'mWrite',
-      body: { documents },
-      notify: options.notify,
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        index,
+        collection,
+        action: "mWrite",
+        body: { documents },
+        notify: options.notify,
+      },
+      options
+    ).then((response) => response.result);
   }
 }
 
 export interface ArgsBulkControllerDeleteByQuery extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
+  refresh?: "wait_for" | "false";
 }
 
-export interface ArgsBulkControllerImport extends ArgsDefault {
-}
+export interface ArgsBulkControllerImport extends ArgsDefault {}
 
 export interface ArgsBulkControllerUpdateByQuery extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
+  refresh?: "wait_for" | "false";
 }
 
 export interface ArgsBulkControllerWrite extends ArgsDefault {
-    notify?: boolean;
-    refresh?: 'wait_for' | 'false';
+  notify?: boolean;
+  refresh?: "wait_for" | "false";
 }
 
 export interface ArgsBulkControllerMWrite extends ArgsDefault {
-    notify?: boolean;
-    refresh?: 'wait_for' | 'false';
+  notify?: boolean;
+  refresh?: "wait_for" | "false";
 }

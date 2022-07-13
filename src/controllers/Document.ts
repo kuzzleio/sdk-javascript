@@ -1,5 +1,5 @@
-import { BaseController } from './Base';
-import { DocumentSearchResult } from '../core/searchResult/Document';
+import { BaseController } from "./Base";
+import { DocumentSearchResult } from "../core/searchResult/Document";
 import {
   JSONObject,
   mCreateResponse,
@@ -17,12 +17,12 @@ import {
   KDocument,
   KHit,
   mUpsertRequest,
-} from '../types';
-import { SearchResult } from '../core/searchResult/SearchResultBase';
+} from "../types";
+import { SearchResult } from "../core/searchResult/SearchResultBase";
 
 export class DocumentController extends BaseController {
-  constructor (kuzzle) {
-    super(kuzzle, 'document');
+  constructor(kuzzle) {
+    super(kuzzle, "document");
   }
 
   /**
@@ -42,7 +42,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The number of matching documents
    */
-  count (
+  count(
     index: string,
     collection: string,
     body?: JSONObject,
@@ -52,11 +52,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body,
-      action: 'count'
+      action: "count",
     };
 
-    return this.query(request, options)
-      .then(response => response.result.count);
+    return this.query(request, options).then(
+      (response) => response.result.count
+    );
   }
 
   /**
@@ -75,7 +76,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The created document
    */
-  create<TKDocumentContent extends KDocumentContentGeneric> (
+  create<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     content: Partial<TKDocumentContent>,
@@ -87,12 +88,11 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'create',
+      action: "create",
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -112,7 +112,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The created or replaced document
    */
-  createOrReplace<TKDocumentContent extends KDocumentContentGeneric> (
+  createOrReplace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -124,12 +124,11 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'createOrReplace',
+      action: "createOrReplace",
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -148,7 +147,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The document ID
    */
-  delete (
+  delete(
     index: string,
     collection: string,
     _id: string,
@@ -158,12 +157,11 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'delete',
+      action: "delete",
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result._id);
+    return this.query(request, options).then((response) => response.result._id);
   }
 
   /**
@@ -183,7 +181,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The deleted documents IDs
    */
-  deleteByQuery (
+  deleteByQuery(
     index: string,
     collection: string,
     query: JSONObject = {},
@@ -193,13 +191,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: query,
-      action: 'deleteByQuery',
+      action: "deleteByQuery",
       lang: options.lang,
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result.ids);
+    return this.query(request, options).then((response) => response.result.ids);
   }
 
   /**
@@ -219,7 +216,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The updated document
    */
-  deleteFields<TKDocumentContent extends KDocumentContentGeneric> (
+  deleteFields<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -231,13 +228,12 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: { fields },
-      action: 'deleteFields',
+      action: "deleteFields",
       silent: options.silent,
       source: options.source,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -256,7 +252,7 @@ export class DocumentController extends BaseController {
    *
    * @returns True if the document exists
    */
-  exists (
+  exists(
     index: string,
     collection: string,
     _id: string,
@@ -266,11 +262,10 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'exists'
+      action: "exists",
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -289,7 +284,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The document
    */
-  get<TKDocumentContent extends KDocumentContentGeneric> (
+  get<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -299,11 +294,10 @@ export class DocumentController extends BaseController {
       index,
       collection,
       _id,
-      action: 'get'
+      action: "get",
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -323,7 +317,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mCreate<TKDocumentContent extends KDocumentContentGeneric> (
+  mCreate<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     documents: mCreateRequest<TKDocumentContent>,
@@ -333,13 +327,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreate',
+      action: "mCreate",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -359,7 +352,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mCreateOrReplace<TKDocumentContent extends KDocumentContentGeneric> (
+  mCreateOrReplace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     documents: mCreateOrReplaceRequest<TKDocumentContent>,
@@ -369,13 +362,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mCreateOrReplace',
+      action: "mCreateOrReplace",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -395,7 +387,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mDelete (
+  mDelete(
     index: string,
     collection: string,
     ids: mDeleteRequest,
@@ -405,13 +397,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { ids },
-      action: 'mDelete',
+      action: "mDelete",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -429,7 +420,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mGet<TKDocumentContent extends KDocumentContentGeneric> (
+  mGet<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     ids: string[],
@@ -447,12 +438,11 @@ export class DocumentController extends BaseController {
     const request = {
       index,
       collection,
-      action: 'mGet',
+      action: "mGet",
       body: { ids },
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -472,7 +462,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mReplace<TKDocumentContent extends KDocumentContentGeneric> (
+  mReplace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     documents: mReplaceRequest<TKDocumentContent>,
@@ -482,13 +472,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mReplace',
+      action: "mReplace",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -512,7 +501,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mUpdate<TKDocumentContent extends KDocumentContentGeneric> (
+  mUpdate<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     documents: mUpdateRequest<TKDocumentContent>,
@@ -522,13 +511,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mUpdate',
+      action: "mUpdate",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -549,7 +537,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mUpsert<TKDocumentContent extends KDocumentContentGeneric> (
+  mUpsert<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     documents: mUpsertRequest<TKDocumentContent>,
@@ -559,13 +547,12 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { documents },
-      action: 'mUpsert',
+      action: "mUpsert",
       silent: options.silent,
       strict: options.strict,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -584,7 +571,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The replaced document
    */
-  replace<TKDocumentContent extends KDocumentContentGeneric> (
+  replace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -596,12 +583,11 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'replace',
+      action: "replace",
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -622,19 +608,19 @@ export class DocumentController extends BaseController {
    *
    * @returns A SearchResult
    */
-  search<TKDocumentContent extends KDocumentContentGeneric> (
+  search<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     searchBody: JSONObject = {},
     options: ArgsDocumentControllerSearch = {}
   ): Promise<SearchResult<KHit<TKDocumentContent>>> {
-    return this._search(index, collection, searchBody, options)
-      .then(({ response, request, opts }) => (
+    return this._search(index, collection, searchBody, options).then(
+      ({ response, request, opts }) =>
         new DocumentSearchResult(this.kuzzle, request, opts, response.result)
-      ));
+    );
   }
 
-  private _search (
+  private _search(
     index: string,
     collection: string,
     body: JSONObject = {},
@@ -644,24 +630,27 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: null,
-      action: 'search',
+      action: "search",
     };
-    if ( this.kuzzle.protocol.name === 'http'
-      && options.verb
-      && options.verb.toLowerCase() === 'get'
+    if (
+      this.kuzzle.protocol.name === "http" &&
+      options.verb &&
+      options.verb.toLowerCase() === "get"
     ) {
       request.searchBody = body;
-    }
-    else {
+    } else {
       request.body = body;
     }
-    for (const opt of ['from', 'size', 'scroll', 'lang']) {
+    for (const opt of ["from", "size", "scroll", "lang"]) {
       request[opt] = options[opt];
     }
 
-    const opts = { verb: options.verb || 'POST', ...options };
-    return this.query(request, opts)
-      .then(response => ({ response, request, opts }));
+    const opts = { verb: options.verb || "POST", ...options };
+    return this.query(request, opts).then((response) => ({
+      response,
+      request,
+      opts,
+    }));
   }
 
   /**
@@ -682,7 +671,7 @@ export class DocumentController extends BaseController {
    *
    * @returns The replaced document
    */
-  update<TKDocumentContent extends KDocumentContentGeneric> (
+  update<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -694,14 +683,13 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: content,
-      action: 'update',
+      action: "update",
       retryOnConflict: options.retryOnConflict,
       source: options.source,
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -722,7 +710,7 @@ export class DocumentController extends BaseController {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  updateByQuery<TKDocumentContent extends KDocumentContentGeneric> (
+  updateByQuery<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     query: JSONObject,
@@ -755,14 +743,13 @@ export class DocumentController extends BaseController {
       index,
       collection,
       body: { query, changes },
-      action: 'updateByQuery',
+      action: "updateByQuery",
       source: options.source,
       lang: options.lang,
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -782,8 +769,8 @@ export class DocumentController extends BaseController {
    *    - `source` If true, returns the updated document inside the response
    *
    * @returns Information about the updated document
-  */
-  upsert<TKDocumentContent extends KDocumentContentGeneric> (
+   */
+  upsert<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
@@ -795,13 +782,12 @@ export class DocumentController extends BaseController {
       collection,
       _id,
       body: { changes, default: options.default },
-      action: 'upsert',
+      action: "upsert",
       source: options.source,
       silent: options.silent,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -818,138 +804,139 @@ export class DocumentController extends BaseController {
    *
    * @returns True if the document is valid
    */
-  validate<TKDocumentContent extends KDocumentContentGeneric> (
+  validate<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     content: TKDocumentContent,
     options: ArgsDocumentControllerValidate = {}
   ): Promise<boolean> {
-    return this.query({
-      index,
-      collection,
-      body: content,
-      action: 'validate'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        index,
+        collection,
+        body: content,
+        action: "validate",
+      },
+      options
+    ).then((response) => response.result);
   }
 }
 
-export interface ArgsDocumentControllerCount extends ArgsDefault {
-}
+export interface ArgsDocumentControllerCount extends ArgsDefault {}
 
 export interface ArgsDocumentControllerCreate extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerCreateOrReplace extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerDelete extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerDeleteByQuery extends ArgsDefault {
-    refresh?: string;
-    silent?: boolean;
-    lang?: string;
+  refresh?: string;
+  silent?: boolean;
+  lang?: string;
 }
 
 export interface ArgsDocumentControllerDeleteFields extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    source?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  source?: boolean;
 }
 
 export interface ArgsDocumentControllerExists extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerGet extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerMCreate extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMCreateOrReplace extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMDelete extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMGet extends ArgsDefault {
-    verb?: string;
+  verb?: string;
 }
 
 export interface ArgsDocumentControllerMReplace extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMUpdate extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    retryOnConflict?: number;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  retryOnConflict?: number;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerMUpsert extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    retryOnConflict?: number;
-    strict?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  retryOnConflict?: number;
+  strict?: boolean;
 }
 
 export interface ArgsDocumentControllerReplace extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
 }
 
 export interface ArgsDocumentControllerSearch extends ArgsDefault {
-    from?: number;
-    size?: number;
-    scroll?: string;
-    lang?: string;
-    verb?: string;
+  from?: number;
+  size?: number;
+  scroll?: string;
+  lang?: string;
+  verb?: string;
 }
 
 export interface ArgsDocumentControllerUpdate extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    retryOnConflict?: number;
-    source?: boolean;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  retryOnConflict?: number;
+  source?: boolean;
 }
 
 export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
-    silent?: boolean;
-    source?: boolean;
-    lang?: string;
+  refresh?: "wait_for" | "false";
+  silent?: boolean;
+  source?: boolean;
+  lang?: string;
 }
 
-export interface ArgsDocumentControllerUpsert<TKDocumentContent> extends ArgsDefault {
-    default?: Partial<TKDocumentContent>;
-    refresh?: string;
-    silent?: boolean;
-    retryOnConflict?: boolean;
-    source?: boolean;
+export interface ArgsDocumentControllerUpsert<TKDocumentContent>
+  extends ArgsDefault {
+  default?: Partial<TKDocumentContent>;
+  refresh?: string;
+  silent?: boolean;
+  retryOnConflict?: boolean;
+  source?: boolean;
 }
 
-export interface ArgsDocumentControllerValidate extends ArgsDefault {
-}
+export interface ArgsDocumentControllerValidate extends ArgsDefault {}

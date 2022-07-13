@@ -1,105 +1,104 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  ProtocolMock = require('../mocks/protocol.mock'),
-  { BaseController } = require('../../src/controllers/Base'),
-  { Kuzzle } = require('../../src/Kuzzle');
+const should = require("should"),
+  sinon = require("sinon"),
+  ProtocolMock = require("../mocks/protocol.mock"),
+  { BaseController } = require("../../src/controllers/Base"),
+  { Kuzzle } = require("../../src/Kuzzle");
 
 class CustomController extends BaseController {
-  constructor (kuzzle) {
-    super(kuzzle, 'custom-plugin/custom');
+  constructor(kuzzle) {
+    super(kuzzle, "custom-plugin/custom");
   }
 
-  sayHello (message) {
+  sayHello(message) {
     const request = {
-      action: 'sayHello',
+      action: "sayHello",
       body: {
-        message
-      }
+        message,
+      },
     };
 
-    return this.query(request)
-      .then(response => response.result);
+    return this.query(request).then((response) => response.result);
   }
 }
 
 class UnamedController extends BaseController {
-  constructor (kuzzle) {
+  constructor(kuzzle) {
     super(kuzzle);
   }
 }
 
 class WrongConstructorController extends BaseController {
-  constructor (kuzzle) {
-    super({}, 'wrongConstructor', kuzzle);
+  constructor(kuzzle) {
+    super({}, "wrongConstructor", kuzzle);
   }
 }
 
-describe('Kuzzle custom controllers management', () => {
-  describe('#useController', () => {
-    let
-      response,
-      kuzzle;
+describe("Kuzzle custom controllers management", () => {
+  describe("#useController", () => {
+    let response, kuzzle;
 
     beforeEach(() => {
       response = {
-        result: { }
+        result: {},
       };
 
-      const protocol = new ProtocolMock('somewhere');
+      const protocol = new ProtocolMock("somewhere");
 
       kuzzle = new Kuzzle(protocol);
       kuzzle.protocol.query.resolves(response);
     });
 
-    it('should add the controller to the controllers list', () => {
-      kuzzle.useController(CustomController, 'custom');
+    it("should add the controller to the controllers list", () => {
+      kuzzle.useController(CustomController, "custom");
 
       should(kuzzle.custom).be.instanceOf(CustomController);
     });
 
-    it('should set the kuzzle object in the controller', () => {
-      kuzzle.useController(CustomController, 'custom');
+    it("should set the kuzzle object in the controller", () => {
+      kuzzle.useController(CustomController, "custom");
 
       should(kuzzle.custom.kuzzle).be.eql(kuzzle);
     });
 
-    it('should use the controller name by default for query()', () => {
-      kuzzle.useController(CustomController, 'custom');
+    it("should use the controller name by default for query()", () => {
+      kuzzle.useController(CustomController, "custom");
 
-      return kuzzle.custom.sayHello('Wake up, and smell the ashes')
-        .then(() => {
-          should(kuzzle.protocol.query).be.calledOnce();
-          should(kuzzle.protocol.query).be.calledWith(
-            sinon.match.has('controller', 'custom-plugin/custom')
-          );
-        });
+      return kuzzle.custom.sayHello("Wake up, and smell the ashes").then(() => {
+        should(kuzzle.protocol.query).be.calledOnce();
+        should(kuzzle.protocol.query).be.calledWith(
+          sinon.match.has("controller", "custom-plugin/custom")
+        );
+      });
     });
 
-    it('should throw if the controller does not have a name', () => {
+    it("should throw if the controller does not have a name", () => {
       should(() => {
-        kuzzle.useController(UnamedController, 'unamed');
-      }).throw('Controllers must have a name.');
+        kuzzle.useController(UnamedController, "unamed");
+      }).throw("Controllers must have a name.");
     });
 
-    it('should throw if the controller does not call the parent with the Kuzzle sdk instance', () => {
+    it("should throw if the controller does not call the parent with the Kuzzle sdk instance", () => {
       should(() => {
-        kuzzle.useController(WrongConstructorController, 'unamed');
-      }).throw('You must pass the Kuzzle SDK instance to the parent constructor.');
+        kuzzle.useController(WrongConstructorController, "unamed");
+      }).throw(
+        "You must pass the Kuzzle SDK instance to the parent constructor."
+      );
     });
 
-    it('should throw if the controller does not have an accessor', () => {
+    it("should throw if the controller does not have an accessor", () => {
       should(() => {
         kuzzle.useController(CustomController);
-      }).throw('You must provide a valid accessor.');
+      }).throw("You must provide a valid accessor.");
     });
 
-    it('should throw if the accessor is already taken', () => {
-      kuzzle.useController(CustomController, 'custom');
+    it("should throw if the accessor is already taken", () => {
+      kuzzle.useController(CustomController, "custom");
 
       should(() => {
-        kuzzle.useController(CustomController, 'custom');
-      }).throw('There is already a controller with the accessor \'custom\'. Please use another one.');
+        kuzzle.useController(CustomController, "custom");
+      }).throw(
+        "There is already a controller with the accessor 'custom'. Please use another one."
+      );
     });
   });
 });

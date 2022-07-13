@@ -1,29 +1,31 @@
-import { JSONObject, KDocumentContentGeneric, KHit } from '../../types';
-import { Observer } from '../Observer';
-import { Kuzzle } from '../../Kuzzle';
-import { RequestPayload } from '../../types/RequestPayload';
-import { SearchResultBase } from './SearchResultBase';
+import { JSONObject, KDocumentContentGeneric, KHit } from "../../types";
+import { Observer } from "../Observer";
+import { Kuzzle } from "../../Kuzzle";
+import { RequestPayload } from "../../types/RequestPayload";
+import { SearchResultBase } from "./SearchResultBase";
 
 /**
  * Represents a SearchResult containing realtime documents.
  */
-export class RealtimeDocumentSearchResult<TKDocumentContent extends KDocumentContentGeneric> extends SearchResultBase<KHit<TKDocumentContent>> {
+export class RealtimeDocumentSearchResult<
+  TKDocumentContent extends KDocumentContentGeneric
+> extends SearchResultBase<KHit<TKDocumentContent>> {
   private observer: Observer;
 
-  constructor (
+  constructor(
     kuzzle: Kuzzle,
     request: RequestPayload,
     options: JSONObject,
     result: JSONObject,
-    observer: Observer,
+    observer: Observer
   ) {
     super(kuzzle, request, options, result);
 
-    this._searchAction = 'search';
-    this._scrollAction = 'scroll';
+    this._searchAction = "search";
+    this._scrollAction = "scroll";
 
-    Reflect.defineProperty(this, 'observer', {
-      value: observer
+    Reflect.defineProperty(this, "observer", {
+      value: observer,
     });
   }
 
@@ -34,7 +36,7 @@ export class RealtimeDocumentSearchResult<TKDocumentContent extends KDocumentCon
    *
    * @internal
    */
-  start (): Promise<this> {
+  start(): Promise<this> {
     const { index, collection } = this._request;
 
     const rtDocuments = [];
@@ -45,21 +47,22 @@ export class RealtimeDocumentSearchResult<TKDocumentContent extends KDocumentCon
 
     this.hits = rtDocuments;
 
-    return this.observer.watchCollection(index, collection)
-      .then(() => this);
+    return this.observer.watchCollection(index, collection).then(() => this);
   }
 
-  next (): Promise<this> {
+  next(): Promise<this> {
     return super.next() as any;
   }
 
-  protected _buildNextSearchResult (result: JSONObject) {
-    const nextSearchResult = new RealtimeDocumentSearchResult<TKDocumentContent>(
-      this._kuzzle,
-      this._request,
-      this._options,
-      result,
-      this.observer);
+  protected _buildNextSearchResult(result: JSONObject) {
+    const nextSearchResult =
+      new RealtimeDocumentSearchResult<TKDocumentContent>(
+        this._kuzzle,
+        this._request,
+        this._options,
+        result,
+        this.observer
+      );
 
     nextSearchResult.fetched += this.fetched;
 

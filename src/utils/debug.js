@@ -1,13 +1,13 @@
-function shouldDebug () {
-  if (typeof window === 'undefined') {
-    const debugString = process.env.DEBUG || '';
+function shouldDebug() {
+  if (typeof window === "undefined") {
+    const debugString = process.env.DEBUG || "";
 
-    return debugString.includes('kuzzle-sdk');
+    return debugString.includes("kuzzle-sdk");
   }
 
   const url = new URL(window.location);
 
-  return url.searchParams.get('debugKuzzleSdk') !== null;
+  return url.searchParams.get("debugKuzzleSdk") !== null;
 }
 
 /**
@@ -16,9 +16,9 @@ function shouldDebug () {
  * In Node.js, you can set the `DEBUG=kuzzle-sdk` env variable
  * In a browser, you can add the `?debugKuzzleSdk` in the URL
  */
-function debug (message, obj) {
-  if (! shouldDebug()) {
-    return ;
+function debug(message, obj) {
+  if (!shouldDebug()) {
+    return;
   }
 
   // eslint-disable-next-line no-console

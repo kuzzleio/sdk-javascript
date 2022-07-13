@@ -1,17 +1,15 @@
-const
-  sinon = require('sinon'),
-  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter'),
-  DisconnectionOrigin = require('../../src/protocols/DisconnectionOrigin');
+const sinon = require("sinon"),
+  { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter"),
+  DisconnectionOrigin = require("../../src/protocols/DisconnectionOrigin");
 
 class ProtocolMock extends KuzzleEventEmitter {
-
-  constructor (host, options = {}) {
+  constructor(host, options = {}) {
     super();
 
     this.options = options || {};
     this.host = host;
     this.port = this.options.port || 7512;
-    this.state = 'offline';
+    this.state = "offline";
     this.connectCalled = false;
 
     this.close = sinon.stub();
@@ -28,37 +26,38 @@ class ProtocolMock extends KuzzleEventEmitter {
     this.removeAllListeners();
   }
 
-  connect () {
-    this.state = 'connecting';
+  connect() {
+    this.state = "connecting";
     this.connectCalled = true;
     return new Promise((resolve, reject) => {
-      const error = new Error('Mock Error');
+      const error = new Error("Mock Error");
       switch (this.host) {
-        case 'nowhere':
-          this.state = 'error';
-          this.emit('networkError', error);
+        case "nowhere":
+          this.state = "error";
+          this.emit("networkError", error);
           reject(error);
           break;
-        case 'somewhereagain':
-          this.state = 'connected';
-          this.emit('reconnect');
+        case "somewhereagain":
+          this.state = "connected";
+          this.emit("reconnect");
           resolve();
           break;
         default:
-          this.state = 'connected';
-          this.emit('connect');
+          this.state = "connected";
+          this.emit("connect");
           resolve();
       }
     });
   }
 
-
-  disconnect () {
-    this.state = 'offline';
-    this.emit('disconnect', {origin: DisconnectionOrigin.USER_CONNECTION_CLOSED });
+  disconnect() {
+    this.state = "offline";
+    this.emit("disconnect", {
+      origin: DisconnectionOrigin.USER_CONNECTION_CLOSED,
+    });
   }
 
-  send (request) {
+  send(request) {
     this.emit(request.requestId, request.response);
   }
 }

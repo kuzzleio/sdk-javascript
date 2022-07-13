@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import { hilightUserCode } from './utils/stackTrace';
-import { RequestPayload } from './types/RequestPayload';
-import { JSONObject } from './types';
+import { hilightUserCode } from "./utils/stackTrace";
+import { RequestPayload } from "./types/RequestPayload";
+import { JSONObject } from "./types";
 
 /**
  * Standard Kuzzle error.
@@ -102,11 +102,20 @@ export class KuzzleError extends Error {
     >    at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
           at processTicksAndRejections (internal/process/task_queues.js:97:5)
    */
-  constructor (
-    apiError: { message: string, status?: number, id?: string, code?: number, errors?: JSONObject[], count?: number, stack?: string, props?: string[] },
+  constructor(
+    apiError: {
+      message: string;
+      status?: number;
+      id?: string;
+      code?: number;
+      errors?: JSONObject[];
+      count?: number;
+      stack?: string;
+      props?: string[];
+    },
     sdkStack?: string,
     protocol?: string,
-    request?: RequestPayload,
+    request?: RequestPayload
   ) {
     super(apiError.message);
 
@@ -135,24 +144,23 @@ export class KuzzleError extends Error {
     // the SDK one
     if (apiError.stack) {
       this.kuzzleStack = apiError.stack;
-      this.stack = apiError.stack + '\n';
-      this.stack += '          |\n';
-      this.stack += '          |\n';
+      this.stack = apiError.stack + "\n";
+      this.stack += "          |\n";
+      this.stack += "          |\n";
       this.stack += `          ${protocol}\n`;
-      this.stack += '          |\n';
-      this.stack += '          |\n';
-    }
-    else {
+      this.stack += "          |\n";
+      this.stack += "          |\n";
+    } else {
       this.stack = `KuzzleError: ${apiError.message}\n`;
     }
 
     // Append the SDK stacktrace
     if (sdkStack) {
       this.stack += sdkStack
-        .split('\n')
+        .split("\n")
         .map(hilightUserCode)
         .slice(1)
-        .join('\n');
+        .join("\n");
     }
   }
 }

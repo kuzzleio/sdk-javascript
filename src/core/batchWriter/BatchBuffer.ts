@@ -1,13 +1,13 @@
-import { JSONObject } from '../../types';
-import { InstrumentablePromise } from '../InstrumentablePromise';
+import { JSONObject } from "../../types";
+import { InstrumentablePromise } from "../InstrumentablePromise";
 
 /**
  * @internal
  */
 export type DocumentsBuffer = {
-  documents: Array<{ _id: string, body: JSONObject }>,
-  promise: InstrumentablePromise,
-  options: JSONObject,
+  documents: Array<{ _id: string; body: JSONObject }>;
+  promise: InstrumentablePromise;
+  options: JSONObject;
 };
 
 /**
@@ -36,18 +36,18 @@ export class BatchBuffer {
    *
    * @returns An object containing the result index in the array of results and a promise resolving to the array of results
    */
-  add (
+  add(
     index: string,
     collection: string,
     body: JSONObject,
     _id?: string,
-    options?: JSONObject,
-  ): { idx: number, promise: InstrumentablePromise } {
-    if (! this.indexes.has(index)) {
+    options?: JSONObject
+  ): { idx: number; promise: InstrumentablePromise } {
+    if (!this.indexes.has(index)) {
       this.indexes.set(index, new Map<string, DocumentsBuffer>());
     }
 
-    if (! this.indexes.get(index).has(collection)) {
+    if (!this.indexes.get(index).has(collection)) {
       this.indexes.get(index).set(collection, {
         documents: [],
         promise: new InstrumentablePromise(),

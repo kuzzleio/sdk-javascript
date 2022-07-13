@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-import { KuzzleError } from '../KuzzleError';
-import { BaseProtocolRealtime } from './abstract/Realtime';
-import { JSONObject } from '../types';
-import { RequestPayload } from '../types/RequestPayload';
-import HttpProtocol from './Http';
-import * as DisconnectionOrigin from './DisconnectionOrigin';
+import { KuzzleError } from "../KuzzleError";
+import { BaseProtocolRealtime } from "./abstract/Realtime";
+import { JSONObject } from "../types";
+import { RequestPayload } from "../types/RequestPayload";
+import HttpProtocol from "./Http";
+import * as DisconnectionOrigin from "./DisconnectionOrigin";
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -46,33 +46,35 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       ssl?: boolean;
     } = {}
   ) {
-    super(host, options, 'ws');
+    super(host, options, "ws");
 
-    if (typeof host !== 'string' || host === '') {
-      throw new Error('host is required');
+    if (typeof host !== "string" || host === "") {
+      throw new Error("host is required");
     }
 
     // Browsers WebSocket API
-    if (typeof WebSocket !== 'undefined') {
+    if (typeof WebSocket !== "undefined") {
       this.WebSocketClient = WebSocket;
       // There are no options allowed in the browsers WebSocket API
       this.options = null;
-    }
-    else {
-      this.WebSocketClient = require('ws');
+    } else {
+      this.WebSocketClient = require("ws");
       this.options = {
         perMessageDeflate: false,
-        headers: options.headers || null
+        headers: options.headers || null,
       };
 
-      if (this.options.headers !== null &&
-          (Array.isArray(this.options.headers) ||
-          typeof this.options.headers !== 'object')) {
+      if (
+        this.options.headers !== null &&
+        (Array.isArray(this.options.headers) ||
+          typeof this.options.headers !== "object")
+      ) {
         throw new Error('Invalid "headers" option: expected an object');
       }
     }
 
-    this._pingInterval = typeof options.pingInterval === 'number' ? options.pingInterval : 2000;
+    this._pingInterval =
+      typeof options.pingInterval === "number" ? options.pingInterval : 2000;
     this.client = null;
     this.lasturl = null;
   }
@@ -80,9 +82,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * Connect to the websocket server
    */
-  _connect (): Promise<void> {
+  _connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const url = `${this.ssl ? 'wss' : 'ws'}://${this.host}:${this.port}`;
+      const url = `${this.ssl ? "wss" : "ws"}://${this.host}:${this.port}`;
 
       super.connect();
 
@@ -97,17 +99,16 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
        * Defining behavior depending on the Websocket client type
        * Which can be the browser or node one.
        */
-      if (typeof WebSocket !== 'undefined') {
+      if (typeof WebSocket !== "undefined") {
         this.ping = () => {
           this.client.send('{"p":1}');
         };
-      }
-      else {
+      } else {
         this.ping = () => {
           this.client.ping();
         };
 
-        this.client.on('pong', () => {
+        this.client.on("pong", () => {
           this.waitForPong = false;
         });
       }
@@ -121,14 +122,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       };
 
       this.client.onclose = (closeEvent, message) => {
-        let
-          status,
+        let status,
           reason = message;
 
-        if (typeof closeEvent === 'number') {
+        if (typeof closeEvent === "number") {
           status = closeEvent;
-        }
-        else {
+        } else {
           status = closeEvent.code;
 
           if (closeEvent.reason) {
@@ -148,24 +147,30 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
       };
 
-      this.client.onerror = error => {
+      this.client.onerror = (error) => {
         let err = error;
 
         if (!(error instanceof Error)) {
           // browser-side, the payload sent to this event is a generic "Event"
           // object bearing no information about the cause of the error
-          err = error && (typeof Event === 'undefined' || !(error instanceof Event)) ?
-            new Error(error.message || error) : new Error('Connection error');
+          err =
+            error && (typeof Event === "undefined" || !(error instanceof Event))
+              ? new Error(error.message || error)
+              : new Error("Connection error");
         }
 
         this.clientNetworkError(err);
 
-        if ([this.client.CLOSING, this.client.CLOSED].indexOf(this.client.readyState) > -1) {
+        if (
+          [this.client.CLOSING, this.client.CLOSED].indexOf(
+            this.client.readyState
+          ) > -1
+        ) {
           return reject(err);
         }
       };
 
-      this.client.onmessage = payload => {
+      this.client.onmessage = (payload) => {
         const data = JSON.parse(payload.data || payload);
 
         /**
@@ -178,22 +183,21 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         }
 
         // for responses, data.room == requestId
-        if (data.type === 'TokenExpired') {
-          this.emit('tokenExpired');
-        }
-        else if (data.room) {
+        if (data.type === "TokenExpired") {
+          this.emit("tokenExpired");
+        } else if (data.room) {
           this.emit(data.room, data);
-        }
-        else {
+        } else {
           // @deprecated
-          this.emit('discarded', data);
+          this.emit("discarded", data);
 
           const error = new KuzzleError(
             data.error,
-            (new Error().stack),
-            this.constructor.name);
+            new Error().stack,
+            this.constructor.name
+          );
 
-          this.emit('queryError', { error, request: data });
+          this.emit("queryError", { error, request: data });
         }
         /**
          * In case you're running a Kuzzle version under 2.10.0
@@ -206,27 +210,25 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     });
   }
 
-  connect (): Promise<void> {
+  connect(): Promise<void> {
     if (this.cookieSupport) {
-      return this._httpProtocol.connect()
-        .then(() => this._connect());
+      return this._httpProtocol.connect().then(() => this._connect());
     }
     return this._connect();
   }
 
-  enableCookieSupport () {
-    if (typeof XMLHttpRequest === 'undefined') {
-      throw new Error('Support for cookie cannot be enabled outside of a browser');
+  enableCookieSupport() {
+    if (typeof XMLHttpRequest === "undefined") {
+      throw new Error(
+        "Support for cookie cannot be enabled outside of a browser"
+      );
     }
 
     super.enableCookieSupport();
-    this._httpProtocol = new HttpProtocol(
-      this.host,
-      {
-        port: this.port,
-        ssl: this.ssl,
-      }
-    );
+    this._httpProtocol = new HttpProtocol(this.host, {
+      port: this.port,
+      ssl: this.ssl,
+    });
     this._httpProtocol.enableCookieSupport();
   }
 
@@ -235,16 +237,17 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *
    * @param {Object} payload
    */
-  send (request: RequestPayload, options: JSONObject = {}) {
+  send(request: RequestPayload, options: JSONObject = {}) {
     if (!this.client || this.client.readyState !== this.client.OPEN) {
       return;
     }
 
-    if (! this.cookieSupport
-      || request.controller !== 'auth'
-      || ( request.action !== 'login'
-        && request.action !== 'logout'
-        && request.action !== 'refreshToken')
+    if (
+      !this.cookieSupport ||
+      request.controller !== "auth" ||
+      (request.action !== "login" &&
+        request.action !== "logout" &&
+        request.action !== "refreshToken")
     ) {
       this.client.send(JSON.stringify(request));
       return;
@@ -256,7 +259,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       return;
     }
 
-    this.emit('websocketRenewalStart'); // Notify that the websocket is going to renew his connection with Kuzzle
+    this.emit("websocketRenewalStart"); // Notify that the websocket is going to renew his connection with Kuzzle
     if (this.client) {
       this.client.onclose = undefined; // Remove the listener that will emit disconnected / networkError event before closing
       this.client.close(1000);
@@ -264,25 +267,25 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     this.client = null;
     this.clientDisconnected(DisconnectionOrigin.WEBSOCKET_AUTH_RENEWAL); // Simulate a disconnection, this will enable offline queue and trigger realtime subscriptions backup
 
-    this._httpProtocol._sendHttpRequest(formattedRequest)
-      .then(response => {
+    this._httpProtocol
+      ._sendHttpRequest(formattedRequest)
+      .then((response) => {
         // Reconnection
-        return this.connect()
-          .then(() => {
-            this.emit(formattedRequest.payload.requestId, response);
-            this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
-          });
+        return this.connect().then(() => {
+          this.emit(formattedRequest.payload.requestId, response);
+          this.emit("websocketRenewalDone"); // Notify that the websocket has finished renewing his connection with Kuzzle
+        });
       })
-      .catch(error => {
-        this.emit(formattedRequest.payload.requestId, {error});
-        this.emit('websocketRenewalDone'); // Notify that the websocket has finished renewing his connection with Kuzzle
+      .catch((error) => {
+        this.emit(formattedRequest.payload.requestId, { error });
+        this.emit("websocketRenewalDone"); // Notify that the websocket has finished renewing his connection with Kuzzle
       });
   }
 
   /**
    * @override
    */
-  clientDisconnected (origin: string) {
+  clientDisconnected(origin: string) {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.clientDisconnected(origin);
@@ -293,7 +296,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    *
    * @param {Error} error
    */
-  clientNetworkError (error) {
+  clientNetworkError(error) {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.clientNetworkError(error);
@@ -302,8 +305,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * Closes the connection
    */
-  close () {
-    this.state = 'offline';
+  close() {
+    this.state = "offline";
     this.wasConnected = false;
     if (this.client) {
       this.client.close(1000); // Close with 1000 will trigger the `disconnect`
@@ -317,7 +320,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     super.close();
   }
 
-  private setupPingPong () {
+  private setupPingPong() {
     clearInterval(this.pingIntervalId);
 
     // Reset when connection is established
@@ -325,9 +328,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
     this.pingIntervalId = setInterval(() => {
       // If the connection is established and we are not waiting for a pong we ping Kuzzle
-      if ( this.client
-        && this.client.readyState === this.client.OPEN
-        && ! this.waitForPong
+      if (
+        this.client &&
+        this.client.readyState === this.client.OPEN &&
+        !this.waitForPong
       ) {
         this.ping();
         this.waitForPong = true;
@@ -337,7 +341,9 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
       // If we were waiting for a pong that never occured before the next ping cycle we throw an error
       if (this.waitForPong) {
-        const error: any = new Error('Kuzzle does\'nt respond to ping. Connection lost.');
+        const error: any = new Error(
+          "Kuzzle does'nt respond to ping. Connection lost."
+        );
         error.status = 503;
 
         /**

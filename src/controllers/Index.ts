@@ -1,10 +1,9 @@
-import { BaseController } from './Base';
-import { JSONObject, ArgsDefault } from '../types';
+import { BaseController } from "./Base";
+import { JSONObject, ArgsDefault } from "../types";
 
 export class IndexController extends BaseController {
-
-  constructor (kuzzle) {
-    super(kuzzle, 'index');
+  constructor(kuzzle) {
+    super(kuzzle, "index");
   }
 
   /**
@@ -17,16 +16,15 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  create (
+  create(
     index: string,
     options: ArgsIndexControllerCreate = {}
   ): Promise<void> {
     const request = {
       index,
-      action: 'create'
+      action: "create",
     };
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -39,16 +37,15 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  delete (
+  delete(
     index: string,
     options: ArgsIndexControllerDelete = {}
   ): Promise<void> {
     const request = {
       index,
-      action: 'delete'
+      action: "delete",
     };
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -61,15 +58,17 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  exists (
+  exists(
     index: string,
     options: ArgsIndexControllerExists = {}
   ): Promise<boolean> {
-    return this.query({
-      index,
-      action : 'exists'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        index,
+        action: "exists",
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -81,13 +80,13 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  list (
-    options: ArgsIndexControllerList = {}
-  ): Promise<Array<string>> {
-    return this.query({
-      action: 'list'
-    }, options)
-      .then(response => response.result.indexes);
+  list(options: ArgsIndexControllerList = {}): Promise<Array<string>> {
+    return this.query(
+      {
+        action: "list",
+      },
+      options
+    ).then((response) => response.result.indexes);
   }
 
   /**
@@ -102,19 +101,20 @@ export class IndexController extends BaseController {
    *
    * @returns Names of successfully deleted indexes
    */
-  mDelete (
+  mDelete(
     indexes: Array<string>,
     options: ArgsIndexControllerMDelete = {}
   ): Promise<Array<string>> {
     const request = {
-      action: 'mDelete',
+      action: "mDelete",
       body: {
-        indexes
-      }
+        indexes,
+      },
     };
 
-    return this.query(request, options)
-      .then(response => response.result.deleted);
+    return this.query(request, options).then(
+      (response) => response.result.deleted
+    );
   }
 
   /**
@@ -126,30 +126,24 @@ export class IndexController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  stats (
-    options: ArgsIndexControllerStats = {}
-  ): Promise<JSONObject> {
-    return this.query({
-      action: 'stats'
-    }, options)
-      .then(response => response.result);
+  stats(options: ArgsIndexControllerStats = {}): Promise<JSONObject> {
+    return this.query(
+      {
+        action: "stats",
+      },
+      options
+    ).then((response) => response.result);
   }
 }
 
-export interface ArgsIndexControllerCreate extends ArgsDefault {
-}
+export interface ArgsIndexControllerCreate extends ArgsDefault {}
 
-export interface ArgsIndexControllerDelete extends ArgsDefault {
-}
+export interface ArgsIndexControllerDelete extends ArgsDefault {}
 
-export interface ArgsIndexControllerExists extends ArgsDefault {
-}
+export interface ArgsIndexControllerExists extends ArgsDefault {}
 
-export interface ArgsIndexControllerList extends ArgsDefault {
-}
+export interface ArgsIndexControllerList extends ArgsDefault {}
 
-export interface ArgsIndexControllerMDelete extends ArgsDefault {
-}
+export interface ArgsIndexControllerMDelete extends ArgsDefault {}
 
-export interface ArgsIndexControllerStats extends ArgsDefault {
-}
+export interface ArgsIndexControllerStats extends ArgsDefault {}

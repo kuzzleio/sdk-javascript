@@ -29,11 +29,11 @@ export type HttpRoutes = {
       /**
        * HTTP verb
        */
-      verb: string,
+      verb: string;
       /**
        * URL
        */
-      url: string
-    }
-  }
-}
+      url: string;
+    };
+  };
+};

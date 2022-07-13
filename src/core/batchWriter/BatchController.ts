@@ -1,15 +1,15 @@
-import { Kuzzle } from '../../Kuzzle';
+import { Kuzzle } from "../../Kuzzle";
 import {
   ArgsDocumentControllerCreate,
   ArgsDocumentControllerCreateOrReplace,
   ArgsDocumentControllerReplace,
   ArgsDocumentControllerUpdate,
-  DocumentController
-} from '../../controllers/Document';
-import { JSONObject, KDocumentContentGeneric, KDocument } from '../../types';
-import { BatchWriter } from './BatchWriter';
-import { omit } from '../../utils/object';
-import { KuzzleError } from '../../KuzzleError';
+  DocumentController,
+} from "../../controllers/Document";
+import { JSONObject, KDocumentContentGeneric, KDocument } from "../../types";
+import { BatchWriter } from "./BatchWriter";
+import { omit } from "../../utils/object";
+import { KuzzleError } from "../../KuzzleError";
 
 /**
  * Overload of the document controller.
@@ -42,7 +42,7 @@ export class BatchController extends DocumentController {
    * @param options.maxWriteBufferSize Max write buffer size (200). (Should match "limits.documentsWriteCount")
    * @param options.maxReadBufferSize Max read buffer size. (Should match "limits.documentsReadCount")
    */
-  constructor (
+  constructor(
     sdk: Kuzzle,
     { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
   ) {
@@ -51,7 +51,7 @@ export class BatchController extends DocumentController {
     this.writer = this.createWriter(sdk, {
       interval,
       maxWriteBufferSize,
-      maxReadBufferSize
+      maxReadBufferSize,
     });
 
     this.writer.begin();
@@ -62,7 +62,7 @@ export class BatchController extends DocumentController {
    *
    * This method has to be called to destroy the underlaying timer sending batch requests.
    */
-  async dispose () {
+  async dispose() {
     await this.writer.dispose();
   }
 
@@ -80,27 +80,35 @@ export class BatchController extends DocumentController {
    *
    * @returns The created document
    */
-  async create<TKDocumentContent extends KDocumentContentGeneric> (
+  async create<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     content: Partial<TKDocumentContent>,
     _id?: string,
     options?: ArgsDocumentControllerCreate
   ): Promise<KDocument<TKDocumentContent>> {
-    const { idx, promise } = this.writer.addCreate(index, collection, content, _id, options);
+    const { idx, promise } = this.writer.addCreate(
+      index,
+      collection,
+      content,
+      _id,
+      options
+    );
 
     const { successes, errors } = await promise.promise;
 
     if (errors.length > 0) {
-      const error = errors.find(e => {
-        const responseDoc = omit(e.document._source, ['_kuzzle_info']);
+      const error = errors.find((e) => {
+        const responseDoc = omit(e.document._source, ["_kuzzle_info"]);
         const originDoc = content;
 
         return JSON.stringify(responseDoc) === JSON.stringify(originDoc);
       });
 
       if (error) {
-        throw new Error(`Cannot create document in "${index}":"${collection}" : ${error.reason}`);
+        throw new Error(
+          `Cannot create document in "${index}":"${collection}" : ${error.reason}`
+        );
       }
     }
 
@@ -121,21 +129,29 @@ export class BatchController extends DocumentController {
    *
    * @returns The replaced document
    */
-  async replace<TKDocumentContent extends KDocumentContentGeneric> (
+  async replace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
     options?: ArgsDocumentControllerReplace
   ): Promise<KDocument<TKDocumentContent>> {
-    const { idx, promise } = this.writer.addReplace(index, collection, content, _id, options);
+    const { idx, promise } = this.writer.addReplace(
+      index,
+      collection,
+      content,
+      _id,
+      options
+    );
 
     const { successes, errors } = await promise.promise;
 
     const error = errors.find(({ _id: id }) => id === _id);
 
     if (error) {
-      throw new Error(`Cannot replace document "${index}":"${collection}":"${_id}": ${error.reason}`);
+      throw new Error(
+        `Cannot replace document "${index}":"${collection}":"${_id}": ${error.reason}`
+      );
     }
 
     return successes[idx];
@@ -154,21 +170,29 @@ export class BatchController extends DocumentController {
    *
    * @returns The created or replaced document
    */
-  async createOrReplace<TKDocumentContent extends KDocumentContentGeneric> (
+  async createOrReplace<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
     options?: ArgsDocumentControllerCreateOrReplace
   ): Promise<KDocument<TKDocumentContent>> {
-    const { idx, promise } = this.writer.addCreateOrReplace(index, collection, content, _id, options);
+    const { idx, promise } = this.writer.addCreateOrReplace(
+      index,
+      collection,
+      content,
+      _id,
+      options
+    );
 
     const { successes, errors } = await promise.promise;
 
     const error = errors.find(({ document }) => document._id === _id);
 
     if (error) {
-      throw new Error(`Cannot create or replace document "${index}":"${collection}":"${_id}": ${error.reason}`);
+      throw new Error(
+        `Cannot create or replace document "${index}":"${collection}":"${_id}": ${error.reason}`
+      );
     }
 
     return successes[idx];
@@ -190,21 +214,29 @@ export class BatchController extends DocumentController {
    *
    * @returns The replaced document
    */
-  async update<TKDocumentContent extends KDocumentContentGeneric> (
+  async update<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
     options?: ArgsDocumentControllerUpdate
   ): Promise<KDocument<TKDocumentContent>> {
-    const { idx, promise } = this.writer.addUpdate(index, collection, content, _id, options);
+    const { idx, promise } = this.writer.addUpdate(
+      index,
+      collection,
+      content,
+      _id,
+      options
+    );
 
     const { successes, errors } = await promise.promise;
 
     const error = errors.find(({ _id: id }) => id === _id);
 
     if (error) {
-      throw new Error(`Cannot update document "${index}":"${collection}":"${_id}": ${error.reason}`);
+      throw new Error(
+        `Cannot update document "${index}":"${collection}":"${_id}": ${error.reason}`
+      );
     }
 
     return successes[idx];
@@ -224,7 +256,7 @@ export class BatchController extends DocumentController {
    *
    * @returns The document
    */
-  async get<TKDocumentContent extends KDocumentContentGeneric> (
+  async get<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     id: string
@@ -235,10 +267,10 @@ export class BatchController extends DocumentController {
 
     const document = successes.find(({ _id }) => _id === id);
 
-    if (! document) {
+    if (!document) {
       throw new KuzzleError({
         message: `Document "${index}":"${collection}":"${id}" not found`,
-        id: 'services.storage.not_found',
+        id: "services.storage.not_found",
       });
     }
 
@@ -259,8 +291,17 @@ export class BatchController extends DocumentController {
    *
    * @returns True if the document exists
    */
-  async exists (index: string, collection: string, id: string): Promise<boolean> {
-    const { idx, promise } = this.writer.addExists(index, collection, undefined, id);
+  async exists(
+    index: string,
+    collection: string,
+    id: string
+  ): Promise<boolean> {
+    const { idx, promise } = this.writer.addExists(
+      index,
+      collection,
+      undefined,
+      id
+    );
 
     const existences = await promise.promise;
 
@@ -281,15 +322,22 @@ export class BatchController extends DocumentController {
    *
    * @returns The document ID
    */
-  async delete (index: string, collection: string, id: string): Promise<string> {
-    const { idx, promise } = this.writer.addDelete(index, collection, undefined, id);
+  async delete(index: string, collection: string, id: string): Promise<string> {
+    const { idx, promise } = this.writer.addDelete(
+      index,
+      collection,
+      undefined,
+      id
+    );
 
     const { successes, errors } = await promise.promise;
 
     const error = errors.find(({ _id }) => _id === id);
 
     if (error) {
-      throw new Error(`Cannot delete document "${index}":"${collection}":"${id}" : ${error.reason}`);
+      throw new Error(
+        `Cannot delete document "${index}":"${collection}":"${id}" : ${error.reason}`
+      );
     }
 
     return successes[idx];
@@ -299,7 +347,7 @@ export class BatchController extends DocumentController {
    * Used in function tests.
    * @internal
    */
-  private createWriter (sdk: Kuzzle, options: JSONObject) {
+  private createWriter(sdk: Kuzzle, options: JSONObject) {
     return new BatchWriter(sdk, options);
   }
 }

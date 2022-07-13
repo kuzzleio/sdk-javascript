@@ -1,32 +1,31 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  { Kuzzle } = require('../../src/Kuzzle'),
-  { AuthController } = require('../../src/controllers/Auth'),
-  { BulkController } = require('../../src/controllers/Bulk'),
-  { CollectionController } = require('../../src/controllers/Collection'),
-  { DocumentController } = require('../../src/controllers/Document'),
-  { IndexController } = require('../../src/controllers/Index'),
-  { MemoryStorageController } = require('../../src/controllers/MemoryStorage'),
-  { SecurityController } = require('../../src/controllers/Security'),
-  { ServerController } = require('../../src/controllers/Server'),
-  { RealtimeController } = require('../../src/controllers/Realtime'),
+const should = require("should"),
+  sinon = require("sinon"),
+  { Kuzzle } = require("../../src/Kuzzle"),
+  { AuthController } = require("../../src/controllers/Auth"),
+  { BulkController } = require("../../src/controllers/Bulk"),
+  { CollectionController } = require("../../src/controllers/Collection"),
+  { DocumentController } = require("../../src/controllers/Document"),
+  { IndexController } = require("../../src/controllers/Index"),
+  { MemoryStorageController } = require("../../src/controllers/MemoryStorage"),
+  { SecurityController } = require("../../src/controllers/Security"),
+  { ServerController } = require("../../src/controllers/Server"),
+  { RealtimeController } = require("../../src/controllers/Realtime"),
   {
     WebSocket, // eslint-disable-line no-redeclare
-    Http
-  } = require('../../src/protocols'),
-  ProtocolMock = require('../mocks/protocol.mock');
+    Http,
+  } = require("../../src/protocols"),
+  ProtocolMock = require("../mocks/protocol.mock");
 
-describe('Kuzzle constructor', () => {
-  const protocolMock = new ProtocolMock('somewhere');
+describe("Kuzzle constructor", () => {
+  const protocolMock = new ProtocolMock("somewhere");
 
-  it('should throw an error if no protocol wrapper is provided', () => {
+  it("should throw an error if no protocol wrapper is provided", () => {
     should(function () {
       new Kuzzle();
     }).throw('"protocol" argument missing');
   });
 
-  it('should throw an error if the protocol wrapper does not implement required methods', () => {
+  it("should throw an error if the protocol wrapper does not implement required methods", () => {
     const protocol = {};
     should(function () {
       new Kuzzle(protocol);
@@ -48,13 +47,13 @@ describe('Kuzzle constructor', () => {
     }).not.throw();
   });
 
-  it('should get a custom protocol instance', () => {
+  it("should get a custom protocol instance", () => {
     const kuzzle = new Kuzzle(protocolMock);
     should(kuzzle.protocol).be.an.instanceOf(ProtocolMock);
     should(kuzzle.protocol).be.equal(protocolMock);
   });
 
-  it('should expose the documented controllers', () => {
+  it("should expose the documented controllers", () => {
     const kuzzle = new Kuzzle(protocolMock);
 
     should(kuzzle.auth).be.an.instanceof(AuthController);
@@ -68,9 +67,8 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.realtime).be.an.instanceof(RealtimeController);
   });
 
-  it('should expose the documented properties with their default values', () => {
-    const
-      version = require('../../package').version,
+  it("should expose the documented properties with their default values", () => {
+    const version = require("../../package").version,
       kuzzle = new Kuzzle(protocolMock);
 
     should(kuzzle.autoResubscribe).be.a.Boolean().and.be.true();
@@ -82,12 +80,11 @@ describe('Kuzzle constructor', () => {
   });
 
   it('should initialize correctly properties using the "options" argument', function () {
-    const
-      options = {
+    const options = {
         autoResubscribe: false,
-        volatile: {foo: ['bar', 'baz', 'qux'], bar: 'foo'},
+        volatile: { foo: ["bar", "baz", "qux"], bar: "foo" },
         eventTimeout: 1000,
-        foo: 'bar'
+        foo: "bar",
       },
       kuzzle = new Kuzzle(protocolMock, options);
 
@@ -97,21 +94,20 @@ describe('Kuzzle constructor', () => {
   });
 
   it('should not override read-only properties with the "options" argument', function () {
-    const
-      version = require('../../package').version,
+    const version = require("../../package").version,
       options = {
-        auth: 'Auth',
-        bulk: 'Bulk',
-        collection: 'Collection',
-        document: 'Document',
-        index: 'Index',
-        ms: 'MS',
-        security: 'security',
-        server: 'server',
-        realtime: 'realtime',
-        protocol: 'protocol',
-        jwt: 'jwt',
-        version: 'version'
+        auth: "Auth",
+        bulk: "Bulk",
+        collection: "Collection",
+        document: "Document",
+        index: "Index",
+        ms: "MS",
+        security: "security",
+        server: "server",
+        realtime: "realtime",
+        protocol: "protocol",
+        jwt: "jwt",
+        version: "version",
       },
       kuzzle = new Kuzzle(protocolMock, options);
 
@@ -129,37 +125,33 @@ describe('Kuzzle constructor', () => {
     should(kuzzle.jwt).be.null();
   });
 
-  it('should set autoQueue and autoReplay if offlineMode is set to auto', () => {
+  it("should set autoQueue and autoReplay if offlineMode is set to auto", () => {
     const kuzzle = new Kuzzle(protocolMock, {
       autoQueue: false,
-      autoReplay : true,
-      offlineMode: 'auto'
+      autoReplay: true,
+      offlineMode: "auto",
     });
 
     should(kuzzle.autoQueue).be.true();
     should(kuzzle.autoReplay).be.true();
   });
 
-  it('should initialize kuzzle with WebSocket', () => {
+  it("should initialize kuzzle with WebSocket", () => {
     should(() => {
-      new Kuzzle(
-        new WebSocket('localhost')
-      );
+      new Kuzzle(new WebSocket("localhost"));
     }).not.throw();
   });
 
-  it('should initialize kuzzle with Http', () => {
+  it("should initialize kuzzle with Http", () => {
     should(() => {
-      new Kuzzle(
-        new Http('localhost')
-      );
+      new Kuzzle(new Http("localhost"));
     }).not.throw();
   });
 
-  it('should call protocol.enableCookieSupport', () => {
+  it("should call protocol.enableCookieSupport", () => {
     /* eslint-disable no-native-reassign */
     /* eslint-disable no-global-assign */
-    XMLHttpRequest = () => {}; // Faking being in a browser, otherwise kuzzle will throw that cookie are not supported    
+    XMLHttpRequest = () => {}; // Faking being in a browser, otherwise kuzzle will throw that cookie are not supported
     const kuzzle = new Kuzzle(protocolMock, {
       cookieAuth: true,
     });

@@ -1,4 +1,4 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 export type MappingsProperties = {
   /**
@@ -6,14 +6,14 @@ export type MappingsProperties = {
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-properties
    */
-  properties?: MappingsProperties | JSONObject,
+  properties?: MappingsProperties | JSONObject;
   /**
    * Dynamic mapping policy
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-dynamic-policy
    */
-  dynamic?: 'true' | 'false' | 'strict'
-}
+  dynamic?: "true" | "false" | "strict";
+};
 
 /**
  * Collection mappings definition
@@ -32,11 +32,11 @@ export type CollectionMappings = {
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-properties
    */
-  properties?: MappingsProperties,
+  properties?: MappingsProperties;
   /**
    * Dynamic mapping policy
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-dynamic-polic
    */
-  dynamic?: 'true' | 'false' | 'strict',
-}
+  dynamic?: "true" | "false" | "strict";
+};

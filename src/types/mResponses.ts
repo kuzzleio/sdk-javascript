@@ -1,4 +1,4 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 type mResponseErrors = Array<{
   /**
@@ -102,4 +102,3 @@ export type mDeleteResponse = {
     reason: string;
   }>;
 };
-

@@ -1,7 +1,6 @@
-'use strict';
+"use strict";
 
 class Room {
-
   /**
    * @param {RealtimeController} controller
    * @param {string} index
@@ -10,9 +9,9 @@ class Room {
    * @param {function} callback
    * @param {object} options
    */
-  constructor (controller, index, collection, body, callback, options = {}) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: controller.kuzzle
+  constructor(controller, index, collection, body, callback, options = {}) {
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: controller.kuzzle,
     });
     this.controller = controller;
     this.index = index;
@@ -28,51 +27,52 @@ class Room {
       index,
       collection,
       body,
-      controller: 'realtime',
-      action: 'subscribe',
+      controller: "realtime",
+      action: "subscribe",
       state: this.options.state,
       scope: this.options.scope,
       users: this.options.users,
-      volatile: this.options.volatile
+      volatile: this.options.volatile,
     };
 
-    this.autoResubscribe = typeof options.autoResubscribe === 'boolean'
-      ? options.autoResubscribe
-      : this.kuzzle.autoResubscribe;
-    this.subscribeToSelf = typeof options.subscribeToSelf === 'boolean'
-      ? options.subscribeToSelf
-      : true;
+    this.autoResubscribe =
+      typeof options.autoResubscribe === "boolean"
+        ? options.autoResubscribe
+        : this.kuzzle.autoResubscribe;
+    this.subscribeToSelf =
+      typeof options.subscribeToSelf === "boolean"
+        ? options.subscribeToSelf
+        : true;
 
     // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
   }
 
-  get kuzzle () {
+  get kuzzle() {
     return this._kuzzle;
   }
 
-  subscribe () {
-    return this.kuzzle.query(this.request, this.options)
-      .then(response => {
-        this.id = response.result.roomId;
-        this.channel = response.result.channel;
+  subscribe() {
+    return this.kuzzle.query(this.request, this.options).then((response) => {
+      this.id = response.result.roomId;
+      this.channel = response.result.channel;
 
-        // we rely on kuzzle event emitter to not duplicate the listeners here
-        this.kuzzle.protocol.on(this.channel, this._channelListener);
+      // we rely on kuzzle event emitter to not duplicate the listeners here
+      this.kuzzle.protocol.on(this.channel, this._channelListener);
 
-        return response;
-      });
+      return response;
+    });
   }
 
-  removeListeners () {
+  removeListeners() {
     if (this.channel) {
       this.kuzzle.protocol.removeListener(this.channel, this._channelListener);
     }
   }
 
-  _channelListener (data) {
+  _channelListener(data) {
     // intercept token expiration messages and relay them to kuzzle
-    if (data.type === 'TokenExpired') {
+    if (data.type === "TokenExpired") {
       return this.kuzzle.tokenExpired();
     }
 
