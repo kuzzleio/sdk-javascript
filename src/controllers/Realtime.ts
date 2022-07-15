@@ -114,11 +114,11 @@ export class RealtimeController extends BaseController {
     options: ArgsRealtimeControllerPublish = {}
   ): Promise<boolean> {
     const request = {
-      index,
-      collection,
-      body: message,
-      action: "publish",
       _id: options._id,
+      action: "publish",
+      body: message,
+      collection,
+      index,
     };
 
     return this.query(request, options).then(
@@ -264,7 +264,7 @@ export class RealtimeController extends BaseController {
   }
 }
 
-export interface ArgsRealtimeControllerCount extends ArgsDefault {}
+export type ArgsRealtimeControllerCount = ArgsDefault;
 
 export interface ArgsRealtimeControllerPublish extends ArgsDefault {
   _id?: string;
@@ -277,4 +277,4 @@ export interface ArgsRealtimeControllerSubscribe extends ArgsDefault {
   volatile?: JSONObject;
 }
 
-export interface ArgsRealtimeControllerUnsubscribe extends ArgsDefault {}
+export type ArgsRealtimeControllerUnsubscribe = ArgsDefault;

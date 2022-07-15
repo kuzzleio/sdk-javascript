@@ -1,3 +1,5 @@
+"use strict";
+
 // golfed version of uuid-v4
 // uuid node module relies on crypto, which is a bit fat to embed
 //

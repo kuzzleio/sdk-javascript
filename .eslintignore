@@ -1,3 +1,5 @@
+src/controllers/MemoryStorage.js
+
 # JS generated files from TS
 src/**/*.d.ts
 src/**/*.js.map

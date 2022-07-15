@@ -1,5 +1,3 @@
-"use strict";
-
 import staticHttpRoutes from "./routes.json";
 import { KuzzleAbstractProtocol } from "./abstract/Base";
 import { HttpRoutes, JSONObject } from "../types";
@@ -240,7 +238,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       const error = new Error(
         `No URL found for "${request.controller}:${request.action}".`
       );
-      this.emit(request.requestId, { status: 400, error });
+      this.emit(request.requestId, { error, status: 400 });
       return;
     }
 
@@ -295,7 +293,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
           `Missing URL param "${matches[1]}" in "${matches.input}"`
         );
 
-        this.emit(payload.requestId, { status: 400, error });
+        this.emit(payload.requestId, { error, status: 400 });
         return;
       }
 

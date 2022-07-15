@@ -1,5 +1,3 @@
-"use strict";
-
 import { KuzzleError } from "../KuzzleError";
 import { BaseProtocolRealtime } from "./abstract/Realtime";
 import { JSONObject } from "../types";
@@ -60,8 +58,8 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     } else {
       this.WebSocketClient = require("ws");
       this.options = {
-        perMessageDeflate: false,
         headers: options.headers || null,
+        perMessageDeflate: false,
       };
 
       if (

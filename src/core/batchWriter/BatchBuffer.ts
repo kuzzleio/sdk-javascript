@@ -50,8 +50,8 @@ export class BatchBuffer {
     if (!this.indexes.get(index).has(collection)) {
       this.indexes.get(index).set(collection, {
         documents: [],
-        promise: new InstrumentablePromise(),
         options,
+        promise: new InstrumentablePromise(),
       });
     }
 

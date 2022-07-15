@@ -1,3 +1,5 @@
+"use strict";
+
 function shouldDebug() {
   if (typeof window === "undefined") {
     const debugString = process.env.DEBUG || "";
@@ -5,6 +7,7 @@ function shouldDebug() {
     return debugString.includes("kuzzle-sdk");
   }
 
+  // eslint-disable-next-line no-undef
   const url = new URL(window.location);
 
   return url.searchParams.get("debugKuzzleSdk") !== null;

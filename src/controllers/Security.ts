@@ -30,14 +30,14 @@ export class SecurityController extends BaseController {
     options: ArgsSecurityControllerCreateApiKey = {}
   ) {
     const request = {
-      userId,
-      action: "createApiKey",
       _id: options._id,
-      expiresIn: options.expiresIn,
-      refresh: options.refresh,
+      action: "createApiKey",
       body: {
         description,
       },
+      expiresIn: options.expiresIn,
+      refresh: options.refresh,
+      userId,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -55,9 +55,9 @@ export class SecurityController extends BaseController {
     options: ArgsSecurityControllerCheckRights
   ) {
     const request = {
-      userId: kuid,
-      body: requestPayload,
       action: "checkRights",
+      body: requestPayload,
+      userId: kuid,
     };
 
     return this.query(request, options).then(
@@ -76,10 +76,10 @@ export class SecurityController extends BaseController {
    */
   deleteApiKey(userId, id, options: ArgsSecurityControllerDeleteApiKey = {}) {
     const request = {
-      userId,
-      action: "deleteApiKey",
       _id: id,
+      action: "deleteApiKey",
       refresh: options.refresh,
+      userId,
     };
 
     return this.query(request, options);
@@ -100,12 +100,12 @@ export class SecurityController extends BaseController {
     options: ArgsSecurityControllerSearchApiKeys = {}
   ) {
     const request = {
-      userId,
       action: "searchApiKeys",
-      from: options.from,
-      size: options.size,
-      lang: options.lang,
       body: query,
+      from: options.from,
+      lang: options.lang,
+      size: options.size,
+      userId,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -120,9 +120,9 @@ export class SecurityController extends BaseController {
     return this.query(
       {
         _id,
-        strategy,
-        body,
         action: "createCredentials",
+        body,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -135,8 +135,8 @@ export class SecurityController extends BaseController {
   ) {
     const request = {
       _id,
-      body,
       action: "createFirstAdmin",
+      body,
       reset: options.reset,
     };
 
@@ -153,8 +153,8 @@ export class SecurityController extends BaseController {
   ) {
     const request = {
       _id,
-      body,
       action: "createOrReplaceProfile",
+      body,
     };
 
     return this.query(request, options).then(
@@ -170,8 +170,8 @@ export class SecurityController extends BaseController {
   ) {
     const request = {
       _id,
-      body,
       action: "createOrReplaceRole",
+      body,
       force: options.force ? true : null,
     };
     return this.query(request, options).then(
@@ -187,8 +187,8 @@ export class SecurityController extends BaseController {
   createProfile(_id, body, options: ArgsSecurityControllerCreateProfile = {}) {
     const request = {
       _id,
-      body,
       action: "createProfile",
+      body,
     };
 
     return this.query(request, options).then(
@@ -208,8 +208,8 @@ export class SecurityController extends BaseController {
 
     const request = {
       _id,
-      body,
       action: "createRestrictedUser",
+      body,
     };
 
     return this.query(request, options).then(
@@ -221,8 +221,8 @@ export class SecurityController extends BaseController {
   createRole(_id, body, options: ArgsSecurityControllerCreateRole = {}) {
     const request = {
       _id,
-      body,
       action: "createRole",
+      body,
       force: options.force ? true : null,
     };
     return this.query(request, options).then(
@@ -238,8 +238,8 @@ export class SecurityController extends BaseController {
   createUser(_id, body, options: ArgsSecurityControllerCreateUser = {}) {
     const request = {
       _id,
-      body,
       action: "createUser",
+      body,
     };
 
     return this.query(request, options).then(
@@ -254,9 +254,9 @@ export class SecurityController extends BaseController {
     options: ArgsSecurityControllerDeleteCredentials = {}
   ) {
     const request = {
-      strategy,
       _id,
       action: "deleteCredentials",
+      strategy,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -303,8 +303,8 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        strategy,
         action: "getCredentialFields",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -317,9 +317,9 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        strategy,
         _id,
         action: "getCredentials",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -332,9 +332,9 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        strategy,
         _id,
         action: "getCredentialsById",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -444,9 +444,9 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        strategy,
         _id,
         action: "hasCredentials",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -517,16 +517,16 @@ export class SecurityController extends BaseController {
 
   refresh(collection) {
     return this.query({
-      collection,
       action: "refresh",
+      collection,
     });
   }
 
   replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
     const request = {
       _id,
-      body,
       action: "replaceUser",
+      body,
     };
     return this.query(request, options).then(
       (response) =>
@@ -536,8 +536,8 @@ export class SecurityController extends BaseController {
 
   searchProfiles(body, options: ArgsSecurityControllerSearchProfiles = {}) {
     const request = {
-      body,
       action: "searchProfiles",
+      body,
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
@@ -551,8 +551,8 @@ export class SecurityController extends BaseController {
 
   searchRoles(body, options: ArgsSecurityControllerSearchRoles = {}) {
     const request = {
-      body,
       action: "searchRoles",
+      body,
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
@@ -566,8 +566,8 @@ export class SecurityController extends BaseController {
 
   searchUsers(body, options: ArgsSecurityControllerSearchUsers = {}) {
     const request = {
-      body,
       action: "searchUsers",
+      body,
     };
     for (const opt of ["from", "size", "scroll", "lang"]) {
       request[opt] = options[opt];
@@ -587,10 +587,10 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        strategy,
         _id,
-        body,
         action: "updateCredentials",
+        body,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -599,8 +599,8 @@ export class SecurityController extends BaseController {
   updateProfile(_id, body, options: ArgsSecurityControllerUpdateProfile = {}) {
     const request = {
       _id,
-      body,
       action: "updateProfile",
+      body,
     };
 
     return this.query(request, options).then(
@@ -615,8 +615,8 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        body,
         action: "updateProfileMapping",
+        body,
       },
       options
     ).then((response) => response.result);
@@ -625,8 +625,8 @@ export class SecurityController extends BaseController {
   updateRole(_id, body, options: ArgsSecurityControllerUpdateRole = {}) {
     const request = {
       _id,
-      body,
       action: "updateRole",
+      body,
       force: options.force ? true : null,
     };
 
@@ -646,8 +646,8 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        body,
         action: "updateRoleMapping",
+        body,
       },
       options
     ).then((response) => response.result);
@@ -656,8 +656,8 @@ export class SecurityController extends BaseController {
   updateUser(_id, body, options: ArgsSecurityControllerUpdateUser = {}) {
     const request = {
       _id,
-      body,
       action: "updateUser",
+      body,
     };
     return this.query(request, options).then(
       (response) =>
@@ -671,8 +671,8 @@ export class SecurityController extends BaseController {
   ) {
     return this.query(
       {
-        body,
         action: "updateUserMapping",
+        body,
       },
       options
     ).then((response) => response.result);
@@ -687,9 +687,9 @@ export class SecurityController extends BaseController {
     return this.query(
       {
         _id,
-        strategy,
-        body,
         action: "validateCredentials",
+        body,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -702,7 +702,7 @@ export interface ArgsSecurityControllerCreateApiKey extends ArgsDefault {
   refresh?: "wait_for" | "false";
 }
 
-export interface ArgsSecurityControllerCheckRights extends ArgsDefault {}
+export type ArgsSecurityControllerCheckRights = ArgsDefault;
 
 export interface ArgsSecurityControllerDeleteApiKey extends ArgsDefault {
   refresh?: "wait_for" | "false";
@@ -714,104 +714,98 @@ export interface ArgsSecurityControllerSearchApiKeys extends ArgsDefault {
   lang?: string;
 }
 
-export interface ArgsSecurityControllerCreateCredentials extends ArgsDefault {}
+export type ArgsSecurityControllerCreateCredentials = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateFirstAdmin extends ArgsDefault {
   reset?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateOrReplaceProfile
-  extends ArgsDefault {}
+export type ArgsSecurityControllerCreateOrReplaceProfile = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateOrReplaceRole extends ArgsDefault {
   force?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateProfile extends ArgsDefault {}
+export type ArgsSecurityControllerCreateProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerCreateRestrictedUser
-  extends ArgsDefault {}
+export type ArgsSecurityControllerCreateRestrictedUser = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateRole extends ArgsDefault {
   force?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateUser extends ArgsDefault {}
+export type ArgsSecurityControllerCreateUser = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteCredentials extends ArgsDefault {}
+export type ArgsSecurityControllerDeleteCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteProfile extends ArgsDefault {}
+export type ArgsSecurityControllerDeleteProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteRole extends ArgsDefault {}
+export type ArgsSecurityControllerDeleteRole = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteUser extends ArgsDefault {}
+export type ArgsSecurityControllerDeleteUser = ArgsDefault;
 
-export interface ArgsSecurityControllerGetAllCredentialFields
-  extends ArgsDefault {}
+export type ArgsSecurityControllerGetAllCredentialFields = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentialFields
-  extends ArgsDefault {}
+export type ArgsSecurityControllerGetCredentialFields = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentials extends ArgsDefault {}
+export type ArgsSecurityControllerGetCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentialsById extends ArgsDefault {}
+export type ArgsSecurityControllerGetCredentialsById = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfile extends ArgsDefault {}
+export type ArgsSecurityControllerGetProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfileMapping extends ArgsDefault {}
+export type ArgsSecurityControllerGetProfileMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfileRights extends ArgsDefault {}
+export type ArgsSecurityControllerGetProfileRights = ArgsDefault;
 
-export interface ArgsSecurityControllerGetRole extends ArgsDefault {}
+export type ArgsSecurityControllerGetRole = ArgsDefault;
 
-export interface ArgsSecurityControllerGetRoleMapping extends ArgsDefault {}
+export type ArgsSecurityControllerGetRoleMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUser extends ArgsDefault {}
+export type ArgsSecurityControllerGetUser = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserMapping extends ArgsDefault {}
+export type ArgsSecurityControllerGetUserMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserRights extends ArgsDefault {}
+export type ArgsSecurityControllerGetUserRights = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserStrategies extends ArgsDefault {}
+export type ArgsSecurityControllerGetUserStrategies = ArgsDefault;
 
-export interface ArgsSecurityControllerHasCredentials extends ArgsDefault {}
+export type ArgsSecurityControllerHasCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteProfiles extends ArgsDefault {}
+export type ArgsSecurityControllerMDeleteProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteRoles extends ArgsDefault {}
+export type ArgsSecurityControllerMDeleteRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteUsers extends ArgsDefault {}
+export type ArgsSecurityControllerMDeleteUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetProfiles extends ArgsDefault {}
+export type ArgsSecurityControllerMGetProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetUsers extends ArgsDefault {}
+export type ArgsSecurityControllerMGetUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetRoles extends ArgsDefault {}
+export type ArgsSecurityControllerMGetRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerReplaceUser extends ArgsDefault {}
+export type ArgsSecurityControllerReplaceUser = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchProfiles extends ArgsDefault {}
+export type ArgsSecurityControllerSearchProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchRoles extends ArgsDefault {}
+export type ArgsSecurityControllerSearchRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchUsers extends ArgsDefault {}
+export type ArgsSecurityControllerSearchUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateCredentials extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateProfile extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateProfileMapping
-  extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateProfileMapping = ArgsDefault;
 
 export interface ArgsSecurityControllerUpdateRole extends ArgsDefault {
   force?: boolean;
 }
 
-export interface ArgsSecurityControllerUpdateRoleMapping extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateRoleMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateUser extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateUser = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateUserMapping extends ArgsDefault {}
+export type ArgsSecurityControllerUpdateUserMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerValidateCredentials
-  extends ArgsDefault {}
+export type ArgsSecurityControllerValidateCredentials = ArgsDefault;

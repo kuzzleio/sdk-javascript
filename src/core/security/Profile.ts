@@ -70,8 +70,8 @@ export class Profile {
   serialize(): JSONObject {
     return {
       _id: this._id,
-      rateLimit: this.rateLimit,
       policies: this.policies,
+      rateLimit: this.rateLimit,
     };
   }
 }

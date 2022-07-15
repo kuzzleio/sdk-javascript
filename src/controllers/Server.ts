@@ -142,16 +142,16 @@ export class ServerController extends BaseController {
   }
 }
 
-export interface ArgsServerControllerAdminExists extends ArgsDefault {}
+export type ArgsServerControllerAdminExists = ArgsDefault;
 
-export interface ArgsServerControllerGetAllStats extends ArgsDefault {}
+export type ArgsServerControllerGetAllStats = ArgsDefault;
 
-export interface ArgsServerControllerGetConfig extends ArgsDefault {}
+export type ArgsServerControllerGetConfig = ArgsDefault;
 
-export interface ArgsServerControllerGetLastStats extends ArgsDefault {}
+export type ArgsServerControllerGetLastStats = ArgsDefault;
 
-export interface ArgsServerControllerGetStats extends ArgsDefault {}
+export type ArgsServerControllerGetStats = ArgsDefault;
 
-export interface ArgsServerControllerInfo extends ArgsDefault {}
+export type ArgsServerControllerInfo = ArgsDefault;
 
-export interface ArgsServerControllerNow extends ArgsDefault {}
+export type ArgsServerControllerNow = ArgsDefault;

@@ -231,11 +231,11 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this._protectedEvents = {
       connected: {},
-      error: {},
       disconnected: {},
+      error: {},
+      loginAttempt: {},
       reconnected: {},
       tokenExpired: {},
-      loginAttempt: {},
     };
 
     this.autoResubscribe =
@@ -380,9 +380,9 @@ export class Kuzzle extends KuzzleEventEmitter {
     });
 
     return proxify(this, {
-      seal: true,
-      name: "kuzzle",
       exposeApi: true,
+      name: "kuzzle",
+      seal: true,
     }) as Kuzzle;
   }
 
@@ -865,11 +865,11 @@ export class Kuzzle extends KuzzleEventEmitter {
 
         return new Promise((resolve, reject) => {
           this.offlineQueue.push({
-            resolve,
             reject,
             request,
-            ts: Date.now(),
+            resolve,
             timeout: requestTimeout,
+            ts: Date.now(),
           });
         });
       }

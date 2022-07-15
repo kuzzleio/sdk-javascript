@@ -31,10 +31,10 @@ export class BulkController extends BaseController {
     options: ArgsBulkControllerDeleteByQuery = {}
   ): Promise<number> {
     const request = {
-      index,
-      collection,
-      body: query,
       action: "deleteByQuery",
+      body: query,
+      collection,
+      index,
     };
 
     return this.query(request, options).then(
@@ -109,12 +109,12 @@ export class BulkController extends BaseController {
   }> {
     return this.query(
       {
-        index,
-        collection,
         action: "import",
         body: {
           bulkData,
         },
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -143,10 +143,10 @@ export class BulkController extends BaseController {
     options: ArgsBulkControllerUpdateByQuery = {}
   ): Promise<number> {
     const request = {
-      index,
-      collection,
-      body: { query, changes },
       action: "updateByQuery",
+      body: { changes, query },
+      collection,
+      index,
     };
 
     return this.query(request, options).then(
@@ -180,11 +180,11 @@ export class BulkController extends BaseController {
   ): Promise<Document> {
     return this.query(
       {
-        index,
-        collection,
         _id: id,
         action: "write",
         body: document,
+        collection,
+        index,
         notify: options.notify,
       },
       options
@@ -246,10 +246,10 @@ export class BulkController extends BaseController {
   }> {
     return this.query(
       {
-        index,
-        collection,
         action: "mWrite",
         body: { documents },
+        collection,
+        index,
         notify: options.notify,
       },
       options
@@ -261,7 +261,7 @@ export interface ArgsBulkControllerDeleteByQuery extends ArgsDefault {
   refresh?: "wait_for" | "false";
 }
 
-export interface ArgsBulkControllerImport extends ArgsDefault {}
+export type ArgsBulkControllerImport = ArgsDefault;
 
 export interface ArgsBulkControllerUpdateByQuery extends ArgsDefault {
   refresh?: "wait_for" | "false";

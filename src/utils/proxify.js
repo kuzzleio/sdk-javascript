@@ -1,3 +1,5 @@
+"use strict";
+
 /*
 Class wrapper throwing errors when getting/setting undeclared properties.
 
@@ -53,13 +55,13 @@ const getOptions = (options) =>
   Object.assign(
     {},
     {
+      apiNamespace: "__proxy__",
+      deprecated: [],
+      exposeApi: false,
       name: "object",
       seal: true,
       sealGet: false,
-      deprecated: [],
       warnDeprecationOnce: true,
-      exposeApi: false,
-      apiNamespace: "__proxy__",
     },
     options
   );
@@ -98,9 +100,9 @@ const proxify = (obj, opts = {}) => {
 
   if (options.exposeApi) {
     obj[options.apiNamespace] = {
+      hasProp: (name) => properties.has(name),
       registerProp: (name) => properties.add(name),
       unregisterProp: (name) => properties.delete(name),
-      hasProp: (name) => properties.has(name),
     };
   }
 

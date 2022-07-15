@@ -344,7 +344,7 @@ export class Observer {
 
         return this.watchCollection(index, collection);
       })
-      .then(() => ({ successes: rtDocuments, errors: _errors }));
+      .then(() => ({ errors: _errors, successes: rtDocuments }));
   }
 
   /**

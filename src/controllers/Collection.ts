@@ -40,10 +40,10 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerCreate = {}
   ): Promise<void> {
     const request = {
-      index,
-      collection,
-      body: definition,
       action: "create",
+      body: definition,
+      collection,
+      index,
     };
 
     return this.query(request, options).then(() => undefined);
@@ -66,9 +66,9 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerDeleteSpecifications = {}
   ): Promise<void> {
     const request = {
-      index,
-      collection,
       action: "deleteSpecifications",
+      collection,
+      index,
     };
     return this.query(request, options).then(() => undefined);
   }
@@ -91,9 +91,9 @@ export class CollectionController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        index,
-        collection,
         action: "exists",
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -118,9 +118,9 @@ export class CollectionController extends BaseController {
   ): Promise<void> {
     return this.query(
       {
-        index,
-        collection,
         action: "refresh",
+        collection,
+        index,
       },
       options
     ).then(() => undefined);
@@ -144,10 +144,10 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerGetMapping = {}
   ): Promise<CollectionMappings> {
     const request = {
-      index,
-      collection,
       action: "getMapping",
+      collection,
       includeKuzzleMeta: options.includeKuzzleMeta || false,
+      index,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -173,9 +173,9 @@ export class CollectionController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        index,
-        collection,
         action: "getSpecifications",
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -216,10 +216,10 @@ export class CollectionController extends BaseController {
     }>;
   }> {
     const request = {
-      index,
       action: "list",
-      size: options.size || 0,
       from: options.from,
+      index,
+      size: options.size || 0,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -243,8 +243,8 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerSearchSpecifications = {}
   ): Promise<SpecificationsSearchResult> {
     const request = {
-      body: query,
       action: "searchSpecifications",
+      body: query,
     };
 
     for (const opt of ["from", "size", "scroll"]) {
@@ -279,9 +279,9 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerTruncate = {}
   ): Promise<void> {
     const request = {
-      index,
-      collection,
       action: "truncate",
+      collection,
+      index,
     };
     return this.query(request, options).then(() => undefined);
   }
@@ -320,10 +320,10 @@ export class CollectionController extends BaseController {
   ): Promise<void> {
     return this.query(
       {
-        index,
-        collection,
-        body: definition,
         action: "update",
+        body: definition,
+        collection,
+        index,
       },
       options
     ).then(() => undefined);
@@ -340,10 +340,10 @@ export class CollectionController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        index,
-        collection,
-        body: mappings,
         action: "updateMapping",
+        body: mappings,
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -371,10 +371,10 @@ export class CollectionController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        index,
-        collection,
-        body: specifications,
         action: "updateSpecifications",
+        body: specifications,
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -407,10 +407,10 @@ export class CollectionController extends BaseController {
   }> {
     return this.query(
       {
-        index,
-        collection,
-        body: specifications,
         action: "validateSpecifications",
+        body: specifications,
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
@@ -432,30 +432,28 @@ export class CollectionController extends BaseController {
     options: ArgsCollectionControllerDelete = {}
   ): Promise<void> {
     const request = {
-      index,
-      collection,
       action: "delete",
+      collection,
+      index,
     };
 
     return this.query(request, options).then(() => undefined);
   }
 }
 
-export interface ArgsCollectionControllerCreate extends ArgsDefault {}
+export type ArgsCollectionControllerCreate = ArgsDefault;
 
-export interface ArgsCollectionControllerDeleteSpecifications
-  extends ArgsDefault {}
+export type ArgsCollectionControllerDeleteSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerExists extends ArgsDefault {}
+export type ArgsCollectionControllerExists = ArgsDefault;
 
-export interface ArgsCollectionControllerRefresh extends ArgsDefault {}
+export type ArgsCollectionControllerRefresh = ArgsDefault;
 
 export interface ArgsCollectionControllerGetMapping extends ArgsDefault {
   includeKuzzleMeta?: boolean;
 }
 
-export interface ArgsCollectionControllerGetSpecifications
-  extends ArgsDefault {}
+export type ArgsCollectionControllerGetSpecifications = ArgsDefault;
 
 export interface ArgsCollectionControllerList extends ArgsDefault {
   from?: number;
@@ -469,16 +467,14 @@ export interface ArgsCollectionControllerSearchSpecifications
   scroll?: string;
 }
 
-export interface ArgsCollectionControllerTruncate extends ArgsDefault {}
+export type ArgsCollectionControllerTruncate = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdate extends ArgsDefault {}
+export type ArgsCollectionControllerUpdate = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdateMapping extends ArgsDefault {}
+export type ArgsCollectionControllerUpdateMapping = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdateSpecifications
-  extends ArgsDefault {}
+export type ArgsCollectionControllerUpdateSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerValidateSpecifications
-  extends ArgsDefault {}
+export type ArgsCollectionControllerValidateSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerDelete extends ArgsDefault {}
+export type ArgsCollectionControllerDelete = ArgsDefault;

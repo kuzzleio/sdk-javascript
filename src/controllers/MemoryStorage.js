@@ -228,7 +228,7 @@ class MemoryStorageController extends BaseController {
 
 // Dynamically builds this class' prototypes using the "commands" global variable
 for (const action of Object.keys(commands)) {
-  // eslint-disable-next-line no-loop-func
+  // eslint-disable-next-line
   MemoryStorageController.prototype[action] = function (...args) {
     const command = commands[action];
     const request = {

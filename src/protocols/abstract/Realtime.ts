@@ -1,5 +1,3 @@
-"use strict";
-
 import { KuzzleAbstractProtocol } from "./Base";
 import * as DisconnectionOrigin from "../DisconnectionOrigin";
 

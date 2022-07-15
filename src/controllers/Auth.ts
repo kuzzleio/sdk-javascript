@@ -82,13 +82,13 @@ export class AuthController extends BaseController {
     options: ArgsAuthControllerCreateApiKey = {}
   ): Promise<ApiKey> {
     const request = {
-      action: "createApiKey",
       _id: options._id,
-      expiresIn: options.expiresIn,
-      refresh: options.refresh,
+      action: "createApiKey",
       body: {
         description,
       },
+      expiresIn: options.expiresIn,
+      refresh: options.refresh,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -108,8 +108,8 @@ export class AuthController extends BaseController {
     options: ArgsAuthControllerCheckRights = {}
   ): Promise<boolean> {
     const request = {
-      body: requestPayload,
       action: "checkRights",
+      body: requestPayload,
     };
 
     return this.query(request, options).then(
@@ -132,8 +132,8 @@ export class AuthController extends BaseController {
     options: ArgsAuthControllerDeleteApiKey = {}
   ): Promise<null> {
     const request = {
-      action: "deleteApiKey",
       _id: id,
+      action: "deleteApiKey",
       refresh: options.refresh,
     };
 
@@ -168,10 +168,10 @@ export class AuthController extends BaseController {
   }> {
     const request = {
       action: "searchApiKeys",
-      from: options.from,
-      size: options.size,
-      lang: options.lang,
       body: query,
+      from: options.from,
+      lang: options.lang,
+      size: options.size,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -249,9 +249,9 @@ export class AuthController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        strategy,
         action: "createMyCredentials",
         body: credentials,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -275,8 +275,8 @@ export class AuthController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        strategy,
         action: "credentialsExist",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -298,8 +298,8 @@ export class AuthController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        strategy,
         action: "deleteMyCredentials",
+        strategy,
       },
       options
     ).then((response) => response.result.acknowledged);
@@ -349,8 +349,8 @@ export class AuthController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        strategy,
         action: "getMyCredentials",
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -440,14 +440,14 @@ export class AuthController extends BaseController {
     expiresIn?: string | number
   ): Promise<string> {
     const request = {
-      strategy,
-      expiresIn,
-      body: credentials,
       action: "login",
+      body: credentials,
       cookieAuth: this.kuzzle.cookieAuthentication,
+      expiresIn,
+      strategy,
     };
 
-    return this.query(request, { queuable: false, verb: "POST", timeout: -1 })
+    return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
       .then((response) => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
@@ -455,8 +455,8 @@ export class AuthController extends BaseController {
               "Kuzzle support for cookie authentication is disabled or not supported"
             );
             this.kuzzle.emit("loginAttempt", {
-              success: false,
               error: err.message,
+              success: false,
             });
             throw err;
           }
@@ -473,8 +473,8 @@ export class AuthController extends BaseController {
       })
       .catch((err) => {
         this.kuzzle.emit("loginAttempt", {
-          success: false,
           error: err.message,
+          success: false,
         });
         throw err;
       });
@@ -519,9 +519,9 @@ export class AuthController extends BaseController {
   ): Promise<JSONObject> {
     return this.query(
       {
-        strategy,
-        body: credentials,
         action: "updateMyCredentials",
+        body: credentials,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -546,8 +546,8 @@ export class AuthController extends BaseController {
   ): Promise<User> {
     return this.query(
       {
-        body: content,
         action: "updateSelf",
+        body: content,
       },
       options
     ).then(
@@ -574,9 +574,9 @@ export class AuthController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        strategy,
-        body: credentials,
         action: "validateMyCredentials",
+        body: credentials,
+        strategy,
       },
       options
     ).then((response) => response.result);
@@ -614,8 +614,8 @@ export class AuthController extends BaseController {
   }> {
     const query = {
       action: "refreshToken",
-      expiresIn: options.expiresIn,
       cookieAuth: this.kuzzle.cookieAuthentication,
+      expiresIn: options.expiresIn,
     };
 
     return this.query(query, options).then((response) => {
@@ -634,7 +634,7 @@ export interface ArgsAuthControllerCreateApiKey extends ArgsDefault {
   refresh?: "wait_for" | "false";
 }
 
-export interface ArgsAuthControllerCheckRights extends ArgsDefault {}
+export type ArgsAuthControllerCheckRights = ArgsDefault;
 
 export interface ArgsAuthControllerDeleteApiKey extends ArgsDefault {
   refresh?: "wait_for" | "false";
@@ -646,27 +646,27 @@ export interface ArgsAuthControllerSearchApiKeys extends ArgsDefault {
   lang?: string;
 }
 
-export interface ArgsAuthControllerCheckToken extends ArgsDefault {}
+export type ArgsAuthControllerCheckToken = ArgsDefault;
 
-export interface ArgsAuthControllerCreateMyCredentials extends ArgsDefault {}
+export type ArgsAuthControllerCreateMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerCredentialsExist extends ArgsDefault {}
+export type ArgsAuthControllerCredentialsExist = ArgsDefault;
 
-export interface ArgsAuthControllerDeleteMyCredentials extends ArgsDefault {}
+export type ArgsAuthControllerDeleteMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerGetCurrentUser extends ArgsDefault {}
+export type ArgsAuthControllerGetCurrentUser = ArgsDefault;
 
-export interface ArgsAuthControllerGetMyCredentials extends ArgsDefault {}
+export type ArgsAuthControllerGetMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerGetMyRights extends ArgsDefault {}
+export type ArgsAuthControllerGetMyRights = ArgsDefault;
 
-export interface ArgsAuthControllerGetStrategies extends ArgsDefault {}
+export type ArgsAuthControllerGetStrategies = ArgsDefault;
 
-export interface ArgsAuthControllerUpdateMyCredentials extends ArgsDefault {}
+export type ArgsAuthControllerUpdateMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerUpdateSelf extends ArgsDefault {}
+export type ArgsAuthControllerUpdateSelf = ArgsDefault;
 
-export interface ArgsAuthControllerValidateMyCredentials extends ArgsDefault {}
+export type ArgsAuthControllerValidateMyCredentials = ArgsDefault;
 
 export interface ArgsAuthControllerRefreshToken extends ArgsDefault {
   expiresIn?: number | string;

@@ -6,6 +6,8 @@ const should = require("should"),
 
 describe("Kuzzle query management", () => {
   describe("#_timeoutRequest", () => {
+    let kuzzle;
+
     beforeEach(() => {
       const protocol = new ProtocolMock("somewhere");
 

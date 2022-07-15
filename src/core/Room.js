@@ -24,13 +24,13 @@ class Room {
 
     // format complete request from body & options
     this.request = {
-      index,
-      collection,
-      body,
-      controller: "realtime",
       action: "subscribe",
-      state: this.options.state,
+      body,
+      collection,
+      controller: "realtime",
+      index,
       scope: this.options.scope,
+      state: this.options.state,
       users: this.options.users,
       volatile: this.options.volatile,
     };

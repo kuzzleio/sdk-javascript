@@ -1,5 +1,3 @@
-"use strict";
-
 import { KuzzleError } from "../../KuzzleError";
 import { uuidv4 } from "../../utils/uuidv4";
 import { KuzzleEventEmitter } from "../../core/KuzzleEventEmitter";

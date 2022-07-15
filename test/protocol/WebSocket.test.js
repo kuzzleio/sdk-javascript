@@ -20,6 +20,7 @@ describe("WebSocket networking module", () => {
     };
 
     windowMock.inject();
+    // eslint-disable-next-line
     WebSocket = function (...args) {
       // eslint-disable-line
       wsargs = args;
@@ -154,11 +155,9 @@ describe("WebSocket networking module", () => {
     websocket.connect();
     clientStub.onopen();
     clientStub.onclose(1000);
-    should(cb)
-      .be.calledOnce()
-      .and.be.calledWith({
-        origin: DisconnectionOrigin.USER_CONNECTION_CLOSED,
-      });
+    should(cb).be.calledOnce().and.be.calledWith({
+      origin: DisconnectionOrigin.USER_CONNECTION_CLOSED,
+    });
     should(clearInterval).be.calledTwice();
   });
 
@@ -277,11 +276,9 @@ describe("WebSocket networking module", () => {
     clientStub.onclose(1000);
 
     clock.tick(10);
-    should(cb)
-      .be.calledOnce()
-      .and.be.calledWith({
-        origin: DisconnectionOrigin.USER_CONNECTION_CLOSED,
-      });
+    should(cb).be.calledOnce().and.be.calledWith({
+      origin: DisconnectionOrigin.USER_CONNECTION_CLOSED,
+    });
     should(websocket.listeners("disconnect").length).be.eql(1);
     websocket.clear.should.be.calledOnce();
   });

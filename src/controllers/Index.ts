@@ -21,8 +21,8 @@ export class IndexController extends BaseController {
     options: ArgsIndexControllerCreate = {}
   ): Promise<void> {
     const request = {
-      index,
       action: "create",
+      index,
     };
     return this.query(request, options).then(() => undefined);
   }
@@ -42,8 +42,8 @@ export class IndexController extends BaseController {
     options: ArgsIndexControllerDelete = {}
   ): Promise<void> {
     const request = {
-      index,
       action: "delete",
+      index,
     };
     return this.query(request, options).then(() => undefined);
   }
@@ -64,8 +64,8 @@ export class IndexController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        index,
         action: "exists",
+        index,
       },
       options
     ).then((response) => response.result);
@@ -136,14 +136,14 @@ export class IndexController extends BaseController {
   }
 }
 
-export interface ArgsIndexControllerCreate extends ArgsDefault {}
+export type ArgsIndexControllerCreate = ArgsDefault;
 
-export interface ArgsIndexControllerDelete extends ArgsDefault {}
+export type ArgsIndexControllerDelete = ArgsDefault;
 
-export interface ArgsIndexControllerExists extends ArgsDefault {}
+export type ArgsIndexControllerExists = ArgsDefault;
 
-export interface ArgsIndexControllerList extends ArgsDefault {}
+export type ArgsIndexControllerList = ArgsDefault;
 
-export interface ArgsIndexControllerMDelete extends ArgsDefault {}
+export type ArgsIndexControllerMDelete = ArgsDefault;
 
-export interface ArgsIndexControllerStats extends ArgsDefault {}
+export type ArgsIndexControllerStats = ArgsDefault;

@@ -49,10 +49,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerCount = {}
   ): Promise<number> {
     const request = {
-      index,
-      collection,
-      body,
       action: "count",
+      body,
+      collection,
+      index,
     };
 
     return this.query(request, options).then(
@@ -84,11 +84,11 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerCreate = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: content,
       action: "create",
+      body: content,
+      collection,
+      index,
       silent: options.silent,
     };
 
@@ -120,11 +120,11 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerCreateOrReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: content,
       action: "createOrReplace",
+      body: content,
+      collection,
+      index,
       silent: options.silent,
     };
 
@@ -154,10 +154,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerDelete = {}
   ): Promise<string> {
     const request = {
-      index,
-      collection,
       _id,
       action: "delete",
+      collection,
+      index,
       silent: options.silent,
     };
 
@@ -188,10 +188,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerDeleteByQuery = {}
   ): Promise<string[]> {
     const request = {
-      index,
-      collection,
-      body: query,
       action: "deleteByQuery",
+      body: query,
+      collection,
+      index,
       lang: options.lang,
       silent: options.silent,
     };
@@ -224,11 +224,11 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerDeleteFields = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: { fields },
       action: "deleteFields",
+      body: { fields },
+      collection,
+      index,
       silent: options.silent,
       source: options.source,
     };
@@ -259,10 +259,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerExists = {}
   ): Promise<boolean> {
     const request = {
-      index,
-      collection,
       _id,
       action: "exists",
+      collection,
+      index,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -291,10 +291,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerGet = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
       action: "get",
+      collection,
+      index,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -324,10 +324,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMCreate = {}
   ): Promise<mCreateResponse> {
     const request = {
-      index,
-      collection,
-      body: { documents },
       action: "mCreate",
+      body: { documents },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -359,10 +359,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMCreateOrReplace = {}
   ): Promise<mCreateOrReplaceResponse> {
     const request = {
-      index,
-      collection,
-      body: { documents },
       action: "mCreateOrReplace",
+      body: { documents },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -394,10 +394,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMDelete = {}
   ): Promise<mDeleteResponse> {
     const request = {
-      index,
-      collection,
-      body: { ids },
       action: "mDelete",
+      body: { ids },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -436,10 +436,10 @@ export class DocumentController extends BaseController {
     errors: string[];
   }> {
     const request = {
-      index,
-      collection,
       action: "mGet",
       body: { ids },
+      collection,
+      index,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -469,10 +469,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMReplace = {}
   ): Promise<mReplaceResponse> {
     const request = {
-      index,
-      collection,
-      body: { documents },
       action: "mReplace",
+      body: { documents },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -508,10 +508,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMUpdate = {}
   ): Promise<mUpdateResponse> {
     const request = {
-      index,
-      collection,
-      body: { documents },
       action: "mUpdate",
+      body: { documents },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -544,10 +544,10 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
     const request = {
-      index,
-      collection,
-      body: { documents },
       action: "mUpsert",
+      body: { documents },
+      collection,
+      index,
       silent: options.silent,
       strict: options.strict,
     };
@@ -579,11 +579,11 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: content,
       action: "replace",
+      body: content,
+      collection,
+      index,
       silent: options.silent,
     };
 
@@ -627,10 +627,10 @@ export class DocumentController extends BaseController {
     options: JSONObject = {}
   ) {
     const request: any = {
-      index,
-      collection,
-      body: null,
       action: "search",
+      body: null,
+      collection,
+      index,
     };
     if (
       this.kuzzle.protocol.name === "http" &&
@@ -647,9 +647,9 @@ export class DocumentController extends BaseController {
 
     const opts = { verb: options.verb || "POST", ...options };
     return this.query(request, opts).then((response) => ({
-      response,
-      request,
       opts,
+      request,
+      response,
     }));
   }
 
@@ -679,14 +679,14 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerUpdate = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: content,
       action: "update",
+      body: content,
+      collection,
+      index,
       retryOnConflict: options.retryOnConflict,
-      source: options.source,
       silent: options.silent,
+      source: options.source,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -740,13 +740,13 @@ export class DocumentController extends BaseController {
     }>;
   }> {
     const request = {
-      index,
-      collection,
-      body: { query, changes },
       action: "updateByQuery",
-      source: options.source,
+      body: { changes, query },
+      collection,
+      index,
       lang: options.lang,
       silent: options.silent,
+      source: options.source,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -778,13 +778,13 @@ export class DocumentController extends BaseController {
     options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
-      index,
-      collection,
       _id,
-      body: { changes, default: options.default },
       action: "upsert",
-      source: options.source,
+      body: { changes, default: options.default },
+      collection,
+      index,
       silent: options.silent,
+      source: options.source,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -812,17 +812,17 @@ export class DocumentController extends BaseController {
   ): Promise<boolean> {
     return this.query(
       {
-        index,
-        collection,
-        body: content,
         action: "validate",
+        body: content,
+        collection,
+        index,
       },
       options
     ).then((response) => response.result);
   }
 }
 
-export interface ArgsDocumentControllerCount extends ArgsDefault {}
+export type ArgsDocumentControllerCount = ArgsDefault;
 
 export interface ArgsDocumentControllerCreate extends ArgsDefault {
   refresh?: "wait_for" | "false";
@@ -939,4 +939,4 @@ export interface ArgsDocumentControllerUpsert<TKDocumentContent>
   source?: boolean;
 }
 
-export interface ArgsDocumentControllerValidate extends ArgsDefault {}
+export type ArgsDocumentControllerValidate = ArgsDefault;

@@ -1,4 +1,12 @@
 {
   "plugins": ["kuzzle"],
-  "extends": ["plugin:kuzzle/default", "plugin:kuzzle/node"]
+  "extends": ["plugin:kuzzle/default", "plugin:kuzzle/node"],
+  "overrides": [
+    {
+      "files": ["test/**/*.js", "features*/**/*.js"],
+      "rules": {
+        "strict": "off"
+      }
+    }
+  ]
 }

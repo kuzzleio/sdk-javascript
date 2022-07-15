@@ -104,8 +104,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
     if (this._request.scroll) {
       return this._kuzzle
         .query({
-          controller: this._request.controller,
           action: this._scrollAction,
+          controller: this._request.controller,
           scroll: this._request.scroll,
           scrollId: this._result.scrollId,
         })

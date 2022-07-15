@@ -50,8 +50,8 @@ export class BatchController extends DocumentController {
 
     this.writer = this.createWriter(sdk, {
       interval,
-      maxWriteBufferSize,
       maxReadBufferSize,
+      maxWriteBufferSize,
     });
 
     this.writer.begin();
@@ -269,8 +269,8 @@ export class BatchController extends DocumentController {
 
     if (!document) {
       throw new KuzzleError({
-        message: `Document "${index}":"${collection}":"${id}" not found`,
         id: "services.storage.not_found",
+        message: `Document "${index}":"${collection}":"${id}" not found`,
       });
     }
 

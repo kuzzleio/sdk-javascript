@@ -37,12 +37,12 @@ export class BatchWriter {
   // Buffers
   private buffers = {
     create: new BatchBuffer(),
-    update: new BatchBuffer(),
-    get: new BatchBuffer(),
-    exists: new BatchBuffer(),
-    delete: new BatchBuffer(),
-    replace: new BatchBuffer(),
     createOrReplace: new BatchBuffer(),
+    delete: new BatchBuffer(),
+    exists: new BatchBuffer(),
+    get: new BatchBuffer(),
+    replace: new BatchBuffer(),
+    update: new BatchBuffer(),
   };
 
   get addCreate() {
