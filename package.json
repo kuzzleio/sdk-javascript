@@ -48,7 +48,6 @@
     "buffer": "^6.0.3",
     "codecov": "^3.8.3",
     "cucumber": "^6.0.5",
-    "eslint-plugin-kuzzle": "^0.0.3",
     "https-browserify": "^1.0.0",
     "lodash": "^4.17.21",
     "lolex": "^6.0.0",

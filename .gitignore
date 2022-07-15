@@ -4,7 +4,6 @@
 # Node
 *.log
 node_modules/
-package-lock.json
 .nyc_output
 
 # Other
