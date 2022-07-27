@@ -10,9 +10,7 @@ function shouldDebug () {
     return NODE_DEBUG;
   }
 
-  const url = new URL(window.location);
-
-  return window.debugKuzzleSdk || url.searchParams.get('debugKuzzleSdk') !== null;
+  return window.debugKuzzleSdk || new URL(window.location).searchParams.get('debugKuzzleSdk') !== null;
 }
 
 /**
