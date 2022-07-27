@@ -36,8 +36,6 @@ export DEBUG=kuzzle-sdk
 # Run your program
 ```
 
-In the Browser, you need to add the `debugKuzzleSdk` search param in the URL.
-
-```
-http://my-application.by/devices?debugKuzzleSdk
-```
+In the Browser, you can:
+ - add the `debugKuzzleSdk` search param in the URL. (e.g. `http://my-application.by/<path>?debugKuzzleSdk`)
+ - set the `window.debugKuzzleSdk` variable to `true`
