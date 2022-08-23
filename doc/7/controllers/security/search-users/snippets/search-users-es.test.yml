@@ -15,6 +15,6 @@ hooks:
     - curl -f -XDELETE kuzzle:7512/users/user1
     - curl -f -XDELETE kuzzle:7512/users/user2
     - curl -f -XDELETE kuzzle:7512/users/user3
- 
+
 template: default
-expected: ^Successfully retrieved 3 users$
+expected: ^Successfully retrieved 0 users$
