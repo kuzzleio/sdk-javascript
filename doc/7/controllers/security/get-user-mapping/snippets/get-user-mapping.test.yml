@@ -3,7 +3,3 @@ description: get users mapping
 template: default
 expected:
   - "mapping: {"
-  - "firstName: { type: \\'text\\', fields: \\[Object\\] },"
-  - "fullName: { type: \\'text\\', fields: \\[Object\\] },"
-  - "lastName: { type: \\'text\\', fields: \\[Object\\] },"
-  - "profileIds: { type: \\'keyword\\' }"
