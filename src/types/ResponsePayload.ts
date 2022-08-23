@@ -5,7 +5,7 @@ import { JSONObject } from './JSONObject';
  *
  * @see https://docs.kuzzle.io/core/2/api/payloads/response
  */
-export type ResponsePayload = {
+export interface ResponsePayload<TResult extends JSONObject = JSONObject> {
   /**
    * API controller name
    */
@@ -86,7 +86,7 @@ export type ResponsePayload = {
   /**
    * API action result
    */
-  result: any;
+  result: TResult;
 
   /**
    * HTTP status code

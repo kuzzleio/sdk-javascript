@@ -5,16 +5,16 @@ import { JSONObject } from './JSONObject';
  *
  * @see https://docs.kuzzle.io/core/2/api/payloads/request
  */
-export type RequestPayload = {
+export interface RequestPayload {
   /**
    * API controller name
    */
-  controller?: string;
+  controller: string;
 
   /**
    * API action name
    */
-  action?: string;
+  action: string;
 
   /**
    * Index name

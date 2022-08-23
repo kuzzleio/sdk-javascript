@@ -15,7 +15,7 @@ import { Deprecation } from './utils/Deprecation';
 import { uuidv4 } from './utils/uuidv4';
 import { proxify } from './utils/proxify';
 import { debug } from './utils/debug';
-import { JSONObject } from './types';
+import { BaseRequest, JSONObject } from './types';
 import { RequestPayload } from './types/RequestPayload';
 import { ResponsePayload } from './types/ResponsePayload';
 import { RequestTimeoutError } from './RequestTimeoutError';
@@ -766,7 +766,10 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param req
    * @param opts - Optional arguments
    */
-  query (req: RequestPayload = {}, opts: JSONObject = {}): Promise<ResponsePayload> {
+  query<TRequest extends BaseRequest, TResult> (
+    req: TRequest,
+    opts: JSONObject = {},
+  ): Promise<ResponsePayload<TResult>> {
     if (typeof req !== 'object' || Array.isArray(req)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
     }
@@ -857,7 +860,7 @@ Discarded request: ${JSON.stringify(request)}`));
       requestTimeout,
       request,
       options
-    ).then((response: ResponsePayload) => {
+    ).then((response: ResponsePayload<TResult>) => {
       debug('RESPONSE', response);
 
       return this.deprecationHandler.logDeprecation(response);
