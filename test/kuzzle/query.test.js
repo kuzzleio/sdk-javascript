@@ -174,7 +174,7 @@ describe('Kuzzle query management', () => {
       };
 
       kuzzle.volatile = volatile;
-      kuzzle.query();
+      kuzzle.query({});
       should(kuzzle._timeoutRequest).be.calledOnce();
       should(kuzzle._timeoutRequest).be.calledWithMatch(kuzzle._requestTimeout, {volatile: kuzzle.volatile});
     });
