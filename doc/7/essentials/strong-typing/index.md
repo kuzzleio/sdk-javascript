@@ -36,7 +36,7 @@ By default, a generic document content with only a strongly defined `_kuzzle_inf
 
 ## Kuzzle.query method
 
-<SinceBadge version="auto-version"/>
+<SinceBadge version="7.10.1"/>
 
 The [Kuzzle.query](/sdk/js/7/core-classes/kuzzle/query) method can accept 2 optional types.
 
