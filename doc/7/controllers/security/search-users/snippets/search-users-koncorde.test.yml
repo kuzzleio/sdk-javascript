@@ -13,4 +13,4 @@ hooks:
     done
   after:
 template: default
-expected: ^Successfully retrieved 3 users$
+expected: ^Successfully retrieved 0 users$

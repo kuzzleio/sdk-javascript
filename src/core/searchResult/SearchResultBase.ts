@@ -1,4 +1,4 @@
-import { JSONObject } from '../../types';
+import { BaseRequest, JSONObject } from '../../types';
 import { RequestPayload } from '../../types/RequestPayload';
 import { Kuzzle } from '../../Kuzzle';
 
@@ -60,7 +60,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
   constructor (
     kuzzle: Kuzzle,
-    request: RequestPayload = {},
+    request: BaseRequest,
     options: JSONObject = {},
     result: any = {}
   ) {
