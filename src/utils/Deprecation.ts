@@ -1,11 +1,11 @@
-import { ResponsePayload } from '../types/ResponsePayload';
+import { ResponsePayload } from "../types/ResponsePayload";
 
 export class Deprecation {
   private deprecationWarning: boolean;
 
-  constructor (deprecationWarning: boolean) {
+  constructor(deprecationWarning: boolean) {
     this.deprecationWarning =
-      process.env.NODE_ENV !== 'production' ? deprecationWarning : false;
+      process.env.NODE_ENV !== "production" ? deprecationWarning : false;
   }
 
   /**
@@ -15,10 +15,11 @@ export class Deprecation {
    *
    * @returns Same as response param, just like a middleware
    */
-  logDeprecation (response: ResponsePayload) {
-    if ( this.deprecationWarning
-      && response.deprecations
-      && response.deprecations.length
+  logDeprecation(response: ResponsePayload) {
+    if (
+      this.deprecationWarning &&
+      response.deprecations &&
+      response.deprecations.length
     ) {
       for (const deprecation of response.deprecations) {
         // eslint-disable-next-line no-console

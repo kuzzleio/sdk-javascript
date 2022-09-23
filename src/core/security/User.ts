@@ -1,5 +1,5 @@
-import { JSONObject } from '../../types';
-import { Profile } from './Profile';
+import { JSONObject } from "../../types";
+import { Profile } from "./Profile";
 
 export class User {
   /**
@@ -26,37 +26,37 @@ export class User {
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle, _id = null, content = {}) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle
+  constructor(kuzzle, _id = null, content = {}) {
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: kuzzle,
     });
 
-    Reflect.defineProperty(this, 'content', {
+    Reflect.defineProperty(this, "content", {
       enumerable: true,
-      get () {
+      get() {
         return this._source;
-      }
+      },
     });
 
     this._id = _id;
     this._source = content;
   }
 
-  private get kuzzle () {
+  private get kuzzle() {
     return this._kuzzle;
   }
 
   /**
    * Array of profile IDs
    */
-  get profileIds (): Array<string> {
+  get profileIds(): Array<string> {
     return this._source.profileIds || [];
   }
 
   /**
    * Gets user profile definitions from the API
    */
-  getProfiles (): Promise<Array<Profile>> {
+  getProfiles(): Promise<Array<Profile>> {
     if (!this.profileIds || this.profileIds.length === 0) {
       return Promise.resolve([]);
     }
@@ -67,7 +67,7 @@ export class User {
   /**
    * Serialize the instance
    */
-  serialize (): JSONObject {
+  serialize(): JSONObject {
     return {
       _id: this._id,
       _source: this._source,
@@ -76,4 +76,3 @@ export class User {
 }
 
 module.exports = { User };
-

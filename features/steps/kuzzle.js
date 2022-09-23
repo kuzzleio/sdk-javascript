@@ -1,10 +1,9 @@
-const { Given, Then } = require('cucumber');
-const should = require('should');
+const { Given, Then } = require("cucumber");
+const should = require("should");
 
-Given('Kuzzle Server is running', function () {
+Given("Kuzzle Server is running", function () {
   return this.kuzzle.connect();
 });
-
 
 Then(/^I get an error(?: with status (.*))?$/, function (status) {
   should(this.error).not.be.null();
@@ -14,7 +13,7 @@ Then(/^I get an error(?: with status (.*))?$/, function (status) {
   }
 });
 
-Then('I get {string} and {string}', function (string1, string2) {
+Then("I get {string} and {string}", function (string1, string2) {
   should(this.content).be.an.Array();
   should(this.content.length).eql(2);
 
@@ -23,28 +22,29 @@ Then('I get {string} and {string}', function (string1, string2) {
   }
 });
 
-Then('the content should not be null', function () {
+Then("the content should not be null", function () {
   should(this.content).not.be.null();
 });
 
-Then(/^the response '(.*)' field contains the pair '(.*)':'(.*)'$/, function (field, key, val) {
-  should(this.content[field][key]).eql(val);
-});
+Then(
+  /^the response '(.*)' field contains the pair '(.*)':'(.*)'$/,
+  function (field, key, val) {
+    should(this.content[field][key]).eql(val);
+  }
+);
 
 Then(/^I shall receive (.*?)$/, function (what) {
   if (/^\d+$/.test(what)) {
     what = parseInt(what);
-  }
-  else if (/^[\d.]+$/.test(what)) {
+  } else if (/^[\d.]+$/.test(what)) {
     what = parseFloat(what);
-  }
-  else if (/(true|false)/.test.what) {
-    what = what === 'true';
+  } else if (/(true|false)/.test.what) {
+    what = what === "true";
   }
 
   should(this.content).eql(what);
 });
 
-Then('the result contains {int} hits', function (hits) {
+Then("the result contains {int} hits", function (hits) {
   should(this.total).eql(hits);
 });

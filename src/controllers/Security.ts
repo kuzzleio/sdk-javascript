@@ -1,18 +1,18 @@
-import { BaseController } from './Base';
-import { Role } from '../core/security/Role';
-import { RoleSearchResult } from '../core/searchResult/Role';
-import { Profile } from '../core/security/Profile';
-import { ProfileSearchResult } from '../core/searchResult/Profile';
-import { User } from '../core/security/User';
-import { UserSearchResult } from '../core/searchResult/User';
-import { ArgsDefault } from '../types';
+import { BaseController } from "./Base";
+import { Role } from "../core/security/Role";
+import { RoleSearchResult } from "../core/searchResult/Role";
+import { Profile } from "../core/security/Profile";
+import { ProfileSearchResult } from "../core/searchResult/Profile";
+import { User } from "../core/security/User";
+import { UserSearchResult } from "../core/searchResult/User";
+import { ArgsDefault } from "../types";
 
 export class SecurityController extends BaseController {
   /**
    * @param {Kuzzle} kuzzle
    */
-  constructor (kuzzle) {
-    super(kuzzle, 'security');
+  constructor(kuzzle) {
+    super(kuzzle, "security");
   }
 
   /**
@@ -27,20 +27,20 @@ export class SecurityController extends BaseController {
   createApiKey(
     userId,
     description,
-    options: ArgsSecurityControllerCreateApiKey = {}) {
+    options: ArgsSecurityControllerCreateApiKey = {}
+  ) {
     const request = {
-      userId,
-      action: 'createApiKey',
       _id: options._id,
+      action: "createApiKey",
+      body: {
+        description,
+      },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
-      body: {
-        description
-      }
+      userId,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -49,15 +49,20 @@ export class SecurityController extends BaseController {
    * @param {String} kuid - User kuid
    * @param {Object} requestPayload - Request to check
    */
-  checkRights (kuid, requestPayload, options: ArgsSecurityControllerCheckRights) {
+  checkRights(
+    kuid,
+    requestPayload,
+    options: ArgsSecurityControllerCheckRights
+  ) {
     const request = {
-      userId: kuid,
+      action: "checkRights",
       body: requestPayload,
-      action: 'checkRights'
+      userId: kuid,
     };
 
-    return this.query(request, options)
-      .then(response => response.result.allowed);
+    return this.query(request, options).then(
+      (response) => response.result.allowed
+    );
   }
 
   /**
@@ -69,15 +74,12 @@ export class SecurityController extends BaseController {
    *
    * @returns {Promise}
    */
-  deleteApiKey(
-    userId,
-    id,
-    options: ArgsSecurityControllerDeleteApiKey = {}) {
+  deleteApiKey(userId, id, options: ArgsSecurityControllerDeleteApiKey = {}) {
     const request = {
-      userId,
-      action: 'deleteApiKey',
       _id: id,
-      refresh: options.refresh
+      action: "deleteApiKey",
+      refresh: options.refresh,
+      userId,
     };
 
     return this.query(request, options);
@@ -98,615 +100,712 @@ export class SecurityController extends BaseController {
     options: ArgsSecurityControllerSearchApiKeys = {}
   ) {
     const request = {
-      userId,
-      action: 'searchApiKeys',
+      action: "searchApiKeys",
+      body: query,
       from: options.from,
-      size: options.size,
       lang: options.lang,
-      body: query
+      size: options.size,
+      userId,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  createCredentials (strategy, _id, body, options: ArgsSecurityControllerCreateCredentials = {}) {
-    return this.query({
-      _id,
-      strategy,
-      body,
-      action: 'createCredentials'
-    }, options)
-      .then(response => response.result);
+  createCredentials(
+    strategy,
+    _id,
+    body,
+    options: ArgsSecurityControllerCreateCredentials = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "createCredentials",
+        body,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  createFirstAdmin (
+  createFirstAdmin(
     _id,
     body,
     options: ArgsSecurityControllerCreateFirstAdmin = {}
   ) {
     const request = {
       _id,
+      action: "createFirstAdmin",
       body,
-      action: 'createFirstAdmin',
-      reset: options.reset
+      reset: options.reset,
     };
 
-    return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  createOrReplaceProfile (_id, body, options: ArgsSecurityControllerCreateOrReplaceProfile = {}) {
+  createOrReplaceProfile(
+    _id,
+    body,
+    options: ArgsSecurityControllerCreateOrReplaceProfile = {}
+  ) {
     const request = {
       _id,
+      action: "createOrReplaceProfile",
       body,
-      action: 'createOrReplaceProfile'
     };
 
-    return this.query(request, options)
-      .then(response => new Profile(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new Profile(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  createOrReplaceRole (
+  createOrReplaceRole(
     _id,
     body,
     options: ArgsSecurityControllerCreateOrReplaceRole = {}
   ) {
     const request = {
       _id,
+      action: "createOrReplaceRole",
       body,
-      action: 'createOrReplaceRole',
-      force: options.force ? true : null
+      force: options.force ? true : null,
     };
-    return this.query(request, options)
-      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
+    return this.query(request, options).then(
+      (response) =>
+        new Role(
+          this.kuzzle,
+          response.result._id,
+          response.result._source.controllers
+        )
+    );
   }
 
-  createProfile (_id, body, options: ArgsSecurityControllerCreateProfile = {}) {
+  createProfile(_id, body, options: ArgsSecurityControllerCreateProfile = {}) {
     const request = {
       _id,
+      action: "createProfile",
       body,
-      action: 'createProfile'
     };
 
-    return this.query(request, options)
-      .then(response => new Profile(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new Profile(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  createRestrictedUser (body, _id = null, options: ArgsSecurityControllerCreateRestrictedUser = {}) {
+  createRestrictedUser(
+    body,
+    _id = null,
+    options: ArgsSecurityControllerCreateRestrictedUser = {}
+  ) {
     if (!body.content) {
       body.content = {};
     }
 
     const request = {
       _id,
+      action: "createRestrictedUser",
       body,
-      action: 'createRestrictedUser'
     };
 
-    return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  createRole (_id, body, options: ArgsSecurityControllerCreateRole = {}) {
+  createRole(_id, body, options: ArgsSecurityControllerCreateRole = {}) {
     const request = {
       _id,
+      action: "createRole",
       body,
-      action: 'createRole',
-      force: options.force ? true : null
+      force: options.force ? true : null,
     };
-    return this.query(request, options)
-      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
+    return this.query(request, options).then(
+      (response) =>
+        new Role(
+          this.kuzzle,
+          response.result._id,
+          response.result._source.controllers
+        )
+    );
   }
 
-  createUser (_id, body, options: ArgsSecurityControllerCreateUser = {}) {
+  createUser(_id, body, options: ArgsSecurityControllerCreateUser = {}) {
     const request = {
       _id,
+      action: "createUser",
       body,
-      action: 'createUser'
     };
 
-    return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  deleteCredentials (strategy, _id, options: ArgsSecurityControllerDeleteCredentials = {}) {
+  deleteCredentials(
+    strategy,
+    _id,
+    options: ArgsSecurityControllerDeleteCredentials = {}
+  ) {
     const request = {
+      _id,
+      action: "deleteCredentials",
       strategy,
-      _id,
-      action: 'deleteCredentials'
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  deleteProfile (_id, options: ArgsSecurityControllerDeleteProfile = {}) {
+  deleteProfile(_id, options: ArgsSecurityControllerDeleteProfile = {}) {
     const request = {
       _id,
-      action: 'deleteProfile'
+      action: "deleteProfile",
     };
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  deleteRole (_id, options: ArgsSecurityControllerDeleteRole = {}) {
+  deleteRole(_id, options: ArgsSecurityControllerDeleteRole = {}) {
     const request = {
       _id,
-      action: 'deleteRole'
+      action: "deleteRole",
     };
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  deleteUser (_id, options: ArgsSecurityControllerDeleteUser = {}) {
+  deleteUser(_id, options: ArgsSecurityControllerDeleteUser = {}) {
     const request = {
       _id,
-      action: 'deleteUser'
+      action: "deleteUser",
     };
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  getAllCredentialFields (options: ArgsSecurityControllerGetAllCredentialFields = {}) {
-    return this.query({
-      action: 'getAllCredentialFields'
-    }, options)
-      .then(response => response.result);
+  getAllCredentialFields(
+    options: ArgsSecurityControllerGetAllCredentialFields = {}
+  ) {
+    return this.query(
+      {
+        action: "getAllCredentialFields",
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getCredentialFields (strategy, options: ArgsSecurityControllerGetCredentialFields = {}) {
-    return this.query({
-      strategy,
-      action: 'getCredentialFields'
-    }, options)
-      .then(response => response.result);
+  getCredentialFields(
+    strategy,
+    options: ArgsSecurityControllerGetCredentialFields = {}
+  ) {
+    return this.query(
+      {
+        action: "getCredentialFields",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getCredentials (strategy, _id, options: ArgsSecurityControllerGetCredentials = {}) {
-    return this.query({
-      strategy,
-      _id,
-      action: 'getCredentials'
-    }, options)
-      .then(response => response.result);
+  getCredentials(
+    strategy,
+    _id,
+    options: ArgsSecurityControllerGetCredentials = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "getCredentials",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getCredentialsById (strategy, _id, options: ArgsSecurityControllerGetCredentialsById = {}) {
-    return this.query({
-      strategy,
-      _id,
-      action: 'getCredentialsById'
-    }, options)
-      .then(response => response.result);
+  getCredentialsById(
+    strategy,
+    _id,
+    options: ArgsSecurityControllerGetCredentialsById = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "getCredentialsById",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getProfile (_id, options: ArgsSecurityControllerGetProfile = {}) {
-    return this.query({_id, action: 'getProfile'}, options)
-      .then(response => new Profile(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+  getProfile(_id, options: ArgsSecurityControllerGetProfile = {}) {
+    return this.query({ _id, action: "getProfile" }, options).then(
+      (response) =>
+        new Profile(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  getProfileMapping (options: ArgsSecurityControllerGetProfileMapping = {}) {
-    return this.query({
-      action: 'getProfileMapping'
-    }, options)
-      .then(response => response.result);
+  getProfileMapping(options: ArgsSecurityControllerGetProfileMapping = {}) {
+    return this.query(
+      {
+        action: "getProfileMapping",
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getProfileRights (_id, options: ArgsSecurityControllerGetProfileRights = {}) {
-    return this.query({
-      _id,
-      action: 'getProfileRights'
-    }, options)
-      .then(response => response.result.hits);
+  getProfileRights(_id, options: ArgsSecurityControllerGetProfileRights = {}) {
+    return this.query(
+      {
+        _id,
+        action: "getProfileRights",
+      },
+      options
+    ).then((response) => response.result.hits);
   }
 
-  getRole (_id, options: ArgsSecurityControllerGetRole = {}) {
-    return this.query({
-      _id,
-      action: 'getRole'
-    }, options)
-      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
+  getRole(_id, options: ArgsSecurityControllerGetRole = {}) {
+    return this.query(
+      {
+        _id,
+        action: "getRole",
+      },
+      options
+    ).then(
+      (response) =>
+        new Role(
+          this.kuzzle,
+          response.result._id,
+          response.result._source.controllers
+        )
+    );
   }
 
-  getRoleMapping (options: ArgsSecurityControllerGetRoleMapping = {}) {
-    return this.query({
-      action: 'getRoleMapping'
-    }, options)
-      .then(response => response.result);
+  getRoleMapping(options: ArgsSecurityControllerGetRoleMapping = {}) {
+    return this.query(
+      {
+        action: "getRoleMapping",
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getUser (_id, options: ArgsSecurityControllerGetUser = {}) {
-    return this.query({
-      _id,
-      action: 'getUser'
-    }, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+  getUser(_id, options: ArgsSecurityControllerGetUser = {}) {
+    return this.query(
+      {
+        _id,
+        action: "getUser",
+      },
+      options
+    ).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  getUserMapping (options: ArgsSecurityControllerGetUserMapping = {}) {
-    return this.query({
-      action: 'getUserMapping'
-    }, options)
-      .then(response => response.result);
+  getUserMapping(options: ArgsSecurityControllerGetUserMapping = {}) {
+    return this.query(
+      {
+        action: "getUserMapping",
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  getUserRights (_id, options: ArgsSecurityControllerGetUserRights = {}) {
-    return this.query({
-      _id,
-      action: 'getUserRights'
-    }, options)
-      .then(response => response.result.hits);
+  getUserRights(_id, options: ArgsSecurityControllerGetUserRights = {}) {
+    return this.query(
+      {
+        _id,
+        action: "getUserRights",
+      },
+      options
+    ).then((response) => response.result.hits);
   }
 
-  getUserStrategies (_id, options: ArgsSecurityControllerGetUserStrategies = {}) {
-    return this.query({
-      _id,
-      action: 'getUserStrategies'
-    }, options)
-      .then(response => response.result.strategies);
+  getUserStrategies(
+    _id,
+    options: ArgsSecurityControllerGetUserStrategies = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "getUserStrategies",
+      },
+      options
+    ).then((response) => response.result.strategies);
   }
 
-  hasCredentials (strategy, _id, options: ArgsSecurityControllerHasCredentials = {}) {
-    return this.query({
-      strategy,
-      _id,
-      action: 'hasCredentials'
-    }, options)
-      .then(response => response.result);
+  hasCredentials(
+    strategy,
+    _id,
+    options: ArgsSecurityControllerHasCredentials = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "hasCredentials",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  mDeleteProfiles (ids, options: ArgsSecurityControllerMDeleteProfiles = {}) {
+  mDeleteProfiles(ids, options: ArgsSecurityControllerMDeleteProfiles = {}) {
     const request = {
-      action: 'mDeleteProfiles',
-      body: {ids}
+      action: "mDeleteProfiles",
+      body: { ids },
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  mDeleteRoles (ids, options: ArgsSecurityControllerMDeleteRoles = {}) {
+  mDeleteRoles(ids, options: ArgsSecurityControllerMDeleteRoles = {}) {
     const request = {
-      action: 'mDeleteRoles',
-      body: {ids}
+      action: "mDeleteRoles",
+      body: { ids },
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  mDeleteUsers (ids, options: ArgsSecurityControllerMDeleteUsers = {}) {
+  mDeleteUsers(ids, options: ArgsSecurityControllerMDeleteUsers = {}) {
     const request = {
-      action: 'mDeleteUsers',
-      body: {ids}
+      action: "mDeleteUsers",
+      body: { ids },
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
-  mGetProfiles (ids, options: ArgsSecurityControllerMGetProfiles = {}) {
-    return this.query({action: 'mGetProfiles', body: {ids}}, options)
-      .then(response => response.result.hits.map(
-        hit => new Profile(this.kuzzle, hit._id, hit._source)));
+  mGetProfiles(ids, options: ArgsSecurityControllerMGetProfiles = {}) {
+    return this.query({ action: "mGetProfiles", body: { ids } }, options).then(
+      (response) =>
+        response.result.hits.map(
+          (hit) => new Profile(this.kuzzle, hit._id, hit._source)
+        )
+    );
   }
 
-  mGetUsers (ids, options: ArgsSecurityControllerMGetUsers = {}) {
+  mGetUsers(ids, options: ArgsSecurityControllerMGetUsers = {}) {
     const request = {
-      action: 'mGetUsers',
-      body: {ids}
+      action: "mGetUsers",
+      body: { ids },
     };
 
-    return this.query(request, options)
-      .then(response => response.result.hits.map(hit => new User(this.kuzzle, hit._id, hit._source)));
+    return this.query(request, options).then((response) =>
+      response.result.hits.map(
+        (hit) => new User(this.kuzzle, hit._id, hit._source)
+      )
+    );
   }
 
-  mGetRoles (ids, options: ArgsSecurityControllerMGetRoles = {}) {
-    return this.query({
-      action: 'mGetRoles',
-      body: {ids}
-    }, options)
-      .then(response => response.result.hits.map(hit => new Role(this.kuzzle, hit._id, hit._source.controllers)));
+  mGetRoles(ids, options: ArgsSecurityControllerMGetRoles = {}) {
+    return this.query(
+      {
+        action: "mGetRoles",
+        body: { ids },
+      },
+      options
+    ).then((response) =>
+      response.result.hits.map(
+        (hit) => new Role(this.kuzzle, hit._id, hit._source.controllers)
+      )
+    );
   }
 
   refresh(collection) {
     return this.query({
+      action: "refresh",
       collection,
-      action: 'refresh'
     });
   }
 
-  replaceUser (_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
+  replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
     const request = {
       _id,
+      action: "replaceUser",
       body,
-      action: 'replaceUser'
     };
-    return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  searchProfiles (body, options: ArgsSecurityControllerSearchProfiles= {}) {
+  searchProfiles(body, options: ArgsSecurityControllerSearchProfiles = {}) {
     const request = {
+      action: "searchProfiles",
       body,
-      action: 'searchProfiles'
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
     }
 
-    return this.query(request, options)
-      .then(response => new ProfileSearchResult(this.kuzzle, request, options, response.result));
+    return this.query(request, options).then(
+      (response) =>
+        new ProfileSearchResult(this.kuzzle, request, options, response.result)
+    );
   }
 
-  searchRoles (body, options: ArgsSecurityControllerSearchRoles = {}) {
+  searchRoles(body, options: ArgsSecurityControllerSearchRoles = {}) {
     const request = {
+      action: "searchRoles",
       body,
-      action: 'searchRoles'
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
     }
 
-    return this.query(request, options)
-      .then(response => new RoleSearchResult(this.kuzzle, request, options, response.result));
+    return this.query(request, options).then(
+      (response) =>
+        new RoleSearchResult(this.kuzzle, request, options, response.result)
+    );
   }
 
-  searchUsers (body, options: ArgsSecurityControllerSearchUsers = {}) {
+  searchUsers(body, options: ArgsSecurityControllerSearchUsers = {}) {
     const request = {
+      action: "searchUsers",
       body,
-      action: 'searchUsers'
     };
-    for (const opt of ['from', 'size', 'scroll', 'lang']) {
+    for (const opt of ["from", "size", "scroll", "lang"]) {
       request[opt] = options[opt];
     }
 
-    return this.query(request, options)
-      .then(response => new UserSearchResult(this.kuzzle, request, options, response.result));
+    return this.query(request, options).then(
+      (response) =>
+        new UserSearchResult(this.kuzzle, request, options, response.result)
+    );
   }
 
-  updateCredentials (strategy, _id, body, options: ArgsSecurityControllerUpdateCredentials = {}) {
-    return this.query({
-      strategy,
-      _id,
-      body,
-      action: 'updateCredentials'
-    }, options)
-      .then(response => response.result);
+  updateCredentials(
+    strategy,
+    _id,
+    body,
+    options: ArgsSecurityControllerUpdateCredentials = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "updateCredentials",
+        body,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  updateProfile (_id, body, options: ArgsSecurityControllerUpdateProfile = {}) {
+  updateProfile(_id, body, options: ArgsSecurityControllerUpdateProfile = {}) {
     const request = {
       _id,
+      action: "updateProfile",
       body,
-      action: 'updateProfile'
     };
 
-    return this.query(request, options)
-      .then(response => new Profile(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new Profile(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  updateProfileMapping (body, options: ArgsSecurityControllerUpdateProfileMapping = {}) {
-    return this.query({
-      body,
-      action: 'updateProfileMapping'
-    }, options)
-      .then(response => response.result);
+  updateProfileMapping(
+    body,
+    options: ArgsSecurityControllerUpdateProfileMapping = {}
+  ) {
+    return this.query(
+      {
+        action: "updateProfileMapping",
+        body,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  updateRole (_id, body, options: ArgsSecurityControllerUpdateRole = {}) {
+  updateRole(_id, body, options: ArgsSecurityControllerUpdateRole = {}) {
     const request = {
       _id,
+      action: "updateRole",
       body,
-      action: 'updateRole',
-      force: options.force ? true : null
+      force: options.force ? true : null,
     };
 
-    return this.query(request, options)
-      .then(response => new Role(this.kuzzle, response.result._id, response.result._source.controllers));
+    return this.query(request, options).then(
+      (response) =>
+        new Role(
+          this.kuzzle,
+          response.result._id,
+          response.result._source.controllers
+        )
+    );
   }
 
-  updateRoleMapping (body, options: ArgsSecurityControllerUpdateRoleMapping = {}) {
-    return this.query({
-      body,
-      action: 'updateRoleMapping'
-    }, options)
-      .then(response => response.result);
+  updateRoleMapping(
+    body,
+    options: ArgsSecurityControllerUpdateRoleMapping = {}
+  ) {
+    return this.query(
+      {
+        action: "updateRoleMapping",
+        body,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  updateUser (_id, body, options: ArgsSecurityControllerUpdateUser = {}) {
+  updateUser(_id, body, options: ArgsSecurityControllerUpdateUser = {}) {
     const request = {
       _id,
+      action: "updateUser",
       body,
-      action: 'updateUser'
     };
-    return this.query(request, options)
-      .then(response => new User(this.kuzzle, response.result._id, response.result._source));
+    return this.query(request, options).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
-  updateUserMapping (body, options: ArgsSecurityControllerUpdateUserMapping = {}) {
-    return this.query({
-      body,
-      action: 'updateUserMapping'
-    }, options)
-      .then(response => response.result);
+  updateUserMapping(
+    body,
+    options: ArgsSecurityControllerUpdateUserMapping = {}
+  ) {
+    return this.query(
+      {
+        action: "updateUserMapping",
+        body,
+      },
+      options
+    ).then((response) => response.result);
   }
 
-  validateCredentials (strategy, _id, body, options: ArgsSecurityControllerValidateCredentials = {}) {
-    return this.query({
-      _id,
-      strategy,
-      body,
-      action: 'validateCredentials'
-    }, options)
-      .then(response => response.result);
+  validateCredentials(
+    strategy,
+    _id,
+    body,
+    options: ArgsSecurityControllerValidateCredentials = {}
+  ) {
+    return this.query(
+      {
+        _id,
+        action: "validateCredentials",
+        body,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 }
 
 export interface ArgsSecurityControllerCreateApiKey extends ArgsDefault {
-    expiresIn?: string | number;
-    _id?: string;
-    refresh?: 'wait_for' | 'false';
+  expiresIn?: string | number;
+  _id?: string;
+  refresh?: "wait_for" | "false";
 }
 
-export interface ArgsSecurityControllerCheckRights extends ArgsDefault {
-}
+export type ArgsSecurityControllerCheckRights = ArgsDefault;
 
 export interface ArgsSecurityControllerDeleteApiKey extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
+  refresh?: "wait_for" | "false";
 }
 
 export interface ArgsSecurityControllerSearchApiKeys extends ArgsDefault {
-    from?: number;
-    size?: number;
-    lang?: string;
+  from?: number;
+  size?: number;
+  lang?: string;
 }
 
-export interface ArgsSecurityControllerCreateCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerCreateCredentials = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateFirstAdmin extends ArgsDefault {
-    reset?: boolean;
+  reset?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateOrReplaceProfile extends ArgsDefault {
-}
+export type ArgsSecurityControllerCreateOrReplaceProfile = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateOrReplaceRole extends ArgsDefault {
-    force?: boolean;
+  force?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateProfile extends ArgsDefault {
-}
+export type ArgsSecurityControllerCreateProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerCreateRestrictedUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerCreateRestrictedUser = ArgsDefault;
 
 export interface ArgsSecurityControllerCreateRole extends ArgsDefault {
-    force?: boolean;
+  force?: boolean;
 }
 
-export interface ArgsSecurityControllerCreateUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerCreateUser = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerDeleteCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteProfile extends ArgsDefault {
-}
+export type ArgsSecurityControllerDeleteProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteRole extends ArgsDefault {
-}
+export type ArgsSecurityControllerDeleteRole = ArgsDefault;
 
-export interface ArgsSecurityControllerDeleteUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerDeleteUser = ArgsDefault;
 
-export interface ArgsSecurityControllerGetAllCredentialFields extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetAllCredentialFields = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentialFields extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetCredentialFields = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerGetCredentialsById extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetCredentialsById = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfile extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfileMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetProfileMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetProfileRights extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetProfileRights = ArgsDefault;
 
-export interface ArgsSecurityControllerGetRole extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetRole = ArgsDefault;
 
-export interface ArgsSecurityControllerGetRoleMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetRoleMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetUser = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetUserMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserRights extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetUserRights = ArgsDefault;
 
-export interface ArgsSecurityControllerGetUserStrategies extends ArgsDefault {
-}
+export type ArgsSecurityControllerGetUserStrategies = ArgsDefault;
 
-export interface ArgsSecurityControllerHasCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerHasCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteProfiles extends ArgsDefault {
-}
+export type ArgsSecurityControllerMDeleteProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteRoles extends ArgsDefault {
-}
+export type ArgsSecurityControllerMDeleteRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerMDeleteUsers extends ArgsDefault {
-}
+export type ArgsSecurityControllerMDeleteUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetProfiles extends ArgsDefault {
-}
+export type ArgsSecurityControllerMGetProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetUsers extends ArgsDefault {
-}
+export type ArgsSecurityControllerMGetUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerMGetRoles extends ArgsDefault {
-}
+export type ArgsSecurityControllerMGetRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerReplaceUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerReplaceUser = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchProfiles extends ArgsDefault {
-}
+export type ArgsSecurityControllerSearchProfiles = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchRoles extends ArgsDefault {
-}
+export type ArgsSecurityControllerSearchRoles = ArgsDefault;
 
-export interface ArgsSecurityControllerSearchUsers extends ArgsDefault {
-}
+export type ArgsSecurityControllerSearchUsers = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateCredentials = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateProfile extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateProfile = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateProfileMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateProfileMapping = ArgsDefault;
 
 export interface ArgsSecurityControllerUpdateRole extends ArgsDefault {
-    force?: boolean;
+  force?: boolean;
 }
 
-export interface ArgsSecurityControllerUpdateRoleMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateRoleMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateUser extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateUser = ArgsDefault;
 
-export interface ArgsSecurityControllerUpdateUserMapping extends ArgsDefault {
-}
+export type ArgsSecurityControllerUpdateUserMapping = ArgsDefault;
 
-export interface ArgsSecurityControllerValidateCredentials extends ArgsDefault {
-}
+export type ArgsSecurityControllerValidateCredentials = ArgsDefault;

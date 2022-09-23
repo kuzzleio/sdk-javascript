@@ -49,42 +49,46 @@ console.log(obj.bar); // throw error
 ```
 */
 
-const getOptions = options => (Object.assign({}, {
-  name: 'object',
-  seal: true,
-  sealGet: false,
-  deprecated: [],
-  warnDeprecationOnce: true,
-  exposeApi: false,
-  apiNamespace: '__proxy__'
-}, options));
+/* eslint sort-keys: 0 */
 
-const getPropertyNames = obj => {
+const getOptions = (options) =>
+  Object.assign(
+    {},
+    {
+      apiNamespace: "__proxy__",
+      name: "object",
+      deprecated: [],
+      exposeApi: false,
+      seal: true,
+      sealGet: false,
+      warnDeprecationOnce: true,
+    },
+    options
+  );
+
+const getPropertyNames = (obj) => {
   if (!obj) {
     return [];
   }
   const methods = Object.getOwnPropertyNames(obj.prototype || obj);
   const proto = Object.getPrototypeOf(obj);
-  return deleteDuplicates([
-    ...methods,
-    ...getPropertyNames(proto)
-  ]);
+  return deleteDuplicates([...methods, ...getPropertyNames(proto)]);
 };
 
-const deleteDuplicates = arr => [...new Set(arr)];
+const deleteDuplicates = (arr) => [...new Set(arr)];
 
 const proxify = (obj, opts = {}) => {
-  if (!obj || (typeof obj !== 'object' && typeof obj !== 'function')) {
-    throw Error('proxify only applies on non-null object');
+  if (!obj || (typeof obj !== "object" && typeof obj !== "function")) {
+    throw Error("proxify only applies on non-null object");
   }
 
   const options = getOptions(opts);
-  const properties = new Set(['inspect']);
+  const properties = new Set(["inspect"]);
   const deprecated = new Set(options.deprecated);
 
   const warnedDeprecation = new Set();
 
-  const warnDeprecation = name => {
+  const warnDeprecation = (name) => {
     const hash = `${options.name}.${name}`;
     if (options.warnDeprecationOnce && warnedDeprecation.has(hash)) {
       return;
@@ -96,16 +100,15 @@ const proxify = (obj, opts = {}) => {
 
   if (options.exposeApi) {
     obj[options.apiNamespace] = {
-      registerProp: name => properties.add(name),
-      unregisterProp: name => properties.delete(name),
-      hasProp: name => properties.has(name)
+      registerProp: (name) => properties.add(name),
+      unregisterProp: (name) => properties.delete(name),
+      hasProp: (name) => properties.has(name),
     };
   }
 
-  [
-    ...Object.getOwnPropertyNames(obj),
-    ...getPropertyNames(obj)
-  ].forEach(prop => properties.add(prop));
+  [...Object.getOwnPropertyNames(obj), ...getPropertyNames(obj)].forEach(
+    (prop) => properties.add(prop)
+  );
 
   const handler = {
     get: (target, name) => {
@@ -119,14 +122,16 @@ const proxify = (obj, opts = {}) => {
     },
     set: (target, name, value) => {
       if (options.seal && !properties.has(name)) {
-        throw new Error(`Cannot set a value to the undefined '${name}' property in '${options.name}'`);
+        throw new Error(
+          `Cannot set a value to the undefined '${name}' property in '${options.name}'`
+        );
       }
       if (deprecated.has(name)) {
         warnDeprecation(name);
       }
       target[name] = value;
       return true;
-    }
+    },
   };
 
   return new Proxy(obj, handler);

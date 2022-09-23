@@ -1,27 +1,26 @@
-const
-  should = require('should'),
-  sinon = require('sinon'),
-  ProtocolMock = require('../mocks/protocol.mock'),
-  generateJwt = require('../mocks/generateJwt.mock'),
-  { Jwt } = require('../../src/core/Jwt'),
-  { Kuzzle } = require('../../src/Kuzzle');
+const should = require("should"),
+  sinon = require("sinon"),
+  ProtocolMock = require("../mocks/protocol.mock"),
+  generateJwt = require("../mocks/generateJwt.mock"),
+  { Jwt } = require("../../src/core/Jwt"),
+  { Kuzzle } = require("../../src/Kuzzle");
 
-describe('Kuzzle setters', () => {
+describe("Kuzzle setters", () => {
   let kuzzle;
 
   beforeEach(() => {
-    const protocol = new ProtocolMock('somewhere');
+    const protocol = new ProtocolMock("somewhere");
     kuzzle = new Kuzzle(protocol);
   });
 
-  describe('#autoQueue', () => {
-    it('should throw if not a boolean', () => {
-      should(function() {
-        kuzzle.autoQueue = 'foo-bar';
+  describe("#autoQueue", () => {
+    it("should throw if not a boolean", () => {
+      should(function () {
+        kuzzle.autoQueue = "foo-bar";
       }).throw();
     });
 
-    it('should set private _autoQueue property', () => {
+    it("should set private _autoQueue property", () => {
       should(kuzzle.protocol.autoQueue).be.undefined();
 
       kuzzle.autoQueue = true;
@@ -32,14 +31,14 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#autoReconnect', () => {
-    it('should throw if not a boolean', () => {
-      should(function() {
-        kuzzle.autoReconnect = 'foo-bar';
+  describe("#autoReconnect", () => {
+    it("should throw if not a boolean", () => {
+      should(function () {
+        kuzzle.autoReconnect = "foo-bar";
       }).throw();
     });
 
-    it('should set protocol.autoReconnect property', () => {
+    it("should set protocol.autoReconnect property", () => {
       should(kuzzle.protocol.autoReconnect).be.undefined();
 
       kuzzle.autoReconnect = true;
@@ -50,14 +49,14 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#autoReplay', () => {
-    it('should throw if not a boolean', () => {
-      should(function() {
-        kuzzle.autoReplay = 'foo-bar';
+  describe("#autoReplay", () => {
+    it("should throw if not a boolean", () => {
+      should(function () {
+        kuzzle.autoReplay = "foo-bar";
       }).throw();
     });
 
-    it('should set priavet _autoReplay property', () => {
+    it("should set priavet _autoReplay property", () => {
       should(kuzzle.protocol.autoReplay).be.undefined();
 
       kuzzle.autoReplay = true;
@@ -68,21 +67,21 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#jwt', () => {
-    it('should set the auth controller authenticationToken property', () => {
+  describe("#jwt", () => {
+    it("should set the auth controller authenticationToken property", () => {
       kuzzle.jwt = generateJwt();
       should(kuzzle.auth.authenticationToken).be.instanceOf(Jwt);
     });
   });
 
-  describe('#offlineQueueLoader', () => {
-    it('should throw if not a function', () => {
-      should(function() {
-        kuzzle.offlineQueueLoader = 'foo-bar';
+  describe("#offlineQueueLoader", () => {
+    it("should throw if not a function", () => {
+      should(function () {
+        kuzzle.offlineQueueLoader = "foo-bar";
       }).throw();
     });
 
-    it('should set protocol.offlineQueueLoader property', () => {
+    it("should set protocol.offlineQueueLoader property", () => {
       should(kuzzle.offlineQueueLoader).be.null();
 
       const cb = sinon.stub();
@@ -91,14 +90,14 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#queueFilter', () => {
-    it('should throw if not a function', () => {
-      should(function() {
-        kuzzle.queueFilter = 'foo-bar';
+  describe("#queueFilter", () => {
+    it("should throw if not a function", () => {
+      should(function () {
+        kuzzle.queueFilter = "foo-bar";
       }).throw();
     });
 
-    it('should set private _queueFilter property', () => {
+    it("should set private _queueFilter property", () => {
       should(kuzzle.queueFilter).be.null();
 
       const cb = sinon.stub();
@@ -107,61 +106,61 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#queueMaxSize', () => {
-    it('should throw if not a number', () => {
-      should(function() {
-        kuzzle.queueMaxSize = 'foo-bar';
+  describe("#queueMaxSize", () => {
+    it("should throw if not a number", () => {
+      should(function () {
+        kuzzle.queueMaxSize = "foo-bar";
       }).throw();
     });
 
-    it('should set priavert _queueMaxSize property', () => {
+    it("should set priavert _queueMaxSize property", () => {
       kuzzle.queueMaxSize = 1234;
       should(kuzzle._queueMaxSize).be.equal(1234);
     });
   });
 
-  describe('#queueTTL', () => {
-    it('should throw if not a number', () => {
-      should(function() {
-        kuzzle.queueTTL = 'foo-bar';
+  describe("#queueTTL", () => {
+    it("should throw if not a number", () => {
+      should(function () {
+        kuzzle.queueTTL = "foo-bar";
       }).throw();
     });
 
-    it('should set private _queueTTL property', () => {
+    it("should set private _queueTTL property", () => {
       kuzzle.queueTTL = 1234;
       should(kuzzle._queueTTL).be.equal(1234);
     });
   });
 
-  describe('#replayInterval', () => {
-    it('should throw if not a number', () => {
-      should(function() {
-        kuzzle.replayInterval = 'foo-bar';
+  describe("#replayInterval", () => {
+    it("should throw if not a number", () => {
+      should(function () {
+        kuzzle.replayInterval = "foo-bar";
       }).throw();
     });
 
-    it('should set private _replayInterval property', () => {
+    it("should set private _replayInterval property", () => {
       kuzzle.replayInterval = 1234;
       should(kuzzle._replayInterval).be.equal(1234);
     });
   });
 
-  describe('#requestTimeout', () => {
-    it('should throw if not a number', () => {
-      should(function() {
-        kuzzle.requestTimeout = 'foo-bar';
+  describe("#requestTimeout", () => {
+    it("should throw if not a number", () => {
+      should(function () {
+        kuzzle.requestTimeout = "foo-bar";
       }).throw();
     });
 
-    it('should set private _requestTimeout property', () => {
+    it("should set private _requestTimeout property", () => {
       kuzzle.requestTimeout = 1234;
       should(kuzzle._requestTimeout).be.equal(1234);
     });
   });
 
-  describe('#flushQueue', () => {
-    it('flush the offline queue', () => {
-      kuzzle._offlineQueue.push({ foo: 'bar' });
+  describe("#flushQueue", () => {
+    it("flush the offline queue", () => {
+      kuzzle._offlineQueue.push({ foo: "bar" });
 
       kuzzle.flushQueue();
 
@@ -169,14 +168,14 @@ describe('Kuzzle setters', () => {
     });
   });
 
-  describe('#tokenExpiredInterval', () => {
-    it('should throw if not a number', () => {
+  describe("#tokenExpiredInterval", () => {
+    it("should throw if not a number", () => {
       should(() => {
-        kuzzle.tokenExpiredInterval = 'foo-bar';
+        kuzzle.tokenExpiredInterval = "foo-bar";
       }).throw();
     });
 
-    it('should set private _tokenExpiredInterval', () => {
+    it("should set private _tokenExpiredInterval", () => {
       kuzzle.tokenExpiredInterval = 42;
       should(kuzzle._tokenExpiredInterval).eql(42);
     });

@@ -1,8 +1,8 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 type PropertyObject = {
   properties?: MappingsProperties;
-}
+};
 
 type PropertyDynamic = {
   /**
@@ -10,14 +10,17 @@ type PropertyDynamic = {
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-dynamic-policy
    */
-  dynamic?: 'true' | 'false' | 'strict';
-}
+  dynamic?: "true" | "false" | "strict";
+};
 
 type PropertyType = {
-  [name: string]: { type?: string; } | PropertyObject | JSONObject
-}
+  [name: string]: { type?: string } | PropertyObject | JSONObject;
+};
 
-export type MappingsProperties = PropertyObject | PropertyDynamic | PropertyType;
+export type MappingsProperties =
+  | PropertyObject
+  | PropertyDynamic
+  | PropertyType;
 
 /**
  * Collection mappings definition
@@ -58,5 +61,5 @@ export type CollectionMappings = {
    *
    * @see https://docs.kuzzle.io/core/2/guides/main-concepts/data-storage/#mappings-dynamic-polic
    */
-  dynamic?: 'true' | 'false' | 'strict';
-}
+  dynamic?: "true" | "false" | "strict";
+};

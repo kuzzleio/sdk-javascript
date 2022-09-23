@@ -1,4 +1,4 @@
-import { JSONObject, RoleRightsDefinition } from '../../types';
+import { JSONObject, RoleRightsDefinition } from "../../types";
 
 export class Role {
   /**
@@ -17,23 +17,23 @@ export class Role {
    * @param {Kuzzle} kuzzle
    * @param {Object} data
    */
-  constructor (kuzzle, _id = null, controllers = {}) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle
+  constructor(kuzzle, _id = null, controllers = {}) {
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: kuzzle,
     });
 
     this._id = _id;
     this.controllers = controllers;
   }
 
-  protected get kuzzle () {
+  protected get kuzzle() {
     return this._kuzzle;
   }
 
   /**
    * Serialize the instance
    */
-  serialize (): JSONObject {
+  serialize(): JSONObject {
     return {
       _id: this._id,
       controllers: this.controllers,
@@ -42,4 +42,3 @@ export class Role {
 }
 
 module.exports = { Role };
-

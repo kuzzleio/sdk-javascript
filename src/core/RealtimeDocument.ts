@@ -1,4 +1,4 @@
-import { KDocumentContentGeneric } from '../types';
+import { KDocumentContentGeneric } from "../types";
 
 /**
  * Represents a realtime document that will mutate it's content in realtime
@@ -6,7 +6,9 @@ import { KDocumentContentGeneric } from '../types';
  *
  * Use the `Observer` class to manipulate such documents.
  */
-export class RealtimeDocument<TKDocumentContent extends KDocumentContentGeneric> {
+export class RealtimeDocument<
+  TKDocumentContent extends KDocumentContentGeneric
+> {
   /**
    * Document ID
    */
@@ -24,7 +26,7 @@ export class RealtimeDocument<TKDocumentContent extends KDocumentContentGeneric>
    */
   public deleted: boolean;
 
-  constructor ({ _id, _source }: { _id: string, _source: TKDocumentContent }) {
+  constructor({ _id, _source }: { _id: string; _source: TKDocumentContent }) {
     this._id = _id;
     this._source = _source;
     this.deleted = false;

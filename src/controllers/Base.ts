@@ -1,5 +1,5 @@
-import { Kuzzle } from '../Kuzzle';
-import { JSONObject } from '../types';
+import { Kuzzle } from "../Kuzzle";
+import { JSONObject } from "../types";
 
 export class BaseController {
   private _name: string;
@@ -9,22 +9,22 @@ export class BaseController {
    * @param {Kuzzle} kuzzle - Kuzzle SDK object.
    * @param {string} name - Controller full name for API request.
    */
-  constructor (kuzzle: any, name: string) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle
+  constructor(kuzzle: any, name: string) {
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: kuzzle,
     });
 
     this._name = name;
   }
 
-  protected get kuzzle () {
+  protected get kuzzle() {
     return this._kuzzle;
   }
 
   /**
    * Controller name
    */
-  get name () {
+  get name() {
     return this._name;
   }
 
@@ -34,8 +34,8 @@ export class BaseController {
    *
    * @param request
    * @param options
-  */
-  query (request: any, options: any = {}): Promise<JSONObject> {
+   */
+  query(request: any, options: any = {}): Promise<JSONObject> {
     request.controller = request.controller || this.name;
 
     return this._kuzzle.query(request, options);

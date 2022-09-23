@@ -30,7 +30,7 @@ export type RoleRightsDefinition = {
       /**
        * API action name
        */
-      [action: string]: boolean
-    }
-  }
-}
+      [action: string]: boolean;
+    };
+  };
+};

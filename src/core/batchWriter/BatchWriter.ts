@@ -1,6 +1,6 @@
-import { Kuzzle } from '../../Kuzzle';
-import { JSONObject } from '../../types';
-import { BatchBuffer } from './BatchBuffer';
+import { Kuzzle } from "../../Kuzzle";
+import { JSONObject } from "../../types";
+import { BatchBuffer } from "./BatchBuffer";
 
 /**
  * This class handle buffers for every supported API action of the document controller:
@@ -37,44 +37,44 @@ export class BatchWriter {
   // Buffers
   private buffers = {
     create: new BatchBuffer(),
-    update: new BatchBuffer(),
-    get: new BatchBuffer(),
-    exists: new BatchBuffer(),
-    delete: new BatchBuffer(),
-    replace: new BatchBuffer(),
     createOrReplace: new BatchBuffer(),
+    delete: new BatchBuffer(),
+    exists: new BatchBuffer(),
+    get: new BatchBuffer(),
+    replace: new BatchBuffer(),
+    update: new BatchBuffer(),
   };
 
-  get addCreate () {
+  get addCreate() {
     // @todo implements the send of buffer if approaching the limit
     return this.buffers.create.add.bind(this.buffers.create);
   }
 
-  get addUpdate () {
+  get addUpdate() {
     return this.buffers.update.add.bind(this.buffers.update);
   }
 
-  get addGet () {
+  get addGet() {
     return this.buffers.get.add.bind(this.buffers.get);
   }
 
-  get addExists () {
+  get addExists() {
     return this.buffers.exists.add.bind(this.buffers.exists);
   }
 
-  get addDelete () {
+  get addDelete() {
     return this.buffers.delete.add.bind(this.buffers.delete);
   }
 
-  get addReplace () {
+  get addReplace() {
     return this.buffers.replace.add.bind(this.buffers.replace);
   }
 
-  get addCreateOrReplace () {
+  get addCreateOrReplace() {
     return this.buffers.createOrReplace.add.bind(this.buffers.createOrReplace);
   }
 
-  constructor (
+  constructor(
     sdk: Kuzzle,
     { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
   ) {
@@ -87,7 +87,7 @@ export class BatchWriter {
   /**
    * Execute API actions with documents stored in the buffers.
    */
-  async execute () {
+  async execute() {
     const buffers: JSONObject = {};
 
     // make a copy of the buffers
@@ -112,7 +112,7 @@ export class BatchWriter {
   /**
    * Initialize the buffers and start the timer
    */
-  begin () {
+  begin() {
     this.prepareRound();
 
     this.timer = setInterval(async () => {
@@ -123,7 +123,7 @@ export class BatchWriter {
   /**
    * Execute pending actions from the buffers and stop the timer.
    */
-  async dispose () {
+  async dispose() {
     await this.execute();
 
     clearInterval(this.timer);
@@ -133,28 +133,33 @@ export class BatchWriter {
   /**
    * Reset all the buffers
    */
-  private prepareRound () {
+  private prepareRound() {
     for (const name of Object.keys(this.buffers)) {
       this.buffers[name] = new BatchBuffer();
     }
   }
 
-  private async sendWriteBuffer (
+  private async sendWriteBuffer(
     mAction: any,
     buffer: BatchBuffer,
-    options: JSONObject = {},
+    options: JSONObject = {}
   ) {
     const promises = [];
 
     for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
+      for (const [
+        collection,
+        { promise, documents },
+      ] of collectionBuffer.entries()) {
         if (documents.length === 0) {
           promise.resolve();
           continue;
         }
 
         promises.push(
-          this.sdk.document[mAction](index, collection, documents as any, { ...options })
+          this.sdk.document[mAction](index, collection, documents as any, {
+            ...options,
+          })
             .then(promise.resolve)
             .catch(promise.reject)
         );
@@ -164,27 +169,42 @@ export class BatchWriter {
     await Promise.all(promises);
   }
 
-  private sendCreateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
-    return this.sendWriteBuffer('mCreate', buffer, options);
+  private sendCreateBuffer(
+    buffer: BatchBuffer,
+    options?: { refresh?: "wait_for" | "false" }
+  ) {
+    return this.sendWriteBuffer("mCreate", buffer, options);
   }
 
-  private sendUpdateBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
-    return this.sendWriteBuffer('mUpdate', buffer, options);
+  private sendUpdateBuffer(
+    buffer: BatchBuffer,
+    options?: { refresh?: "wait_for" | "false" }
+  ) {
+    return this.sendWriteBuffer("mUpdate", buffer, options);
   }
 
-  private sendReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
-    return this.sendWriteBuffer('mReplace', buffer, options);
+  private sendReplaceBuffer(
+    buffer: BatchBuffer,
+    options?: { refresh?: "wait_for" | "false" }
+  ) {
+    return this.sendWriteBuffer("mReplace", buffer, options);
   }
 
-  private sendCreateOrReplaceBuffer (buffer: BatchBuffer, options?: { refresh?: 'wait_for' | 'false' }) {
-    return this.sendWriteBuffer('mCreateOrReplace', buffer, options);
+  private sendCreateOrReplaceBuffer(
+    buffer: BatchBuffer,
+    options?: { refresh?: "wait_for" | "false" }
+  ) {
+    return this.sendWriteBuffer("mCreateOrReplace", buffer, options);
   }
 
-  private async sendGetBuffer (buffer: BatchBuffer) {
+  private async sendGetBuffer(buffer: BatchBuffer) {
     const promises = [];
 
     for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
+      for (const [
+        collection,
+        { promise, documents },
+      ] of collectionBuffer.entries()) {
         if (documents.length === 0) {
           promise.resolve();
           continue;
@@ -193,7 +213,8 @@ export class BatchWriter {
         const ids = documents.map(({ _id }) => _id);
 
         promises.push(
-          this.sdk.document.mGet(index, collection, ids)
+          this.sdk.document
+            .mGet(index, collection, ids)
             .then(promise.resolve)
             .catch(promise.reject)
         );
@@ -203,11 +224,14 @@ export class BatchWriter {
     await Promise.all(promises);
   }
 
-  private async sendExistsBuffer (buffer: BatchBuffer) {
+  private async sendExistsBuffer(buffer: BatchBuffer) {
     const promises = [];
 
     for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
+      for (const [
+        collection,
+        { promise, documents },
+      ] of collectionBuffer.entries()) {
         if (documents.length === 0) {
           promise.resolve();
           continue;
@@ -215,7 +239,8 @@ export class BatchWriter {
 
         const ids = documents.map(({ _id }) => _id);
         promises.push(
-          this.sdk.document.mGet(index, collection, ids)
+          this.sdk.document
+            .mGet(index, collection, ids)
             .then(({ successes }) => {
               const successesId = successes.map(({ _id }) => _id);
               const existences = new Array(ids.length);
@@ -234,11 +259,14 @@ export class BatchWriter {
     await Promise.all(promises);
   }
 
-  private async sendDeleteBuffer (buffer: BatchBuffer) {
+  private async sendDeleteBuffer(buffer: BatchBuffer) {
     const promises = [];
 
     for (const [index, collectionBuffer] of buffer.indexes.entries()) {
-      for (const [collection, { promise, documents }] of collectionBuffer.entries()) {
+      for (const [
+        collection,
+        { promise, documents },
+      ] of collectionBuffer.entries()) {
         if (documents.length === 0) {
           promise.resolve();
           continue;
@@ -247,7 +275,8 @@ export class BatchWriter {
         const ids = documents.map(({ _id }) => _id);
 
         promises.push(
-          this.sdk.document.mDelete(index, collection, ids)
+          this.sdk.document
+            .mDelete(index, collection, ids)
             .then(promise.resolve)
             .catch(promise.reject)
         );

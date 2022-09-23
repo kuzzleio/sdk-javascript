@@ -1,34 +1,35 @@
-const
-  sinon = require('sinon'),
-  { KuzzleEventEmitter } = require('../../src/core/KuzzleEventEmitter');
+const sinon = require("sinon"),
+  { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter");
 
 // A class to mock the global window object
 class WindowMock extends KuzzleEventEmitter {
-  constructor () {
+  constructor() {
     super();
 
-    if (typeof window !== 'undefined') {
-      throw new Error('Cannot mock add a global "window" object: already defined');
+    if (typeof window !== "undefined") {
+      throw new Error(
+        'Cannot mock add a global "window" object: already defined'
+      );
     }
 
     this.navigator = {
-      onLine: true
+      onLine: true,
     };
 
     this.addEventListener = this.addListener;
-    sinon.spy(this, 'addEventListener');
+    sinon.spy(this, "addEventListener");
   }
 
-  static restore () {
+  static restore() {
     delete global.window;
   }
 
-  static inject () {
-    Object.defineProperty(global, 'window', {
+  static inject() {
+    Object.defineProperty(global, "window", {
       value: new this(),
       enumerable: false,
       writable: false,
-      configurable: true
+      configurable: true,
     });
   }
 }

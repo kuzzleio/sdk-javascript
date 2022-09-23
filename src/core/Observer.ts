@@ -1,12 +1,17 @@
-import { Kuzzle } from '../Kuzzle';
-import { RealtimeDocument } from './RealtimeDocument';
-import { DocumentNotification, JSONObject, KDocument, KDocumentContentGeneric } from '../types';
-import { RealtimeDocumentSearchResult } from './searchResult/RealtimeDocument';
+import { Kuzzle } from "../Kuzzle";
+import { RealtimeDocument } from "./RealtimeDocument";
+import {
+  DocumentNotification,
+  JSONObject,
+  KDocument,
+  KDocumentContentGeneric,
+} from "../types";
+import { RealtimeDocumentSearchResult } from "./searchResult/RealtimeDocument";
 import {
   ArgsDocumentControllerGet,
   ArgsDocumentControllerMGet,
   ArgsDocumentControllerSearch,
-} from '../controllers/Document';
+} from "../controllers/Document";
 
 /**
  * Class based on a Set<string> that holds the observed documents IDs of
@@ -33,20 +38,20 @@ class ObservedDocuments extends Set<string> {
   /**
    * Gets documents IDs
    */
-  get ids (): string[] {
+  get ids(): string[] {
     return Array.from(this.values());
   }
 
   /**
    * Gets Koncorde filters for observed documents
    */
-  get filters () {
+  get filters() {
     return {
-      ids: { values: Array.from(this.values()) }
+      ids: { values: Array.from(this.values()) },
     };
   }
 
-  constructor (index: string, collection: string) {
+  constructor(index: string, collection: string) {
     super();
 
     this.index = index;
@@ -60,14 +65,18 @@ type CollectionUrn = string;
 /**
  * Provide an Uniform Resource Locator given an index, a collection and a document
  */
-function documentUrn (index: string, collection: string, id: string): DocumentUrn {
+function documentUrn(
+  index: string,
+  collection: string,
+  id: string
+): DocumentUrn {
   return `${index}:${collection}:${id}`;
 }
 
 /**
  * Provide an Uniform Resource Locator given an index and a collection
  */
-function collectionUrn (index: string, collection: string): CollectionUrn {
+function collectionUrn(index: string, collection: string): CollectionUrn {
   return `${index}:${collection}`;
 }
 
@@ -77,7 +86,7 @@ export type ObserverOptions = {
    *
    * @default 5000
    */
-  pullingDelay: number,
+  pullingDelay: number;
 };
 
 /**
@@ -129,7 +138,10 @@ export class Observer {
    *
    * @internal
    */
-  private documents = new Map<DocumentUrn, RealtimeDocument<KDocumentContentGeneric>>();
+  private documents = new Map<
+    DocumentUrn,
+    RealtimeDocument<KDocumentContentGeneric>
+  >();
 
   /**
    * @internal
@@ -153,21 +165,21 @@ export class Observer {
    * Either through the realtime notifications system or by pulling documents
    * with the document.mGet method (HTTP protocol)
    */
-  public readonly mode: 'realtime' | 'pulling';
+  public readonly mode: "realtime" | "pulling";
 
   /**
    * Instantiate a new Observer
    *
    * @param sdk SDK instance
    */
-  constructor (sdk: Kuzzle, options?: ObserverOptions) {
-    Reflect.defineProperty(this, 'sdk', {
-      value: sdk
+  constructor(sdk: Kuzzle, options?: ObserverOptions) {
+    Reflect.defineProperty(this, "sdk", {
+      value: sdk,
     });
 
     this.options = { ...this.options, ...options };
 
-    this.mode = this.sdk.protocol.name === 'http' ? 'pulling' : 'realtime';
+    this.mode = this.sdk.protocol.name === "http" ? "pulling" : "realtime";
   }
 
   /**
@@ -182,7 +194,7 @@ export class Observer {
    * @param documents Array of documents
    *
    */
-  stop (
+  stop(
     index?: string,
     collection?: string,
     documents?: Array<{ _id: string }>
@@ -202,12 +214,14 @@ export class Observer {
     return this.disposeAll();
   }
 
-  private disposeDocuments (
+  private disposeDocuments(
     index: string,
     collection: string,
     documents: Array<{ _id: string }>
   ): Promise<void> {
-    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
+    const observedDocuments = this.documentsByCollection.get(
+      collectionUrn(index, collection)
+    );
 
     for (const document of documents) {
       this.documents.delete(documentUrn(index, collection, document._id));
@@ -222,8 +236,10 @@ export class Observer {
     return this.watchCollection(index, collection);
   }
 
-  private disposeCollection (index: string, collection: string): Promise<void> {
-    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
+  private disposeCollection(index: string, collection: string): Promise<void> {
+    const observedDocuments = this.documentsByCollection.get(
+      collectionUrn(index, collection)
+    );
 
     for (const id of observedDocuments.ids) {
       this.documents.delete(documentUrn(index, collection, id));
@@ -231,7 +247,7 @@ export class Observer {
 
     this.documentsByCollection.delete(collectionUrn(index, collection));
 
-    if (this.mode === 'realtime') {
+    if (this.mode === "realtime") {
       return this.sdk.realtime.unsubscribe(observedDocuments.roomId);
     }
 
@@ -245,7 +261,7 @@ export class Observer {
    *
    * @internal
    */
-  private disposeAll (): Promise<void> {
+  private disposeAll(): Promise<void> {
     const promises = [];
 
     for (const observedDocuments of this.documentsByCollection.values()) {
@@ -254,7 +270,7 @@ export class Observer {
       }
     }
 
-    if (this.mode === 'pulling') {
+    if (this.mode === "pulling") {
       promises.push(this.clearPullingTimer());
     }
 
@@ -275,14 +291,17 @@ export class Observer {
    *
    * @returns The realtime document
    */
-  get<TKDocumentContent extends KDocumentContentGeneric> (
+  get<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     id: string,
     options: ArgsDocumentControllerGet = {}
   ): Promise<RealtimeDocument<TKDocumentContent>> {
-    return this.sdk.document.get<TKDocumentContent>(index, collection, id, options)
-      .then(document => this.observe<TKDocumentContent>(index, collection, document));
+    return this.sdk.document
+      .get<TKDocumentContent>(index, collection, id, options)
+      .then((document) =>
+        this.observe<TKDocumentContent>(index, collection, document)
+      );
   }
 
   /**
@@ -296,11 +315,11 @@ export class Observer {
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
-  mGet<TKDocumentContent extends KDocumentContentGeneric> (
+  mGet<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     ids: string[],
-    options: ArgsDocumentControllerMGet = {},
+    options: ArgsDocumentControllerMGet = {}
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -314,7 +333,8 @@ export class Observer {
     const rtDocuments = [];
     let _errors;
 
-    return this.sdk.document.mGet(index, collection, ids, options)
+    return this.sdk.document
+      .mGet(index, collection, ids, options)
       .then(({ successes, errors }) => {
         _errors = errors;
 
@@ -324,7 +344,7 @@ export class Observer {
 
         return this.watchCollection(index, collection);
       })
-      .then(() => ({ successes: rtDocuments, errors: _errors }));
+      .then(() => ({ errors: _errors, successes: rtDocuments }));
   }
 
   /**
@@ -338,24 +358,29 @@ export class Observer {
    *
    * @returns A SearchResult containing realtime documents
    */
-  search<TKDocumentContent extends KDocumentContentGeneric> (
+  search<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     searchBody: JSONObject = {},
     options: ArgsDocumentControllerSearch = {}
   ): Promise<RealtimeDocumentSearchResult<TKDocumentContent>> {
     // eslint-disable-next-line dot-notation
-    return this.sdk.document['_search'](index, collection, searchBody, options)
-      .then(({ response, request, opts }) => {
-        const result = new RealtimeDocumentSearchResult<TKDocumentContent>(
-          this.sdk,
-          request,
-          opts,
-          response.result,
-          this);
+    return this.sdk.document["_search"](
+      index,
+      collection,
+      searchBody,
+      options
+    ).then(({ response, request, opts }) => {
+      const result = new RealtimeDocumentSearchResult<TKDocumentContent>(
+        this.sdk,
+        request,
+        opts,
+        response.result,
+        this
+      );
 
-        return result.start();
-      });
+      return result.start();
+    });
   }
 
   /**
@@ -367,15 +392,14 @@ export class Observer {
    *
    * @returns A realtime document
    */
-  observe<TKDocumentContent extends KDocumentContentGeneric> (
+  observe<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
-    document: KDocument<TKDocumentContent>,
+    document: KDocument<TKDocumentContent>
   ): Promise<RealtimeDocument<TKDocumentContent>> {
     const rtDocument = this.addDocument(index, collection, document);
 
-    return this.watchCollection(index, collection)
-      .then(() => rtDocument);
+    return this.watchCollection(index, collection).then(() => rtDocument);
   }
 
   /**
@@ -385,7 +409,7 @@ export class Observer {
    *
    * Use observe() to retrieve a realtime document.
    */
-  addDocument<TKDocumentContent extends KDocumentContentGeneric> (
+  addDocument<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
     document: KDocument<TKDocumentContent>
@@ -394,15 +418,21 @@ export class Observer {
 
     const urn = collectionUrn(index, collection);
 
-    if (! this.documentsByCollection.has(urn)) {
-      this.documentsByCollection.set(urn, new ObservedDocuments(index, collection));
+    if (!this.documentsByCollection.has(urn)) {
+      this.documentsByCollection.set(
+        urn,
+        new ObservedDocuments(index, collection)
+      );
     }
 
     const observedDocuments = this.documentsByCollection.get(urn);
 
     observedDocuments.add(document._id);
 
-    this.documents.set(documentUrn(index, collection, document._id), rtDocument);
+    this.documents.set(
+      documentUrn(index, collection, document._id),
+      rtDocument
+    );
 
     return rtDocument;
   }
@@ -412,8 +442,8 @@ export class Observer {
    *
    * @internal
    */
-  watchCollection (index: string, collection: string): Promise<void> {
-    if (this.mode === 'realtime') {
+  watchCollection(index: string, collection: string): Promise<void> {
+    if (this.mode === "realtime") {
       return this.resubscribe(index, collection);
     }
 
@@ -422,13 +452,14 @@ export class Observer {
     return Promise.resolve();
   }
 
-  private restartPulling (): void {
+  private restartPulling(): void {
     this.clearPullingTimer();
 
     if (this.documentsByCollection.size !== 0) {
       this.pullingTimer = setInterval(
         this.pullingHandler.bind(this),
-        this.options.pullingDelay);
+        this.options.pullingDelay
+      );
     }
   }
 
@@ -438,21 +469,23 @@ export class Observer {
    *
    * This method never returns a rejected promise.
    */
-  private pullingHandler (): Promise<void> {
+  private pullingHandler(): Promise<void> {
     const promises = [];
 
     for (const observedDocuments of this.documentsByCollection.values()) {
-      const promise = this.sdk.document.mGet(
-        observedDocuments.index,
-        observedDocuments.collection,
-        observedDocuments.ids
-      )
+      const promise = this.sdk.document
+        .mGet(
+          observedDocuments.index,
+          observedDocuments.collection,
+          observedDocuments.ids
+        )
         .then(({ successes, errors }) => {
           for (const document of successes) {
             const urn = documentUrn(
               observedDocuments.index,
               observedDocuments.collection,
-              document._id);
+              document._id
+            );
 
             const rtDocument = this.documents.get(urn);
             Object.assign(rtDocument._source, document._source);
@@ -462,7 +495,8 @@ export class Observer {
             const urn = documentUrn(
               observedDocuments.index,
               observedDocuments.collection,
-              deletedDocumentId);
+              deletedDocumentId
+            );
 
             const rtDocument = this.documents.get(urn);
 
@@ -473,7 +507,12 @@ export class Observer {
             observedDocuments.delete(deletedDocumentId);
 
             if (observedDocuments.size === 0) {
-              this.documentsByCollection.delete(collectionUrn(observedDocuments.index, observedDocuments.collection));
+              this.documentsByCollection.delete(
+                collectionUrn(
+                  observedDocuments.index,
+                  observedDocuments.collection
+                )
+              );
             }
           }
         })
@@ -489,7 +528,7 @@ export class Observer {
     return Promise.all(promises).then(() => {});
   }
 
-  private clearPullingTimer (): void {
+  private clearPullingTimer(): void {
     if (this.pullingTimer) {
       clearInterval(this.pullingTimer);
     }
@@ -501,10 +540,12 @@ export class Observer {
    *
    * @internal
    */
-  private resubscribe (index: string, collection: string): Promise<void> {
-    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
+  private resubscribe(index: string, collection: string): Promise<void> {
+    const observedDocuments = this.documentsByCollection.get(
+      collectionUrn(index, collection)
+    );
 
-    if (! observedDocuments) {
+    if (!observedDocuments) {
       return Promise.resolve();
     }
 
@@ -515,13 +556,14 @@ export class Observer {
         : Promise.resolve();
     }
 
-    return this.sdk.realtime.subscribe(
-      index,
-      collection,
-      observedDocuments.filters,
-      this.notificationHandler.bind(this)
-    )
-      .then(roomId => {
+    return this.sdk.realtime
+      .subscribe(
+        index,
+        collection,
+        observedDocuments.filters,
+        this.notificationHandler.bind(this)
+      )
+      .then((roomId) => {
         const oldRoomId = observedDocuments.roomId;
 
         observedDocuments.roomId = roomId;
@@ -537,7 +579,9 @@ export class Observer {
    *
    * @internal
    */
-  private notificationHandler (notification: DocumentNotification): Promise<void> {
+  private notificationHandler(
+    notification: DocumentNotification
+  ): Promise<void> {
     const { index, collection, result } = notification;
 
     const urn = documentUrn(index, collection, result._id);
@@ -545,8 +589,8 @@ export class Observer {
 
     // On "write", mutate document with changes
     // On "publish", nothing
-    if (notification.event !== 'delete') {
-      if (notification.event === 'write') {
+    if (notification.event !== "delete") {
+      if (notification.event === "write") {
         Object.assign(rtDocument._source, result._source);
       }
 
@@ -557,7 +601,9 @@ export class Observer {
 
     this.documents.delete(documentUrn(index, collection, rtDocument._id));
 
-    const observedDocuments = this.documentsByCollection.get(collectionUrn(index, collection));
+    const observedDocuments = this.documentsByCollection.get(
+      collectionUrn(index, collection)
+    );
     observedDocuments.delete(result._id);
 
     if (observedDocuments.size === 0) {

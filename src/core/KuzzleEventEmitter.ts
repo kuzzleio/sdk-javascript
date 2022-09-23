@@ -14,59 +14,63 @@ class Listener {
 export class KuzzleEventEmitter {
   private _events: Map<string, Array<Listener>>;
 
-  constructor () {
+  constructor() {
     this._events = new Map();
   }
 
-  private _exists (listeners, fn) {
-    return Boolean(listeners.find(listener => listener.fn === fn));
+  private _exists(listeners, fn) {
+    return Boolean(listeners.find((listener) => listener.fn === fn));
   }
 
-  listeners (eventName) {
-    if (! this._events.has(eventName)) {
+  listeners(eventName) {
+    if (!this._events.has(eventName)) {
       return [];
     }
 
-    return this._events.get(eventName).map(listener => listener.fn);
+    return this._events.get(eventName).map((listener) => listener.fn);
   }
 
-  addListener (eventName, listener, once = false) {
+  addListener(eventName, listener, once = false) {
     if (!eventName || !listener) {
       return this;
     }
 
     const listenerType = typeof listener;
 
-    if (listenerType !== 'function') {
-      throw new Error(`Invalid listener type: expected a function, got a ${listenerType}`);
+    if (listenerType !== "function") {
+      throw new Error(
+        `Invalid listener type: expected a function, got a ${listenerType}`
+      );
     }
 
-    if (! this._events.has(eventName)) {
+    if (!this._events.has(eventName)) {
       this._events.set(eventName, []);
     }
 
-    if (! this._exists(this._events.get(eventName), listener)) {
+    if (!this._exists(this._events.get(eventName), listener)) {
       this._events.get(eventName).push(new Listener(listener, once));
     }
 
     return this;
   }
 
-  on (eventName, listener) {
+  on(eventName, listener) {
     return this.addListener(eventName, listener);
   }
 
-  prependListener (eventName, listener, once = false) {
+  prependListener(eventName, listener, once = false) {
     if (!eventName || !listener) {
       return this;
     }
 
-    if (! this._events.has(eventName)) {
+    if (!this._events.has(eventName)) {
       this._events.set(eventName, []);
     }
 
     if (!this._exists(this._events.get(eventName), listener)) {
-      const listeners = [new Listener(listener, once)].concat(this._events.get(eventName));
+      const listeners = [new Listener(listener, once)].concat(
+        this._events.get(eventName)
+      );
 
       this._events.set(eventName, listeners);
     }
@@ -74,26 +78,26 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  addOnceListener (eventName, listener) {
+  addOnceListener(eventName, listener) {
     return this.addListener(eventName, listener, true);
   }
 
-  once (eventName, listener) {
+  once(eventName, listener) {
     return this.addOnceListener(eventName, listener);
   }
 
-  prependOnceListener (eventName, listener) {
+  prependOnceListener(eventName, listener) {
     return this.prependListener(eventName, listener, true);
   }
 
-  removeListener (eventName, listener) {
+  removeListener(eventName, listener) {
     const listeners = this._events.get(eventName);
 
     if (!listeners || !listeners.length) {
       return this;
     }
 
-    const index = listeners.findIndex(l => l.fn === listener);
+    const index = listeners.findIndex((l) => l.fn === listener);
 
     if (index !== -1) {
       listeners.splice(index, 1);
@@ -106,18 +110,17 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners (eventName?: string) {
+  removeAllListeners(eventName?: string) {
     if (eventName) {
       this._events.delete(eventName);
-    }
-    else {
+    } else {
       this._events = new Map();
     }
 
     return this;
   }
 
-  emit (eventName, ...payload) {
+  emit(eventName, ...payload) {
     const listeners = this._events.get(eventName);
 
     if (listeners === undefined) {
@@ -141,12 +144,14 @@ export class KuzzleEventEmitter {
     return true;
   }
 
-  eventNames () {
+  eventNames() {
     return Array.from(this._events.keys());
   }
 
-  listenerCount (eventName) {
-    return this._events.has(eventName) && this._events.get(eventName).length || 0;
+  listenerCount(eventName) {
+    return (
+      (this._events.has(eventName) && this._events.get(eventName).length) || 0
+    );
   }
 }
 

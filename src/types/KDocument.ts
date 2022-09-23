@@ -1,4 +1,4 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 /**
  * Represents Kuzzle Metadata.
@@ -35,8 +35,7 @@ export interface KDocumentContent {
 /**
  * Generic kuzzle document content
  */
-export interface KDocumentContentGeneric extends KDocumentContent, JSONObject {
-}
+export interface KDocumentContentGeneric extends KDocumentContent, JSONObject {}
 
 /**
  * Represents a Kuzzle document
@@ -62,7 +61,8 @@ export interface KDocument<TKDocumentContent extends KDocumentContent> {
 /**
  * Represents a Kuzzle document retrieved from search
  */
-export interface KHit<TKDocumentContent extends KDocumentContent> extends KDocument<TKDocumentContent> {
+export interface KHit<TKDocumentContent extends KDocumentContent>
+  extends KDocument<TKDocumentContent> {
   /**
    * Elasticsearch relevance score
    */
