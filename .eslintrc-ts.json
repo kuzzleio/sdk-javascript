@@ -1,5 +1,5 @@
 {
-  "plugins": ["kuzzle", "sort-keys-fix"],
+  "plugins": ["kuzzle"],
   "extends": [
     "plugin:kuzzle/default",
     "plugin:kuzzle/node",
@@ -7,7 +7,6 @@
   ],
   "rules": {
     "func-names": 0,
-    "strict": 0,
-    "sort-keys-fix/sort-keys-fix": "warn"
+    "strict": 0
   }
 }
