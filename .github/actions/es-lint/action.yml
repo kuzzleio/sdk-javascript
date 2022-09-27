@@ -4,7 +4,7 @@ runs:
   using: "composite"
   steps:
     - name: Install deps
-      run: npm install && ls -l node_modules/
+      run: npm install && node --version && npm -- version
       shell: bash
     - name: Run lint
       run: npm run test:lint
