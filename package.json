@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.10.1",
+  "version": "7.10.2",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {

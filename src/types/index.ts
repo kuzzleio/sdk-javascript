@@ -24,4 +24,6 @@ export * from "./KDocument";
 
 export * from "./RequestPayload";
 
+export * from "./ResponsePayload";
+
 export * from "./BaseRequest";
