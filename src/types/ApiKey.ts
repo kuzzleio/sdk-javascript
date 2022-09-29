@@ -32,5 +32,5 @@ export type ApiKey = {
      * Authentication token associated with this API key
      */
     token: string;
-  }
-}
+  };
+};

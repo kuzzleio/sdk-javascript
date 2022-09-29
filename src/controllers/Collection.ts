@@ -1,10 +1,10 @@
-import { BaseController } from './Base';
-import { SpecificationsSearchResult } from '../core/searchResult/Specifications';
-import { CollectionMappings, JSONObject, ArgsDefault } from '../types';
+import { BaseController } from "./Base";
+import { SpecificationsSearchResult } from "../core/searchResult/Specifications";
+import { CollectionMappings, JSONObject, ArgsDefault } from "../types";
 
 export class CollectionController extends BaseController {
-  constructor (kuzzle) {
-    super(kuzzle, 'collection');
+  constructor(kuzzle) {
+    super(kuzzle, "collection");
   }
 
   /**
@@ -22,31 +22,31 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  create (
+  create(
     index: string,
     collection: string,
     definition:
-    {
-      /**
-       * Mappings definition
-       */
-      mappings?: CollectionMappings;
-      /**
-       * Elasticsearch index settings
-       */
-      settings?: JSONObject
-    } | CollectionMappings,
+      | {
+          /**
+           * Mappings definition
+           */
+          mappings?: CollectionMappings;
+          /**
+           * Elasticsearch index settings
+           */
+          settings?: JSONObject;
+        }
+      | CollectionMappings,
     options: ArgsCollectionControllerCreate = {}
   ): Promise<void> {
     const request = {
-      index,
-      collection,
+      action: "create",
       body: definition,
-      action: 'create'
+      collection,
+      index,
     };
 
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -60,18 +60,17 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  deleteSpecifications (
+  deleteSpecifications(
     index: string,
     collection: string,
     options: ArgsCollectionControllerDeleteSpecifications = {}
   ): Promise<void> {
     const request = {
-      index,
+      action: "deleteSpecifications",
       collection,
-      action: 'deleteSpecifications'
+      index,
     };
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -85,17 +84,19 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  exists (
+  exists(
     index: string,
     collection: string,
     options: ArgsCollectionControllerExists = {}
   ): Promise<boolean> {
-    return this.query({
-      index,
-      collection,
-      action: 'exists'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "exists",
+        collection,
+        index,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -110,17 +111,19 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  refresh (
+  refresh(
     index: string,
     collection: string,
     options: ArgsCollectionControllerRefresh = {}
   ): Promise<void> {
-    return this.query({
-      index,
-      collection,
-      action: 'refresh'
-    }, options)
-      .then(() => undefined);
+    return this.query(
+      {
+        action: "refresh",
+        collection,
+        index,
+      },
+      options
+    ).then(() => undefined);
   }
 
   /**
@@ -135,20 +138,19 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  getMapping (
+  getMapping(
     index: string,
     collection: string,
     options: ArgsCollectionControllerGetMapping = {}
   ): Promise<CollectionMappings> {
     const request = {
-      index,
+      action: "getMapping",
       collection,
-      action: 'getMapping',
-      includeKuzzleMeta: options.includeKuzzleMeta || false
+      includeKuzzleMeta: options.includeKuzzleMeta || false,
+      index,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -164,17 +166,19 @@ export class CollectionController extends BaseController {
    *
    * @returns The specifications
    */
-  getSpecifications (
+  getSpecifications(
     index: string,
     collection: string,
     options: ArgsCollectionControllerGetSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query({
-      index,
-      collection,
-      action: 'getSpecifications'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "getSpecifications",
+        collection,
+        index,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -189,7 +193,7 @@ export class CollectionController extends BaseController {
    *
    * @returns An object containing the collection list
    */
-  list (
+  list(
     index: string,
     options: ArgsCollectionControllerList = {}
   ): Promise<{
@@ -208,18 +212,17 @@ export class CollectionController extends BaseController {
       /**
        * Collection type
        */
-      type: 'realtime' | 'stored'
+      type: "realtime" | "stored";
     }>;
   }> {
     const request = {
+      action: "list",
+      from: options.from,
       index,
-      action: 'list',
       size: options.size || 0,
-      from: options.from
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -235,25 +238,29 @@ export class CollectionController extends BaseController {
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  searchSpecifications (
+  searchSpecifications(
     query: JSONObject = {},
     options: ArgsCollectionControllerSearchSpecifications = {}
   ): Promise<SpecificationsSearchResult> {
     const request = {
+      action: "searchSpecifications",
       body: query,
-      action: 'searchSpecifications'
     };
 
-    for (const opt of ['from', 'size', 'scroll']) {
+    for (const opt of ["from", "size", "scroll"]) {
       request[opt] = options[opt];
     }
 
-    return this.query(request, options)
-      .then(response => (
-        new SpecificationsSearchResult(this.kuzzle, request, options, response.result)
-      ));
+    return this.query(request, options).then(
+      (response) =>
+        new SpecificationsSearchResult(
+          this.kuzzle,
+          request,
+          options,
+          response.result
+        )
+    );
   }
-
 
   /**
    * Removes all documents from a collection, while keeping the associated mappings.
@@ -266,18 +273,17 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  truncate (
+  truncate(
     index: string,
     collection: string,
     options: ArgsCollectionControllerTruncate = {}
   ): Promise<void> {
     const request = {
-      index,
+      action: "truncate",
       collection,
-      action: 'truncate'
+      index,
     };
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -295,47 +301,52 @@ export class CollectionController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  update (
+  update(
     index: string,
     collection: string,
     definition:
-    {
-      /**
-       * Mappings definition
-       */
-      mappings?: CollectionMappings;
-      /**
-       * Elasticsearch index settings
-       */
-      settings?: JSONObject
-    } | CollectionMappings,
+      | {
+          /**
+           * Mappings definition
+           */
+          mappings?: CollectionMappings;
+          /**
+           * Elasticsearch index settings
+           */
+          settings?: JSONObject;
+        }
+      | CollectionMappings,
     options: ArgsCollectionControllerUpdate = {}
   ): Promise<void> {
-    return this.query({
-      index,
-      collection,
-      body: definition,
-      action: 'update'
-    }, options)
-      .then(() => undefined);
+    return this.query(
+      {
+        action: "update",
+        body: definition,
+        collection,
+        index,
+      },
+      options
+    ).then(() => undefined);
   }
 
   /**
    * @deprecated Use collection.update instead
    */
-  updateMapping (
+  updateMapping(
     index: string,
     collection: string,
     mappings: CollectionMappings,
     options: ArgsCollectionControllerUpdateMapping = {}
   ): Promise<JSONObject> {
-    return this.query({
-      index,
-      collection,
-      body: mappings,
-      action: 'updateMapping'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "updateMapping",
+        body: mappings,
+        collection,
+        index,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -352,19 +363,21 @@ export class CollectionController extends BaseController {
    *
    * @returns The updated specifications
    */
-  updateSpecifications (
+  updateSpecifications(
     index: string,
     collection: string,
     specifications: JSONObject,
     options: ArgsCollectionControllerUpdateSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query({
-      index,
-      collection,
-      body: specifications,
-      action: 'updateSpecifications'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "updateSpecifications",
+        body: specifications,
+        collection,
+        index,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -382,7 +395,7 @@ export class CollectionController extends BaseController {
    *
    * @returns An object which contain information about the specifications validity.
    */
-  validateSpecifications (
+  validateSpecifications(
     index: string,
     collection: string,
     specifications: JSONObject,
@@ -392,13 +405,15 @@ export class CollectionController extends BaseController {
     details: Array<string>;
     description: string;
   }> {
-    return this.query({
-      index,
-      collection,
-      body: specifications,
-      action: 'validateSpecifications'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "validateSpecifications",
+        body: specifications,
+        collection,
+        index,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -411,66 +426,55 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  delete (
+  delete(
     index: string,
     collection: string,
     options: ArgsCollectionControllerDelete = {}
   ): Promise<void> {
     const request = {
-      index,
+      action: "delete",
       collection,
-      action: 'delete'
+      index,
     };
 
-    return this.query(request, options)
-      .then(() => undefined);
+    return this.query(request, options).then(() => undefined);
   }
 }
 
-export interface ArgsCollectionControllerCreate extends ArgsDefault {
-}
+export type ArgsCollectionControllerCreate = ArgsDefault;
 
-export interface ArgsCollectionControllerDeleteSpecifications extends ArgsDefault {
-}
+export type ArgsCollectionControllerDeleteSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerExists extends ArgsDefault {
-}
+export type ArgsCollectionControllerExists = ArgsDefault;
 
-export interface ArgsCollectionControllerRefresh extends ArgsDefault {
-}
+export type ArgsCollectionControllerRefresh = ArgsDefault;
 
 export interface ArgsCollectionControllerGetMapping extends ArgsDefault {
-    includeKuzzleMeta?: boolean;
+  includeKuzzleMeta?: boolean;
 }
 
-export interface ArgsCollectionControllerGetSpecifications extends ArgsDefault {
-}
+export type ArgsCollectionControllerGetSpecifications = ArgsDefault;
 
 export interface ArgsCollectionControllerList extends ArgsDefault {
-    from?: number;
-    size?: number;
+  from?: number;
+  size?: number;
 }
 
-export interface ArgsCollectionControllerSearchSpecifications extends ArgsDefault {
-    from?: number;
-    size?: number;
-    scroll?: string;
+export interface ArgsCollectionControllerSearchSpecifications
+  extends ArgsDefault {
+  from?: number;
+  size?: number;
+  scroll?: string;
 }
 
-export interface ArgsCollectionControllerTruncate extends ArgsDefault {
-}
+export type ArgsCollectionControllerTruncate = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdate extends ArgsDefault {
-}
+export type ArgsCollectionControllerUpdate = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdateMapping extends ArgsDefault {
-}
+export type ArgsCollectionControllerUpdateMapping = ArgsDefault;
 
-export interface ArgsCollectionControllerUpdateSpecifications extends ArgsDefault {
-}
+export type ArgsCollectionControllerUpdateSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerValidateSpecifications extends ArgsDefault {
-}
+export type ArgsCollectionControllerValidateSpecifications = ArgsDefault;
 
-export interface ArgsCollectionControllerDelete extends ArgsDefault {
-}
+export type ArgsCollectionControllerDelete = ArgsDefault;

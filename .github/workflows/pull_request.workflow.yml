@@ -5,7 +5,7 @@ on: [pull_request]
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -19,14 +19,14 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v1.4.4
+      - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "14"
       - uses: ./.github/actions/es-lint
 
   unit-tests:
      name: Unit Tests
-     runs-on: ubuntu-18.04
+     runs-on: ubuntu-22.04
      needs: [lint]
      steps:
        - uses: actions/checkout@v2
@@ -41,14 +41,14 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
+       - uses: actions/setup-node@v2
          with:
-           node-version: "12"
+           node-version: "14"
        - uses: ./.github/actions/unit-tests
 
   functional-tests:
      name: Functional Tests
-     runs-on: ubuntu-18.04
+     runs-on: ubuntu-22.04
      needs: [unit-tests]
      steps:
        - uses: actions/checkout@v2
@@ -65,16 +65,16 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
+       - uses: actions/setup-node@v2
          with:
-           node-version: "12"
+           node-version: "14"
        - uses: ./.github/actions/functional-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   admin-console-tests:
     name: Admin Console Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: [unit-tests]
     steps:
       - uses: actions/checkout@v2
@@ -91,7 +91,7 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: "14"
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
@@ -123,7 +123,7 @@ jobs:
   documentation-snippet-tests:
      name: Documentation Snippet Tests
      needs: [unit-tests]
-     runs-on: ubuntu-18.04
+     runs-on: ubuntu-22.04
      steps:
        - uses: actions/checkout@v2
        - name: Cache node modules
@@ -137,9 +137,9 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v1.4.4
+       - uses: actions/setup-node@v2
          with:
-           node-version: "12"
+           node-version: "14"
        - uses: ./.github/actions/snippet-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}

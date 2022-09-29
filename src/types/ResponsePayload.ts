@@ -1,4 +1,4 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 /**
  * Kuzzle API response payload
@@ -35,7 +35,6 @@ export interface ResponsePayload<TResult = JSONObject> {
    * Array of deprecation warnings (hidden if NODE_ENV=production)
    */
   deprecations?: Array<{
-
     /**
      * Deprecation description
      */
@@ -51,7 +50,6 @@ export interface ResponsePayload<TResult = JSONObject> {
    * API error
    */
   error?: {
-
     /**
      * Error human readable identifier
      */

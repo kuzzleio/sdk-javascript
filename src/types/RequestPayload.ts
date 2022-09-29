@@ -1,4 +1,4 @@
-import { JSONObject } from './JSONObject';
+import { JSONObject } from "./JSONObject";
 
 /**
  * Kuzzle API request payload

@@ -1,19 +1,12 @@
 {
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["kuzzle"],
   "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:kuzzle/default",
+    "plugin:kuzzle/node",
+    "plugin:kuzzle/typescript"
   ],
   "rules": {
-    "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "error",
-    "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/explicit-module-boundary-types": 0,
-    "@typescript-eslint/no-empty-interface": 0
+    "func-names": 0,
+    "strict": 0
   }
 }

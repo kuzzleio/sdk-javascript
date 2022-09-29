@@ -3,7 +3,7 @@ export class InstrumentablePromise {
   public resolve: (...any) => any;
   public reject: (...any) => any;
 
-  constructor () {
+  constructor() {
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;

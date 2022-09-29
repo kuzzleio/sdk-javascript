@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Hilight user code
@@ -9,21 +9,23 @@
  * >  at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
  *      at processTicksAndRejections (internal/process/task_queues.js:97:5)]
  */
-function hilightUserCode (line) {
+function hilightUserCode(line) {
   // ignore first line (error message)
-  if (! line.includes(' at ')) {
+  if (!line.includes(" at ")) {
     return line;
   }
 
-  if ( line.includes('sdk-javascript/src/') // ignore kuzzle code
-    || (line.indexOf('at /') === -1 && line.charAt(line.indexOf('(') + 1) !== '/') // ignore node internal
-    || line.includes('node_modules') // ignore dependencies
+  if (
+    line.includes("sdk-javascript/src/") || // ignore kuzzle code
+    (line.indexOf("at /") === -1 &&
+      line.charAt(line.indexOf("(") + 1) !== "/") || // ignore node internal
+    line.includes("node_modules") // ignore dependencies
   ) {
-    return '   ' + line;
+    return "   " + line;
   }
 
   // hilight user code
-  return '>' + line;
+  return ">" + line;
 }
 
 module.exports = {

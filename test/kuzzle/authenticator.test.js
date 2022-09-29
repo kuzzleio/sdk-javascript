@@ -1,15 +1,15 @@
-const should = require('should');
-const sinon = require('sinon');
-const ProtocolMock = require('../mocks/protocol.mock');
-const { Kuzzle } = require('../../src/Kuzzle');
-const generateJwt = require('../mocks/generateJwt.mock');
+const should = require("should");
+const sinon = require("sinon");
+const ProtocolMock = require("../mocks/protocol.mock");
+const { Kuzzle } = require("../../src/Kuzzle");
+const generateJwt = require("../mocks/generateJwt.mock");
 
-describe('Kuzzle authenticator function mecanisms', () => {
+describe("Kuzzle authenticator function mecanisms", () => {
   let kuzzle;
   let protocol;
 
   beforeEach(() => {
-    protocol = new ProtocolMock('somewhere');
+    protocol = new ProtocolMock("somewhere");
     kuzzle = new Kuzzle(protocol);
   });
 
@@ -17,21 +17,21 @@ describe('Kuzzle authenticator function mecanisms', () => {
     sinon.restore();
   });
 
-  describe('jwt property', () => {
-    it('should set the SDK property _loggedIn when setting the JWT property', () => {
+  describe("jwt property", () => {
+    it("should set the SDK property _loggedIn when setting the JWT property", () => {
       kuzzle.jwt = generateJwt();
 
       should(kuzzle._loggedIn).be.true();
     });
 
-    it('should set the SDK property _loggedIn when setting the JWT property to null or undefined', () => {
+    it("should set the SDK property _loggedIn when setting the JWT property to null or undefined", () => {
       kuzzle.jwt = null;
 
       should(kuzzle._loggedIn).be.false();
     });
   });
 
-  describe('connected listener', () => {
+  describe("connected listener", () => {
     let resolve;
     let promise;
 
@@ -39,15 +39,15 @@ describe('Kuzzle authenticator function mecanisms', () => {
       kuzzle.auth.checkToken = sinon.stub().resolves(true);
     });
 
-    it('should check the validity of the token at connection to know if we are already logged in', async () => {
-      promise = new Promise(_resolve => {
+    it("should check the validity of the token at connection to know if we are already logged in", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       kuzzle.auth.checkToken.resolves({ valid: true });
 
       should(kuzzle._loggedIn).be.false();
-      kuzzle.emit('connected');
+      kuzzle.emit("connected");
 
       setTimeout(() => {
         should(kuzzle.auth.checkToken).be.calledOnce();
@@ -59,7 +59,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
   });
 
-  describe('loginAttempt listener', () => {
+  describe("loginAttempt listener", () => {
     let resolve;
     let promise;
 
@@ -67,13 +67,13 @@ describe('Kuzzle authenticator function mecanisms', () => {
       kuzzle.auth.checkToken = sinon.stub().resolves(true);
     });
 
-    it('should set _loggedIn to true on successful login attempt', async () => {
-      promise = new Promise(_resolve => {
+    it("should set _loggedIn to true on successful login attempt", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       should(kuzzle._loggedIn).be.false();
-      kuzzle.emit('loginAttempt', { success: true });
+      kuzzle.emit("loginAttempt", { success: true });
 
       setTimeout(() => {
         should(kuzzle.auth.checkToken).not.be.calledOnce();
@@ -84,15 +84,15 @@ describe('Kuzzle authenticator function mecanisms', () => {
       return promise;
     });
 
-    it('should verify the stored token when the login attempt has failed', async () => {
-      promise = new Promise(_resolve => {
+    it("should verify the stored token when the login attempt has failed", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       kuzzle.auth.checkToken.resolves({ valid: true });
 
       should(kuzzle._loggedIn).be.false();
-      kuzzle.emit('loginAttempt', { success: false, err: new Error('foo') });
+      kuzzle.emit("loginAttempt", { success: false, err: new Error("foo") });
 
       setTimeout(() => {
         should(kuzzle.auth.checkToken).be.calledOnce();
@@ -104,18 +104,17 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
   });
 
-  describe('logoutAttempt listener', () => {
+  describe("logoutAttempt listener", () => {
     let resolve;
     let promise;
 
-
-    it('should set _loggedIn to false on logout', async () => {
-      promise = new Promise(_resolve => {
+    it("should set _loggedIn to false on logout", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       kuzzle._loggedIn = true;
-      kuzzle.emit('logoutAttempt', { success: true });
+      kuzzle.emit("logoutAttempt", { success: true });
 
       setTimeout(() => {
         should(kuzzle.auth.checkToken).not.be.calledOnce();
@@ -127,7 +126,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
   });
 
-  describe('reconnect listener', () => {
+  describe("reconnect listener", () => {
     let reconnectedSpy;
     let resolve;
     let promise;
@@ -135,22 +134,22 @@ describe('Kuzzle authenticator function mecanisms', () => {
     beforeEach(() => {
       kuzzle.authenticator = async () => {};
 
-      sinon.stub(kuzzle, 'tryReAuthenticate').resolves(true);
-      sinon.stub(kuzzle, 'disconnect');
+      sinon.stub(kuzzle, "tryReAuthenticate").resolves(true);
+      sinon.stub(kuzzle, "disconnect");
 
       reconnectedSpy = sinon.stub();
-      kuzzle.on('reconnected', reconnectedSpy);
+      kuzzle.on("reconnected", reconnectedSpy);
     });
 
-    it('should try to re-authenticate when reconnecting if an authenticator was set we were logged in', async () => {
-      promise = new Promise(_resolve => {
+    it("should try to re-authenticate when reconnecting if an authenticator was set we were logged in", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
       await kuzzle.connect();
 
       kuzzle._loggedIn = true;
 
-      protocol.emit('reconnect');
+      protocol.emit("reconnect");
 
       // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
@@ -162,15 +161,15 @@ describe('Kuzzle authenticator function mecanisms', () => {
       return promise;
     });
 
-    it('should not try to re-authenticate when reconnecting if we were not logged in', async () => {
-      promise = new Promise(_resolve => {
+    it("should not try to re-authenticate when reconnecting if we were not logged in", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
       await kuzzle.connect();
 
       kuzzle._loggedIn = false;
 
-      protocol.emit('reconnect');
+      protocol.emit("reconnect");
 
       // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
@@ -182,15 +181,15 @@ describe('Kuzzle authenticator function mecanisms', () => {
       return promise;
     });
 
-    it('should not fire the reconnected event and disconnect the SDK if authentication fail', async () => {
-      promise = new Promise(_resolve => {
+    it("should not fire the reconnected event and disconnect the SDK if authentication fail", async () => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
       await kuzzle.connect();
       kuzzle._loggedIn = true;
       kuzzle.tryReAuthenticate.resolves(false);
 
-      protocol.emit('reconnect');
+      protocol.emit("reconnect");
 
       // We need a timeout since the listener on "reconnect" even is async
       setTimeout(() => {
@@ -202,15 +201,15 @@ describe('Kuzzle authenticator function mecanisms', () => {
       return promise;
     });
 
-    it('should not try to authenticate if no authenticator was set', async () => {
+    it("should not try to authenticate if no authenticator was set", async () => {
       kuzzle.authenticator = null;
-      promise = new Promise(_resolve => {
+      promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
       await kuzzle.connect();
       kuzzle._loggedIn = true;
 
-      protocol.emit('reconnect');
+      protocol.emit("reconnect");
 
       // We need a timeout since the listener on "reconnect" even is async
       setTimeout(() => {
@@ -222,20 +221,20 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
   });
 
-  describe('#tryReAuthenticate', () => {
+  describe("#tryReAuthenticate", () => {
     let reconnectionErrorSpy;
 
     beforeEach(() => {
-      sinon.stub(kuzzle.auth, 'checkToken').resolves({ valid: false });
-      sinon.stub(kuzzle, 'authenticate').resolves();
+      sinon.stub(kuzzle.auth, "checkToken").resolves({ valid: false });
+      sinon.stub(kuzzle, "authenticate").resolves();
 
       reconnectionErrorSpy = sinon.stub();
-      kuzzle.on('reconnectionError', reconnectionErrorSpy);
+      kuzzle.on("reconnectionError", reconnectionErrorSpy);
 
       kuzzle.authenticator = () => {};
     });
 
-    it('should returns true if the token is still valid', async () => {
+    it("should returns true if the token is still valid", async () => {
       kuzzle.auth.checkToken.resolves({ valid: true });
 
       const ret = await kuzzle.tryReAuthenticate();
@@ -245,7 +244,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
       should(reconnectionErrorSpy).not.be.called();
     });
 
-    it('should returns false if the token is not valid and there is no authenticator and emit a reconnectionError', async () => {
+    it("should returns false if the token is not valid and there is no authenticator and emit a reconnectionError", async () => {
       kuzzle.auth.checkToken.resolves({ valid: false });
       kuzzle.authenticator = null;
 
@@ -265,7 +264,7 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
 
     it('should emit "reconnectionError" if the "authenticator" function fail', async () => {
-      kuzzle.authenticate.rejects('auth fail');
+      kuzzle.authenticate.rejects("auth fail");
 
       const ret = await kuzzle.tryReAuthenticate();
 
@@ -274,13 +273,13 @@ describe('Kuzzle authenticator function mecanisms', () => {
     });
   });
 
-  describe('#authenticate', () => {
+  describe("#authenticate", () => {
     beforeEach(() => {
       kuzzle.authenticator = async () => {};
 
-      sinon.stub(kuzzle.auth, 'checkToken').resolves({ valid: true });
+      sinon.stub(kuzzle.auth, "checkToken").resolves({ valid: true });
 
-      sinon.spy(kuzzle, 'authenticator');
+      sinon.spy(kuzzle, "authenticator");
     });
 
     it('should execute the "authenticator"', async () => {

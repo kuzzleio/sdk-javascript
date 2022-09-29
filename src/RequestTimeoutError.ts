@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-import { RequestPayload } from './types/RequestPayload';
+import { RequestPayload } from "./types/RequestPayload";
 
 /**
  * Request Timeout error.

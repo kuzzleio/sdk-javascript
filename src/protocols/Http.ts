@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-import staticHttpRoutes from './routes.json';
-import { KuzzleAbstractProtocol } from './abstract/Base';
-import { HttpRoutes, JSONObject } from '../types';
-import { RequestPayload } from '../types/RequestPayload';
+import staticHttpRoutes from "./routes.json";
+import { KuzzleAbstractProtocol } from "./abstract/Base";
+import { HttpRoutes, JSONObject } from "../types";
+import { RequestPayload } from "../types/RequestPayload";
 
 /**
  * Http protocol used to connect to a Kuzzle server.
@@ -35,14 +35,14 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       sslConnection?: boolean;
       ssl?: boolean;
       customRoutes?: HttpRoutes;
-      timeout?: number,
-      headers?: JSONObject,
+      timeout?: number;
+      headers?: JSONObject;
     } = {}
   ) {
-    super(host, options, 'http');
+    super(host, options, "http");
 
-    if (typeof host !== 'string' || host === '') {
-      throw new Error('host is required');
+    if (typeof host !== "string" || host === "") {
+      throw new Error("host is required");
     }
 
     this._routes = {};
@@ -59,13 +59,15 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       for (const action of Object.keys(definition)) {
         const route = definition[action];
 
-        if (!(typeof route.url === 'string' && route.url.length > 0)) {
+        if (!(typeof route.url === "string" && route.url.length > 0)) {
           throw new Error(
-            `Incorrect URL for custom route ${controller}:${action}.`);
+            `Incorrect URL for custom route ${controller}:${action}.`
+          );
         }
-        if (!(typeof route.verb === 'string' && route.verb.length > 0)) {
+        if (!(typeof route.verb === "string" && route.verb.length > 0)) {
           throw new Error(
-            `Incorrect VERB for custom route ${controller}:${action}.`);
+            `Incorrect VERB for custom route ${controller}:${action}.`
+          );
         }
       }
     }
@@ -74,69 +76,75 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   /**
    * @deprecated Use `routes` instead
    */
-  get http () {
+  get http() {
     return this.routes;
   }
 
   /**
    * Returns a list of available routes
    */
-  get routes (): HttpRoutes {
+  get routes(): HttpRoutes {
     return this._routes;
   }
 
   /**
    * `http` or `https`
    */
-  get protocol (): string {
-    return this.ssl ? 'https' : 'http';
+  get protocol(): string {
+    return this.ssl ? "https" : "http";
   }
 
   /**
    * Always returns `true`
    */
-  get connected (): true {
+  get connected(): true {
     return true;
   }
 
   /**
    * Connection timeout in milliseconds
    */
-  get timeout (): number {
+  get timeout(): number {
     return this._timeout;
   }
 
-  set timeout (timeout: number) {
+  set timeout(timeout: number) {
     this._timeout = timeout;
   }
 
   /**
    * Connect to the server
    */
-  connect (): Promise<void> {
-    if (this.state === 'ready') {
+  connect(): Promise<void> {
+    if (this.state === "ready") {
       return Promise.resolve();
     }
 
     const publicApiRequest = {
-      method: 'GET',
-      path: '/_publicApi',
+      method: "GET",
+      path: "/_publicApi",
       payload: {
         headers: this._defaultHeaders,
-      }
+      },
     };
     return this._sendHttpRequest(publicApiRequest)
       .then(({ result, error }) => {
-        if (! error) {
+        if (!error) {
           this._routes = this._constructRoutes(result);
 
           return;
         }
 
         if (error.status === 401 || error.status === 403) {
-          this._warn('"server:publicApi" route is restricted for anonymous user.');
-          this._warn('This route is used by the HTTP protocol to build API URLs.');
-          this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
+          this._warn(
+            '"server:publicApi" route is restricted for anonymous user.'
+          );
+          this._warn(
+            "This route is used by the HTTP protocol to build API URLs."
+          );
+          this._warn(
+            "Fallback to static routes, some API routes may be unavailable as well as plugin custom routes"
+          );
 
           // fallback to static http routes
           this._routes = staticHttpRoutes;
@@ -146,16 +154,18 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
           // fallback to server:info route
           // server:publicApi is only available since Kuzzle 1.9.0
           const serverInfoRequest = {
-            method: 'GET',
-            path: '/',
+            method: "GET",
+            path: "/",
             payload: {
               headers: this._defaultHeaders,
-            }
+            },
           };
-          return this._sendHttpRequest(serverInfoRequest)
-            .then(({ result: res, error: err }) => {
-              if (! err) {
-                this._routes = this._constructRoutes(res.serverInfo.kuzzle.api.routes);
+          return this._sendHttpRequest(serverInfoRequest).then(
+            ({ result: res, error: err }) => {
+              if (!err) {
+                this._routes = this._constructRoutes(
+                  res.serverInfo.kuzzle.api.routes
+                );
 
                 return;
               }
@@ -164,14 +174,23 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
                 throw err;
               }
 
-              this._warn('"server:info" route is restricted for anonymous user.');
-              this._warn('This route is used by the HTTP protocol to build API URLs.');
-              this._warn('If you want to expose your API routes without disclosing server information you can use "server:publicApi" (available in Kuzzle 1.9.0).');
-              this._warn('Fallback to static routes, some API routes may be unavailable as well as plugin custom routes');
+              this._warn(
+                '"server:info" route is restricted for anonymous user.'
+              );
+              this._warn(
+                "This route is used by the HTTP protocol to build API URLs."
+              );
+              this._warn(
+                'If you want to expose your API routes without disclosing server information you can use "server:publicApi" (available in Kuzzle 1.9.0).'
+              );
+              this._warn(
+                "Fallback to static routes, some API routes may be unavailable as well as plugin custom routes"
+              );
 
               // fallback to static http routes
               this._routes = staticHttpRoutes;
-            });
+            }
+          );
         }
 
         throw error;
@@ -182,11 +201,13 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         // Client is ready
         this.clientConnected();
       })
-      .catch(err => {
-        const connectionError: any = new Error(`Unable to connect to kuzzle server at ${this.host}:${this.port}`);
+      .catch((err) => {
+        const connectionError: any = new Error(
+          `Unable to connect to kuzzle server at ${this.host}:${this.port}`
+        );
         connectionError.internal = err;
 
-        this.emit('networkError', connectionError);
+        this.emit("networkError", connectionError);
         throw err;
       });
   }
@@ -194,9 +215,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   /**
    * Enable cookie authentication support at protocol level
    */
-  enableCookieSupport () {
-    if (typeof XMLHttpRequest === 'undefined') {
-      throw new Error('Support for cookie cannot be enabled outside of a browser');
+  enableCookieSupport() {
+    if (typeof XMLHttpRequest === "undefined") {
+      throw new Error(
+        "Support for cookie cannot be enabled outside of a browser"
+      );
     }
 
     super.enableCookieSupport();
@@ -208,13 +231,16 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  formatRequest (request: RequestPayload, options: JSONObject = {}) {
-    const route = this.routes[request.controller]
-      && this.routes[request.controller][request.action];
+  formatRequest(request: RequestPayload, options: JSONObject = {}) {
+    const route =
+      this.routes[request.controller] &&
+      this.routes[request.controller][request.action];
 
-    if (! route) {
-      const error = new Error(`No URL found for "${request.controller}:${request.action}".`);
-      this.emit(request.requestId, { status: 400, error });
+    if (!route) {
+      const error = new Error(
+        `No URL found for "${request.controller}:${request.action}".`
+      );
+      this.emit(request.requestId, { error, status: 400 });
       return;
     }
 
@@ -226,7 +252,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       collection: undefined,
       controller: undefined,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...this._defaultHeaders,
       },
       index: undefined,
@@ -238,24 +264,19 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     for (const key of Object.keys(request)) {
       const value = request[key];
 
-      if (key === 'body') {
-        if (method === 'GET') {
+      if (key === "body") {
+        if (method === "GET") {
           Object.assign(queryArgs, value);
-        }
-        else {
+        } else {
           payload.body = JSON.stringify(value);
         }
-      }
-      else if (key === 'jwt') {
-        payload.headers.authorization = 'Bearer ' + value;
-      }
-      else if (key === 'volatile') {
-        payload.headers['x-kuzzle-volatile'] = JSON.stringify(value);
-      }
-      else if (Object.prototype.hasOwnProperty.call(payload, key)) {
+      } else if (key === "jwt") {
+        payload.headers.authorization = "Bearer " + value;
+      } else if (key === "volatile") {
+        payload.headers["x-kuzzle-volatile"] = JSON.stringify(value);
+      } else if (Object.prototype.hasOwnProperty.call(payload, key)) {
         payload[key] = value;
-      }
-      else if (value !== undefined && value !== null) {
+      } else if (value !== undefined && value !== null) {
         queryArgs[key] = value;
       }
     }
@@ -266,13 +287,15 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     let matches = regex.exec(url);
 
     while (matches) {
-      const urlParam = request[ matches[1] ];
+      const urlParam = request[matches[1]];
 
       // check if an url param is missing (eg: "/:index/_create)
       if (!urlParam) {
-        const error = new Error(`Missing URL param "${matches[1]}" in "${matches.input}"`);
+        const error = new Error(
+          `Missing URL param "${matches[1]}" in "${matches.input}"`
+        );
 
-        this.emit(payload.requestId, { status: 400, error });
+        this.emit(payload.requestId, { error, status: 400 });
         return;
       }
 
@@ -292,8 +315,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
       if (Array.isArray(value)) {
         queryString.push(`${encodedKey}=${encodeURIComponent(value.join())}`);
-      }
-      else if (typeof value === 'boolean') {
+      } else if (typeof value === "boolean") {
         // In Kuzzle, an optional boolean option is set to true if present in
         // the querystring, and false if absent.
         // As there is no boolean type in querystrings, encoding a boolean
@@ -301,21 +323,20 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         if (value === true) {
           queryString.push(encodedKey);
         }
-      }
-      else {
-        value = typeof value === 'object' ? JSON.stringify(value) : value;
+      } else {
+        value = typeof value === "object" ? JSON.stringify(value) : value;
         queryString.push(`${encodedKey}=${encodeURIComponent(value)}`);
       }
     }
 
     if (queryString.length > 0) {
-      url += '?' + queryString.join('&');
+      url += "?" + queryString.join("&");
     }
 
     return {
       method,
       path: url,
-      payload
+      payload,
     };
   }
 
@@ -325,42 +346,55 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
    * @param {Object} data
    * @returns {Promise<any>}
    */
-  send (request: RequestPayload, options: JSONObject = {}) {
+  send(request: RequestPayload, options: JSONObject = {}) {
     const formattedRequest = this.formatRequest(request, options);
 
     if (formattedRequest) {
       this._sendHttpRequest(formattedRequest)
-        .then(response => this.emit(formattedRequest.payload.requestId, response))
-        .catch(error => this.emit(formattedRequest.payload.requestId, { error }));
+        .then((response) =>
+          this.emit(formattedRequest.payload.requestId, response)
+        )
+        .catch((error) =>
+          this.emit(formattedRequest.payload.requestId, { error })
+        );
     }
   }
 
-  _sendHttpRequest ({ method, path, payload }: {
-    method: string,
-    path: string,
-    payload: JSONObject
+  _sendHttpRequest({
+    method,
+    path,
+    payload,
+  }: {
+    method: string;
+    path: string;
+    payload: JSONObject;
   }) {
-    if (typeof XMLHttpRequest === 'undefined') {
+    if (typeof XMLHttpRequest === "undefined") {
       // NodeJS implementation, using http.request:
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const httpClient = require('min-req-promise');
+      const httpClient = require("min-req-promise");
 
-      if (path[0] !== '/') {
+      if (path[0] !== "/") {
         path = `/${path}`;
       }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
-      const headers = payload && payload.headers || {};
-      headers['Content-Length'] = Buffer.byteLength(payload && payload.body || '');
+      const headers = (payload && payload.headers) || {};
+      headers["Content-Length"] = Buffer.byteLength(
+        (payload && payload.body) || ""
+      );
 
-      return httpClient.request(url, method, {
-        body: payload && payload.body,
-        headers: headers,
-        timeout: this._timeout
-      })
-        .then(response => {
+      return httpClient
+        .request(url, method, {
+          body: payload && payload.body,
+          headers: headers,
+          timeout: this._timeout,
+        })
+        .then((response) => {
           if (response.statusCode === 431) {
-            throw new Error('Request query string is too large. Try to use the method with the POST verb instead.');
+            throw new Error(
+              "Request query string is too large. Try to use the method with the POST verb instead."
+            );
           }
 
           return JSON.parse(response.body);
@@ -369,15 +403,14 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
     // Browser implementation, using XMLHttpRequest:
     return new Promise((resolve, reject) => {
-      const
-        xhr = new XMLHttpRequest(),
+      const xhr = new XMLHttpRequest(),
         url = `${this.protocol}://${this.host}:${this.port}${path}`;
 
       xhr.timeout = this._timeout;
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 0) {
-          reject(new Error('Cannot connect to host. Is the host online?'));
+          reject(new Error("Cannot connect to host. Is the host online?"));
         }
       };
 
@@ -386,7 +419,9 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       // Authorize the reception of cookies
       xhr.withCredentials = this.cookieSupport;
 
-      for (const [header, value] of Object.entries(payload && payload.headers || {})) {
+      for (const [header, value] of Object.entries(
+        (payload && payload.headers) || {}
+      )) {
         xhr.setRequestHeader(header, value as string);
       }
 
@@ -394,8 +429,7 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         try {
           const json = JSON.parse(xhr.responseText);
           resolve(json);
-        }
-        catch (err) {
+        } catch (err) {
           reject(err);
         }
       };
@@ -404,9 +438,9 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     });
   }
 
-  _constructRoutes (publicApi) {
+  _constructRoutes(publicApi) {
     const apiRoutes = Object.keys(publicApi)
-      .map(key => [key, publicApi[key]])
+      .map((key) => [key, publicApi[key]])
       .reduce((routes, [controller, definition]) => {
         routes[controller] = {};
 
@@ -415,17 +449,15 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
           if (http && http.length === 1) {
             routes[controller][action] = http[0];
-          }
-          else if (http && http.length > 1) {
+          } else if (http && http.length > 1) {
             // We need this ugly fix because the document:search route can also
             // be accessed in GET with this url: "/:index/:collection"
             // But to send a query, we need to pass it in the body so we need POST
             // so we can change the verb but then POST on "/:index/:collection"
             // is the collection:update method (document:search is "/:index/:collection/_search")
-            if (controller === 'document' && action === 'search') {
+            if (controller === "document" && action === "search") {
               routes[controller][action] = getPostRoute(http);
-            }
-            else {
+            } else {
               routes[controller][action] = getCorrectRoute(http);
             }
           }
@@ -441,16 +473,16 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     return apiRoutes;
   }
 
-  _warn (message) {
+  _warn(message) {
     console.warn(message); // eslint-disable-line no-console
   }
 }
 
-function getPostRoute (routes) {
-  return routes[0].verb === 'POST' ? routes[0] : routes[1];
+function getPostRoute(routes) {
+  return routes[0].verb === "POST" ? routes[0] : routes[1];
 }
 
-function getCorrectRoute (routes) {
+function getCorrectRoute(routes) {
   let shortestRoute = routes[0];
   let getRoute = routes[0];
   let minLength = routes[0].url.length;
@@ -466,7 +498,7 @@ function getCorrectRoute (routes) {
       minLength = route.url.length;
     }
 
-    if (route.verb === 'GET') {
+    if (route.verb === "GET") {
       getRoute = route;
     }
   }

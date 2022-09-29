@@ -1,22 +1,22 @@
-const should = require('should');
-const sinon = require('sinon');
+const should = require("should");
+const sinon = require("sinon");
 
-const ProtocolMock = require('../mocks/protocol.mock');
+const ProtocolMock = require("../mocks/protocol.mock");
 
-const { Kuzzle } = require('../../src/Kuzzle');
+const { Kuzzle } = require("../../src/Kuzzle");
 
-describe('Kuzzle queue', () => {
+describe("Kuzzle queue", () => {
   let kuzzle;
 
   beforeEach(() => {
-    const protocol = new ProtocolMock('somewhere');
+    const protocol = new ProtocolMock("somewhere");
     kuzzle = new Kuzzle(protocol);
     kuzzle._timeoutRequest = sinon.stub().resolves();
   });
 
-  describe('#flushQueue', () => {
-    it('should flush the offline queue', () => {
-      kuzzle.offlineQueue.push({ foo: 'bar' });
+  describe("#flushQueue", () => {
+    it("should flush the offline queue", () => {
+      kuzzle.offlineQueue.push({ foo: "bar" });
 
       kuzzle.flushQueue();
 
@@ -24,25 +24,25 @@ describe('Kuzzle queue', () => {
     });
   });
 
-  describe('#playQueue', () => {
+  describe("#playQueue", () => {
     let query;
 
     beforeEach(() => {
       query = {
         request: {
-          requestId: 'alfen',
-          action: 'action',
-          controller: 'controller',
+          requestId: "alfen",
+          action: "action",
+          controller: "controller",
         },
         timeout: 10000,
       };
 
       kuzzle.protocol.isReady.returns(true);
-      sinon.spy(kuzzle, '_cleanQueue');
+      sinon.spy(kuzzle, "_cleanQueue");
     });
 
-    it('should start playing queue', () => {
-      sinon.stub(kuzzle, '_dequeue');
+    it("should start playing queue", () => {
+      sinon.stub(kuzzle, "_dequeue");
 
       kuzzle.playQueue();
 
@@ -50,8 +50,8 @@ describe('Kuzzle queue', () => {
       should(kuzzle._dequeue).be.calledOnce();
     });
 
-    it('should not play the queue if protocol is not ready', () => {
-      sinon.stub(kuzzle, '_dequeue');
+    it("should not play the queue if protocol is not ready", () => {
+      sinon.stub(kuzzle, "_dequeue");
       kuzzle.protocol.isReady.returns(false);
 
       kuzzle.playQueue();
@@ -60,21 +60,18 @@ describe('Kuzzle queue', () => {
       should(kuzzle._dequeue).not.called();
     });
 
-    it('should play the offline queue', () => {
+    it("should play the offline queue", () => {
       kuzzle.offlineQueue.push(query);
 
       kuzzle.playQueue();
 
-      should(kuzzle._timeoutRequest).be.calledWith(
-        10000,
-        query.request
-      );
+      should(kuzzle._timeoutRequest).be.calledWith(10000, query.request);
     });
 
-    it('should emit an offlineQueuePop event', () => {
+    it("should emit an offlineQueuePop event", () => {
       const spy = sinon.spy();
       kuzzle.offlineQueue.push(query);
-      kuzzle.addListener('offlineQueuePop', playedQuery => {
+      kuzzle.addListener("offlineQueuePop", (playedQuery) => {
         spy(playedQuery);
       });
 
@@ -83,12 +80,12 @@ describe('Kuzzle queue', () => {
       should(spy).be.calledWith(query.request);
     });
 
-    it('should play an additional queue returned by offlineQueueLoader', done => {
+    it("should play an additional queue returned by offlineQueueLoader", (done) => {
       const query2 = {
         request: {
-          requestId: 'plum',
-          action: 'action',
-          controller: 'controller',
+          requestId: "plum",
+          action: "action",
+          controller: "controller",
         },
       };
 
@@ -100,24 +97,26 @@ describe('Kuzzle queue', () => {
       // Wait queries to be dequeued
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
-        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(
+          query2.request
+        );
         should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
       }, 100);
     });
 
-    it('should play an additional queue returned by an asynchronous offlineQueueLoader', done => {
+    it("should play an additional queue returned by an asynchronous offlineQueueLoader", (done) => {
       const query2 = {
         request: {
-          requestId: 'plum',
-          action: 'action',
-          controller: 'controller',
+          requestId: "plum",
+          action: "action",
+          controller: "controller",
         },
       };
 
       kuzzle.offlineQueue.push(query);
       kuzzle.offlineQueueLoader = () => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setImmediate(() => resolve([query2]));
         });
       };
@@ -127,13 +126,15 @@ describe('Kuzzle queue', () => {
       // Wait queries to be dequeued
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
-        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(query2.request);
+        should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(
+          query2.request
+        );
         should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
       }, 100);
     });
 
-    it('should discard requests queued for too long', async () => {
+    it("should discard requests queued for too long", async () => {
       kuzzle.queueTTL = 1;
 
       let resolve;
@@ -153,17 +154,19 @@ describe('Kuzzle queue', () => {
 
       let rejectedRequest = sinon.spy();
 
-      kuzzle.on('offlineQueuePop', request => {
+      kuzzle.on("offlineQueuePop", (request) => {
         rejectedRequest(request);
       });
 
       kuzzle.playQueue();
 
-      await should(deferred).rejectedWith('Query aborted: queued time exceeded the queueTTL option value');
+      await should(deferred).rejectedWith(
+        "Query aborted: queued time exceeded the queueTTL option value"
+      );
       should(rejectedRequest).calledOnce().calledWith(query.request);
     });
 
-    it('should discard requests when the queue is full', async () => {
+    it("should discard requests when the queue is full", async () => {
       kuzzle.queueMaxSize = 1;
       kuzzle.queueTTL = 0; // ignore ttl
 
@@ -184,17 +187,19 @@ describe('Kuzzle queue', () => {
 
       // this one is just to simulate a queue exceeding capacity: queries must
       // be dequeued in order so only "query" should be discarded
-      kuzzle.offlineQueue.push({ request: { foo: 'bar' }});
+      kuzzle.offlineQueue.push({ request: { foo: "bar" } });
 
       let rejectedRequest = sinon.spy();
 
-      kuzzle.on('offlineQueuePop', request => {
+      kuzzle.on("offlineQueuePop", (request) => {
         rejectedRequest(request);
       });
 
       kuzzle.playQueue();
 
-      await should(deferred).rejectedWith('Query aborted: too many queued requests (see the queueMaxSize option)');
+      await should(deferred).rejectedWith(
+        "Query aborted: too many queued requests (see the queueMaxSize option)"
+      );
       should(rejectedRequest).calledTwice().calledWith(query.request);
     });
   });

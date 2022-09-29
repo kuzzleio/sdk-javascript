@@ -1,4 +1,4 @@
-const { Before, BeforeAll } = require('cucumber');
+const { Before, BeforeAll } = require("cucumber");
 
 let _world;
 
@@ -19,19 +19,21 @@ BeforeAll(function () {
   this.notifications = [];
 });
 
-function clean () {
+function clean() {
   const kuzzle = _world.kuzzle;
 
-  return kuzzle.connect()
-    .then(() => kuzzle.query({
-      controller: 'admin',
-      action: 'resetDatabase'
-    }))
-    .catch(error => {
+  return kuzzle
+    .connect()
+    .then(() =>
+      kuzzle.query({
+        controller: "admin",
+        action: "resetDatabase",
+      })
+    )
+    .catch((error) => {
       // rethrow to get a readable error
       // eslint-disable-next-line no-console
       console.error(error);
       throw error;
     });
-
 }

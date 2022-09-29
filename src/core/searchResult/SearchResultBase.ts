@@ -1,6 +1,6 @@
-import { BaseRequest, JSONObject } from '../../types';
-import { RequestPayload } from '../../types/RequestPayload';
-import { Kuzzle } from '../../Kuzzle';
+import { BaseRequest, JSONObject } from "../../types";
+import { RequestPayload } from "../../types/RequestPayload";
+import { Kuzzle } from "../../Kuzzle";
 
 export interface SearchResult<T> {
   /**
@@ -36,7 +36,7 @@ export interface SearchResult<T> {
    *
    * @returns A SearchResult or null if no more pages
    */
-  next (): Promise<SearchResult<T> | null>;
+  next(): Promise<SearchResult<T> | null>;
 }
 
 export class SearchResultBase<T> implements SearchResult<T> {
@@ -58,35 +58,35 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
   public fetched: number;
 
-  constructor (
+  constructor(
     kuzzle: Kuzzle,
     request: BaseRequest,
     options: JSONObject = {},
     result: any = {}
   ) {
-    Reflect.defineProperty(this, '_kuzzle', {
-      value: kuzzle
+    Reflect.defineProperty(this, "_kuzzle", {
+      value: kuzzle,
     });
-    Reflect.defineProperty(this, '_request', {
-      value: request
+    Reflect.defineProperty(this, "_request", {
+      value: request,
     });
-    Reflect.defineProperty(this, '_options', {
-      value: options
+    Reflect.defineProperty(this, "_options", {
+      value: options,
     });
-    Reflect.defineProperty(this, '_result', {
-      value: result
+    Reflect.defineProperty(this, "_result", {
+      value: result,
     });
-    Reflect.defineProperty(this, '_controller', {
+    Reflect.defineProperty(this, "_controller", {
       value: request.controller,
-      writable: true
+      writable: true,
     });
-    Reflect.defineProperty(this, '_searchAction', {
-      value: 'search',
-      writable: true
+    Reflect.defineProperty(this, "_searchAction", {
+      value: "search",
+      writable: true,
     });
-    Reflect.defineProperty(this, '_scrollAction', {
-      value: 'scroll',
-      writable: true
+    Reflect.defineProperty(this, "_scrollAction", {
+      value: "scroll",
+      writable: true,
     });
 
     this.aggregations = result.aggregations;
@@ -96,21 +96,21 @@ export class SearchResultBase<T> implements SearchResult<T> {
     this.suggest = result.suggest;
   }
 
-  next (): Promise<SearchResult<T> | null> {
+  next(): Promise<SearchResult<T> | null> {
     if (this.fetched >= this.total) {
       return Promise.resolve(null);
     }
 
     if (this._request.scroll) {
-      return this._kuzzle.query({
-        controller: this._request.controller,
-        action: this._scrollAction,
-        scroll: this._request.scroll,
-        scrollId: this._result.scrollId
-      })
+      return this._kuzzle
+        .query({
+          action: this._scrollAction,
+          controller: this._request.controller,
+          scroll: this._request.scroll,
+          scrollId: this._result.scrollId,
+        })
         .then(({ result }) => this._buildNextSearchResult(result));
-    }
-    else if (this._request.size && this._request.body.sort) {
+    } else if (this._request.size && this._request.body.sort) {
       const request = { ...this._request, action: this._searchAction };
       const hit = this._result.hits[this._result.hits.length - 1];
 
@@ -119,59 +119,70 @@ export class SearchResultBase<T> implements SearchResult<T> {
       // directly after.
       // It resulting in having less fetched documents than the total and thus the SDK
       // try to fetch the next results page but it's empty
-      if (! hit) {
-        return Promise.reject(new Error('Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.'));
+      if (!hit) {
+        return Promise.reject(
+          new Error(
+            'Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.'
+          )
+        );
       }
 
       request.body.search_after = [];
 
       let sorts;
-      if (typeof this._request.body.sort === 'string') {
+      if (typeof this._request.body.sort === "string") {
         sorts = [this._request.body.sort];
-      }
-      else if (Array.isArray(this._request.body.sort)) {
+      } else if (Array.isArray(this._request.body.sort)) {
         sorts = this._request.body.sort;
-      }
-      else {
+      } else {
         sorts = Object.keys(this._request.body.sort);
       }
 
       if (sorts.length === 0) {
-        return Promise.reject(new Error('Unable to retrieve next results from search: sort param is empty'));
+        return Promise.reject(
+          new Error(
+            "Unable to retrieve next results from search: sort param is empty"
+          )
+        );
       }
 
       for (const sort of sorts) {
-        const key = typeof sort === 'string'
-          ? sort
-          : Object.keys(sort)[0];
+        const key = typeof sort === "string" ? sort : Object.keys(sort)[0];
 
-        const value = key === '_id'
-          ? hit._id
-          : this._get(hit._source, key.split('.'));
+        const value =
+          key === "_id" ? hit._id : this._get(hit._source, key.split("."));
 
         request.body.search_after.push(value);
       }
 
-      return this._kuzzle.query(request, this._options)
+      return this._kuzzle
+        .query(request, this._options)
         .then(({ result }) => this._buildNextSearchResult(result));
-    }
-    else if (this._request.size) {
+    } else if (this._request.size) {
       if (this._request.from >= this._result.total) {
         return Promise.resolve(null);
       }
 
-      return this._kuzzle.query({
-        ...this._request,
-        action: this._searchAction,
-        from: this.fetched
-      }, this._options)
+      return this._kuzzle
+        .query(
+          {
+            ...this._request,
+            action: this._searchAction,
+            from: this.fetched,
+          },
+          this._options
+        )
         .then(({ result }) => this._buildNextSearchResult(result));
     }
 
-    return Promise.reject(new Error('Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params'));
+    return Promise.reject(
+      new Error(
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+      )
+    );
   }
 
-  protected _get (object, path) {
+  protected _get(object, path) {
     if (!object) {
       return object;
     }
@@ -184,10 +195,15 @@ export class SearchResultBase<T> implements SearchResult<T> {
     return this._get(object[key], path);
   }
 
-  protected _buildNextSearchResult (result) {
+  protected _buildNextSearchResult(result) {
     const Constructor: any = this.constructor;
 
-    const nextSearchResult = new Constructor(this._kuzzle, this._request, this._options, result);
+    const nextSearchResult = new Constructor(
+      this._kuzzle,
+      this._request,
+      this._options,
+      result
+    );
     nextSearchResult.fetched += this.fetched;
 
     return nextSearchResult;

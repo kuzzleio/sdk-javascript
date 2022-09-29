@@ -1,424 +1,445 @@
-const
-  { CollectionController } = require('../../src/controllers/Collection'),
-  { SpecificationsSearchResult } = require('../../src/core/searchResult/Specifications'),
-  sinon = require('sinon'),
-  should = require('should');
+const { CollectionController } = require("../../src/controllers/Collection"),
+  {
+    SpecificationsSearchResult,
+  } = require("../../src/core/searchResult/Specifications"),
+  sinon = require("sinon"),
+  should = require("should");
 
-describe('Collection Controller', () => {
-  const options = {opt: 'in'};
+describe("Collection Controller", () => {
+  const options = { opt: "in" };
   let kuzzle;
 
   beforeEach(() => {
     kuzzle = {
-      query: sinon.stub().resolves()
+      query: sinon.stub().resolves(),
     };
     kuzzle.collection = new CollectionController(kuzzle);
   });
 
-  describe('create', () => {
-    it('should call collection/create query and return a Promise which resolves', () => {
-      kuzzle.query.resolves({result: {acknowledged: true}});
+  describe("create", () => {
+    it("should call collection/create query and return a Promise which resolves", () => {
+      kuzzle.query.resolves({ result: { acknowledged: true } });
 
-      return kuzzle.collection.create('index', 'collection', null, options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'create',
+      return kuzzle.collection
+        .create("index", "collection", null, options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "create",
               body: null,
-              index: 'index',
-              collection: 'collection'
-            }, options);
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
 
           should(res).be.undefined();
         });
     });
 
-    it('should handle a collection mapping, if one is provided', () => {
-      kuzzle.query.resolves({result: {acknowledged: true}});
+    it("should handle a collection mapping, if one is provided", () => {
+      kuzzle.query.resolves({ result: { acknowledged: true } });
 
-      return kuzzle.collection.create('index', 'collection', {properties: true}, options)
-        .then(res => {
+      return kuzzle.collection
+        .create("index", "collection", { properties: true }, options)
+        .then((res) => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'create',
-              body: {properties: true},
-              index: 'index',
-              collection: 'collection'
-            }, options);
-
-          should(res).be.undefined();
-        });
-    });
-  });
-
-  describe('deleteSpecifications', () => {
-    it('should call collection/deleteSpecifications query and return a Promise which resolves', () => {
-      kuzzle.query.resolves({result: {acknowledged: true}});
-
-      return kuzzle.collection.deleteSpecifications('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'deleteSpecifications',
-              index: 'index',
-              collection: 'collection'
-            }, options);
+            .be.calledWith(
+              {
+                controller: "collection",
+                action: "create",
+                body: { properties: true },
+                index: "index",
+                collection: "collection",
+              },
+              options
+            );
 
           should(res).be.undefined();
         });
     });
   });
 
-  describe('exists', () => {
-    it('should call collection/exists query names and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves({result: true});
+  describe("deleteSpecifications", () => {
+    it("should call collection/deleteSpecifications query and return a Promise which resolves", () => {
+      kuzzle.query.resolves({ result: { acknowledged: true } });
 
-      return kuzzle.collection.exists('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'exists',
-              index: 'index',
-              collection: 'collection'
-            }, options);
+      return kuzzle.collection
+        .deleteSpecifications("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "deleteSpecifications",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
+
+          should(res).be.undefined();
+        });
+    });
+  });
+
+  describe("exists", () => {
+    it("should call collection/exists query names and return a Promise which resolves a boolean", () => {
+      kuzzle.query.resolves({ result: true });
+
+      return kuzzle.collection
+        .exists("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "exists",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
 
           should(res).be.a.Boolean().and.be.true();
         });
     });
   });
 
-  describe('refresh', () => {
-    it('should call collection/refresh query names and return a Promise which resolves a boolean', () => {
-      kuzzle.query.resolves({result: null});
+  describe("refresh", () => {
+    it("should call collection/refresh query names and return a Promise which resolves a boolean", () => {
+      kuzzle.query.resolves({ result: null });
 
-      return kuzzle.collection.refresh('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'refresh',
-              index: 'index',
-              collection: 'collection'
-            }, options);
+      return kuzzle.collection
+        .refresh("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "refresh",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
 
           should(res).be.undefined();
         });
     });
   });
 
-  describe('getMapping', () => {
-    it('should call collection/getMapping query and return a Promise which resolves a json object', () => {
+  describe("getMapping", () => {
+    it("should call collection/getMapping query and return a Promise which resolves a json object", () => {
       kuzzle.query.resolves({
         result: {
           index: {
             mappings: {
               collection: {
                 properties: {
-                  field1: {type: 'foo'},
-                  field2: {type: 'bar'}
-                }
-              }
-            }
-          }
-        }
+                  field1: { type: "foo" },
+                  field2: { type: "bar" },
+                },
+              },
+            },
+          },
+        },
       });
       options.includeKuzzleMeta = true;
 
-
-      return kuzzle.collection.getMapping('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'getMapping',
-              index: 'index',
-              collection: 'collection',
-              includeKuzzleMeta: true
-            }, options);
+      return kuzzle.collection
+        .getMapping("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "getMapping",
+              index: "index",
+              collection: "collection",
+              includeKuzzleMeta: true,
+            },
+            options
+          );
 
           should(res).match({
             index: {
               mappings: {
                 collection: {
                   properties: {
-                    field1: {type: 'foo'},
-                    field2: {type: 'bar'}
-                  }
-                }
-              }
-            }
+                    field1: { type: "foo" },
+                    field2: { type: "bar" },
+                  },
+                },
+              },
+            },
           });
         });
     });
   });
 
-  describe('getSpecifications', () => {
-    it('should call collection/getSpecifications query and return a Promise which resolves a json object', () => {
+  describe("getSpecifications", () => {
+    it("should call collection/getSpecifications query and return a Promise which resolves a json object", () => {
       kuzzle.query.resolves({
         result: {
-          index: 'index',
-          collection: 'collection',
+          index: "index",
+          collection: "collection",
           validation: {
             fields: {
-              foobar: {type: 'integer', mandatory: true, defaultValue: 42}
+              foobar: { type: "integer", mandatory: true, defaultValue: 42 },
             },
-            strict: true
-          }
-        }
+            strict: true,
+          },
+        },
       });
 
-      return kuzzle.collection.getSpecifications('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'getSpecifications',
-              index: 'index',
-              collection: 'collection'
-            }, options);
+      return kuzzle.collection
+        .getSpecifications("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "getSpecifications",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
 
           should(res).match({
-            index: 'index',
-            collection: 'collection',
+            index: "index",
+            collection: "collection",
             validation: {
               fields: {
-                foobar: {type: 'integer', mandatory: true, defaultValue: 42}
+                foobar: { type: "integer", mandatory: true, defaultValue: 42 },
               },
-              strict: true
-            }
+              strict: true,
+            },
           });
         });
     });
   });
 
-  describe('list', () => {
-    it('should call collection/list query and return a Promise which resolves collection list', () => {
+  describe("list", () => {
+    it("should call collection/list query and return a Promise which resolves collection list", () => {
       kuzzle.query.resolves({
         result: {
           collections: [
-            {name: 'foo', type: 'realtime'},
-            {name: 'bar', type: 'realtime'},
-            {name: 'foobar', type: 'stored'},
-            {name: 'barfoo', type: 'stored'}
-          ]
-        }
+            { name: "foo", type: "realtime" },
+            { name: "bar", type: "realtime" },
+            { name: "foobar", type: "stored" },
+            { name: "barfoo", type: "stored" },
+          ],
+        },
       });
 
-      return kuzzle.collection.list('index', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'list',
-              index: 'index',
-              size: 0,
-              from: undefined
-            }, options);
+      return kuzzle.collection.list("index", options).then((res) => {
+        should(kuzzle.query).be.calledOnce().be.calledWith(
+          {
+            controller: "collection",
+            action: "list",
+            index: "index",
+            size: 0,
+            from: undefined,
+          },
+          options
+        );
 
-          should(res).match({
-            collections: [
-              {name: 'foo', type: 'realtime'},
-              {name: 'bar', type: 'realtime'},
-              {name: 'foobar', type: 'stored'},
-              {name: 'barfoo', type: 'stored'}
-            ]
-          });
+        should(res).match({
+          collections: [
+            { name: "foo", type: "realtime" },
+            { name: "bar", type: "realtime" },
+            { name: "foobar", type: "stored" },
+            { name: "barfoo", type: "stored" },
+          ],
         });
+      });
     });
   });
 
-  describe('searchSpecifications', () => {
-    it('should call collection/searchSpecifications query with search filter and return a Promise which resolves a SpecificationsSearchResult object', () => {
+  describe("searchSpecifications", () => {
+    it("should call collection/searchSpecifications query with search filter and return a Promise which resolves a SpecificationsSearchResult object", () => {
       kuzzle.query.resolves({
         result: {
-          hits: [
-            {foo: 'bar'},
-            {bar: 'foo'}
-          ],
-          total: 2
-        }
+          hits: [{ foo: "bar" }, { bar: "foo" }],
+          total: 2,
+        },
       });
 
-      const body = {foo: 'bar'};
-      return kuzzle.collection.searchSpecifications(body, {from: 3, size: 42, scroll: 'scroll', foo: 'bar'})
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'searchSpecifications',
+      const body = { foo: "bar" };
+      return kuzzle.collection
+        .searchSpecifications(body, {
+          from: 3,
+          size: 42,
+          scroll: "scroll",
+          foo: "bar",
+        })
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "searchSpecifications",
               body,
               from: 3,
               size: 42,
-              scroll: 'scroll'
-            }, { foo: 'bar', from: 3, scroll: 'scroll', size: 42 });
+              scroll: "scroll",
+            },
+            { foo: "bar", from: 3, scroll: "scroll", size: 42 }
+          );
 
           should(res).be.an.instanceOf(SpecificationsSearchResult);
           should(res._request).match({
-            controller: 'collection',
-            action: 'searchSpecifications',
+            controller: "collection",
+            action: "searchSpecifications",
             body,
             from: 3,
             size: 42,
-            scroll: 'scroll'
+            scroll: "scroll",
           });
-          should(res._options).match({foo: 'bar'});
+          should(res._options).match({ foo: "bar" });
           should(res._result).match({
-            hits: [
-              {foo: 'bar'},
-              {bar: 'foo'}
-            ],
-            total: 2
+            hits: [{ foo: "bar" }, { bar: "foo" }],
+            total: 2,
           });
         });
     });
   });
 
-  describe('truncate', () => {
-    it('should call collection/truncate query and return a Promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({result: {acknowledged: true}});
+  describe("truncate", () => {
+    it("should call collection/truncate query and return a Promise which resolves an acknowledgement", () => {
+      kuzzle.query.resolves({ result: { acknowledged: true } });
 
-      return kuzzle.collection.truncate('index', 'collection', options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'truncate',
-              index: 'index',
-              collection: 'collection'
-            }, options);
-
-          should(res).be.undefined();
-        });
-    });
-  });
-
-  describe('updateMapping', () => {
-    it('should call collection/updateMapping query with the new mapping and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({result: {foo: 'bar'}});
-
-      const body = {foo: 'bar'};
-      return kuzzle.collection.updateMapping('index', 'collection', body, options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              body,
-              controller: 'collection',
-              action: 'updateMapping',
-              index: 'index',
-              collection: 'collection'
-            }, options);
-
-          should(res).match({foo: 'bar'});
-        });
-    });
-  });
-
-  describe('update', () => {
-    it('should call collection/update query with the new mapping and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({ result: { foo: 'bar' } });
-
-      const body = { foo: 'bar' };
-      return kuzzle.collection.update('index', 'collection', body)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              body,
-              controller: 'collection',
-              action: 'update',
-              index: 'index',
-              collection: 'collection'
-            });
+      return kuzzle.collection
+        .truncate("index", "collection", options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              controller: "collection",
+              action: "truncate",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
 
           should(res).be.undefined();
         });
     });
   });
 
-  describe('updateSpecifications', () => {
-    it('should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object', () => {
-      kuzzle.query.resolves({ result: { foo: 'bar' } });
+  describe("updateMapping", () => {
+    it("should call collection/updateMapping query with the new mapping and return a Promise which resolves a json object", () => {
+      kuzzle.query.resolves({ result: { foo: "bar" } });
 
-      const specifications = {foo: 'bar'};
-      return kuzzle.collection.updateSpecifications('index', 'collection', specifications, options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
+      const body = { foo: "bar" };
+      return kuzzle.collection
+        .updateMapping("index", "collection", body, options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              body,
+              controller: "collection",
+              action: "updateMapping",
+              index: "index",
+              collection: "collection",
+            },
+            options
+          );
+
+          should(res).match({ foo: "bar" });
+        });
+    });
+  });
+
+  describe("update", () => {
+    it("should call collection/update query with the new mapping and return a Promise which resolves a json object", () => {
+      kuzzle.query.resolves({ result: { foo: "bar" } });
+
+      const body = { foo: "bar" };
+      return kuzzle.collection
+        .update("index", "collection", body)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith({
+            body,
+            controller: "collection",
+            action: "update",
+            index: "index",
+            collection: "collection",
+          });
+
+          should(res).be.undefined();
+        });
+    });
+  });
+
+  describe("updateSpecifications", () => {
+    it("should call collection/updateSpecifications query with the new specifications and return a Promise which resolves a json object", () => {
+      kuzzle.query.resolves({ result: { foo: "bar" } });
+
+      const specifications = { foo: "bar" };
+      return kuzzle.collection
+        .updateSpecifications("index", "collection", specifications, options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
               body: specifications,
-              index: 'index',
-              collection: 'collection',
-              controller: 'collection',
-              action: 'updateSpecifications'
-            }, options);
+              index: "index",
+              collection: "collection",
+              controller: "collection",
+              action: "updateSpecifications",
+            },
+            options
+          );
 
-          should(res).match({foo: 'bar'});
+          should(res).match({ foo: "bar" });
         });
     });
   });
 
-  describe('validateSpecifications', () => {
-    it('should call collection/validateSpecifications query with the specifications to validate and return a Promise which resolves a json object', () => {
+  describe("validateSpecifications", () => {
+    it("should call collection/validateSpecifications query with the specifications to validate and return a Promise which resolves a json object", () => {
       kuzzle.query.resolves({
         result: {
           valid: false,
-          description: 'foo bar',
-          details: ['foo', 'bar']
-        }
+          description: "foo bar",
+          details: ["foo", "bar"],
+        },
       });
 
-      const specifications = {foo: 'bar'};
-      return kuzzle.collection.validateSpecifications('index', 'collection', specifications, options)
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              index: 'index',
-              collection: 'collection',
+      const specifications = { foo: "bar" };
+      return kuzzle.collection
+        .validateSpecifications("index", "collection", specifications, options)
+        .then((res) => {
+          should(kuzzle.query).be.calledOnce().be.calledWith(
+            {
+              index: "index",
+              collection: "collection",
               body: specifications,
-              controller: 'collection',
-              action: 'validateSpecifications'
-            }, options);
+              controller: "collection",
+              action: "validateSpecifications",
+            },
+            options
+          );
 
           should(res).match({
             valid: false,
-            description: 'foo bar',
-            details: ['foo', 'bar']
+            description: "foo bar",
+            details: ["foo", "bar"],
           });
         });
     });
   });
 
-  describe('delete', () => {
-    it('should call collection/delete query and return a promise which resolves an acknowledgement', () => {
-      kuzzle.query.resolves({result: {acknowledged: true}});
-      return kuzzle.collection.delete('index', 'collection')
-        .then(res => {
-          should(kuzzle.query)
-            .be.calledOnce()
-            .be.calledWith({
-              controller: 'collection',
-              action: 'delete',
-              index: 'index',
-              collection: 'collection',
-            });
-          should(res).be.undefined();
+  describe("delete", () => {
+    it("should call collection/delete query and return a promise which resolves an acknowledgement", () => {
+      kuzzle.query.resolves({ result: { acknowledged: true } });
+      return kuzzle.collection.delete("index", "collection").then((res) => {
+        should(kuzzle.query).be.calledOnce().be.calledWith({
+          controller: "collection",
+          action: "delete",
+          index: "index",
+          collection: "collection",
         });
+        should(res).be.undefined();
+      });
     });
   });
 });

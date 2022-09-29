@@ -1,10 +1,10 @@
-import { JSONObject } from './JSONObject';
-import { KDocument, KDocumentContentGeneric } from '.';
+import { JSONObject } from "./JSONObject";
+import { KDocument, KDocumentContentGeneric } from ".";
 
 /**
  * Enum for notification types
  */
-export type NotificationType = 'document' | 'user' | 'TokenExpired'
+export type NotificationType = "document" | "user" | "TokenExpired";
 
 /**
  * Real-time notifications sent by Kuzzle.
@@ -29,7 +29,7 @@ export interface BaseNotification extends Notification {
   /**
    * Event type according to API action
    */
-  event: 'write' | 'delete' | 'publish';
+  event: "write" | "delete" | "publish";
   /**
    * Index name
    */
@@ -70,9 +70,9 @@ export interface DocumentNotification extends BaseNotification {
   /**
    * State of the document regarding the scope (`in` or `out`)
    */
-  scope: 'in' | 'out';
+  scope: "in" | "out";
 
-  type: 'document';
+  type: "document";
 }
 
 /**
@@ -82,7 +82,7 @@ export interface UserNotification extends BaseNotification {
   /**
    * Tell wether an user leave or join the subscription room (`in` or `out`)
    */
-  user: 'in' | 'out';
+  user: "in" | "out";
 
   /**
    * Contains the actual number of users in the subscription room
@@ -92,9 +92,9 @@ export interface UserNotification extends BaseNotification {
      * Updated users count sharing the same subscription room
      */
     count: number;
-  }
+  };
 
-  type: 'user';
+  type: "user";
 }
 
 export interface ServerNotification extends BaseNotification {
@@ -103,5 +103,5 @@ export interface ServerNotification extends BaseNotification {
    */
   message: string;
 
-  type: 'TokenExpired';
+  type: "TokenExpired";
 }

@@ -1,8 +1,8 @@
-import { Jwt } from '../core/Jwt';
-import { BaseController } from './Base';
-import { User } from '../core/security/User';
-import { JSONObject, ApiKey, ArgsDefault } from '../types';
-import { RequestPayload } from '../types/RequestPayload';
+import { Jwt } from "../core/Jwt";
+import { BaseController } from "./Base";
+import { User } from "../core/security/User";
+import { JSONObject, ApiKey, ArgsDefault } from "../types";
+import { RequestPayload } from "../types/RequestPayload";
 /**
  * Auth controller
  *
@@ -16,12 +16,12 @@ export class AuthController extends BaseController {
    * constructor
    * @param kuzzle
    */
-  constructor (kuzzle) {
-    super(kuzzle, 'auth');
+  constructor(kuzzle) {
+    super(kuzzle, "auth");
 
     this._authenticationToken = null;
 
-    this.kuzzle.on('tokenExpired', () => {
+    this.kuzzle.on("tokenExpired", () => {
       this._authenticationToken = null;
     });
   }
@@ -36,11 +36,9 @@ export class AuthController extends BaseController {
   set authenticationToken(encodedJwt: any) {
     if (encodedJwt === undefined || encodedJwt === null) {
       this._authenticationToken = null;
-    }
-    else if (typeof encodedJwt === 'string') {
+    } else if (typeof encodedJwt === "string") {
       this._authenticationToken = new Jwt(encodedJwt);
-    }
-    else {
+    } else {
       throw new Error(`Invalid token argument: ${encodedJwt}`);
     }
   }
@@ -49,14 +47,15 @@ export class AuthController extends BaseController {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wishes to verify their token
    */
-  authenticateRequest (request: RequestPayload) {
+  authenticateRequest(request: RequestPayload) {
     if (this.kuzzle.cookieAuthentication) {
       return;
     }
 
-    if ( ! this.authenticationToken
-      || (request.controller === 'auth'
-        && (request.action === 'checkToken' || request.action === 'login'))
+    if (
+      !this.authenticationToken ||
+      (request.controller === "auth" &&
+        (request.action === "checkToken" || request.action === "login"))
     ) {
       return;
     }
@@ -83,17 +82,16 @@ export class AuthController extends BaseController {
     options: ArgsAuthControllerCreateApiKey = {}
   ): Promise<ApiKey> {
     const request = {
-      action: 'createApiKey',
       _id: options._id,
+      action: "createApiKey",
+      body: {
+        description,
+      },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
-      body: {
-        description
-      }
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -105,17 +103,18 @@ export class AuthController extends BaseController {
    * @param options Additional Options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  checkRights (
+  checkRights(
     requestPayload: RequestPayload,
     options: ArgsAuthControllerCheckRights = {}
   ): Promise<boolean> {
     const request = {
+      action: "checkRights",
       body: requestPayload,
-      action: 'checkRights'
     };
 
-    return this.query(request, options)
-      .then(response => response.result.allowed);
+    return this.query(request, options).then(
+      (response) => response.result.allowed
+    );
   }
 
   /**
@@ -133,13 +132,12 @@ export class AuthController extends BaseController {
     options: ArgsAuthControllerDeleteApiKey = {}
   ): Promise<null> {
     const request = {
-      action: 'deleteApiKey',
       _id: id,
-      refresh: options.refresh
+      action: "deleteApiKey",
+      refresh: options.refresh,
     };
 
-    return this.query(request, options)
-      .then(() => null);
+    return this.query(request, options).then(() => null);
   }
 
   /**
@@ -162,22 +160,21 @@ export class AuthController extends BaseController {
     /**
      * Array of found ApiKeys
      */
-    hits: Array<ApiKey>,
+    hits: Array<ApiKey>;
     /**
      * Total number of API keys found
      */
-    total: number
+    total: number;
   }> {
     const request = {
-      action: 'searchApiKeys',
+      action: "searchApiKeys",
+      body: query,
       from: options.from,
-      size: options.size,
       lang: options.lang,
-      body: query
+      size: options.size,
     };
 
-    return this.query(request, options)
-      .then(response => response.result);
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -191,42 +188,44 @@ export class AuthController extends BaseController {
    *
    * @returns A token validity object
    */
-  checkToken (
+  checkToken(
     token?: string,
     options: ArgsAuthControllerCheckToken = {}
   ): Promise<{
     /**
      * Tell if the token is valid or not
      */
-    valid: boolean,
+    valid: boolean;
     /**
      * Explain why the token is invalid
      */
-    state: string,
+    state: string;
     /**
      * Token expiration timestamp
      */
-    expiresAt: number,
+    expiresAt: number;
     /**
      * KUID of the user that the token belongs to
      */
-    kuid: string
+    kuid: string;
   }> {
     let cookieAuth = false;
     if (token === undefined) {
       cookieAuth = this.kuzzle.cookieAuthentication;
 
-      if (! cookieAuth && this.authenticationToken) {
+      if (!cookieAuth && this.authenticationToken) {
         token = this.authenticationToken.encodedJwt;
       }
     }
 
-    return this.query({
-      action: 'checkToken',
-      body: { token },
-      cookieAuth
-    }, { queuable: false, ...options })
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "checkToken",
+        body: { token },
+        cookieAuth,
+      },
+      { queuable: false, ...options }
+    ).then((response) => response.result);
   }
 
   /**
@@ -243,17 +242,19 @@ export class AuthController extends BaseController {
    * @returns An object representing the new credentials.
    *    The content depends on the authentication strategy
    */
-  createMyCredentials (
+  createMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: ArgsAuthControllerCreateMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query({
-      strategy,
-      action: 'createMyCredentials',
-      body: credentials
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "createMyCredentials",
+        body: credentials,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -268,15 +269,17 @@ export class AuthController extends BaseController {
    *
    * @returns A boolean indicating if the credentials exists
    */
-  credentialsExist (
+  credentialsExist(
     strategy: string,
     options: ArgsAuthControllerCredentialsExist = {}
   ): Promise<boolean> {
-    return this.query({
-      strategy,
-      action: 'credentialsExist'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "credentialsExist",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -289,15 +292,17 @@ export class AuthController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  deleteMyCredentials (
+  deleteMyCredentials(
     strategy: string,
     options: ArgsAuthControllerDeleteMyCredentials = {}
   ): Promise<boolean> {
-    return this.query({
-      strategy,
-      action: 'deleteMyCredentials'
-    }, options)
-      .then(response => response.result.acknowledged);
+    return this.query(
+      {
+        action: "deleteMyCredentials",
+        strategy,
+      },
+      options
+    ).then((response) => response.result.acknowledged);
   }
 
   /**
@@ -311,14 +316,18 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  getCurrentUser (options: ArgsAuthControllerGetCurrentUser = {}): Promise<User> {
-    return this.query({
-      action: 'getCurrentUser'
-    }, options)
-      .then(response => new User(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+  getCurrentUser(
+    options: ArgsAuthControllerGetCurrentUser = {}
+  ): Promise<User> {
+    return this.query(
+      {
+        action: "getCurrentUser",
+      },
+      options
+    ).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
   /**
@@ -338,11 +347,13 @@ export class AuthController extends BaseController {
     strategy: string,
     options: ArgsAuthControllerGetMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query({
-      strategy,
-      action: 'getMyCredentials'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "getMyCredentials",
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -356,34 +367,36 @@ export class AuthController extends BaseController {
    *
    * @returns An array containing user rights objects
    */
-  getMyRights (
-    options: ArgsAuthControllerGetMyRights = {}
-  ): Promise<Array<{
-    /**
-     * Controller on wich the rights are applied
-     */
-    controller: string,
-    /**
-     * Action on wich the rights are applied
-     */
-    action: string,
-    /**
-     * Index on wich the rights are applied
-     */
-    index: string,
-    /**
-     * Collection on wich the rights are applied
-     */
-    collection: string,
-    /**
-     * Rights ("allowed" or "denied")
-     */
-    value: string
-  }>> {
-    return this.query({
-      action: 'getMyRights'
-    }, options)
-      .then(response => response.result.hits);
+  getMyRights(options: ArgsAuthControllerGetMyRights = {}): Promise<
+    Array<{
+      /**
+       * Controller on wich the rights are applied
+       */
+      controller: string;
+      /**
+       * Action on wich the rights are applied
+       */
+      action: string;
+      /**
+       * Index on wich the rights are applied
+       */
+      index: string;
+      /**
+       * Collection on wich the rights are applied
+       */
+      collection: string;
+      /**
+       * Rights ("allowed" or "denied")
+       */
+      value: string;
+    }>
+  > {
+    return this.query(
+      {
+        action: "getMyRights",
+      },
+      options
+    ).then((response) => response.result.hits);
   }
 
   /**
@@ -397,13 +410,15 @@ export class AuthController extends BaseController {
    *
    * @returns An array of available strategies names
    */
-  getStrategies (
+  getStrategies(
     options: ArgsAuthControllerGetStrategies = {}
   ): Promise<Array<string>> {
-    return this.query({
-      action: 'getStrategies'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "getStrategies",
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -419,40 +434,48 @@ export class AuthController extends BaseController {
    *
    * @returns The encrypted JSON Web Token
    */
-  login (
+  login(
     strategy: string,
     credentials: JSONObject,
     expiresIn?: string | number
   ): Promise<string> {
     const request = {
-      strategy,
-      expiresIn,
+      action: "login",
       body: credentials,
-      action: 'login',
-      cookieAuth: this.kuzzle.cookieAuthentication
+      cookieAuth: this.kuzzle.cookieAuthentication,
+      expiresIn,
+      strategy,
     };
 
-    return this.query(request, { queuable: false, verb: 'POST', timeout: -1 })
-      .then(response => {
+    return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
+      .then((response) => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
-            const err = new Error('Kuzzle support for cookie authentication is disabled or not supported');
-            this.kuzzle.emit('loginAttempt', { success: false, error: err.message });
+            const err = new Error(
+              "Kuzzle support for cookie authentication is disabled or not supported"
+            );
+            this.kuzzle.emit("loginAttempt", {
+              error: err.message,
+              success: false,
+            });
             throw err;
           }
 
-          this.kuzzle.emit('loginAttempt', { success: true });
+          this.kuzzle.emit("loginAttempt", { success: true });
           return;
         }
 
         this._authenticationToken = new Jwt(response.result.jwt);
 
-        this.kuzzle.emit('loginAttempt', { success: true });
+        this.kuzzle.emit("loginAttempt", { success: true });
 
         return response.result.jwt;
       })
-      .catch(err => {
-        this.kuzzle.emit('loginAttempt', { success: false, error: err.message });
+      .catch((err) => {
+        this.kuzzle.emit("loginAttempt", {
+          error: err.message,
+          success: false,
+        });
         throw err;
       });
   }
@@ -462,15 +485,17 @@ export class AuthController extends BaseController {
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/logout
    */
-  logout (): Promise<void> {
-    return this.query({
-      action: 'logout',
-      cookieAuth: this.kuzzle.cookieAuthentication
-    }, { queuable: false, timeout: -1 })
-      .then(() => {
-        this._authenticationToken = null;
-        this.kuzzle.emit('logoutAttempt', { success: true });
-      });
+  logout(): Promise<void> {
+    return this.query(
+      {
+        action: "logout",
+        cookieAuth: this.kuzzle.cookieAuthentication,
+      },
+      { queuable: false, timeout: -1 }
+    ).then(() => {
+      this._authenticationToken = null;
+      this.kuzzle.emit("logoutAttempt", { success: true });
+    });
   }
 
   /**
@@ -487,17 +512,19 @@ export class AuthController extends BaseController {
    * @returns An object representing the updated credentials.
    *    The content depends on the authentication strategy
    */
-  updateMyCredentials (
+  updateMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: ArgsAuthControllerUpdateMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query({
-      strategy,
-      body: credentials,
-      action: 'updateMyCredentials'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "updateMyCredentials",
+        body: credentials,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -513,18 +540,20 @@ export class AuthController extends BaseController {
    *
    * @returns Currently logged User
    */
-  updateSelf (
+  updateSelf(
     content: JSONObject,
     options: ArgsAuthControllerUpdateSelf = {}
   ): Promise<User> {
-    return this.query({
-      body: content,
-      action: 'updateSelf'
-    }, options)
-      .then(response => new User(
-        this.kuzzle,
-        response.result._id,
-        response.result._source));
+    return this.query(
+      {
+        action: "updateSelf",
+        body: content,
+      },
+      options
+    ).then(
+      (response) =>
+        new User(this.kuzzle, response.result._id, response.result._source)
+    );
   }
 
   /**
@@ -538,17 +567,19 @@ export class AuthController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
-  validateMyCredentials (
+  validateMyCredentials(
     strategy: string,
     credentials: JSONObject,
     options: ArgsAuthControllerValidateMyCredentials = {}
   ): Promise<boolean> {
-    return this.query({
-      strategy,
-      body: credentials,
-      action: 'validateMyCredentials'
-    }, options)
-      .then(response => response.result);
+    return this.query(
+      {
+        action: "validateMyCredentials",
+        body: credentials,
+        strategy,
+      },
+      options
+    ).then((response) => response.result);
   }
 
   /**
@@ -563,9 +594,7 @@ export class AuthController extends BaseController {
    *
    * @returns The refreshed token
    */
-  refreshToken(
-    options: ArgsAuthControllerRefreshToken = {}
-  ): Promise<{
+  refreshToken(options: ArgsAuthControllerRefreshToken = {}): Promise<{
     /**
      * Token unique ID
      */
@@ -584,74 +613,61 @@ export class AuthController extends BaseController {
     ttl: number;
   }> {
     const query = {
-      action: 'refreshToken',
+      action: "refreshToken",
+      cookieAuth: this.kuzzle.cookieAuthentication,
       expiresIn: options.expiresIn,
-      cookieAuth: this.kuzzle.cookieAuthentication
     };
 
-    return this.query(query, options)
-      .then(response => {
-        if (! this.kuzzle.cookieAuthentication) {
-          this._authenticationToken = new Jwt(response.result.jwt);
-        }
+    return this.query(query, options).then((response) => {
+      if (!this.kuzzle.cookieAuthentication) {
+        this._authenticationToken = new Jwt(response.result.jwt);
+      }
 
-        return response.result;
-      });
+      return response.result;
+    });
   }
 }
 
 export interface ArgsAuthControllerCreateApiKey extends ArgsDefault {
-    _id?: string;
-    expiresIn?: number;
-    refresh?: 'wait_for' | 'false';
+  _id?: string;
+  expiresIn?: number;
+  refresh?: "wait_for" | "false";
 }
 
-export interface ArgsAuthControllerCheckRights extends ArgsDefault {
-}
+export type ArgsAuthControllerCheckRights = ArgsDefault;
 
 export interface ArgsAuthControllerDeleteApiKey extends ArgsDefault {
-    refresh?: 'wait_for' | 'false';
+  refresh?: "wait_for" | "false";
 }
 
 export interface ArgsAuthControllerSearchApiKeys extends ArgsDefault {
-    from?: number;
-    size?: number;
-    lang?: string;
+  from?: number;
+  size?: number;
+  lang?: string;
 }
 
-export interface ArgsAuthControllerCheckToken extends ArgsDefault {
-}
+export type ArgsAuthControllerCheckToken = ArgsDefault;
 
-export interface ArgsAuthControllerCreateMyCredentials extends ArgsDefault {
-}
+export type ArgsAuthControllerCreateMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerCredentialsExist extends ArgsDefault {
-}
+export type ArgsAuthControllerCredentialsExist = ArgsDefault;
 
-export interface ArgsAuthControllerDeleteMyCredentials extends ArgsDefault {
-}
+export type ArgsAuthControllerDeleteMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerGetCurrentUser extends ArgsDefault {
-}
+export type ArgsAuthControllerGetCurrentUser = ArgsDefault;
 
-export interface ArgsAuthControllerGetMyCredentials extends ArgsDefault {
-}
+export type ArgsAuthControllerGetMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerGetMyRights extends ArgsDefault {
-}
+export type ArgsAuthControllerGetMyRights = ArgsDefault;
 
-export interface ArgsAuthControllerGetStrategies extends ArgsDefault {
-}
+export type ArgsAuthControllerGetStrategies = ArgsDefault;
 
-export interface ArgsAuthControllerUpdateMyCredentials extends ArgsDefault {
-}
+export type ArgsAuthControllerUpdateMyCredentials = ArgsDefault;
 
-export interface ArgsAuthControllerUpdateSelf extends ArgsDefault {
-}
+export type ArgsAuthControllerUpdateSelf = ArgsDefault;
 
-export interface ArgsAuthControllerValidateMyCredentials extends ArgsDefault {
-}
+export type ArgsAuthControllerValidateMyCredentials = ArgsDefault;
 
 export interface ArgsAuthControllerRefreshToken extends ArgsDefault {
-    expiresIn?: number | string;
+  expiresIn?: number | string;
 }

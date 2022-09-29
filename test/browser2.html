@@ -6,19 +6,19 @@
     <script src="../dist/kuzzle.js"></script>
   </head>
   <body>
-    <h1>
-      Kuzzle Javascript SDK
-    </h1>
+    <h1>Kuzzle Javascript SDK</h1>
     <script type="application/javascript">
       (async function () {
-        window.kuzzle = new KuzzleSDK.Kuzzle(new KuzzleSDK.WebSocket('localhost'))
+        window.kuzzle = new KuzzleSDK.Kuzzle(
+          new KuzzleSDK.WebSocket("localhost")
+        );
 
-        await window.kuzzle.connect()
+        await window.kuzzle.connect();
 
         setInterval(async () => {
-          console.log('Send')
+          console.log("Send");
           await window.kuzzle.index.list();
-        }, 1000)
+        }, 1000);
       })();
     </script>
   </body>
