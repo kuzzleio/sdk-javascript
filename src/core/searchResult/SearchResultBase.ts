@@ -164,13 +164,11 @@ export class SearchResultBase<T> implements SearchResult<T> {
       }
 
       return this._kuzzle
-        .query(
-          {
-            ...this._request,
-            action: this._searchAction,
-            from: this.fetched,
-          },
-        )
+        .query({
+          ...this._request,
+          action: this._searchAction,
+          from: this.fetched,
+        })
         .then(({ result }) => this._buildNextSearchResult(result));
     }
 
