@@ -170,7 +170,6 @@ export class SearchResultBase<T> implements SearchResult<T> {
             action: this._searchAction,
             from: this.fetched,
           },
-          this._options
         )
         .then(({ result }) => this._buildNextSearchResult(result));
     }
