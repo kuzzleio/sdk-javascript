@@ -167,8 +167,7 @@ describe("RoleSearchResult", () => {
                 action: "searchRoles",
                 size: 2,
                 from: 2,
-              },
-              options
+              }
             );
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(RoleSearchResult);
