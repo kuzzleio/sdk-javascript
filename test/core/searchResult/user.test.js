@@ -392,15 +392,13 @@ describe("UserSearchResult", () => {
         return searchResult.next().then((nextSearchResult) => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith(
-              {
-                body: { query: { foo: "bar" } },
-                controller: "security",
-                action: "searchUsers",
-                size: 2,
-                from: 2,
-              }
-            );
+            .be.calledWith({
+              body: { query: { foo: "bar" } },
+              controller: "security",
+              action: "searchUsers",
+              size: 2,
+              from: 2,
+            });
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(UserSearchResult);
         });
