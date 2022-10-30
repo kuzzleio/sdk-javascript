@@ -160,16 +160,13 @@ describe("RoleSearchResult", () => {
         return searchResult.next().then((nextSearchResult) => {
           should(kuzzle.query)
             .be.calledOnce()
-            .be.calledWith(
-              {
-                body: { foo: "bar" },
-                controller: "security",
-                action: "searchRoles",
-                size: 2,
-                from: 2,
-              },
-              options
-            );
+            .be.calledWith({
+              body: { foo: "bar" },
+              controller: "security",
+              action: "searchRoles",
+              size: 2,
+              from: 2,
+            });
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(RoleSearchResult);
         });
