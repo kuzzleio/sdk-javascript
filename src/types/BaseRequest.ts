@@ -1,6 +1,6 @@
 import { JSONObject } from "./JSONObject";
 
-export interface BaseRequest {
+export interface BaseRequest extends JSONObject {
   controller: string;
 
   action: string;

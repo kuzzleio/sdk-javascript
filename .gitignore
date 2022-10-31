@@ -65,3 +65,9 @@ src/controllers/Server.js
 src/core/Observer.js
 src/core/RealtimeDocument.js
 src/core/searchResult/RealtimeDocument.js
+src/core/InstrumentablePromise.js
+src/core/batchWriter/BatchBuffer.js
+src/core/batchWriter/BatchController.js
+src/core/batchWriter/BatchWriter.js
+src/protocols/abstract/PendingRequest.js
+src/utils/object.js

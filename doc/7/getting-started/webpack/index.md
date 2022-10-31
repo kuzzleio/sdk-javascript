@@ -21,7 +21,7 @@ Before going through this tutorial, you should have a Kuzzle server running. Ple
 
 ## Fun with the SDK
 
-It's time to play with the [Kuzzle Javscript SDK](/sdk/js/7). In this section, we will store a document and subscribe to notifications in Kuzzle using the Javascript SDK in your browser.
+It's time to play with the [Kuzzle Javascript SDK](/sdk/js/7). In this section, we will store a document and subscribe to notifications in Kuzzle using the Javascript SDK in your browser.
 
 Before proceeding, please make sure your system has **Node.js** version 8 or higher ([instructions here](https://nodejs.org/en/download/)) installed.
 
