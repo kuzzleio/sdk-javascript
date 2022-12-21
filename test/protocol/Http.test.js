@@ -284,8 +284,8 @@ describe("HTTP networking module", () => {
     it("should send an HTTP request to the backend", (done) => {
       const data = {
         requestId: "requestId",
-        controller: "index",
-        action: "create",
+        controller: "foo",
+        action: "bar",
         index: "index",
         collection: "collection",
         meta: "meta",
@@ -298,14 +298,14 @@ describe("HTTP networking module", () => {
 
           should(protocol._sendHttpRequest.firstCall).be.calledWithMatch({
             method: "VERB",
-            path: "/index/_create",
+            path: "/foo/bar",
             payload: {
               requestId: "requestId",
               headers: {
                 "Content-Type": "application/json",
               },
-              controller: "index",
-              action: "create",
+              controller: "foo",
+              action: "bar",
               index: "index",
               collection: "collection",
               meta: "meta",
@@ -325,9 +325,8 @@ describe("HTTP networking module", () => {
     it("should inject JWT header to the HTTP request", (done) => {
       const data = {
         requestId: "requestId",
-        controller: "index",
-        action: "create",
-        index: "index",
+        controller: "foo",
+        action: "bar",
         jwt: "fake-jwt",
       };
 
@@ -337,15 +336,14 @@ describe("HTTP networking module", () => {
             .be.calledOnce()
             .and.be.calledWithMatch({
               method: "VERB",
-              path: "/index/_create",
+              path: "/foo/bar",
               payload: {
                 requestId: "requestId",
                 headers: {
                   authorization: "Bearer fake-jwt",
                 },
-                controller: "index",
-                action: "create",
-                index: "index",
+                controller: "foo",
+                action: "bar",
               },
             });
 
