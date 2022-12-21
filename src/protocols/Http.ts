@@ -274,6 +274,14 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
         payload.headers.authorization = "Bearer " + value;
       } else if (key === "volatile") {
         payload.headers["x-kuzzle-volatile"] = JSON.stringify(value);
+      } else if (key === "index" || key === "collection") {
+        // If we're calling a non-native route that answer to a GET request
+        // we need to add the index and collection (if provided) to the query string
+        if (!staticHttpRoutes[request.controller][request.action] && method === "GET") {
+          queryArgs[key] = value;
+        } else {
+          payload[key] = value;
+        }
       } else if (Object.prototype.hasOwnProperty.call(payload, key)) {
         payload[key] = value;
       } else if (value !== undefined && value !== null) {

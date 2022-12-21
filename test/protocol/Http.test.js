@@ -284,8 +284,8 @@ describe("HTTP networking module", () => {
     it("should send an HTTP request to the backend", (done) => {
       const data = {
         requestId: "requestId",
-        controller: "foo",
-        action: "bar",
+        controller: "index",
+        action: "create",
         index: "index",
         collection: "collection",
         meta: "meta",
@@ -298,14 +298,14 @@ describe("HTTP networking module", () => {
 
           should(protocol._sendHttpRequest.firstCall).be.calledWithMatch({
             method: "VERB",
-            path: "/foo/bar",
+            path: "/index/_create",
             payload: {
               requestId: "requestId",
               headers: {
                 "Content-Type": "application/json",
               },
-              controller: "foo",
-              action: "bar",
+              controller: "index",
+              action: "create",
               index: "index",
               collection: "collection",
               meta: "meta",
@@ -325,8 +325,9 @@ describe("HTTP networking module", () => {
     it("should inject JWT header to the HTTP request", (done) => {
       const data = {
         requestId: "requestId",
-        controller: "foo",
-        action: "bar",
+        controller: "index",
+        action: "create",
+        index: "index",
         jwt: "fake-jwt",
       };
 
@@ -336,14 +337,15 @@ describe("HTTP networking module", () => {
             .be.calledOnce()
             .and.be.calledWithMatch({
               method: "VERB",
-              path: "/foo/bar",
+              path: "/index/_create",
               payload: {
                 requestId: "requestId",
                 headers: {
                   authorization: "Bearer fake-jwt",
                 },
-                controller: "foo",
-                action: "bar",
+                controller: "index",
+                action: "create",
+                index: "index",
               },
             });
 
@@ -633,6 +635,33 @@ describe("HTTP networking module", () => {
       protocol.on("requestId", (error) => {
         should(protocol._sendHttpRequest).not.be.called();
         should(error.status).be.eql(400);
+
+        done();
+      });
+
+      protocol.send(data);
+    });
+
+    it("should add index and collection to the query args if they are defined when using a custom GET route", (done) => {
+      const data = {
+        requestId: "requestId",
+        controller: "foo",
+        action: "bar",
+        index: "index",
+        collection: "collection",
+      };
+
+      protocol._routes = {
+        foo: { bar: { verb: "GET", url: "/foo/bar" } },
+      };
+
+      protocol.on("requestId", () => {
+        should(protocol._sendHttpRequest)
+          .be.calledOnce()
+          .and.be.calledWithMatch({
+            method: "GET",
+            path: "/foo/bar?index=index&collection=collection",
+          });
 
         done();
       });
