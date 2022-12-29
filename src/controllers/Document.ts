@@ -840,7 +840,7 @@ export interface ArgsDocumentControllerDelete extends ArgsDefault {
 }
 
 export interface ArgsDocumentControllerDeleteByQuery extends ArgsDefault {
-  refresh?: string;
+  refresh?: "wait_for" | "false";
   silent?: boolean;
   lang?: string;
 }
@@ -933,7 +933,7 @@ export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
 export interface ArgsDocumentControllerUpsert<TKDocumentContent>
   extends ArgsDefault {
   default?: Partial<TKDocumentContent>;
-  refresh?: string;
+  refresh?: "wait_for" | "false";
   silent?: boolean;
   retryOnConflict?: boolean;
   source?: boolean;
