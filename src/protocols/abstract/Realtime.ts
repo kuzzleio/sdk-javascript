@@ -83,11 +83,12 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
       this.retrying = true;
 
       if (
+        window !== null &&
         typeof window === "object" &&
-        typeof window.navigator === "object" &&
-        window.navigator.onLine === false
+        typeof window!.navigator === "object" &&
+        window!.navigator.onLine === false
       ) {
-        window.addEventListener(
+        window!.addEventListener(
           "online",
           () => {
             this.retrying = false;

@@ -3,19 +3,33 @@ let NODE_DEBUG;
 /* eslint no-undef: 0 */
 
 function shouldDebug() {
-  if (typeof window === "undefined") {
-    // Avoid multiple calls to process.env
-    if (!NODE_DEBUG) {
-      NODE_DEBUG = (process.env.DEBUG || "").includes("kuzzle-sdk");
+  /**
+   * Some framework like react-native or other might emulate the window object
+   * but when on plateforms like iOS / Android, the window.location is undefined.
+   *
+   * So we need to check if window.location is defined before using it otherwise
+   * we will get an error.
+   *
+   * If something went wrong, be sure to return false to avoid any error.
+   */
+  try {
+    if (typeof window === "undefined") {
+      // Avoid multiple calls to process.env
+      if (!NODE_DEBUG) {
+        NODE_DEBUG = (process.env.DEBUG || "").includes("kuzzle-sdk");
+      }
+
+      return NODE_DEBUG;
     }
 
-    return NODE_DEBUG;
+    return (
+      window.debugKuzzleSdk ||
+      (window.location &&
+        new URL(window.location).searchParams.get("debugKuzzleSdk") !== null)
+    );
+  } catch (e) {
+    return false;
   }
-
-  return (
-    window.debugKuzzleSdk ||
-    new URL(window.location).searchParams.get("debugKuzzleSdk") !== null
-  );
 }
 
 /**
