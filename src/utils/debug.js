@@ -23,7 +23,7 @@ function shouldDebug() {
 
       return NODE_DEBUG;
     }
-    
+
     const window = getBrowserWindow();
     return (
       window.debugKuzzleSdk ||

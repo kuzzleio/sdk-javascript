@@ -30,8 +30,7 @@ export function getBrowserWindow(): Window | undefined {
 }
 
 export function isBrowser(): boolean {
-  const window = getBrowserWindow()
+  const window = getBrowserWindow();
 
-  return window !== undefined
-  && typeof window === 'object';
+  return window !== undefined && window !== null && typeof window === "object";
 }
