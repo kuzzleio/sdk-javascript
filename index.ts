@@ -1,4 +1,4 @@
-import { isBrowser } from 'src/utils/browser';
+import { isBrowser } from './src/utils/browser';
 
 // defined by webpack plugin
 declare var BUILT: any;
