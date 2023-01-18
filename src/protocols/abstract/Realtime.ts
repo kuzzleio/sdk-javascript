@@ -2,6 +2,7 @@
 
 import { KuzzleAbstractProtocol } from "./Base";
 import * as DisconnectionOrigin from "../DisconnectionOrigin";
+import { getBrowserWindow, isBrowser } from "../../utils/browser";
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected _reconnectionDelay: number;
@@ -82,13 +83,13 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
     if (this.autoReconnect && !this.retrying && !this.stopRetryingToConnect) {
       this.retrying = true;
 
+      const window = getBrowserWindow();
       if (
-        window !== null &&
-        typeof window === "object" &&
-        typeof window!.navigator === "object" &&
-        window!.navigator.onLine === false
+        isBrowser() &&
+        typeof window.navigator === "object" &&
+        window.navigator.onLine === false
       ) {
-        window!.addEventListener(
+        window.addEventListener(
           "online",
           () => {
             this.retrying = false;
