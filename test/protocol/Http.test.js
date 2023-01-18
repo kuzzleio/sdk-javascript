@@ -639,6 +639,33 @@ describe("HTTP networking module", () => {
 
       protocol.send(data);
     });
+
+    it("should add index and collection to the query args if they are defined when using a custom GET route", (done) => {
+      const data = {
+        requestId: "requestId",
+        controller: "foo",
+        action: "bar",
+        index: "index",
+        collection: "collection",
+      };
+
+      protocol._routes = {
+        foo: { bar: { verb: "GET", url: "/foo/bar" } },
+      };
+
+      protocol.on("requestId", () => {
+        should(protocol._sendHttpRequest)
+          .be.calledOnce()
+          .and.be.calledWithMatch({
+            method: "GET",
+            path: "/foo/bar?index=index&collection=collection",
+          });
+
+        done();
+      });
+
+      protocol.send(data);
+    });
   });
 
   describe("#sendHttpRequest NodeJS", () => {
