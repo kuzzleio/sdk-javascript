@@ -1,5 +1,7 @@
 let NODE_DEBUG;
 
+const { isBrowser, getBrowserWindow } = require("./browser");
+
 /* eslint no-undef: 0 */
 
 function shouldDebug() {
@@ -13,7 +15,7 @@ function shouldDebug() {
    * If something went wrong, be sure to return false to avoid any error.
    */
   try {
-    if (typeof window === "undefined") {
+    if (!isBrowser()) {
       // Avoid multiple calls to process.env
       if (!NODE_DEBUG) {
         NODE_DEBUG = (process.env.DEBUG || "").includes("kuzzle-sdk");
@@ -22,6 +24,7 @@ function shouldDebug() {
       return NODE_DEBUG;
     }
 
+    const window = getBrowserWindow();
     return (
       window.debugKuzzleSdk ||
       (window.location &&
@@ -49,7 +52,7 @@ function debug(message, obj) {
 
   if (obj) {
     // Browser console can print directly objects
-    const toPrint = typeof window === "undefined" ? JSON.stringify(obj) : obj;
+    const toPrint = !isBrowser() ? JSON.stringify(obj) : obj;
 
     // eslint-disable-next-line no-console
     console.log(toPrint);
