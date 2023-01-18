@@ -1,7 +1,9 @@
+import { isBrowser } from 'src/utils/browser';
+
 // defined by webpack plugin
 declare var BUILT: any;
 
-if (typeof window !== 'undefined' && typeof BUILT === 'undefined') {
+if (isBrowser() && typeof BUILT === 'undefined') {
   throw new Error('It looks like you are using the Nodejs version of Kuzzle SDK ' +
                'in a browser. ' +
                'It is strongly recommended to use the browser-specific build instead. ' +

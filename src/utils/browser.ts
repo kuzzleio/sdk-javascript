@@ -1,6 +1,12 @@
-export function getBrowserWindow() {
-  let windowObject;
-  
+let windowObject: Window | undefined;
+
+let cachedWindowObject = false;
+
+export function getBrowserWindow(): Window | undefined {
+  if (cachedWindowObject) {
+    return windowObject;
+  }
+
   try {
     windowObject ||= globalThis.window;
   } catch {
@@ -19,10 +25,11 @@ export function getBrowserWindow() {
     // do nothing
   }
 
+  cachedWindowObject = true;
   return windowObject;
 }
 
-export function isBrowser() {
+export function isBrowser(): boolean {
   const window = getBrowserWindow()
 
   return window !== undefined

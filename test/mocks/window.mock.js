@@ -1,12 +1,13 @@
 const sinon = require("sinon"),
   { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter");
+const { getBrowserWindow } = require("../../src/utils/browser");
 
 // A class to mock the global window object
 class WindowMock extends KuzzleEventEmitter {
   constructor() {
     super();
 
-    if (typeof window !== "undefined") {
+    if (typeof getBrowserWindow() !== "undefined") {
       throw new Error(
         'Cannot mock add a global "window" object: already defined'
       );
@@ -21,11 +22,11 @@ class WindowMock extends KuzzleEventEmitter {
   }
 
   static restore() {
-    delete global.window;
+    delete getBrowserWindow().window;
   }
 
   static inject() {
-    Object.defineProperty(global, "window", {
+    Object.defineProperty(getBrowserWindow(), "window", {
       value: new this(),
       enumerable: false,
       writable: false,
