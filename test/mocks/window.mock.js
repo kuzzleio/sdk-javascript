@@ -22,11 +22,11 @@ class WindowMock extends KuzzleEventEmitter {
   }
 
   static restore() {
-    delete getBrowserWindow().window;
+    delete global.window;
   }
 
   static inject() {
-    Object.defineProperty(getBrowserWindow(), "window", {
+    Object.defineProperty(global, "window", {
       value: new this(),
       enumerable: false,
       writable: false,

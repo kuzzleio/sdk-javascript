@@ -2,7 +2,7 @@
 
 import { KuzzleAbstractProtocol } from "./Base";
 import * as DisconnectionOrigin from "../DisconnectionOrigin";
-import { getBrowserWindow, isBrowser } from "src/utils/browser";
+import { getBrowserWindow, isBrowser } from "../../utils/browser";
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected _reconnectionDelay: number;
