@@ -1,32 +1,32 @@
-let windowObject: Window | undefined;
-
-let cachedWindowObject = false;
-
 export function getBrowserWindow(): Window | undefined {
-  if (cachedWindowObject) {
-    return windowObject;
-  }
+  let windowObject: Window | undefined;
 
   try {
     windowObject ||= globalThis.window;
+    if (windowObject) {
+      return windowObject;
+    }
   } catch {
-    // do nothing
+    // Check next variable
   }
 
   try {
     windowObject ||= global.window;
+    if (windowObject) {
+      return windowObject;
+    }
   } catch {
-    // do nothing
+    // Check next variable
   }
 
   try {
     windowObject ||= window;
+    if (windowObject) {
+      return windowObject;
+    }
   } catch {
-    // do nothing
+    // return undefined
   }
-
-  cachedWindowObject = true;
-  return windowObject;
 }
 
 export function isBrowser(): boolean {
