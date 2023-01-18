@@ -52,7 +52,7 @@ function debug(message, obj) {
 
   if (obj) {
     // Browser console can print directly objects
-    const toPrint = isBrowser() ? JSON.stringify(obj) : obj;
+    const toPrint = !isBrowser() ? JSON.stringify(obj) : obj;
 
     // eslint-disable-next-line no-console
     console.log(toPrint);
