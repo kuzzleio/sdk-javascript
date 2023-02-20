@@ -780,7 +780,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * @param req
    * @param opts - Optional arguments
    */
-  query<TRequest extends BaseRequest, TResult>(
+  query<TRequest extends BaseRequest = BaseRequest, TResult = JSONObject>(
     req: TRequest,
     opts: JSONObject = {}
   ): Promise<ResponsePayload<TResult>> {
