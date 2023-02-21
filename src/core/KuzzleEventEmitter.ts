@@ -1,3 +1,6 @@
+import { KuzzleError } from "../KuzzleError";
+import { Notification, RequestPayload } from "../types";
+
 class Listener {
   public fn: (...any) => any;
   public once: boolean;
@@ -8,6 +11,18 @@ class Listener {
   }
 }
 
+export type KuzzleSDKEvents =
+  | "connected"
+  | "reconnected"
+  | "tokenExpired"
+  | "loginAttempt"
+  | "discarded"
+  | "disconnected"
+  | "networkError"
+  | "offlineQueuePop"
+  | "offlineQueuePush"
+  | "queryError"
+  | "callbackError";
 /**
  * @todo proper TS conversion
  */
@@ -22,7 +37,7 @@ export class KuzzleEventEmitter {
     return Boolean(listeners.find((listener) => listener.fn === fn));
   }
 
-  listeners(eventName) {
+  listeners(eventName: KuzzleSDKEvents) {
     if (!this._events.has(eventName)) {
       return [];
     }
@@ -30,7 +45,7 @@ export class KuzzleEventEmitter {
     return this._events.get(eventName).map((listener) => listener.fn);
   }
 
-  addListener(eventName, listener, once = false) {
+  addListener(eventName: KuzzleSDKEvents, listener, once = false) {
     if (!eventName || !listener) {
       return this;
     }
@@ -54,7 +69,49 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  on(eventName, listener) {
+  on(
+    eventName: "connected" | "reconnected" | "tokenExpired",
+    listener: () => void
+  ): this;
+  on(
+    eventName: "loginAttempt",
+    listener: (data: { success: boolean; error: string }) => void
+  ): this;
+  on(eventName: "discarded", listener: (request: RequestPayload) => void): this;
+  on(
+    eventName: "disconnected",
+    listener: (context: {
+      origin:
+        | "websocket/auth-renewal"
+        | "user/connection-closed"
+        | "network/error";
+    }) => void
+  ): this;
+  on(
+    eventName: "networkError",
+    listener: (error: {
+      message: string;
+      status: number;
+      stack?: string;
+    }) => void
+  ): this;
+  on(
+    eventName: "offlineQueuePop",
+    listener: (request: RequestPayload) => void
+  ): this;
+  on(
+    eventName: "offlineQueuePush",
+    listener: (data: { request: RequestPayload }) => void
+  ): this;
+  on(
+    eventName: "queryError",
+    listener: (data: { error: KuzzleError; request: RequestPayload }) => void
+  ): this;
+  on(
+    eventName: "callbackError",
+    listener: (data: { error: KuzzleError; notification: Notification }) => void
+  ): this;
+  on(eventName: KuzzleSDKEvents, listener: (args: any) => void): this {
     return this.addListener(eventName, listener);
   }
 
@@ -90,7 +147,7 @@ export class KuzzleEventEmitter {
     return this.prependListener(eventName, listener, true);
   }
 
-  removeListener(eventName, listener) {
+  removeListener(eventName: KuzzleSDKEvents, listener: (args: any) => void) {
     const listeners = this._events.get(eventName);
 
     if (!listeners || !listeners.length) {
@@ -110,7 +167,7 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners(eventName?: string) {
+  removeAllListeners(eventName?: KuzzleSDKEvents) {
     if (eventName) {
       this._events.delete(eventName);
     } else {
@@ -120,7 +177,7 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  emit(eventName, ...payload) {
+  emit(eventName: KuzzleSDKEvents, ...payload: (Error | RequestPayload)[]) {
     const listeners = this._events.get(eventName);
 
     if (listeners === undefined) {
@@ -148,7 +205,7 @@ export class KuzzleEventEmitter {
     return Array.from(this._events.keys());
   }
 
-  listenerCount(eventName) {
+  listenerCount(eventName: KuzzleSDKEvents) {
     return (
       (this._events.has(eventName) && this._events.get(eventName).length) || 0
     );

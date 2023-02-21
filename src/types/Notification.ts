@@ -57,12 +57,12 @@ export interface BaseNotification {
  * (create, update, delete)
  */
 export interface DocumentNotification<
-  DocContent extends KDocumentContentGeneric = KDocumentContentGeneric
+  TDocContent extends KDocumentContentGeneric = KDocumentContentGeneric
 > extends BaseNotification {
   /**
    * Updated document that triggered the notification
    */
-  result: KDocument<DocContent>;
+  result: KDocument<TDocContent>;
   /**
    * State of the document regarding the scope (`in` or `out`)
    */
