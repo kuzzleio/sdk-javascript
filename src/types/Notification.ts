@@ -6,18 +6,12 @@ import { KDocument, KDocumentContentGeneric } from ".";
  */
 export type NotificationType = "document" | "user" | "TokenExpired";
 
-/**
- * Real-time notifications sent by Kuzzle.
- *
- */
-export interface Notification {
+export interface BaseNotification {
   /**
    * Notification type
    */
   type: NotificationType;
-}
 
-export interface BaseNotification extends Notification {
   /**
    * Controller that triggered the notification
    */
@@ -62,11 +56,13 @@ export interface BaseNotification extends Notification {
  * Notification triggered by a document change.
  * (create, update, delete)
  */
-export interface DocumentNotification extends BaseNotification {
+export interface DocumentNotification<
+  DocContent extends KDocumentContentGeneric = KDocumentContentGeneric
+> extends BaseNotification {
   /**
    * Updated document that triggered the notification
    */
-  result: KDocument<KDocumentContentGeneric>;
+  result: KDocument<DocContent>;
   /**
    * State of the document regarding the scope (`in` or `out`)
    */
@@ -105,3 +101,11 @@ export interface ServerNotification extends BaseNotification {
 
   type: "TokenExpired";
 }
+
+/**
+ * Real-time notifications sent by Kuzzle.
+ */
+export type Notification =
+  | DocumentNotification
+  | UserNotification
+  | ServerNotification;
