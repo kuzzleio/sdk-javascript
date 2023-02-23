@@ -620,6 +620,19 @@ export class Kuzzle extends KuzzleEventEmitter {
     return this.protocol.connect();
   }
 
+  /**
+   * Set this client to use a specific API key.
+   *
+   * After doing this you don't need to use login as it bypasses the authentication process.
+   */
+  public setAPIKey(apiKey: string) {
+    if (apiKey.match(/^kapikey-/) === null) {
+      throw new Error("Invalid API key. Missing the `kapikey-` prefix.");
+    }
+
+    this.jwt = apiKey;
+  }
+
   async _reconnect() {
     if (this._reconnectInProgress) {
       return;

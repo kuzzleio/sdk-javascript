@@ -18,6 +18,9 @@ try {
   */
 
   console.log('API key successfully created');
+
+  // Then use it with your client. Note: You don't need to call login after this because this bypasses the authentication system.
+  kuzzle.setAPIKey(apiKey._source.token)
 } catch (e) {
   console.error(e);
 }
