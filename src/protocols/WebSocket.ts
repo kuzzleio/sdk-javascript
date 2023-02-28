@@ -5,7 +5,7 @@ import { BaseProtocolRealtime } from "./abstract/Realtime";
 import { JSONObject } from "../types";
 import { RequestPayload } from "../types/RequestPayload";
 import HttpProtocol from "./Http";
-import * as DisconnectionOrigin from "./DisconnectionOrigin";
+import { DisconnectionOrigin } from "./DisconnectionOrigin";
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -285,7 +285,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * @override
    */
-  clientDisconnected(origin: string) {
+  clientDisconnected(origin: DisconnectionOrigin) {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.clientDisconnected(origin);

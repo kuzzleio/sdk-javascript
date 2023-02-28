@@ -1,4 +1,4 @@
-import { KuzzleEventEmitter } from "./core/KuzzleEventEmitter";
+import { KuzzleEventEmitter, KuzzleSDKEvents } from "./core/KuzzleEventEmitter";
 import { KuzzleAbstractProtocol } from "./protocols/abstract/Base";
 
 import { AuthController } from "./controllers/Auth";
@@ -542,7 +542,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Emit an event to all registered listeners
    * An event cannot be emitted multiple times before a timeout has been reached.
    */
-  emit(eventName: string, ...payload) {
+  emit(eventName: KuzzleSDKEvents, ...payload: unknown[]) {
     const now = Date.now(),
       protectedEvent = this._protectedEvents[eventName];
 

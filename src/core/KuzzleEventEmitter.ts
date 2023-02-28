@@ -1,8 +1,10 @@
+import { DisconnectionOrigin } from "../protocols/DisconnectionOrigin";
 import { KuzzleError } from "../KuzzleError";
 import { Notification, RequestPayload } from "../types";
 
+type ListenerFunction = (...args: unknown[]) => unknown;
 class Listener {
-  public fn: (...any) => any;
+  public fn: ListenerFunction;
   public once: boolean;
 
   constructor(fn, once = false) {
@@ -12,17 +14,25 @@ class Listener {
 }
 
 export type KuzzleSDKEvents =
+  | "connect"
+  | "reconnect"
   | "connected"
   | "reconnected"
+  | "reAuthenticated"
   | "tokenExpired"
   | "loginAttempt"
   | "discarded"
+  | "disconnect"
   | "disconnected"
   | "networkError"
+  | "queryError"
+  | "reconnectionError"
+  | "callbackError"
   | "offlineQueuePop"
   | "offlineQueuePush"
-  | "queryError"
-  | "callbackError";
+  | "logoutAttempt"
+  | "websocketRenewalStart"
+  | "websocketRenewalDone";
 /**
  * @todo proper TS conversion
  */
@@ -33,7 +43,7 @@ export class KuzzleEventEmitter {
     this._events = new Map();
   }
 
-  private _exists(listeners, fn) {
+  private _exists(listeners: Listener[], fn: ListenerFunction) {
     return Boolean(listeners.find((listener) => listener.fn === fn));
   }
 
@@ -45,11 +55,16 @@ export class KuzzleEventEmitter {
     return this._events.get(eventName).map((listener) => listener.fn);
   }
 
-  addListener(eventName: KuzzleSDKEvents, listener, once = false) {
+  addListener(
+    eventName: KuzzleSDKEvents,
+    listener: ListenerFunction,
+    once = false
+  ) {
     if (!eventName || !listener) {
       return this;
     }
 
+    // TODO: this check could be safely, when TypeScript type will be completed.
     const listenerType = typeof listener;
 
     if (listenerType !== "function") {
@@ -70,8 +85,18 @@ export class KuzzleEventEmitter {
   }
 
   on(
-    eventName: "connected" | "reconnected" | "tokenExpired",
+    eventName:
+      | "connected"
+      | "reconnected"
+      | "tokenExpired"
+      | "reAuthenticated"
+      | "websocketRenewalStart"
+      | "websocketRenewalDone",
     listener: () => void
+  ): this;
+  on(
+    eventName: "logoutAttempt",
+    listener: (status: { success: true }) => void
   ): this;
   on(
     eventName: "loginAttempt",
@@ -79,21 +104,12 @@ export class KuzzleEventEmitter {
   ): this;
   on(eventName: "discarded", listener: (request: RequestPayload) => void): this;
   on(
-    eventName: "disconnected",
-    listener: (context: {
-      origin:
-        | "websocket/auth-renewal"
-        | "user/connection-closed"
-        | "network/error";
-    }) => void
+    eventName: "disconnect" | "disconnected",
+    listener: (context: { origin: DisconnectionOrigin }) => void
   ): this;
   on(
-    eventName: "networkError",
-    listener: (error: {
-      message: string;
-      status: number;
-      stack?: string;
-    }) => void
+    eventName: "networkError" | "reconnectionError",
+    listener: (error: Error) => void
   ): this;
   on(
     eventName: "offlineQueuePop",
@@ -147,7 +163,9 @@ export class KuzzleEventEmitter {
     return this.prependListener(eventName, listener, true);
   }
 
-  removeListener(eventName: KuzzleSDKEvents, listener: (args: any) => void) {
+  removeListener(eventName: KuzzleSDKEvents, listener: () => void): this;
+  removeListener(eventName: string, listener: () => void): this;
+  removeListener(eventName: string, listener: (...args: unknown[]) => void) {
     const listeners = this._events.get(eventName);
 
     if (!listeners || !listeners.length) {
@@ -167,7 +185,9 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners(eventName?: KuzzleSDKEvents) {
+  removeAllListeners(eventName?: KuzzleSDKEvents): this;
+  removeAllListeners(eventName?: string): this;
+  removeAllListeners(eventName?: string): this {
     if (eventName) {
       this._events.delete(eventName);
     } else {
@@ -177,7 +197,10 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  emit(eventName: KuzzleSDKEvents, ...payload: (Error | RequestPayload)[]) {
+  // TODO: Improve these unknown type someday, to secure all emit events and be sure they match {@link KuzzleEventEmitter.on}.
+  emit(eventName: KuzzleSDKEvents, ...payload: unknown[]): boolean;
+  emit(eventName: string, ...payload: unknown[]): boolean;
+  emit(eventName: string, ...payload: unknown[]): boolean {
     const listeners = this._events.get(eventName);
 
     if (listeners === undefined) {
