@@ -5,6 +5,7 @@
  * If you see red warning, it's likely that you broke the code somewhere and introduced a breaking change.
  *
  * TODO: This can be safely removed when test will be migrated to TypeScript.
+ * TODO: Due to how the stack actually build and test, this file is not part of the CI, check it on your own before pushing.
  *
  * Inspired by TS standard from DefinitelyTyped
  * @see https://github.com/DefinitelyTyped/DefinitelyTyped#my-package-teststs
