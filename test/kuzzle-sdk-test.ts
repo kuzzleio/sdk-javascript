@@ -30,7 +30,7 @@ kuzzle.on(
     volatile,
   }) => {}
 );
-kuzzle.on("disconnect", ({ origin }) => {});
+kuzzle.on("disconnected", ({ origin }) => {});
 kuzzle.on("loginAttempt", ({ success, error }) => {});
 
 // Methods

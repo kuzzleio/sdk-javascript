@@ -1,8 +1,5 @@
-import { DisconnectionOrigin } from "../protocols/DisconnectionOrigin";
-import { KuzzleError } from "../KuzzleError";
-import { Notification, RequestPayload } from "../types";
-
 type ListenerFunction = (...args: unknown[]) => unknown;
+
 class Listener {
   public fn: ListenerFunction;
   public once: boolean;
@@ -13,26 +10,37 @@ class Listener {
   }
 }
 
-export type KuzzleSDKEvents =
+export type PublicKuzzleEvents =
+  | "callbackError"
+  | "connected"
+  | "discarded"
+  | "disconnected"
+  | "loginAttempt"
+  | "logoutAttempt"
+  | "networkError"
+  | "offlineQueuePush"
+  | "offlineQueuePop"
+  | "queryError"
+  | "reAuthenticated"
+  | "reconnected"
+  | "reconnectionError"
+  | "tokenExpired";
+
+type PrivateKuzzleEvents =
   | "connect"
   | "reconnect"
-  | "connected"
-  | "reconnected"
-  | "reAuthenticated"
-  | "tokenExpired"
-  | "loginAttempt"
-  | "discarded"
   | "disconnect"
-  | "disconnected"
-  | "networkError"
-  | "queryError"
-  | "reconnectionError"
-  | "callbackError"
-  | "offlineQueuePop"
   | "offlineQueuePush"
-  | "logoutAttempt"
   | "websocketRenewalStart"
   | "websocketRenewalDone";
+
+/**
+ * For internal use only
+ */
+export type PrivateAndPublicSDKEvents =
+  | PublicKuzzleEvents
+  | PrivateKuzzleEvents;
+
 /**
  * @todo proper TS conversion
  */
@@ -47,7 +55,7 @@ export class KuzzleEventEmitter {
     return Boolean(listeners.find((listener) => listener.fn === fn));
   }
 
-  listeners(eventName: KuzzleSDKEvents) {
+  listeners(eventName: PrivateAndPublicSDKEvents) {
     if (!this._events.has(eventName)) {
       return [];
     }
@@ -56,7 +64,7 @@ export class KuzzleEventEmitter {
   }
 
   addListener(
-    eventName: KuzzleSDKEvents,
+    eventName: PrivateAndPublicSDKEvents,
     listener: ListenerFunction,
     once = false
   ) {
@@ -85,49 +93,9 @@ export class KuzzleEventEmitter {
   }
 
   on(
-    eventName:
-      | "connected"
-      | "reconnected"
-      | "tokenExpired"
-      | "reAuthenticated"
-      | "websocketRenewalStart"
-      | "websocketRenewalDone",
-    listener: () => void
-  ): this;
-  on(
-    eventName: "logoutAttempt",
-    listener: (status: { success: true }) => void
-  ): this;
-  on(
-    eventName: "loginAttempt",
-    listener: (data: { success: boolean; error: string }) => void
-  ): this;
-  on(eventName: "discarded", listener: (request: RequestPayload) => void): this;
-  on(
-    eventName: "disconnect" | "disconnected",
-    listener: (context: { origin: DisconnectionOrigin }) => void
-  ): this;
-  on(
-    eventName: "networkError" | "reconnectionError",
-    listener: (error: Error) => void
-  ): this;
-  on(
-    eventName: "offlineQueuePop",
-    listener: (request: RequestPayload) => void
-  ): this;
-  on(
-    eventName: "offlineQueuePush",
-    listener: (data: { request: RequestPayload }) => void
-  ): this;
-  on(
-    eventName: "queryError",
-    listener: (data: { error: KuzzleError; request: RequestPayload }) => void
-  ): this;
-  on(
-    eventName: "callbackError",
-    listener: (data: { error: KuzzleError; notification: Notification }) => void
-  ): this;
-  on(eventName: KuzzleSDKEvents, listener: (args: any) => void): this {
+    eventName: PrivateAndPublicSDKEvents,
+    listener: (args: any) => void
+  ): this {
     return this.addListener(eventName, listener);
   }
 
@@ -163,7 +131,10 @@ export class KuzzleEventEmitter {
     return this.prependListener(eventName, listener, true);
   }
 
-  removeListener(eventName: KuzzleSDKEvents, listener: () => void): this;
+  removeListener(
+    eventName: PrivateAndPublicSDKEvents,
+    listener: () => void
+  ): this;
   removeListener(eventName: string, listener: () => void): this;
   removeListener(eventName: string, listener: (...args: unknown[]) => void) {
     const listeners = this._events.get(eventName);
@@ -185,7 +156,7 @@ export class KuzzleEventEmitter {
     return this;
   }
 
-  removeAllListeners(eventName?: KuzzleSDKEvents): this;
+  removeAllListeners(eventName?: PrivateAndPublicSDKEvents): this;
   removeAllListeners(eventName?: string): this;
   removeAllListeners(eventName?: string): this {
     if (eventName) {
@@ -198,7 +169,7 @@ export class KuzzleEventEmitter {
   }
 
   // TODO: Improve these unknown type someday, to secure all emit events and be sure they match {@link KuzzleEventEmitter.on}.
-  emit(eventName: KuzzleSDKEvents, ...payload: unknown[]): boolean;
+  emit(eventName: PrivateAndPublicSDKEvents, ...payload: unknown[]): boolean;
   emit(eventName: string, ...payload: unknown[]): boolean;
   emit(eventName: string, ...payload: unknown[]): boolean {
     const listeners = this._events.get(eventName);
@@ -228,7 +199,7 @@ export class KuzzleEventEmitter {
     return Array.from(this._events.keys());
   }
 
-  listenerCount(eventName: KuzzleSDKEvents) {
+  listenerCount(eventName: PrivateAndPublicSDKEvents) {
     return (
       (this._events.has(eventName) && this._events.get(eventName).length) || 0
     );
