@@ -6,7 +6,8 @@ const NodeWS = require("ws");
 const { default: WS } = require("../../src/protocols/WebSocket");
 const windowMock = require("../mocks/window.mock");
 const { default: HttpProtocol } = require("../../src/protocols/Http");
-const DisconnectionOrigin = require("../../src/protocols/DisconnectionOrigin");
+const DisconnectionOrigin =
+  require("../../src/protocols/DisconnectionOrigin").DisconnectionOrigin;
 
 describe("WebSocket networking module", () => {
   let clock, websocket, wsargs, clientStub;
