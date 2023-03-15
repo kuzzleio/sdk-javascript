@@ -1,4 +1,8 @@
-import { KuzzleEventEmitter } from "./core/KuzzleEventEmitter";
+import {
+  KuzzleEventEmitter,
+  PrivateAndPublicSDKEvents,
+  PublicKuzzleEvents,
+} from "./core/KuzzleEventEmitter";
 import { KuzzleAbstractProtocol } from "./protocols/abstract/Base";
 
 import { AuthController } from "./controllers/Auth";
@@ -15,11 +19,13 @@ import { Deprecation } from "./utils/Deprecation";
 import { uuidv4 } from "./utils/uuidv4";
 import { proxify } from "./utils/proxify";
 import { debug } from "./utils/debug";
-import { BaseRequest, JSONObject } from "./types";
+import { BaseRequest, JSONObject, Notification } from "./types";
 import { RequestPayload } from "./types/RequestPayload";
 import { ResponsePayload } from "./types/ResponsePayload";
 import { RequestTimeoutError } from "./RequestTimeoutError";
 import { BaseProtocolRealtime } from "./protocols/abstract/Realtime";
+import { KuzzleError } from "./KuzzleError";
+import { DisconnectionOrigin } from "./protocols/DisconnectionOrigin";
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -72,7 +78,7 @@ export class Kuzzle extends KuzzleEventEmitter {
   /**
    * List of every events emitted by the SDK.
    */
-  public events = [
+  public events: PublicKuzzleEvents[] = [
     "callbackError",
     "connected",
     "discarded",
@@ -542,7 +548,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    * Emit an event to all registered listeners
    * An event cannot be emitted multiple times before a timeout has been reached.
    */
-  emit(eventName: string, ...payload) {
+  public emit(eventName: PrivateAndPublicSDKEvents, ...payload: unknown[]) {
     const now = Date.now(),
       protectedEvent = this._protectedEvents[eventName];
 
@@ -561,6 +567,48 @@ export class Kuzzle extends KuzzleEventEmitter {
 
   private _superEmit(eventName, ...payload) {
     return super.emit(eventName, ...payload);
+  }
+
+  on(
+    eventName: "connected" | "reconnected" | "reAuthenticated" | "tokenExpired",
+    listener: () => void
+  ): this;
+
+  on(
+    eventName: "logoutAttempt",
+    listener: (status: { success: true }) => void
+  ): this;
+  on(
+    eventName: "loginAttempt",
+    listener: (data: { success: boolean; error: string }) => void
+  ): this;
+  on(eventName: "discarded", listener: (request: RequestPayload) => void): this;
+  on(
+    eventName: "disconnected",
+    listener: (context: { origin: DisconnectionOrigin }) => void
+  ): this;
+  on(
+    eventName: "networkError" | "reconnectionError",
+    listener: (error: Error) => void
+  ): this;
+  on(
+    eventName: "offlineQueuePop",
+    listener: (request: RequestPayload) => void
+  ): this;
+  on(
+    eventName: "offlineQueuePush",
+    listener: (data: { request: RequestPayload }) => void
+  ): this;
+  on(
+    eventName: "queryError",
+    listener: (data: { error: KuzzleError; request: RequestPayload }) => void
+  ): this;
+  on(
+    eventName: "callbackError",
+    listener: (data: { error: KuzzleError; notification: Notification }) => void
+  ): this;
+  on(eventName: PublicKuzzleEvents, listener: (args: any) => void): this {
+    return super.on(eventName, listener);
   }
 
   /**
@@ -618,6 +666,19 @@ export class Kuzzle extends KuzzleEventEmitter {
     });
 
     return this.protocol.connect();
+  }
+
+  /**
+   * Set this client to use a specific API key.
+   *
+   * After doing this you don't need to use login as it bypasses the authentication process.
+   */
+  public setAPIKey(apiKey: string) {
+    if (apiKey.match(/^kapikey-/) === null) {
+      throw new Error("Invalid API key. Missing the `kapikey-` prefix.");
+    }
+
+    this.jwt = apiKey;
   }
 
   async _reconnect() {

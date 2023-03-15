@@ -1,8 +1,9 @@
 "use strict";
 
 import { KuzzleAbstractProtocol } from "./Base";
-import * as DisconnectionOrigin from "../DisconnectionOrigin";
 import { getBrowserWindow, isBrowser } from "../../utils/browser";
+import { DisconnectionOrigin } from "../DisconnectionOrigin";
+import { KuzzleError } from "../../KuzzleError";
 
 export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   protected _reconnectionDelay: number;
@@ -56,7 +57,7 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
    *
    * @param {string} origin String that describe what is causing the disconnection
    */
-  clientDisconnected(origin: string) {
+  clientDisconnected(origin: DisconnectionOrigin) {
     this.clear();
     this.emit("disconnect", { origin });
   }
@@ -64,9 +65,9 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
   /**
    * Called when the client's connection is closed with an error state
    *
-   * @param {Error} error
+   * @param {KuzzleError} error
    */
-  clientNetworkError(error) {
+  clientNetworkError(error: KuzzleError) {
     // Only emit disconnect once, if the connection was ready before
     if (this.isReady()) {
       this.emit("disconnect", { origin: DisconnectionOrigin.NETWORK_ERROR });
