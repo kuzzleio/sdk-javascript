@@ -67,4 +67,14 @@ export interface KHit<TKDocumentContent extends KDocumentContent>
    * Elasticsearch relevance score
    */
   _score: number;
+
+  /**
+   * Document index
+   */
+  index: string;
+
+  /**
+   * Document collection
+   */
+  collection: string;
 }
