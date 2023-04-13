@@ -70,11 +70,13 @@ export interface KHit<TKDocumentContent extends KDocumentContent>
 
   /**
    * Document index
+   * Present only in the case of a multi search
    */
-  index: string;
+  index?: string;
 
   /**
    * Document collection
+   * Present only in the case of a multi search
    */
-  collection: string;
+  collection?: string;
 }
