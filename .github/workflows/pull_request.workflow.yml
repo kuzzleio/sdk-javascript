@@ -5,11 +5,11 @@ on: [pull_request]
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -19,19 +19,19 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
       - uses: ./.github/actions/es-lint
 
   unit-tests:
      name: Unit Tests
-     runs-on: ubuntu-22.04
+     runs-on: ubuntu-20.04
      needs: [lint]
      steps:
-       - uses: actions/checkout@v2
+       - uses: actions/checkout@v3
        - name: Cache node modules
-         uses: actions/cache@v2
+         uses: actions/cache@v3
          env:
            cache-name: cache-node-modules
          with:
@@ -41,21 +41,21 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v2
+       - uses: actions/setup-node@v3
          with:
-           node-version: "14"
+           node-version: "16"
        - uses: ./.github/actions/unit-tests
 
   functional-tests:
      name: Functional Tests
-     runs-on: ubuntu-22.04
+     runs-on: ubuntu-20.04
      needs: [unit-tests]
      steps:
-       - uses: actions/checkout@v2
+       - uses: actions/checkout@v3
          with:
           submodules: 'recursive'
        - name: Cache node modules
-         uses: actions/cache@v2
+         uses: actions/cache@v3
          env:
            cache-name: cache-node-modules
          with:
@@ -65,21 +65,21 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v2
+       - uses: actions/setup-node@v3
          with:
-           node-version: "14"
+           node-version: "16"
        - uses: ./.github/actions/functional-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
   admin-console-tests:
     name: Admin Console Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     needs: [unit-tests]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -91,7 +91,7 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: "14"
+          node-version: "16"
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
@@ -101,7 +101,7 @@ jobs:
   #   name: Check dead-links
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3
   #       with:
   #         fetch-depth: 0
   #     - name: Extract references from context
@@ -123,11 +123,11 @@ jobs:
   documentation-snippet-tests:
      name: Documentation Snippet Tests
      needs: [unit-tests]
-     runs-on: ubuntu-22.04
+     runs-on: ubuntu-20.04
      steps:
-       - uses: actions/checkout@v2
+       - uses: actions/checkout@v3
        - name: Cache node modules
-         uses: actions/cache@v2
+         uses: actions/cache@v3
          env:
            cache-name: cache-node-modules
          with:
@@ -137,9 +137,9 @@ jobs:
              ${{ runner.os }}-build-${{ env.cache-name }}-
              ${{ runner.os }}-build-
              ${{ runner.os }}-
-       - uses: actions/setup-node@v2
+       - uses: actions/setup-node@v3
          with:
-           node-version: "14"
+           node-version: "16"
        - uses: ./.github/actions/snippet-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
