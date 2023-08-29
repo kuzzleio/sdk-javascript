@@ -51,4 +51,4 @@ jobs:
           github_token: ${{ secrets.ACCESS_TOKEN_CI }}
           workflow_file_name: child_repo.workflow.yml
           ref: ${{ github.ref_name == 'master' && 'master' || 'develop' }}
-          client_payload: '{"repo_name":"kuzzle-plugin-s3","branch":"${{ github.ref_name }}","version":"1"}'
+          client_payload: '{"repo_name":"sdk-javascript","branch":"${{ github.ref_name }}","version":"1"}'
