@@ -48,6 +48,8 @@
     "buffer": "^6.0.3",
     "codecov": "^3.8.3",
     "cucumber": "^6.0.5",
+    "semantic-release-config-kuzzle": "^1.0.0",
+    "semantic-release-slack-bot": "^4.0.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint-plugin-kuzzle": "^0.0.6",
     "https-browserify": "^1.0.0",
