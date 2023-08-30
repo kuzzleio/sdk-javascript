@@ -1,9 +1,7 @@
 try {
-  const { result } = await kuzzle.document.exists('nyc-open-data', 'yellow-taxi', 'some-id');
+  const response = await kuzzle.document.exists('nyc-open-data', 'yellow-taxi', 'some-id');
 
-  if (result) {
-    console.log('Success');
-  }
+  console.log(response);
 } catch (error) {
   console.error(error.message);
 }
