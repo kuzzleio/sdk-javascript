@@ -1,9 +1,0 @@
-name: gettingstarted#nodejsload
-description: Load SDK
-hooks:
-  before:
-  after:
-template: empty
-expected: Success
-sdk: js
-version: 6

@@ -81,34 +81,6 @@ jobs:
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
 
-  admin-console-tests:
-    name: Admin Console Tests
-    runs-on: ubuntu-20.04
-    needs: [unit-tests]
-    strategy:
-      matrix:
-        node-version: ["16", "18"]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: ./.github/actions/tests-ac
-        with:
-          sdk-version: 7
-          cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
-
   documentation-snippet-tests:
      name: Documentation Snippet Tests
      needs: [unit-tests]
