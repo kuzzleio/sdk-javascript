@@ -1,5 +1,5 @@
 name: document#delete
-description: Deletes a document from kuzzle
+description: Deletes a field from a document in kuzzle
 hooks:
   before: |
     curl -XDELETE kuzzle:7512/nyc-open-data
