@@ -6,6 +6,9 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: ["16", "18"]
     steps:
       - uses: actions/checkout@v3
       - name: Cache node modules
@@ -21,13 +24,16 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/es-lint
 
   unit-tests:
      name: Unit Tests
      runs-on: ubuntu-20.04
      needs: [lint]
+     strategy:
+      matrix:
+        node-version: ["16", "18"]
      steps:
        - uses: actions/checkout@v3
        - name: Cache node modules
@@ -43,13 +49,16 @@ jobs:
              ${{ runner.os }}-
        - uses: actions/setup-node@v3
          with:
-           node-version: "16"
+           node-version: ${{ matrix.node-version }}
        - uses: ./.github/actions/unit-tests
 
   functional-tests:
      name: Functional Tests
      runs-on: ubuntu-20.04
      needs: [unit-tests]
+     strategy:
+      matrix:
+        node-version: ["16", "18"]
      steps:
        - uses: actions/checkout@v3
          with:
@@ -67,7 +76,7 @@ jobs:
              ${{ runner.os }}-
        - uses: actions/setup-node@v3
          with:
-           node-version: "16"
+           node-version: ${{ matrix.node-version }}
        - uses: ./.github/actions/functional-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
@@ -76,6 +85,9 @@ jobs:
     name: Admin Console Tests
     runs-on: ubuntu-20.04
     needs: [unit-tests]
+    strategy:
+      matrix:
+        node-version: ["16", "18"]
     steps:
       - uses: actions/checkout@v3
       - name: Cache node modules
@@ -91,39 +103,19 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: "16"
+          node-version: ${{ matrix.node-version }}
       - uses: ./.github/actions/tests-ac
         with:
           sdk-version: 7
           cypress-key: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-  # doc-dead-links:
-  #   name: Check dead-links
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
-  #     - name: Extract references from context
-  #       shell: bash
-  #       id: extract-refs
-  #       run: |
-  #         echo "::set-output name=version::$(git describe --abbrev=0 --tags | cut -d. -f 1)"
-  #         echo "::set-output name=repo::$(echo $GITHUB_REPOSITORY | cut -d/ -f 2)"
-  #         echo "::set-output name=fw-branch::$(if [ $BASE_BRANCH == master ]; then echo master; else echo develop; fi)"
-  #     - uses: convictional/trigger-workflow-and-wait@v1.3.0
-  #       with:
-  #         owner: kuzzleio
-  #         repo: documentation
-  #         github_token: ${{ secrets.ACCESS_TOKEN_CI }}
-  #         workflow_file_name: dead_links.workflow.yml
-  #         ref: ${{ steps.extract-refs.outputs.fw-branch }}
-  #         inputs: '{"repo_name": "${{ steps.extract-refs.outputs.repo }}", "branch": "${{ github.head_ref }}", "version": "${{ steps.extract-refs.outputs.version }}"}'
-
   documentation-snippet-tests:
      name: Documentation Snippet Tests
      needs: [unit-tests]
      runs-on: ubuntu-20.04
+     strategy:
+      matrix:
+        node-version: ["16", "18"]
      steps:
        - uses: actions/checkout@v3
        - name: Cache node modules
@@ -139,7 +131,7 @@ jobs:
              ${{ runner.os }}-
        - uses: actions/setup-node@v3
          with:
-           node-version: "16"
+           node-version: ${{ matrix.node-version }}
        - uses: ./.github/actions/snippet-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
