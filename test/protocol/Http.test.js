@@ -677,9 +677,12 @@ describe("HTTP networking module", () => {
     let httpRequestStub;
 
     beforeEach(() => {
-      httpRequestStub = sinon
-        .stub()
-        .resolves({ body: JSON.stringify(mockResponseBody) });
+      httpRequestStub = sinon.stub().resolves({
+        body: JSON.stringify(mockResponseBody),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
 
       const { default: MockHttp } = proxyquire("../../src/protocols/Http", {
         "min-req-promise": { request: httpRequestStub },
@@ -793,6 +796,7 @@ describe("HTTP networking module", () => {
         open: sinon.stub(),
         send: sinon.stub(),
         setRequestHeader: sinon.stub(),
+        getResponseHeader: sinon.stub().returns("application/json"),
         onreadystatechange: sinon.stub(),
         timeout: 0,
       };
