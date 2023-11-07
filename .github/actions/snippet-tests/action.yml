@@ -9,7 +9,7 @@ runs:
   steps:
     - name: Build the Stack
       run: |
-        npm install
+        npm ci
         npm run build
       shell: bash
     - run: npm run doc-testing
