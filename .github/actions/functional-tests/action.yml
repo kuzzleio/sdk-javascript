@@ -14,7 +14,7 @@ runs:
       shell: bash
     - name: Build Kuzzle
       run: |
-        npm install
+        npm ci
         npm run build
       shell: bash
     - name: Run functional tests
