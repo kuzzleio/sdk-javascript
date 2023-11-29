@@ -24,17 +24,19 @@ export type ProfilePolicy = {
   /**
    * Optional array of restrictions on which the rights are gonne be applied
    */
-  restrictedTo?: {
-    /**
-     * Index name.
-     * Rights will only be applied on this index.
-     */
-    index: string;
+  restrictedTo?: [
+    {
+      /**
+       * Index name.
+       * Rights will only be applied on this index.
+       */
+      index: string;
 
-    /**
-     * Collection names.
-     * Rights will only be applied on those collections.
-     */
-    collections?: Array<string>;
-  };
+      /**
+       * Collection names.
+       * Rights will only be applied on those collections.
+       */
+      collections?: Array<string>;
+    }
+  ];
 };
