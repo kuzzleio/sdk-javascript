@@ -45,7 +45,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: convictional/trigger-workflow-and-wait@v1.6.3
+      - name: Deploy the documentation
+        uses: convictional/trigger-workflow-and-wait@v1.6.3
         with:
           owner: kuzzleio
           repo: documentation
