@@ -45,11 +45,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: convictional/trigger-workflow-and-wait@v1.6.3
+      - name: Deploy the documentation
+        uses: convictional/trigger-workflow-and-wait@v1.6.3
         with:
           owner: kuzzleio
           repo: documentation
           github_token: ${{ secrets.ACCESS_TOKEN_CI }}
           workflow_file_name: child_repo.workflow.yml
           ref: ${{ github.ref_name == 'master' && 'master' || 'develop' }}
-          client_payload: '{"repo_name":"sdk-javascript","branch":"${{ github.ref_name }}","version":"1"}'
+          client_payload: '{"repo_name":"sdk-javascript","branch":"${{ github.ref_name }}","version":"7"}'
