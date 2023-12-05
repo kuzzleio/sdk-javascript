@@ -1,9 +1,9 @@
 "use strict";
 
-import staticHttpRoutes from "./routes.json";
-import { KuzzleAbstractProtocol } from "./abstract/Base";
 import { HttpRoutes, JSONObject } from "../types";
 import { RequestPayload } from "../types/RequestPayload";
+import { KuzzleAbstractProtocol } from "./abstract/Base";
+import staticHttpRoutes from "./routes.json";
 
 /**
  * Http protocol used to connect to a Kuzzle server.
@@ -405,6 +405,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
             );
           }
 
+          const contentType = response.headers["content-type"];
+          if (!contentType || !contentType.includes("application/json")) {
+            return response.body;
+          }
+
           return JSON.parse(response.body);
         });
     }
@@ -435,6 +440,11 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
 
       xhr.onload = () => {
         try {
+          const contentType = xhr.getResponseHeader("Content-Type");
+          if (!contentType || !contentType.includes("application/json")) {
+            resolve(xhr.responseText);
+            return;
+          }
           const json = JSON.parse(xhr.responseText);
           resolve(json);
         } catch (err) {

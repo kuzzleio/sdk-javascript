@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Run build
       run: |
-        npm install
+        npm ci
         npm run build
       shell: bash
     - name: Run tests
