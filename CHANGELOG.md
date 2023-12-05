@@ -1,3 +1,11 @@
+## [7.11.2-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.1...v7.11.2-beta.1) (2023-12-05)
+
+
+### Bug Fixes
+
+* (ProfilePolicy.ts) restrictedTo was mistyped ([#733](https://github.com/kuzzleio/sdk-javascript/issues/733)) ([5770997](https://github.com/kuzzleio/sdk-javascript/commit/57709975d549441118d7cca420bf3b08f96a4322))
+* **documentation:** update the version of the branch to deploy ([9980995](https://github.com/kuzzleio/sdk-javascript/commit/99809952038b0c4c1050acdc499e35f8e52d3e37))
+
 ## [7.11.1-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.0...v7.11.1-beta.1) (2023-12-05)
 
 
