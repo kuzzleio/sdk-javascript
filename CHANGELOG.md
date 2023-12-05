@@ -7,6 +7,11 @@
 * **documentation:** update the version of the branch to deploy ([9980995](https://github.com/kuzzleio/sdk-javascript/commit/99809952038b0c4c1050acdc499e35f8e52d3e37))
 * **http:** fix empty raw responses parsed as json ([9becea5](https://github.com/kuzzleio/sdk-javascript/commit/9becea5761bee0b36d07ce81542d478325ab2ef2))
 
+## [7.11.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.0...v7.11.1) (2023-11-15)
+
+### Bug Fixes
+* **http:** fix empty raw responses parsed as json ([9becea5](https://github.com/kuzzleio/sdk-javascript/commit/9becea5761bee0b36d07ce81542d478325ab2ef2))
+
 # [7.11.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.10.8...v7.11.0) (2023-08-30)
 
 
