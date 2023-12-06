@@ -935,7 +935,7 @@ export interface ArgsDocumentControllerUpsert<TKDocumentContent>
   default?: Partial<TKDocumentContent>;
   refresh?: "wait_for" | "false";
   silent?: boolean;
-  retryOnConflict?: boolean;
+  retryOnConflict?: number;
   source?: boolean;
 }
 
