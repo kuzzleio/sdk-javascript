@@ -1,0 +1,14 @@
+name: gettingstarted#webpacksubscribe
+description: Subscribes to document notifications
+hooks:
+  before: |
+    curl -XPOST kuzzle:7512/nyc-open-data/_create
+    curl -XPUT kuzzle:7512/nyc-open-data/yellow-taxi
+  after:
+template: createDocumentAfterSnippet
+expected:
+  - Successfully subscribed to document notifications!
+  - New driver Sirkis with id
+sdk: js
+version: 6
+runner: webpack

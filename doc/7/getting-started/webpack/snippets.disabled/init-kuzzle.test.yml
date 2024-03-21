@@ -1,0 +1,10 @@
+name: gettingstarted#webpackinitkuzzle
+description: Creates an index and a collection
+hooks:
+  before: curl -X DELETE kuzzle:7512/nyc-open-data
+  after:
+template: empty
+expected: nyc-open-data/yellow-taxi ready!
+sdk: js
+version: 6
+runner: webpack
