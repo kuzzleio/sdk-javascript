@@ -38,6 +38,10 @@ await kuzzle.realtime.subscribe('test', 'test', {}, () => {
 
 </details>
 
+:::info
+Note that the offline tools will use the current authentication token to replay the requests in the queue.
+:::
+
 ## Contructor options and properties
 
 These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/7/core-classes/kuzzle/constructor#arguments).
