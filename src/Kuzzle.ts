@@ -26,6 +26,7 @@ import { RequestTimeoutError } from "./RequestTimeoutError";
 import { BaseProtocolRealtime } from "./protocols/abstract/Realtime";
 import { KuzzleError } from "./KuzzleError";
 import { DisconnectionOrigin } from "./protocols/DisconnectionOrigin";
+import { Jwt } from "./core/Jwt";
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -1061,11 +1062,17 @@ Discarded request: ${JSON.stringify(request)}`)
   private _cleanQueue() {
     const now = Date.now();
     let lastDocumentIndex = -1;
-
+    const currentJwt = new Jwt(this.jwt)
     if (this.queueTTL > 0) {
       this.offlineQueue.forEach((query, index) => {
+        const queryJwt = new Jwt(query.request.jwt)
         if (query.ts < now - this.queueTTL) {
           lastDocumentIndex = index;
+        }
+        if (currentJwt._userId === queryJwt._userId) {
+          query.request.jwt = this.jwt
+        }else{
+          this.emit("offlineQueuePop", query.request);
         }
       });
 
