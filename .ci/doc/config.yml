@@ -1,5 +1,4 @@
 ---
-
 snippets:
   mount: /mnt
   path: doc/**/snippets/*.test.yml
@@ -24,7 +23,7 @@ runners:
     path: /var/snippets/web
     lint:
       global: true
-      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}/*.html
+      cmd: eslint -c /mnt/.ci/doc/eslint.json --parser-options ecmaVersion:12 {{ snippet.dir }}/*.html
       before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     run:
       cmd: node puppeteer.js {{ snippet.dir }}/{{ snippet.source }}

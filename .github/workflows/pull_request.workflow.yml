@@ -85,9 +85,6 @@ jobs:
      name: Documentation Snippet Tests
      needs: [unit-tests]
      runs-on: ubuntu-20.04
-     strategy:
-      matrix:
-        node-version: ["16", "18"]
      steps:
        - uses: actions/checkout@v3
        - name: Cache node modules
@@ -103,7 +100,7 @@ jobs:
              ${{ runner.os }}-
        - uses: actions/setup-node@v3
          with:
-           node-version: ${{ matrix.node-version }}
+           node-version: '18'
        - uses: ./.github/actions/snippet-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
