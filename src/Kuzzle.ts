@@ -1104,6 +1104,9 @@ Discarded request: ${JSON.stringify(request)}`)
     const uniqueQueue = {},
       dequeuingProcess = () => {
         if (this.offlineQueue.length > 0) {
+          // Reapply the jwt to the request since it could have been expired
+          this.offlineQueue[0].request.jwt = this.jwt;
+
           this._timeoutRequest(
             this.offlineQueue[0].timeout,
             this.offlineQueue[0].request
