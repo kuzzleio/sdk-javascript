@@ -1,3 +1,10 @@
+## [7.11.3](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.2...v7.11.3) (2024-06-03)
+
+
+### Bug Fixes
+
+* Reapply current JWT before executing offlineQueue requests ([#744](https://github.com/kuzzleio/sdk-javascript/issues/744)) ([ea1872a](https://github.com/kuzzleio/sdk-javascript/commit/ea1872a663bb7ae7ae5f8017ecedb812e1d50ebf))
+
 ## [7.11.2](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.1...v7.11.2) (2023-12-06)
 
 
