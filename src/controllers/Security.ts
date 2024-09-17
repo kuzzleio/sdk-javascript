@@ -20,7 +20,7 @@ export class SecurityController extends BaseController {
    *
    * @param {String} userId - User kuid
    * @param {String} description - API key description
-   * @param {Object} [options] - { _id, expiresIn, refresh }
+   * @param {Object} [options] - { _id, expiresIn, refresh, triggerEvents, queuable, timeout }
    *
    * @returns {Promise.<Object>} ApiKey { _id, _source }
    */
@@ -37,6 +37,7 @@ export class SecurityController extends BaseController {
       },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
+      triggerEvents: options.triggerEvents,
       userId,
     };
 
@@ -44,10 +45,13 @@ export class SecurityController extends BaseController {
   }
 
   /**
-   * Checks if an API action can be executed by a user
+   * Checks if an API action can be executed by a user.
    *
    * @param {String} kuid - User kuid
    * @param {Object} requestPayload - Request to check
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Boolean>} Whether the action is allowed
    */
   checkRights(
     kuid,
@@ -57,6 +61,7 @@ export class SecurityController extends BaseController {
     const request = {
       action: "checkRights",
       body: requestPayload,
+      triggerEvents: options.triggerEvents,
       userId: kuid,
     };
 
@@ -66,19 +71,20 @@ export class SecurityController extends BaseController {
   }
 
   /**
-   * Deletes an user API key.
+   * Deletes a user's API key.
    *
    * @param {String} userId - User kuid
    * @param {String} id - API key ID
-   * @param {Object} [options] - { refresh }
+   * @param {Object} [options] - { refresh, triggerEvents, queuable, timeout }
    *
-   * @returns {Promise}
+   * @returns {Promise} API key deletion result
    */
   deleteApiKey(userId, id, options: ArgsSecurityControllerDeleteApiKey = {}) {
     const request = {
       _id: id,
       action: "deleteApiKey",
       refresh: options.refresh,
+      triggerEvents: options.triggerEvents,
       userId,
     };
 
@@ -86,11 +92,11 @@ export class SecurityController extends BaseController {
   }
 
   /**
-   * Searches for a user API key.
+   * Searches for API keys of a user.
    *
    * @param {String} userId - User kuid
    * @param {Object} [query] - Search query
-   * @param {Object} [options] - { from, size }
+   * @param {Object} [options] - { from, size, triggerEvents, queuable, timeout }
    *
    * @returns {Promise.<object[]>} - { hits, total }
    */
@@ -105,12 +111,23 @@ export class SecurityController extends BaseController {
       from: options.from,
       lang: options.lang,
       size: options.size,
+      triggerEvents: options.triggerEvents,
       userId,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Creates credentials for a strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User kuid
+   * @param {Object} body - Credentials data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Created credentials
+   */
   createCredentials(
     strategy,
     _id,
@@ -123,11 +140,21 @@ export class SecurityController extends BaseController {
         action: "createCredentials",
         body,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Creates the first admin user.
+   *
+   * @param {String} _id - User kuid
+   * @param {Object} body - User data
+   * @param {Object} [options] - { reset, triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} Created admin user
+   */
   createFirstAdmin(
     _id,
     body,
@@ -138,6 +165,7 @@ export class SecurityController extends BaseController {
       action: "createFirstAdmin",
       body,
       reset: options.reset,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -146,6 +174,15 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates or replaces a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} body - Profile definition
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Profile>} The created or replaced profile
+   */
   createOrReplaceProfile(
     _id,
     body,
@@ -155,6 +192,7 @@ export class SecurityController extends BaseController {
       _id,
       action: "createOrReplaceProfile",
       body,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -163,6 +201,15 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates or replaces a security role.
+   *
+   * @param {String} _id - Role id
+   * @param {Object} body - Role definition
+   * @param {Object} [options] - { force, triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Role>} The created or replaced role
+   */
   createOrReplaceRole(
     _id,
     body,
@@ -173,6 +220,7 @@ export class SecurityController extends BaseController {
       action: "createOrReplaceRole",
       body,
       force: options.force ? true : null,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(
       (response) =>
@@ -184,11 +232,21 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} body - Profile definition
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Profile>} The created profile
+   */
   createProfile(_id, body, options: ArgsSecurityControllerCreateProfile = {}) {
     const request = {
       _id,
       action: "createProfile",
       body,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -197,6 +255,15 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates a restricted user.
+   *
+   * @param {Object} body - User content
+   * @param {String} [_id] - User kuid
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} The created restricted user
+   */
   createRestrictedUser(
     body,
     _id = null,
@@ -210,6 +277,7 @@ export class SecurityController extends BaseController {
       _id,
       action: "createRestrictedUser",
       body,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -218,12 +286,22 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates a security role.
+   *
+   * @param {String} _id - Role id
+   * @param {Object} body - Role definition
+   * @param {Object} [options] - { force, triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Role>} The created role
+   */
   createRole(_id, body, options: ArgsSecurityControllerCreateRole = {}) {
     const request = {
       _id,
       action: "createRole",
       body,
       force: options.force ? true : null,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(
       (response) =>
@@ -235,11 +313,21 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Creates a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} body - User data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} The created user
+   */
   createUser(_id, body, options: ArgsSecurityControllerCreateUser = {}) {
     const request = {
       _id,
       action: "createUser",
       body,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -248,6 +336,15 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Deletes credentials for a strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User kuid
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   deleteCredentials(
     strategy,
     _id,
@@ -257,46 +354,90 @@ export class SecurityController extends BaseController {
       _id,
       action: "deleteCredentials",
       strategy,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Deletes a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   deleteProfile(_id, options: ArgsSecurityControllerDeleteProfile = {}) {
     const request = {
       _id,
       action: "deleteProfile",
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Deletes a security role.
+   *
+   * @param {String} _id - Role id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   deleteRole(_id, options: ArgsSecurityControllerDeleteRole = {}) {
     const request = {
       _id,
       action: "deleteRole",
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Deletes a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   deleteUser(_id, options: ArgsSecurityControllerDeleteUser = {}) {
     const request = {
       _id,
       action: "deleteUser",
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Retrieves all credential fields for every strategy.
+   *
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The credentials fields
+   */
   getAllCredentialFields(
     options: ArgsSecurityControllerGetAllCredentialFields = {}
   ) {
     return this.query(
       {
         action: "getAllCredentialFields",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves the credential fields for a specific strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The credential fields
+   */
   getCredentialFields(
     strategy,
     options: ArgsSecurityControllerGetCredentialFields = {}
@@ -305,11 +446,21 @@ export class SecurityController extends BaseController {
       {
         action: "getCredentialFields",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves credentials for a specific strategy and user.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The credentials
+   */
   getCredentials(
     strategy,
     _id,
@@ -320,11 +471,21 @@ export class SecurityController extends BaseController {
         _id,
         action: "getCredentials",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves credentials by ID for a specific strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The credentials
+   */
   getCredentialsById(
     strategy,
     _id,
@@ -335,11 +496,20 @@ export class SecurityController extends BaseController {
         _id,
         action: "getCredentialsById",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Profile>} The profile
+   */
   getProfile(_id, options: ArgsSecurityControllerGetProfile = {}) {
     return this.query({ _id, action: "getProfile" }, options).then(
       (response) =>
@@ -347,30 +517,56 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Retrieves the profile mapping.
+   *
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The profile mapping
+   */
   getProfileMapping(options: ArgsSecurityControllerGetProfileMapping = {}) {
     return this.query(
       {
         action: "getProfileMapping",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves the rights of a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array>} The profile rights
+   */
   getProfileRights(_id, options: ArgsSecurityControllerGetProfileRights = {}) {
     return this.query(
       {
         _id,
         action: "getProfileRights",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.hits);
   }
 
+  /**
+   * Retrieves a security role.
+   *
+   * @param {String} _id - Role id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Role>} The role
+   */
   getRole(_id, options: ArgsSecurityControllerGetRole = {}) {
     return this.query(
       {
         _id,
         action: "getRole",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(
@@ -383,20 +579,37 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Retrieves the role mapping.
+   *
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The role mapping
+   */
   getRoleMapping(options: ArgsSecurityControllerGetRoleMapping = {}) {
     return this.query(
       {
         action: "getRoleMapping",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} The user
+   */
   getUser(_id, options: ArgsSecurityControllerGetUser = {}) {
     return this.query(
       {
         _id,
         action: "getUser",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(
@@ -405,25 +618,50 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Retrieves the user mapping.
+   *
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} The user mapping
+   */
   getUserMapping(options: ArgsSecurityControllerGetUserMapping = {}) {
     return this.query(
       {
         action: "getUserMapping",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Retrieves the rights of a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array>} The user rights
+   */
   getUserRights(_id, options: ArgsSecurityControllerGetUserRights = {}) {
     return this.query(
       {
         _id,
         action: "getUserRights",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.hits);
   }
 
+  /**
+   * Retrieves the authentication strategies used by a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array>} The user strategies
+   */
   getUserStrategies(
     _id,
     options: ArgsSecurityControllerGetUserStrategies = {}
@@ -432,11 +670,21 @@ export class SecurityController extends BaseController {
       {
         _id,
         action: "getUserStrategies",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.strategies);
   }
 
+  /**
+   * Checks if a user has credentials for a specific strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User id
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Boolean>} Whether the user has credentials
+   */
   hasCredentials(
     strategy,
     _id,
@@ -447,38 +695,74 @@ export class SecurityController extends BaseController {
         _id,
         action: "hasCredentials",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Deletes multiple profiles.
+   *
+   * @param {Array<String>} ids - Profile ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   mDeleteProfiles(ids, options: ArgsSecurityControllerMDeleteProfiles = {}) {
     const request = {
       action: "mDeleteProfiles",
       body: { ids },
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Deletes multiple roles.
+   *
+   * @param {Array<String>} ids - Role ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   mDeleteRoles(ids, options: ArgsSecurityControllerMDeleteRoles = {}) {
     const request = {
       action: "mDeleteRoles",
       body: { ids },
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Deletes multiple users.
+   *
+   * @param {Array<String>} ids - User ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Deletion result
+   */
   mDeleteUsers(ids, options: ArgsSecurityControllerMDeleteUsers = {}) {
     const request = {
       action: "mDeleteUsers",
       body: { ids },
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
+  /**
+   * Retrieves multiple profiles.
+   *
+   * @param {Array<String>} ids - Profile ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array.<Profile>>} The profiles
+   */
   mGetProfiles(ids, options: ArgsSecurityControllerMGetProfiles = {}) {
     return this.query({ action: "mGetProfiles", body: { ids } }, options).then(
       (response) =>
@@ -488,10 +772,19 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Retrieves multiple users.
+   *
+   * @param {Array<String>} ids - User ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array.<User>>} The users
+   */
   mGetUsers(ids, options: ArgsSecurityControllerMGetUsers = {}) {
     const request = {
       action: "mGetUsers",
       body: { ids },
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) =>
@@ -501,11 +794,20 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Retrieves multiple roles.
+   *
+   * @param {Array<String>} ids - Role ids
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Array.<Role>>} The roles
+   */
   mGetRoles(ids, options: ArgsSecurityControllerMGetRoles = {}) {
     return this.query(
       {
         action: "mGetRoles",
         body: { ids },
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) =>
@@ -515,6 +817,13 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Refreshes a collection.
+   *
+   * @param {String} collection - The collection name
+   *
+   * @returns {Promise} Refresh result
+   */
   refresh(collection) {
     return this.query({
       action: "refresh",
@@ -522,11 +831,21 @@ export class SecurityController extends BaseController {
     });
   }
 
+  /**
+   * Replaces a user with new data.
+   *
+   * @param {String} _id - User id
+   * @param {Object} body - User data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} The replaced user
+   */
   replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
     const request = {
       _id,
       action: "replaceUser",
       body,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(
       (response) =>
@@ -534,10 +853,19 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Searches for profiles based on a query.
+   *
+   * @param {Object} body - Search query
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<ProfileSearchResult>} Search result
+   */
   searchProfiles(body, options: ArgsSecurityControllerSearchProfiles = {}) {
     const request = {
       action: "searchProfiles",
       body,
+      triggerEvents: options.triggerEvents,
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
@@ -549,10 +877,19 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Searches for roles based on a query.
+   *
+   * @param {Object} body - Search query
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<RoleSearchResult>} Search result
+   */
   searchRoles(body, options: ArgsSecurityControllerSearchRoles = {}) {
     const request = {
       action: "searchRoles",
       body,
+      triggerEvents: options.triggerEvents,
     };
     for (const [key, value] of Object.entries(options)) {
       request[key] = value;
@@ -564,10 +901,19 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Searches for users based on a query.
+   *
+   * @param {Object} body - Search query
+   * @param {Object} [options] - { from, size, scroll, lang, triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<UserSearchResult>} Search result
+   */
   searchUsers(body, options: ArgsSecurityControllerSearchUsers = {}) {
     const request = {
       action: "searchUsers",
       body,
+      triggerEvents: options.triggerEvents,
     };
     for (const opt of ["from", "size", "scroll", "lang"]) {
       request[opt] = options[opt];
@@ -579,6 +925,16 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Updates credentials for a user and strategy.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User id
+   * @param {Object} body - Updated credentials data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Updated credentials
+   */
   updateCredentials(
     strategy,
     _id,
@@ -591,16 +947,27 @@ export class SecurityController extends BaseController {
         action: "updateCredentials",
         body,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Updates a security profile.
+   *
+   * @param {String} _id - Profile id
+   * @param {Object} body - Updated profile definition
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Profile>} The updated profile
+   */
   updateProfile(_id, body, options: ArgsSecurityControllerUpdateProfile = {}) {
     const request = {
       _id,
       action: "updateProfile",
       body,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -609,6 +976,14 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Updates the profile mapping.
+   *
+   * @param {Object} body - Updated mapping
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Update result
+   */
   updateProfileMapping(
     body,
     options: ArgsSecurityControllerUpdateProfileMapping = {}
@@ -617,17 +992,28 @@ export class SecurityController extends BaseController {
       {
         action: "updateProfileMapping",
         body,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Updates a security role.
+   *
+   * @param {String} _id - Role id
+   * @param {Object} body - Updated role definition
+   * @param {Object} [options] - { force, triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Role>} The updated role
+   */
   updateRole(_id, body, options: ArgsSecurityControllerUpdateRole = {}) {
     const request = {
       _id,
       action: "updateRole",
       body,
       force: options.force ? true : null,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -640,6 +1026,14 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Updates the role mapping.
+   *
+   * @param {Object} body - Updated mapping
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Update result
+   */
   updateRoleMapping(
     body,
     options: ArgsSecurityControllerUpdateRoleMapping = {}
@@ -648,16 +1042,27 @@ export class SecurityController extends BaseController {
       {
         action: "updateRoleMapping",
         body,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Updates a user.
+   *
+   * @param {String} _id - User id
+   * @param {Object} body - Updated user data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<User>} The updated user
+   */
   updateUser(_id, body, options: ArgsSecurityControllerUpdateUser = {}) {
     const request = {
       _id,
       action: "updateUser",
       body,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(
       (response) =>
@@ -665,6 +1070,14 @@ export class SecurityController extends BaseController {
     );
   }
 
+  /**
+   * Updates the user mapping.
+   *
+   * @param {Object} body - Updated mapping
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Update result
+   */
   updateUserMapping(
     body,
     options: ArgsSecurityControllerUpdateUserMapping = {}
@@ -673,11 +1086,22 @@ export class SecurityController extends BaseController {
       {
         action: "updateUserMapping",
         body,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
+  /**
+   * Validates credentials for a strategy and user.
+   *
+   * @param {String} strategy - Authentication strategy
+   * @param {String} _id - User id
+   * @param {Object} body - Credentials data
+   * @param {Object} [options] - { triggerEvents, queuable, timeout }
+   *
+   * @returns {Promise.<Object>} Validation result
+   */
   validateCredentials(
     strategy,
     _id,
@@ -690,6 +1114,7 @@ export class SecurityController extends BaseController {
         action: "validateCredentials",
         body,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);

@@ -75,6 +75,7 @@ export class RealtimeController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns A number represensting active connections using the same provided subscription room.
    */
@@ -86,6 +87,7 @@ export class RealtimeController extends BaseController {
       {
         action: "count",
         body: { roomId },
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.count);
@@ -97,7 +99,7 @@ export class RealtimeController extends BaseController {
    * The message will be dispatched to all clients with subscriptions
    * matching the index, the collection and the message content.
    *
-   * @see https://docs.kuzzle.io/sdk/js/7/controllers/realtime/count/
+   * @see https://docs.kuzzle.io/sdk/js/7/controllers/realtime/publish/
    *
    * @param index Index name
    * @param collection Collection name
@@ -106,6 +108,7 @@ export class RealtimeController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `_id` Additional unique ID (will be put in the `_id` property of the notification)
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   publish(
     index: string,
@@ -119,6 +122,7 @@ export class RealtimeController extends BaseController {
       body: message,
       collection,
       index,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -144,6 +148,7 @@ export class RealtimeController extends BaseController {
    *    - `subscribeToSelf` Subscribe to notifications fired by our own queries. (default: true)
    *    - `volatile` Subscription information sent alongside notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns A string containing the room ID
    */
@@ -172,6 +177,7 @@ export class RealtimeController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   unsubscribe(
     roomId: string,
@@ -180,6 +186,7 @@ export class RealtimeController extends BaseController {
     const request = {
       action: "unsubscribe",
       body: { roomId },
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(() => {

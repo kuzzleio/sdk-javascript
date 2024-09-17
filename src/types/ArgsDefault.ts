@@ -6,5 +6,7 @@ export interface ArgsDefault {
 
   timeout?: number;
 
+  triggerEvents?: boolean;
+
   [name: string]: any;
 }

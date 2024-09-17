@@ -21,6 +21,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   create(
     index: string,
@@ -44,6 +45,7 @@ export class CollectionController extends BaseController {
       body: definition,
       collection,
       index,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(() => undefined);
@@ -59,6 +61,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   deleteSpecifications(
     index: string,
@@ -69,6 +72,7 @@ export class CollectionController extends BaseController {
       action: "deleteSpecifications",
       collection,
       index,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(() => undefined);
   }
@@ -83,6 +87,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   exists(
     index: string,
@@ -94,6 +99,7 @@ export class CollectionController extends BaseController {
         action: "exists",
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -110,6 +116,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   refresh(
     index: string,
@@ -121,6 +128,7 @@ export class CollectionController extends BaseController {
         action: "refresh",
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(() => undefined);
@@ -137,6 +145,7 @@ export class CollectionController extends BaseController {
    *    - `includeKuzzleMeta` If true, the returned mappings will contain Kuzzle metadata
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   getMapping(
     index: string,
@@ -148,6 +157,7 @@ export class CollectionController extends BaseController {
       collection,
       includeKuzzleMeta: options.includeKuzzleMeta || false,
       index,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -163,6 +173,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The specifications
    */
@@ -176,6 +187,7 @@ export class CollectionController extends BaseController {
         action: "getSpecifications",
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -190,6 +202,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing the collection list
    */
@@ -220,6 +233,7 @@ export class CollectionController extends BaseController {
       from: options.from,
       index,
       size: options.size || 0,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -237,6 +251,7 @@ export class CollectionController extends BaseController {
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   searchSpecifications(
     query: JSONObject = {},
@@ -245,6 +260,7 @@ export class CollectionController extends BaseController {
     const request = {
       action: "searchSpecifications",
       body: query,
+      triggerEvents: options.triggerEvents,
     };
 
     for (const opt of ["from", "size", "scroll"]) {
@@ -272,6 +288,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   truncate(
     index: string,
@@ -282,12 +299,13 @@ export class CollectionController extends BaseController {
       action: "truncate",
       collection,
       index,
+      triggerEvents: options.triggerEvents,
     };
     return this.query(request, options).then(() => undefined);
   }
 
   /**
-   * Updates a collection informations
+   * Updates a collection's information.
    * You can also provide optional mappings and settings that allow you to exploit
    * the full capabilities of our persistent data storage layer.
    *
@@ -300,6 +318,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   update(
     index: string,
@@ -324,6 +343,7 @@ export class CollectionController extends BaseController {
         body: definition,
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(() => undefined);
@@ -344,13 +364,14 @@ export class CollectionController extends BaseController {
         body: mappings,
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
   /**
-   * Create or updates the validation specifications for a collection.
+   * Creates or updates the validation specifications for a collection.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/collection/update-specifications/
    *
@@ -360,6 +381,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The updated specifications
    */
@@ -375,6 +397,7 @@ export class CollectionController extends BaseController {
         body: specifications,
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -392,8 +415,9 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
-   * @returns An object which contain information about the specifications validity.
+   * @returns An object which contains information about the specifications' validity.
    */
   validateSpecifications(
     index: string,
@@ -411,6 +435,7 @@ export class CollectionController extends BaseController {
         body: specifications,
         collection,
         index,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -425,6 +450,7 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   delete(
     index: string,
@@ -435,6 +461,7 @@ export class CollectionController extends BaseController {
       action: "delete",
       collection,
       index,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(() => undefined);

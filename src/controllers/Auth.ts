@@ -3,6 +3,7 @@ import { BaseController } from "./Base";
 import { User } from "../core/security/User";
 import { JSONObject, ApiKey, ArgsDefault } from "../types";
 import { RequestPayload } from "../types/RequestPayload";
+
 /**
  * Auth controller
  *
@@ -74,6 +75,7 @@ export class AuthController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `expiresIn` Expiration duration
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The created API key
    */
@@ -89,19 +91,21 @@ export class AuthController extends BaseController {
       },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
   }
 
   /**
-   * Checks if an API action can be executed by the current user
+   * Checks if an API action can be executed by the current user.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-rights
    *
    * @param requestPayload Request to check
-   * @param options Additional Options
+   * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   checkRights(
     requestPayload: RequestPayload,
@@ -110,6 +114,7 @@ export class AuthController extends BaseController {
     const request = {
       action: "checkRights",
       body: requestPayload,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(
@@ -126,6 +131,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   deleteApiKey(
     id: string,
@@ -135,6 +141,7 @@ export class AuthController extends BaseController {
       _id: id,
       action: "deleteApiKey",
       refresh: options.refresh,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then(() => null);
@@ -150,6 +157,7 @@ export class AuthController extends BaseController {
    *    - `from` Offset of the first document to fetch
    *    - `size` Maximum number of documents to retrieve per page
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns A search result object
    */
@@ -172,6 +180,7 @@ export class AuthController extends BaseController {
       from: options.from,
       lang: options.lang,
       size: options.size,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(request, options).then((response) => response.result);
@@ -183,7 +192,7 @@ export class AuthController extends BaseController {
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/check-token
    *
    * @param token The jwt token to check (default to current SDK token)
-   * @param options Additional Options
+   * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns A token validity object
@@ -223,6 +232,7 @@ export class AuthController extends BaseController {
         action: "checkToken",
         body: { token },
         cookieAuth,
+        triggerEvents: options.triggerEvents,
       },
       { queuable: false, ...options }
     ).then((response) => response.result);
@@ -238,6 +248,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object representing the new credentials.
    *    The content depends on the authentication strategy
@@ -252,6 +263,7 @@ export class AuthController extends BaseController {
         action: "createMyCredentials",
         body: credentials,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -266,8 +278,9 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
-   * @returns A boolean indicating if the credentials exists
+   * @returns A boolean indicating if the credentials exist
    */
   credentialsExist(
     strategy: string,
@@ -277,6 +290,7 @@ export class AuthController extends BaseController {
       {
         action: "credentialsExist",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -291,6 +305,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   deleteMyCredentials(
     strategy: string,
@@ -300,6 +315,7 @@ export class AuthController extends BaseController {
       {
         action: "deleteMyCredentials",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.acknowledged);
@@ -313,6 +329,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns Currently logged User
    */
@@ -322,6 +339,7 @@ export class AuthController extends BaseController {
     return this.query(
       {
         action: "getCurrentUser",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(
@@ -339,6 +357,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object representing the credentials for the provided authentication strategy.
    *    Its content depends on the authentication strategy.
@@ -351,6 +370,7 @@ export class AuthController extends BaseController {
       {
         action: "getMyCredentials",
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -364,6 +384,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An array containing user rights objects
    */
@@ -394,19 +415,21 @@ export class AuthController extends BaseController {
     return this.query(
       {
         action: "getMyRights",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result.hits);
   }
 
   /**
-   * Get all the strategies registered in Kuzzle by all auth plugins
+   * Get all the strategies registered in Kuzzle by all auth plugins.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/get-strategies
    *
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An array of available strategies names
    */
@@ -416,15 +439,16 @@ export class AuthController extends BaseController {
     return this.query(
       {
         action: "getStrategies",
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
   /**
-   * Send login request to kuzzle with credentials
-   * If cookieAuthentication is false and login succeeds, store the jwt into the kuzzle object
-   * If cookieAuthentication is true and login succeeds, the token is stored in a cookie
+   * Send login request to kuzzle with credentials.
+   * If cookieAuthentication is false and login succeeds, store the jwt into the kuzzle object.
+   * If cookieAuthentication is true and login succeeds, the token is stored in a cookie.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/login
    *
@@ -540,6 +564,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object representing the updated credentials.
    *    The content depends on the authentication strategy
@@ -554,6 +579,7 @@ export class AuthController extends BaseController {
         action: "updateMyCredentials",
         body: credentials,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
@@ -569,6 +595,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns Currently logged User
    */
@@ -580,6 +607,7 @@ export class AuthController extends BaseController {
       {
         action: "updateSelf",
         body: content,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then(
@@ -598,6 +626,7 @@ export class AuthController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   validateMyCredentials(
     strategy: string,
@@ -609,13 +638,14 @@ export class AuthController extends BaseController {
         action: "validateMyCredentials",
         body: credentials,
         strategy,
+        triggerEvents: options.triggerEvents,
       },
       options
     ).then((response) => response.result);
   }
 
   /**
-   * Refresh the SDK current authentication token
+   * Refresh the SDK current authentication token.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/refresh-token
    *
@@ -623,6 +653,7 @@ export class AuthController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `expiresIn` Expiration duration
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The refreshed token
    */
@@ -648,6 +679,7 @@ export class AuthController extends BaseController {
       action: "refreshToken",
       cookieAuth: this.kuzzle.cookieAuthentication,
       expiresIn: options.expiresIn,
+      triggerEvents: options.triggerEvents,
     };
 
     return this.query(query, options).then((response) => {

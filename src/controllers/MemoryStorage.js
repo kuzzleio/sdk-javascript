@@ -233,9 +233,17 @@ for (const action of Object.keys(commands)) {
   // eslint-disable-next-line no-loop-func
   MemoryStorageController.prototype[action] = function (...args) {
     const command = commands[action];
+    // args.length - 1 should be options
+    const triggerEvents =
+      args[args.length - 1] && args[args.length - 1].triggerEvents;
     const request = {
       action,
     };
+
+    if (triggerEvents !== undefined) {
+      request.triggerEvents = triggerEvents;
+    }
+
     const options = {};
 
     if (!command.getter) {

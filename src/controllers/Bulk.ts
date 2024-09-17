@@ -7,7 +7,7 @@ export class BulkController extends BaseController {
   }
 
   /**
-   * Directly deletes every documents matching the search query without:
+   * Directly deletes every document matching the search query without:
    *  - applying max documents write limit
    *  - fetching deleted documents
    *  - triggering realtime notifications
@@ -21,7 +21,7 @@ export class BulkController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
-   *
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    * @returns The number of deleted documents
    */
   deleteByQuery(
@@ -53,7 +53,7 @@ export class BulkController extends BaseController {
    * @param options - Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
-   *
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
   import(
@@ -62,47 +62,17 @@ export class BulkController extends BaseController {
     bulkData: Array<JSONObject>,
     options: ArgsBulkControllerImport = {}
   ): Promise<{
-    /**
-     * Array of successfully executed actions
-     */
     successes: Array<{
-      /**
-       * Name of the action (e.g. "index", "create", etc)
-       */
       [actionName: string]: {
-        /**
-         * Document unique identifier
-         */
         _id: string;
-        /**
-         * HTTP status code for that action
-         */
         status: string;
       };
     }>;
-    /**
-     * Array of failed actions
-     */
     errors: Array<{
-      /**
-       * Document unique identifier
-       */
       _id: string;
-      /**
-       * HTTP status code for that action
-       */
       status: string;
-      /**
-       * Error object
-       */
       error: {
-        /**
-         * Elasticsearch client error type
-         */
         type: string;
-        /**
-         * Human readable error message
-         */
         reason: string;
       };
     }>;
@@ -110,9 +80,7 @@ export class BulkController extends BaseController {
     return this.query(
       {
         action: "import",
-        body: {
-          bulkData,
-        },
+        body: { bulkData },
         collection,
         index,
       },
@@ -132,6 +100,7 @@ export class BulkController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The number of updated documents
    */
@@ -162,12 +131,13 @@ export class BulkController extends BaseController {
    * @param index - Index name
    * @param collection - Collection name
    * @param document- Document body (with the _kuzzle_info metadata)
-   * @param id - Optionnal document ID
+   * @param id - Optional document ID
    * @param options - Additional options
    *    - `notify` If true, Kuzzle will trigger realtime notifications
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing the document creation result
    */
@@ -204,6 +174,7 @@ export class BulkController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -211,36 +182,15 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     documents: Array<{
-      /**
-       * Document ID
-       */
       _id?: string;
-      /**
-       * Document content
-       */
       _source: JSONObject;
     }>,
     options: ArgsBulkControllerMWrite = {}
   ): Promise<{
-    /**
-     * Array of successfully created/replaced documents
-     */
     successes: Array<Document>;
-    /**
-     * Array of failed creation
-     */
     errors: Array<{
-      /**
-       * Document that cause the error
-       */
       document: Document;
-      /**
-       * HTTP error status
-       */
       status: number;
-      /**
-       * Human readable reason
-       */
       reason: string;
     }>;
   }> {
