@@ -72,6 +72,27 @@ Triggered when a login attempt completes, either with a success or a failure res
 | `success` | <pre>boolean</pre> | Indicate if login attempt succeed |
 | `error`   | <pre>string</pre>  | Error message when login fail     |
 
+## beforeLogout
+
+Triggered before logout attempt.
+
+## afterLogout
+
+Triggered when a logout attempt completes, either with a success or a failure result.
+
+## logoutAttempt
+
+Legacy event triggered when a logout attempt completes, either with a success or a failure result.
+
+**Callback arguments:**
+
+`@param {object} data`
+
+| Property  | Type               | Description                       |
+| --------- | ------------------ | --------------------------------- |
+| `success` | <pre>boolean</pre> | Indicate if logout attempt succeed |
+| `error`   | <pre>string</pre>  | Error message when logout fail     |
+
 ## networkError
 
 Triggered when the SDK has failed to connect to Kuzzle.
