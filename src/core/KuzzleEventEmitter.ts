@@ -17,6 +17,8 @@ export type PublicKuzzleEvents =
   | "disconnected"
   | "loginAttempt"
   | "logoutAttempt"
+  | "beforeLogout"
+  | "afterLogout"
   | "networkError"
   | "offlineQueuePush"
   | "offlineQueuePop"

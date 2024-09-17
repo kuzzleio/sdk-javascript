@@ -104,17 +104,17 @@ describe("Kuzzle authenticator function mecanisms", () => {
     });
   });
 
-  describe("logoutAttempt listener", () => {
+  describe("logout listener", () => {
     let resolve;
     let promise;
 
-    it("should set _loggedIn to false on logout", async () => {
+    it("should set _loggedIn to false on afterLogout", async () => {
       promise = new Promise((_resolve) => {
         resolve = _resolve;
       });
 
       kuzzle._loggedIn = true;
-      kuzzle.emit("logoutAttempt", { success: true });
+      kuzzle.emit("afterLogout", { success: true });
 
       setTimeout(() => {
         should(kuzzle.auth.checkToken).not.be.calledOnce();

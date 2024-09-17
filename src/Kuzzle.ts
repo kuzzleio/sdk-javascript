@@ -85,6 +85,8 @@ export class Kuzzle extends KuzzleEventEmitter {
     "disconnected",
     "loginAttempt",
     "logoutAttempt",
+    "beforeLogout",
+    "afterLogout",
     "networkError",
     "offlineQueuePush",
     "offlineQueuePop",
@@ -369,7 +371,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     /**
      * When successfuly logged out
      */
-    this.on("logoutAttempt", (status) => {
+    this.on("afterLogout", (status) => {
       if (status.success) {
         this._loggedIn = false;
       }
@@ -575,7 +577,11 @@ export class Kuzzle extends KuzzleEventEmitter {
   ): this;
 
   on(
-    eventName: "logoutAttempt",
+    eventName: "beforeLogout",
+    listener: () => void
+  ): this;
+  on(
+    eventName: "logoutAttempt" | "afterLogout",
     listener: (status: { success: true }) => void
   ): this;
   on(

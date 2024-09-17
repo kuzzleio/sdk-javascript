@@ -485,17 +485,31 @@ export class AuthController extends BaseController {
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/logout
    */
-  logout(): Promise<void> {
-    return this.query(
-      {
-        action: "logout",
-        cookieAuth: this.kuzzle.cookieAuthentication,
-      },
-      { queuable: false, timeout: -1 }
-    ).then(() => {
+  async logout(): Promise<void> {
+    this.kuzzle.emit("beforeLogout");
+    try {
+      await this.query(
+        {
+          action: "logout",
+          cookieAuth: this.kuzzle.cookieAuthentication,
+        },
+        { queuable: false, timeout: -1 }
+      );
       this._authenticationToken = null;
+      /**
+       * @deprecated logout `logoutAttempt` is legacy event. Use afterLogout instead.
+       */
       this.kuzzle.emit("logoutAttempt", { success: true });
-    });
+      this.kuzzle.emit("afterLogout", { success: true });
+    } catch (error) {
+      /**
+       * @deprecated logout `logoutAttempt` is legacy event. Use afterLogout instead.
+       */
+      this.kuzzle.emit("logoutAttempt", { success: false, error: (error as Error).message });
+      this.kuzzle.emit("afterLogout", { success: false, error: (error as Error).message });
+
+      throw error;
+    }
   }
 
   /**
