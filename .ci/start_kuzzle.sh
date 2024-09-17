@@ -4,7 +4,7 @@ set -e
 
 echo "[$(date --rfc-3339 seconds)] - Start Kuzzle stack"
 
-docker-compose -f .ci/docker-compose.yml up -d
+docker compose -f .ci/docker-compose.yml up -d
 
 spinner="/"
 until $(curl --output /dev/null --silent --head --fail http://localhost:7512); do
