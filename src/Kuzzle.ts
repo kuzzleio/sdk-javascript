@@ -241,11 +241,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.protocol = protocol;
 
     this._protectedEvents = {
+      afterLogin: {},
       connected: {},
       disconnected: {},
       error: {},
       loginAttempt: {},
-      afterLogin: {},
       reconnected: {},
       tokenExpired: {},
     };
@@ -582,18 +582,12 @@ export class Kuzzle extends KuzzleEventEmitter {
     listener: () => void
   ): this;
 
-  on(
-    eventName: "beforeLogout",
-    listener: () => void
-  ): this;
+  on(eventName: "beforeLogout", listener: () => void): this;
   on(
     eventName: "logoutAttempt" | "afterLogout",
     listener: (status: { success: true }) => void
   ): this;
-  on(
-    eventName: "beforeLogin",
-    listener: () => void
-  ): this;
+  on(eventName: "beforeLogin", listener: () => void): this;
   on(
     eventName: "loginAttempt" | "afterLogin",
     listener: (data: { success: boolean; error: string }) => void

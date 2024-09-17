@@ -517,8 +517,14 @@ export class AuthController extends BaseController {
       /**
        * @deprecated logout `logoutAttempt` is legacy event. Use afterLogout instead.
        */
-      this.kuzzle.emit("logoutAttempt", { success: false, error: (error as Error).message });
-      this.kuzzle.emit("afterLogout", { success: false, error: (error as Error).message });
+      this.kuzzle.emit("logoutAttempt", {
+        error: (error as Error).message,
+        success: false,
+      });
+      this.kuzzle.emit("afterLogout", {
+        error: (error as Error).message,
+        success: false,
+      });
 
       throw error;
     }

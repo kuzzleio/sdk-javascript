@@ -506,28 +506,33 @@ describe("Auth Controller", () => {
         });
     });
 
-    it('should trigger a login events the user is logged in', async () => {
+    it("should trigger a login events the user is logged in", async () => {
       kuzzle.emit = sinon.stub();
 
-      await kuzzle.auth
-        .login("strategy", credentials, "expiresIn")
-        .then(() => {
-          should(kuzzle.emit).be.calledWith("beforeLogin");
-          should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
-          should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
-        });
+      await kuzzle.auth.login("strategy", credentials, "expiresIn").then(() => {
+        should(kuzzle.emit).be.calledWith("beforeLogin");
+        should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+        should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+      });
       kuzzle.emit.reset();
 
       kuzzle.query.rejects();
-      await kuzzle.auth.login("strategy", credentials, "expiresIn")
+      await kuzzle.auth
+        .login("strategy", credentials, "expiresIn")
         .catch(() => {
           should(kuzzle.emit).be.calledWith("beforeLogin");
-          should(kuzzle.emit).be.calledWith("afterLogin", { success: false, error: "Error" });
-          should(kuzzle.emit).be.calledWith("loginAttempt", { success: false, error: "Error" });
+          should(kuzzle.emit).be.calledWith("afterLogin", {
+            success: false,
+            error: "Error",
+          });
+          should(kuzzle.emit).be.calledWith("loginAttempt", {
+            success: false,
+            error: "Error",
+          });
         });
     });
 
-    it('should trigger a login events the user is logged in with cookieAuthentication enabled', async () => {
+    it("should trigger a login events the user is logged in with cookieAuthentication enabled", async () => {
       kuzzle.emit = sinon.stub();
       kuzzle.cookieAuthentication = true;
       kuzzle.query.resolves({
@@ -536,13 +541,11 @@ describe("Auth Controller", () => {
         },
       });
 
-      await kuzzle.auth
-        .login("strategy", credentials, "expiresIn")
-        .then(() => {
-          should(kuzzle.emit).be.calledWith("beforeLogin");
-          should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
-          should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
-        });
+      await kuzzle.auth.login("strategy", credentials, "expiresIn").then(() => {
+        should(kuzzle.emit).be.calledWith("beforeLogin");
+        should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+        should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+      });
       kuzzle.emit.reset();
 
       kuzzle.query.rejects();
@@ -550,8 +553,14 @@ describe("Auth Controller", () => {
         .be.rejected()
         .catch(() => {
           should(kuzzle.emit).be.calledWith("beforeLogin");
-          should(kuzzle.emit).be.calledWith("afterLogin", { success: false, error: "Error" });
-          should(kuzzle.emit).be.calledWith("loginAttempt", { success: false, error: "Error" });
+          should(kuzzle.emit).be.calledWith("afterLogin", {
+            success: false,
+            error: "Error",
+          });
+          should(kuzzle.emit).be.calledWith("loginAttempt", {
+            success: false,
+            error: "Error",
+          });
         });
     });
 
@@ -616,11 +625,14 @@ describe("Auth Controller", () => {
       // ? Fail logout
       kuzzle.query.rejects();
       await kuzzle.auth.logout().catch(() => {
-        should(kuzzle.emit).be.calledWith("logoutAttempt", { success: false, error: "Error" });
+        should(kuzzle.emit).be.calledWith("logoutAttempt", {
+          success: false,
+          error: "Error",
+        });
       });
     });
 
-    it('should trigger logout events when the user is logged out', async () => {
+    it("should trigger logout events when the user is logged out", async () => {
       kuzzle.emit = sinon.stub();
       await kuzzle.auth.logout().then(() => {
         should(kuzzle.emit).be.calledWith("beforeLogout");
@@ -631,7 +643,10 @@ describe("Auth Controller", () => {
       // ? Fail logout
       kuzzle.query.rejects();
       await kuzzle.auth.logout().catch(() => {
-        should(kuzzle.emit).be.calledWith("afterLogout", { success: false, error: "Error" });
+        should(kuzzle.emit).be.calledWith("afterLogout", {
+          success: false,
+          error: "Error",
+        });
       });
     });
   });
