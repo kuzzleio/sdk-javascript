@@ -26,6 +26,8 @@ describe("Kuzzle listeners management", () => {
       "discarded",
       "disconnected",
       "loginAttempt",
+      "beforeLogin",
+      "afterLogin",
       "logoutAttempt",
       "beforeLogout",
       "afterLogout",

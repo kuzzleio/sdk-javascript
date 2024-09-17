@@ -84,6 +84,8 @@ export class Kuzzle extends KuzzleEventEmitter {
     "discarded",
     "disconnected",
     "loginAttempt",
+    "beforeLogin",
+    "afterLogin",
     "logoutAttempt",
     "beforeLogout",
     "afterLogout",
@@ -243,6 +245,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       disconnected: {},
       error: {},
       loginAttempt: {},
+      afterLogin: {},
       reconnected: {},
       tokenExpired: {},
     };
@@ -352,7 +355,10 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this._loggedIn = false;
 
-    this.on("loginAttempt", async (status) => {
+    /**
+     * When successfuly logged in
+     */
+    this.on("afterLogin", async (status) => {
       if (status.success) {
         this._loggedIn = true;
         return;
@@ -585,7 +591,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     listener: (status: { success: true }) => void
   ): this;
   on(
-    eventName: "loginAttempt",
+    eventName: "beforeLogin",
+    listener: () => void
+  ): this;
+  on(
+    eventName: "loginAttempt" | "afterLogin",
     listener: (data: { success: boolean; error: string }) => void
   ): this;
   on(eventName: "discarded", listener: (request: RequestPayload) => void): this;

@@ -506,17 +506,28 @@ describe("Auth Controller", () => {
         });
     });
 
-    it('should trigger a "loginAttempt" event once the user is logged in', () => {
+    it('should trigger a login events the user is logged in', async () => {
       kuzzle.emit = sinon.stub();
 
-      return kuzzle.auth
+      await kuzzle.auth
         .login("strategy", credentials, "expiresIn")
         .then(() => {
-          should(kuzzle.emit).be.calledOnce().be.calledWith("loginAttempt");
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+          should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+        });
+      kuzzle.emit.reset();
+
+      kuzzle.query.rejects();
+      await kuzzle.auth.login("strategy", credentials, "expiresIn")
+        .catch(() => {
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", { success: false, error: "Error" });
+          should(kuzzle.emit).be.calledWith("loginAttempt", { success: false, error: "Error" });
         });
     });
 
-    it('should trigger a "loginAttempt" event once the user is logged in with cookieAuthentication enabled', () => {
+    it('should trigger a login events the user is logged in with cookieAuthentication enabled', async () => {
       kuzzle.emit = sinon.stub();
       kuzzle.cookieAuthentication = true;
       kuzzle.query.resolves({
@@ -525,10 +536,22 @@ describe("Auth Controller", () => {
         },
       });
 
-      return kuzzle.auth
+      await kuzzle.auth
         .login("strategy", credentials, "expiresIn")
         .then(() => {
-          should(kuzzle.emit).be.calledOnce().be.calledWith("loginAttempt");
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+          should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+        });
+      kuzzle.emit.reset();
+
+      kuzzle.query.rejects();
+      await should(kuzzle.auth.login("strategy", credentials, "expiresIn"))
+        .be.rejected()
+        .catch(() => {
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", { success: false, error: "Error" });
+          should(kuzzle.emit).be.calledWith("loginAttempt", { success: false, error: "Error" });
         });
     });
 

@@ -447,6 +447,7 @@ export class AuthController extends BaseController {
       strategy,
     };
 
+    this.kuzzle.emit("beforeLogin");
     return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
       .then((response) => {
         if (this.kuzzle.cookieAuthentication) {
@@ -458,16 +459,22 @@ export class AuthController extends BaseController {
               error: err.message,
               success: false,
             });
+            this.kuzzle.emit("afterLogin", {
+              error: err.message,
+              success: false,
+            });
             throw err;
           }
 
           this.kuzzle.emit("loginAttempt", { success: true });
+          this.kuzzle.emit("afterLogin", { success: true });
           return;
         }
 
         this._authenticationToken = new Jwt(response.result.jwt);
 
         this.kuzzle.emit("loginAttempt", { success: true });
+        this.kuzzle.emit("afterLogin", { success: true });
 
         return response.result.jwt;
       })
@@ -476,6 +483,11 @@ export class AuthController extends BaseController {
           error: err.message,
           success: false,
         });
+        this.kuzzle.emit("afterLogin", {
+          error: err.message,
+          success: false,
+        });
+
         throw err;
       });
   }

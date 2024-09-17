@@ -16,6 +16,8 @@ export type PublicKuzzleEvents =
   | "discarded"
   | "disconnected"
   | "loginAttempt"
+  | "beforeLogin"
+  | "afterLogin"
   | "logoutAttempt"
   | "beforeLogout"
   | "afterLogout"
