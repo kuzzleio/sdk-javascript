@@ -84,7 +84,11 @@ export class Kuzzle extends KuzzleEventEmitter {
     "discarded",
     "disconnected",
     "loginAttempt",
+    "beforeLogin",
+    "afterLogin",
     "logoutAttempt",
+    "beforeLogout",
+    "afterLogout",
     "networkError",
     "offlineQueuePush",
     "offlineQueuePop",
@@ -237,6 +241,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.protocol = protocol;
 
     this._protectedEvents = {
+      afterLogin: {},
       connected: {},
       disconnected: {},
       error: {},
@@ -350,7 +355,10 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     this._loggedIn = false;
 
-    this.on("loginAttempt", async (status) => {
+    /**
+     * When successfuly logged in
+     */
+    this.on("afterLogin", async (status) => {
       if (status.success) {
         this._loggedIn = true;
         return;
@@ -369,7 +377,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     /**
      * When successfuly logged out
      */
-    this.on("logoutAttempt", (status) => {
+    this.on("afterLogout", (status) => {
       if (status.success) {
         this._loggedIn = false;
       }
@@ -574,12 +582,14 @@ export class Kuzzle extends KuzzleEventEmitter {
     listener: () => void
   ): this;
 
+  on(eventName: "beforeLogout", listener: () => void): this;
   on(
-    eventName: "logoutAttempt",
+    eventName: "logoutAttempt" | "afterLogout",
     listener: (status: { success: true }) => void
   ): this;
+  on(eventName: "beforeLogin", listener: () => void): this;
   on(
-    eventName: "loginAttempt",
+    eventName: "loginAttempt" | "afterLogin",
     listener: (data: { success: boolean; error: string }) => void
   ): this;
   on(eventName: "discarded", listener: (request: RequestPayload) => void): this;

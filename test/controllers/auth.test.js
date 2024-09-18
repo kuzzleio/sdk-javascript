@@ -7,9 +7,20 @@ const { AuthController } = require("../../src/controllers/Auth");
 const { User } = require("../../src/core/security/User");
 const generateJwt = require("../mocks/generateJwt.mock");
 
+/**
+ * Kuzzle interface
+ *
+ * @typedef {Object} Kuzzle
+ * @property {import("sinon").SinonStub} Kuzzle.query
+ * @property {import("sinon").SinonStub} Kuzzle.emit
+ * @property {boolean} Kuzzle.cookieAuthentication
+ */
+
 describe("Auth Controller", () => {
   const options = { opt: "in" };
-  let jwt, kuzzle;
+  /** @type {Kuzzle} */
+  let kuzzle;
+  let jwt;
 
   beforeEach(() => {
     kuzzle = new KuzzleEventEmitter();
@@ -495,17 +506,33 @@ describe("Auth Controller", () => {
         });
     });
 
-    it('should trigger a "loginAttempt" event once the user is logged in', () => {
+    it("should trigger a login events the user is logged in", async () => {
       kuzzle.emit = sinon.stub();
 
-      return kuzzle.auth
+      await kuzzle.auth.login("strategy", credentials, "expiresIn").then(() => {
+        should(kuzzle.emit).be.calledWith("beforeLogin");
+        should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+        should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+      });
+      kuzzle.emit.reset();
+
+      kuzzle.query.rejects();
+      await kuzzle.auth
         .login("strategy", credentials, "expiresIn")
-        .then(() => {
-          should(kuzzle.emit).be.calledOnce().be.calledWith("loginAttempt");
+        .catch(() => {
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", {
+            success: false,
+            error: "Error",
+          });
+          should(kuzzle.emit).be.calledWith("loginAttempt", {
+            success: false,
+            error: "Error",
+          });
         });
     });
 
-    it('should trigger a "loginAttempt" event once the user is logged in with cookieAuthentication enabled', () => {
+    it("should trigger a login events the user is logged in with cookieAuthentication enabled", async () => {
       kuzzle.emit = sinon.stub();
       kuzzle.cookieAuthentication = true;
       kuzzle.query.resolves({
@@ -514,10 +541,26 @@ describe("Auth Controller", () => {
         },
       });
 
-      return kuzzle.auth
-        .login("strategy", credentials, "expiresIn")
-        .then(() => {
-          should(kuzzle.emit).be.calledOnce().be.calledWith("loginAttempt");
+      await kuzzle.auth.login("strategy", credentials, "expiresIn").then(() => {
+        should(kuzzle.emit).be.calledWith("beforeLogin");
+        should(kuzzle.emit).be.calledWith("afterLogin", { success: true });
+        should(kuzzle.emit).be.calledWith("loginAttempt", { success: true });
+      });
+      kuzzle.emit.reset();
+
+      kuzzle.query.rejects();
+      await should(kuzzle.auth.login("strategy", credentials, "expiresIn"))
+        .be.rejected()
+        .catch(() => {
+          should(kuzzle.emit).be.calledWith("beforeLogin");
+          should(kuzzle.emit).be.calledWith("afterLogin", {
+            success: false,
+            error: "Error",
+          });
+          should(kuzzle.emit).be.calledWith("loginAttempt", {
+            success: false,
+            error: "Error",
+          });
         });
     });
 
@@ -568,6 +611,42 @@ describe("Auth Controller", () => {
     it("should unset the authenticationToken property", () => {
       return kuzzle.auth.logout().then(() => {
         should(kuzzle.auth.authenticationToken).be.null();
+      });
+    });
+
+    // ? Legacy event
+    it('should trigger a legacy "logoutAttempt" event the user is logged out', async () => {
+      kuzzle.emit = sinon.stub();
+      await kuzzle.auth.logout().then(() => {
+        should(kuzzle.emit).be.calledWith("logoutAttempt", { success: true });
+      });
+      kuzzle.emit.reset();
+
+      // ? Fail logout
+      kuzzle.query.rejects();
+      await kuzzle.auth.logout().catch(() => {
+        should(kuzzle.emit).be.calledWith("logoutAttempt", {
+          success: false,
+          error: "Error",
+        });
+      });
+    });
+
+    it("should trigger logout events when the user is logged out", async () => {
+      kuzzle.emit = sinon.stub();
+      await kuzzle.auth.logout().then(() => {
+        should(kuzzle.emit).be.calledWith("beforeLogout");
+        should(kuzzle.emit).be.calledWith("afterLogout", { success: true });
+      });
+      kuzzle.emit.reset();
+
+      // ? Fail logout
+      kuzzle.query.rejects();
+      await kuzzle.auth.logout().catch(() => {
+        should(kuzzle.emit).be.calledWith("afterLogout", {
+          success: false,
+          error: "Error",
+        });
       });
     });
   });

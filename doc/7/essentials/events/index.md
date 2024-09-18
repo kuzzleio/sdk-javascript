@@ -59,9 +59,18 @@ Triggered when the current session has been unexpectedly disconnected.
 | `websocket/auth-renewal` | The websocket protocol si reconnecting to renew the token. See [Websocket Cookie Authentication](sdk/js/7/protocols/websocket/introduction#cookie-authentication). |
 | `user/connection-closed` | The disconnection is done by the user.                                                                                                                             |
 | `network/error`          | An network error occured and caused a disconnection.                                                                                                               |
-## loginAttempt
+
+## beforeLogin
+
+Triggered before login attempt.
+
+## afterLogin
 
 Triggered when a login attempt completes, either with a success or a failure result.
+
+## loginAttempt
+
+Legacy event triggered when a login attempt completes, either with a success or a failure result.
 
 **Callback arguments:**
 
@@ -71,6 +80,27 @@ Triggered when a login attempt completes, either with a success or a failure res
 | --------- | ------------------ | --------------------------------- |
 | `success` | <pre>boolean</pre> | Indicate if login attempt succeed |
 | `error`   | <pre>string</pre>  | Error message when login fail     |
+
+## beforeLogout
+
+Triggered before logout attempt.
+
+## afterLogout
+
+Triggered when a logout attempt completes, either with a success or a failure result.
+
+## logoutAttempt
+
+Legacy event triggered when a logout attempt completes, either with a success or a failure result.
+
+**Callback arguments:**
+
+`@param {object} data`
+
+| Property  | Type               | Description                       |
+| --------- | ------------------ | --------------------------------- |
+| `success` | <pre>boolean</pre> | Indicate if logout attempt succeed |
+| `error`   | <pre>string</pre>  | Error message when logout fail     |
 
 ## networkError
 
