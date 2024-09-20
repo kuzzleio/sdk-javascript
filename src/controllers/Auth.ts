@@ -520,7 +520,6 @@ export class AuthController extends BaseController {
 
     this.kuzzle.emit("beforeLogin");
 
-
     return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
       .then((response: any) => {
         if (this.kuzzle.cookieAuthentication) {
