@@ -77,20 +77,22 @@ export class RealtimeController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
-   * @returns A number represensting active connections using the same provided subscription room.
+   * @returns A number representing active connections using the same provided subscription room.
    */
   count(
     roomId: string,
     options: ArgsRealtimeControllerCount = {}
   ): Promise<number> {
-    return this.query(
-      {
-        action: "count",
-        body: { roomId },
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.count);
+    const request: any = {
+      action: "count",
+      body: { roomId },
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.count);
   }
 
   /**
@@ -116,14 +118,20 @@ export class RealtimeController extends BaseController {
     message: JSONObject,
     options: ArgsRealtimeControllerPublish = {}
   ): Promise<boolean> {
-    const request = {
-      _id: options._id,
+    const request: any = {
       action: "publish",
       body: message,
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options._id !== undefined) {
+      request._id = options._id;
+    }
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.published
@@ -183,11 +191,14 @@ export class RealtimeController extends BaseController {
     roomId: string,
     options: ArgsRealtimeControllerUnsubscribe = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "unsubscribe",
       body: { roomId },
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(() => {
       const rooms = this._subscriptions.get(roomId);

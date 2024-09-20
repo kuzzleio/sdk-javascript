@@ -40,13 +40,16 @@ export class CollectionController extends BaseController {
       | CollectionMappings,
     options: ArgsCollectionControllerCreate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "create",
       body: definition,
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(() => undefined);
   }
@@ -68,12 +71,16 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerDeleteSpecifications = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "deleteSpecifications",
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -94,15 +101,17 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerExists = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "exists",
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "exists",
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -123,15 +132,17 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerRefresh = {}
   ): Promise<void> {
-    return this.query(
-      {
-        action: "refresh",
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(() => undefined);
+    const request: any = {
+      action: "refresh",
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -152,13 +163,16 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerGetMapping = {}
   ): Promise<CollectionMappings> {
-    const request = {
+    const request: any = {
       action: "getMapping",
       collection,
       includeKuzzleMeta: options.includeKuzzleMeta || false,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -182,15 +196,17 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerGetSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "getSpecifications",
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getSpecifications",
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -228,13 +244,16 @@ export class CollectionController extends BaseController {
       type: "realtime" | "stored";
     }>;
   }> {
-    const request = {
+    const request: any = {
       action: "list",
       from: options.from,
       index,
       size: options.size || 0,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -257,11 +276,14 @@ export class CollectionController extends BaseController {
     query: JSONObject = {},
     options: ArgsCollectionControllerSearchSpecifications = {}
   ): Promise<SpecificationsSearchResult> {
-    const request = {
+    const request: any = {
       action: "searchSpecifications",
       body: query,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     for (const opt of ["from", "size", "scroll"]) {
       request[opt] = options[opt];
@@ -295,12 +317,16 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerTruncate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "truncate",
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -337,16 +363,18 @@ export class CollectionController extends BaseController {
       | CollectionMappings,
     options: ArgsCollectionControllerUpdate = {}
   ): Promise<void> {
-    return this.query(
-      {
-        action: "update",
-        body: definition,
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(() => undefined);
+    const request: any = {
+      action: "update",
+      body: definition,
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -358,16 +386,18 @@ export class CollectionController extends BaseController {
     mappings: CollectionMappings,
     options: ArgsCollectionControllerUpdateMapping = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "updateMapping",
-        body: mappings,
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateMapping",
+      body: mappings,
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -391,16 +421,18 @@ export class CollectionController extends BaseController {
     specifications: JSONObject,
     options: ArgsCollectionControllerUpdateSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "updateSpecifications",
-        body: specifications,
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateSpecifications",
+      body: specifications,
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -429,16 +461,18 @@ export class CollectionController extends BaseController {
     details: Array<string>;
     description: string;
   }> {
-    return this.query(
-      {
-        action: "validateSpecifications",
-        body: specifications,
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "validateSpecifications",
+      body: specifications,
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -457,12 +491,15 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerDelete = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "delete",
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(() => undefined);
   }

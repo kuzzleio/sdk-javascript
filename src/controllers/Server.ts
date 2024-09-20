@@ -19,14 +19,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Boolean>}
    */
-  adminExists(options: ArgsServerControllerAdminExists) {
-    return this.query(
-      {
-        action: "adminExists",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.exists);
+  adminExists(options: ArgsServerControllerAdminExists = {}) {
+    const request: any = {
+      action: "adminExists",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.exists);
   }
 
   /**
@@ -35,14 +37,16 @@ export class ServerController extends BaseController {
    * @example https://docs.kuzzle.io/core/2/api/controllers/server/capabilities/#response
    * @returns {Promise<Object>}
    */
-  capabilities(options: ArgsServerControllerCapabilities) {
-    return this.query(
-      {
-        action: "capabilities",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+  capabilities(options: ArgsServerControllerCapabilities = {}) {
+    const request: any = {
+      action: "capabilities",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -51,14 +55,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getAllStats(options: ArgsServerControllerGetAllStats) {
-    return this.query(
-      {
-        action: "getAllStats",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+  getAllStats(options: ArgsServerControllerGetAllStats = {}) {
+    const request: any = {
+      action: "getAllStats",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -67,14 +73,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getConfig(options: ArgsServerControllerGetConfig) {
-    return this.query(
-      {
-        action: "getConfig",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+  getConfig(options: ArgsServerControllerGetConfig = {}) {
+    const request: any = {
+      action: "getConfig",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -83,14 +91,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getLastStats(options: ArgsServerControllerGetLastStats) {
-    return this.query(
-      {
-        action: "getLastStats",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+  getLastStats(options: ArgsServerControllerGetLastStats = {}) {
+    const request: any = {
+      action: "getLastStats",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -104,17 +114,19 @@ export class ServerController extends BaseController {
   getStats(
     startTime: number | string,
     stopTime: number | string,
-    options: ArgsServerControllerGetStats
+    options: ArgsServerControllerGetStats = {}
   ) {
-    return this.query(
-      {
-        action: "getStats",
-        startTime,
-        stopTime,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getStats",
+      startTime,
+      stopTime,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -123,14 +135,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  info(options: ArgsServerControllerInfo) {
-    return this.query(
-      {
-        action: "info",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+  info(options: ArgsServerControllerInfo = {}) {
+    const request: any = {
+      action: "info",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -139,14 +153,16 @@ export class ServerController extends BaseController {
    * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Number>}
    */
-  now(options: ArgsServerControllerNow) {
-    return this.query(
-      {
-        action: "now",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.now);
+  now(options: ArgsServerControllerNow = {}) {
+    const request: any = {
+      action: "now",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.now);
   }
 }
 

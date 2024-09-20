@@ -233,16 +233,9 @@ for (const action of Object.keys(commands)) {
   // eslint-disable-next-line no-loop-func
   MemoryStorageController.prototype[action] = function (...args) {
     const command = commands[action];
-    // args.length - 1 should be options
-    const triggerEvents =
-      args[args.length - 1] && args[args.length - 1].triggerEvents;
     const request = {
       action,
     };
-
-    if (triggerEvents !== undefined) {
-      request.triggerEvents = triggerEvents;
-    }
 
     const options = {};
 
@@ -267,11 +260,15 @@ for (const action of Object.keys(commands)) {
     if (args.length) {
       if (typeof args[0] !== "object" || Array.isArray(args[0])) {
         throw new Error(
-          `ms.${action}: invalid optional paramater (expected an object`
+          `ms.${action}: invalid optional parameter (expected an object)`
         );
       }
 
       Object.assign(options, args[0]);
+
+      if (options.triggerEvents !== undefined) {
+        request.triggerEvents = options.triggerEvents;
+      }
 
       if (Array.isArray(command.opts)) {
         for (const opt of command.opts) {

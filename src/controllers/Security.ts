@@ -29,7 +29,7 @@ export class SecurityController extends BaseController {
     description,
     options: ArgsSecurityControllerCreateApiKey = {}
   ) {
-    const request = {
+    const request: any = {
       _id: options._id,
       action: "createApiKey",
       body: {
@@ -37,9 +37,12 @@ export class SecurityController extends BaseController {
       },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
-      triggerEvents: options.triggerEvents,
       userId,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -56,14 +59,17 @@ export class SecurityController extends BaseController {
   checkRights(
     kuid,
     requestPayload,
-    options: ArgsSecurityControllerCheckRights
+    options: ArgsSecurityControllerCheckRights = {}
   ) {
-    const request = {
+    const request: any = {
       action: "checkRights",
       body: requestPayload,
-      triggerEvents: options.triggerEvents,
       userId: kuid,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.allowed
@@ -80,13 +86,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise} API key deletion result
    */
   deleteApiKey(userId, id, options: ArgsSecurityControllerDeleteApiKey = {}) {
-    const request = {
+    const request: any = {
       _id: id,
       action: "deleteApiKey",
       refresh: options.refresh,
-      triggerEvents: options.triggerEvents,
       userId,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options);
   }
@@ -105,15 +114,18 @@ export class SecurityController extends BaseController {
     query = {},
     options: ArgsSecurityControllerSearchApiKeys = {}
   ) {
-    const request = {
+    const request: any = {
       action: "searchApiKeys",
       body: query,
       from: options.from,
       lang: options.lang,
       size: options.size,
-      triggerEvents: options.triggerEvents,
       userId,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -134,16 +146,18 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerCreateCredentials = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "createCredentials",
-        body,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "createCredentials",
+      body,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -160,13 +174,16 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerCreateFirstAdmin = {}
   ) {
-    const request = {
+    const request: any = {
       _id,
       action: "createFirstAdmin",
       body,
       reset: options.reset,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -188,12 +205,15 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerCreateOrReplaceProfile = {}
   ) {
-    const request = {
+    const request: any = {
       _id,
       action: "createOrReplaceProfile",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -215,13 +235,17 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerCreateOrReplaceRole = {}
   ) {
-    const request = {
+    const request: any = {
       _id,
       action: "createOrReplaceRole",
       body,
       force: options.force ? true : null,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(
       (response) =>
         new Role(
@@ -242,12 +266,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Profile>} The created profile
    */
   createProfile(_id, body, options: ArgsSecurityControllerCreateProfile = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "createProfile",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -273,12 +300,15 @@ export class SecurityController extends BaseController {
       body.content = {};
     }
 
-    const request = {
+    const request: any = {
       _id,
       action: "createRestrictedUser",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -296,13 +326,17 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Role>} The created role
    */
   createRole(_id, body, options: ArgsSecurityControllerCreateRole = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "createRole",
       body,
       force: options.force ? true : null,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(
       (response) =>
         new Role(
@@ -323,12 +357,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<User>} The created user
    */
   createUser(_id, body, options: ArgsSecurityControllerCreateUser = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "createUser",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -350,12 +387,15 @@ export class SecurityController extends BaseController {
     _id,
     options: ArgsSecurityControllerDeleteCredentials = {}
   ) {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteCredentials",
       strategy,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -369,11 +409,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   deleteProfile(_id, options: ArgsSecurityControllerDeleteProfile = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteProfile",
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -386,11 +430,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   deleteRole(_id, options: ArgsSecurityControllerDeleteRole = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteRole",
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -403,11 +451,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   deleteUser(_id, options: ArgsSecurityControllerDeleteUser = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteUser",
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -421,13 +473,15 @@ export class SecurityController extends BaseController {
   getAllCredentialFields(
     options: ArgsSecurityControllerGetAllCredentialFields = {}
   ) {
-    return this.query(
-      {
-        action: "getAllCredentialFields",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getAllCredentialFields",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -442,14 +496,16 @@ export class SecurityController extends BaseController {
     strategy,
     options: ArgsSecurityControllerGetCredentialFields = {}
   ) {
-    return this.query(
-      {
-        action: "getCredentialFields",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getCredentialFields",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -466,15 +522,17 @@ export class SecurityController extends BaseController {
     _id,
     options: ArgsSecurityControllerGetCredentials = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "getCredentials",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "getCredentials",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -491,15 +549,17 @@ export class SecurityController extends BaseController {
     _id,
     options: ArgsSecurityControllerGetCredentialsById = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "getCredentialsById",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "getCredentialsById",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -525,13 +585,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} The profile mapping
    */
   getProfileMapping(options: ArgsSecurityControllerGetProfileMapping = {}) {
-    return this.query(
-      {
-        action: "getProfileMapping",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getProfileMapping",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -543,14 +605,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Array>} The profile rights
    */
   getProfileRights(_id, options: ArgsSecurityControllerGetProfileRights = {}) {
-    return this.query(
-      {
-        _id,
-        action: "getProfileRights",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.hits);
+    const request: any = {
+      _id,
+      action: "getProfileRights",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.hits);
   }
 
   /**
@@ -562,14 +626,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Role>} The role
    */
   getRole(_id, options: ArgsSecurityControllerGetRole = {}) {
-    return this.query(
-      {
-        _id,
-        action: "getRole",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(
+    const request: any = {
+      _id,
+      action: "getRole",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(
       (response) =>
         new Role(
           this.kuzzle,
@@ -587,13 +653,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} The role mapping
    */
   getRoleMapping(options: ArgsSecurityControllerGetRoleMapping = {}) {
-    return this.query(
-      {
-        action: "getRoleMapping",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getRoleMapping",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -605,14 +673,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<User>} The user
    */
   getUser(_id, options: ArgsSecurityControllerGetUser = {}) {
-    return this.query(
-      {
-        _id,
-        action: "getUser",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(
+    const request: any = {
+      _id,
+      action: "getUser",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
     );
@@ -626,13 +696,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} The user mapping
    */
   getUserMapping(options: ArgsSecurityControllerGetUserMapping = {}) {
-    return this.query(
-      {
-        action: "getUserMapping",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getUserMapping",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -644,14 +716,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Array>} The user rights
    */
   getUserRights(_id, options: ArgsSecurityControllerGetUserRights = {}) {
-    return this.query(
-      {
-        _id,
-        action: "getUserRights",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.hits);
+    const request: any = {
+      _id,
+      action: "getUserRights",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.hits);
   }
 
   /**
@@ -666,14 +740,16 @@ export class SecurityController extends BaseController {
     _id,
     options: ArgsSecurityControllerGetUserStrategies = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "getUserStrategies",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.strategies);
+    const request: any = {
+      _id,
+      action: "getUserStrategies",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result.strategies);
   }
 
   /**
@@ -690,15 +766,17 @@ export class SecurityController extends BaseController {
     _id,
     options: ArgsSecurityControllerHasCredentials = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "hasCredentials",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "hasCredentials",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -710,11 +788,14 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   mDeleteProfiles(ids, options: ArgsSecurityControllerMDeleteProfiles = {}) {
-    const request = {
+    const request: any = {
       action: "mDeleteProfiles",
       body: { ids },
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -728,11 +809,14 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   mDeleteRoles(ids, options: ArgsSecurityControllerMDeleteRoles = {}) {
-    const request = {
+    const request: any = {
       action: "mDeleteRoles",
       body: { ids },
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -746,11 +830,14 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Object>} Deletion result
    */
   mDeleteUsers(ids, options: ArgsSecurityControllerMDeleteUsers = {}) {
-    const request = {
+    const request: any = {
       action: "mDeleteUsers",
       body: { ids },
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -764,7 +851,12 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Array.<Profile>>} The profiles
    */
   mGetProfiles(ids, options: ArgsSecurityControllerMGetProfiles = {}) {
-    return this.query({ action: "mGetProfiles", body: { ids } }, options).then(
+    const request: any = {
+      action: "mGetProfiles",
+      body: { ids },
+    };
+
+    return this.query(request, options).then(
       (response) =>
         response.result.hits.map(
           (hit) => new Profile(this.kuzzle, hit._id, hit._source)
@@ -781,11 +873,14 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Array.<User>>} The users
    */
   mGetUsers(ids, options: ArgsSecurityControllerMGetUsers = {}) {
-    const request = {
+    const request: any = {
       action: "mGetUsers",
       body: { ids },
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) =>
       response.result.hits.map(
@@ -803,14 +898,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Array.<Role>>} The roles
    */
   mGetRoles(ids, options: ArgsSecurityControllerMGetRoles = {}) {
-    return this.query(
-      {
-        action: "mGetRoles",
-        body: { ids },
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) =>
+    const request: any = {
+      action: "mGetRoles",
+      body: { ids },
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) =>
       response.result.hits.map(
         (hit) => new Role(this.kuzzle, hit._id, hit._source.controllers)
       )
@@ -841,12 +938,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<User>} The replaced user
    */
   replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "replaceUser",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
@@ -862,13 +963,20 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<ProfileSearchResult>} Search result
    */
   searchProfiles(body, options: ArgsSecurityControllerSearchProfiles = {}) {
-    const request = {
+    const request: any = {
       action: "searchProfiles",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    // Exclude undefined values and triggerEvents if not defined
     for (const [key, value] of Object.entries(options)) {
-      request[key] = value;
+      if (key !== "triggerEvents" && value !== undefined) {
+        request[key] = value;
+      }
+    }
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -886,13 +994,20 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<RoleSearchResult>} Search result
    */
   searchRoles(body, options: ArgsSecurityControllerSearchRoles = {}) {
-    const request = {
+    const request: any = {
       action: "searchRoles",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    // Exclude undefined values and triggerEvents if not defined
     for (const [key, value] of Object.entries(options)) {
-      request[key] = value;
+      if (key !== "triggerEvents" && value !== undefined) {
+        request[key] = value;
+      }
+    }
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -910,13 +1025,19 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<UserSearchResult>} Search result
    */
   searchUsers(body, options: ArgsSecurityControllerSearchUsers = {}) {
-    const request = {
+    const request: any = {
       action: "searchUsers",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
     for (const opt of ["from", "size", "scroll", "lang"]) {
-      request[opt] = options[opt];
+      if (options[opt] !== undefined) {
+        request[opt] = options[opt];
+      }
+    }
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -941,16 +1062,18 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerUpdateCredentials = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "updateCredentials",
-        body,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "updateCredentials",
+      body,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -963,12 +1086,15 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Profile>} The updated profile
    */
   updateProfile(_id, body, options: ArgsSecurityControllerUpdateProfile = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "updateProfile",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -988,14 +1114,16 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerUpdateProfileMapping = {}
   ) {
-    return this.query(
-      {
-        action: "updateProfileMapping",
-        body,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateProfileMapping",
+      body,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -1008,13 +1136,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<Role>} The updated role
    */
   updateRole(_id, body, options: ArgsSecurityControllerUpdateRole = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "updateRole",
       body,
       force: options.force ? true : null,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) =>
@@ -1038,14 +1169,16 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerUpdateRoleMapping = {}
   ) {
-    return this.query(
-      {
-        action: "updateRoleMapping",
-        body,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateRoleMapping",
+      body,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -1058,12 +1191,16 @@ export class SecurityController extends BaseController {
    * @returns {Promise.<User>} The updated user
    */
   updateUser(_id, body, options: ArgsSecurityControllerUpdateUser = {}) {
-    const request = {
+    const request: any = {
       _id,
       action: "updateUser",
       body,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
@@ -1082,14 +1219,16 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerUpdateUserMapping = {}
   ) {
-    return this.query(
-      {
-        action: "updateUserMapping",
-        body,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateUserMapping",
+      body,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -1108,16 +1247,18 @@ export class SecurityController extends BaseController {
     body,
     options: ArgsSecurityControllerValidateCredentials = {}
   ) {
-    return this.query(
-      {
-        _id,
-        action: "validateCredentials",
-        body,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id,
+      action: "validateCredentials",
+      body,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

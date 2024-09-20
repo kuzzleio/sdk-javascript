@@ -20,10 +20,15 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerCreate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "create",
       index,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -41,10 +46,15 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerDelete = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "delete",
       index,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -62,13 +72,16 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerExists = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "exists",
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "exists",
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -81,12 +94,17 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   list(options: ArgsIndexControllerList = {}): Promise<Array<string>> {
-    return this.query(
-      {
-        action: "list",
-      },
-      options
-    ).then((response) => response.result.indexes);
+    const request: any = {
+      action: "list",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(
+      (response) => response.result.indexes
+    );
   }
 
   /**
@@ -105,12 +123,16 @@ export class IndexController extends BaseController {
     indexes: Array<string>,
     options: ArgsIndexControllerMDelete = {}
   ): Promise<Array<string>> {
-    const request = {
+    const request: any = {
       action: "mDelete",
       body: {
         indexes,
       },
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.deleted
@@ -127,12 +149,15 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   stats(options: ArgsIndexControllerStats = {}): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "stats",
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "stats",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

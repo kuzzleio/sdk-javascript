@@ -30,11 +30,11 @@ export class AuthController extends BaseController {
   /**
    *  Authentication token in use
    */
-  get authenticationToken(): any | null {
+  get authenticationToken(): Jwt | null {
     return this._authenticationToken;
   }
 
-  set authenticationToken(encodedJwt: any) {
+  set authenticationToken(encodedJwt: string | null) {
     if (encodedJwt === undefined || encodedJwt === null) {
       this._authenticationToken = null;
     } else if (typeof encodedJwt === "string") {
@@ -48,7 +48,7 @@ export class AuthController extends BaseController {
    * Do not add the token for the checkToken route, to avoid getting a token error when
    * a developer simply wishes to verify their token
    */
-  authenticateRequest(request: RequestPayload) {
+  authenticateRequest(request: RequestPayload): void {
     if (this.kuzzle.cookieAuthentication) {
       return;
     }
@@ -83,7 +83,7 @@ export class AuthController extends BaseController {
     description: string,
     options: ArgsAuthControllerCreateApiKey = {}
   ): Promise<ApiKey> {
-    const request = {
+    const request: Record<string, any> = {
       _id: options._id,
       action: "createApiKey",
       body: {
@@ -91,10 +91,13 @@ export class AuthController extends BaseController {
       },
       expiresIn: options.expiresIn,
       refresh: options.refresh,
-      triggerEvents: options.triggerEvents,
     };
 
-    return this.query(request, options).then((response) => response.result);
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -111,14 +114,17 @@ export class AuthController extends BaseController {
     requestPayload: RequestPayload,
     options: ArgsAuthControllerCheckRights = {}
   ): Promise<boolean> {
-    const request = {
+    const request: Record<string, any> = {
       action: "checkRights",
       body: requestPayload,
-      triggerEvents: options.triggerEvents,
     };
 
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(request, options).then(
-      (response) => response.result.allowed
+      (response: any) => response.result.allowed
     );
   }
 
@@ -137,12 +143,15 @@ export class AuthController extends BaseController {
     id: string,
     options: ArgsAuthControllerDeleteApiKey = {}
   ): Promise<null> {
-    const request = {
+    const request: Record<string, any> = {
       _id: id,
       action: "deleteApiKey",
       refresh: options.refresh,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(() => null);
   }
@@ -174,16 +183,19 @@ export class AuthController extends BaseController {
      */
     total: number;
   }> {
-    const request = {
+    const request: Record<string, any> = {
       action: "searchApiKeys",
       body: query,
       from: options.from,
       lang: options.lang,
       size: options.size,
-      triggerEvents: options.triggerEvents,
     };
 
-    return this.query(request, options).then((response) => response.result);
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -194,6 +206,7 @@ export class AuthController extends BaseController {
    * @param token The jwt token to check (default to current SDK token)
    * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns A token validity object
    */
@@ -227,15 +240,20 @@ export class AuthController extends BaseController {
       }
     }
 
+    const request: Record<string, any> = {
+      action: "checkToken",
+      body: { token },
+      cookieAuth,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     return this.query(
-      {
-        action: "checkToken",
-        body: { token },
-        cookieAuth,
-        triggerEvents: options.triggerEvents,
-      },
+      request,
       { queuable: false, ...options }
-    ).then((response) => response.result);
+    ).then((response: any) => response.result);
   }
 
   /**
@@ -258,15 +276,17 @@ export class AuthController extends BaseController {
     credentials: JSONObject,
     options: ArgsAuthControllerCreateMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "createMyCredentials",
-        body: credentials,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "createMyCredentials",
+      body: credentials,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -286,14 +306,16 @@ export class AuthController extends BaseController {
     strategy: string,
     options: ArgsAuthControllerCredentialsExist = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "credentialsExist",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "credentialsExist",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -311,14 +333,16 @@ export class AuthController extends BaseController {
     strategy: string,
     options: ArgsAuthControllerDeleteMyCredentials = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "deleteMyCredentials",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.acknowledged);
+    const request: Record<string, any> = {
+      action: "deleteMyCredentials",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result.acknowledged);
   }
 
   /**
@@ -336,14 +360,16 @@ export class AuthController extends BaseController {
   getCurrentUser(
     options: ArgsAuthControllerGetCurrentUser = {}
   ): Promise<User> {
-    return this.query(
-      {
-        action: "getCurrentUser",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(
-      (response) =>
+    const request: Record<string, any> = {
+      action: "getCurrentUser",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(
+      (response: any) =>
         new User(this.kuzzle, response.result._id, response.result._source)
     );
   }
@@ -366,14 +392,16 @@ export class AuthController extends BaseController {
     strategy: string,
     options: ArgsAuthControllerGetMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "getMyCredentials",
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "getMyCredentials",
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -391,19 +419,19 @@ export class AuthController extends BaseController {
   getMyRights(options: ArgsAuthControllerGetMyRights = {}): Promise<
     Array<{
       /**
-       * Controller on wich the rights are applied
+       * Controller on which the rights are applied
        */
       controller: string;
       /**
-       * Action on wich the rights are applied
+       * Action on which the rights are applied
        */
       action: string;
       /**
-       * Index on wich the rights are applied
+       * Index on which the rights are applied
        */
       index: string;
       /**
-       * Collection on wich the rights are applied
+       * Collection on which the rights are applied
        */
       collection: string;
       /**
@@ -412,13 +440,15 @@ export class AuthController extends BaseController {
       value: string;
     }>
   > {
-    return this.query(
-      {
-        action: "getMyRights",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result.hits);
+    const request: Record<string, any> = {
+      action: "getMyRights",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result.hits);
   }
 
   /**
@@ -436,13 +466,15 @@ export class AuthController extends BaseController {
   getStrategies(
     options: ArgsAuthControllerGetStrategies = {}
   ): Promise<Array<string>> {
-    return this.query(
-      {
-        action: "getStrategies",
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "getStrategies",
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -462,18 +494,17 @@ export class AuthController extends BaseController {
     strategy: string,
     credentials: JSONObject,
     expiresIn?: string | number
-  ): Promise<string> {
-    const request = {
+  ): Promise<string | void> {
+    const request: Record<string, any> = {
       action: "login",
       body: credentials,
       cookieAuth: this.kuzzle.cookieAuthentication,
-      expiresIn,
       strategy,
     };
 
     this.kuzzle.emit("beforeLogin");
     return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
-      .then((response) => {
+      .then((response: any) => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
             const err = new Error(
@@ -502,7 +533,7 @@ export class AuthController extends BaseController {
 
         return response.result.jwt;
       })
-      .catch((err) => {
+      .catch((err: any) => {
         this.kuzzle.emit("loginAttempt", {
           error: err.message,
           success: false,
@@ -574,15 +605,17 @@ export class AuthController extends BaseController {
     credentials: JSONObject,
     options: ArgsAuthControllerUpdateMyCredentials = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "updateMyCredentials",
-        body: credentials,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "updateMyCredentials",
+      body: credentials,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -603,15 +636,17 @@ export class AuthController extends BaseController {
     content: JSONObject,
     options: ArgsAuthControllerUpdateSelf = {}
   ): Promise<User> {
-    return this.query(
-      {
-        action: "updateSelf",
-        body: content,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then(
-      (response) =>
+    const request: Record<string, any> = {
+      action: "updateSelf",
+      body: content,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then(
+      (response: any) =>
         new User(this.kuzzle, response.result._id, response.result._source)
     );
   }
@@ -633,15 +668,17 @@ export class AuthController extends BaseController {
     credentials: JSONObject,
     options: ArgsAuthControllerValidateMyCredentials = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "validateMyCredentials",
-        body: credentials,
-        strategy,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: Record<string, any> = {
+      action: "validateMyCredentials",
+      body: credentials,
+      strategy,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => response.result);
   }
 
   /**
@@ -675,14 +712,20 @@ export class AuthController extends BaseController {
      */
     ttl: number;
   }> {
-    const query = {
+    const request: Record<string, any> = {
       action: "refreshToken",
       cookieAuth: this.kuzzle.cookieAuthentication,
-      expiresIn: options.expiresIn,
-      triggerEvents: options.triggerEvents,
     };
 
-    return this.query(query, options).then((response) => {
+    if (options.expiresIn !== undefined) {
+      request.expiresIn = options.expiresIn;
+    }
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response: any) => {
       if (!this.kuzzle.cookieAuthentication) {
         this._authenticationToken = new Jwt(response.result.jwt);
       }

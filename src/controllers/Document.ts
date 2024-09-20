@@ -49,13 +49,16 @@ export class DocumentController extends BaseController {
     body?: JSONObject,
     options: ArgsDocumentControllerCount = {}
   ): Promise<number> {
-    const request = {
+    const request: any = {
       action: "count",
       body,
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.count
@@ -86,15 +89,18 @@ export class DocumentController extends BaseController {
     _id: string = null,
     options: ArgsDocumentControllerCreate = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "create",
       body: content,
       collection,
       index,
       silent: options.silent,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -124,15 +130,18 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerCreateOrReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "createOrReplace",
       body: content,
       collection,
       index,
       silent: options.silent,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -160,14 +169,17 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerDelete = {}
   ): Promise<string> {
-    const request = {
+    const request: any = {
       _id,
       action: "delete",
       collection,
       index,
       silent: options.silent,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result._id);
   }
@@ -196,15 +208,18 @@ export class DocumentController extends BaseController {
     query: JSONObject = {},
     options: ArgsDocumentControllerDeleteByQuery = {}
   ): Promise<string[]> {
-    const request = {
+    const request: any = {
       action: "deleteByQuery",
       body: query,
       collection,
       index,
       lang: options.lang,
       silent: options.silent,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result.ids);
   }
@@ -234,7 +249,7 @@ export class DocumentController extends BaseController {
     fields: string[],
     options: ArgsDocumentControllerDeleteFields = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteFields",
       body: { fields },
@@ -242,8 +257,11 @@ export class DocumentController extends BaseController {
       index,
       silent: options.silent,
       source: options.source,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -271,13 +289,16 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerExists = {}
   ): Promise<boolean> {
-    const request = {
+    const request: any = {
       _id,
       action: "exists",
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -306,13 +327,16 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerGet = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "get",
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -341,15 +365,18 @@ export class DocumentController extends BaseController {
     documents: mCreateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreate = {}
   ): Promise<mCreateResponse> {
-    const request = {
+    const request: any = {
       action: "mCreate",
       body: { documents },
       collection,
       index,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -378,15 +405,18 @@ export class DocumentController extends BaseController {
     documents: mCreateOrReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreateOrReplace = {}
   ): Promise<mCreateOrReplaceResponse> {
-    const request = {
+    const request: any = {
       action: "mCreateOrReplace",
       body: { documents },
       collection,
       index,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -415,15 +445,18 @@ export class DocumentController extends BaseController {
     ids: mDeleteRequest,
     options: ArgsDocumentControllerMDelete = {}
   ): Promise<mDeleteResponse> {
-    const request = {
+    const request: any = {
       action: "mDelete",
       body: { ids },
       collection,
       index,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -459,13 +492,16 @@ export class DocumentController extends BaseController {
      */
     errors: string[];
   }> {
-    const request = {
+    const request: any = {
       action: "mGet",
       body: { ids },
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -495,15 +531,18 @@ export class DocumentController extends BaseController {
     documents: mReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMReplace = {}
   ): Promise<mReplaceResponse> {
-    const request = {
+    const request: any = {
       action: "mReplace",
       body: { documents },
       collection,
       index,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -536,15 +575,19 @@ export class DocumentController extends BaseController {
     documents: mUpdateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpdate = {}
   ): Promise<mUpdateResponse> {
-    const request = {
+    const request: any = {
       action: "mUpdate",
       body: { documents },
       collection,
       index,
+      retryOnConflict: options.retryOnConflict,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -574,15 +617,19 @@ export class DocumentController extends BaseController {
     documents: mUpsertRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
-    const request = {
+    const request: any = {
       action: "mUpsert",
       body: { documents },
       collection,
       index,
+      retryOnConflict: options.retryOnConflict,
       silent: options.silent,
       strict: options.strict,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -611,15 +658,18 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "replace",
       body: content,
       collection,
       index,
       silent: options.silent,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -666,8 +716,12 @@ export class DocumentController extends BaseController {
       body: null,
       collection,
       index,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     if (
       this.kuzzle.protocol.name === "http" &&
       options.verb &&
@@ -715,7 +769,7 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdate = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "update",
       body: content,
@@ -724,8 +778,11 @@ export class DocumentController extends BaseController {
       retryOnConflict: options.retryOnConflict,
       silent: options.silent,
       source: options.source,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -778,7 +835,7 @@ export class DocumentController extends BaseController {
       reason: string;
     }>;
   }> {
-    const request = {
+    const request: any = {
       action: "updateByQuery",
       body: { changes, query },
       collection,
@@ -786,8 +843,11 @@ export class DocumentController extends BaseController {
       lang: options.lang,
       silent: options.silent,
       source: options.source,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -818,7 +878,7 @@ export class DocumentController extends BaseController {
     changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "upsert",
       body: { changes, default: options.default },
@@ -826,8 +886,11 @@ export class DocumentController extends BaseController {
       index,
       silent: options.silent,
       source: options.source,
-      triggerEvents: options.triggerEvents,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -853,16 +916,18 @@ export class DocumentController extends BaseController {
     content: TKDocumentContent,
     options: ArgsDocumentControllerValidate = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "validate",
-        body: content,
-        collection,
-        index,
-        triggerEvents: options.triggerEvents,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "validate",
+      body: content,
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

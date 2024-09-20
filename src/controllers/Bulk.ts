@@ -30,12 +30,16 @@ export class BulkController extends BaseController {
     query: JSONObject = {},
     options: ArgsBulkControllerDeleteByQuery = {}
   ): Promise<number> {
-    const request = {
+    const request: any = {
       action: "deleteByQuery",
       body: query,
       collection,
       index,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.deleted
@@ -77,15 +81,18 @@ export class BulkController extends BaseController {
       };
     }>;
   }> {
-    return this.query(
-      {
-        action: "import",
-        body: { bulkData },
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "import",
+      body: { bulkData },
+      collection,
+      index,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -111,12 +118,16 @@ export class BulkController extends BaseController {
     changes: JSONObject,
     options: ArgsBulkControllerUpdateByQuery = {}
   ): Promise<number> {
-    const request = {
+    const request: any = {
       action: "updateByQuery",
       body: { changes, query },
       collection,
       index,
     };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
 
     return this.query(request, options).then(
       (response) => response.result.updated
@@ -148,17 +159,20 @@ export class BulkController extends BaseController {
     id?: string,
     options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
-    return this.query(
-      {
-        _id: id,
-        action: "write",
-        body: document,
-        collection,
-        index,
-        notify: options.notify,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      _id: id,
+      action: "write",
+      body: document,
+      collection,
+      index,
+      notify: options.notify,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -194,16 +208,19 @@ export class BulkController extends BaseController {
       reason: string;
     }>;
   }> {
-    return this.query(
-      {
-        action: "mWrite",
-        body: { documents },
-        collection,
-        index,
-        notify: options.notify,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "mWrite",
+      body: { documents },
+      collection,
+      index,
+      notify: options.notify,
+    };
+
+    if (options.triggerEvents !== undefined) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 
