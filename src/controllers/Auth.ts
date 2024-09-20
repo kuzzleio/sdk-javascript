@@ -97,7 +97,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -195,7 +197,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -250,10 +254,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(
-      request,
-      { queuable: false, ...options }
-    ).then((response: any) => response.result);
+    return this.query(request, { queuable: false, ...options }).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -286,7 +289,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -315,7 +320,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -342,7 +349,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result.acknowledged);
+    return this.query(request, options).then(
+      (response: any) => response.result.acknowledged
+    );
   }
 
   /**
@@ -401,7 +410,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -448,7 +459,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result.hits);
+    return this.query(request, options).then(
+      (response: any) => response.result.hits
+    );
   }
 
   /**
@@ -474,7 +487,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -503,6 +518,11 @@ export class AuthController extends BaseController {
     };
 
     this.kuzzle.emit("beforeLogin");
+
+    if (expiresIn !== undefined) {
+      request.expiresIn = expiresIn;
+    }
+
     return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
       .then((response: any) => {
         if (this.kuzzle.cookieAuthentication) {
@@ -615,7 +635,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**
@@ -678,7 +700,9 @@ export class AuthController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response: any) => response.result);
+    return this.query(request, options).then(
+      (response: any) => response.result
+    );
   }
 
   /**

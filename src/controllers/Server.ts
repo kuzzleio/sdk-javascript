@@ -28,7 +28,9 @@ export class ServerController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response) => response.result.exists);
+    return this.query(request, options).then(
+      (response) => response.result.exists
+    );
   }
 
   /**

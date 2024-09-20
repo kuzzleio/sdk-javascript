@@ -614,7 +614,9 @@ export class SecurityController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response) => response.result.hits);
+    return this.query(request, options).then(
+      (response) => response.result.hits
+    );
   }
 
   /**
@@ -725,7 +727,9 @@ export class SecurityController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response) => response.result.hits);
+    return this.query(request, options).then(
+      (response) => response.result.hits
+    );
   }
 
   /**
@@ -749,7 +753,9 @@ export class SecurityController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response) => response.result.strategies);
+    return this.query(request, options).then(
+      (response) => response.result.strategies
+    );
   }
 
   /**
@@ -856,11 +862,10 @@ export class SecurityController extends BaseController {
       body: { ids },
     };
 
-    return this.query(request, options).then(
-      (response) =>
-        response.result.hits.map(
-          (hit) => new Profile(this.kuzzle, hit._id, hit._source)
-        )
+    return this.query(request, options).then((response) =>
+      response.result.hits.map(
+        (hit) => new Profile(this.kuzzle, hit._id, hit._source)
+      )
     );
   }
 

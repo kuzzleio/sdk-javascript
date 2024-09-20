@@ -92,7 +92,9 @@ export class RealtimeController extends BaseController {
       request.triggerEvents = options.triggerEvents;
     }
 
-    return this.query(request, options).then((response) => response.result.count);
+    return this.query(request, options).then(
+      (response) => response.result.count
+    );
   }
 
   /**
