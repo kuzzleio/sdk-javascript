@@ -1036,9 +1036,7 @@ export class SecurityController extends BaseController {
     };
 
     for (const opt of ["from", "size", "scroll", "lang"]) {
-      if (options[opt] !== undefined) {
-        request[opt] = options[opt];
-      }
+      request[opt] = options[opt];
     }
 
     if (options.triggerEvents !== undefined) {

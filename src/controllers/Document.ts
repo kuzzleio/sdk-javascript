@@ -580,7 +580,6 @@ export class DocumentController extends BaseController {
       body: { documents },
       collection,
       index,
-      retryOnConflict: options.retryOnConflict,
       silent: options.silent,
       strict: options.strict,
     };

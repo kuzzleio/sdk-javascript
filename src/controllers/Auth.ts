@@ -514,14 +514,12 @@ export class AuthController extends BaseController {
       action: "login",
       body: credentials,
       cookieAuth: this.kuzzle.cookieAuthentication,
+      expiresIn,
       strategy,
     };
 
     this.kuzzle.emit("beforeLogin");
 
-    if (expiresIn !== undefined) {
-      request.expiresIn = expiresIn;
-    }
 
     return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
       .then((response: any) => {
@@ -739,11 +737,8 @@ export class AuthController extends BaseController {
     const request: Record<string, any> = {
       action: "refreshToken",
       cookieAuth: this.kuzzle.cookieAuthentication,
+      expiresIn: options.expiresIn,
     };
-
-    if (options.expiresIn !== undefined) {
-      request.expiresIn = options.expiresIn;
-    }
 
     if (options.triggerEvents !== undefined) {
       request.triggerEvents = options.triggerEvents;
