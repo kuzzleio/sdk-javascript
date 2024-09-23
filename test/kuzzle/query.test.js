@@ -1,4 +1,5 @@
 /* eslint no-undef: 0 */
+const { DocumentController } = require("../../src/controllers/Document");
 
 const should = require("should"),
   sinon = require("sinon"),
@@ -354,6 +355,62 @@ describe("Kuzzle query management", () => {
       should(kuzzle.deprecationHandler.logDeprecation)
         .be.calledOnce()
         .be.calledWith(response);
+    });
+  });
+
+  describe("triggerEvents option handling", () => {
+    const index = "index";
+    const collection = "collection";
+    const documentContent = { foo: "bar" };
+    const documentId = "test";
+
+    beforeEach(() => {
+      kuzzle.query = sinon
+        .stub()
+        .resolves({ result: { _id: documentId, _source: documentContent } });
+      kuzzle.document = new DocumentController(kuzzle);
+    });
+
+    it("should include triggerEvents: true in the request parameters when triggerEvents option is used", async () => {
+      const options = { triggerEvents: true };
+
+      kuzzle.document
+        .create(index, collection, documentContent, documentId, options)
+        .then((r) => console.log({ r }));
+
+      should(kuzzle.query.calledOnce).be.true();
+
+      const [request] = kuzzle.query.firstCall.args;
+      // Assert that triggerEvents is set to true in the request
+      should(request.triggerEvents).be.true();
+
+      should(request.index).be.equal(index);
+      should(request.collection).be.equal(collection);
+      should(request.body).be.deepEqual(documentContent);
+      should(request._id).be.equal(documentId);
+    });
+
+    it("should not include triggerEvents in the request parameters when triggerEvents option is not used", async () => {
+      const options = {};
+
+      await kuzzle.document.create(
+        index,
+        collection,
+        documentContent,
+        documentId,
+        options
+      );
+
+      should(kuzzle.query.calledOnce).be.true();
+
+      const [request] = kuzzle.query.firstCall.args;
+
+      should(request.triggerEvents).be.undefined();
+
+      should(request.index).be.equal(index);
+      should(request.collection).be.equal(collection);
+      should(request.body).be.deepEqual(documentContent);
+      should(request._id).be.equal(documentId);
     });
   });
 });
