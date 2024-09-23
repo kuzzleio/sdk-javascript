@@ -18,17 +18,6 @@ runners:
       cmd: node {{ snippet.source }}
       before: timeout 600 ash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
 
-  web:
-    service: doc-runner-web
-    path: /var/snippets/web
-    lint:
-      global: true
-      cmd: eslint -c /mnt/.ci/doc/eslint.json --parser-options ecmaVersion:12 {{ snippet.dir }}/*.html
-      before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
-    run:
-      cmd: node puppeteer.js {{ snippet.dir }}/{{ snippet.source }}
-      before: timeout 600 bash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
-
   webpack:
     service: doc-runner-webpack
     path: /var/snippets/webpack
