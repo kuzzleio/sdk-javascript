@@ -34,7 +34,6 @@ services:
     depends_on:
       - kuzzle
       - doc-runner-node
-      - doc-runner-web
       - doc-runner-webpack
     volumes:
       - ../..:/mnt
