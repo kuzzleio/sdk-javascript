@@ -1,3 +1,10 @@
+# [7.12.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.3...v7.12.0) (2024-09-18)
+
+
+### Features
+
+* **auth:** improve auth events ([#746](https://github.com/kuzzleio/sdk-javascript/issues/746)) ([fe7be9d](https://github.com/kuzzleio/sdk-javascript/commit/fe7be9d69528751175cd082288074d921c426ff1))
+
 ## [7.11.3](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.2...v7.11.3) (2024-06-03)
 
 
