@@ -11,5 +11,4 @@ runs:
     - name: Run tests
       run: |
         npm run test:unit
-        cat ./coverage/lcov.info | ./node_modules/.bin/codecov
       shell: bash

@@ -27,7 +27,7 @@ update(index, collection, definition);
 <br/>
 
 | Arguments    | Type              | Description                                                 |
-|--------------|-------------------|-------------------------------------------------------------|
+| ------------ | ----------------- | ----------------------------------------------------------- |
 | `index`      | <pre>string</pre> | Index name                                                  |
 | `collection` | <pre>string</pre> | Collection name                                             |
 | `definition` | <pre>object</pre> | Describes the collection mappings and the ES index settings |
@@ -37,39 +37,41 @@ update(index, collection, definition);
 
 Additional query options
 
-| Options    | Type<br/>(default)              | Description                                                                                                           |
-| ---------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again                                          |
-| `refresh`  | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                    |
-| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
-
+| Options                                               | Type<br/>(default)              | Description                                                                                                           |
+| ----------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `queuable`                                            | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again                                          |
+| `refresh`                                             | <pre>string</pre><br/>(`""`)    | If set to `wait_for`, waits for the change to be reflected for `search` (up to 1s)                                    |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout) | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
 
 <SinceBadge version="7.4.0">
 
 ### definition
 
 An object containing:
- - [collection mappings](/core/2/guides/main-concepts/data-storage).
- - Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
 
+- [collection mappings](/core/2/guides/main-concepts/data-storage).
+- Elasticsearch [index settings](https://www.elastic.co/guide/en/elasticsearch/reference/7.5/index-modules.html#index-modules-settings)
+- `reindexCollection` (optional): if set to `true`, Kuzzle will reindex the collection after updating the mappings. This is useful when you want to update the mappings of a collection that already contains data.
 
 ```js
 const definition = {
   mappings: {
     properties: {
-      field1: { type: 'text' },
+      field1: { type: "text" },
       field2: {
         properties: {
-          nestedField: { type: 'keyword' }
-        }
-      }
-    }    
+          nestedField: { type: "keyword" },
+        },
+      },
+    },
   },
+  reindexCollection: true,
   settings: {
     // index settings (e.g. analyzers)
-  }
+  },
 };
 ```
+
 </SinceBadge>
 
 <DeprecatedBadge version="7.4.0" >
@@ -83,13 +85,13 @@ The mappings must have a root field `properties` that contain the mappings prope
 ```js
 const mappings = {
   properties: {
-    field1: { type: 'text' },
+    field1: { type: "text" },
     field2: {
       properties: {
-        nestedField: { type: 'keyword' }
-      }
-    }
-  }
+        nestedField: { type: "keyword" },
+      },
+    },
+  },
 };
 ```
 

@@ -5,9 +5,6 @@
   <a href="https://travis-ci.org/kuzzleio/sdk-javascript">
     <img src="https://travis-ci.org/kuzzleio/sdk-javascript.svg?branch=master"/>
   </a>
-  <a href="https://codecov.io/gh/kuzzleio/sdk-javascript">
-    <img src="https://codecov.io/gh/kuzzleio/sdk-javascript/branch/master/graph/badge.svg" />
-  </a>
   <a href="https://david-dm.org/kuzzleio/sdk-javascript">
     <img src="https://david-dm.org/kuzzleio/sdk-javascript.svg" />
   </a>
@@ -24,8 +21,8 @@ This is the official Javascript SDK for the free and open-source backend Kuzzle.
 
 #### Multiprotocols
 
-Currently, the SDK provides 2 protocols: __Http and WebSocket.__
-WebSocket protocol implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).  
+Currently, the SDK provides 2 protocols: **Http and WebSocket.**
+WebSocket protocol implement the whole Kuzzle API, while the HTTP protocol does not implement realtime features (rooms and subscriptions).
 
 #### Promises based
 
@@ -42,11 +39,10 @@ Any error must be caught either at the end of the `Promise` chain, or by using `
 Kuzzle is an open-source backend that includes a scalable server, a multiprotocol API,
 an administration console and a set of plugins that provide advanced functionalities like real-time pub/sub, blazing fast search and geofencing.
 
-* :octocat: __[Github](https://github.com/kuzzleio/kuzzle)__
-* :earth_africa: __[Website](https://kuzzle.io)__
-* :books: __[Documentation](https://docs.kuzzle.io)__
-* :email: __[Discord](http://join.discord.kuzzle.io)__
-
+- :octocat: **[Github](https://github.com/kuzzleio/kuzzle)**
+- :earth_africa: **[Website](https://kuzzle.io)**
+- :books: **[Documentation](https://docs.kuzzle.io)**
+- :email: **[Discord](http://join.discord.kuzzle.io)**
 
 ## Get trained by the creators of Kuzzle :zap:
 
@@ -59,24 +55,24 @@ Our teams will be able to meet your needs in terms of expertise and multi-techno
 ## Compatibility matrix
 
 | Kuzzle Version | SDK Version |
-|----------------|-------------|
+| -------------- | ----------- |
 | 1.x.x          | 5.x.x       |
 | 1.x.x          | 6.x.x       |
 | 2.x.x          | 7.x.x       |
 
 ## Getting started :point_right:
 
-  - [Node.js](https://docs.kuzzle.io/sdk/js/7/getting-started/node-js/)
-  - [Browser](https://docs.kuzzle.io/sdk/js/7/getting-started/raw-web/)
-  - [Webpack](https://docs.kuzzle.io/sdk/js/7/getting-started/webpack/)
-  - [React/Redux](https://docs.kuzzle.io/sdk/js/7/getting-started/react/with-redux/)
-  - [Vue.js](https://docs.kuzzle.io/sdk/js/7/getting-started/vuejs/standalone/) 
+- [Node.js](https://docs.kuzzle.io/sdk/js/7/getting-started/node-js/)
+- [Browser](https://docs.kuzzle.io/sdk/js/7/getting-started/raw-web/)
+- [Webpack](https://docs.kuzzle.io/sdk/js/7/getting-started/webpack/)
+- [React/Redux](https://docs.kuzzle.io/sdk/js/7/getting-started/react/with-redux/)
+- [Vue.js](https://docs.kuzzle.io/sdk/js/7/getting-started/vuejs/standalone/)
 
 ### Installation
 
 This SDK can be used either in NodeJS or in a browser.
 
-#### Node.js 
+#### Node.js
 
 ```
 npm install kuzzle-sdk
@@ -84,11 +80,13 @@ npm install kuzzle-sdk
 
 #### Browser
 
-To run the SDK in the browser, you have to build it yourself by cloning this repository and running 
+To run the SDK in the browser, you have to build it yourself by cloning this repository and running
+
 ```bash
 $ npm install
 $ npm run build
-````
+```
+
 A `dist` directory will be created, containing a browser version of this SDK.
 
 ```html
@@ -98,18 +96,19 @@ A `dist` directory will be created, containing a browser version of this SDK.
 or use the CDN:
 
 ```html
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/kuzzle-sdk@latest/dist/kuzzle.min.js"></script>
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/kuzzle-sdk@latest/dist/kuzzle.min.js"
+></script>
 ```
 
 Then the Kuzzle SDK will be available under the `KuzzleSDK` variable:
 
 ```html
-  <script>
-    const kuzzle = new KuzzleSDK.Kuzzle(
-      new KuzzleSDK.WebSocket('localhost')
-    );
-    // ...
-  </script>
+<script>
+  const kuzzle = new KuzzleSDK.Kuzzle(new KuzzleSDK.WebSocket("localhost"));
+  // ...
+</script>
 ```
 
 #### Browser with Webpack
@@ -124,21 +123,19 @@ But you'll still need to pick the built version (which ships with the package).
 
 ```javascript
 // with the classic require...
-const { Kuzzle } = require('kuzzle-sdk')
+const { Kuzzle } = require("kuzzle-sdk");
 // ... or with the new import directive.
-import { Kuzzle } from 'kuzzle-sdk'
+import { Kuzzle } from "kuzzle-sdk";
 ```
 
 ### Example
 
-The SDK supports different protocols. When instantiating, 
-you must choose the protocol to use and fill in the different options needed to connect to Kuzzle.  
+The SDK supports different protocols. When instantiating,
+you must choose the protocol to use and fill in the different options needed to connect to Kuzzle.
 
 ```js
-const { Kuzzle,  WebSocket } = require('kuzzle-sdk');
-const kuzzle = new Kuzzle(
-  new WebSocket('localhost', { port: 7512 })
-);
+const { Kuzzle, WebSocket } = require("kuzzle-sdk");
+const kuzzle = new Kuzzle(new WebSocket("localhost", { port: 7512 }));
 
 try {
   await kuzzle.connect();
