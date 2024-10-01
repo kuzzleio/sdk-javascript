@@ -31,7 +31,7 @@ export class BulkController extends BaseController {
     query: JSONObject = {},
     options: ArgsBulkControllerDeleteByQuery = {}
   ): Promise<number> {
-    const request: Omit<RequestPayload, "controller"> = {
+    const request = {
       action: "deleteByQuery",
       body: query,
       collection,
@@ -108,7 +108,7 @@ export class BulkController extends BaseController {
       };
     }>;
   }> {
-    const request: Omit<RequestPayload, "controller"> = {
+    const request = {
       action: "import",
       body: { bulkData },
       collection,
@@ -141,7 +141,7 @@ export class BulkController extends BaseController {
     changes: JSONObject,
     options: ArgsBulkControllerUpdateByQuery = {}
   ): Promise<number> {
-    const request: Omit<RequestPayload, "controller"> = {
+    const request = {
       action: "updateByQuery",
       body: { changes, query },
       collection,
@@ -178,7 +178,7 @@ export class BulkController extends BaseController {
     id?: string,
     options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
-    const request: Omit<RequestPayload, "controller"> = {
+    const request = {
       _id: id,
       action: "write",
       body: document,
@@ -244,7 +244,7 @@ export class BulkController extends BaseController {
       reason: string;
     }>;
   }> {
-    const request: Omit<RequestPayload, "controller"> = {
+    const request = {
       action: "mWrite",
       body: { documents },
       collection,
