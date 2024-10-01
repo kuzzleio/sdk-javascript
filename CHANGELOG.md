@@ -1,3 +1,10 @@
+# [7.13.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.12.0...v7.13.0) (2024-10-01)
+
+
+### Features
+
+* **collection:** add flag to reindex collection after an update ([1b5ec25](https://github.com/kuzzleio/sdk-javascript/commit/1b5ec2559fae4647e1991a1651ab1a2dc956fced))
+
 # [7.12.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.11.3...v7.12.0) (2024-09-18)
 
 
