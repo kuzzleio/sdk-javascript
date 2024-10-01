@@ -1,5 +1,6 @@
 import { BaseController } from "./Base";
 import { JSONObject, ArgsDefault } from "../types";
+import { RequestPayload } from "../types";
 
 export class BulkController extends BaseController {
   constructor(kuzzle) {
@@ -30,7 +31,7 @@ export class BulkController extends BaseController {
     query: JSONObject = {},
     options: ArgsBulkControllerDeleteByQuery = {}
   ): Promise<number> {
-    const request: any = {
+    const request: Omit<RequestPayload, "controller"> = {
       action: "deleteByQuery",
       body: query,
       collection,
@@ -66,22 +67,52 @@ export class BulkController extends BaseController {
     bulkData: Array<JSONObject>,
     options: ArgsBulkControllerImport = {}
   ): Promise<{
+    /**
+     * Array of successfully executed actions
+     */
     successes: Array<{
+      /**
+       * Name of the action (e.g. "index", "create", etc)
+       */
       [actionName: string]: {
+        /**
+         * Document unique identifier
+         */
         _id: string;
+        /**
+         * HTTP status code for that action
+         */
         status: string;
       };
     }>;
+    /**
+     * Array of failed actions
+     */
     errors: Array<{
+      /**
+       * Document unique identifier
+       */
       _id: string;
+      /**
+       * HTTP status code for that action
+       */
       status: string;
+      /**
+       * Error object
+       */
       error: {
+        /**
+         * Elasticsearch client error type
+         */
         type: string;
+        /**
+         * Human readable error message
+         */
         reason: string;
       };
     }>;
   }> {
-    const request: any = {
+    const request: Omit<RequestPayload, "controller"> = {
       action: "import",
       body: { bulkData },
       collection,
@@ -118,7 +149,7 @@ export class BulkController extends BaseController {
     changes: JSONObject,
     options: ArgsBulkControllerUpdateByQuery = {}
   ): Promise<number> {
-    const request: any = {
+    const request: Omit<RequestPayload, "controller"> = {
       action: "updateByQuery",
       body: { changes, query },
       collection,
@@ -159,7 +190,7 @@ export class BulkController extends BaseController {
     id?: string,
     options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
-    const request: any = {
+    const request: Omit<RequestPayload, "controller"> = {
       _id: id,
       action: "write",
       body: document,
@@ -196,19 +227,40 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     documents: Array<{
+      /**
+       * Document ID
+       */
       _id?: string;
+      /**
+       * Document content
+       */
       _source: JSONObject;
     }>,
     options: ArgsBulkControllerMWrite = {}
   ): Promise<{
+    /**
+     * Array of successfully created/replaced documents
+     */
     successes: Array<Document>;
+    /**
+     * Array of failed creation
+     */
     errors: Array<{
+      /**
+       * Document that cause the error
+       */
       document: Document;
+      /**
+       * HTTP error status
+       */
       status: number;
+      /**
+       * Human readable reason
+       */
       reason: string;
     }>;
   }> {
-    const request: any = {
+    const request: Omit<RequestPayload, "controller"> = {
       action: "mWrite",
       body: { documents },
       collection,
