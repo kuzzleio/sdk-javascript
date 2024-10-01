@@ -93,10 +93,6 @@ export class AuthController extends BaseController {
       refresh: options.refresh,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result
     );
@@ -120,10 +116,6 @@ export class AuthController extends BaseController {
       action: "checkRights",
       body: requestPayload,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) => response.result.allowed
@@ -150,10 +142,6 @@ export class AuthController extends BaseController {
       action: "deleteApiKey",
       refresh: options.refresh,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => null);
   }
@@ -192,10 +180,6 @@ export class AuthController extends BaseController {
       lang: options.lang,
       size: options.size,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) => response.result
@@ -250,10 +234,6 @@ export class AuthController extends BaseController {
       cookieAuth,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, { queuable: false, ...options }).then(
       (response: any) => response.result
     );
@@ -285,10 +265,6 @@ export class AuthController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result
     );
@@ -316,10 +292,6 @@ export class AuthController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result
     );
@@ -345,10 +317,6 @@ export class AuthController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result.acknowledged
     );
@@ -372,10 +340,6 @@ export class AuthController extends BaseController {
     const request: Record<string, any> = {
       action: "getCurrentUser",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) =>
@@ -405,10 +369,6 @@ export class AuthController extends BaseController {
       action: "getMyCredentials",
       strategy,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) => response.result
@@ -455,10 +415,6 @@ export class AuthController extends BaseController {
       action: "getMyRights",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result.hits
     );
@@ -482,10 +438,6 @@ export class AuthController extends BaseController {
     const request: Record<string, any> = {
       action: "getStrategies",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) => response.result
@@ -628,10 +580,6 @@ export class AuthController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response: any) => response.result
     );
@@ -659,10 +607,6 @@ export class AuthController extends BaseController {
       action: "updateSelf",
       body: content,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) =>
@@ -692,10 +636,6 @@ export class AuthController extends BaseController {
       body: credentials,
       strategy,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response: any) => response.result
@@ -738,10 +678,6 @@ export class AuthController extends BaseController {
       cookieAuth: this.kuzzle.cookieAuthentication,
       expiresIn: options.expiresIn,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response: any) => {
       if (!this.kuzzle.cookieAuthentication) {

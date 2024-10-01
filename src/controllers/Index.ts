@@ -25,10 +25,6 @@ export class IndexController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(() => undefined);
   }
 
@@ -50,10 +46,6 @@ export class IndexController extends BaseController {
       action: "delete",
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => undefined);
   }
@@ -77,10 +69,6 @@ export class IndexController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -97,10 +85,6 @@ export class IndexController extends BaseController {
     const request: any = {
       action: "list",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) => response.result.indexes
@@ -130,10 +114,6 @@ export class IndexController extends BaseController {
       },
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.deleted
     );
@@ -152,10 +132,6 @@ export class IndexController extends BaseController {
     const request: any = {
       action: "stats",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }

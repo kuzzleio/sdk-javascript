@@ -374,9 +374,13 @@ describe("Kuzzle query management", () => {
     it("should include triggerEvents: true in the request parameters when triggerEvents option is used", async () => {
       const options = { triggerEvents: true };
 
-      kuzzle.document
-        .create(index, collection, documentContent, documentId, options)
-        .then((r) => console.log({ r }));
+      await kuzzle.document.create(
+        index,
+        collection,
+        documentContent,
+        documentId,
+        options
+      );
 
       should(kuzzle.query.calledOnce).be.true();
 

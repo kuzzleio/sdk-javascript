@@ -24,10 +24,6 @@ export class ServerController extends BaseController {
       action: "adminExists",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.exists
     );
@@ -44,10 +40,6 @@ export class ServerController extends BaseController {
       action: "capabilities",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -61,10 +53,6 @@ export class ServerController extends BaseController {
     const request: any = {
       action: "getAllStats",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -80,10 +68,6 @@ export class ServerController extends BaseController {
       action: "getConfig",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -97,10 +81,6 @@ export class ServerController extends BaseController {
     const request: any = {
       action: "getLastStats",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -124,10 +104,6 @@ export class ServerController extends BaseController {
       stopTime,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -142,10 +118,6 @@ export class ServerController extends BaseController {
       action: "info",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -159,10 +131,6 @@ export class ServerController extends BaseController {
     const request: any = {
       action: "now",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result.now);
   }

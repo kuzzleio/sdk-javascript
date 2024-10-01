@@ -56,10 +56,6 @@ export class DocumentController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.count
     );
@@ -98,10 +94,6 @@ export class DocumentController extends BaseController {
       silent: options.silent,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -139,10 +131,6 @@ export class DocumentController extends BaseController {
       silent: options.silent,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -176,10 +164,6 @@ export class DocumentController extends BaseController {
       index,
       silent: options.silent,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result._id);
   }
@@ -216,10 +200,6 @@ export class DocumentController extends BaseController {
       lang: options.lang,
       silent: options.silent,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result.ids);
   }
@@ -259,10 +239,6 @@ export class DocumentController extends BaseController {
       source: options.source,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -295,10 +271,6 @@ export class DocumentController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -333,10 +305,6 @@ export class DocumentController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -374,10 +342,6 @@ export class DocumentController extends BaseController {
       strict: options.strict,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -414,10 +378,6 @@ export class DocumentController extends BaseController {
       strict: options.strict,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -453,10 +413,6 @@ export class DocumentController extends BaseController {
       silent: options.silent,
       strict: options.strict,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -499,10 +455,6 @@ export class DocumentController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -539,10 +491,6 @@ export class DocumentController extends BaseController {
       silent: options.silent,
       strict: options.strict,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -584,10 +532,6 @@ export class DocumentController extends BaseController {
       strict: options.strict,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -626,10 +570,6 @@ export class DocumentController extends BaseController {
       strict: options.strict,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -665,10 +605,6 @@ export class DocumentController extends BaseController {
       index,
       silent: options.silent,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -716,10 +652,6 @@ export class DocumentController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     if (
       this.kuzzle.protocol.name === "http" &&
@@ -778,10 +710,6 @@ export class DocumentController extends BaseController {
       silent: options.silent,
       source: options.source,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -844,10 +772,6 @@ export class DocumentController extends BaseController {
       source: options.source,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -887,10 +811,6 @@ export class DocumentController extends BaseController {
       source: options.source,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -921,10 +841,6 @@ export class DocumentController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }

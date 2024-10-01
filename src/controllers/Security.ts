@@ -40,10 +40,6 @@ export class SecurityController extends BaseController {
       userId,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -67,10 +63,6 @@ export class SecurityController extends BaseController {
       userId: kuid,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.allowed
     );
@@ -92,10 +84,6 @@ export class SecurityController extends BaseController {
       refresh: options.refresh,
       userId,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options);
   }
@@ -123,10 +111,6 @@ export class SecurityController extends BaseController {
       userId,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -153,10 +137,6 @@ export class SecurityController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -180,10 +160,6 @@ export class SecurityController extends BaseController {
       body,
       reset: options.reset,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -210,10 +186,6 @@ export class SecurityController extends BaseController {
       action: "createOrReplaceProfile",
       body,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -242,10 +214,6 @@ export class SecurityController extends BaseController {
       force: options.force ? true : null,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) =>
         new Role(
@@ -271,10 +239,6 @@ export class SecurityController extends BaseController {
       action: "createProfile",
       body,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -306,10 +270,6 @@ export class SecurityController extends BaseController {
       body,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
@@ -332,10 +292,6 @@ export class SecurityController extends BaseController {
       body,
       force: options.force ? true : null,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -363,10 +319,6 @@ export class SecurityController extends BaseController {
       body,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
@@ -393,10 +345,6 @@ export class SecurityController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -413,10 +361,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "deleteProfile",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -435,10 +379,6 @@ export class SecurityController extends BaseController {
       action: "deleteRole",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -456,10 +396,6 @@ export class SecurityController extends BaseController {
       action: "deleteUser",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -476,10 +412,6 @@ export class SecurityController extends BaseController {
     const request: any = {
       action: "getAllCredentialFields",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -500,10 +432,6 @@ export class SecurityController extends BaseController {
       action: "getCredentialFields",
       strategy,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -528,10 +456,6 @@ export class SecurityController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -554,10 +478,6 @@ export class SecurityController extends BaseController {
       action: "getCredentialsById",
       strategy,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -589,10 +509,6 @@ export class SecurityController extends BaseController {
       action: "getProfileMapping",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -609,10 +525,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "getProfileRights",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) => response.result.hits
@@ -632,10 +544,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "getRole",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -659,10 +567,6 @@ export class SecurityController extends BaseController {
       action: "getRoleMapping",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -679,10 +583,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "getUser",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -702,10 +602,6 @@ export class SecurityController extends BaseController {
       action: "getUserMapping",
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -722,10 +618,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "getUserRights",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) => response.result.hits
@@ -748,10 +640,6 @@ export class SecurityController extends BaseController {
       _id,
       action: "getUserStrategies",
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) => response.result.strategies
@@ -778,10 +666,6 @@ export class SecurityController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -798,10 +682,6 @@ export class SecurityController extends BaseController {
       action: "mDeleteProfiles",
       body: { ids },
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -820,10 +700,6 @@ export class SecurityController extends BaseController {
       body: { ids },
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -840,10 +716,6 @@ export class SecurityController extends BaseController {
       action: "mDeleteUsers",
       body: { ids },
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -883,10 +755,6 @@ export class SecurityController extends BaseController {
       body: { ids },
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) =>
       response.result.hits.map(
         (hit) => new User(this.kuzzle, hit._id, hit._source)
@@ -907,10 +775,6 @@ export class SecurityController extends BaseController {
       action: "mGetRoles",
       body: { ids },
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) =>
       response.result.hits.map(
@@ -949,10 +813,6 @@ export class SecurityController extends BaseController {
       body,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) =>
         new User(this.kuzzle, response.result._id, response.result._source)
@@ -978,10 +838,6 @@ export class SecurityController extends BaseController {
       if (key !== "triggerEvents" && value !== undefined) {
         request[key] = value;
       }
-    }
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -1011,10 +867,6 @@ export class SecurityController extends BaseController {
       }
     }
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) =>
         new RoleSearchResult(this.kuzzle, request, options, response.result)
@@ -1037,10 +889,6 @@ export class SecurityController extends BaseController {
 
     for (const opt of ["from", "size", "scroll", "lang"]) {
       request[opt] = options[opt];
-    }
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -1072,10 +920,6 @@ export class SecurityController extends BaseController {
       strategy,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -1094,10 +938,6 @@ export class SecurityController extends BaseController {
       action: "updateProfile",
       body,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -1122,10 +962,6 @@ export class SecurityController extends BaseController {
       body,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -1145,10 +981,6 @@ export class SecurityController extends BaseController {
       body,
       force: options.force ? true : null,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -1177,10 +1009,6 @@ export class SecurityController extends BaseController {
       body,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -1199,10 +1027,6 @@ export class SecurityController extends BaseController {
       action: "updateUser",
       body,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) =>
@@ -1226,10 +1050,6 @@ export class SecurityController extends BaseController {
       action: "updateUserMapping",
       body,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -1256,10 +1076,6 @@ export class SecurityController extends BaseController {
       body,
       strategy,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }

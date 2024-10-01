@@ -38,10 +38,6 @@ export class BulkController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.deleted
     );
@@ -119,10 +115,6 @@ export class BulkController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -155,10 +147,6 @@ export class BulkController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(
       (response) => response.result.updated
@@ -198,10 +186,6 @@ export class BulkController extends BaseController {
       index,
       notify: options.notify,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -267,10 +251,6 @@ export class BulkController extends BaseController {
       index,
       notify: options.notify,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }

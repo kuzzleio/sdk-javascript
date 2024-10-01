@@ -905,6 +905,13 @@ export class Kuzzle extends KuzzleEventEmitter {
       request.retryOnConflict = options.retryOnConflict;
     }
 
+    if (
+      request.triggerEvents === undefined &&
+      options.triggerEvents !== undefined
+    ) {
+      request.triggerEvents = options.triggerEvents;
+    }
+
     if (!request.volatile) {
       request.volatile = this.volatile;
     } else if (

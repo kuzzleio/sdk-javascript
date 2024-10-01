@@ -88,10 +88,6 @@ export class RealtimeController extends BaseController {
       body: { roomId },
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(
       (response) => response.result.count
     );
@@ -129,10 +125,6 @@ export class RealtimeController extends BaseController {
 
     if (options._id !== undefined) {
       request._id = options._id;
-    }
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
     }
 
     return this.query(request, options).then(
@@ -197,10 +189,6 @@ export class RealtimeController extends BaseController {
       action: "unsubscribe",
       body: { roomId },
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => {
       const rooms = this._subscriptions.get(roomId);

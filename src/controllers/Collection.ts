@@ -47,10 +47,6 @@ export class CollectionController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(() => undefined);
   }
 
@@ -76,10 +72,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => undefined);
   }
@@ -107,10 +99,6 @@ export class CollectionController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -137,10 +125,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => undefined);
   }
@@ -170,10 +154,6 @@ export class CollectionController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -201,10 +181,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -251,10 +227,6 @@ export class CollectionController extends BaseController {
       size: options.size || 0,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -280,10 +252,6 @@ export class CollectionController extends BaseController {
       action: "searchSpecifications",
       body: query,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     for (const opt of ["from", "size", "scroll"]) {
       request[opt] = options[opt];
@@ -322,10 +290,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => undefined);
   }
@@ -370,10 +334,6 @@ export class CollectionController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then(() => undefined);
   }
 
@@ -392,10 +352,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -427,10 +383,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then((response) => response.result);
   }
@@ -468,10 +420,6 @@ export class CollectionController extends BaseController {
       index,
     };
 
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
-
     return this.query(request, options).then((response) => response.result);
   }
 
@@ -496,10 +444,6 @@ export class CollectionController extends BaseController {
       collection,
       index,
     };
-
-    if (options.triggerEvents !== undefined) {
-      request.triggerEvents = options.triggerEvents;
-    }
 
     return this.query(request, options).then(() => undefined);
   }
