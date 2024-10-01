@@ -1,6 +1,6 @@
-import { BaseController } from "./Base";
 import { SpecificationsSearchResult } from "../core/searchResult/Specifications";
-import { CollectionMappings, JSONObject, ArgsDefault } from "../types";
+import { ArgsDefault, CollectionMappings, JSONObject } from "../types";
+import { BaseController } from "./Base";
 
 export class CollectionController extends BaseController {
   constructor(kuzzle) {
@@ -310,6 +310,10 @@ export class CollectionController extends BaseController {
            * Mappings definition
            */
           mappings?: CollectionMappings;
+          /**
+           * If true, reindex the collection
+           */
+          reindexCollection?: boolean;
           /**
            * Elasticsearch index settings
            */
