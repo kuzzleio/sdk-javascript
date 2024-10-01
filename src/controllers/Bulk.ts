@@ -1,5 +1,6 @@
 import { BaseController } from "./Base";
 import { JSONObject, ArgsDefault } from "../types";
+import { RequestPayload } from "../types";
 
 export class BulkController extends BaseController {
   constructor(kuzzle) {
@@ -7,7 +8,7 @@ export class BulkController extends BaseController {
   }
 
   /**
-   * Directly deletes every documents matching the search query without:
+   * Directly deletes every document matching the search query without:
    *  - applying max documents write limit
    *  - fetching deleted documents
    *  - triggering realtime notifications
@@ -21,7 +22,7 @@ export class BulkController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
-   *
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    * @returns The number of deleted documents
    */
   deleteByQuery(
@@ -53,7 +54,7 @@ export class BulkController extends BaseController {
    * @param options - Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
-   *
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
   import(
@@ -107,17 +108,14 @@ export class BulkController extends BaseController {
       };
     }>;
   }> {
-    return this.query(
-      {
-        action: "import",
-        body: {
-          bulkData,
-        },
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request = {
+      action: "import",
+      body: { bulkData },
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -132,6 +130,7 @@ export class BulkController extends BaseController {
    * @param options Additional options
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The number of updated documents
    */
@@ -162,12 +161,13 @@ export class BulkController extends BaseController {
    * @param index - Index name
    * @param collection - Collection name
    * @param document- Document body (with the _kuzzle_info metadata)
-   * @param id - Optionnal document ID
+   * @param id - Optional document ID
    * @param options - Additional options
    *    - `notify` If true, Kuzzle will trigger realtime notifications
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing the document creation result
    */
@@ -178,17 +178,16 @@ export class BulkController extends BaseController {
     id?: string,
     options: ArgsBulkControllerWrite = {}
   ): Promise<Document> {
-    return this.query(
-      {
-        _id: id,
-        action: "write",
-        body: document,
-        collection,
-        index,
-        notify: options.notify,
-      },
-      options
-    ).then((response) => response.result);
+    const request = {
+      _id: id,
+      action: "write",
+      body: document,
+      collection,
+      index,
+      notify: options.notify,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -204,6 +203,7 @@ export class BulkController extends BaseController {
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -244,16 +244,15 @@ export class BulkController extends BaseController {
       reason: string;
     }>;
   }> {
-    return this.query(
-      {
-        action: "mWrite",
-        body: { documents },
-        collection,
-        index,
-        notify: options.notify,
-      },
-      options
-    ).then((response) => response.result);
+    const request = {
+      action: "mWrite",
+      body: { documents },
+      collection,
+      index,
+      notify: options.notify,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

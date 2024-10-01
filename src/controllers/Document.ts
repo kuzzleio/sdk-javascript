@@ -39,6 +39,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The number of matching documents
    */
@@ -48,7 +49,7 @@ export class DocumentController extends BaseController {
     body?: JSONObject,
     options: ArgsDocumentControllerCount = {}
   ): Promise<number> {
-    const request = {
+    const request: any = {
       action: "count",
       body,
       collection,
@@ -73,6 +74,7 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The created document
    */
@@ -83,7 +85,7 @@ export class DocumentController extends BaseController {
     _id: string = null,
     options: ArgsDocumentControllerCreate = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "create",
       body: content,
@@ -109,6 +111,7 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The created or replaced document
    */
@@ -119,7 +122,7 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerCreateOrReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "createOrReplace",
       body: content,
@@ -144,6 +147,7 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The document ID
    */
@@ -153,7 +157,7 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerDelete = {}
   ): Promise<string> {
-    const request = {
+    const request: any = {
       _id,
       action: "delete",
       collection,
@@ -178,6 +182,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The deleted documents IDs
    */
@@ -187,7 +192,7 @@ export class DocumentController extends BaseController {
     query: JSONObject = {},
     options: ArgsDocumentControllerDeleteByQuery = {}
   ): Promise<string[]> {
-    const request = {
+    const request: any = {
       action: "deleteByQuery",
       body: query,
       collection,
@@ -213,6 +218,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `source` If true, the response will contain the updated document
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The updated document
    */
@@ -223,7 +229,7 @@ export class DocumentController extends BaseController {
     fields: string[],
     options: ArgsDocumentControllerDeleteFields = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "deleteFields",
       body: { fields },
@@ -249,6 +255,7 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns True if the document exists
    */
@@ -258,7 +265,7 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerExists = {}
   ): Promise<boolean> {
-    const request = {
+    const request: any = {
       _id,
       action: "exists",
       collection,
@@ -281,6 +288,8 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
+   *
    *
    * @returns The document
    */
@@ -290,7 +299,7 @@ export class DocumentController extends BaseController {
     _id: string,
     options: ArgsDocumentControllerGet = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "get",
       collection,
@@ -313,6 +322,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -323,7 +333,7 @@ export class DocumentController extends BaseController {
     documents: mCreateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreate = {}
   ): Promise<mCreateResponse> {
-    const request = {
+    const request: any = {
       action: "mCreate",
       body: { documents },
       collection,
@@ -348,6 +358,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `strict` If true, an error will occur if a document was not created
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -358,7 +369,7 @@ export class DocumentController extends BaseController {
     documents: mCreateOrReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMCreateOrReplace = {}
   ): Promise<mCreateOrReplaceResponse> {
-    const request = {
+    const request: any = {
       action: "mCreateOrReplace",
       body: { documents },
       collection,
@@ -384,6 +395,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not deleted
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -393,7 +405,7 @@ export class DocumentController extends BaseController {
     ids: mDeleteRequest,
     options: ArgsDocumentControllerMDelete = {}
   ): Promise<mDeleteResponse> {
-    const request = {
+    const request: any = {
       action: "mDelete",
       body: { ids },
       collection,
@@ -416,6 +428,7 @@ export class DocumentController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `verb` (HTTP only) Forces the verb of the route
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -435,7 +448,7 @@ export class DocumentController extends BaseController {
      */
     errors: string[];
   }> {
-    const request = {
+    const request: any = {
       action: "mGet",
       body: { ids },
       collection,
@@ -459,6 +472,8 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not replaced
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
+   *
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
    */
@@ -468,7 +483,7 @@ export class DocumentController extends BaseController {
     documents: mReplaceRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMReplace = {}
   ): Promise<mReplaceResponse> {
-    const request = {
+    const request: any = {
       action: "mReplace",
       body: { documents },
       collection,
@@ -496,6 +511,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *    - `strict` If true, an error will occur if a document was not updated
    *
@@ -507,7 +523,7 @@ export class DocumentController extends BaseController {
     documents: mUpdateRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpdate = {}
   ): Promise<mUpdateResponse> {
-    const request = {
+    const request: any = {
       action: "mUpdate",
       body: { documents },
       collection,
@@ -533,6 +549,7 @@ export class DocumentController extends BaseController {
    *    - `refresh` If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `strict` If true, an error will occur if a document was not updated
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -543,11 +560,12 @@ export class DocumentController extends BaseController {
     documents: mUpsertRequest<TKDocumentContent>,
     options: ArgsDocumentControllerMUpsert = {}
   ): Promise<mUpdateResponse> {
-    const request = {
+    const request: any = {
       action: "mUpsert",
       body: { documents },
       collection,
       index,
+      retryOnConflict: options.retryOnConflict,
       silent: options.silent,
       strict: options.strict,
     };
@@ -568,6 +586,7 @@ export class DocumentController extends BaseController {
    * @param options.refresh If set to `wait_for`, Kuzzle will not respond until the API key is indexed
    * @param options.silent If true, then Kuzzle will not generate notifications
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The replaced document
    */
@@ -578,7 +597,7 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerReplace = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "replace",
       body: content,
@@ -603,6 +622,7 @@ export class DocumentController extends BaseController {
    *    - `from` Offset of the first document to fetch
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `verb` (HTTP only) Forces the verb of the route
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
@@ -632,6 +652,7 @@ export class DocumentController extends BaseController {
       collection,
       index,
     };
+
     if (
       this.kuzzle.protocol.name === "http" &&
       options.verb &&
@@ -668,6 +689,7 @@ export class DocumentController extends BaseController {
    * @param options.retryOnConflict Number of times the database layer should retry in case of version conflict
    * @param options.source If true, returns the updated document inside the response
    * @param options.timeout Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   * @param options.triggerEvents Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The replaced document
    */
@@ -678,7 +700,7 @@ export class DocumentController extends BaseController {
     content: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdate = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "update",
       body: content,
@@ -706,6 +728,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `source` If true, returns the updated document inside the response
    *    - `lang` Query syntax. Can be 'elasticsearch' or 'koncorde'
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns An object containing 2 arrays: "successes" and "errors"
@@ -739,7 +762,7 @@ export class DocumentController extends BaseController {
       reason: string;
     }>;
   }> {
-    const request = {
+    const request: any = {
       action: "updateByQuery",
       body: { changes, query },
       collection,
@@ -767,6 +790,7 @@ export class DocumentController extends BaseController {
    *    - `silent` If true, then Kuzzle will not generate notifications
    *    - `retryOnConflict` Number of times the database layer should retry in case of version conflict
    *    - `source` If true, returns the updated document inside the response
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns Information about the updated document
    */
@@ -777,7 +801,7 @@ export class DocumentController extends BaseController {
     changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
   ): Promise<KDocument<TKDocumentContent>> {
-    const request = {
+    const request: any = {
       _id,
       action: "upsert",
       body: { changes, default: options.default },
@@ -800,6 +824,7 @@ export class DocumentController extends BaseController {
    * @param content Document content
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    *
    * @returns True if the document is valid
@@ -810,15 +835,14 @@ export class DocumentController extends BaseController {
     content: TKDocumentContent,
     options: ArgsDocumentControllerValidate = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "validate",
-        body: content,
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "validate",
+      body: content,
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

@@ -20,7 +20,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "test": "npm run test:lint && npm run test:unit && npm run test:functional",
-    "test:unit": "nyc --reporter=text-summary --reporter=lcov mocha",
+    "test:unit": "nyc --reporter=text-summary mocha",
     "test:functional": "cucumber-js --exit --fail-fast",
     "test:lint": "npm run test:lint:js && npm run test:lint:ts",
     "test:lint:js": "eslint --max-warnings=0 ./src ./test ./features",

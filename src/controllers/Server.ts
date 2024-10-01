@@ -16,133 +16,129 @@ export class ServerController extends BaseController {
   /**
    * Checks if an administrator user exists
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Boolean>}
    */
-  adminExists(options: ArgsServerControllerAdminExists) {
-    return this.query(
-      {
-        action: "adminExists",
-      },
-      options
-    ).then((response) => response.result.exists);
+  adminExists(options: ArgsServerControllerAdminExists = {}) {
+    const request: any = {
+      action: "adminExists",
+    };
+
+    return this.query(request, options).then(
+      (response) => response.result.exists
+    );
   }
 
   /**
    * Returns the Kuzzle capabilities
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @example https://docs.kuzzle.io/core/2/api/controllers/server/capabilities/#response
    * @returns {Promise<Object>}
    */
-  capabilities(options: ArgsServerControllerGetAllStats) {
-    return this.query(
-      {
-        action: "capabilities",
-      },
-      options
-    ).then((response) => response.result);
+  capabilities(options: ArgsServerControllerCapabilities = {}) {
+    const request: any = {
+      action: "capabilities",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Returns all stored statistics frames
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getAllStats(options: ArgsServerControllerGetAllStats) {
-    return this.query(
-      {
-        action: "getAllStats",
-      },
-      options
-    ).then((response) => response.result);
+  getAllStats(options: ArgsServerControllerGetAllStats = {}) {
+    const request: any = {
+      action: "getAllStats",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Returns the Kuzzle configuration
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getConfig(options: ArgsServerControllerGetConfig) {
-    return this.query(
-      {
-        action: "getConfig",
-      },
-      options
-    ).then((response) => response.result);
+  getConfig(options: ArgsServerControllerGetConfig = {}) {
+    const request: any = {
+      action: "getConfig",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Returns the last statistics frame
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  getLastStats(options: ArgsServerControllerGetLastStats) {
-    return this.query(
-      {
-        action: "getLastStats",
-      },
-      options
-    ).then((response) => response.result);
+  getLastStats(options: ArgsServerControllerGetLastStats = {}) {
+    const request: any = {
+      action: "getLastStats",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Returns the statistics frame from a date
    *
-   * @param {Number|String} startTime - begining of statistics frame set (timestamp or datetime format)
+   * @param {Number|String} startTime - beginning of statistics frame set (timestamp or datetime format)
    * @param {Number|String} stopTime - end of statistics frame set (timestamp or datetime format)
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
   getStats(
     startTime: number | string,
     stopTime: number | string,
-    options: ArgsServerControllerGetStats
+    options: ArgsServerControllerGetStats = {}
   ) {
-    return this.query(
-      {
-        action: "getStats",
-        startTime,
-        stopTime,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getStats",
+      startTime,
+      stopTime,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Returns the Kuzzle server information
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Object>}
    */
-  info(options: ArgsServerControllerInfo) {
-    return this.query(
-      {
-        action: "info",
-      },
-      options
-    ).then((response) => response.result);
+  info(options: ArgsServerControllerInfo = {}) {
+    const request: any = {
+      action: "info",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
    * Get server's current timestamp
    *
-   * @param {Object} options - {queuable: Boolean(true)}
+   * @param {Object} options - {queuable: Boolean(true), triggerEvents: Boolean(false)}
    * @returns {Promise<Number>}
    */
-  now(options: ArgsServerControllerNow) {
-    return this.query(
-      {
-        action: "now",
-      },
-      options
-    ).then((response) => response.result.now);
+  now(options: ArgsServerControllerNow = {}) {
+    const request: any = {
+      action: "now",
+    };
+
+    return this.query(request, options).then((response) => response.result.now);
   }
 }
 
 export type ArgsServerControllerAdminExists = ArgsDefault;
+
+export type ArgsServerControllerCapabilities = ArgsDefault;
 
 export type ArgsServerControllerGetAllStats = ArgsDefault;
 

@@ -236,6 +236,7 @@ for (const action of Object.keys(commands)) {
     const request = {
       action,
     };
+
     const options = {};
 
     if (!command.getter) {
@@ -259,11 +260,15 @@ for (const action of Object.keys(commands)) {
     if (args.length) {
       if (typeof args[0] !== "object" || Array.isArray(args[0])) {
         throw new Error(
-          `ms.${action}: invalid optional paramater (expected an object`
+          `ms.${action}: invalid optional parameter (expected an object)`
         );
       }
 
       Object.assign(options, args[0]);
+
+      if (options.triggerEvents !== undefined) {
+        request.triggerEvents = options.triggerEvents;
+      }
 
       if (Array.isArray(command.opts)) {
         for (const opt of command.opts) {

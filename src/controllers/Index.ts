@@ -20,10 +20,11 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerCreate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "create",
       index,
     };
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -41,10 +42,11 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerDelete = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "delete",
       index,
     };
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -62,13 +64,12 @@ export class IndexController extends BaseController {
     index: string,
     options: ArgsIndexControllerExists = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "exists",
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "exists",
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -81,12 +82,13 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   list(options: ArgsIndexControllerList = {}): Promise<Array<string>> {
-    return this.query(
-      {
-        action: "list",
-      },
-      options
-    ).then((response) => response.result.indexes);
+    const request: any = {
+      action: "list",
+    };
+
+    return this.query(request, options).then(
+      (response) => response.result.indexes
+    );
   }
 
   /**
@@ -105,7 +107,7 @@ export class IndexController extends BaseController {
     indexes: Array<string>,
     options: ArgsIndexControllerMDelete = {}
   ): Promise<Array<string>> {
-    const request = {
+    const request: any = {
       action: "mDelete",
       body: {
         indexes,
@@ -127,12 +129,11 @@ export class IndexController extends BaseController {
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
    */
   stats(options: ArgsIndexControllerStats = {}): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "stats",
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "stats",
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 }
 

@@ -48,12 +48,18 @@ Additional query options
 | Property   | Type<br/>(default)              | Description                                                                                                           |
 | ---------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `queuable` | <pre>boolean</pre><br/>(`true`) | Make this request queuable or not                                                                                     |
-| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)  | <pre>number</pre>               | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)  | <pre>number</pre><br/> (`-1`)              | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`triggerEvents`](/sdk/7/core-classes/kuzzle/query#triggerEvents)  | <pre>boolean</pre> <br/>(`false`)| If set to `true`, will trigger events even if using Embeded SDK. You should always ensure that your events/pipes does not create an infinite loop. <SinceBadge version="Kuzzle 2.31.0"/> |
 
 #### timeout
 
 ::: warn
     The **timeout** option can only be used to prevent the SDK from being frozen if Kuzzle take too long to resolve a request, this will not prevent the request from being executed and Kuzzle will still resolve it at some point.
+
+#### triggerEvents
+
+::: warn
+    The **triggerEvents** option can only be used to prevent the EmbededSDK from escaping events such as a pipe or a hook. Use it can lead to infinite loop if used wrongly. (ex: a pipe on document creation that create a document that triggers same pipe again and again)
 
 ## Resolves
 

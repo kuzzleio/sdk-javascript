@@ -21,6 +21,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   create(
     index: string,
@@ -39,7 +40,7 @@ export class CollectionController extends BaseController {
       | CollectionMappings,
     options: ArgsCollectionControllerCreate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "create",
       body: definition,
       collection,
@@ -59,17 +60,19 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   deleteSpecifications(
     index: string,
     collection: string,
     options: ArgsCollectionControllerDeleteSpecifications = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "deleteSpecifications",
       collection,
       index,
     };
+
     return this.query(request, options).then(() => undefined);
   }
 
@@ -83,20 +86,20 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   exists(
     index: string,
     collection: string,
     options: ArgsCollectionControllerExists = {}
   ): Promise<boolean> {
-    return this.query(
-      {
-        action: "exists",
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "exists",
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -110,20 +113,20 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   refresh(
     index: string,
     collection: string,
     options: ArgsCollectionControllerRefresh = {}
   ): Promise<void> {
-    return this.query(
-      {
-        action: "refresh",
-        collection,
-        index,
-      },
-      options
-    ).then(() => undefined);
+    const request: any = {
+      action: "refresh",
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -137,13 +140,14 @@ export class CollectionController extends BaseController {
    *    - `includeKuzzleMeta` If true, the returned mappings will contain Kuzzle metadata
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   getMapping(
     index: string,
     collection: string,
     options: ArgsCollectionControllerGetMapping = {}
   ): Promise<CollectionMappings> {
-    const request = {
+    const request: any = {
       action: "getMapping",
       collection,
       includeKuzzleMeta: options.includeKuzzleMeta || false,
@@ -163,6 +167,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The specifications
    */
@@ -171,14 +176,13 @@ export class CollectionController extends BaseController {
     collection: string,
     options: ArgsCollectionControllerGetSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "getSpecifications",
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "getSpecifications",
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -190,6 +194,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns An object containing the collection list
    */
@@ -215,7 +220,7 @@ export class CollectionController extends BaseController {
       type: "realtime" | "stored";
     }>;
   }> {
-    const request = {
+    const request: any = {
       action: "list",
       from: options.from,
       index,
@@ -237,12 +242,13 @@ export class CollectionController extends BaseController {
    *    - `size` Maximum number of documents to retrieve per page
    *    - `scroll` When set, gets a forward-only cursor having its ttl set to the given value (e.g. `30s`)
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   searchSpecifications(
     query: JSONObject = {},
     options: ArgsCollectionControllerSearchSpecifications = {}
   ): Promise<SpecificationsSearchResult> {
-    const request = {
+    const request: any = {
       action: "searchSpecifications",
       body: query,
     };
@@ -272,22 +278,24 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   truncate(
     index: string,
     collection: string,
     options: ArgsCollectionControllerTruncate = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "truncate",
       collection,
       index,
     };
+
     return this.query(request, options).then(() => undefined);
   }
 
   /**
-   * Updates a collection informations
+   * Updates a collection's information.
    * You can also provide optional mappings and settings that allow you to exploit
    * the full capabilities of our persistent data storage layer.
    *
@@ -300,6 +308,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   update(
     index: string,
@@ -318,15 +327,14 @@ export class CollectionController extends BaseController {
       | CollectionMappings,
     options: ArgsCollectionControllerUpdate = {}
   ): Promise<void> {
-    return this.query(
-      {
-        action: "update",
-        body: definition,
-        collection,
-        index,
-      },
-      options
-    ).then(() => undefined);
+    const request: any = {
+      action: "update",
+      body: definition,
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then(() => undefined);
   }
 
   /**
@@ -338,19 +346,18 @@ export class CollectionController extends BaseController {
     mappings: CollectionMappings,
     options: ArgsCollectionControllerUpdateMapping = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "updateMapping",
-        body: mappings,
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateMapping",
+      body: mappings,
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
-   * Create or updates the validation specifications for a collection.
+   * Creates or updates the validation specifications for a collection.
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/collection/update-specifications/
    *
@@ -360,6 +367,7 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
    * @returns The updated specifications
    */
@@ -369,15 +377,14 @@ export class CollectionController extends BaseController {
     specifications: JSONObject,
     options: ArgsCollectionControllerUpdateSpecifications = {}
   ): Promise<JSONObject> {
-    return this.query(
-      {
-        action: "updateSpecifications",
-        body: specifications,
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "updateSpecifications",
+      body: specifications,
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -392,8 +399,9 @@ export class CollectionController extends BaseController {
    * @param options Additional options
    *    - `queuable` If true, queues the request during downtime, until connected to Kuzzle again
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    *
-   * @returns An object which contain information about the specifications validity.
+   * @returns An object which contains information about the specifications' validity.
    */
   validateSpecifications(
     index: string,
@@ -405,15 +413,14 @@ export class CollectionController extends BaseController {
     details: Array<string>;
     description: string;
   }> {
-    return this.query(
-      {
-        action: "validateSpecifications",
-        body: specifications,
-        collection,
-        index,
-      },
-      options
-    ).then((response) => response.result);
+    const request: any = {
+      action: "validateSpecifications",
+      body: specifications,
+      collection,
+      index,
+    };
+
+    return this.query(request, options).then((response) => response.result);
   }
 
   /**
@@ -425,13 +432,14 @@ export class CollectionController extends BaseController {
    * @param collection Collection name
    * @param options Additional options
    *    - `timeout` Request Timeout in ms, after the delay if not resolved the promise will be rejected
+   *    - `triggerEvents` Forces pipes to execute even when called from EmbeddedSDK
    */
   delete(
     index: string,
     collection: string,
     options: ArgsCollectionControllerDelete = {}
   ): Promise<void> {
-    const request = {
+    const request: any = {
       action: "delete",
       collection,
       index,
