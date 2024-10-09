@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: ["16", "18"]
+        node-version: ["16", "18", "20"]
     steps:
       - uses: actions/checkout@v3
       - name: Cache node modules
@@ -33,7 +33,7 @@ jobs:
      needs: [lint]
      strategy:
       matrix:
-        node-version: ["16", "18"]
+        node-version: ["16", "18", "20"]
      steps:
        - uses: actions/checkout@v3
        - name: Cache node modules
@@ -58,7 +58,7 @@ jobs:
      needs: [unit-tests]
      strategy:
       matrix:
-        node-version: ["16", "18"]
+        node-version: ["16", "18", "20"]
      steps:
        - uses: actions/checkout@v3
          with:
@@ -100,7 +100,7 @@ jobs:
              ${{ runner.os }}-
        - uses: actions/setup-node@v3
          with:
-           node-version: '18'
+           node-version: '20'
        - uses: ./.github/actions/snippet-tests
          with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
