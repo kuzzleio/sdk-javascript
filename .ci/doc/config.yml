@@ -12,7 +12,7 @@ runners:
     path: /var/snippets/node
     lint:
       global: true
-      cmd: eslint -c /mnt/.ci/doc/eslint.json --skipLibCheck {{ snippet.dir }}
+      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
       before: timeout 600 ash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     run:
       cmd: node {{ snippet.source }}
@@ -23,7 +23,7 @@ runners:
     path: /var/snippets/web
     lint:
       global: true
-      cmd: eslint -c /mnt/.ci/doc/eslint.json --parser-options ecmaVersion:12 --skipLibCheck {{ snippet.dir }}/*.html
+      cmd: eslint -c /mnt/.ci/doc/eslint.json --parser-options ecmaVersion:12 {{ snippet.dir }}/*.html
       before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     run:
       cmd: node puppeteer.js {{ snippet.dir }}/{{ snippet.source }}
@@ -34,7 +34,7 @@ runners:
     path: /var/snippets/webpack
     lint:
       global: true
-      cmd: eslint -c /mnt/.ci/doc/eslint.json --skipLibCheck {{ snippet.dir }}
+      cmd: eslint -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
       before: timeout 600 bash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     build:
       cmd: node webpackBuild.js {{ snippet.dir }}/{{ snippet.source }}

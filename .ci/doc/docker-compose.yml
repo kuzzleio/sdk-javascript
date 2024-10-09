@@ -49,7 +49,7 @@ services:
       ash -c '
         mkdir -p /var/snippets/node;
         apk add --no-cache curl;
-        npm install -g eslint@6.8.0;
+        npm install -g eslint@8.38.0;
         cd /var/snippets/node;
         npm install \
           bluebird \
@@ -77,7 +77,7 @@ services:
         apt-get update;
         apt-get install -y curl;
         npm install -g \
-          eslint;
+          eslint@8.38.0;
         cd /mnt;
         npm install;
         cd /var/snippets/web;
@@ -107,7 +107,7 @@ services:
         apt-get update;
         apt-get install -y curl;
         npm install -g \
-          eslint;
+          eslint@8.38.0;
         cd /var/snippets/webpack;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
         cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
