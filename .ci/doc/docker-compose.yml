@@ -82,7 +82,7 @@ services:
         npm install;
         cd /var/snippets/web;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
-        npm install \
+        npm install -g \
           /mnt/ \
           eslint \
           eslint-plugin-html \
