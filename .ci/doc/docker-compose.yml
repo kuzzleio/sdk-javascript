@@ -70,6 +70,7 @@ services:
 
   doc-runner-web:
     image: ghcr.io/puppeteer/puppeteer:23.5.1
+    user: root
     command: >
       bash -c '
         mkdir -p /var/snippets/web;
@@ -99,6 +100,7 @@ services:
 
   doc-runner-webpack:
     image: ghcr.io/puppeteer/puppeteer:23.5.1
+    user: root
     command: >
       bash -c '
         mkdir -p /var/snippets/webpack;
