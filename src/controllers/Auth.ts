@@ -510,9 +510,8 @@ export class AuthController extends BaseController {
         {
           action: "logout",
           cookieAuth: this.kuzzle.cookieAuthentication,
-          ...options,
         },
-        { queuable: false, timeout: -1 }
+        { queuable: false, timeout: -1, ...options }
       );
       this._authenticationToken = null;
       /**
