@@ -516,10 +516,13 @@ export class SecurityController extends BaseController {
   }
 
   refresh(collection, options: ArgsSecurityControllerRefresh = {}) {
-    return this.query({
-      action: "refresh",
-      collection,
-    }, options);
+    return this.query(
+      {
+        action: "refresh",
+        collection,
+      },
+      options
+    );
   }
 
   replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {

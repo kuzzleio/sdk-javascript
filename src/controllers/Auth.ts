@@ -449,7 +449,12 @@ export class AuthController extends BaseController {
     };
 
     this.kuzzle.emit("beforeLogin");
-    return this.query(request, { queuable: false, timeout: -1, verb: "POST", ...options })
+    return this.query(request, {
+      queuable: false,
+      timeout: -1,
+      verb: "POST",
+      ...options,
+    })
       .then((response) => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
@@ -505,7 +510,7 @@ export class AuthController extends BaseController {
         {
           action: "logout",
           cookieAuth: this.kuzzle.cookieAuthentication,
-          ...options
+          ...options,
         },
         { queuable: false, timeout: -1 }
       );
