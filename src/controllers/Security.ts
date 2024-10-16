@@ -515,11 +515,14 @@ export class SecurityController extends BaseController {
     );
   }
 
-  refresh(collection) {
-    return this.query({
-      action: "refresh",
-      collection,
-    });
+  refresh(collection, options: ArgsSecurityControllerRefresh = {}) {
+    return this.query(
+      {
+        action: "refresh",
+        collection,
+      },
+      options
+    );
   }
 
   replaceUser(_id, body, options: ArgsSecurityControllerReplaceUser = {}) {
@@ -809,3 +812,5 @@ export type ArgsSecurityControllerUpdateUser = ArgsDefault;
 export type ArgsSecurityControllerUpdateUserMapping = ArgsDefault;
 
 export type ArgsSecurityControllerValidateCredentials = ArgsDefault;
+
+export type ArgsSecurityControllerRefresh = ArgsDefault;

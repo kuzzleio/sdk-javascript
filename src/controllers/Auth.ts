@@ -437,7 +437,8 @@ export class AuthController extends BaseController {
   login(
     strategy: string,
     credentials: JSONObject,
-    expiresIn?: string | number
+    expiresIn?: string | number,
+    options: ArgsAuthControllerLogin = {}
   ): Promise<string> {
     const request = {
       action: "login",
@@ -448,7 +449,12 @@ export class AuthController extends BaseController {
     };
 
     this.kuzzle.emit("beforeLogin");
-    return this.query(request, { queuable: false, timeout: -1, verb: "POST" })
+    return this.query(request, {
+      queuable: false,
+      timeout: -1,
+      verb: "POST",
+      ...options,
+    })
       .then((response) => {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
@@ -497,7 +503,7 @@ export class AuthController extends BaseController {
    *
    * @see https://docs.kuzzle.io/sdk/js/7/controllers/auth/logout
    */
-  async logout(): Promise<void> {
+  async logout(options: ArgsAuthControllerLogin = {}): Promise<void> {
     this.kuzzle.emit("beforeLogout");
     try {
       await this.query(
@@ -505,7 +511,7 @@ export class AuthController extends BaseController {
           action: "logout",
           cookieAuth: this.kuzzle.cookieAuthentication,
         },
-        { queuable: false, timeout: -1 }
+        { queuable: false, timeout: -1, ...options }
       );
       this._authenticationToken = null;
       /**
@@ -699,6 +705,10 @@ export type ArgsAuthControllerUpdateMyCredentials = ArgsDefault;
 export type ArgsAuthControllerUpdateSelf = ArgsDefault;
 
 export type ArgsAuthControllerValidateMyCredentials = ArgsDefault;
+
+export type ArgsAuthControllerLogin = ArgsDefault;
+
+export type ArgsAuthControllerLogout = ArgsDefault;
 
 export interface ArgsAuthControllerRefreshToken extends ArgsDefault {
   expiresIn?: number | string;
