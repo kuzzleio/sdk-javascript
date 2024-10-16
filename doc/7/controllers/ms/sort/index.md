@@ -35,7 +35,9 @@ The `options` arguments can contain the following option properties:
 | `direction` | <pre>string ('ASC')</pre>  | Sorts in ascendant or descendant order.<br/>Allowed values: `ASC`, `DESC`                                                                                   |
 | `get`       | <pre>string[]</pre>        | Instead of returning the sorted values directly, returns the values contained in external keys, using patterns completed by the sorted values               |
 | `limit`     | <pre>integer[]</pre>       | Limits the result set to a range of matching elements (similar to _SELECT LIMIT offset, count_ in SQL).<br/>Format: `[<offset(int)>, <count(int)>]`         |
-| `queuable`  | <pre>boolean (true)</pre>  | If true, queues the request during downtime, until connected to Kuzzle again                                                                                |
+| `queuable`  | <pre>boolean (true)</pre>  | If `true`, queues the request during downtime, until connected to Kuzzle again                                                                                |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)         | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`triggerEvents`](/sdk/7/core-classes/kuzzle/query#triggerEvents)  | <pre>boolean</pre> <br/>(`false`)| If set to `true`, will trigger events even if using Embeded SDK. You should always ensure that your events/pipes does not create an infinite loop. <SinceBadge version="Kuzzle 2.31.0"/> |
 
 ## Resolve
 
