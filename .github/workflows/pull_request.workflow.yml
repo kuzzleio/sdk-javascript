@@ -23,7 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: ./.github/actions/es-lint
+      - runs: |
+          npm ci
+          npm run test:lint
 
   unit-tests:
     name: Unit Tests
