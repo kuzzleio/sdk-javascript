@@ -8,21 +8,13 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: ["16", "18", "20"]
+        node-version: ["18", "20"]
     steps:
-      - uses: actions/checkout@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
       - run: |
           npm ci
           npm run test:lint
@@ -33,12 +25,13 @@ jobs:
     needs: [lint]
     strategy:
       matrix:
-        node-version: ["16", "18", "20"]
+        node-version: ["18", "20"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
       - uses: ./.github/actions/unit-tests
 
   functional-tests:
@@ -47,12 +40,13 @@ jobs:
     needs: [unit-tests]
     strategy:
       matrix:
-        node-version: ["16", "18", "20"]
+        node-version: ["18", "20"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
       - uses: ./.github/actions/functional-tests
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
@@ -62,10 +56,11 @@ jobs:
     needs: [unit-tests]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: 'npm'
       - uses: ./.github/actions/snippet-tests
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
