@@ -8,4 +8,4 @@ template: without-connect
 expected: Offline queue flushed
 
 sdk: js
-version: 6
+version: 7

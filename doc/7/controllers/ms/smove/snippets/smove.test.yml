@@ -8,4 +8,4 @@ expected:
   - "\\[ '(bar|baz)', '(bar|baz)' ]"
   - "\\[ '(foo|qux)', '(foo|qux)' ]"
 sdk: js
-version: 6
+version: 7

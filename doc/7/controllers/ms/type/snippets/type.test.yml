@@ -9,4 +9,4 @@ expected:
   - ^list$
   - ^set$
 sdk: js
-version: 6
+version: 7

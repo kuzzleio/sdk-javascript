@@ -9,4 +9,4 @@ template: default
 expected:
   - Role { _id: \'default\'
 sdk: js
-version: 6
+version: 7

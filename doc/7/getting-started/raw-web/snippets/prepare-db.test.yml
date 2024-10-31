@@ -6,5 +6,5 @@ hooks:
 template: default
 expected: nyc-open-data/yellow-taxi ready
 sdk: js
-version: 6
+version: 7
 runner: web

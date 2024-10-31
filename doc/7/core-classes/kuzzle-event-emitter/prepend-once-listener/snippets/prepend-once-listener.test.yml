@@ -9,4 +9,4 @@ expected:
   - ^listener1$
   - ^listener1$
 sdk: js
-version: 6
+version: 7

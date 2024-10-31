@@ -12,4 +12,4 @@ expected:
   - "]"
   - "\\[ 'bar', 'baz', 'foo', 'qux' ]"
 sdk: js
-version: 6
+version: 7

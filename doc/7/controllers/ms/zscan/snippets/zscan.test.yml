@@ -10,4 +10,4 @@ expected:
     - "values: \\[ 'baz', '-272.1\\d{1,}', 'bar', '4', 'foo', '42' ]"
     - "}"
 sdk: js
-version: 6
+version: 7
