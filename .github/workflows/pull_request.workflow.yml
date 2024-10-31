@@ -11,7 +11,6 @@ jobs:
         node-version: ["16", "18", "20"]
     steps:
       - uses: actions/checkout@v3
-      - name: Cache node modules
         uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
@@ -65,7 +64,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Cache node modules
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
