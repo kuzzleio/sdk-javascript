@@ -76,12 +76,11 @@ services:
         apt-get install -y curl;
         npm install -g \
           eslint@8.38.0;
-        cd /mnt;
-        npm install;
         cd /var/snippets/web;
         cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
         npm install \
-          /mnt/.ci/doc \
+          /mnt/ \
+          puppeteer \
           eslint \
           eslint-plugin-html \
           eslint-plugin-import \
@@ -111,6 +110,7 @@ services:
         cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
         npm install \
           /mnt/ \
+          puppeteer \
           babel-loader \
           @babel/core \
           html-webpack-plugin \
