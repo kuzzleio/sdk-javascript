@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "docs for kuzzle-sdk",
   "author": "The Kuzzle Team <support@kuzzle.io>",
+  "main": "index.js",
   "scripts": {},
   "dependencies": {},
   "devDependencies": {}
