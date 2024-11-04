@@ -9,4 +9,4 @@ docker compose -f ./doc/docker-compose.yml build
 docker compose -f ./doc/docker-compose.yml pull
 docker compose -f ./doc/docker-compose.yml run doc-tests node index
 EXIT=$?
-# docker compose -f ./doc/docker-compose.yml down
+docker compose -f ./doc/docker-compose.yml down
