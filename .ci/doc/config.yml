@@ -13,10 +13,10 @@ runners:
     lint:
       global: true
       cmd: npx eslint@8.38.0 -c /mnt/.ci/doc/eslint.json {{ snippet.dir }}
-      before: timeout 600 ash -c 'until stat /home/node/runner_ready_to_lint; do sleep 1; done'
+      before: timeout 600 ash -c 'until stat /tmp/runner_ready_to_lint; do sleep 1; done'
     run:
       cmd: node {{ snippet.source }}
-      before: timeout 600 ash -c 'until stat /home/node/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
+      before: timeout 600 ash -c 'until stat /tmp/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
 
   web:
     service: doc-runner-web
