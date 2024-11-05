@@ -6,4 +6,4 @@ hooks:
 template: default
 expected: \[ 'never', 'gonna', 'give you up' ]
 sdk: js
-version: 6
+version: 7

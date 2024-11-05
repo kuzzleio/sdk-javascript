@@ -8,5 +8,5 @@ hooks:
 template: default
 expected: Successfully subscribed to document notifications
 sdk: js
-version: 6
+version: 7
 runner: web

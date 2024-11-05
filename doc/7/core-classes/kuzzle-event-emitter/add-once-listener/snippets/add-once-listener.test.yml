@@ -6,4 +6,4 @@ hooks:
 template: eventemitter
 expected: Caught event "myEvent"!
 sdk: js
-version: 6
+version: 7

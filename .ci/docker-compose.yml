@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   kuzzle:
     image: kuzzleio/kuzzle:2

@@ -11,4 +11,4 @@ expected:
   - "]"
   - "\\[ { member: 'baz', score: -272.15 }, { member: 'foo', score: -29 } ]"
 sdk: js
-version: 6
+version: 7

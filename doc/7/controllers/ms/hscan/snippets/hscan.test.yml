@@ -10,4 +10,4 @@ expected:
   - "values: \\[ 'key1', 'val1', 'key2', 'val2', 'key3', 'val3' ]"
   - "}"
 sdk: js
-version: 6
+version: 7

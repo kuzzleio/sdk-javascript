@@ -1,5 +1,5 @@
 try {
-  const exists = kuzzle.collection.exists('nyc-open-data', 'green-taxi');
+  const exists = await kuzzle.collection.exists('nyc-open-data', 'green-taxi');
 
   if (exists) {
     console.log('Success');

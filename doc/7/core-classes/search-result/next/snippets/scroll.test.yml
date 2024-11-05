@@ -10,4 +10,4 @@ hooks:
 template: default
 expected: Successfully retrieved 100 documents
 sdk: js
-version: 6
+version: 7

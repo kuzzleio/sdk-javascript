@@ -7,4 +7,4 @@ template: default
 expected:
   - "\\[ { member: 'baz', score: -272.15 }, { member: 'bar', score: 4 } ]"
 sdk: js
-version: 6
+version: 7
