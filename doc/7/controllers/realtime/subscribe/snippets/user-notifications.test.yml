@@ -6,4 +6,4 @@ hooks:
 template: realtime
 expected: "username: 'nina vkote'"
 sdk: js
-version: 6
+version: 7

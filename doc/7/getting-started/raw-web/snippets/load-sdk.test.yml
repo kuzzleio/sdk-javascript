@@ -6,5 +6,5 @@ hooks:
 template: default
 expected: Successfully connected to Kuzzle
 sdk: js
-version: 6
+version: 7
 runner: web

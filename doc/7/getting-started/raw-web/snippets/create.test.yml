@@ -8,5 +8,5 @@ hooks:
 template: default
 expected: New document successfully created
 sdk: js
-version: 6
+version: 7
 runner: web

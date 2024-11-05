@@ -6,4 +6,4 @@ hooks:
 template: default
 expected: "\\[ 'foo', 'qux', 'bar', 'baz' ]"
 sdk: js
-version: 6
+version: 7

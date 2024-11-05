@@ -10,4 +10,4 @@ template: default
 expected: Successfully deleted 2 indexes
 
 sdk: js
-version: 6
+version: 7

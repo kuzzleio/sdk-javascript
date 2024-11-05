@@ -1,5 +1,5 @@
 try {
-  kuzzle.index.delete('nyc-open-data');
+  await kuzzle.index.delete('nyc-open-data');
 
   console.log('Index deleted');
 } catch (error) {

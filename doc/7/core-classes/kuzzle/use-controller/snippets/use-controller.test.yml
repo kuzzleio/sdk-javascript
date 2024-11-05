@@ -8,4 +8,4 @@ template: controller
 expected: Success
 
 sdk: js
-version: 6
+version: 7

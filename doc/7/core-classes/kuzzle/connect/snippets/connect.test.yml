@@ -8,4 +8,4 @@ template: without-connect
 expected: Successfully connected
 
 sdk: js
-version: 6
+version: 7

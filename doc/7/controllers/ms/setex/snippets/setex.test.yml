@@ -8,4 +8,4 @@ expected:
   - ^[0-9]{1,2}$
   - ^bar$
 sdk: js
-version: 6
+version: 7

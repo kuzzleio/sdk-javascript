@@ -8,4 +8,4 @@ expected:
   - ^true$
   - ^false$
 sdk: js
-version: 6
+version: 7

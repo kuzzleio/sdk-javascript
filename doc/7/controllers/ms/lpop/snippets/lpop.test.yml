@@ -8,4 +8,4 @@ expected:
   - ^foo$
   - "\\[ 'bar', 'baz' ]"
 sdk: js
-version: 6
+version: 7
