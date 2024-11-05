@@ -50,7 +50,7 @@ Additional query options
 
 | Property     | Type<br/>(default)    | Description   |
 | -------------- | --------- | ------------- |
-| `queuable` | <pre>boolean</pre><br/>(`true`) | If true, queues the request during downtime, until connected to Kuzzle again |
+| `queuable` | <pre>boolean</pre><br/>(`true`) | If `true`, queues the request during downtime, until connected to Kuzzle again |
 
 ## Resolves
 

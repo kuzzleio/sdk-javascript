@@ -6,4 +6,4 @@ hooks:
 template: eventemitter
 expected: Successfully removed all listeners
 sdk: js
-version: 6
+version: 7

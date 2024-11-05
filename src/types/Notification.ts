@@ -1,5 +1,5 @@
 import { JSONObject } from "./JSONObject";
-import { KDocument, KDocumentContentGeneric } from ".";
+import { KDocumentContentGeneric } from ".";
 
 /**
  * Enum for notification types
@@ -62,7 +62,21 @@ export interface DocumentNotification<
   /**
    * Updated document that triggered the notification
    */
-  result: KDocument<TDocContent>;
+  result: {
+    /**
+     * The message or full document content.
+     */
+    _source: TDocContent;
+    /**
+     * Document unique ID.
+     * `null` if the notification is from a real-time message.
+     */
+    _id: string | null;
+    /**
+     * List of fields that have been updated (only available on document partial updates).
+     */
+    _updatedFields?: string[];
+  };
   /**
    * State of the document regarding the scope (`in` or `out`)
    */
@@ -95,7 +109,7 @@ export interface UserNotification extends BaseNotification {
 
 export interface ServerNotification extends BaseNotification {
   /**
-   * Server message explaining why this notifications has been triggered
+   * Server message explaining why this notifications has been triggered.
    */
   message: string;
 

@@ -8,4 +8,4 @@ template: without-connect
 expected: Start queuing requests
 
 sdk: js
-version: 6
+version: 7

@@ -8,4 +8,4 @@ hooks:
 template: empty
 expected: New document successfully created!
 sdk: js
-version: 6
+version: 7
