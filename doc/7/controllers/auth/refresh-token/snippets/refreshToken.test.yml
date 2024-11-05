@@ -12,4 +12,4 @@ expected:
   - ^\s*expiresAt: \d+
   - ^\s*ttl: \d+ }
 sdk: js
-version: 6
+version: 7

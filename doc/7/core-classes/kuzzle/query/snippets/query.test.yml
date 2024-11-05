@@ -11,4 +11,4 @@ template: default
 expected: Document created
 
 sdk: js
-version: 6
+version: 7

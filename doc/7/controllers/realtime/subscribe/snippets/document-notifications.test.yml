@@ -7,4 +7,4 @@ template: realtime
 expected: Document nina vkote enter the scope
 
 sdk: js
-version: 6
+version: 7

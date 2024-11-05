@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   kuzzle:
     image: kuzzleio/kuzzle:2
@@ -44,17 +42,16 @@ services:
       - CONFIG_FILE=/mnt/.ci/doc/config.yml
 
   doc-runner-node:
-    image: node:18-alpine
+    image: node:20-alpine
     command: >
       ash -c '
         mkdir -p /var/snippets/node;
         apk add --no-cache curl;
-        npm install -g eslint@6.8.0;
         cd /var/snippets/node;
         npm install \
           bluebird \
           /mnt/ \
-          eslint \
+          eslint@8.38.0 \
           eslint-plugin-html \
           eslint-plugin-import \
           eslint-plugin-node \
@@ -69,66 +66,40 @@ services:
       - snippets:/var/snippets
 
   doc-runner-web:
-    image: buildkite/puppeteer:latest
-    command: >
-      bash -c '
-        mkdir -p /var/snippets/web;
-        apt-get update;
-        apt-get install -y curl;
-        npm install -g \
-          eslint@6.8.0;
-        cd /mnt;
-        npm install;
-        cd /var/snippets/web;
-        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
-        npm install \
-          /mnt/ \
-          eslint \
-          eslint-plugin-html \
-          eslint-plugin-import \
-          eslint-plugin-node \
-          eslint-plugin-promise \
-          eslint-plugin-standard;
-        touch /tmp/runner_ready_to_lint;
-        touch /tmp/runner_is_ready;
-        tail -f /dev/null
-      '
+    build: .
     volumes:
       - ../..:/mnt
       - snippets:/var/snippets
+    working_dir: /var/snippets/web
+    command: >
+      bash -c '
+        cp /mnt/.ci/doc/puppeteer.js /var/snippets/web/;
+        npm install /mnt/;
+        cp -fr /usr/local/lib/node_modules/* /var/snippets/web/node_modules;
+        cp -fr /usr/local/lib/node_modules/* /var/snippets/webpack/node_modules;
+        touch /home/node/runner_ready_to_lint;
+        touch /home/node/runner_is_ready;
+        tail -f /dev/null
+      '
 
   doc-runner-webpack:
-    image: buildkite/puppeteer:latest
-    command: >
-      bash -c '
-        mkdir -p /var/snippets/webpack;
-        apt-get update;
-        apt-get install -y curl;
-        npm install -g \
-          eslint@6.8.0;
-        cd /var/snippets/webpack;
-        cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
-        cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
-        npm install \
-          /mnt/ \
-          babel-loader \
-          @babel/core \
-          html-webpack-plugin \
-          webpack \
-          webpack-cli \
-          eslint \
-          eslint-plugin-html \
-          eslint-plugin-import \
-          eslint-plugin-node \
-          eslint-plugin-promise \
-          eslint-plugin-standard;
-        touch /tmp/runner_ready_to_lint;
-        touch /tmp/runner_is_ready;
-        tail -f /dev/null
-      '
+    build: .
     volumes:
       - ../..:/mnt
       - snippets:/var/snippets
+    working_dir: /var/snippets/webpack
+    command: >
+      bash -c '
+        cp /mnt/.ci/doc/puppeteer.js /var/snippets/webpack/;
+        cp /mnt/.ci/doc/webpackBuild.js /var/snippets/webpack/;
+        npm install /mnt/;
+        cp -fr /usr/local/lib/node_modules/* /var/snippets/web/node_modules;
+        cp -fr /usr/local/lib/node_modules/* /var/snippets/webpack/node_modules;
+        touch /home/node/runner_ready_to_lint;
+        touch /home/node/runner_is_ready;
+        tail -f /dev/null
+      '
+
 
 volumes:
   snippets:

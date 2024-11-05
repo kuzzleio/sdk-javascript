@@ -2,7 +2,7 @@
 code: true
 type: page
 title: delete
-description: Deletes an index
+description: Delete an index
 ---
 
 # delete

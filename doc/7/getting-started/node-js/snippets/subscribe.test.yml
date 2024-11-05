@@ -8,4 +8,4 @@ hooks:
 template: empty-realtime
 expected: Successfully subscribed to document notifications!
 sdk: js
-version: 6
+version: 7

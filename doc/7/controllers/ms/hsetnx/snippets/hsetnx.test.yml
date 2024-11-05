@@ -9,4 +9,4 @@ expected:
   - ^false$
   - ^bar$
 sdk: js
-version: 6
+version: 7
