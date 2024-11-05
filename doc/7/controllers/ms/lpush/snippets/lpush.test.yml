@@ -8,4 +8,4 @@ expected:
   - ^3$
   - "\\[ 'Hello', 'World', 'foobar' ]"
 sdk: js
-version: 6
+version: 7

@@ -6,4 +6,4 @@ hooks:
 template: default
 expected: "\\[ 'baz' ]"
 sdk: js
-version: 6
+version: 7

@@ -45,11 +45,13 @@ The `options` arguments can contain the following option properties:
 
 | Property   | Type (default)             | Description                                                                                                                                            |
 | ---------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ch`       | <pre>boolean (false)</pre> | If true, instead of returning the number of added elements, returns the number of changes performed                                                    |
-| `incr`     | <pre>boolean (false)</pre> | If true, instead of adding elements, increments the existing member with the provided `score`. Only one element can be specified if this option is set |
-| `nx`       | <pre>boolean (false)</pre> | If true, only adds new elements, without altering existing ones                                                                                        |
-| `queuable` | <pre>boolean (true)</pre>  | If true, queues the request during downtime, until connected to Kuzzle again                                                                           |
-| `xx`       | <pre>boolean (false)</pre> | If true, ignores new elements, alters only existing ones                                                                                               |
+| `ch`       | <pre>boolean (false)</pre> | If `true`, instead of returning the number of added elements, returns the number of changes performed                                                    |
+| `incr`     | <pre>boolean (false)</pre> | If `true`, instead of adding elements, increments the existing member with the provided `score`. Only one element can be specified if this option is set |
+| `nx`       | <pre>boolean (false)</pre> | If `true`, only adds new elements, without altering existing ones                                                                                        |
+| `queuable` | <pre>boolean (true)</pre>  | If `true`, queues the request during downtime, until connected to Kuzzle again                                                                           |
+| [`timeout`](/sdk/7/core-classes/kuzzle/query#timeout)         | <pre>number</pre><br/>(`-1`)     | Time (in ms) during which a request will still be waited to be resolved. Set it `-1` if you want to wait indefinitely |
+| [`triggerEvents`](/sdk/7/core-classes/kuzzle/query#triggerEvents)  | <pre>boolean</pre> <br/>(`false`)| If set to `true`, will trigger events even if using Embeded SDK. You should always ensure that your events/pipes does not create an infinite loop. <SinceBadge version="Kuzzle 2.31.0"/> |
+| `xx`       | <pre>boolean (false)</pre> | If `true`, ignores new elements, alters only existing ones                                                                                               |
 
 ## Resolve
 

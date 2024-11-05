@@ -8,4 +8,4 @@ expected:
   - "^\\[ '[a-f]' ]"
   - "^\\[ '[a-f]', '[a-f]', '[a-f]' ]"
 sdk: js
-version: 6
+version: 7

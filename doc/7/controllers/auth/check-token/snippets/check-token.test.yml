@@ -8,4 +8,4 @@ template: default
 expected: Token is valid
 
 sdk: js
-version: 6
+version: 7

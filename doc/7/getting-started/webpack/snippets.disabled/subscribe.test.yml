@@ -10,5 +10,5 @@ expected:
   - Successfully subscribed to document notifications!
   - New driver Sirkis with id
 sdk: js
-version: 6
+version: 7
 runner: webpack

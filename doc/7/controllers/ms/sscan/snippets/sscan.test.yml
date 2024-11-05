@@ -8,4 +8,4 @@ expected:
   - "{ cursor: '0', values: \\[ 'ba[rz]', 'ba[rz]' ] }"
 
 sdk: js
-version: 6
+version: 7

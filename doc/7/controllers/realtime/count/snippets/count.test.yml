@@ -7,4 +7,4 @@ template: default
 expected: Currently 1 active subscription
 
 sdk: js
-version: 6
+version: 7
