@@ -1,3 +1,29 @@
+# [7.14.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.13.0...v7.14.0) (2024-11-05)
+
+
+### Bug Fixes
+
+* change options in the right object ([d193eda](https://github.com/kuzzleio/sdk-javascript/commit/d193eda82f7ccc8ef155f32a872fa0a27057dc49))
+* **ci:** Update ci to work with last version of puppeteer ([f4962e4](https://github.com/kuzzleio/sdk-javascript/commit/f4962e4ec272d3c5441a59f29ce77c4b0e6cb8e0))
+* **ci:** Update ci to work with last version of puppeteer ([c413283](https://github.com/kuzzleio/sdk-javascript/commit/c413283acd10c9bd10ac45f6ebac4aaf17a6bfe3))
+* **ci:** Update ci to work with last version of puppeteer ([ff6b29f](https://github.com/kuzzleio/sdk-javascript/commit/ff6b29fa81bf2f9c017a94d2e950ee8e9c3dae2c))
+* **ci:** Update ci to work with last version of puppeteer ([102b224](https://github.com/kuzzleio/sdk-javascript/commit/102b22422b08adfb5d3d471d3d3ddf58bc1819df))
+* **ci:** Update ci to work with last version of puppeteer ([ad8e533](https://github.com/kuzzleio/sdk-javascript/commit/ad8e53374120f149661207ca291f50a85a8c2028))
+* eslint ([adaf4e9](https://github.com/kuzzleio/sdk-javascript/commit/adaf4e962671faac2c252d1169a6c332205dc7aa))
+* ignore external library linting ([f1e27d2](https://github.com/kuzzleio/sdk-javascript/commit/f1e27d29488aa9b704935eb1fec045f5832d4851))
+* use root user in the new puppeteer images ([96306fa](https://github.com/kuzzleio/sdk-javascript/commit/96306fa77bcc80c6fc2e364501c63a5b55720e06))
+* ws vulnerability ([afcf3ac](https://github.com/kuzzleio/sdk-javascript/commit/afcf3ac2d993d8c132a9b09a1e8f9fdcd99617cf))
+
+
+### Features
+
+* add options parameter to controller functions containing a query ([0aa4222](https://github.com/kuzzleio/sdk-javascript/commit/0aa42224e0684bed46c14b4810d0e210b3df1ec2))
+
+
+### Reverts
+
+* revert skipLibCheck and use a fixed eslint version instead ([fb9f599](https://github.com/kuzzleio/sdk-javascript/commit/fb9f59959d1304ce18af5a9c177f8cd3bd4d7084))
+
 # [7.14.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.13.0...v7.14.0-beta.1) (2024-11-05)
 
 
