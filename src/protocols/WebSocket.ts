@@ -116,10 +116,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         });
       }
 
-      this.client.onopen = () => {
+      this.client.onopen = async () => {
         this.clientConnected();
 
         this.setupPingPong();
+
+        await this.getMaxPayloadSize();
 
         return resolve();
       };
@@ -241,9 +243,15 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    * @param {Object} payload
    */
   send(request: RequestPayload, options: JSONObject = {}) {
+    if (this.maxPayloadSize !== null && Buffer.byteLength(JSON.stringify(request), 'utf8') > this.maxPayloadSize) {
+      
+      const error: any= new Error(
+        `Payload size exceeded the maximum allowed by the server ${this.maxPayloadSize} bytes`
+      );
 
-    if (this.maxPayloadSize && Buffer.byteLength(JSON.stringify(request), 'utf8') > this.maxPayloadSize) {
-      this.clientNetworkError(new Error('Payload size exceeds the maximum allowed size of ' + this.maxPayloadSize));
+      this.emit("networkError", { error });
+      this.clientDisconnected(DisconnectionOrigin.PAYLOAD_MAX_SIZE_EXCEEDED);
+
       return;
     }
 
@@ -351,7 +359,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       // If we were waiting for a pong that never occured before the next ping cycle we throw an error
       if (this.waitForPong) {
         const error: any = new Error(
-          "Kuzzle does'nt respond to ping. Connection lost."
+          "Kuzzle doesn't respond to ping. Connection lost."
         );
         error.status = 503;
 
@@ -368,10 +376,13 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       }
     }, this._pingInterval);
   }
+  /**
+   * Get the maximum payload size allowed by the server
+   * Stores the value in `this.maxPayloadSize`
+  **/
   async getMaxPayloadSize() {
     return new Promise((resolve, reject) => {
         const originalOnMessage = this.client.onmessage;
-
         this.client.onmessage = (payload) => {
             try {
                 const data = JSON.parse(payload.data || payload);
