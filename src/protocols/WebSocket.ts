@@ -243,9 +243,11 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
    * @param {Object} payload
    */
   send(request: RequestPayload, options: JSONObject = {}) {
-    if (this.maxPayloadSize !== null && Buffer.byteLength(JSON.stringify(request), 'utf8') > this.maxPayloadSize) {
-      
-      const error: any= new Error(
+    if (
+      this.maxPayloadSize !== null &&
+      Buffer.byteLength(JSON.stringify(request), "utf8") > this.maxPayloadSize
+    ) {
+      const error: any = new Error(
         `Payload size exceeded the maximum allowed by the server ${this.maxPayloadSize} bytes`
       );
 
@@ -379,35 +381,34 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   /**
    * Get the maximum payload size allowed by the server
    * Stores the value in `this.maxPayloadSize`
-  **/
+   **/
   async getMaxPayloadSize() {
     return new Promise((resolve, reject) => {
-        const originalOnMessage = this.client.onmessage;
-        this.client.onmessage = (payload) => {
-            try {
-                const data = JSON.parse(payload.data || payload);
+      const originalOnMessage = this.client.onmessage;
+      this.client.onmessage = (payload) => {
+        try {
+          const data = JSON.parse(payload.data || payload);
 
-                // Check if the message corresponds to the `getMaxPayloadSize` response
-                if (data.result && data.result.server && data.result.server.maxRequestSize) {
-                    this.maxPayloadSize = parseSize(data.result.server.maxRequestSize);
+          // Check if the message corresponds to the `getMaxPayloadSize` response
+          if (
+            data.result &&
+            data.result.server &&
+            data.result.server.maxRequestSize
+          ) {
+            this.maxPayloadSize = parseSize(data.result.server.maxRequestSize);
 
-                    // Restore the original `onmessage` handler
-                    this.client.onmessage = originalOnMessage;
-                    resolve(this.maxPayloadSize);
-                    return;
-                }
+            // Restore the original `onmessage` handler
+            this.client.onmessage = originalOnMessage;
+            resolve(this.maxPayloadSize);
+            return;
+          }
+        } catch (error) {
+          reject(error);
+        }
+      };
 
-                // If not related to `getMaxPayloadSize`, pass to the original handler
-                if (originalOnMessage) {
-                    originalOnMessage(payload);
-                }
-            } catch (error) {
-                reject(error);
-            }
-        };
-
-        // Send the request
-        this.send({ controller: "server", action: "getConfig" });
+      // Send the request
+      this.send({ action: "getConfig", controller: "server" });
     });
   }
 }
