@@ -716,29 +716,7 @@ export class DocumentController extends BaseController {
     query: JSONObject,
     changes: Partial<TKDocumentContent>,
     options: ArgsDocumentControllerUpdateByQuery = {}
-  ): Promise<{
-    /**
-     * Array of successfully updated documents
-     */
-    successes: KDocument<TKDocumentContent>[];
-    /**
-     * Array of failed creation
-     */
-    errors: Array<{
-      /**
-       * Document that cause the error
-       */
-      document: KDocument<TKDocumentContent>;
-      /**
-       * HTTP error status
-       */
-      status: number;
-      /**
-       * Human readable reason
-       */
-      reason: string;
-    }>;
-  }> {
+  ): Promise<UpdateByQueryResponse<TKDocumentContent>> {
     const request = {
       action: "updateByQuery",
       body: { changes, query },
@@ -940,3 +918,27 @@ export interface ArgsDocumentControllerUpsert<TKDocumentContent>
 }
 
 export type ArgsDocumentControllerValidate = ArgsDefault;
+
+export interface UpdateByQueryResponse<TKDocumentContent> {
+  /**
+   * Array of successfully updated documents
+   */
+  successes: KDocument<TKDocumentContent>[];
+  /**
+   * Array of failed creation
+   */
+  errors: Array<{
+    /**
+     * Document that cause the error
+     */
+    document: KDocument<TKDocumentContent>;
+    /**
+     * HTTP error status
+     */
+    status: number;
+    /**
+     * Human readable reason
+     */
+    reason: string;
+  }>;
+}
