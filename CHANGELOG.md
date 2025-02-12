@@ -1,3 +1,15 @@
+# [7.15.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.14.0...v7.15.0) (2025-02-12)
+
+
+### Bug Fixes
+
+* add default options to security:checkRights ([#757](https://github.com/kuzzleio/sdk-javascript/issues/757)) ([b07f061](https://github.com/kuzzleio/sdk-javascript/commit/b07f0617a38cb16d7e0022af8363bb1f3e8d79a8))
+
+
+### Features
+
+* create an interface to export and use in KDM ([#758](https://github.com/kuzzleio/sdk-javascript/issues/758)) ([84e7a1b](https://github.com/kuzzleio/sdk-javascript/commit/84e7a1b403a7da0b93f73a8d30e3c94e40b83993))
+
 # [7.15.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.14.0...v7.15.0-beta.1) (2025-02-12)
 
 
