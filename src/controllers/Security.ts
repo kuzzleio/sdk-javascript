@@ -52,7 +52,7 @@ export class SecurityController extends BaseController {
   checkRights(
     kuid,
     requestPayload,
-    options: ArgsSecurityControllerCheckRights
+    options: ArgsSecurityControllerCheckRights = {}
   ) {
     const request = {
       action: "checkRights",
