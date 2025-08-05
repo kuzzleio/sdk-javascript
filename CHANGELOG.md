@@ -1,3 +1,11 @@
+## [7.15.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.15.0...v7.15.1) (2025-08-05)
+
+
+### Bug Fixes
+
+* **mResponse:** the mResponseErrors document contain body property instead of _source ([cb7f0b4](https://github.com/kuzzleio/sdk-javascript/commit/cb7f0b4de96cab2e3f0fdb4593d1d57577de4dcd))
+* **workflow:** upgrade to ubuntu 24.04 ([f52e71c](https://github.com/kuzzleio/sdk-javascript/commit/f52e71c9aab88787062bdc076c3914f2fff1765f))
+
 ## [7.15.1-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.15.0...v7.15.1-beta.1) (2025-08-05)
 
 
