@@ -5,7 +5,7 @@ on: [pull_request]
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         node-version: ["18", "20"]
@@ -21,7 +21,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [lint]
     strategy:
       matrix:
@@ -36,7 +36,7 @@ jobs:
 
   functional-tests:
     name: Functional Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [unit-tests]
     strategy:
       matrix:
@@ -54,7 +54,7 @@ jobs:
   documentation-snippet-tests:
     name: Documentation Snippet Tests
     needs: [unit-tests]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
