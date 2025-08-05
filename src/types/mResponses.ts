@@ -6,7 +6,7 @@ type mResponseErrors = Array<{
    */
   document: {
     _id: string;
-    _source: JSONObject;
+    body: JSONObject;
   };
 
   /**
