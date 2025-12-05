@@ -1,5 +1,3 @@
-"use strict";
-
 // Loads the Kuzzle SDK modules
 const { Kuzzle, WebSocket } = require("kuzzle-sdk");
 

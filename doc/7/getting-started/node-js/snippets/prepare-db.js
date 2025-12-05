@@ -1,6 +1,3 @@
-/* eslint-disable no-undef */
-"use strict";
-
 const run = async () => {
   try {
     // Connects to the Kuzzle server

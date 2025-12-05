@@ -1,5 +1,3 @@
-"use strict";
-
 // Loads the WebSocket protocol
 const { Kuzzle, WebSocket } = require("kuzzle-sdk");
 
