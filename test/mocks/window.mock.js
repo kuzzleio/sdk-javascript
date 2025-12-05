@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon"),
   { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter");
 
@@ -8,7 +10,7 @@ class WindowMock extends KuzzleEventEmitter {
 
     if (typeof window !== "undefined") {
       throw new Error(
-        'Cannot mock add a global "window" object: already defined'
+        'Cannot mock add a global "window" object: already defined',
       );
     }
 

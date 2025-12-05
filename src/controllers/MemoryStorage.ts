@@ -1,35 +1,48 @@
-const { BaseController } = require("./Base");
+import { BaseController } from "./Base";
 
-/* eslint sort-keys: 0 */
+type CommandOptionsMapper = (data: any, options: any) => void;
+
+type CommandDefinition = {
+  getter?: boolean;
+  required?: string[];
+  opts?: string[] | CommandOptionsMapper;
+  mapResults?: (results: any) => any;
+};
 
 // Parameter mutualization
-const getId = { getter: true, required: ["_id"] };
-const getIdField = { getter: true, required: ["_id", "field"] };
-const getKeys = { getter: true, required: ["keys"] };
-const getMember = { getter: true, required: ["_id", "member"] };
-const getxScan = {
+const getId: CommandDefinition = { getter: true, required: ["_id"] };
+const getIdField: CommandDefinition = {
+  getter: true,
+  required: ["_id", "field"],
+};
+const getKeys: CommandDefinition = { getter: true, required: ["keys"] };
+const getMember: CommandDefinition = {
+  getter: true,
+  required: ["_id", "member"],
+};
+const getxScan: CommandDefinition = {
   getter: true,
   required: ["_id", "cursor"],
   opts: ["match", "count"],
   mapResults: mapScanResults,
 };
-const getZrange = {
+const getZrange: CommandDefinition = {
   getter: true,
   required: ["_id", "start", "stop"],
   opts: assignZrangeOptions,
   mapResults: mapZrangeResults,
 };
-const getZrangeBy = {
+const getZrangeBy: CommandDefinition = {
   getter: true,
   required: ["_id", "min", "max"],
   opts: assignZrangeOptions,
   mapResults: mapZrangeResults,
 };
-const setId = { required: ["_id"] };
-const setIdValue = { required: ["_id", "value"] };
+const setId: CommandDefinition = { required: ["_id"] };
+const setIdValue: CommandDefinition = { required: ["_id", "value"] };
 
 // Redis commands
-const commands = {
+const commands: Record<string, CommandDefinition> = {
   append: setIdValue,
   bitcount: { getter: true, required: ["_id"], opts: ["start", "end"] },
   bitop: { required: ["_id", "operation", "keys"] },
@@ -219,11 +232,9 @@ const commands = {
  *  - script based functions
  *  - transaction functions
  *
- * @param {object} kuzzle - Kuzzle instance to inherit from
- * @constructor
  */
-class MemoryStorageController extends BaseController {
-  constructor(kuzzle) {
+export class MemoryStorageController extends BaseController {
+  constructor(kuzzle: any) {
     super(kuzzle, "ms");
   }
 }
@@ -231,12 +242,14 @@ class MemoryStorageController extends BaseController {
 // Dynamically builds this class' prototypes using the "commands" global variable
 for (const action of Object.keys(commands)) {
   // eslint-disable-next-line no-loop-func
-  MemoryStorageController.prototype[action] = function (...args) {
+  (MemoryStorageController.prototype as any)[action] = function (
+    ...args: any[]
+  ) {
     const command = commands[action];
-    const request = {
+    const request: any = {
       action,
     };
-    const options = {};
+    const options: any = {};
 
     if (!command.getter) {
       request.body = {};
@@ -259,7 +272,7 @@ for (const action of Object.keys(commands)) {
     if (args.length) {
       if (typeof args[0] !== "object" || Array.isArray(args[0])) {
         throw new Error(
-          `ms.${action}: invalid optional paramater (expected an object`
+          `ms.${action}: invalid optional paramater (expected an object`,
         );
       }
 
@@ -390,7 +403,7 @@ function mapGeoRadiusResults(results) {
 
   return results.map(function (point) {
     // The point id is always the first item
-    const p = {
+    const p: any = {
       name: point.shift(),
     };
 
@@ -497,5 +510,3 @@ function mapScanResults(results) {
     values: results[1],
   };
 }
-
-module.exports = { MemoryStorageController };

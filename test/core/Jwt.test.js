@@ -1,3 +1,6 @@
+/* eslint-disable no-new */
+"use strict";
+
 const generateJwt = require("../mocks/generateJwt.mock"),
   rewire = require("rewire"),
   should = require("should");
@@ -39,7 +42,7 @@ describe("Jwt", () => {
     it("should return a boolean according to expiresAt", () => {
       const encodedJwt = generateJwt(
         "user-gordon",
-        Math.round(Date.now() / 1000) - 1000
+        Math.round(Date.now() / 1000) - 1000,
       );
 
       authenticationToken = new Jwt(encodedJwt);

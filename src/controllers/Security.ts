@@ -27,7 +27,7 @@ export class SecurityController extends BaseController {
   createApiKey(
     userId,
     description,
-    options: ArgsSecurityControllerCreateApiKey = {}
+    options: ArgsSecurityControllerCreateApiKey = {},
   ) {
     const request = {
       _id: options._id,
@@ -52,7 +52,7 @@ export class SecurityController extends BaseController {
   checkRights(
     kuid,
     requestPayload,
-    options: ArgsSecurityControllerCheckRights = {}
+    options: ArgsSecurityControllerCheckRights = {},
   ) {
     const request = {
       action: "checkRights",
@@ -61,7 +61,7 @@ export class SecurityController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.allowed
+      (response) => response.result.allowed,
     );
   }
 
@@ -97,7 +97,7 @@ export class SecurityController extends BaseController {
   searchApiKeys(
     userId,
     query = {},
-    options: ArgsSecurityControllerSearchApiKeys = {}
+    options: ArgsSecurityControllerSearchApiKeys = {},
   ) {
     const request = {
       action: "searchApiKeys",
@@ -115,7 +115,7 @@ export class SecurityController extends BaseController {
     strategy,
     _id,
     body,
-    options: ArgsSecurityControllerCreateCredentials = {}
+    options: ArgsSecurityControllerCreateCredentials = {},
   ) {
     return this.query(
       {
@@ -124,14 +124,14 @@ export class SecurityController extends BaseController {
         body,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
   createFirstAdmin(
     _id,
     body,
-    options: ArgsSecurityControllerCreateFirstAdmin = {}
+    options: ArgsSecurityControllerCreateFirstAdmin = {},
   ) {
     const request = {
       _id,
@@ -142,14 +142,14 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   createOrReplaceProfile(
     _id,
     body,
-    options: ArgsSecurityControllerCreateOrReplaceProfile = {}
+    options: ArgsSecurityControllerCreateOrReplaceProfile = {},
   ) {
     const request = {
       _id,
@@ -159,14 +159,14 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new Profile(this.kuzzle, response.result._id, response.result._source)
+        new Profile(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   createOrReplaceRole(
     _id,
     body,
-    options: ArgsSecurityControllerCreateOrReplaceRole = {}
+    options: ArgsSecurityControllerCreateOrReplaceRole = {},
   ) {
     const request = {
       _id,
@@ -179,8 +179,8 @@ export class SecurityController extends BaseController {
         new Role(
           this.kuzzle,
           response.result._id,
-          response.result._source.controllers
-        )
+          response.result._source.controllers,
+        ),
     );
   }
 
@@ -193,14 +193,14 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new Profile(this.kuzzle, response.result._id, response.result._source)
+        new Profile(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   createRestrictedUser(
     body,
     _id = null,
-    options: ArgsSecurityControllerCreateRestrictedUser = {}
+    options: ArgsSecurityControllerCreateRestrictedUser = {},
   ) {
     if (!body.content) {
       body.content = {};
@@ -214,7 +214,7 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -230,8 +230,8 @@ export class SecurityController extends BaseController {
         new Role(
           this.kuzzle,
           response.result._id,
-          response.result._source.controllers
-        )
+          response.result._source.controllers,
+        ),
     );
   }
 
@@ -244,14 +244,14 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   deleteCredentials(
     strategy,
     _id,
-    options: ArgsSecurityControllerDeleteCredentials = {}
+    options: ArgsSecurityControllerDeleteCredentials = {},
   ) {
     const request = {
       _id,
@@ -287,33 +287,33 @@ export class SecurityController extends BaseController {
   }
 
   getAllCredentialFields(
-    options: ArgsSecurityControllerGetAllCredentialFields = {}
+    options: ArgsSecurityControllerGetAllCredentialFields = {},
   ) {
     return this.query(
       {
         action: "getAllCredentialFields",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
   getCredentialFields(
     strategy,
-    options: ArgsSecurityControllerGetCredentialFields = {}
+    options: ArgsSecurityControllerGetCredentialFields = {},
   ) {
     return this.query(
       {
         action: "getCredentialFields",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
   getCredentials(
     strategy,
     _id,
-    options: ArgsSecurityControllerGetCredentials = {}
+    options: ArgsSecurityControllerGetCredentials = {},
   ) {
     return this.query(
       {
@@ -321,14 +321,14 @@ export class SecurityController extends BaseController {
         action: "getCredentials",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
   getCredentialsById(
     strategy,
     _id,
-    options: ArgsSecurityControllerGetCredentialsById = {}
+    options: ArgsSecurityControllerGetCredentialsById = {},
   ) {
     return this.query(
       {
@@ -336,14 +336,14 @@ export class SecurityController extends BaseController {
         action: "getCredentialsById",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
   getProfile(_id, options: ArgsSecurityControllerGetProfile = {}) {
     return this.query({ _id, action: "getProfile" }, options).then(
       (response) =>
-        new Profile(this.kuzzle, response.result._id, response.result._source)
+        new Profile(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -352,7 +352,7 @@ export class SecurityController extends BaseController {
       {
         action: "getProfileMapping",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -362,7 +362,7 @@ export class SecurityController extends BaseController {
         _id,
         action: "getProfileRights",
       },
-      options
+      options,
     ).then((response) => response.result.hits);
   }
 
@@ -372,14 +372,14 @@ export class SecurityController extends BaseController {
         _id,
         action: "getRole",
       },
-      options
+      options,
     ).then(
       (response) =>
         new Role(
           this.kuzzle,
           response.result._id,
-          response.result._source.controllers
-        )
+          response.result._source.controllers,
+        ),
     );
   }
 
@@ -388,7 +388,7 @@ export class SecurityController extends BaseController {
       {
         action: "getRoleMapping",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -398,10 +398,10 @@ export class SecurityController extends BaseController {
         _id,
         action: "getUser",
       },
-      options
+      options,
     ).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -410,7 +410,7 @@ export class SecurityController extends BaseController {
       {
         action: "getUserMapping",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -420,27 +420,27 @@ export class SecurityController extends BaseController {
         _id,
         action: "getUserRights",
       },
-      options
+      options,
     ).then((response) => response.result.hits);
   }
 
   getUserStrategies(
     _id,
-    options: ArgsSecurityControllerGetUserStrategies = {}
+    options: ArgsSecurityControllerGetUserStrategies = {},
   ) {
     return this.query(
       {
         _id,
         action: "getUserStrategies",
       },
-      options
+      options,
     ).then((response) => response.result.strategies);
   }
 
   hasCredentials(
     strategy,
     _id,
-    options: ArgsSecurityControllerHasCredentials = {}
+    options: ArgsSecurityControllerHasCredentials = {},
   ) {
     return this.query(
       {
@@ -448,7 +448,7 @@ export class SecurityController extends BaseController {
         action: "hasCredentials",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -483,8 +483,8 @@ export class SecurityController extends BaseController {
     return this.query({ action: "mGetProfiles", body: { ids } }, options).then(
       (response) =>
         response.result.hits.map(
-          (hit) => new Profile(this.kuzzle, hit._id, hit._source)
-        )
+          (hit) => new Profile(this.kuzzle, hit._id, hit._source),
+        ),
     );
   }
 
@@ -496,8 +496,8 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then((response) =>
       response.result.hits.map(
-        (hit) => new User(this.kuzzle, hit._id, hit._source)
-      )
+        (hit) => new User(this.kuzzle, hit._id, hit._source),
+      ),
     );
   }
 
@@ -507,11 +507,11 @@ export class SecurityController extends BaseController {
         action: "mGetRoles",
         body: { ids },
       },
-      options
+      options,
     ).then((response) =>
       response.result.hits.map(
-        (hit) => new Role(this.kuzzle, hit._id, hit._source.controllers)
-      )
+        (hit) => new Role(this.kuzzle, hit._id, hit._source.controllers),
+      ),
     );
   }
 
@@ -521,7 +521,7 @@ export class SecurityController extends BaseController {
         action: "refresh",
         collection,
       },
-      options
+      options,
     );
   }
 
@@ -533,7 +533,7 @@ export class SecurityController extends BaseController {
     };
     return this.query(request, options).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -548,7 +548,7 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new ProfileSearchResult(this.kuzzle, request, options, response.result)
+        new ProfileSearchResult(this.kuzzle, request, options, response.result),
     );
   }
 
@@ -563,7 +563,7 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new RoleSearchResult(this.kuzzle, request, options, response.result)
+        new RoleSearchResult(this.kuzzle, request, options, response.result),
     );
   }
 
@@ -578,7 +578,7 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new UserSearchResult(this.kuzzle, request, options, response.result)
+        new UserSearchResult(this.kuzzle, request, options, response.result),
     );
   }
 
@@ -586,7 +586,7 @@ export class SecurityController extends BaseController {
     strategy,
     _id,
     body,
-    options: ArgsSecurityControllerUpdateCredentials = {}
+    options: ArgsSecurityControllerUpdateCredentials = {},
   ) {
     return this.query(
       {
@@ -595,7 +595,7 @@ export class SecurityController extends BaseController {
         body,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -608,20 +608,20 @@ export class SecurityController extends BaseController {
 
     return this.query(request, options).then(
       (response) =>
-        new Profile(this.kuzzle, response.result._id, response.result._source)
+        new Profile(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   updateProfileMapping(
     body,
-    options: ArgsSecurityControllerUpdateProfileMapping = {}
+    options: ArgsSecurityControllerUpdateProfileMapping = {},
   ) {
     return this.query(
       {
         action: "updateProfileMapping",
         body,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -638,21 +638,21 @@ export class SecurityController extends BaseController {
         new Role(
           this.kuzzle,
           response.result._id,
-          response.result._source.controllers
-        )
+          response.result._source.controllers,
+        ),
     );
   }
 
   updateRoleMapping(
     body,
-    options: ArgsSecurityControllerUpdateRoleMapping = {}
+    options: ArgsSecurityControllerUpdateRoleMapping = {},
   ) {
     return this.query(
       {
         action: "updateRoleMapping",
         body,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -664,20 +664,20 @@ export class SecurityController extends BaseController {
     };
     return this.query(request, options).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
   updateUserMapping(
     body,
-    options: ArgsSecurityControllerUpdateUserMapping = {}
+    options: ArgsSecurityControllerUpdateUserMapping = {},
   ) {
     return this.query(
       {
         action: "updateUserMapping",
         body,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -685,7 +685,7 @@ export class SecurityController extends BaseController {
     strategy,
     _id,
     body,
-    options: ArgsSecurityControllerValidateCredentials = {}
+    options: ArgsSecurityControllerValidateCredentials = {},
   ) {
     return this.query(
       {
@@ -694,7 +694,7 @@ export class SecurityController extends BaseController {
         body,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 }

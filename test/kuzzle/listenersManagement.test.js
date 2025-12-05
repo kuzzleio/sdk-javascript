@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 
@@ -44,7 +46,7 @@ describe("Kuzzle listeners management", () => {
     should(function () {
       kuzzle.addListener("foo", sinon.stub());
     }).throw(
-      "[foo] is not a known event. Known events: " + knownEvents.join(", ")
+      "[foo] is not a known event. Known events: " + knownEvents.join(", "),
     );
 
     let i;
@@ -56,7 +58,7 @@ describe("Kuzzle listeners management", () => {
 
     for (i = 0; i < knownEvents.length; i++) {
       should(KuzzleEventEmitter.prototype.addListener.getCall(i)).be.calledWith(
-        knownEvents[i]
+        knownEvents[i],
       );
     }
   });
@@ -72,11 +74,11 @@ describe("Kuzzle listeners management", () => {
       should(KuzzleEventEmitter.prototype.emit).be.calledTwice();
       should(KuzzleEventEmitter.prototype.emit.firstCall).be.calledWith(
         "connected",
-        "foo"
+        "foo",
       );
       should(KuzzleEventEmitter.prototype.emit.secondCall).be.calledWith(
         "offlineQueuePush",
-        "bar"
+        "bar",
       );
 
       KuzzleEventEmitter.prototype.emit.reset();
@@ -88,7 +90,7 @@ describe("Kuzzle listeners management", () => {
           should(KuzzleEventEmitter.prototype.emit).be.calledOnce();
           should(KuzzleEventEmitter.prototype.emit).be.calledWith(
             "connected",
-            "bar"
+            "bar",
           );
           done();
         }, 0);

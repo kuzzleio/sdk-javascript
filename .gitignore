@@ -27,47 +27,8 @@ doc/7/getting-started/.vuejs/cypress/videos
 # Debug snippets
 test-*.js
 
-# Typescript related files
-*.d.ts
-*.js.map
-index.js
-src/Kuzzle.js
-src/KuzzleError.js
-src/RequestTimeoutError.js
-src/controllers/Auth.js
-src/controllers/Bulk.js
-src/controllers/Document.js
-src/controllers/Index.js
-src/controllers/Collection.js
-src/controllers/Base.js
-src/controllers/Realtime.js
-src/controllers/Security.js
-src/core/security/User.js
-src/core/security/Profile.js
-src/core/security/Role.js
-src/protocols/abstract/Base.js
-src/protocols/abstract/Realtime.js
-src/protocols/DisconnectionOrigin.js
-src/protocols/Http.js
-src/protocols/WebSocket.js
-src/protocols/index.js
-src/types/*.js
-src/core/KuzzleEventEmitter.js
-src/core/searchResult/SearchResultBase.js
-src/core/searchResult/Document.js
-src/core/searchResult/Profile.js
-src/core/searchResult/Role.js
-src/core/searchResult/Specifications.js
-src/core/searchResult/User.js
-src/utils/Deprecation.js
-src/utils/interfaces.js
-src/controllers/Server.js
-src/core/Observer.js
-src/core/RealtimeDocument.js
-src/core/searchResult/RealtimeDocument.js
-src/core/InstrumentablePromise.js
-src/core/batchWriter/BatchBuffer.js
-src/core/batchWriter/BatchController.js
-src/core/batchWriter/BatchWriter.js
-src/protocols/abstract/PendingRequest.js
-src/utils/object.js
+## Webpack output
+dist
+
+# Typescript output
+out

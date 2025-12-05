@@ -79,7 +79,7 @@ export class AuthController extends BaseController {
    */
   createApiKey(
     description: string,
-    options: ArgsAuthControllerCreateApiKey = {}
+    options: ArgsAuthControllerCreateApiKey = {},
   ): Promise<ApiKey> {
     const request = {
       _id: options._id,
@@ -105,7 +105,7 @@ export class AuthController extends BaseController {
    */
   checkRights(
     requestPayload: RequestPayload,
-    options: ArgsAuthControllerCheckRights = {}
+    options: ArgsAuthControllerCheckRights = {},
   ): Promise<boolean> {
     const request = {
       action: "checkRights",
@@ -113,7 +113,7 @@ export class AuthController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.allowed
+      (response) => response.result.allowed,
     );
   }
 
@@ -129,7 +129,7 @@ export class AuthController extends BaseController {
    */
   deleteApiKey(
     id: string,
-    options: ArgsAuthControllerDeleteApiKey = {}
+    options: ArgsAuthControllerDeleteApiKey = {},
   ): Promise<null> {
     const request = {
       _id: id,
@@ -155,7 +155,7 @@ export class AuthController extends BaseController {
    */
   searchApiKeys(
     query: JSONObject = {},
-    options: ArgsAuthControllerSearchApiKeys = {}
+    options: ArgsAuthControllerSearchApiKeys = {},
   ): Promise<{
     /**
      * Array of found ApiKeys
@@ -190,7 +190,7 @@ export class AuthController extends BaseController {
    */
   checkToken(
     token?: string,
-    options: ArgsAuthControllerCheckToken = {}
+    options: ArgsAuthControllerCheckToken = {},
   ): Promise<{
     /**
      * Tell if the token is valid or not
@@ -224,7 +224,7 @@ export class AuthController extends BaseController {
         body: { token },
         cookieAuth,
       },
-      { queuable: false, ...options }
+      { queuable: false, ...options },
     ).then((response) => response.result);
   }
 
@@ -245,7 +245,7 @@ export class AuthController extends BaseController {
   createMyCredentials(
     strategy: string,
     credentials: JSONObject,
-    options: ArgsAuthControllerCreateMyCredentials = {}
+    options: ArgsAuthControllerCreateMyCredentials = {},
   ): Promise<JSONObject> {
     return this.query(
       {
@@ -253,7 +253,7 @@ export class AuthController extends BaseController {
         body: credentials,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -271,14 +271,14 @@ export class AuthController extends BaseController {
    */
   credentialsExist(
     strategy: string,
-    options: ArgsAuthControllerCredentialsExist = {}
+    options: ArgsAuthControllerCredentialsExist = {},
   ): Promise<boolean> {
     return this.query(
       {
         action: "credentialsExist",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -294,14 +294,14 @@ export class AuthController extends BaseController {
    */
   deleteMyCredentials(
     strategy: string,
-    options: ArgsAuthControllerDeleteMyCredentials = {}
+    options: ArgsAuthControllerDeleteMyCredentials = {},
   ): Promise<boolean> {
     return this.query(
       {
         action: "deleteMyCredentials",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result.acknowledged);
   }
 
@@ -317,16 +317,16 @@ export class AuthController extends BaseController {
    * @returns Currently logged User
    */
   getCurrentUser(
-    options: ArgsAuthControllerGetCurrentUser = {}
+    options: ArgsAuthControllerGetCurrentUser = {},
   ): Promise<User> {
     return this.query(
       {
         action: "getCurrentUser",
       },
-      options
+      options,
     ).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -345,14 +345,14 @@ export class AuthController extends BaseController {
    */
   getMyCredentials(
     strategy: string,
-    options: ArgsAuthControllerGetMyCredentials = {}
+    options: ArgsAuthControllerGetMyCredentials = {},
   ): Promise<JSONObject> {
     return this.query(
       {
         action: "getMyCredentials",
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -395,7 +395,7 @@ export class AuthController extends BaseController {
       {
         action: "getMyRights",
       },
-      options
+      options,
     ).then((response) => response.result.hits);
   }
 
@@ -411,13 +411,13 @@ export class AuthController extends BaseController {
    * @returns An array of available strategies names
    */
   getStrategies(
-    options: ArgsAuthControllerGetStrategies = {}
+    options: ArgsAuthControllerGetStrategies = {},
   ): Promise<Array<string>> {
     return this.query(
       {
         action: "getStrategies",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -438,7 +438,7 @@ export class AuthController extends BaseController {
     strategy: string,
     credentials: JSONObject,
     expiresIn?: string | number,
-    options: ArgsAuthControllerLogin = {}
+    options: ArgsAuthControllerLogin = {},
   ): Promise<string> {
     const request = {
       action: "login",
@@ -459,7 +459,7 @@ export class AuthController extends BaseController {
         if (this.kuzzle.cookieAuthentication) {
           if (response.result.jwt) {
             const err = new Error(
-              "Kuzzle support for cookie authentication is disabled or not supported"
+              "Kuzzle support for cookie authentication is disabled or not supported",
             );
             this.kuzzle.emit("loginAttempt", {
               error: err.message,
@@ -511,7 +511,7 @@ export class AuthController extends BaseController {
           action: "logout",
           cookieAuth: this.kuzzle.cookieAuthentication,
         },
-        { queuable: false, timeout: -1, ...options }
+        { queuable: false, timeout: -1, ...options },
       );
       this._authenticationToken = null;
       /**
@@ -553,7 +553,7 @@ export class AuthController extends BaseController {
   updateMyCredentials(
     strategy: string,
     credentials: JSONObject,
-    options: ArgsAuthControllerUpdateMyCredentials = {}
+    options: ArgsAuthControllerUpdateMyCredentials = {},
   ): Promise<JSONObject> {
     return this.query(
       {
@@ -561,7 +561,7 @@ export class AuthController extends BaseController {
         body: credentials,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -580,17 +580,17 @@ export class AuthController extends BaseController {
    */
   updateSelf(
     content: JSONObject,
-    options: ArgsAuthControllerUpdateSelf = {}
+    options: ArgsAuthControllerUpdateSelf = {},
   ): Promise<User> {
     return this.query(
       {
         action: "updateSelf",
         body: content,
       },
-      options
+      options,
     ).then(
       (response) =>
-        new User(this.kuzzle, response.result._id, response.result._source)
+        new User(this.kuzzle, response.result._id, response.result._source),
     );
   }
 
@@ -608,7 +608,7 @@ export class AuthController extends BaseController {
   validateMyCredentials(
     strategy: string,
     credentials: JSONObject,
-    options: ArgsAuthControllerValidateMyCredentials = {}
+    options: ArgsAuthControllerValidateMyCredentials = {},
   ): Promise<boolean> {
     return this.query(
       {
@@ -616,7 +616,7 @@ export class AuthController extends BaseController {
         body: credentials,
         strategy,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 

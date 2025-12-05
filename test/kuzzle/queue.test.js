@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 
@@ -98,7 +100,7 @@ describe("Kuzzle queue", () => {
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
         should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(
-          query2.request
+          query2.request,
         );
         should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
@@ -127,7 +129,7 @@ describe("Kuzzle queue", () => {
       setTimeout(() => {
         should(kuzzle._timeoutRequest).be.calledTwice();
         should(kuzzle._timeoutRequest.getCall(0).args[1]).be.eql(
-          query2.request
+          query2.request,
         );
         should(kuzzle._timeoutRequest.getCall(1).args[1]).be.eql(query.request);
         done();
@@ -161,7 +163,7 @@ describe("Kuzzle queue", () => {
       kuzzle.playQueue();
 
       await should(deferred).rejectedWith(
-        "Query aborted: queued time exceeded the queueTTL option value"
+        "Query aborted: queued time exceeded the queueTTL option value",
       );
       should(rejectedRequest).calledOnce().calledWith(query.request);
     });
@@ -198,7 +200,7 @@ describe("Kuzzle queue", () => {
       kuzzle.playQueue();
 
       await should(deferred).rejectedWith(
-        "Query aborted: too many queued requests (see the queueMaxSize option)"
+        "Query aborted: too many queued requests (see the queueMaxSize option)",
       );
       should(rejectedRequest).calledTwice().calledWith(query.request);
     });

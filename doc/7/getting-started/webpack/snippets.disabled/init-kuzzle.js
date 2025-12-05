@@ -1,16 +1,18 @@
+"use strict";
+
 // load the Kuzzle SDK module
 /* snippet:start:1 */
-import { Kuzzle, WebSocket } from 'kuzzle-sdk';
+const { Kuzzle, WebSocket } = require("kuzzle-sdk");
 /* snippet:end */
 
 // instantiate a Kuzzle client
 /* snippet:start:2 */
-const kuzzle = new Kuzzle(new WebSocket('kuzzle'));
+const kuzzle = new Kuzzle(new WebSocket("kuzzle"));
 /* snippet:end */
 
 // add a listener to detect any connection problems
 /* snippet:start:3 */
-kuzzle.on('networkError', error => {
+kuzzle.on("networkError", (error) => {
   console.error(`Network Error: ${error}`);
 });
 /* snippet:end */
@@ -22,11 +24,11 @@ const run = async () => {
     await kuzzle.connect();
 
     // Create an index
-    await kuzzle.index.create('nyc-open-data');
+    await kuzzle.index.create("nyc-open-data");
 
     // Create a collection
-    await kuzzle.collection.create('nyc-open-data', 'yellow-taxi');
-    console.log('nyc-open-data/yellow-taxi ready!');
+    await kuzzle.collection.create("nyc-open-data", "yellow-taxi");
+    console.log("nyc-open-data/yellow-taxi ready!");
   } catch (error) {
     console.error(error.message);
   } finally {

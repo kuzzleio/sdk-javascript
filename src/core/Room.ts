@@ -1,15 +1,64 @@
-"use strict";
+import type {
+  ArgsRealtimeControllerSubscribe,
+  RealtimeController,
+} from "../controllers/Realtime";
+import type { JSONObject, Notification } from "../types";
+
+type SubscribeResponse = {
+  result: {
+    channel: string;
+    roomId: string;
+  };
+};
+
+type RoomOptions = ArgsRealtimeControllerSubscribe & {
+  autoResubscribe?: boolean;
+  state?: string;
+};
+
+type SubscribeRequest = {
+  action: "subscribe";
+  body: JSONObject;
+  collection: string;
+  controller: "realtime";
+  index: string;
+  scope?: RoomOptions["scope"];
+  state?: RoomOptions["state"];
+  users?: RoomOptions["users"];
+  volatile?: RoomOptions["volatile"];
+};
+
+type RoomCallback = (notification: Notification) => void | Promise<void>;
 
 class Room {
+  public controller: RealtimeController;
+  public index: string;
+  public collection: string;
+  public callback: RoomCallback;
+  public options: RoomOptions;
+  public id: string = null;
+  public channel: string = null;
+  public request: SubscribeRequest;
+  public autoResubscribe: boolean;
+  public subscribeToSelf: boolean;
+  private _kuzzle: any;
+
   /**
-   * @param {RealtimeController} controller
-   * @param {string} index
-   * @param {string} collection
-   * @param {object} body
-   * @param {function} callback
-   * @param {object} options
+   * @param controller
+   * @param index
+   * @param collection
+   * @param body
+   * @param callback
+   * @param options
    */
-  constructor(controller, index, collection, body, callback, options = {}) {
+  constructor(
+    controller: RealtimeController,
+    index: string,
+    collection: string,
+    body: JSONObject,
+    callback: RoomCallback,
+    options: RoomOptions = {},
+  ) {
     Reflect.defineProperty(this, "_kuzzle", {
       value: controller.kuzzle,
     });
@@ -22,7 +71,6 @@ class Room {
     this.id = null;
     this.channel = null;
 
-    // format complete request from body & options
     this.request = {
       action: "subscribe",
       body,
@@ -44,7 +92,6 @@ class Room {
         ? options.subscribeToSelf
         : true;
 
-    // force bind for further event listener calls
     this._channelListener = this._channelListener.bind(this);
   }
 
@@ -52,26 +99,26 @@ class Room {
     return this._kuzzle;
   }
 
-  subscribe() {
-    return this.kuzzle.query(this.request, this.options).then((response) => {
-      this.id = response.result.roomId;
-      this.channel = response.result.channel;
+  subscribe(): Promise<SubscribeResponse> {
+    return this.kuzzle
+      .query(this.request, this.options)
+      .then((response: SubscribeResponse) => {
+        this.id = response.result.roomId;
+        this.channel = response.result.channel;
 
-      // we rely on kuzzle event emitter to not duplicate the listeners here
-      this.kuzzle.protocol.on(this.channel, this._channelListener);
+        this.kuzzle.protocol.on(this.channel, this._channelListener);
 
-      return response;
-    });
+        return response;
+      });
   }
 
-  removeListeners() {
+  removeListeners(): void {
     if (this.channel) {
       this.kuzzle.protocol.removeListener(this.channel, this._channelListener);
     }
   }
 
-  _channelListener(data) {
-    // intercept token expiration messages and relay them to kuzzle
+  private _channelListener(data: any): void {
     if (data.type === "TokenExpired") {
       return this.kuzzle.tokenExpired();
     }
@@ -100,4 +147,5 @@ class Room {
   }
 }
 
+export default Room;
 module.exports = Room;

@@ -37,7 +37,7 @@ export class CollectionController extends BaseController {
           settings?: JSONObject;
         }
       | CollectionMappings,
-    options: ArgsCollectionControllerCreate = {}
+    options: ArgsCollectionControllerCreate = {},
   ): Promise<void> {
     const request = {
       action: "create",
@@ -63,7 +63,7 @@ export class CollectionController extends BaseController {
   deleteSpecifications(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerDeleteSpecifications = {}
+    options: ArgsCollectionControllerDeleteSpecifications = {},
   ): Promise<void> {
     const request = {
       action: "deleteSpecifications",
@@ -87,7 +87,7 @@ export class CollectionController extends BaseController {
   exists(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerExists = {}
+    options: ArgsCollectionControllerExists = {},
   ): Promise<boolean> {
     return this.query(
       {
@@ -95,7 +95,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -114,7 +114,7 @@ export class CollectionController extends BaseController {
   refresh(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerRefresh = {}
+    options: ArgsCollectionControllerRefresh = {},
   ): Promise<void> {
     return this.query(
       {
@@ -122,7 +122,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then(() => undefined);
   }
 
@@ -141,7 +141,7 @@ export class CollectionController extends BaseController {
   getMapping(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerGetMapping = {}
+    options: ArgsCollectionControllerGetMapping = {},
   ): Promise<CollectionMappings> {
     const request = {
       action: "getMapping",
@@ -169,7 +169,7 @@ export class CollectionController extends BaseController {
   getSpecifications(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerGetSpecifications = {}
+    options: ArgsCollectionControllerGetSpecifications = {},
   ): Promise<JSONObject> {
     return this.query(
       {
@@ -177,7 +177,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -195,7 +195,7 @@ export class CollectionController extends BaseController {
    */
   list(
     index: string,
-    options: ArgsCollectionControllerList = {}
+    options: ArgsCollectionControllerList = {},
   ): Promise<{
     /**
      *  Types of returned collections.
@@ -240,7 +240,7 @@ export class CollectionController extends BaseController {
    */
   searchSpecifications(
     query: JSONObject = {},
-    options: ArgsCollectionControllerSearchSpecifications = {}
+    options: ArgsCollectionControllerSearchSpecifications = {},
   ): Promise<SpecificationsSearchResult> {
     const request = {
       action: "searchSpecifications",
@@ -257,8 +257,8 @@ export class CollectionController extends BaseController {
           this.kuzzle,
           request,
           options,
-          response.result
-        )
+          response.result,
+        ),
     );
   }
 
@@ -276,7 +276,7 @@ export class CollectionController extends BaseController {
   truncate(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerTruncate = {}
+    options: ArgsCollectionControllerTruncate = {},
   ): Promise<void> {
     const request = {
       action: "truncate",
@@ -320,7 +320,7 @@ export class CollectionController extends BaseController {
           settings?: JSONObject;
         }
       | CollectionMappings,
-    options: ArgsCollectionControllerUpdate = {}
+    options: ArgsCollectionControllerUpdate = {},
   ): Promise<void> {
     return this.query(
       {
@@ -329,7 +329,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then(() => undefined);
   }
 
@@ -340,7 +340,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     mappings: CollectionMappings,
-    options: ArgsCollectionControllerUpdateMapping = {}
+    options: ArgsCollectionControllerUpdateMapping = {},
   ): Promise<JSONObject> {
     return this.query(
       {
@@ -349,7 +349,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -371,7 +371,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: ArgsCollectionControllerUpdateSpecifications = {}
+    options: ArgsCollectionControllerUpdateSpecifications = {},
   ): Promise<JSONObject> {
     return this.query(
       {
@@ -380,7 +380,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -403,7 +403,7 @@ export class CollectionController extends BaseController {
     index: string,
     collection: string,
     specifications: JSONObject,
-    options: ArgsCollectionControllerValidateSpecifications = {}
+    options: ArgsCollectionControllerValidateSpecifications = {},
   ): Promise<{
     valid: boolean;
     details: Array<string>;
@@ -416,7 +416,7 @@ export class CollectionController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -433,7 +433,7 @@ export class CollectionController extends BaseController {
   delete(
     index: string,
     collection: string,
-    options: ArgsCollectionControllerDelete = {}
+    options: ArgsCollectionControllerDelete = {},
   ): Promise<void> {
     const request = {
       action: "delete",
@@ -464,8 +464,7 @@ export interface ArgsCollectionControllerList extends ArgsDefault {
   size?: number;
 }
 
-export interface ArgsCollectionControllerSearchSpecifications
-  extends ArgsDefault {
+export interface ArgsCollectionControllerSearchSpecifications extends ArgsDefault {
   from?: number;
   size?: number;
   scroll?: string;

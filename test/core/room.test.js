@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -43,7 +45,7 @@ describe("Room", () => {
         "collection",
         body,
         cb,
-        options
+        options,
       );
 
       should(room.controller).be.equal(controller);
@@ -169,7 +171,7 @@ describe("Room", () => {
               users: "all",
               volatile: { bar: "foo" },
             },
-            opts
+            opts,
           );
 
         should(res).be.equal(response);
@@ -229,7 +231,7 @@ describe("Room", () => {
         "collection",
         { foo: "bar" },
         sinon.stub(),
-        options
+        options,
       );
       room.id = "my-room-id";
       room.channel = "subscription-channel";
@@ -239,7 +241,7 @@ describe("Room", () => {
       room._channelListener = sinon.stub();
       controller.kuzzle.protocol.on(
         "subscription-channel",
-        room._channelListener
+        room._channelListener,
       );
 
       should(room._channelListener).not.be.called();
@@ -265,7 +267,7 @@ describe("Room", () => {
         "collection",
         { foo: "bar" },
         cb,
-        options
+        options,
       );
       room.id = "my-room-id";
       room.channel = "subscription-channel";

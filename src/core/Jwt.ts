@@ -1,12 +1,10 @@
-"use strict";
-
 // atob is not available in React Native
 // https://stackoverflow.com/questions/42829838/react-native-atob-btoa-not-working-without-remote-js-debugging
 
 const base64Charset =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
-const decodeBase64 = (input) => {
+const decodeBase64 = (input: string): string => {
   const str = input.replace(/=+$/, "");
   let output = "";
 
@@ -27,8 +25,17 @@ const decodeBase64 = (input) => {
   return output;
 };
 
-class Jwt {
-  constructor(encodedJwt) {
+interface JwtPayload {
+  _id?: string;
+  exp?: number;
+}
+
+export class Jwt {
+  private _encodedJwt: string;
+  private _userId: string | null;
+  private _expiresAt: number | null;
+
+  constructor(encodedJwt: string) {
     this._encodedJwt = encodedJwt;
 
     this._userId = null;
@@ -37,39 +44,41 @@ class Jwt {
     this._decode();
   }
 
-  get encodedJwt() {
+  get encodedJwt(): string {
     return this._encodedJwt;
   }
 
-  get userId() {
+  get userId(): string | null {
     return this._userId;
   }
 
-  get expiresAt() {
+  get expiresAt(): number | null {
     return this._expiresAt;
   }
 
-  get expired() {
-    return Math.round(Date.now() / 1000) > this.expiresAt;
+  get expired(): boolean {
+    const expiresAt = this._expiresAt;
+
+    return expiresAt === null
+      ? true
+      : Math.round(Date.now() / 1000) > expiresAt;
   }
 
-  _decode() {
+  private _decode(): void {
     const payloadRaw = this._encodedJwt.split(".")[1];
 
     if (!payloadRaw) {
       throw new Error("Invalid JWT format");
     }
 
-    let payload;
+    let payload: JwtPayload;
     try {
       payload = JSON.parse(decodeBase64(payloadRaw));
     } catch (error) {
       throw new Error("Invalid JSON payload for JWT");
     }
 
-    this._userId = payload._id;
-    this._expiresAt = payload.exp;
+    this._userId = payload._id ?? null;
+    this._expiresAt = payload.exp ?? null;
   }
 }
-
-module.exports = { Jwt };

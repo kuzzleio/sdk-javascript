@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Hilight user code
  *
@@ -9,7 +7,7 @@
  * >  at /home/aschen/projets/kuzzleio/sdk-javascript/test.js:8:18
  *      at processTicksAndRejections (internal/process/task_queues.js:97:5)]
  */
-function hilightUserCode(line) {
+export function hilightUserCode(line) {
   // ignore first line (error message)
   if (!line.includes(" at ")) {
     return line;
@@ -27,7 +25,3 @@ function hilightUserCode(line) {
   // hilight user code
   return ">" + line;
 }
-
-module.exports = {
-  hilightUserCode,
-};

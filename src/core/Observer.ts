@@ -68,7 +68,7 @@ type CollectionUrn = string;
 function documentUrn(
   index: string,
   collection: string,
-  id: string
+  id: string,
 ): DocumentUrn {
   return `${index}:${collection}:${id}`;
 }
@@ -197,7 +197,7 @@ export class Observer {
   stop(
     index?: string,
     collection?: string,
-    documents?: Array<{ _id: string }>
+    documents?: Array<{ _id: string }>,
   ): Promise<void> {
     if (index && collection && documents) {
       return this.disposeDocuments(index, collection, documents);
@@ -217,10 +217,10 @@ export class Observer {
   private disposeDocuments(
     index: string,
     collection: string,
-    documents: Array<{ _id: string }>
+    documents: Array<{ _id: string }>,
   ): Promise<void> {
     const observedDocuments = this.documentsByCollection.get(
-      collectionUrn(index, collection)
+      collectionUrn(index, collection),
     );
 
     for (const document of documents) {
@@ -238,7 +238,7 @@ export class Observer {
 
   private disposeCollection(index: string, collection: string): Promise<void> {
     const observedDocuments = this.documentsByCollection.get(
-      collectionUrn(index, collection)
+      collectionUrn(index, collection),
     );
 
     for (const id of observedDocuments.ids) {
@@ -295,12 +295,12 @@ export class Observer {
     index: string,
     collection: string,
     id: string,
-    options: ArgsDocumentControllerGet = {}
+    options: ArgsDocumentControllerGet = {},
   ): Promise<RealtimeDocument<TKDocumentContent>> {
     return this.sdk.document
       .get<TKDocumentContent>(index, collection, id, options)
       .then((document) =>
-        this.observe<TKDocumentContent>(index, collection, document)
+        this.observe<TKDocumentContent>(index, collection, document),
       );
   }
 
@@ -319,7 +319,7 @@ export class Observer {
     index: string,
     collection: string,
     ids: string[],
-    options: ArgsDocumentControllerMGet = {}
+    options: ArgsDocumentControllerMGet = {},
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -362,21 +362,21 @@ export class Observer {
     index: string,
     collection: string,
     searchBody: JSONObject = {},
-    options: ArgsDocumentControllerSearch = {}
+    options: ArgsDocumentControllerSearch = {},
   ): Promise<RealtimeDocumentSearchResult<TKDocumentContent>> {
     // eslint-disable-next-line dot-notation
     return this.sdk.document["_search"](
       index,
       collection,
       searchBody,
-      options
+      options,
     ).then(({ response, request, opts }) => {
       const result = new RealtimeDocumentSearchResult<TKDocumentContent>(
         this.sdk,
         request,
         opts,
         response.result,
-        this
+        this,
       );
 
       return result.start();
@@ -395,7 +395,7 @@ export class Observer {
   observe<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
-    document: KDocument<TKDocumentContent>
+    document: KDocument<TKDocumentContent>,
   ): Promise<RealtimeDocument<TKDocumentContent>> {
     const rtDocument = this.addDocument(index, collection, document);
 
@@ -412,7 +412,7 @@ export class Observer {
   addDocument<TKDocumentContent extends KDocumentContentGeneric>(
     index: string,
     collection: string,
-    document: KDocument<TKDocumentContent>
+    document: KDocument<TKDocumentContent>,
   ): RealtimeDocument<TKDocumentContent> {
     const rtDocument = new RealtimeDocument(document);
 
@@ -421,7 +421,7 @@ export class Observer {
     if (!this.documentsByCollection.has(urn)) {
       this.documentsByCollection.set(
         urn,
-        new ObservedDocuments(index, collection)
+        new ObservedDocuments(index, collection),
       );
     }
 
@@ -431,7 +431,7 @@ export class Observer {
 
     this.documents.set(
       documentUrn(index, collection, document._id),
-      rtDocument
+      rtDocument,
     );
 
     return rtDocument;
@@ -458,7 +458,7 @@ export class Observer {
     if (this.documentsByCollection.size !== 0) {
       this.pullingTimer = setInterval(
         this.pullingHandler.bind(this),
-        this.options.pullingDelay
+        this.options.pullingDelay,
       );
     }
   }
@@ -477,14 +477,14 @@ export class Observer {
         .mGet(
           observedDocuments.index,
           observedDocuments.collection,
-          observedDocuments.ids
+          observedDocuments.ids,
         )
         .then(({ successes, errors }) => {
           for (const document of successes) {
             const urn = documentUrn(
               observedDocuments.index,
               observedDocuments.collection,
-              document._id
+              document._id,
             );
 
             const rtDocument = this.documents.get(urn);
@@ -495,7 +495,7 @@ export class Observer {
             const urn = documentUrn(
               observedDocuments.index,
               observedDocuments.collection,
-              deletedDocumentId
+              deletedDocumentId,
             );
 
             const rtDocument = this.documents.get(urn);
@@ -510,8 +510,8 @@ export class Observer {
               this.documentsByCollection.delete(
                 collectionUrn(
                   observedDocuments.index,
-                  observedDocuments.collection
-                )
+                  observedDocuments.collection,
+                ),
               );
             }
           }
@@ -542,7 +542,7 @@ export class Observer {
    */
   private resubscribe(index: string, collection: string): Promise<void> {
     const observedDocuments = this.documentsByCollection.get(
-      collectionUrn(index, collection)
+      collectionUrn(index, collection),
     );
 
     if (!observedDocuments) {
@@ -561,7 +561,7 @@ export class Observer {
         index,
         collection,
         observedDocuments.filters,
-        this.notificationHandler.bind(this)
+        this.notificationHandler.bind(this),
       )
       .then((roomId) => {
         const oldRoomId = observedDocuments.roomId;
@@ -580,7 +580,7 @@ export class Observer {
    * @internal
    */
   private notificationHandler(
-    notification: DocumentNotification
+    notification: DocumentNotification,
   ): Promise<void> {
     const { index, collection, result } = notification;
 
@@ -602,7 +602,7 @@ export class Observer {
     this.documents.delete(documentUrn(index, collection, rtDocument._id));
 
     const observedDocuments = this.documentsByCollection.get(
-      collectionUrn(index, collection)
+      collectionUrn(index, collection),
     );
     observedDocuments.delete(result._id);
 

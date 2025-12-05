@@ -46,7 +46,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     body?: JSONObject,
-    options: ArgsDocumentControllerCount = {}
+    options: ArgsDocumentControllerCount = {},
   ): Promise<number> {
     const request = {
       action: "count",
@@ -56,7 +56,7 @@ export class DocumentController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.count
+      (response) => response.result.count,
     );
   }
 
@@ -81,7 +81,7 @@ export class DocumentController extends BaseController {
     collection: string,
     content: Partial<TKDocumentContent>,
     _id: string = null,
-    options: ArgsDocumentControllerCreate = {}
+    options: ArgsDocumentControllerCreate = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -117,7 +117,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerCreateOrReplace = {}
+    options: ArgsDocumentControllerCreateOrReplace = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -151,7 +151,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: ArgsDocumentControllerDelete = {}
+    options: ArgsDocumentControllerDelete = {},
   ): Promise<string> {
     const request = {
       _id,
@@ -185,7 +185,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: ArgsDocumentControllerDeleteByQuery = {}
+    options: ArgsDocumentControllerDeleteByQuery = {},
   ): Promise<string[]> {
     const request = {
       action: "deleteByQuery",
@@ -221,7 +221,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     fields: string[],
-    options: ArgsDocumentControllerDeleteFields = {}
+    options: ArgsDocumentControllerDeleteFields = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -256,7 +256,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: ArgsDocumentControllerExists = {}
+    options: ArgsDocumentControllerExists = {},
   ): Promise<boolean> {
     const request = {
       _id,
@@ -288,7 +288,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     _id: string,
-    options: ArgsDocumentControllerGet = {}
+    options: ArgsDocumentControllerGet = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -321,7 +321,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     documents: mCreateRequest<TKDocumentContent>,
-    options: ArgsDocumentControllerMCreate = {}
+    options: ArgsDocumentControllerMCreate = {},
   ): Promise<mCreateResponse> {
     const request = {
       action: "mCreate",
@@ -356,7 +356,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     documents: mCreateOrReplaceRequest<TKDocumentContent>,
-    options: ArgsDocumentControllerMCreateOrReplace = {}
+    options: ArgsDocumentControllerMCreateOrReplace = {},
   ): Promise<mCreateOrReplaceResponse> {
     const request = {
       action: "mCreateOrReplace",
@@ -391,7 +391,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: mDeleteRequest,
-    options: ArgsDocumentControllerMDelete = {}
+    options: ArgsDocumentControllerMDelete = {},
   ): Promise<mDeleteResponse> {
     const request = {
       action: "mDelete",
@@ -424,7 +424,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     ids: string[],
-    options: ArgsDocumentControllerMGet = {}
+    options: ArgsDocumentControllerMGet = {},
   ): Promise<{
     /**
      * Array of successfully retrieved documents
@@ -466,7 +466,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     documents: mReplaceRequest<TKDocumentContent>,
-    options: ArgsDocumentControllerMReplace = {}
+    options: ArgsDocumentControllerMReplace = {},
   ): Promise<mReplaceResponse> {
     const request = {
       action: "mReplace",
@@ -505,7 +505,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     documents: mUpdateRequest<TKDocumentContent>,
-    options: ArgsDocumentControllerMUpdate = {}
+    options: ArgsDocumentControllerMUpdate = {},
   ): Promise<mUpdateResponse> {
     const request = {
       action: "mUpdate",
@@ -541,7 +541,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     documents: mUpsertRequest<TKDocumentContent>,
-    options: ArgsDocumentControllerMUpsert = {}
+    options: ArgsDocumentControllerMUpsert = {},
   ): Promise<mUpdateResponse> {
     const request = {
       action: "mUpsert",
@@ -576,7 +576,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerReplace = {}
+    options: ArgsDocumentControllerReplace = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -612,11 +612,11 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     searchBody: JSONObject = {},
-    options: ArgsDocumentControllerSearch = {}
+    options: ArgsDocumentControllerSearch = {},
   ): Promise<SearchResult<KHit<TKDocumentContent>>> {
     return this._search(index, collection, searchBody, options).then(
       ({ response, request, opts }) =>
-        new DocumentSearchResult(this.kuzzle, request, opts, response.result)
+        new DocumentSearchResult(this.kuzzle, request, opts, response.result),
     );
   }
 
@@ -624,7 +624,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     body: JSONObject = {},
-    options: JSONObject = {}
+    options: JSONObject = {},
   ) {
     const request: any = {
       action: "search",
@@ -676,7 +676,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     content: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerUpdate = {}
+    options: ArgsDocumentControllerUpdate = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -715,7 +715,7 @@ export class DocumentController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerUpdateByQuery = {}
+    options: ArgsDocumentControllerUpdateByQuery = {},
   ): Promise<UpdateByQueryResponse<TKDocumentContent>> {
     const request = {
       action: "updateByQuery",
@@ -753,7 +753,7 @@ export class DocumentController extends BaseController {
     collection: string,
     _id: string,
     changes: Partial<TKDocumentContent>,
-    options: ArgsDocumentControllerUpsert<TKDocumentContent> = {}
+    options: ArgsDocumentControllerUpsert<TKDocumentContent> = {},
   ): Promise<KDocument<TKDocumentContent>> {
     const request = {
       _id,
@@ -786,7 +786,7 @@ export class DocumentController extends BaseController {
     index: string,
     collection: string,
     content: TKDocumentContent,
-    options: ArgsDocumentControllerValidate = {}
+    options: ArgsDocumentControllerValidate = {},
   ): Promise<boolean> {
     return this.query(
       {
@@ -795,7 +795,7 @@ export class DocumentController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 }
@@ -908,8 +908,9 @@ export interface ArgsDocumentControllerUpdateByQuery extends ArgsDefault {
   lang?: string;
 }
 
-export interface ArgsDocumentControllerUpsert<TKDocumentContent>
-  extends ArgsDefault {
+export interface ArgsDocumentControllerUpsert<
+  TKDocumentContent,
+> extends ArgsDefault {
   default?: Partial<TKDocumentContent>;
   refresh?: "wait_for" | "false";
   silent?: boolean;

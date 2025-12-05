@@ -1,5 +1,3 @@
-"use strict";
-
 import { hilightUserCode } from "./utils/stackTrace";
 import { RequestPayload } from "./types/RequestPayload";
 import { JSONObject } from "./types";
@@ -115,7 +113,7 @@ export class KuzzleError extends Error {
     },
     sdkStack?: string,
     protocol?: string,
-    request?: RequestPayload
+    request?: RequestPayload,
   ) {
     super(apiError.message);
 

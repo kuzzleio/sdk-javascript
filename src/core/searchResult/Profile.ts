@@ -8,7 +8,7 @@ export class ProfileSearchResult extends SearchResultBase<Profile> {
     this._searchAction = "searchProfiles";
     this._scrollAction = "scrollProfiles";
     this.hits = result.hits.map(
-      (hit) => new Profile(this._kuzzle, hit._id, hit._source)
+      (hit) => new Profile(this._kuzzle, hit._id, hit._source),
     );
   }
 
@@ -19,7 +19,7 @@ export class ProfileSearchResult extends SearchResultBase<Profile> {
       }
 
       nextSearchResult.hits = nextSearchResult._result.hits.map(
-        (hit) => new Profile(nextSearchResult._kuzzle, hit._id, hit._source)
+        (hit) => new Profile(nextSearchResult._kuzzle, hit._id, hit._source),
       );
 
       return nextSearchResult;

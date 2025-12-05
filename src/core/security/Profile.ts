@@ -60,7 +60,7 @@ export class Profile {
 
     return this.kuzzle.security.mGetRoles(
       this.policies.map((policy) => policy.roleId),
-      options
+      options,
     );
   }
 

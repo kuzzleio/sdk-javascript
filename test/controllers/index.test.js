@@ -1,3 +1,5 @@
+"use strict";
+
 const { IndexController } = require("../../src/controllers/Index"),
   sinon = require("sinon"),
   should = require("should");
@@ -29,7 +31,7 @@ describe("Index Controller", () => {
             action: "create",
             index: "index",
           },
-          options
+          options,
         );
 
         should(res).be.undefined();
@@ -50,7 +52,7 @@ describe("Index Controller", () => {
             action: "delete",
             index: "index",
           },
-          options
+          options,
         );
 
         should(res).be.undefined();
@@ -69,7 +71,7 @@ describe("Index Controller", () => {
             action: "exists",
             index: "index",
           },
-          options
+          options,
         );
 
         should(res).be.a.Boolean().and.be.true();
@@ -90,7 +92,7 @@ describe("Index Controller", () => {
             controller: "index",
             action: "list",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result.indexes);
@@ -114,7 +116,7 @@ describe("Index Controller", () => {
               action: "mDelete",
               body: { indexes: ["foo", "bar"] },
             },
-            options
+            options,
           );
 
         should(res).be.equal(result.deleted);
@@ -147,7 +149,7 @@ describe("Index Controller", () => {
             controller: "index",
             action: "stats",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);

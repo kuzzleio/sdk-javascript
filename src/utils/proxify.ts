@@ -49,8 +49,6 @@ console.log(obj.bar); // throw error
 ```
 */
 
-/* eslint sort-keys: 0 */
-
 const getOptions = (options) =>
   Object.assign(
     {},
@@ -63,7 +61,7 @@ const getOptions = (options) =>
       sealGet: false,
       warnDeprecationOnce: true,
     },
-    options
+    options,
   );
 
 const getPropertyNames = (obj) => {
@@ -77,7 +75,7 @@ const getPropertyNames = (obj) => {
 
 const deleteDuplicates = (arr) => [...new Set(arr)];
 
-const proxify = (obj, opts = {}) => {
+export const proxify = (obj, opts = {}) => {
   if (!obj || (typeof obj !== "object" && typeof obj !== "function")) {
     throw Error("proxify only applies on non-null object");
   }
@@ -107,7 +105,7 @@ const proxify = (obj, opts = {}) => {
   }
 
   [...Object.getOwnPropertyNames(obj), ...getPropertyNames(obj)].forEach(
-    (prop) => properties.add(prop)
+    (prop) => properties.add(prop),
   );
 
   const handler = {
@@ -123,7 +121,7 @@ const proxify = (obj, opts = {}) => {
     set: (target, name, value) => {
       if (options.seal && !properties.has(name)) {
         throw new Error(
-          `Cannot set a value to the undefined '${name}' property in '${options.name}'`
+          `Cannot set a value to the undefined '${name}' property in '${options.name}'`,
         );
       }
       if (deprecated.has(name)) {
@@ -136,5 +134,3 @@ const proxify = (obj, opts = {}) => {
 
   return new Proxy(obj, handler);
 };
-
-module.exports = { proxify };

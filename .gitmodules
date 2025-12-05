@@ -1,3 +1,0 @@
-[submodule "features/features"]
-	path = features/features
-	url = https://github.com/kuzzleio/sdk-features.git

@@ -80,14 +80,14 @@ export class RealtimeController extends BaseController {
    */
   count(
     roomId: string,
-    options: ArgsRealtimeControllerCount = {}
+    options: ArgsRealtimeControllerCount = {},
   ): Promise<number> {
     return this.query(
       {
         action: "count",
         body: { roomId },
       },
-      options
+      options,
     ).then((response) => response.result.count);
   }
 
@@ -111,7 +111,7 @@ export class RealtimeController extends BaseController {
     index: string,
     collection: string,
     message: JSONObject,
-    options: ArgsRealtimeControllerPublish = {}
+    options: ArgsRealtimeControllerPublish = {},
   ): Promise<boolean> {
     const request = {
       _id: options._id,
@@ -122,7 +122,7 @@ export class RealtimeController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.published
+      (response) => response.result.published,
     );
   }
 
@@ -152,7 +152,7 @@ export class RealtimeController extends BaseController {
     collection: string,
     filters: JSONObject,
     callback: (notification: Notification) => void | Promise<void>,
-    options: ArgsRealtimeControllerSubscribe = {}
+    options: ArgsRealtimeControllerSubscribe = {},
   ): Promise<string> {
     const room = new Room(this, index, collection, filters, callback, options);
 
@@ -175,7 +175,7 @@ export class RealtimeController extends BaseController {
    */
   unsubscribe(
     roomId: string,
-    options: ArgsRealtimeControllerUnsubscribe = {}
+    options: ArgsRealtimeControllerUnsubscribe = {},
   ): Promise<void> {
     const request = {
       action: "unsubscribe",
@@ -237,7 +237,7 @@ export class RealtimeController extends BaseController {
         room
           .subscribe()
           .catch(() =>
-            this.kuzzle.emit("discarded", { request: room.request })
+            this.kuzzle.emit("discarded", { request: room.request }),
           );
       }
 

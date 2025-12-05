@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+"use strict";
+
 const proxyquire = require("proxyquire");
 const should = require("should");
 const sinon = require("sinon");
@@ -235,7 +238,7 @@ describe("HTTP networking module", () => {
 
           should(emittedError.internal).eql(error);
           should(emittedError.message).startWith(
-            "Unable to connect to kuzzle server at"
+            "Unable to connect to kuzzle server at",
           );
         });
     });
@@ -435,9 +438,9 @@ describe("HTTP networking module", () => {
             .and.be.calledWithMatch({
               method: "GET",
               path: `/foo?foo=${encodeURIComponent(
-                '{"foofoo":{"barbar":"bar"}}'
+                '{"foofoo":{"barbar":"bar"}}',
               )}&${encodeURIComponent("&baz")}=${encodeURIComponent(
-                "oh,an,array"
+                "oh,an,array",
               )}`,
             });
           done();
@@ -463,7 +466,7 @@ describe("HTTP networking module", () => {
           .and.be.calledWithMatch({
             method: "VERB",
             path: `/foo/bar?${encodeURIComponent(
-              "foo?lol"
+              "foo?lol",
             )}=${encodeURIComponent("bar&baz")}`,
           });
 
@@ -702,7 +705,7 @@ describe("HTTP networking module", () => {
           body: undefined,
           headers: { "Content-Length": 0 },
           timeout: 0,
-        }
+        },
       );
     });
 
@@ -722,7 +725,7 @@ describe("HTTP networking module", () => {
           body: "http request body",
           headers: { "Content-Length": body.length },
           timeout: 0,
-        }
+        },
       );
     });
 
@@ -738,7 +741,7 @@ describe("HTTP networking module", () => {
           body: undefined,
           headers: { "Content-Length": 0 },
           timeout: 42000,
-        }
+        },
       );
     });
 
@@ -758,7 +761,7 @@ describe("HTTP networking module", () => {
           body: "http request body",
           headers: { "Content-Length": body.length, foo: "bar" },
           timeout: 0,
-        }
+        },
       );
     });
 
@@ -889,7 +892,7 @@ describe("HTTP networking module", () => {
       setTimeout(() => xhrStub.onreadystatechange(), 20);
 
       return should(
-        protocol._sendHttpRequest("VERB", "/foo/bar", { body: "foobar" })
+        protocol._sendHttpRequest("VERB", "/foo/bar", { body: "foobar" }),
       ).be.rejectedWith({
         message: "Cannot connect to host. Is the host online?",
       });

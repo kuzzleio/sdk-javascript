@@ -76,7 +76,7 @@ export class BatchWriter {
 
   constructor(
     sdk: Kuzzle,
-    { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {}
+    { interval = 10, maxWriteBufferSize = 200, maxReadBufferSize = 200 } = {},
   ) {
     this.sdk = sdk;
     this.interval = interval;
@@ -142,7 +142,7 @@ export class BatchWriter {
   private async sendWriteBuffer(
     mAction: any,
     buffer: BatchBuffer,
-    options: JSONObject = {}
+    options: JSONObject = {},
   ) {
     const promises = [];
 
@@ -161,7 +161,7 @@ export class BatchWriter {
             ...options,
           })
             .then(promise.resolve)
-            .catch(promise.reject)
+            .catch(promise.reject),
         );
       }
     }
@@ -171,28 +171,28 @@ export class BatchWriter {
 
   private sendCreateBuffer(
     buffer: BatchBuffer,
-    options?: { refresh?: "wait_for" | "false" }
+    options?: { refresh?: "wait_for" | "false" },
   ) {
     return this.sendWriteBuffer("mCreate", buffer, options);
   }
 
   private sendUpdateBuffer(
     buffer: BatchBuffer,
-    options?: { refresh?: "wait_for" | "false" }
+    options?: { refresh?: "wait_for" | "false" },
   ) {
     return this.sendWriteBuffer("mUpdate", buffer, options);
   }
 
   private sendReplaceBuffer(
     buffer: BatchBuffer,
-    options?: { refresh?: "wait_for" | "false" }
+    options?: { refresh?: "wait_for" | "false" },
   ) {
     return this.sendWriteBuffer("mReplace", buffer, options);
   }
 
   private sendCreateOrReplaceBuffer(
     buffer: BatchBuffer,
-    options?: { refresh?: "wait_for" | "false" }
+    options?: { refresh?: "wait_for" | "false" },
   ) {
     return this.sendWriteBuffer("mCreateOrReplace", buffer, options);
   }
@@ -216,7 +216,7 @@ export class BatchWriter {
           this.sdk.document
             .mGet(index, collection, ids)
             .then(promise.resolve)
-            .catch(promise.reject)
+            .catch(promise.reject),
         );
       }
     }
@@ -251,7 +251,7 @@ export class BatchWriter {
 
               promise.resolve(existences);
             })
-            .catch(promise.reject)
+            .catch(promise.reject),
         );
       }
     }
@@ -278,7 +278,7 @@ export class BatchWriter {
           this.sdk.document
             .mDelete(index, collection, ids)
             .then(promise.resolve)
-            .catch(promise.reject)
+            .catch(promise.reject),
         );
       }
     }

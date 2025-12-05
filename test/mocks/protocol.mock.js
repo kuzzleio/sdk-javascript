@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon"),
   { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter"),
   DisconnectionOrigin = require("../../src/protocols/DisconnectionOrigin");

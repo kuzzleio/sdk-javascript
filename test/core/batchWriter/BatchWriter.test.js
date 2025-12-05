@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -115,19 +117,19 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       writer.buffers.create.add(
         "city",
         "tbilisi",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
       const colombo = writer.buffers.create.add(
         "city",
         "colombo",
         { name: "Ugo" },
-        "ugo"
+        "ugo",
       );
 
       await writer.sendWriteBuffer("mCreate", writer.buffers.create);
@@ -150,7 +152,7 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
 
       await writer.sendWriteBuffer("mCreate", writer.buffers.create);
@@ -173,14 +175,14 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
       writer.buffers.get.add("city", "tbilisi", undefined, "aschen");
       const colombo = writer.buffers.get.add(
         "city",
         "colombo",
         undefined,
-        "ugo"
+        "ugo",
       );
 
       await writer.sendGetBuffer(writer.buffers.get);
@@ -198,7 +200,7 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
 
       await writer.sendGetBuffer(writer.buffers.get);
@@ -225,14 +227,14 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
       writer.buffers.exists.add("city", "tbilisi", undefined, "aschen");
       const colombo = writer.buffers.exists.add(
         "city",
         "colombo",
         undefined,
-        "ugo"
+        "ugo",
       );
 
       await writer.sendExistsBuffer(writer.buffers.exists);
@@ -249,7 +251,7 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
       writer.buffers.exists.add("city", "tbilisi", undefined, "aschen");
       writer.sdk.document.mGet.onCall(0).resolves({
@@ -268,7 +270,7 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
 
       await writer.sendExistsBuffer(writer.buffers.exists);
@@ -290,14 +292,14 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
       writer.buffers.delete.add("city", "tbilisi", undefined, "aschen");
       const colombo = writer.buffers.delete.add(
         "city",
         "colombo",
         undefined,
-        "ugo"
+        "ugo",
       );
 
       await writer.sendDeleteBuffer(writer.buffers.delete);
@@ -315,7 +317,7 @@ describe("BatchWriter", () => {
         "city",
         "tbilisi",
         undefined,
-        "dana"
+        "dana",
       );
 
       await writer.sendDeleteBuffer(writer.buffers.delete);
