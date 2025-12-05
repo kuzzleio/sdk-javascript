@@ -19,7 +19,6 @@ type HookWorld = IWorld & {
 };
 
 Before<HookWorld>(async function () {
-  console.log(this);
   await clean(this);
 });
 
