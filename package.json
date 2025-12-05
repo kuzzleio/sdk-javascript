@@ -60,10 +60,8 @@
   },
   "files": [
     "dist/**/*",
-    "index.js",
-    "index.d.ts",
-    "src/**/*.js",
-    "src/**/*.d.ts",
-    "src/**/*.json"
+    "out/**/*.js",
+    "out/**/*.d.ts",
+    "out/**/*.json"
   ]
 }
