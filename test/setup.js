@@ -11,6 +11,7 @@ if (typeof global.XMLHttpRequest === "undefined") {
 // Define a writable global binding for WebSocket when Node does not provide one
 if (typeof WebSocket === "undefined") {
   /* eslint-disable no-var */
+  // eslint-disable-next-line vars-on-top
   var WebSocket = undefined; // creates the global binding
   /* eslint-enable no-var */
 }
