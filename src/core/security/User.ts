@@ -74,5 +74,3 @@ export class User {
     };
   }
 }
-
-module.exports = { User };

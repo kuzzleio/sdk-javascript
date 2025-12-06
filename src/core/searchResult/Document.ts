@@ -17,5 +17,3 @@ export class DocumentSearchResult<
     this._scrollAction = "scroll";
   }
 }
-
-module.exports = { DocumentSearchResult };

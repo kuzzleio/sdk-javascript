@@ -27,7 +27,8 @@ const ignoreOptionalModules: Plugin = {
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "out/index.js"),
+      // Use the TypeScript entry so Rollup sees ES modules and can generate a proper UMD bundle
+      entry: path.resolve(__dirname, "index.ts"),
       fileName: () => "kuzzle.js",
       formats: ["umd"],
       name: "KuzzleSDK",

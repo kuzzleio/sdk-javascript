@@ -209,5 +209,3 @@ export class KuzzleEventEmitter {
     );
   }
 }
-
-module.exports = { KuzzleEventEmitter };

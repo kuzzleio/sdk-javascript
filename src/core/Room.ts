@@ -148,4 +148,3 @@ class Room {
 }
 
 export default Room;
-module.exports = Room;

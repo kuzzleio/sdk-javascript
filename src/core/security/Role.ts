@@ -40,5 +40,3 @@ export class Role {
     };
   }
 }
-
-module.exports = { Role };
