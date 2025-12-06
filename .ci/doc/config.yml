@@ -20,13 +20,3 @@ runners:
     run:
       cmd: node puppeteer.js {{ snippet.dir }}/{{ snippet.source }}
       before: timeout 600 bash -c 'until stat /home/node/runner_is_ready && curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
-
-  webpack:
-    service: doc-runner-webpack
-    path: /var/snippets/webpack
-    build:
-      cmd: node webpackBuild.js {{ snippet.dir }}/{{ snippet.source }}
-      before: timeout 600 bash -c 'until stat /home/node/runner_is_ready; do sleep 1; done'
-    run:
-      cmd: node puppeteer.js /tmp/{{ snippet.name }}/index.html
-      before: timeout 600 bash -c 'until curl -f -s -o /dev/null http://kuzzle:7512/_now; do sleep 1; done'
