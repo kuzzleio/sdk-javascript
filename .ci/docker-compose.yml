@@ -1,0 +1,24 @@
+services:
+  kuzzle:
+    image: kuzzleio/kuzzle:2
+    ports:
+      - "7512:7512"
+    cap_add:
+      - SYS_PTRACE
+    depends_on:
+      - redis
+      - elasticsearch
+    environment:
+      - kuzzle_services__storageEngine__client__node=http://elasticsearch:9200
+      - kuzzle_services__internalCache__node__host=redis
+      - kuzzle_services__memoryStorage__node__host=redis
+      - kuzzle_services__storageEngine__commonMapping__dynamic=true
+      - NODE_ENV=production
+
+  redis:
+    image: redis:8
+
+  elasticsearch:
+    image: docker.io/bitnamilegacy/elasticsearch:8.17.1-debian-12-r6
+    ulimits:
+      nofile: 65536
