@@ -30,7 +30,8 @@ export default defineConfig({
       // Use the TypeScript entry so Rollup sees ES modules and can generate a proper UMD bundle
       entry: path.resolve(__dirname, "index.ts"),
       fileName: () => "kuzzle.js",
-      formats: ["umd"],
+      // Use an IIFE to avoid CommonJS/AMD detection in browsers that execute the bundle as an ES module
+      formats: ["iife"],
       name: "KuzzleSDK",
     },
     outDir: "dist",
