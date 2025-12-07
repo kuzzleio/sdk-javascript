@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 "use strict";
 
-const proxyquire = require("proxyquire");
 const should = require("should");
 const sinon = require("sinon");
 
@@ -677,28 +676,26 @@ describe("HTTP networking module", () => {
       result: "Kuzzle Result",
     };
 
-    let httpRequestStub;
+    let nodeRequestStub;
 
     beforeEach(() => {
-      httpRequestStub = sinon.stub().resolves({
+      nodeRequestStub = sinon.stub().resolves({
         body: JSON.stringify(mockResponseBody),
         headers: {
           "content-type": "application/json",
         },
+        statusCode: mockResponseBody.status,
       });
 
-      const { default: MockHttp } = proxyquire("../../src/protocols/Http", {
-        "min-req-promise": { request: httpRequestStub },
-      });
-
-      protocol = new MockHttp("address", { port: 1234 });
+      protocol = new Http("address", { port: 1234 });
+      protocol._nodeRequest = nodeRequestStub;
     });
 
     it("should call http.request with empty body", () => {
       protocol._sendHttpRequest({ method: "VERB", path: "/foo/bar" });
 
-      should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith(
+      should(nodeRequestStub).be.calledOnce();
+      should(nodeRequestStub).be.calledWithMatch(
         "http://address:1234/foo/bar",
         "VERB",
         {
@@ -717,8 +714,8 @@ describe("HTTP networking module", () => {
         payload: { body },
       });
 
-      should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith(
+      should(nodeRequestStub).be.calledOnce();
+      should(nodeRequestStub).be.calledWithMatch(
         "http://address:1234/foo/bar",
         "VERB",
         {
@@ -733,8 +730,8 @@ describe("HTTP networking module", () => {
       protocol.timeout = 42000;
       protocol._sendHttpRequest({ method: "VERB", path: "/foo/bar" });
 
-      should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith(
+      should(nodeRequestStub).be.calledOnce();
+      should(nodeRequestStub).be.calledWithMatch(
         "http://address:1234/foo/bar",
         "VERB",
         {
@@ -753,8 +750,8 @@ describe("HTTP networking module", () => {
         payload: { body, headers: { foo: "bar" } },
       });
 
-      should(httpRequestStub).be.calledOnce();
-      should(httpRequestStub).be.calledWith(
+      should(nodeRequestStub).be.calledOnce();
+      should(nodeRequestStub).be.calledWithMatch(
         "http://address:1234/foo/bar",
         "VERB",
         {
@@ -766,14 +763,14 @@ describe("HTTP networking module", () => {
     });
 
     it("should reject the request in case of error", () => {
-      httpRequestStub.rejects("My HTTP Error");
+      nodeRequestStub.rejects(new Error("My HTTP Error"));
 
       return protocol
         ._sendHttpRequest({ method: "VERB", path: "/foo/bar" })
         .then(() => Promise.reject("No error"))
         .catch((err) => {
           should(err).be.an.instanceof(Error);
-          should(err.name).be.exactly("My HTTP Error");
+          should(err.message).be.exactly("My HTTP Error");
         });
     });
 

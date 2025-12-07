@@ -4,7 +4,6 @@ import { version } from "./package.json";
 
 const ignoredModules = new Set<string>([
   "http",
-  "min-req-promise",
   "package",
   "ws",
   "https",
@@ -29,13 +28,17 @@ export default defineConfig({
     lib: {
       // Use the TypeScript entry so Rollup sees ES modules and can generate a proper UMD bundle
       entry: path.resolve(__dirname, "index.ts"),
-      fileName: () => "kuzzle.js",
+      fileName: () => "kuzzle",
       name: "KuzzleSDK",
+      // Match the legacy Webpack output: single UMD bundle
+      formats: ["umd"],
     },
     outDir: "dist",
     rollupOptions: {
       output: {
         banner: `// Kuzzle Javascript SDK version ${version}`,
+        // Expose build flags on the global scope for browser usage (mirrors old webpack define)
+        intro: `var BUILT = true; var SDKVERSION = "${version}";`,
       },
     },
     sourcemap: true,

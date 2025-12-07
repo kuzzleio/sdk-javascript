@@ -373,43 +373,39 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
   }: {
     method: string;
     path: string;
-    payload: JSONObject;
+    payload?: JSONObject;
   }) {
     if (typeof XMLHttpRequest === "undefined") {
       // NodeJS implementation, using http.request:
-
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const httpClient = require("min-req-promise");
 
       if (path[0] !== "/") {
         path = `/${path}`;
       }
       const url = `${this.protocol}://${this.host}:${this.port}${path}`;
-      const headers = (payload && payload.headers) || {};
-      headers["Content-Length"] = Buffer.byteLength(
-        (payload && payload.body) || "",
-      );
+      const body = payload && (payload as any).body;
+      const headers = {
+        ...((payload && payload.headers) || {}),
+        "Content-Length": Buffer.byteLength(body || ""),
+      };
 
-      return httpClient
-        .request(url, method, {
-          body: payload && payload.body,
-          headers: headers,
-          timeout: this._timeout,
-        })
-        .then((response) => {
-          if (response.statusCode === 431) {
-            throw new Error(
-              "Request query string is too large. Try to use the method with the POST verb instead.",
-            );
-          }
+      return this._nodeRequest(url, method, {
+        body,
+        headers,
+        timeout: this._timeout,
+      }).then((response) => {
+        if (response.statusCode === 431) {
+          throw new Error(
+            "Request query string is too large. Try to use the method with the POST verb instead.",
+          );
+        }
 
-          const contentType = response.headers["content-type"];
-          if (!contentType || !contentType.includes("application/json")) {
-            return response.body;
-          }
+        const contentType = response.headers["content-type"];
+        if (!contentType || !contentType.includes("application/json")) {
+          return response.body;
+        }
 
-          return JSON.parse(response.body);
-        });
+        return JSON.parse(response.body);
+      });
     }
 
     // Browser implementation, using XMLHttpRequest:
@@ -451,6 +447,56 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
       };
 
       xhr.send(payload && payload.body);
+    });
+  }
+
+  private _nodeRequest(
+    url: string,
+    method: string,
+    options: { body?: string; headers?: JSONObject; timeout?: number },
+  ): Promise<{
+    statusCode?: number;
+    headers: JSONObject;
+    body: string;
+  }> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const httpModule = this.ssl ? require("https") : require("http");
+
+    return new Promise((resolve, reject) => {
+      const req = httpModule.request(
+        url,
+        {
+          method,
+          headers: options.headers,
+        },
+        (res) => {
+          const chunks: Buffer[] = [];
+
+          res.on("data", (chunk) => chunks.push(chunk));
+          res.on("end", () => {
+            resolve({
+              statusCode: res.statusCode,
+              headers: res.headers as JSONObject,
+              body: Buffer.concat(chunks).toString(),
+            });
+          });
+        },
+      );
+
+      req.on("error", reject);
+
+      const timeout = options.timeout || 0;
+      if (timeout > 0) {
+        req.setTimeout(timeout, () => {
+          req.destroy(new Error("Request timed out"));
+        });
+      }
+
+      if (options.body) {
+        req.write(options.body);
+      }
+
+      req.end();
     });
   }
 
