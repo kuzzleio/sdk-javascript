@@ -1,20 +1,3 @@
-import { isBrowser } from "./src/utils/browser";
-
-// defined by webpack plugin
-declare let BUILT: any;
-
-console.log("isBrowser", isBrowser());
-console.log(typeof BUILT);
-
-if (isBrowser() && typeof BUILT === "undefined") {
-  throw new Error(
-    "It looks like you are using the Nodejs version of Kuzzle SDK " +
-      "in a browser. " +
-      "It is strongly recommended to use the browser-specific build instead. " +
-      "Learn more at https://github.com/kuzzleio/sdk-javascript/tree/master#browser",
-  );
-}
-
 export * from "./src/Kuzzle";
 export * from "./src/protocols";
 export * from "./src/protocols/abstract/Base";

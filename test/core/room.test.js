@@ -6,6 +6,8 @@ const should = require("should");
 const Room = require("../../src/core/Room");
 const { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter");
 
+console.log(Room);
+
 describe("Room", () => {
   const eventEmitter = new KuzzleEventEmitter();
   const options = { opt: "in" };
@@ -39,7 +41,7 @@ describe("Room", () => {
 
       controller.kuzzle.autoResubscribe = "default";
 
-      const room = new Room(
+      const room = new Room.default(
         controller,
         "index",
         "collection",
@@ -83,7 +85,14 @@ describe("Room", () => {
       const body = { foo: "bar" };
       const cb = sinon.stub();
 
-      const room = new Room(controller, "index", "collection", body, cb, opts);
+      const room = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        opts,
+      );
 
       should(room.request.scope).be.equal("scope");
       should(room.request.state).be.equal("state");
@@ -97,15 +106,36 @@ describe("Room", () => {
 
       controller.kuzzle.autoResubscribe = "default";
 
-      const room1 = new Room(controller, "index", "collection", body, cb, {
-        autoResubscribe: true,
-      });
-      const room2 = new Room(controller, "index", "collection", body, cb, {
-        autoResubscribe: false,
-      });
-      const room3 = new Room(controller, "index", "collection", body, cb, {
-        autoResubscribe: "foobar",
-      });
+      const room1 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          autoResubscribe: true,
+        },
+      );
+      const room2 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          autoResubscribe: false,
+        },
+      );
+      const room3 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          autoResubscribe: "foobar",
+        },
+      );
 
       should(room1.autoResubscribe).be.a.Boolean().and.be.True();
       should(room2.autoResubscribe).be.a.Boolean().and.be.False();
@@ -116,15 +146,36 @@ describe("Room", () => {
       const body = { foo: "bar" };
       const cb = sinon.stub();
 
-      const room1 = new Room(controller, "index", "collection", body, cb, {
-        subscribeToSelf: true,
-      });
-      const room2 = new Room(controller, "index", "collection", body, cb, {
-        subscribeToSelf: false,
-      });
-      const room3 = new Room(controller, "index", "collection", body, cb, {
-        subscribeToSelf: "foobar",
-      });
+      const room1 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          subscribeToSelf: true,
+        },
+      );
+      const room2 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          subscribeToSelf: false,
+        },
+      );
+      const room3 = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        {
+          subscribeToSelf: "foobar",
+        },
+      );
 
       should(room1.subscribeToSelf).be.a.Boolean().and.be.True();
       should(room2.subscribeToSelf).be.a.Boolean().and.be.False();
@@ -154,7 +205,14 @@ describe("Room", () => {
       };
       const body = { foo: "bar" };
       const cb = sinon.stub();
-      const room = new Room(controller, "index", "collection", body, cb, opts);
+      const room = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        opts,
+      );
 
       return room.subscribe().then((res) => {
         should(controller.kuzzle.query)
@@ -188,7 +246,14 @@ describe("Room", () => {
       };
       const body = { foo: "bar" };
       const cb = sinon.stub();
-      const room = new Room(controller, "index", "collection", body, cb, opts);
+      const room = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        opts,
+      );
 
       return room.subscribe().then(() => {
         should(room.id).be.equal("my-room-id");
@@ -206,7 +271,14 @@ describe("Room", () => {
       };
       const body = { foo: "bar" };
       const cb = sinon.stub();
-      const room = new Room(controller, "index", "collection", body, cb, opts);
+      const room = new Room.default(
+        controller,
+        "index",
+        "collection",
+        body,
+        cb,
+        opts,
+      );
 
       room._channelListener = sinon.stub();
 
@@ -225,7 +297,7 @@ describe("Room", () => {
     let room;
 
     beforeEach(() => {
-      room = new Room(
+      room = new Room.default(
         controller,
         "index",
         "collection",
@@ -261,7 +333,7 @@ describe("Room", () => {
 
     beforeEach(() => {
       cb = sinon.stub();
-      room = new Room(
+      room = new Room.default(
         controller,
         "index",
         "collection",

@@ -459,45 +459,49 @@ export default class HttpProtocol extends KuzzleAbstractProtocol {
     headers: JSONObject;
     body: string;
   }> {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const httpModule = this.ssl ? require("https") : require("http");
+    const httpModulePromise: Promise<
+      typeof import("node:http") | typeof import("node:https")
+    > = this.ssl ? import("node:https") : import("node:http");
 
-    return new Promise((resolve, reject) => {
-      const req = httpModule.request(
-        url,
-        {
-          method,
-          headers: options.headers,
-        },
-        (res) => {
-          const chunks: Buffer[] = [];
+    return httpModulePromise.then(
+      (httpModule) =>
+        new Promise((resolve, reject) => {
+          const req = httpModule.request(
+            url,
+            {
+              method,
+              headers: options.headers,
+            },
+            (res) => {
+              const chunks: Buffer[] = [];
 
-          res.on("data", (chunk) => chunks.push(chunk));
-          res.on("end", () => {
-            resolve({
-              statusCode: res.statusCode,
-              headers: res.headers as JSONObject,
-              body: Buffer.concat(chunks).toString(),
+              res.on("data", (chunk) => chunks.push(chunk));
+              res.on("end", () => {
+                resolve({
+                  statusCode: res.statusCode,
+                  headers: res.headers as JSONObject,
+                  body: Buffer.concat(chunks).toString(),
+                });
+              });
+            },
+          );
+
+          req.on("error", reject);
+
+          const timeout = options.timeout || 0;
+          if (timeout > 0) {
+            req.setTimeout(timeout, () => {
+              req.destroy(new Error("Request timed out"));
             });
-          });
-        },
-      );
+          }
 
-      req.on("error", reject);
+          if (options.body) {
+            req.write(options.body);
+          }
 
-      const timeout = options.timeout || 0;
-      if (timeout > 0) {
-        req.setTimeout(timeout, () => {
-          req.destroy(new Error("Request timed out"));
-        });
-      }
-
-      if (options.body) {
-        req.write(options.body);
-      }
-
-      req.end();
-    });
+          req.end();
+        }),
+    );
   }
 
   _constructRoutes(publicApi) {

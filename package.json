@@ -27,8 +27,19 @@
     "dev": "node -r ts-node/register ",
     "doc-testing": "bash .ci/test-docs.sh"
   },
-  "browser": "dist/kuzzle.js",
-  "main": "out/index.js",
+  "browser": "./dist/kuzzle.js",
+  "main": "./out/index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "browser": "./dist/kuzzle.js",
+      "import": "./out/index.js",
+      "require": "./out/index.js",
+      "default": "./out/index.js",
+      "types": "./index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "license": "Apache-2.0",
   "dependencies": {
     "ws": "8.18.3"
