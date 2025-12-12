@@ -222,7 +222,7 @@ export class Kuzzle extends KuzzleEventEmitter {
        * Default: `true`
        */
       deprecationWarning?: boolean;
-    } = {}
+    } = {},
   ) {
     super();
 
@@ -234,7 +234,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     for (const method of ["addListener", "isReady", "query"]) {
       if (typeof protocol[method] !== "function") {
         throw new Error(
-          `Protocol instance must implement a "${method}" method`
+          `Protocol instance must implement a "${method}" method`,
         );
       }
     }
@@ -298,12 +298,12 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.deprecationHandler = new Deprecation(
       typeof options.deprecationWarning === "boolean"
         ? options.deprecationWarning
-        : true
+        : true,
     );
 
     if (this._cookieAuthentication && typeof XMLHttpRequest === "undefined") {
       throw new Error(
-        "Support for cookie authentication with cookieAuth option is not supported outside a browser"
+        "Support for cookie authentication with cookieAuth option is not supported outside a browser",
       );
     }
 
@@ -406,7 +406,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    */
   get authenticated() {
     return Boolean(
-      this.auth.authenticationToken && !this.auth.authenticationToken.expired
+      this.auth.authenticationToken && !this.auth.authenticationToken.expired,
     );
   }
 
@@ -579,43 +579,46 @@ export class Kuzzle extends KuzzleEventEmitter {
 
   on(
     eventName: "connected" | "reconnected" | "reAuthenticated" | "tokenExpired",
-    listener: () => void
+    listener: () => void,
   ): this;
 
   on(eventName: "beforeLogout", listener: () => void): this;
   on(
     eventName: "logoutAttempt" | "afterLogout",
-    listener: (status: { success: true }) => void
+    listener: (status: { success: true }) => void,
   ): this;
   on(eventName: "beforeLogin", listener: () => void): this;
   on(
     eventName: "loginAttempt" | "afterLogin",
-    listener: (data: { success: boolean; error: string }) => void
+    listener: (data: { success: boolean; error: string }) => void,
   ): this;
   on(eventName: "discarded", listener: (request: RequestPayload) => void): this;
   on(
     eventName: "disconnected",
-    listener: (context: { origin: DisconnectionOrigin }) => void
+    listener: (context: { origin: DisconnectionOrigin }) => void,
   ): this;
   on(
     eventName: "networkError" | "reconnectionError",
-    listener: (error: Error) => void
+    listener: (error: Error) => void,
   ): this;
   on(
     eventName: "offlineQueuePop",
-    listener: (request: RequestPayload) => void
+    listener: (request: RequestPayload) => void,
   ): this;
   on(
     eventName: "offlineQueuePush",
-    listener: (data: { request: RequestPayload }) => void
+    listener: (data: { request: RequestPayload }) => void,
   ): this;
   on(
     eventName: "queryError",
-    listener: (data: { error: KuzzleError; request: RequestPayload }) => void
+    listener: (data: { error: KuzzleError; request: RequestPayload }) => void,
   ): this;
   on(
     eventName: "callbackError",
-    listener: (data: { error: KuzzleError; notification: Notification }) => void
+    listener: (data: {
+      error: KuzzleError;
+      notification: Notification;
+    }) => void,
   ): this;
   on(eventName: PublicKuzzleEvents, listener: (args: any) => void): this {
     return super.on(eventName, listener);
@@ -665,7 +668,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     this.protocol.addListener("reconnect", this._reconnect.bind(this));
 
     this.protocol.addListener("discarded", (data) =>
-      this.emit("discarded", data)
+      this.emit("discarded", data),
     );
 
     this.protocol.addListener("websocketRenewalStart", () => {
@@ -742,7 +745,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       if (!this.authenticator) {
         this.emit("reconnectionError", {
           error: new Error(
-            'Could not re-authenticate: "authenticator" property is not set.'
+            'Could not re-authenticate: "authenticator" property is not set.',
           ),
         });
         return false;
@@ -754,7 +757,7 @@ export class Kuzzle extends KuzzleEventEmitter {
     } catch (err) {
       this.emit("reconnectionError", {
         error: new Error(
-          `Failed to authenticate the SDK after reconnection: ${err}`
+          `Failed to authenticate the SDK after reconnection: ${err}`,
         ),
       });
 
@@ -782,7 +785,7 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     if (!valid) {
       throw new Error(
-        'The "authenticator" function failed to authenticate the SDK.'
+        'The "authenticator" function failed to authenticate the SDK.',
       );
     }
   }
@@ -809,8 +812,8 @@ export class Kuzzle extends KuzzleEventEmitter {
     if (this.events.indexOf(event) === -1) {
       throw new Error(
         `[${event}] is not a known event. Known events: ${this.events.join(
-          ", "
-        )}`
+          ", ",
+        )}`,
       );
     }
 
@@ -853,7 +856,7 @@ export class Kuzzle extends KuzzleEventEmitter {
    */
   query<TRequest extends BaseRequest = BaseRequest, TResult = JSONObject>(
     req: TRequest,
-    opts: JSONObject = {}
+    opts: JSONObject = {},
   ): Promise<ResponsePayload<TResult>> {
     if (typeof req !== "object" || Array.isArray(req)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
@@ -861,7 +864,7 @@ export class Kuzzle extends KuzzleEventEmitter {
 
     if (typeof opts !== "object" || Array.isArray(opts)) {
       throw new Error(
-        `Kuzzle.query: Invalid "options" argument: ${JSON.stringify(opts)}`
+        `Kuzzle.query: Invalid "options" argument: ${JSON.stringify(opts)}`,
       );
     }
 
@@ -913,8 +916,8 @@ export class Kuzzle extends KuzzleEventEmitter {
     ) {
       throw new Error(
         `Kuzzle.query: Invalid volatile argument received: ${JSON.stringify(
-          request.volatile
-        )}`
+          request.volatile,
+        )}`,
       );
     }
 
@@ -949,7 +952,7 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.emit("discarded", { request });
       return Promise.reject(
         new Error(`Unable to execute request: not connected to a Kuzzle server.
-Discarded request: ${JSON.stringify(request)}`)
+Discarded request: ${JSON.stringify(request)}`),
       );
     }
 
@@ -958,7 +961,7 @@ Discarded request: ${JSON.stringify(request)}`)
         debug("RESPONSE", response);
 
         return this.deprecationHandler.logDeprecation(response);
-      }
+      },
     );
   }
 
@@ -1030,7 +1033,7 @@ Discarded request: ${JSON.stringify(request)}`)
 
     if (this.__proxy__ ? this.__proxy__.hasProp(accessor) : this[accessor]) {
       throw new Error(
-        `There is already a controller with the accessor '${accessor}'. Please use another one.`
+        `There is already a controller with the accessor '${accessor}'. Please use another one.`,
       );
     }
 
@@ -1042,7 +1045,7 @@ Discarded request: ${JSON.stringify(request)}`)
 
     if (controller.kuzzle !== this) {
       throw new Error(
-        "You must pass the Kuzzle SDK instance to the parent constructor."
+        "You must pass the Kuzzle SDK instance to the parent constructor.",
       );
     }
 
@@ -1060,7 +1063,7 @@ Discarded request: ${JSON.stringify(request)}`)
 
     if (wrongType) {
       throw new Error(
-        `Expected ${prop} to be a ${typestr}, ${typeof value} received`
+        `Expected ${prop} to be a ${typestr}, ${typeof value} received`,
       );
     }
   }
@@ -1086,8 +1089,8 @@ Discarded request: ${JSON.stringify(request)}`)
             this.emit("offlineQueuePop", droppedRequest.request);
             droppedRequest.reject(
               new Error(
-                "Query aborted: queued time exceeded the queueTTL option value"
-              )
+                "Query aborted: queued time exceeded the queueTTL option value",
+              ),
             );
           });
       }
@@ -1100,8 +1103,8 @@ Discarded request: ${JSON.stringify(request)}`)
           this.emit("offlineQueuePop", droppedRequest.request);
           droppedRequest.reject(
             new Error(
-              "Query aborted: too many queued requests (see the queueMaxSize option)"
-            )
+              "Query aborted: too many queued requests (see the queueMaxSize option)",
+            ),
           );
         });
     }
@@ -1119,16 +1122,19 @@ Discarded request: ${JSON.stringify(request)}`)
 
           this._timeoutRequest(
             this.offlineQueue[0].timeout,
-            this.offlineQueue[0].request
+            this.offlineQueue[0].request,
           )
             .then(this.offlineQueue[0].resolve)
             .catch(this.offlineQueue[0].reject);
 
           this.emit("offlineQueuePop", this.offlineQueue.shift().request);
 
-          setTimeout(() => {
-            dequeuingProcess();
-          }, Math.max(0, this.replayInterval));
+          setTimeout(
+            () => {
+              dequeuingProcess();
+            },
+            Math.max(0, this.replayInterval),
+          );
         }
       };
 
@@ -1136,7 +1142,7 @@ Discarded request: ${JSON.stringify(request)}`)
       if (typeof this.offlineQueueLoader !== "function") {
         throw new Error(
           "Invalid value for offlineQueueLoader property. Expected: function. Got: " +
-            typeof this.offlineQueueLoader
+            typeof this.offlineQueueLoader,
         );
       }
 
@@ -1155,13 +1161,13 @@ Discarded request: ${JSON.stringify(request)}`)
                   !query.request.controller
                 ) {
                   throw new Error(
-                    "Invalid offline queue request. One or more missing properties: requestId, action, controller."
+                    "Invalid offline queue request. One or more missing properties: requestId, action, controller.",
                   );
                 }
 
                 return Object.prototype.hasOwnProperty.call(
                   uniqueQueue,
-                  query.request.requestId
+                  query.request.requestId,
                 )
                   ? false
                   : (uniqueQueue[query.request.requestId] = true);
@@ -1171,7 +1177,7 @@ Discarded request: ${JSON.stringify(request)}`)
           } else {
             throw new Error(
               "Invalid value returned by the offlineQueueLoader function. Expected: array. Got: " +
-                typeof additionalQueue
+                typeof additionalQueue,
             );
           }
         });
@@ -1191,7 +1197,7 @@ Discarded request: ${JSON.stringify(request)}`)
   private _timeoutRequest(
     delay: number,
     request: RequestPayload,
-    options: JSONObject = {}
+    options: JSONObject = {},
   ) {
     debug("REQUEST", request);
 

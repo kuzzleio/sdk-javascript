@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -90,7 +92,7 @@ describe("DocumentSearchResult", () => {
       searchResult = new DocumentSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
       );
     });
 
@@ -121,7 +123,7 @@ describe("DocumentSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -150,7 +152,7 @@ describe("DocumentSearchResult", () => {
           should(nextSearchResult._result).be.equal(nextResponse);
           should(nextSearchResult.hits).be.equal(nextResponse.hits);
           should(nextSearchResult.aggregations).equal(
-            nextResponse.aggregations
+            nextResponse.aggregations,
           );
         });
       });
@@ -200,7 +202,7 @@ describe("DocumentSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -225,7 +227,7 @@ describe("DocumentSearchResult", () => {
                 action: "search",
                 size: 2,
               },
-              options
+              options,
             );
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(DocumentSearchResult);
@@ -241,7 +243,7 @@ describe("DocumentSearchResult", () => {
           should(nextSearchResult._result).be.equal(nextResponse);
           should(nextSearchResult.hits).be.equal(nextResponse.hits);
           should(nextSearchResult.aggregations).equal(
-            nextResponse.aggregations
+            nextResponse.aggregations,
           );
         });
       });
@@ -252,7 +254,7 @@ describe("DocumentSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         return should(searchResult.next()).be.rejected();
@@ -264,7 +266,7 @@ describe("DocumentSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         return should(searchResult.next()).be.rejected();
@@ -313,7 +315,7 @@ describe("DocumentSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -355,7 +357,7 @@ describe("DocumentSearchResult", () => {
           should(nextSearchResult._result).be.equal(nextResponse);
           should(nextSearchResult.hits).be.equal(nextResponse.hits);
           should(nextSearchResult.aggregations).equal(
-            nextResponse.aggregations
+            nextResponse.aggregations,
           );
         });
       });

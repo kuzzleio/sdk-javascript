@@ -1,7 +1,7 @@
 ---
 code: false
 type: branch
-order: 300
+order: 100
 title: Protocols
 description: Javascript SDK v7.x protocols
 ---

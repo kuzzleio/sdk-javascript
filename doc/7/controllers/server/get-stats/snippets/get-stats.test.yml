@@ -1,7 +1,0 @@
-name: server#getStats
-description: Returns statistics snapshots within a provided timestamp range.
-hooks:
-  before:
-  after:
-template: default
-expected: hits

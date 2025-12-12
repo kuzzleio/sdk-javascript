@@ -1,10 +1,12 @@
-/* eslint no-undef: 0 */
+"use strict";
 
 const should = require("should"),
   sinon = require("sinon"),
   ProtocolMock = require("../mocks/protocol.mock"),
   generateJwt = require("../mocks/generateJwt.mock"),
   { Kuzzle } = require("../../src/Kuzzle");
+
+let kuzzle;
 
 describe("Kuzzle query management", () => {
   describe("#_timeoutRequest", () => {
@@ -19,7 +21,7 @@ describe("Kuzzle query management", () => {
       should(kuzzle.protocol.query).be.calledOnce();
       should(kuzzle.protocol.query).be.calledWith(
         { foo: "bar" },
-        { bar: "baz" }
+        { bar: "baz" },
       );
     });
 
@@ -35,7 +37,7 @@ describe("Kuzzle query management", () => {
       const response = kuzzle._timeoutRequest(
         100,
         { foo: "bar" },
-        { bar: "baz" }
+        { bar: "baz" },
       );
       await should(response).be.resolvedWith("foo");
     });
@@ -52,7 +54,7 @@ describe("Kuzzle query management", () => {
       const promise = kuzzle._timeoutRequest(
         10,
         { foo: "bar" },
-        { bar: "baz" }
+        { bar: "baz" },
       );
       await should(promise).be.rejected();
     });
@@ -69,8 +71,6 @@ describe("Kuzzle query management", () => {
       response = {
         result: { foo: "bar" },
       };
-
-    let kuzzle;
 
     beforeEach(() => {
       const protocol = new ProtocolMock("somewhere");
@@ -95,10 +95,10 @@ describe("Kuzzle query management", () => {
             sdkName: kuzzle.sdkName,
           },
           requestId: sinon.match(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
           ),
         },
-        {}
+        {},
       );
     });
 
@@ -118,13 +118,13 @@ describe("Kuzzle query management", () => {
             sdkName: kuzzle.sdkName,
           },
           requestId: sinon.match(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
           ),
           // propagated arguments
           foo: "bar",
           baz: "yolo",
         },
-        { foo: "bar", baz: "yolo" }
+        { foo: "bar", baz: "yolo" },
       );
     });
 
@@ -150,10 +150,10 @@ describe("Kuzzle query management", () => {
             sdkName: kuzzle.sdkName,
           },
           requestId: sinon.match(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
           ),
         },
-        {}
+        {},
       );
     });
 
@@ -161,11 +161,11 @@ describe("Kuzzle query management", () => {
       kuzzle.query({ controller: "foo", action: "bar" });
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { collection: undefined }
+        { collection: undefined },
       );
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { index: undefined }
+        { index: undefined },
       );
     });
 
@@ -185,7 +185,7 @@ describe("Kuzzle query management", () => {
       should(function () {
         kuzzle.query({ volatile: ["foo", "bar"] });
       }).throw(
-        'Kuzzle.query: Invalid volatile argument received: ["foo","bar"]'
+        'Kuzzle.query: Invalid volatile argument received: ["foo","bar"]',
       );
     });
 
@@ -209,7 +209,7 @@ describe("Kuzzle query management", () => {
       should(kuzzle._timeoutRequest).be.calledOnce();
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { volatile: kuzzle.volatile }
+        { volatile: kuzzle.volatile },
       );
     });
 
@@ -225,7 +225,7 @@ describe("Kuzzle query management", () => {
       should(kuzzle._timeoutRequest).be.calledOnce();
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { volatile: { foo: "foo", baz: volatile.baz } }
+        { volatile: { foo: "foo", baz: volatile.baz } },
       );
     });
 
@@ -247,7 +247,7 @@ describe("Kuzzle query management", () => {
             sdkInstanceId: "req-sdk-instance-id",
             sdkName: "req-sdk-version",
           },
-        }
+        },
       );
     });
 
@@ -255,13 +255,13 @@ describe("Kuzzle query management", () => {
       kuzzle.query({ refresh: "wait_for" });
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { refresh: "wait_for" }
+        { refresh: "wait_for" },
       );
 
       kuzzle.query({ refresh: false });
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { refresh: false }
+        { refresh: false },
       );
     });
 
@@ -270,7 +270,7 @@ describe("Kuzzle query management", () => {
       should(kuzzle._timeoutRequest).be.calledOnce();
       should(kuzzle._timeoutRequest).be.calledWithMatch(
         kuzzle._requestTimeout,
-        { requestId: "foobar" }
+        { requestId: "foobar" },
       );
     });
 

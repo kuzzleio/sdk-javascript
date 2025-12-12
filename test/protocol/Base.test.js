@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should");
 const sinon = require("sinon");
 
@@ -96,7 +98,7 @@ describe("Common Protocol", () => {
         })
         .catch((error) => {
           should(error.message).startWith(
-            "Unable to execute request: not connected to a Kuzzle server."
+            "Unable to execute request: not connected to a Kuzzle server.",
           );
         });
     });
@@ -224,7 +226,7 @@ describe("Common Protocol", () => {
           should(error.id).be.equal("api.process.action_not_found");
           should(error.code).be.equal(33685509);
           should(error.kuzzleStack).be.equal(
-            'NotFoundError: API action "foo":"bar" not found'
+            'NotFoundError: API action "foo":"bar" not found',
           );
           should(error.controller).be.equal("foo");
           should(error.action).be.equal("bar");
@@ -233,7 +235,7 @@ describe("Common Protocol", () => {
           should(error.collection).be.equal("toto");
           should(error.requestId).be.equal("foobar");
           should(error.stack).match(
-            /NotFoundError: API action "foo":"bar" not found/
+            /NotFoundError: API action "foo":"bar" not found/,
           );
           should(error.stack).match(/KuzzleAbstractProtocol/);
           should(error.stack).match(/>\s{4}at Context.<anonymous>/);
@@ -309,7 +311,7 @@ describe("Common Protocol", () => {
           pending2.promise.should.be.rejectedWith({
             message:
               "Network error: request was sent but no response has been received",
-          })
+          }),
         );
     });
   });

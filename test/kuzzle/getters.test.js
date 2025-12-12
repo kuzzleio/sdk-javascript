@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should"),
   ProtocolMock = require("../mocks/protocol.mock"),
   generateJwt = require("../mocks/generateJwt.mock"),

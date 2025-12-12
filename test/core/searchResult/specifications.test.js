@@ -1,3 +1,5 @@
+"use strict";
+
 const {
     SpecificationsSearchResult,
   } = require("../../../src/core/searchResult/Specifications"),
@@ -43,7 +45,7 @@ describe("SpecificationsSearchResult", () => {
         kuzzle,
         request,
         options,
-        result
+        result,
       );
 
       should(searchResult._request).be.equal(request);
@@ -83,7 +85,7 @@ describe("SpecificationsSearchResult", () => {
         kuzzle,
         request,
         options,
-        result
+        result,
       );
 
       return searchResult.next().then((res) => {
@@ -114,11 +116,11 @@ describe("SpecificationsSearchResult", () => {
         kuzzle,
         request,
         options,
-        result
+        result,
       );
 
       return should(searchResult.next()).be.rejectedWith(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
       );
     });
 
@@ -163,7 +165,7 @@ describe("SpecificationsSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -233,7 +235,7 @@ describe("SpecificationsSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -254,7 +256,7 @@ describe("SpecificationsSearchResult", () => {
                 action: "searchSpecifications",
                 size: 2,
               },
-              options
+              options,
             );
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(SpecificationsSearchResult);
@@ -312,7 +314,7 @@ describe("SpecificationsSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });

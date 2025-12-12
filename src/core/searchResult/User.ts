@@ -8,7 +8,7 @@ export class UserSearchResult extends SearchResultBase<User> {
     this._searchAction = "searchUsers";
     this._scrollAction = "scrollUsers";
     this.hits = this._result.hits.map(
-      (hit) => new User(this._kuzzle, hit._id, hit._source)
+      (hit) => new User(this._kuzzle, hit._id, hit._source),
     );
   }
 
@@ -19,7 +19,7 @@ export class UserSearchResult extends SearchResultBase<User> {
       }
 
       nextSearchResult.hits = nextSearchResult._result.hits.map(
-        (hit) => new User(nextSearchResult._kuzzle, hit._id, hit._source)
+        (hit) => new User(nextSearchResult._kuzzle, hit._id, hit._source),
       );
 
       return nextSearchResult;

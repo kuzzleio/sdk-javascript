@@ -1,3 +1,5 @@
+"use strict";
+
 const { CollectionController } = require("../../src/controllers/Collection"),
   {
     SpecificationsSearchResult,
@@ -31,7 +33,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).be.undefined();
@@ -54,7 +56,7 @@ describe("Collection Controller", () => {
                 index: "index",
                 collection: "collection",
               },
-              options
+              options,
             );
 
           should(res).be.undefined();
@@ -76,7 +78,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).be.undefined();
@@ -98,7 +100,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).be.a.Boolean().and.be.true();
@@ -120,7 +122,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).be.undefined();
@@ -157,7 +159,7 @@ describe("Collection Controller", () => {
               collection: "collection",
               includeKuzzleMeta: true,
             },
-            options
+            options,
           );
 
           should(res).match({
@@ -201,7 +203,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).match({
@@ -240,7 +242,7 @@ describe("Collection Controller", () => {
             size: 0,
             from: undefined,
           },
-          options
+          options,
         );
 
         should(res).match({
@@ -282,7 +284,7 @@ describe("Collection Controller", () => {
               size: 42,
               scroll: "scroll",
             },
-            { foo: "bar", from: 3, scroll: "scroll", size: 42 }
+            { foo: "bar", from: 3, scroll: "scroll", size: 42 },
           );
 
           should(res).be.an.instanceOf(SpecificationsSearchResult);
@@ -317,7 +319,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).be.undefined();
@@ -341,7 +343,7 @@ describe("Collection Controller", () => {
               index: "index",
               collection: "collection",
             },
-            options
+            options,
           );
 
           should(res).match({ foo: "bar" });
@@ -386,7 +388,7 @@ describe("Collection Controller", () => {
               controller: "collection",
               action: "updateSpecifications",
             },
-            options
+            options,
           );
 
           should(res).match({ foo: "bar" });
@@ -416,7 +418,7 @@ describe("Collection Controller", () => {
               controller: "collection",
               action: "validateSpecifications",
             },
-            options
+            options,
           );
 
           should(res).match({

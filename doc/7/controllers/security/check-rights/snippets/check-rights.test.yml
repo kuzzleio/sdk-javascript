@@ -1,7 +1,0 @@
-name: security#checkRights
-description: Checks if an API action can be executed by a user
-hooks:
-  before: curl -X POST kuzzle:7512/users/foo/_create -H "Content-Type:application/json" --data '{"content":{"profileIds":["default"]},"credentials":{"local":{"username":"foo","password":"bar"}}}'
-  after: curl -X DELETE kuzzle:7512/users/foo
-template: default
-expected: true

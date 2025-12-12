@@ -28,7 +28,7 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     query: JSONObject = {},
-    options: ArgsBulkControllerDeleteByQuery = {}
+    options: ArgsBulkControllerDeleteByQuery = {},
   ): Promise<number> {
     const request = {
       action: "deleteByQuery",
@@ -38,7 +38,7 @@ export class BulkController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.deleted
+      (response) => response.result.deleted,
     );
   }
 
@@ -60,7 +60,7 @@ export class BulkController extends BaseController {
     index: string,
     collection: string,
     bulkData: Array<JSONObject>,
-    options: ArgsBulkControllerImport = {}
+    options: ArgsBulkControllerImport = {},
   ): Promise<{
     /**
      * Array of successfully executed actions
@@ -116,7 +116,7 @@ export class BulkController extends BaseController {
         collection,
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -140,7 +140,7 @@ export class BulkController extends BaseController {
     collection: string,
     query: JSONObject,
     changes: JSONObject,
-    options: ArgsBulkControllerUpdateByQuery = {}
+    options: ArgsBulkControllerUpdateByQuery = {},
   ): Promise<number> {
     const request = {
       action: "updateByQuery",
@@ -150,7 +150,7 @@ export class BulkController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.updated
+      (response) => response.result.updated,
     );
   }
 
@@ -176,7 +176,7 @@ export class BulkController extends BaseController {
     collection: string,
     document: JSONObject,
     id?: string,
-    options: ArgsBulkControllerWrite = {}
+    options: ArgsBulkControllerWrite = {},
   ): Promise<Document> {
     return this.query(
       {
@@ -187,7 +187,7 @@ export class BulkController extends BaseController {
         index,
         notify: options.notify,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -220,7 +220,7 @@ export class BulkController extends BaseController {
        */
       _source: JSONObject;
     }>,
-    options: ArgsBulkControllerMWrite = {}
+    options: ArgsBulkControllerMWrite = {},
   ): Promise<{
     /**
      * Array of successfully created/replaced documents
@@ -252,7 +252,7 @@ export class BulkController extends BaseController {
         index,
         notify: options.notify,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 }

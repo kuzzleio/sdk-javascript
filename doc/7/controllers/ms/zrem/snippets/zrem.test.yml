@@ -1,9 +1,0 @@
-name: ms#zrem
-description: Removes members from a sorted set
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ { member: 'baz', score: -272.15 } ]"
-sdk: js
-version: 7

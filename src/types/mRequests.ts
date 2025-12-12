@@ -14,7 +14,7 @@ export type mCreateRequest<TKDocumentContent extends KDocumentContentGeneric> =
   }>;
 
 export type mCreateOrReplaceRequest<
-  TKDocumentContent extends KDocumentContentGeneric
+  TKDocumentContent extends KDocumentContentGeneric,
 > = Array<{
   /**
    * Document unique identifier

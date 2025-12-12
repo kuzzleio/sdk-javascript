@@ -2,15 +2,25 @@
   "compilerOptions": {
     "declaration": true,
     "listEmittedFiles": true,
+    "outDir": "out",
     "module": "commonjs",
     "target": "es2020",
     "moduleResolution": "node",
     "sourceMap": true,
     "baseUrl": ".",
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "rootDir": "src/",
-  "include": ["index.ts", "src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "features/**/*.ts",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

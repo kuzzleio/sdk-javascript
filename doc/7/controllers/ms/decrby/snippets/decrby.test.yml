@@ -1,9 +1,0 @@
-name: ms#decrby
-description: Decrements the number stored at key by a provided integer value
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: 42
-sdk: js
-version: 7

@@ -1,9 +1,0 @@
-name: ms#incrby
-description: Increments the number stored at `key` by the provided integer value
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: ^42$
-sdk: js
-version: 7

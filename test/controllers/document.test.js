@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -35,7 +37,7 @@ describe("Document Controller", () => {
                 collection: "collection",
                 body: { foo: "bar" },
               },
-              options
+              options,
             );
 
           should(res).be.a.Number().and.be.equal(1234);
@@ -68,7 +70,7 @@ describe("Document Controller", () => {
                 silent: true,
                 body: { foo: "bar" },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -93,7 +95,7 @@ describe("Document Controller", () => {
           "collection",
           "document-id",
           { foo: "bar" },
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -108,7 +110,7 @@ describe("Document Controller", () => {
                 silent: true,
                 body: { foo: "bar" },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -133,7 +135,7 @@ describe("Document Controller", () => {
               silent: true,
               _id: "document-id",
             },
-            options
+            options,
           );
 
           should(res).equal("document-id");
@@ -157,7 +159,7 @@ describe("Document Controller", () => {
           "collection",
           "document-id",
           ["bar"],
-          optionsCopy
+          optionsCopy,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -173,7 +175,7 @@ describe("Document Controller", () => {
                 silent: true,
                 source: true,
               },
-              optionsCopy
+              optionsCopy,
             );
 
           should(res._id).be.equal("document-id");
@@ -202,7 +204,7 @@ describe("Document Controller", () => {
                 lang: undefined,
                 silent: true,
               },
-              options
+              options,
             );
 
           should(res).be.an.Array();
@@ -236,7 +238,7 @@ describe("Document Controller", () => {
               collection: "collection",
               _id: "document-id",
             },
-            options
+            options,
           );
 
           should(res._id).be.equal("document-id");
@@ -268,7 +270,7 @@ describe("Document Controller", () => {
           "index",
           "collection",
           [{ _id: "document-id", body: { foo: "bar" } }],
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -285,7 +287,7 @@ describe("Document Controller", () => {
                   documents: [{ _id: "document-id", body: { foo: "bar" } }],
                 },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -314,7 +316,7 @@ describe("Document Controller", () => {
           "index",
           "collection",
           [{ _id: "document-id", body: { foo: "bar" } }],
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -331,7 +333,7 @@ describe("Document Controller", () => {
                   documents: [{ _id: "document-id", body: { foo: "bar" } }],
                 },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -357,7 +359,7 @@ describe("Document Controller", () => {
           "collection",
           "some-id",
           { changes: "changes" },
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -376,7 +378,7 @@ describe("Document Controller", () => {
                   default: { def: "default" },
                 },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -406,7 +408,7 @@ describe("Document Controller", () => {
                 strict: true,
                 body: { ids: ["document1", "document2"] },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -438,7 +440,7 @@ describe("Document Controller", () => {
                 collection: "collection",
                 body: { ids: ["document1", "document2"] },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -467,7 +469,7 @@ describe("Document Controller", () => {
           "index",
           "collection",
           [{ _id: "document-id", body: { foo: "bar" } }],
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -484,7 +486,7 @@ describe("Document Controller", () => {
                   documents: [{ _id: "document-id", body: { foo: "bar" } }],
                 },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -513,7 +515,7 @@ describe("Document Controller", () => {
           "index",
           "collection",
           [{ _id: "document-id", body: { foo: "bar" } }],
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
@@ -530,7 +532,7 @@ describe("Document Controller", () => {
                   documents: [{ _id: "document-id", body: { foo: "bar" } }],
                 },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -564,7 +566,7 @@ describe("Document Controller", () => {
                 silent: true,
                 body: { foo: "bar" },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -602,7 +604,7 @@ describe("Document Controller", () => {
                 size: undefined,
                 scroll: undefined,
               },
-              options
+              options,
             );
 
           should(res).be.an.instanceOf(DocumentSearchResult);
@@ -645,7 +647,7 @@ describe("Document Controller", () => {
                 size: undefined,
                 scroll: undefined,
               },
-              options
+              options,
             );
 
           should(res).be.an.instanceOf(DocumentSearchResult);
@@ -674,7 +676,7 @@ describe("Document Controller", () => {
           "index",
           "collection",
           { foo: "bar" },
-          { from: 1, size: 2, scroll: "10s" }
+          { from: 1, size: 2, scroll: "10s" },
         )
         .then((res) => {
           should(kuzzle.query)
@@ -690,7 +692,7 @@ describe("Document Controller", () => {
                 size: 2,
                 scroll: "10s",
               },
-              {}
+              {},
             );
 
           should(res).be.an.instanceOf(DocumentSearchResult);
@@ -776,7 +778,7 @@ describe("Document Controller", () => {
                 silent: true,
                 source: undefined,
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -798,7 +800,7 @@ describe("Document Controller", () => {
           "collection",
           "document-id",
           { foo: "bar" },
-          { retryOnConflict: true }
+          { retryOnConflict: true },
         )
         .then((res) => {
           should(kuzzle.query)
@@ -815,7 +817,7 @@ describe("Document Controller", () => {
                 source: undefined,
                 silent: undefined,
               },
-              { retryOnConflict: true }
+              { retryOnConflict: true },
             );
 
           should(res).be.equal(result);
@@ -837,7 +839,7 @@ describe("Document Controller", () => {
           "collection",
           "document-id",
           { foo: "bar" },
-          { source: true }
+          { source: true },
         )
         .then((res) => {
           should(kuzzle.query)
@@ -899,7 +901,7 @@ describe("Document Controller", () => {
                 silent: true,
                 lang: undefined,
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -972,7 +974,7 @@ describe("Document Controller", () => {
                 collection: "collection",
                 body: { foo: "bar" },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
