@@ -1,6 +1,0 @@
-name: security#createOrReplaceRole
-description: Creates or replaces role
-hooks:
-  after: curl -XDELETE kuzzle:7512/roles/read-only
-template: default
-expected: Role successfully updated

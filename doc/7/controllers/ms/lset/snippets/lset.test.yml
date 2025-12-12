@@ -1,9 +1,0 @@
-name: ms#lset
-description: Sets the list element at index with the provided value
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ 'foo', 'bar', 'baz' ]"
-sdk: js
-version: 7

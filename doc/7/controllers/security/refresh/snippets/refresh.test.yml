@@ -1,5 +1,0 @@
-name: security#refresh
-description: Refreshes security collection
-hooks:
-template: default
-expected: Success

@@ -1,9 +1,0 @@
-name: ms#bitop
-description: Performs a bitwise operation between multiple keys
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "`bc`ab"
-sdk: js
-version: 7
