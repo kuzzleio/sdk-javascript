@@ -29,14 +29,14 @@
   },
   "browser": "./dist/kuzzle.js",
   "main": "./out/index.js",
-  "types": "index.d.ts",
+  "types": "./out/index.d.ts",
   "exports": {
     ".": {
       "browser": "./dist/kuzzle.js",
       "import": "./out/index.js",
       "require": "./out/index.js",
       "default": "./out/index.js",
-      "types": "./index.d.ts"
+      "types": "./out/index.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -69,8 +69,6 @@
   "files": [
     "dist/**/*",
     "out/**/*",
-    "index.js",
-    "index.d.ts",
     "src/**/*.js",
     "src/**/*.d.ts",
     "src/**/*.json"
