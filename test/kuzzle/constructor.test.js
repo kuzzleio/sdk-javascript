@@ -1,3 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-new */
+"use strict";
+
 const should = require("should"),
   sinon = require("sinon"),
   { Kuzzle } = require("../../src/Kuzzle"),

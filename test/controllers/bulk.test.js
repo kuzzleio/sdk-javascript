@@ -1,3 +1,5 @@
+"use strict";
+
 const { BulkController } = require("../../src/controllers/Bulk"),
   sinon = require("sinon"),
   should = require("should");
@@ -26,20 +28,20 @@ describe("Bulk Controller", () => {
           "index",
           "collection",
           { query: { match: { foo: "bar" } } },
-          options
+          options,
         )
         .then((res) => {
           should(kuzzle.query)
             .be.calledOnce()
             .be.calledWith(
               {
-                controller: "bulk",
                 action: "deleteByQuery",
-                index: "index",
-                collection: "collection",
                 body: { query: { match: { foo: "bar" } } },
+                collection: "collection",
+                controller: "bulk",
+                index: "index",
               },
-              options
+              options,
             );
 
           should(res).be.an.Number();
@@ -52,11 +54,11 @@ describe("Bulk Controller", () => {
     it("should call bulk/import query with the bulk data and return a Promise which resolves json object", () => {
       kuzzle.query.resolves({
         result: {
+          errors: false,
           items: [
             { create: { _id: "foo" }, status: 200 },
-            { update: { _id: "bar" }, status: 200 },
+            { status: 200, update: { _id: "bar" } },
           ],
-          errors: false,
         },
       });
 
@@ -68,18 +70,18 @@ describe("Bulk Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              index,
-              collection,
-              body: { bulkData },
-              controller: "bulk",
               action: "import",
+              body: { bulkData },
+              collection,
+              controller: "bulk",
+              index,
             },
-            options
+            options,
           );
 
           should(res.items).match([
             { create: { _id: "foo" }, status: 200 },
-            { update: { _id: "bar" }, status: 200 },
+            { status: 200, update: { _id: "bar" } },
           ]);
           should(res.errors).be.eql(false);
         });
@@ -105,15 +107,15 @@ describe("Bulk Controller", () => {
         .then((result) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              body: document,
               _id: "liia",
-              index: "vietnam",
+              action: "write",
+              body: document,
               collection: "hochiminh",
               controller: "bulk",
-              action: "write",
+              index: "vietnam",
               notify: true,
             },
-            options
+            options,
           );
 
           should(result).match({
@@ -151,14 +153,14 @@ describe("Bulk Controller", () => {
         .then((result) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
+              action: "mWrite",
               body: { documents },
-              index: "vietnam",
               collection: "hochiminh",
               controller: "bulk",
-              action: "mWrite",
+              index: "vietnam",
               notify: true,
             },
-            options
+            options,
           );
 
           should(result.hits[0]).match({

@@ -8,7 +8,7 @@ import { SearchResultBase } from "./SearchResultBase";
  * Represents a SearchResult containing realtime documents.
  */
 export class RealtimeDocumentSearchResult<
-  TKDocumentContent extends KDocumentContentGeneric
+  TKDocumentContent extends KDocumentContentGeneric,
 > extends SearchResultBase<KHit<TKDocumentContent>> {
   private observer: Observer;
 
@@ -17,7 +17,7 @@ export class RealtimeDocumentSearchResult<
     request: RequestPayload,
     options: JSONObject,
     result: JSONObject,
-    observer: Observer
+    observer: Observer,
   ) {
     super(kuzzle, request, options, result);
 
@@ -61,7 +61,7 @@ export class RealtimeDocumentSearchResult<
         this._request,
         this._options,
         result,
-        this.observer
+        this.observer,
       );
 
     nextSearchResult.fetched += this.fetched;

@@ -37,6 +37,6 @@ export type ProfilePolicy = {
        * Rights will only be applied on those collections.
        */
       collections?: Array<string>;
-    }
+    },
   ];
 };

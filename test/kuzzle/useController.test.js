@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should"),
   sinon = require("sinon"),
   ProtocolMock = require("../mocks/protocol.mock"),
@@ -66,7 +68,7 @@ describe("Kuzzle custom controllers management", () => {
       return kuzzle.custom.sayHello("Wake up, and smell the ashes").then(() => {
         should(kuzzle.protocol.query).be.calledOnce();
         should(kuzzle.protocol.query).be.calledWith(
-          sinon.match.has("controller", "custom-plugin/custom")
+          sinon.match.has("controller", "custom-plugin/custom"),
         );
       });
     });
@@ -81,7 +83,7 @@ describe("Kuzzle custom controllers management", () => {
       should(() => {
         kuzzle.useController(WrongConstructorController, "unamed");
       }).throw(
-        "You must pass the Kuzzle SDK instance to the parent constructor."
+        "You must pass the Kuzzle SDK instance to the parent constructor.",
       );
     });
 
@@ -97,7 +99,7 @@ describe("Kuzzle custom controllers management", () => {
       should(() => {
         kuzzle.useController(CustomController, "custom");
       }).throw(
-        "There is already a controller with the accessor 'custom'. Please use another one."
+        "There is already a controller with the accessor 'custom'. Please use another one.",
       );
     });
   });

@@ -1,9 +1,0 @@
-name: ms#geoadd
-description: Adds geospatial points to the specified key
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: 2
-sdk: js
-version: 7

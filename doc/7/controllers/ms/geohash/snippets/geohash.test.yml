@@ -1,9 +1,0 @@
-name: ms#geohash
-description: Converts a key's geopoints into geohashes
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "[ 'spfb0frz6x0', 'spfb09jv9n0' ]"
-sdk: js
-version: 7

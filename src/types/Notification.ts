@@ -57,7 +57,7 @@ export interface BaseNotification {
  * (create, update, delete)
  */
 export interface DocumentNotification<
-  TDocContent extends KDocumentContentGeneric = KDocumentContentGeneric
+  TDocContent extends KDocumentContentGeneric = KDocumentContentGeneric,
 > extends BaseNotification {
   /**
    * Updated document that triggered the notification

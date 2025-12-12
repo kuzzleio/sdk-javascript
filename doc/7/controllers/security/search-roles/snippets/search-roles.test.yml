@@ -1,4 +1,0 @@
-name: security#searchRoles
-description: search roles
-template: default
-expected: ^Successfully retrieved 3 roles$

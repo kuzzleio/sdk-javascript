@@ -1,9 +1,0 @@
-name: ms#set
-description: Creates a key holding the provided value, or overwrites it if it already exists
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: ^bar$
-sdk: js
-version: 7

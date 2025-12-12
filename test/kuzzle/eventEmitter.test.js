@@ -1,3 +1,6 @@
+/* eslint-disable no-invalid-this */
+"use strict";
+
 const should = require("should"),
   sinon = require("sinon"),
   { KuzzleEventEmitter } = require("../../src/core/KuzzleEventEmitter");
@@ -28,13 +31,13 @@ describe("Event emitter", () => {
   describe("#addListener", () => {
     it("should properly add new listeners to events", () => {
       should(kuzzleEventEmitter.on("foo", listener1)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
       should(kuzzleEventEmitter.on("foo", listener2)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
       should(kuzzleEventEmitter.on("bar", listener3)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
       should(kuzzleEventEmitter.listeners("foo"))
         .eql([listener1, listener2])
@@ -254,13 +257,13 @@ describe("Event emitter", () => {
   describe("#eventNames", () => {
     it("should return the list of registered event names", () => {
       should(kuzzleEventEmitter.on("foo", listener1)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
       should(kuzzleEventEmitter.once("bar", listener2)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
       should(kuzzleEventEmitter.on("baz", listener3)).be.eql(
-        kuzzleEventEmitter
+        kuzzleEventEmitter,
       );
 
       should(kuzzleEventEmitter.eventNames()).be.eql(["foo", "bar", "baz"]);

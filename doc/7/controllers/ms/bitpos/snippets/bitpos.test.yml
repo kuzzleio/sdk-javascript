@@ -1,9 +1,0 @@
-name: ms#bitpos
-description: Returns the position of the first bit set to 1 or 0 in a string, or in a substring
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: 23
-sdk: js
-version: 7

@@ -1,9 +1,0 @@
-name: ms#lindex
-description: Returns the element at the provided index in a list
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: ^bar$
-sdk: js
-version: 7

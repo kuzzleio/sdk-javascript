@@ -1,3 +1,5 @@
+"use strict";
+
 const { RoleSearchResult } = require("../../../src/core/searchResult/Role"),
   { Role } = require("../../../src/core/security/Role"),
   sinon = require("sinon"),
@@ -100,7 +102,7 @@ describe("RoleSearchResult", () => {
       searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "only from/size params are allowed for role search"
+        "only from/size params are allowed for role search",
       );
     });
 
@@ -109,7 +111,7 @@ describe("RoleSearchResult", () => {
       searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "only from/size params are allowed for role search"
+        "only from/size params are allowed for role search",
       );
     });
 
@@ -117,7 +119,7 @@ describe("RoleSearchResult", () => {
       searchResult = new RoleSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
       );
     });
 

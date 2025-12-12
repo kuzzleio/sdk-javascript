@@ -1,5 +1,3 @@
-"use strict";
-
 import { KuzzleError } from "../KuzzleError";
 import { BaseProtocolRealtime } from "./abstract/Realtime";
 import { JSONObject } from "../types";
@@ -44,7 +42,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
        */
       sslConnection?: boolean;
       ssl?: boolean;
-    } = {}
+    } = {},
   ) {
     super(host, options, "ws");
 
@@ -163,7 +161,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
 
         if (
           [this.client.CLOSING, this.client.CLOSED].indexOf(
-            this.client.readyState
+            this.client.readyState,
           ) > -1
         ) {
           return reject(err);
@@ -194,7 +192,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           const error = new KuzzleError(
             data.error,
             new Error().stack,
-            this.constructor.name
+            this.constructor.name,
           );
 
           this.emit("queryError", { error, request: data });
@@ -220,7 +218,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
   enableCookieSupport() {
     if (typeof XMLHttpRequest === "undefined") {
       throw new Error(
-        "Support for cookie cannot be enabled outside of a browser"
+        "Support for cookie cannot be enabled outside of a browser",
       );
     }
 
@@ -342,7 +340,7 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
       // If we were waiting for a pong that never occured before the next ping cycle we throw an error
       if (this.waitForPong) {
         const error: any = new Error(
-          "Kuzzle does'nt respond to ping. Connection lost."
+          "Kuzzle does'nt respond to ping. Connection lost.",
         );
         error.status = 503;
 

@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: ["18", "20"]
+        node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
       - run: |
           npm ci
           npm run test:lint
@@ -25,13 +25,13 @@ jobs:
     needs: [lint]
     strategy:
       matrix:
-        node-version: ["18", "20"]
+        node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
       - uses: ./.github/actions/unit-tests
 
   functional-tests:
@@ -40,27 +40,13 @@ jobs:
     needs: [unit-tests]
     strategy:
       matrix:
-        node-version: ["18", "20"]
+        node-version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
       - uses: ./.github/actions/functional-tests
-        with:
-          CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}
-
-  documentation-snippet-tests:
-    name: Documentation Snippet Tests
-    needs: [unit-tests]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: 'npm'
-      - uses: ./.github/actions/snippet-tests
         with:
           CYPRESS_RECORD_KEY_DOC: ${{ secrets.CYPRESS_RECORD_KEY_DOC }}

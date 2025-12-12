@@ -1,7 +1,7 @@
 ---
 code: false
 type: branch
-order: 100
+order: 200
 title: Essentials
 description: Javascript SDK v7.x essential notions
 ---

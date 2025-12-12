@@ -1,5 +1,3 @@
-"use strict";
-
 import { RequestPayload } from "./types/RequestPayload";
 
 /**

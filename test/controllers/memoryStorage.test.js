@@ -1,3 +1,5 @@
+"use strict";
+
 const {
     MemoryStorageController,
   } = require("../../src/controllers/MemoryStorage"),
@@ -21,7 +23,7 @@ describe("MemoryStorage Controller", function () {
     expArgs,
     expOpts,
     result,
-    expected
+    expected,
   ) => {
     kuzzle.query.reset();
     kuzzle.query.resolves({ result });
@@ -38,8 +40,8 @@ describe("MemoryStorage Controller", function () {
               action: command,
             },
             expArgs,
-            expOpts
-          )
+            expOpts,
+          ),
         );
     });
   };
@@ -51,7 +53,7 @@ describe("MemoryStorage Controller", function () {
     expArgs,
     expOpts,
     result,
-    expected
+    expected,
   ) => {
     if (!expArgs.body) {
       expArgs.body = {};
@@ -71,8 +73,8 @@ describe("MemoryStorage Controller", function () {
               action: command,
             },
             expArgs,
-            expOpts
-          )
+            expOpts,
+          ),
         );
 
       return kuzzle.ms[command](...args.concat(opts));
@@ -87,7 +89,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "value" } },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -99,7 +101,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       { start: 2, end: 42 },
       123,
-      123
+      123,
     );
   });
 
@@ -111,7 +113,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { operation: "and", keys: ["foo", "bar"] } },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -123,7 +125,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", bit: 0 },
       { start: 2, end: 42 },
       123,
-      123
+      123,
     );
   });
 
@@ -143,7 +145,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: 42 } },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -155,7 +157,7 @@ describe("MemoryStorage Controller", function () {
       { body: { keys: ["key1", "key2", "key3"] } },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -167,7 +169,7 @@ describe("MemoryStorage Controller", function () {
       { keys: ["key1", "key2", "key3"] },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -179,7 +181,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { seconds: 42 } },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -191,7 +193,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { timestamp: 123456789 } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -220,7 +222,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { points: points } },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -232,7 +234,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", member1: "Palermo", member2: "Catania" },
       { unit: "ft" },
       "12345.678",
-      12345.678
+      12345.678,
     );
   });
 
@@ -244,7 +246,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", members: ["Palermo", "Catania"] },
       {},
       ["foo", "bar"],
-      ["foo", "bar"]
+      ["foo", "bar"],
     );
   });
 
@@ -262,7 +264,7 @@ describe("MemoryStorage Controller", function () {
       [
         [123.45, 67.89],
         [3.14, 6.98],
-      ]
+      ],
     );
   });
 
@@ -280,7 +282,7 @@ describe("MemoryStorage Controller", function () {
       [
         { name: "Palermo", distance: 190.4424, coordinates: [13.36, 38.11] },
         { name: "Catania", distance: 56.44, coordinates: [15.08, 37.5] },
-      ]
+      ],
     ).then(function () {
       return testReadCommand(
         "georadius",
@@ -289,7 +291,7 @@ describe("MemoryStorage Controller", function () {
         { _id: "key", lon: 15, lat: 37, distance: 200, unit: "km" },
         {},
         ["Palermo", "Catania"],
-        [{ name: "Palermo" }, { name: "Catania" }]
+        [{ name: "Palermo" }, { name: "Catania" }],
       );
     });
   });
@@ -308,7 +310,7 @@ describe("MemoryStorage Controller", function () {
       [
         { name: "Palermo", distance: 190.4424, coordinates: [13.36, 38.11] },
         { name: "Catania", distance: 56.44, coordinates: [15.08, 37.5] },
-      ]
+      ],
     ).then(function () {
       return testReadCommand(
         "georadiusbymember",
@@ -317,7 +319,7 @@ describe("MemoryStorage Controller", function () {
         { _id: "key", member: "Palermo", distance: 200, unit: "km" },
         {},
         ["Palermo", "Catania"],
-        [{ name: "Palermo" }, { name: "Catania" }]
+        [{ name: "Palermo" }, { name: "Catania" }],
       );
     });
   });
@@ -330,7 +332,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -342,7 +344,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", offset: 10 },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -354,7 +356,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", start: 2, end: 4 },
       {},
       "bar",
-      "bar"
+      "bar",
     );
   });
 
@@ -366,7 +368,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foobar" } },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -378,7 +380,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { fields: ["f1", "f2", "f3"] } },
       {},
       2,
-      2
+      2,
     );
   });
 
@@ -390,7 +392,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", field: "field" },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -402,7 +404,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", field: "field" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -414,7 +416,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       { foo: "bar", baz: "qux" },
-      { foo: "bar", baz: "qux" }
+      { foo: "bar", baz: "qux" },
     );
   });
 
@@ -426,7 +428,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { field: "field", value: 42 } },
       {},
       2,
-      2
+      2,
     );
   });
 
@@ -438,7 +440,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { field: "field", value: 3.14159 } },
       {},
       "3.14159",
-      3.14159
+      3.14159,
     );
   });
 
@@ -450,7 +452,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       ["foo", "bar", "baz", "qux"],
-      ["foo", "bar", "baz", "qux"]
+      ["foo", "bar", "baz", "qux"],
     );
   });
 
@@ -466,7 +468,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", fields: ["f1", "f2", "f3"] },
       {},
       ["foo", "bar", "baz", "qux"],
-      ["foo", "bar", "baz", "qux"]
+      ["foo", "bar", "baz", "qux"],
     );
   });
 
@@ -483,7 +485,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { entries: entries } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -495,7 +497,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", cursor: 0 },
       { count: 42, match: "foo*" },
       [42, ["bar", "baz", "qux"]],
-      { cursor: 42, values: ["bar", "baz", "qux"] }
+      { cursor: 42, values: ["bar", "baz", "qux"] },
     );
   });
 
@@ -507,7 +509,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { field: "field", value: "value" } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -519,7 +521,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { field: "field", value: "value" } },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -531,7 +533,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", field: "field" },
       {},
       10,
-      10
+      10,
     );
   });
 
@@ -543,7 +545,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       ["foo", "bar", "baz", "qux"],
-      ["foo", "bar", "baz", "qux"]
+      ["foo", "bar", "baz", "qux"],
     );
   });
 
@@ -559,7 +561,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: -3 } },
       {},
       123,
-      123
+      123,
     );
   });
 
@@ -571,7 +573,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: -3.14 } },
       {},
       "123.12",
-      123.12
+      123.12,
     );
   });
 
@@ -583,7 +585,7 @@ describe("MemoryStorage Controller", function () {
       { pattern: "pattern" },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -595,7 +597,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", idx: 3 },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -607,7 +609,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { position: "after", pivot: "foo", value: "bar" } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -623,7 +625,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -635,7 +637,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { values: ["foo", "bar", "baz"] } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -647,7 +649,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foo" } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -659,7 +661,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", start: 0, stop: 1 },
       {},
       ["foo", "bar"],
-      ["foo", "bar"]
+      ["foo", "bar"],
     );
   });
 
@@ -671,7 +673,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { count: 1, value: "foo" } },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -683,7 +685,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { index: 1, value: "foo" } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -695,7 +697,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { start: 1, stop: 2 } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -724,7 +726,7 @@ describe("MemoryStorage Controller", function () {
         [null, "OK"],
         [null, "1"],
         [null, 1],
-      ]
+      ],
     );
   });
 
@@ -736,7 +738,7 @@ describe("MemoryStorage Controller", function () {
       { keys: ["k1", "k2", "k3"] },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -753,7 +755,7 @@ describe("MemoryStorage Controller", function () {
       { body: { entries: entries } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -770,7 +772,7 @@ describe("MemoryStorage Controller", function () {
       { body: { entries: entries } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -782,7 +784,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", subcommand: "encoding" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -794,7 +796,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -806,7 +808,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { milliseconds: 42000 } },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -818,7 +820,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { timestamp: 123456789 } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -830,7 +832,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { elements: ["foo", "bar", "baz"] } },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -842,7 +844,7 @@ describe("MemoryStorage Controller", function () {
       { keys: ["k1", "k2", "k3"] },
       {},
       42,
-      42
+      42,
     );
   });
 
@@ -854,7 +856,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { sources: ["key1", "key2", "key3"] } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -870,7 +872,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "value", milliseconds: 42000 } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -882,7 +884,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       42000,
-      42000
+      42000,
     );
   });
 
@@ -898,7 +900,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { newkey: "newId" } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -910,7 +912,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { newkey: "newId" } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -922,7 +924,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -934,7 +936,7 @@ describe("MemoryStorage Controller", function () {
       { body: { source: "src", destination: "dest" } },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -946,7 +948,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { values: ["foo", "bar", "baz"] } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -958,7 +960,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foo" } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -970,7 +972,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { members: ["foo", "bar", "baz"] } },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -982,7 +984,7 @@ describe("MemoryStorage Controller", function () {
       { cursor: 0 },
       { count: 42, match: "foo*" },
       [42, ["bar", "baz", "qux"]],
-      { cursor: 42, values: ["bar", "baz", "qux"] }
+      { cursor: 42, values: ["bar", "baz", "qux"] },
     );
   });
 
@@ -998,7 +1000,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", keys: ["foo", "bar", "baz"] },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1013,7 +1015,7 @@ describe("MemoryStorage Controller", function () {
       },
       {},
       4,
-      4
+      4,
     );
   });
 
@@ -1025,7 +1027,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foo", ex: 0, nx: true, px: 42, xx: true } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -1037,7 +1039,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foo", seconds: 42 } },
       {},
       "OK",
-      undefined
+      undefined,
     );
   });
 
@@ -1049,7 +1051,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { value: "foo" } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -1061,7 +1063,7 @@ describe("MemoryStorage Controller", function () {
       { keys: ["k1", "k2", "k3"] },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1073,7 +1075,7 @@ describe("MemoryStorage Controller", function () {
       { body: { destination: "key", keys: ["k1", "k2", "k3"] } },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -1085,7 +1087,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", member: "foobar" },
       {},
       0,
-      false
+      false,
     );
   });
 
@@ -1097,7 +1099,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1109,7 +1111,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { destination: "dest", member: "member" } },
       {},
       1,
-      true
+      true,
     );
   });
 
@@ -1136,7 +1138,7 @@ describe("MemoryStorage Controller", function () {
       },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1148,7 +1150,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { count: 2 } },
       {},
       ["foo", "bar"],
-      ["foo", "bar"]
+      ["foo", "bar"],
     );
   });
 
@@ -1160,7 +1162,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       { count: 2 },
       ["foo", "bar"],
-      ["foo", "bar"]
+      ["foo", "bar"],
     );
   });
 
@@ -1172,7 +1174,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { members: ["m1", "m2", "m3"] } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1184,7 +1186,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", cursor: 0 },
       { count: 42, match: "foo*" },
       [42, ["bar", "baz", "qux"]],
-      { cursor: 42, values: ["bar", "baz", "qux"] }
+      { cursor: 42, values: ["bar", "baz", "qux"] },
     );
   });
 
@@ -1200,7 +1202,7 @@ describe("MemoryStorage Controller", function () {
       { keys: ["k1", "k2", "k3"] },
       {},
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1212,7 +1214,7 @@ describe("MemoryStorage Controller", function () {
       { body: { destination: "key", keys: ["k1", "k2", "k3"] } },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -1228,7 +1230,7 @@ describe("MemoryStorage Controller", function () {
       { body: { keys: ["k1", "k2", "k3"] } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1244,7 +1246,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key" },
       {},
       "foobar",
-      "foobar"
+      "foobar",
     );
   });
 
@@ -1265,7 +1267,7 @@ describe("MemoryStorage Controller", function () {
       },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1281,7 +1283,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", min: 2, max: 3 },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1293,7 +1295,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { member: "foo", value: 42 } },
       {},
       2,
-      2
+      2,
     );
   });
 
@@ -1312,7 +1314,7 @@ describe("MemoryStorage Controller", function () {
       },
       {},
       1,
-      1
+      1,
     );
   });
 
@@ -1324,7 +1326,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", min: "foo", max: "bar" },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1339,7 +1341,7 @@ describe("MemoryStorage Controller", function () {
       [
         { member: "foo", score: 123 },
         { member: "bar", score: 456 },
-      ]
+      ],
     );
   });
 
@@ -1351,7 +1353,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", min: "a", max: "z" },
       { limit: [0, 1] },
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1363,7 +1365,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", min: "a", max: "z" },
       { limit: [0, 1] },
       ["foo", "bar", "baz"],
-      ["foo", "bar", "baz"]
+      ["foo", "bar", "baz"],
     );
   });
 
@@ -1378,7 +1380,7 @@ describe("MemoryStorage Controller", function () {
       [
         { member: "foo", score: 123 },
         { member: "bar", score: 456 },
-      ]
+      ],
     );
   });
 
@@ -1390,7 +1392,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", member: "foo" },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1402,7 +1404,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { members: ["m1", "m2", "m3"] } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1414,7 +1416,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { min: "a", max: "z" } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1426,7 +1428,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { start: 0, stop: 3 } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1438,7 +1440,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", body: { min: 0, max: 3 } },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1453,7 +1455,7 @@ describe("MemoryStorage Controller", function () {
       [
         { member: "foo", score: 123 },
         { member: "bar", score: 456 },
-      ]
+      ],
     );
   });
 
@@ -1468,7 +1470,7 @@ describe("MemoryStorage Controller", function () {
       [
         { member: "foo", score: 123 },
         { member: "bar", score: 456 },
-      ]
+      ],
     );
   });
 
@@ -1480,7 +1482,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", member: "foo" },
       {},
       3,
-      3
+      3,
     );
   });
 
@@ -1492,7 +1494,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", cursor: 0 },
       { count: 42, match: "foo*" },
       [42, ["bar", "baz", "qux"]],
-      { cursor: 42, values: ["bar", "baz", "qux"] }
+      { cursor: 42, values: ["bar", "baz", "qux"] },
     );
   });
 
@@ -1504,7 +1506,7 @@ describe("MemoryStorage Controller", function () {
       { _id: "key", member: "foo" },
       {},
       "3.14159",
-      3.14159
+      3.14159,
     );
   });
 
@@ -1523,7 +1525,7 @@ describe("MemoryStorage Controller", function () {
       },
       {},
       1,
-      1
+      1,
     );
   });
 });

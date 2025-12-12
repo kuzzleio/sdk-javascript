@@ -41,7 +41,7 @@ export class BatchBuffer {
     collection: string,
     body: JSONObject,
     _id?: string,
-    options?: JSONObject
+    options?: JSONObject,
   ): { idx: number; promise: InstrumentablePromise } {
     if (!this.indexes.has(index)) {
       this.indexes.set(index, new Map<string, DocumentsBuffer>());

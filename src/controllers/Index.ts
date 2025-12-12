@@ -18,7 +18,7 @@ export class IndexController extends BaseController {
    */
   create(
     index: string,
-    options: ArgsIndexControllerCreate = {}
+    options: ArgsIndexControllerCreate = {},
   ): Promise<void> {
     const request = {
       action: "create",
@@ -39,7 +39,7 @@ export class IndexController extends BaseController {
    */
   delete(
     index: string,
-    options: ArgsIndexControllerDelete = {}
+    options: ArgsIndexControllerDelete = {},
   ): Promise<void> {
     const request = {
       action: "delete",
@@ -60,14 +60,14 @@ export class IndexController extends BaseController {
    */
   exists(
     index: string,
-    options: ArgsIndexControllerExists = {}
+    options: ArgsIndexControllerExists = {},
   ): Promise<boolean> {
     return this.query(
       {
         action: "exists",
         index,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -85,7 +85,7 @@ export class IndexController extends BaseController {
       {
         action: "list",
       },
-      options
+      options,
     ).then((response) => response.result.indexes);
   }
 
@@ -103,7 +103,7 @@ export class IndexController extends BaseController {
    */
   mDelete(
     indexes: Array<string>,
-    options: ArgsIndexControllerMDelete = {}
+    options: ArgsIndexControllerMDelete = {},
   ): Promise<Array<string>> {
     const request = {
       action: "mDelete",
@@ -113,7 +113,7 @@ export class IndexController extends BaseController {
     };
 
     return this.query(request, options).then(
-      (response) => response.result.deleted
+      (response) => response.result.deleted,
     );
   }
 
@@ -131,7 +131,7 @@ export class IndexController extends BaseController {
       {
         action: "stats",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 }

@@ -7,7 +7,7 @@ import { KDocumentContentGeneric } from "../types";
  * Use the `Observer` class to manipulate such documents.
  */
 export class RealtimeDocument<
-  TKDocumentContent extends KDocumentContentGeneric
+  TKDocumentContent extends KDocumentContentGeneric,
 > {
   /**
    * Document ID

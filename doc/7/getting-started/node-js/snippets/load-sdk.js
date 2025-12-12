@@ -1,9 +1,5 @@
-const {
-  Kuzzle,
-  WebSocket
-} = require('kuzzle-sdk');
+const { Kuzzle, WebSocket } = require("kuzzle-sdk");
 
 // Replace 'kuzzle' with your Kuzzle server hostname (e.g. 'localhost')
-const kuzzle = new Kuzzle(
-  new WebSocket('kuzzle')
-);
+// eslint-disable-next-line no-unused-vars
+const kuzzle = new Kuzzle(new WebSocket("kuzzle"));

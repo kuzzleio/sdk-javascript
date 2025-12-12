@@ -1,3 +1,5 @@
+"use strict";
+
 function generateJwt(userId = "test-user", expiresAt = null) {
   const header = { alg: "HS256", typ: "JWT" },
     payload = {
