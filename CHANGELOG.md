@@ -11,6 +11,22 @@
 * modify what files are taken when publishing ([8c45c26](https://github.com/kuzzleio/sdk-javascript/commit/8c45c268bf6a56f4350ffab66c2cbf90b3761dec))
 * node version in ci, trigger release ([3027bdb](https://github.com/kuzzleio/sdk-javascript/commit/3027bdb4b15497cf1e8861025409cd0d31f6cf80))
 * token in ci ([fee5d50](https://github.com/kuzzleio/sdk-javascript/commit/fee5d50738b2f355cb3a720421e93e54c5b9fa0b))
+* token issue ? ([cf3b3e2](https://github.com/kuzzleio/sdk-javascript/commit/cf3b3e25d1a948bd7e968ce8940bf841bf3559a0))
+* update package.json ([d3a00c7](https://github.com/kuzzleio/sdk-javascript/commit/d3a00c7ecc795d5e512b507eb2a7a474b64a8b55))
+
+## [7.16.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.15.1...v7.16.0-beta.1) (2025-12-15)
+
+
+### Features
+
+* nodejs24 ([714dc23](https://github.com/kuzzleio/sdk-javascript/commit/714dc230a5f6ce2af42021e6243a7feddbf2236f))
+
+
+### Bug Fixes
+
+* modify what files are taken when publishing ([8c45c26](https://github.com/kuzzleio/sdk-javascript/commit/8c45c268bf6a56f4350ffab66c2cbf90b3761dec))
+* node version in ci, trigger release ([3027bdb](https://github.com/kuzzleio/sdk-javascript/commit/3027bdb4b15497cf1e8861025409cd0d31f6cf80))
+* token in ci ([fee5d50](https://github.com/kuzzleio/sdk-javascript/commit/fee5d50738b2f355cb3a720421e93e54c5b9fa0b))
 * update package.json ([d3a00c7](https://github.com/kuzzleio/sdk-javascript/commit/d3a00c7ecc795d5e512b507eb2a7a474b64a8b55))
 
 ## [7.16.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.15.1...v7.16.0-beta.1) (2025-12-12)
