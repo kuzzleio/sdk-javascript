@@ -1,3 +1,9 @@
+## [7.17.0-beta.2](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.0-beta.1...v7.17.0-beta.2) (2025-12-16)
+
+### Bug Fixes
+
+* use custom github token to allow sequantial workflow creation ([b3109fe](https://github.com/kuzzleio/sdk-javascript/commit/b3109fe04e9315535e990dbe4b89187a9ed0f867))
+
 ## [7.17.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.16.0...v7.17.0-beta.1) (2025-12-16)
 
 ### Features
