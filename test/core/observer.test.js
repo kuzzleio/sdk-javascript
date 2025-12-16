@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -204,7 +206,7 @@ describe("Observer", () => {
         "index",
         "collection",
         "id",
-        "opts"
+        "opts",
       );
       should(observer.observe).be.calledWith("index", "collection", doc1);
       should(rtDoc).be.eql(rtDoc1);
@@ -225,14 +227,14 @@ describe("Observer", () => {
         "index",
         "collection",
         ["id", "id2"],
-        "opts"
+        "opts",
       );
 
       should(sdk.document.mGet).be.calledWith(
         "index",
         "collection",
         ["id", "id2"],
-        "opts"
+        "opts",
       );
       should(observer.addDocument)
         .be.calledTwice()
@@ -260,14 +262,14 @@ describe("Observer", () => {
         "index",
         "collection",
         query,
-        options
+        options,
       );
 
       should(sdk.document._search).be.calledWith(
         "index",
         "collection",
         query,
-        options
+        options,
       );
       // Called by RealtimeDocumentSearchResult
       should(observer.addDocument)

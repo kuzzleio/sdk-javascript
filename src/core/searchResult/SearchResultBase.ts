@@ -62,7 +62,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
     kuzzle: Kuzzle,
     request: BaseRequest,
     options: JSONObject = {},
-    result: any = {}
+    result: any = {},
   ) {
     Reflect.defineProperty(this, "_kuzzle", {
       value: kuzzle,
@@ -122,8 +122,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
       if (!hit) {
         return Promise.reject(
           new Error(
-            'Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.'
-          )
+            'Unable to retrieve all results from search: the sort combination must identify one item only. Add document "_id" to the sort.',
+          ),
         );
       }
 
@@ -141,8 +141,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
       if (sorts.length === 0) {
         return Promise.reject(
           new Error(
-            "Unable to retrieve next results from search: sort param is empty"
-          )
+            "Unable to retrieve next results from search: sort param is empty",
+          ),
         );
       }
 
@@ -174,8 +174,8 @@ export class SearchResultBase<T> implements SearchResult<T> {
 
     return Promise.reject(
       new Error(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
-      )
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
+      ),
     );
   }
 
@@ -199,7 +199,7 @@ export class SearchResultBase<T> implements SearchResult<T> {
       this._kuzzle,
       this._request,
       this._options,
-      result
+      result,
     );
     nextSearchResult.fetched += this.fetched;
 

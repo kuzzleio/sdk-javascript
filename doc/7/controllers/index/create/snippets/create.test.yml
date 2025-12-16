@@ -1,8 +1,0 @@
----
-name: index#create
-description: Creates a new index
-hooks:
-  before: curl -X DELETE kuzzle:7512/nyc-open-data
-  after:
-template: default
-expected: "Index created"

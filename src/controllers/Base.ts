@@ -17,7 +17,7 @@ export class BaseController {
     this._name = name;
   }
 
-  protected get kuzzle() {
+  get kuzzle() {
     return this._kuzzle;
   }
 

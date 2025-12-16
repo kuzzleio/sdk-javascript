@@ -1,9 +1,0 @@
-name: kuzzleEventEmitter#remove-all-listeners
-description: Removes a listener for the given event
-hooks:
-  before:
-  after:
-template: eventemitter
-expected: Successfully removed all listeners
-sdk: js
-version: 7

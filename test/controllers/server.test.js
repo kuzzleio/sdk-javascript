@@ -1,3 +1,5 @@
+"use strict";
+
 const { ServerController } = require("../../src/controllers/Server"),
   sinon = require("sinon"),
   should = require("should");
@@ -368,7 +370,7 @@ describe("Server Controller", () => {
               startTime: 1234,
               stopTime: null,
             },
-            {}
+            {},
           );
           should(res).match(result);
         })
@@ -385,7 +387,7 @@ describe("Server Controller", () => {
               startTime: null,
               stopTime: 9876,
             },
-            {}
+            {},
           );
           should(res).match(result);
         })
@@ -402,7 +404,7 @@ describe("Server Controller", () => {
               startTime: null,
               stopTime: null,
             },
-            {}
+            {},
           );
           should(res).match(result);
         });

@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -47,30 +49,30 @@ describe("Auth Controller", () => {
       const apiResult = {
         _id: "api-key-id",
         _source: {
-          userId: "kuid",
           description: "description",
           expiresAt: Date.now() + 10000,
-          ttl: 10000,
           token: "secret-token",
+          ttl: 10000,
+          userId: "kuid",
         },
       };
       kuzzle.query.resolves({ result: apiResult });
 
       const result = await kuzzle.auth.createApiKey("description", {
-        expiresIn: 10000,
         _id: "api-key-id",
+        expiresIn: 10000,
         refresh: "wait_for",
       });
 
       should(kuzzle.query).be.calledWith({
-        controller: "auth",
-        action: "createApiKey",
         _id: "api-key-id",
-        expiresIn: 10000,
-        refresh: "wait_for",
+        action: "createApiKey",
         body: {
           description: "description",
         },
+        controller: "auth",
+        expiresIn: 10000,
+        refresh: "wait_for",
       });
 
       should(result).be.eql(apiResult);
@@ -84,9 +86,9 @@ describe("Auth Controller", () => {
       await kuzzle.auth.deleteApiKey("api-key-id", { refresh: "wait_for" });
 
       should(kuzzle.query).be.calledWith({
-        controller: "auth",
-        action: "deleteApiKey",
         _id: "api-key-id",
+        action: "deleteApiKey",
+        controller: "auth",
         refresh: "wait_for",
       });
     });
@@ -98,16 +100,16 @@ describe("Auth Controller", () => {
 
       const result = await kuzzle.auth.searchApiKeys(
         { match: {} },
-        { from: 1, size: 2 }
+        { from: 1, size: 2 },
       );
 
       should(kuzzle.query).be.calledWith({
-        controller: "auth",
         action: "searchApiKeys",
         body: { match: {} },
+        controller: "auth",
         from: 1,
-        size: 2,
         lang: undefined,
+        size: 2,
       });
 
       should(result).be.eql({ hits: [1, 2] });
@@ -118,9 +120,9 @@ describe("Auth Controller", () => {
     it("should call auth/checkToken query with the token and return a Promise which resolves the token validity", () => {
       kuzzle.query.resolves({
         result: {
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         },
       });
 
@@ -129,19 +131,19 @@ describe("Auth Controller", () => {
           .be.calledOnce()
           .be.calledWithMatch(
             {
-              controller: "auth",
               action: "checkToken",
               body: {
                 token: "token",
               },
+              controller: "auth",
               cookieAuth: false,
             },
-            { queuable: false }
+            { queuable: false },
           );
         should(res).match({
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         });
       });
     });
@@ -149,9 +151,9 @@ describe("Auth Controller", () => {
     it("should call auth/checkToken query with cookieAuth false, the token and return a Promise which resolves the token validity", () => {
       kuzzle.query.resolves({
         result: {
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         },
       });
 
@@ -162,19 +164,19 @@ describe("Auth Controller", () => {
           .be.calledOnce()
           .be.calledWithMatch(
             {
-              controller: "auth",
               action: "checkToken",
               body: {
                 token: "token",
               },
+              controller: "auth",
               cookieAuth: false,
             },
-            { queuable: false }
+            { queuable: false },
           );
         should(res).match({
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         });
       });
     });
@@ -182,9 +184,9 @@ describe("Auth Controller", () => {
     it("should call auth/checkToken query with cookieAuth false, the stored token if no token is given and return a Promise which resolves the token validity", () => {
       kuzzle.query.resolves({
         result: {
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         },
       });
 
@@ -196,19 +198,19 @@ describe("Auth Controller", () => {
       return kuzzle.auth.checkToken(undefined, options).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWithMatch(
           {
-            controller: "auth",
             action: "checkToken",
             body: {
               token,
             },
+            controller: "auth",
             cookieAuth: false,
           },
-          { queuable: false }
+          { queuable: false },
         );
         should(res).match({
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         });
       });
     });
@@ -216,9 +218,9 @@ describe("Auth Controller", () => {
     it("should call auth/checkToken query with cookieAuth true, token should be undefined and return a Promise which resolves the token validity", () => {
       kuzzle.query.resolves({
         result: {
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         },
       });
 
@@ -232,19 +234,19 @@ describe("Auth Controller", () => {
           .be.calledOnce()
           .be.calledWithMatch(
             {
-              controller: "auth",
               action: "checkToken",
               body: {
                 token: undefined,
               },
+              controller: "auth",
               cookieAuth: true,
             },
-            { queuable: false }
+            { queuable: false },
           );
         should(res).match({
-          valid: true,
-          state: "Error message",
           expiresAt: 42424242,
+          state: "Error message",
+          valid: true,
         });
       });
     });
@@ -256,8 +258,8 @@ describe("Auth Controller", () => {
 
       kuzzle.query.resolves({
         result: {
-          username: "foo",
           kuid: "bar",
+          username: "foo",
         },
       });
 
@@ -266,15 +268,15 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              strategy: "strategy",
+              action: "createMyCredentials",
               body: credentials,
               controller: "auth",
-              action: "createMyCredentials",
+              strategy: "strategy",
             },
-            options
+            options,
           );
 
-          should(res).match({ username: "foo", kuid: "bar" });
+          should(res).match({ kuid: "bar", username: "foo" });
         });
     });
   });
@@ -286,11 +288,11 @@ describe("Auth Controller", () => {
       return kuzzle.auth.credentialsExist("strategy", options).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            strategy: "strategy",
-            controller: "auth",
             action: "credentialsExist",
+            controller: "auth",
+            strategy: "strategy",
           },
-          options
+          options,
         );
 
         should(res).be.exactly(true);
@@ -307,11 +309,11 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              strategy: "strategy",
-              controller: "auth",
               action: "deleteMyCredentials",
+              controller: "auth",
+              strategy: "strategy",
             },
-            options
+            options,
           );
 
           should(res).be.exactly(true);
@@ -331,10 +333,10 @@ describe("Auth Controller", () => {
       return kuzzle.auth.getCurrentUser(options).then((user) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            controller: "auth",
             action: "getCurrentUser",
+            controller: "auth",
           },
-          options
+          options,
         );
 
         should(user).be.an.instanceOf(User);
@@ -348,22 +350,22 @@ describe("Auth Controller", () => {
     it("should call auth/getMyCredentials query with the strategy name and return a Promise which resolves the user credentials", () => {
       kuzzle.query.resolves({
         result: {
-          username: "foo",
           kuid: "bar",
+          username: "foo",
         },
       });
 
       return kuzzle.auth.getMyCredentials("strategy", options).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            strategy: "strategy",
-            controller: "auth",
             action: "getMyCredentials",
+            controller: "auth",
+            strategy: "strategy",
           },
-          options
+          options,
         );
 
-        should(res).match({ username: "foo", kuid: "bar" });
+        should(res).match({ kuid: "bar", username: "foo" });
       });
     });
   });
@@ -374,10 +376,10 @@ describe("Auth Controller", () => {
         result: {
           hits: [
             {
-              controller: "foo",
               action: "bar",
-              index: "foobar",
               collection: "*",
+              controller: "foo",
+              index: "foobar",
               value: "allowed",
             },
           ],
@@ -387,18 +389,18 @@ describe("Auth Controller", () => {
       return kuzzle.auth.getMyRights(options).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            controller: "auth",
             action: "getMyRights",
+            controller: "auth",
           },
-          options
+          options,
         );
 
         should(res).be.an.Array();
         should(res[0]).match({
-          controller: "foo",
           action: "bar",
-          index: "foobar",
           collection: "*",
+          controller: "foo",
+          index: "foobar",
           value: "allowed",
         });
       });
@@ -412,10 +414,10 @@ describe("Auth Controller", () => {
       return kuzzle.auth.getStrategies(options).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            controller: "auth",
             action: "getStrategies",
+            controller: "auth",
           },
-          options
+          options,
         );
 
         should(res).be.an.Array();
@@ -435,8 +437,8 @@ describe("Auth Controller", () => {
 
       kuzzle.query.resolves({
         result: {
-          jwt,
           _id: "kuid",
+          jwt,
         },
       });
     });
@@ -447,14 +449,14 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              controller: "auth",
               action: "login",
-              strategy: "strategy",
-              expiresIn: "expiresIn",
               body: credentials,
+              controller: "auth",
               cookieAuth: false,
+              expiresIn: "expiresIn",
+              strategy: "strategy",
             },
-            { queuable: false, verb: "POST", timeout: -1 }
+            { queuable: false, timeout: -1, verb: "POST" },
           );
 
           should(res).be.equal(jwt);
@@ -468,14 +470,14 @@ describe("Auth Controller", () => {
         .then(() => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              controller: "auth",
               action: "login",
-              strategy: "strategy",
-              expiresIn: "expiresIn",
               body: credentials,
+              controller: "auth",
               cookieAuth: true,
+              expiresIn: "expiresIn",
+              strategy: "strategy",
             },
-            { queuable: false, verb: "POST", timeout: -1 }
+            { queuable: false, timeout: -1, verb: "POST" },
           );
         });
     });
@@ -492,14 +494,14 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              controller: "auth",
               action: "login",
-              strategy: "strategy",
-              expiresIn: "expiresIn",
               body: credentials,
+              controller: "auth",
               cookieAuth: true,
+              expiresIn: "expiresIn",
+              strategy: "strategy",
             },
-            { queuable: false, verb: "POST", timeout: -1 }
+            { queuable: false, timeout: -1, verb: "POST" },
           );
 
           should(res).be.undefined();
@@ -522,12 +524,12 @@ describe("Auth Controller", () => {
         .catch(() => {
           should(kuzzle.emit).be.calledWith("beforeLogin");
           should(kuzzle.emit).be.calledWith("afterLogin", {
-            success: false,
             error: "Error",
+            success: false,
           });
           should(kuzzle.emit).be.calledWith("loginAttempt", {
-            success: false,
             error: "Error",
+            success: false,
           });
         });
     });
@@ -554,12 +556,12 @@ describe("Auth Controller", () => {
         .catch(() => {
           should(kuzzle.emit).be.calledWith("beforeLogin");
           should(kuzzle.emit).be.calledWith("afterLogin", {
-            success: false,
             error: "Error",
+            success: false,
           });
           should(kuzzle.emit).be.calledWith("loginAttempt", {
-            success: false,
             error: "Error",
+            success: false,
           });
         });
     });
@@ -599,8 +601,8 @@ describe("Auth Controller", () => {
     it("should call auth/logout query and return an empty Promise", () => {
       return kuzzle.auth.logout().then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith({
-          controller: "auth",
           action: "logout",
+          controller: "auth",
           cookieAuth: false,
         });
 
@@ -626,8 +628,8 @@ describe("Auth Controller", () => {
       kuzzle.query.rejects();
       await kuzzle.auth.logout().catch(() => {
         should(kuzzle.emit).be.calledWith("logoutAttempt", {
-          success: false,
           error: "Error",
+          success: false,
         });
       });
     });
@@ -644,8 +646,8 @@ describe("Auth Controller", () => {
       kuzzle.query.rejects();
       await kuzzle.auth.logout().catch(() => {
         should(kuzzle.emit).be.calledWith("afterLogout", {
-          success: false,
           error: "Error",
+          success: false,
         });
       });
     });
@@ -657,8 +659,8 @@ describe("Auth Controller", () => {
 
       kuzzle.query.resolves({
         result: {
-          username: "foo",
           kuid: "bar",
+          username: "foo",
         },
       });
 
@@ -667,15 +669,15 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              controller: "auth",
               action: "updateMyCredentials",
-              strategy: "strategy",
               body: credentials,
+              controller: "auth",
+              strategy: "strategy",
             },
-            options
+            options,
           );
 
-          should(res).match({ username: "foo", kuid: "bar" });
+          should(res).match({ kuid: "bar", username: "foo" });
         });
     });
   });
@@ -694,11 +696,11 @@ describe("Auth Controller", () => {
       return kuzzle.auth.updateSelf(body, options).then((user) => {
         should(kuzzle.query).be.calledOnce().be.calledWith(
           {
-            controller: "auth",
             action: "updateSelf",
             body,
+            controller: "auth",
           },
-          options
+          options,
         );
 
         should(user).be.an.instanceOf(User);
@@ -719,12 +721,12 @@ describe("Auth Controller", () => {
         .then((res) => {
           should(kuzzle.query).be.calledOnce().be.calledWith(
             {
-              strategy: "strategy",
+              action: "validateMyCredentials",
               body,
               controller: "auth",
-              action: "validateMyCredentials",
+              strategy: "strategy",
             },
-            options
+            options,
           );
 
           should(res).be.exactly(true);
@@ -743,10 +745,10 @@ describe("Auth Controller", () => {
     it("should call auth/refreshToken query", () => {
       return kuzzle.auth.refreshToken().then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith({
-          controller: "auth",
           action: "refreshToken",
-          expiresIn: undefined,
+          controller: "auth",
           cookieAuth: false,
+          expiresIn: undefined,
         });
 
         should(res).be.eql(tokenResponse);
@@ -759,10 +761,10 @@ describe("Auth Controller", () => {
       kuzzle.cookieAuthentication = true;
       return kuzzle.auth.refreshToken().then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWith({
-          controller: "auth",
           action: "refreshToken",
-          expiresIn: undefined,
+          controller: "auth",
           cookieAuth: true,
+          expiresIn: undefined,
         });
 
         should(res).be.eql(tokenResponse);
@@ -773,8 +775,8 @@ describe("Auth Controller", () => {
     it("should set the expiresIn option if one is provided", () => {
       return kuzzle.auth.refreshToken({ expiresIn: "foobar" }).then((res) => {
         should(kuzzle.query).be.calledOnce().be.calledWithMatch({
-          controller: "auth",
           action: "refreshToken",
+          controller: "auth",
           expiresIn: "foobar",
         });
 
@@ -805,7 +807,7 @@ describe("Auth Controller", () => {
     });
 
     it("should throw if parameter is not a string", () => {
-      should(function () {
+      should(function auth() {
         kuzzle.auth.authenticationToken = 1234;
       }).throw();
     });

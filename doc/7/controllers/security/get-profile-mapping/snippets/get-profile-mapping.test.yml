@@ -1,5 +1,0 @@
-name: security#getProfileMapping
-description: get profile mapping
-template: default
-expected:
-  - "mapping: { policies: { properties: \\[Object\\]"

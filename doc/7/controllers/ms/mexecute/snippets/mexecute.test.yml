@@ -1,7 +1,0 @@
-name: ms#mexecute
-description: Executes multiple commands in a single step
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ \\[ null, 'OK' ], \\[ null, '1' ], \\[ null, 1 ] ]"

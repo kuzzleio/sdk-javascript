@@ -1,9 +1,0 @@
-name: ms#sdiffstore
-description: Stores the difference between a reference set and a list of other sets in a new key
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ 'baz' ]"
-sdk: js
-version: 7

@@ -1,9 +1,0 @@
-name: ms#mget
-description: Returns the values of the provided keys
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ 'world', 'bar' ]"
-sdk: js
-version: 7

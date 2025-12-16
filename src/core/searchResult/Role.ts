@@ -9,7 +9,7 @@ export class RoleSearchResult extends SearchResultBase<Role> {
     this._scrollAction = null; // scrollRoles action does not exists in Kuzzle API.
 
     this.hits = this._result.hits.map(
-      (hit) => new Role(this._kuzzle, hit._id, hit._source.controllers)
+      (hit) => new Role(this._kuzzle, hit._id, hit._source.controllers),
     );
   }
 
@@ -18,7 +18,7 @@ export class RoleSearchResult extends SearchResultBase<Role> {
     // => we deny "scroll" and "sort" parameters.
     if (this._request.scroll || this._request.sort) {
       return Promise.reject(
-        new Error("only from/size params are allowed for role search")
+        new Error("only from/size params are allowed for role search"),
       );
     }
 
@@ -29,7 +29,7 @@ export class RoleSearchResult extends SearchResultBase<Role> {
 
       nextSearchResult.hits = nextSearchResult._result.hits.map(
         (hit) =>
-          new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers)
+          new Role(nextSearchResult._kuzzle, hit._id, hit._source.controllers),
       );
 
       return nextSearchResult;

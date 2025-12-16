@@ -1,3 +1,5 @@
+"use strict";
+
 const sinon = require("sinon");
 const should = require("should");
 
@@ -106,7 +108,7 @@ describe("BatchController", () => {
 
       should(prom1).be.resolvedWith("dana");
       should(prom2).be.rejectedWith(
-        new Error('Cannot create document in "city":"galle" : some reason')
+        new Error('Cannot create document in "city":"galle" : some reason'),
       );
     });
   });
@@ -132,13 +134,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.replace(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -155,7 +157,7 @@ describe("BatchController", () => {
           "galle",
           "aschen",
           { name: "Aschen" },
-          undefined
+          undefined,
         );
     });
 
@@ -164,13 +166,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.replace(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -189,7 +191,7 @@ describe("BatchController", () => {
 
       should(prom1).be.resolvedWith("dana");
       should(prom2).be.rejectedWith(
-        new Error('Cannot replace document in "city":"galle" : some reason')
+        new Error('Cannot replace document in "city":"galle" : some reason'),
       );
     });
   });
@@ -215,13 +217,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.createOrReplace(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -238,7 +240,7 @@ describe("BatchController", () => {
           "galle",
           "aschen",
           { name: "Aschen" },
-          undefined
+          undefined,
         );
     });
 
@@ -247,13 +249,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.createOrReplace(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -273,8 +275,8 @@ describe("BatchController", () => {
       should(prom1).be.resolvedWith("dana");
       should(prom2).be.rejectedWith(
         new Error(
-          'Cannot create or replace document in "city":"galle" : some reason'
-        )
+          'Cannot create or replace document in "city":"galle" : some reason',
+        ),
       );
     });
   });
@@ -300,13 +302,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.update(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -323,7 +325,7 @@ describe("BatchController", () => {
           "galle",
           "aschen",
           { name: "Aschen" },
-          undefined
+          undefined,
         );
     });
 
@@ -332,13 +334,13 @@ describe("BatchController", () => {
         "city",
         "galle",
         { name: "Dana" },
-        "dana"
+        "dana",
       );
       const prom2 = batchController.update(
         "city",
         "galle",
         { name: "Aschen" },
-        "aschen"
+        "aschen",
       );
 
       promise.resolve({
@@ -357,7 +359,7 @@ describe("BatchController", () => {
 
       should(prom1).be.resolvedWith("dana");
       should(prom2).be.rejectedWith(
-        new Error('Cannot update in "city":"galle" : some reason')
+        new Error('Cannot update in "city":"galle" : some reason'),
       );
     });
   });
@@ -417,7 +419,7 @@ describe("BatchController", () => {
         new KuzzleError({
           message: 'Document "city":"galle":"aschen" not found',
           id: "services.storage.not_found",
-        })
+        }),
       );
     });
   });
@@ -507,7 +509,7 @@ describe("BatchController", () => {
 
       should(prom1).be.resolvedWith("dana");
       should(prom2).be.rejectedWith(
-        new Error('Cannot delete document "city":"galle":aschen": some reason')
+        new Error('Cannot delete document "city":"galle":aschen": some reason'),
       );
     });
   });

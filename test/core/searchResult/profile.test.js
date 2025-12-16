@@ -1,3 +1,5 @@
+"use strict";
+
 const {
     ProfileSearchResult,
   } = require("../../../src/core/searchResult/Profile"),
@@ -114,7 +116,7 @@ describe("ProfileSearchResult", () => {
       searchResult = new ProfileSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
       );
     });
 
@@ -155,7 +157,7 @@ describe("ProfileSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -243,7 +245,7 @@ describe("ProfileSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });
@@ -265,7 +267,7 @@ describe("ProfileSearchResult", () => {
                 action: "searchProfiles",
                 size: 2,
               },
-              options
+              options,
             );
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(ProfileSearchResult);
@@ -333,7 +335,7 @@ describe("ProfileSearchResult", () => {
           kuzzle,
           request,
           options,
-          result
+          result,
         );
 
         kuzzle.query.resolves({ result: nextResponse });

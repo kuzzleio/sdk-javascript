@@ -1,3 +1,5 @@
+"use strict";
+
 const mockrequire = require("mock-require");
 const sinon = require("sinon");
 const should = require("should");
@@ -86,7 +88,7 @@ describe("Realtime Controller", () => {
               action: "count",
               body: { roomId: "roomId" },
             },
-            options
+            options,
           );
 
         should(res).be.a.Number().and.be.equal(1234);
@@ -113,7 +115,7 @@ describe("Realtime Controller", () => {
                 body: { foo: "bar" },
                 _id: "doc-id",
               },
-              options
+              options,
             );
 
           should(published).be.a.Boolean().and.be.true();
@@ -148,7 +150,7 @@ describe("Realtime Controller", () => {
           };
 
           return room;
-        }
+        },
       );
 
       const reRequire = mockrequire.reRequire("../../src/controllers/Realtime");
@@ -193,7 +195,7 @@ describe("Realtime Controller", () => {
             "collection",
             body,
             cb,
-            options
+            options,
           );
         })
         .then(() => {
@@ -255,7 +257,7 @@ describe("Realtime Controller", () => {
             action: "unsubscribe",
             body: { roomId },
           },
-          options
+          options,
         );
       });
     });
@@ -285,7 +287,7 @@ describe("Realtime Controller", () => {
 
       should(kuzzle.realtime._subscriptions).be.empty();
       should(kuzzle.realtime._subscriptionsOff).eql(
-        new Map([["foo", [roomA]]])
+        new Map([["foo", [roomA]]]),
       );
       for (const room of [roomA, roomB, roomC]) {
         should(room.removeListeners).be.calledOnce();
@@ -311,7 +313,7 @@ describe("Realtime Controller", () => {
         new Map([
           ["foo", [roomA, roomB]],
           ["bar", [roomC]],
-        ])
+        ]),
       );
 
       for (const room of [roomA, roomB, roomC]) {

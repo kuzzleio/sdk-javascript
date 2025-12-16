@@ -1,3 +1,5 @@
+"use strict";
+
 const { UserSearchResult } = require("../../../src/core/searchResult/User"),
   { User } = require("../../../src/core/security/User"),
   sinon = require("sinon"),
@@ -120,7 +122,7 @@ describe("UserSearchResult", () => {
       searchResult = new UserSearchResult(kuzzle, request, options, result);
 
       return should(searchResult.next()).be.rejectedWith(
-        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params"
+        "Unable to retrieve next results from search: missing scrollId, from/sort, or from/size params",
       );
     });
 
@@ -288,7 +290,7 @@ describe("UserSearchResult", () => {
                 action: "searchUsers",
                 size: 2,
               },
-              options
+              options,
             );
           should(nextSearchResult).not.be.equal(searchResult);
           should(nextSearchResult).be.instanceOf(UserSearchResult);

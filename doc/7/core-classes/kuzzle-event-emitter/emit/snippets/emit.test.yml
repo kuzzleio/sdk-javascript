@@ -1,9 +1,0 @@
-name: kuzzleEventEmitter#emit
-description: Emits an event
-hooks:
-  before:
-  after:
-template: eventemitter
-expected: Hello World
-sdk: js
-version: 7

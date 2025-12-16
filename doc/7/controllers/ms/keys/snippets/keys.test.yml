@@ -1,9 +1,0 @@
-name: ms#keys
-description: Returns all keys matching the provided pattern
-hooks:
-  before: curl -X POST kuzzle:7512/ms/_flushdb
-  after:
-template: default
-expected: "\\[ '(Hello|foo)', '(Hello|foo)' ]"
-sdk: js
-version: 7

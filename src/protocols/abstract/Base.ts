@@ -1,5 +1,3 @@
-"use strict";
-
 import { KuzzleError } from "../../KuzzleError";
 import { uuidv4 } from "../../utils/uuidv4";
 import { KuzzleEventEmitter } from "../../core/KuzzleEventEmitter";
@@ -26,7 +24,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
   constructor(
     host: string,
     options: JSONObject = {},
-    name: string = undefined
+    name: string = undefined,
   ) {
     super();
 
@@ -38,7 +36,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
 
     if (options.ssl !== undefined && options.sslConnection !== undefined) {
       throw new Error(
-        'Both "ssl" and "sslConnection" options are set. Use only "ssl".'
+        'Both "ssl" and "sslConnection" options are set. Use only "ssl".',
       );
     }
 
@@ -144,7 +142,7 @@ export abstract class KuzzleAbstractProtocol extends KuzzleEventEmitter {
       this.emit("discarded", request);
       return Promise.reject(
         new Error(`Unable to execute request: not connected to a Kuzzle server.
-Discarded request: ${JSON.stringify(request)}`)
+Discarded request: ${JSON.stringify(request)}`),
       );
     }
 
@@ -165,7 +163,7 @@ Discarded request: ${JSON.stringify(request)}`)
             response.error,
             stack,
             this.constructor.name,
-            request
+            request,
           );
         } else {
           // Keep both stacktrace because the one we captured in "stack" will give
@@ -206,7 +204,7 @@ Discarded request: ${JSON.stringify(request)}`)
    */
   clear() {
     const rejectedError = new Error(
-      "Network error: request was sent but no response has been received"
+      "Network error: request was sent but no response has been received",
     );
     for (const pending of this._pendingRequests.values()) {
       pending.reject(rejectedError);

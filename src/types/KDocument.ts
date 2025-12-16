@@ -61,8 +61,9 @@ export interface KDocument<TKDocumentContent extends KDocumentContent> {
 /**
  * Represents a Kuzzle document retrieved from search
  */
-export interface KHit<TKDocumentContent extends KDocumentContent>
-  extends KDocument<TKDocumentContent> {
+export interface KHit<
+  TKDocumentContent extends KDocumentContent,
+> extends KDocument<TKDocumentContent> {
   /**
    * Elasticsearch relevance score
    */

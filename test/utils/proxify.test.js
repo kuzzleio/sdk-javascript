@@ -1,3 +1,5 @@
+"use strict";
+
 const should = require("should"),
   sinon = require("sinon"),
   { proxify } = require("../../src/utils/proxify");
@@ -39,7 +41,7 @@ describe("proxify", () => {
     should(() => {
       obj.prop2 = 42;
     }).throwError(
-      "Cannot set a value to the undefined 'prop2' property in 'object'"
+      "Cannot set a value to the undefined 'prop2' property in 'object'",
     );
   });
 
@@ -91,7 +93,7 @@ describe("proxify", () => {
     should(() => {
       obj.foo = 42;
     }).throwError(
-      "Cannot set a value to the undefined 'foo' property in 'object'"
+      "Cannot set a value to the undefined 'foo' property in 'object'",
     );
     obj.__proxy__.registerProp("foo");
     should.doesNotThrow(() => {
@@ -110,7 +112,7 @@ describe("proxify", () => {
     should(() => {
       obj.prop = 42;
     }).throwError(
-      "Cannot set a value to the undefined 'prop' property in 'object'"
+      "Cannot set a value to the undefined 'prop' property in 'object'",
     );
   });
 

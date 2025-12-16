@@ -70,7 +70,7 @@ export class KuzzleEventEmitter {
   addListener(
     eventName: PrivateAndPublicSDKEvents,
     listener: ListenerFunction,
-    once = false
+    once = false,
   ) {
     if (!eventName || !listener) {
       return this;
@@ -81,7 +81,7 @@ export class KuzzleEventEmitter {
 
     if (listenerType !== "function") {
       throw new Error(
-        `Invalid listener type: expected a function, got a ${listenerType}`
+        `Invalid listener type: expected a function, got a ${listenerType}`,
       );
     }
 
@@ -98,7 +98,7 @@ export class KuzzleEventEmitter {
 
   on(
     eventName: PrivateAndPublicSDKEvents,
-    listener: (args: any) => void
+    listener: (args: any) => void,
   ): this {
     return this.addListener(eventName, listener);
   }
@@ -114,7 +114,7 @@ export class KuzzleEventEmitter {
 
     if (!this._exists(this._events.get(eventName), listener)) {
       const listeners = [new Listener(listener, once)].concat(
-        this._events.get(eventName)
+        this._events.get(eventName),
       );
 
       this._events.set(eventName, listeners);
@@ -137,7 +137,7 @@ export class KuzzleEventEmitter {
 
   removeListener(
     eventName: PrivateAndPublicSDKEvents,
-    listener: () => void
+    listener: () => void,
   ): this;
   removeListener(eventName: string, listener: () => void): this;
   removeListener(eventName: string, listener: (...args: unknown[]) => void) {
@@ -209,5 +209,3 @@ export class KuzzleEventEmitter {
     );
   }
 }
-
-module.exports = { KuzzleEventEmitter };

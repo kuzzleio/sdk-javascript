@@ -1,3 +1,5 @@
+"use strict";
+
 const { SecurityController } = require("../../src/controllers/Security");
 const { Profile } = require("../../src/core/security/Profile");
 const { Role } = require("../../src/core/security/Role");
@@ -81,7 +83,7 @@ describe("Security Controller", () => {
       const result = await kuzzle.security.searchApiKeys(
         "kuid",
         { match: {} },
-        { from: 1, size: 2 }
+        { from: 1, size: 2 },
       );
 
       should(kuzzle.query).be.calledWith({
@@ -119,7 +121,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "createCredentials",
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -149,7 +151,7 @@ describe("Security Controller", () => {
                 action: "createFirstAdmin",
                 reset: undefined,
               },
-              options
+              options,
             );
 
           should(user).be.an.instanceOf(User);
@@ -180,7 +182,7 @@ describe("Security Controller", () => {
                 action: "createFirstAdmin",
                 reset: true,
               },
-              { reset: true }
+              { reset: true },
             );
 
           should(user).be.an.instanceOf(User);
@@ -216,7 +218,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "createOrReplaceProfile",
               },
-              options
+              options,
             );
 
           should(profile).be.an.instanceOf(Profile);
@@ -252,7 +254,7 @@ describe("Security Controller", () => {
                 action: "createOrReplaceRole",
                 force: null,
               },
-              options
+              options,
             );
 
           should(role).be.an.instanceOf(Role);
@@ -287,7 +289,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "createProfile",
               },
-              options
+              options,
             );
 
           should(profile).be.an.instanceOf(Profile);
@@ -323,7 +325,7 @@ describe("Security Controller", () => {
                 action: "createRole",
                 force: null,
               },
-              options
+              options,
             );
 
           should(role).be.an.instanceOf(Role);
@@ -363,7 +365,7 @@ describe("Security Controller", () => {
               controller: "security",
               action: "createUser",
             },
-            options
+            options,
           );
 
           should(user).be.an.instanceOf(User);
@@ -407,7 +409,7 @@ describe("Security Controller", () => {
               controller: "security",
               action: "createRestrictedUser",
             },
-            options
+            options,
           );
 
           should(user).be.an.instanceOf(User);
@@ -438,7 +440,7 @@ describe("Security Controller", () => {
               controller: "security",
               action: "deleteCredentials",
             },
-            options
+            options,
           );
 
           should(res).be.equal(result);
@@ -460,7 +462,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "deleteProfile",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -482,7 +484,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "deleteRole",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -504,7 +506,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "deleteUser",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -526,7 +528,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getAllCredentialFields",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -548,7 +550,7 @@ describe("Security Controller", () => {
               action: "getCredentialFields",
               strategy: "strategy",
             },
-            options
+            options,
           );
 
           should(res).be.equal(result);
@@ -574,7 +576,7 @@ describe("Security Controller", () => {
               strategy: "strategy",
               _id: "kuid",
             },
-            options
+            options,
           );
 
           should(res).be.equal(result);
@@ -600,7 +602,7 @@ describe("Security Controller", () => {
               strategy: "strategy",
               _id: "userId",
             },
-            options
+            options,
           );
 
           should(res).be.equal(result);
@@ -629,7 +631,7 @@ describe("Security Controller", () => {
               controller: "security",
               action: "getProfile",
             },
-            options
+            options,
           );
 
           should(profile).be.an.instanceOf(Profile);
@@ -652,7 +654,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getProfileMapping",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -691,7 +693,7 @@ describe("Security Controller", () => {
               controller: "security",
               action: "getProfileRights",
             },
-            options
+            options,
           );
 
           should(res).be.eql(result.hits);
@@ -718,7 +720,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getRole",
           },
-          options
+          options,
         );
 
         should(role).be.an.instanceOf(Role);
@@ -741,7 +743,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getRoleMapping",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -768,7 +770,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getUser",
           },
-          options
+          options,
         );
 
         should(user).be.an.instanceOf(User);
@@ -795,7 +797,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getUserMapping",
           },
-          options
+          options,
         );
 
         should(res).be.equal(result);
@@ -832,7 +834,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getUserRights",
           },
-          options
+          options,
         );
 
         should(res).be.eql(result.hits);
@@ -854,7 +856,7 @@ describe("Security Controller", () => {
             controller: "security",
             action: "getUserStrategies",
           },
-          options
+          options,
         );
 
         should(res).be.eql(result.strategies);
@@ -876,7 +878,7 @@ describe("Security Controller", () => {
               strategy: "strategy",
               _id: "kuid",
             },
-            options
+            options,
           );
 
           should(res).be.a.Boolean().and.be.True();
@@ -900,7 +902,7 @@ describe("Security Controller", () => {
                 action: "mDeleteProfiles",
                 body: { ids: ["profile1", "profile2"] },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -924,7 +926,7 @@ describe("Security Controller", () => {
                 action: "mDeleteRoles",
                 body: { ids: ["role1", "role2"] },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -948,7 +950,7 @@ describe("Security Controller", () => {
                 action: "mDeleteUsers",
                 body: { ids: ["user1", "user2"] },
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -986,7 +988,7 @@ describe("Security Controller", () => {
                 action: "mGetProfiles",
                 body: { ids: ["profile1", "profile2"] },
               },
-              options
+              options,
             );
 
           should(res).be.an.Array();
@@ -1033,7 +1035,7 @@ describe("Security Controller", () => {
                 action: "mGetRoles",
                 body: { ids: ["role1", "role2"] },
               },
-              options
+              options,
             );
 
           should(res).be.an.Array();
@@ -1095,7 +1097,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "replaceUser",
               },
-              options
+              options,
             );
 
           should(user).be.an.instanceOf(User);
@@ -1145,7 +1147,7 @@ describe("Security Controller", () => {
                 body: { roles: ["foo", "bar"] },
                 opt: "in",
               },
-              options
+              options,
             );
 
           should(res).be.an.instanceOf(ProfileSearchResult);
@@ -1177,7 +1179,7 @@ describe("Security Controller", () => {
       return kuzzle.security
         .searchProfiles(
           { roles: ["foo", "bar"] },
-          { from: 1, size: 2, scroll: "10s" }
+          { from: 1, size: 2, scroll: "10s" },
         )
         .then((res) => {
           should(kuzzle.query)
@@ -1191,7 +1193,7 @@ describe("Security Controller", () => {
                 size: 2,
                 scroll: "10s",
               },
-              { from: 1, scroll: "10s", size: 2 }
+              { from: 1, scroll: "10s", size: 2 },
             );
 
           should(res).be.an.instanceOf(ProfileSearchResult);
@@ -1238,7 +1240,7 @@ describe("Security Controller", () => {
                 body: { controllers: ["foo", "bar"] },
                 opt: "in",
               },
-              options
+              options,
             );
 
           should(res).be.an.instanceOf(RoleSearchResult);
@@ -1280,7 +1282,7 @@ describe("Security Controller", () => {
                 from: 1,
                 size: 2,
               },
-              { from: 1, size: 2 }
+              { from: 1, size: 2 },
             );
 
           should(res).be.an.instanceOf(RoleSearchResult);
@@ -1333,7 +1335,7 @@ describe("Security Controller", () => {
                 scroll: undefined,
                 lang: undefined,
               },
-              options
+              options,
             );
 
           should(res).be.an.instanceOf(UserSearchResult);
@@ -1380,7 +1382,7 @@ describe("Security Controller", () => {
                 scroll: "10s",
                 lang: undefined,
               },
-              { from: 1, scroll: "10s", size: 2 }
+              { from: 1, scroll: "10s", size: 2 },
             );
 
           should(res).be.an.instanceOf(UserSearchResult);
@@ -1412,7 +1414,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateCredentials",
               },
-              options
+              options,
             );
 
           should(res).be.equal(result);
@@ -1445,7 +1447,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateProfile",
               },
-              options
+              options,
             );
 
           should(profile).be.an.instanceOf(Profile);
@@ -1470,7 +1472,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateProfileMapping",
               },
-              options
+              options,
             );
 
           should(res.acknowledged).be.a.Boolean().and.be.True();
@@ -1504,7 +1506,7 @@ describe("Security Controller", () => {
                 action: "updateRole",
                 force: null,
               },
-              options
+              options,
             );
 
           should(role).be.an.instanceOf(Role);
@@ -1529,7 +1531,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateRoleMapping",
               },
-              options
+              options,
             );
 
           should(res.acknowledged).be.a.Boolean().and.be.True();
@@ -1562,7 +1564,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateUser",
               },
-              options
+              options,
             );
 
           should(user).be.an.instanceOf(User);
@@ -1591,7 +1593,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "updateUserMapping",
               },
-              options
+              options,
             );
 
           should(res.acknowledged).be.a.Boolean().and.be.True();
@@ -1616,7 +1618,7 @@ describe("Security Controller", () => {
                 controller: "security",
                 action: "validateCredentials",
               },
-              options
+              options,
             );
 
           should(res).be.a.Boolean().and.be.True();

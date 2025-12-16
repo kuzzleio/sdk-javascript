@@ -24,7 +24,7 @@ export class ServerController extends BaseController {
       {
         action: "adminExists",
       },
-      options
+      options,
     ).then((response) => response.result.exists);
   }
 
@@ -39,7 +39,7 @@ export class ServerController extends BaseController {
       {
         action: "capabilities",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -54,7 +54,7 @@ export class ServerController extends BaseController {
       {
         action: "getAllStats",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -69,7 +69,7 @@ export class ServerController extends BaseController {
       {
         action: "getConfig",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -84,7 +84,7 @@ export class ServerController extends BaseController {
       {
         action: "getLastStats",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -99,7 +99,7 @@ export class ServerController extends BaseController {
   getStats(
     startTime: number | string,
     stopTime: number | string,
-    options: ArgsServerControllerGetStats
+    options: ArgsServerControllerGetStats,
   ) {
     return this.query(
       {
@@ -107,7 +107,7 @@ export class ServerController extends BaseController {
         startTime,
         stopTime,
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -122,7 +122,7 @@ export class ServerController extends BaseController {
       {
         action: "info",
       },
-      options
+      options,
     ).then((response) => response.result);
   }
 
@@ -137,7 +137,7 @@ export class ServerController extends BaseController {
       {
         action: "now",
       },
-      options
+      options,
     ).then((response) => response.result.now);
   }
 }
