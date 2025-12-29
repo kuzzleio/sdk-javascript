@@ -1,3 +1,9 @@
+## [7.17.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.0...v7.17.1) (2025-12-29)
+
+### Bug Fixes
+
+* export files that are used by other libs ([2b0369d](https://github.com/kuzzleio/sdk-javascript/commit/2b0369d0f006e7ef5ab7460cdd280f9c00aa76f2))
+
 ## [7.17.1-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.0...v7.17.1-beta.1) (2025-12-29)
 
 ### Bug Fixes
