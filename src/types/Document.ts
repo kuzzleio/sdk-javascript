@@ -1,23 +1,9 @@
-import { JSONObject } from "./JSONObject";
-import { KDocumentKuzzleInfo } from "./KDocument";
+import type { DocumentContent, JSONObject } from "kuzzle-types";
 
-/**
- * Kuzzle metadata
- *
- * @deprecated Use "KDocumentKuzzleInfo"
- */
-export interface DocumentMetadata {
-  _kuzzle_info?: Partial<KDocumentKuzzleInfo>;
-}
-
-/**
- * Represents the `_source` property of the document
- *
- * @deprecated Create an interface extending "KDocumentContent"
- */
-export interface DocumentContent extends DocumentMetadata {
-  [key: string]: JSONObject | any;
-}
+// Moved to kuzzle-types, the API contract shared by kuzzle and kuzzle-sdk
+// (Kuzzle ADR-0002 step 03). `Document` stays here: it is a class, a runtime
+// value, which the types-only kuzzle-types declares as an interface.
+export type { DocumentContent, DocumentMetadata } from "kuzzle-types";
 
 /**
  * Kuzzle document
