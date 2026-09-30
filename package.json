@@ -19,8 +19,9 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "test": "npm run test:lint && npm run test:unit && npm run test:functional",
+    "test": "npm run test:lint && npm run test:unit && npm run test:types && npm run test:functional",
     "test:unit": "nyc --reporter=text-summary --reporter=lcov mocha",
+    "test:types": "tsc -p test/types/tsconfig.json",
     "test:functional": "cucumber-js --exit --fail-fast -c cucumber.config.cjs",
     "test:lint": "eslint . --fix",
     "build": "tsc --build tsconfig.json && vite build",
@@ -42,6 +43,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "kuzzle-types": "^1.0.0",
     "ws": "8.18.3"
   },
   "devDependencies": {

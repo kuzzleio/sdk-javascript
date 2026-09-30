@@ -12,3 +12,7 @@ runs:
       run: |
         npm run test:unit
       shell: bash
+    - name: Run type tests
+      run: |
+        npm run test:types
+      shell: bash
