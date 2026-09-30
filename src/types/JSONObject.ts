@@ -1,4 +1,3 @@
-/**
- * An interface representing an object with string key and any value
- */
-export type JSONObject = Record<PropertyKey, any>;
+// Moved to kuzzle-types, the API contract shared by kuzzle and kuzzle-sdk
+// (Kuzzle ADR-0002 step 03). Kept so that imports of this path still work.
+export type { JSONObject } from "kuzzle-types";

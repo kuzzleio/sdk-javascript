@@ -1,9 +1,3 @@
-import { JSONObject } from "./JSONObject";
-
-export interface BaseRequest extends JSONObject {
-  controller: string;
-
-  action: string;
-
-  body?: JSONObject;
-}
+// Moved to kuzzle-types, the API contract shared by kuzzle and kuzzle-sdk
+// (Kuzzle ADR-0002 step 03). Kept so that imports of this path still work.
+export type { BaseRequest } from "kuzzle-types";
