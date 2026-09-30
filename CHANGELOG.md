@@ -1,3 +1,15 @@
+## [7.18.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.1...v7.18.0) (2026-09-30)
+
+### Features
+
+* take the API contract types from kuzzle-types ([8354c80](https://github.com/kuzzleio/sdk-javascript/commit/8354c801f7ee6dbbdfb713b8e761f4ef7303e88e))
+
+## [7.18.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.1...v7.18.0-beta.1) (2026-09-30)
+
+### Features
+
+* take the API contract types from kuzzle-types ([8354c80](https://github.com/kuzzleio/sdk-javascript/commit/8354c801f7ee6dbbdfb713b8e761f4ef7303e88e))
+
 ## [7.17.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.17.0...v7.17.1) (2025-12-29)
 
 ### Bug Fixes
