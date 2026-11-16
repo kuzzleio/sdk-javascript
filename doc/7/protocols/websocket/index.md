@@ -59,7 +59,7 @@ The behaviors described above are automatically handled by the SDK, you do not n
 | `host`              | <pre>string</pre>  | Kuzzle server host                                   |
 | `pingInterval`      | <pre>number</pre>  | Number of milliseconds between two pings             |
 | `port`              | <pre>number</pre>  | Kuzzle server port                                   |
-| `reconnectionDelay` | <pre>number</pre>  | Number of milliseconds between reconnection attempts |
+| `reconnectionDelay` | <pre>number</pre>  | Maximum number of milliseconds between reconnection attempts (each attempt waits between half this value and this value) |
 | `ssl`               | <pre>boolean</pre> | `true` if ssl is active                              |
 
 ::: info
@@ -93,7 +93,7 @@ WebSocket protocol connection options.
 | `headers`           | <pre>object</pre>(`{}`)          | Connection custom HTTP headers (e.g. origin, subprotocols, ...)<br/>**(Not supported by browsers)** |
 | `pingInterval`      | <pre>number</pre><br/>(`2000`)   | Number of milliseconds between two pings                                                            |
 | `port`              | <pre>number</pre><br/>(`7512`)   | Kuzzle server port                                                                                  |
-| `reconnectionDelay` | <pre>number</pre><br/>(`1000`)   | Number of milliseconds between reconnection attempts                                                |
+| `reconnectionDelay` | <pre>number</pre><br/>(`1000`)   | Maximum number of milliseconds between reconnection attempts (each attempt waits between half this value and this value) |
 | `sslConnection`     | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server <DeprecatedBadge version="7.4.0"/>                              |
 | `ssl`               | <pre>boolean</pre><br/>(`false`) | Use SSL to connect to Kuzzle server. Defaults to `true` for ports 443 and 7443.                     |
 

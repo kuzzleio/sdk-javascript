@@ -461,6 +461,22 @@ describe("WebSocket networking module", () => {
     });
   });
 
+  describe("reconnection delay", () => {
+    it("should wait between half and the whole configured delay", () => {
+      const random = sinon.stub(Math, "random");
+
+      try {
+        random.returns(0);
+        should(websocket.nextReconnectionDelay()).eql(5);
+
+        random.returns(0.999);
+        should(websocket.nextReconnectionDelay()).eql(10);
+      } finally {
+        random.restore();
+      }
+    });
+  });
+
   it("should set the waitForPong to false when receiving a pong message and return", () => {
     const cb = sinon.stub(),
       cb2 = sinon.stub();
