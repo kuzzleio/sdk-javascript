@@ -26,7 +26,22 @@ import { RequestTimeoutError } from "./RequestTimeoutError";
 import { BaseProtocolRealtime } from "./protocols/abstract/Realtime";
 import { KuzzleError } from "./KuzzleError";
 import { DisconnectionOrigin } from "./protocols/DisconnectionOrigin";
-import { isTransientNetworkError } from "./utils/networkErrors";
+import {
+  isNodeShuttingDownError,
+  isTransientNetworkError,
+} from "./utils/networkErrors";
+
+/**
+ * How many times a request rejected by a stopping node is sent again,
+ * once the SDK has reached another node.
+ */
+const SHUTTING_DOWN_MAX_RETRIES = 3;
+
+/**
+ * How long a request rejected by a stopping node waits for the SDK to reach
+ * another node before giving up with the original error.
+ */
+const SHUTTING_DOWN_RETRY_WAIT_MS = 30000;
 
 /**
  * Outcome of the session check made after a reconnection.
@@ -910,6 +925,14 @@ export class Kuzzle extends KuzzleEventEmitter {
     req: TRequest,
     opts: JSONObject = {},
   ): Promise<ResponsePayload<TResult>> {
+    return this._query<TRequest, TResult>(req, opts, 0);
+  }
+
+  private _query<TRequest extends BaseRequest, TResult>(
+    req: TRequest,
+    opts: JSONObject,
+    shuttingDownRetries: number,
+  ): Promise<ResponsePayload<TResult>> {
     if (typeof req !== "object" || Array.isArray(req)) {
       throw new Error(`Kuzzle.query: Invalid request: ${JSON.stringify(req)}`);
     }
@@ -1008,13 +1031,69 @@ Discarded request: ${JSON.stringify(request)}`),
       );
     }
 
-    return this._timeoutRequest(requestTimeout, request, options).then(
-      (response: ResponsePayload<TResult>) => {
+    return this._timeoutRequest(requestTimeout, request, options)
+      .catch((error) => {
+        // The node stopped before executing the request: send it again once
+        // the SDK has reached another node. Non-queuable requests are left to
+        // the caller, like they are when the SDK is offline.
+        if (
+          queuable &&
+          isNodeShuttingDownError(error) &&
+          shuttingDownRetries < SHUTTING_DOWN_MAX_RETRIES
+        ) {
+          return this.waitForAnotherNode(error).then(() =>
+            this._query<TRequest, TResult>(req, opts, shuttingDownRetries + 1),
+          );
+        }
+
+        throw error;
+      })
+      .then((response: ResponsePayload<TResult>) => {
         debug("RESPONSE", response);
 
         return this.deprecationHandler.logDeprecation(response);
-      },
-    );
+      });
+  }
+
+  /**
+   * Resolves when a request rejected by a stopping node can be sent again.
+   *
+   * A realtime protocol drops the socket of a stopping node and reconnects:
+   * wait for the "connected" or "reconnected" event. A protocol that is still
+   * ready (HTTP: every request may reach another node) retries after a short
+   * delay. Rejects with the original error when no node is reached in time.
+   */
+  private waitForAnotherNode(error: Error): Promise<void> {
+    if (this.protocol.isReady()) {
+      const delay =
+        (this.protocol as BaseProtocolRealtime).reconnectionDelay ?? 1000;
+
+      return new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    return new Promise((resolve, reject) => {
+      // A once-listener is removed by the emitter after the emit loop: each
+      // one only removes the listener of the other event, never its own.
+      const onConnected = () => {
+        clearTimeout(timer);
+        this.removeListener("reconnected", onReconnected);
+        resolve();
+      };
+      const onReconnected = () => {
+        clearTimeout(timer);
+        this.removeListener("connected", onConnected);
+        resolve();
+      };
+
+      const timer = setTimeout(() => {
+        this.removeListener("connected", onConnected);
+        this.removeListener("reconnected", onReconnected);
+        reject(error);
+      }, SHUTTING_DOWN_RETRY_WAIT_MS);
+
+      this.once("connected", onConnected);
+      this.once("reconnected", onReconnected);
+    });
   }
 
   /**
