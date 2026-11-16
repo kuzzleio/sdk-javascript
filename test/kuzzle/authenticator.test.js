@@ -5,6 +5,8 @@ const sinon = require("sinon");
 const ProtocolMock = require("../mocks/protocol.mock");
 const { Kuzzle } = require("../../src/Kuzzle");
 const generateJwt = require("../mocks/generateJwt.mock");
+const { KuzzleError } = require("../../src/KuzzleError");
+const { RequestTimeoutError } = require("../../src/RequestTimeoutError");
 
 describe("Kuzzle authenticator function mecanisms", () => {
   let kuzzle;
@@ -136,7 +138,7 @@ describe("Kuzzle authenticator function mecanisms", () => {
     beforeEach(() => {
       kuzzle.authenticator = async () => {};
 
-      sinon.stub(kuzzle, "tryReAuthenticate").resolves(true);
+      sinon.stub(kuzzle, "verifySession").resolves("valid");
       sinon.stub(kuzzle, "disconnect");
 
       reconnectedSpy = sinon.stub();
@@ -155,7 +157,7 @@ describe("Kuzzle authenticator function mecanisms", () => {
 
       // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
-        should(kuzzle.tryReAuthenticate).be.calledOnce();
+        should(kuzzle.verifySession).be.calledOnce();
         should(reconnectedSpy).be.calledOnce();
         resolve();
       }, 1);
@@ -175,7 +177,7 @@ describe("Kuzzle authenticator function mecanisms", () => {
 
       // We need a timeout since the listener on "reconnect" event is asynchronous
       setTimeout(() => {
-        should(kuzzle.tryReAuthenticate).not.be.called();
+        should(kuzzle.verifySession).not.be.called();
         should(reconnectedSpy).be.calledOnce();
         resolve();
       }, 1);
@@ -189,14 +191,61 @@ describe("Kuzzle authenticator function mecanisms", () => {
       });
       await kuzzle.connect();
       kuzzle._loggedIn = true;
-      kuzzle.tryReAuthenticate.resolves(false);
+      kuzzle.verifySession.resolves("invalid");
 
       protocol.emit("reconnect");
 
       // We need a timeout since the listener on "reconnect" even is async
       setTimeout(() => {
-        should(kuzzle.tryReAuthenticate).be.calledOnce();
+        should(kuzzle.verifySession).be.calledOnce();
         should(kuzzle.disconnect).be.calledOnce();
+        should(reconnectedSpy).not.be.called();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+
+    it("should keep the session and fire the reconnected event if the check could not reach Kuzzle while still connected", async () => {
+      promise = new Promise((_resolve) => {
+        resolve = _resolve;
+      });
+      // The "connected" listener checks the token: keep it valid
+      sinon.stub(kuzzle.auth, "checkToken").resolves({ valid: true });
+      await kuzzle.connect();
+      kuzzle._loggedIn = true;
+      kuzzle.verifySession.resolves("unverified");
+      protocol.isReady.returns(true);
+
+      protocol.emit("reconnect");
+
+      setTimeout(() => {
+        should(kuzzle.disconnect).not.be.called();
+        should(kuzzle._loggedIn).be.true();
+        should(reconnectedSpy).be.calledOnce();
+        resolve();
+      }, 1);
+
+      return promise;
+    });
+
+    it("should keep the session and wait for the next reconnection if the socket was lost during the check", async () => {
+      promise = new Promise((_resolve) => {
+        resolve = _resolve;
+      });
+      // The "connected" listener checks the token: keep it valid
+      sinon.stub(kuzzle.auth, "checkToken").resolves({ valid: true });
+      await kuzzle.connect();
+      kuzzle._loggedIn = true;
+      kuzzle.verifySession.resolves("unverified");
+      protocol.isReady.returns(false);
+
+      protocol.emit("reconnect");
+
+      setTimeout(() => {
+        should(kuzzle.disconnect).not.be.called();
+        should(kuzzle._loggedIn).be.true();
+        should(reconnectedSpy).not.be.called();
         resolve();
       }, 1);
 
@@ -265,6 +314,20 @@ describe("Kuzzle authenticator function mecanisms", () => {
       should(reconnectionErrorSpy).not.be.called();
     });
 
+    it('should return false without emitting "reconnectionError" if the check could not reach Kuzzle', async () => {
+      kuzzle.auth.checkToken.rejects(
+        new Error(
+          "Network error: request was sent but no response has been received",
+        ),
+      );
+
+      const ret = await kuzzle.tryReAuthenticate();
+
+      should(ret).be.false();
+      should(kuzzle.authenticate).not.be.called();
+      should(reconnectionErrorSpy).not.be.called();
+    });
+
     it('should emit "reconnectionError" if the "authenticator" function fail', async () => {
       kuzzle.authenticate.rejects("auth fail");
 
@@ -272,6 +335,67 @@ describe("Kuzzle authenticator function mecanisms", () => {
 
       should(ret).be.false();
       should(reconnectionErrorSpy).be.called();
+    });
+  });
+
+  describe("#verifySession", () => {
+    let reconnectionErrorSpy;
+
+    beforeEach(() => {
+      sinon.stub(kuzzle.auth, "checkToken").resolves({ valid: true });
+      sinon.stub(kuzzle, "authenticate").resolves();
+
+      reconnectionErrorSpy = sinon.stub();
+      kuzzle.on("reconnectionError", reconnectionErrorSpy);
+    });
+
+    it('should resolve "valid" if the token is still valid', async () => {
+      should(await kuzzle.verifySession()).eql("valid");
+      should(kuzzle._reconnectInProgress).be.false();
+    });
+
+    it('should resolve "unverified" if the node is shutting down', async () => {
+      const error = new KuzzleError({
+        id: "api.process.shutting_down",
+        message: "Rejected: this node is shutting down.",
+        status: 503,
+      });
+      kuzzle.auth.checkToken.rejects(error);
+
+      should(await kuzzle.verifySession()).eql("unverified");
+      should(kuzzle.authenticate).not.be.called();
+      should(reconnectionErrorSpy).not.be.called();
+      should(kuzzle._reconnectInProgress).be.false();
+    });
+
+    it('should resolve "unverified" if the check timed out', async () => {
+      kuzzle.auth.checkToken.rejects(
+        new RequestTimeoutError({ controller: "auth" }, 100),
+      );
+
+      should(await kuzzle.verifySession()).eql("unverified");
+      should(reconnectionErrorSpy).not.be.called();
+    });
+
+    it('should resolve "invalid" and emit "reconnectionError" if Kuzzle refused the check', async () => {
+      kuzzle.auth.checkToken.rejects(
+        new KuzzleError({
+          id: "security.rights.forbidden",
+          message: "Forbidden",
+          status: 403,
+        }),
+      );
+
+      should(await kuzzle.verifySession()).eql("invalid");
+      should(reconnectionErrorSpy).be.calledOnce();
+    });
+
+    it('should resolve "invalid" if the token is invalid and there is no authenticator', async () => {
+      kuzzle.auth.checkToken.resolves({ valid: false });
+      kuzzle.authenticator = null;
+
+      should(await kuzzle.verifySession()).eql("invalid");
+      should(reconnectionErrorSpy).be.calledOnce();
     });
   });
 

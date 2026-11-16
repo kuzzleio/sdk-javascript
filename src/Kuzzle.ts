@@ -26,6 +26,15 @@ import { RequestTimeoutError } from "./RequestTimeoutError";
 import { BaseProtocolRealtime } from "./protocols/abstract/Realtime";
 import { KuzzleError } from "./KuzzleError";
 import { DisconnectionOrigin } from "./protocols/DisconnectionOrigin";
+import { isTransientNetworkError } from "./utils/networkErrors";
+
+/**
+ * Outcome of the session check made after a reconnection.
+ * - `valid`: the token is still valid, or the authenticator renewed it
+ * - `invalid`: Kuzzle refused the token and it could not be renewed
+ * - `unverified`: Kuzzle could not be asked (lost socket, node shutting down)
+ */
+type SessionState = "valid" | "invalid" | "unverified";
 
 // Defined by webpack plugin
 declare const SDKVERSION: any;
@@ -703,13 +712,26 @@ export class Kuzzle extends KuzzleEventEmitter {
       this.stopQueuing();
     }
 
-    // If an authenticator was set, check if a user was logged in and  if the token is still valid and try
+    // If a user was logged in, check that the token is still valid and try
     // to re-authenticate if needed. Otherwise the SDK is in disconnected state.
-    if (this._loggedIn && !(await this.tryReAuthenticate())) {
-      this._loggedIn = false;
-      this.disconnect();
+    if (this._loggedIn) {
+      const session = await this.verifySession();
 
-      return;
+      if (session === "invalid") {
+        this._loggedIn = false;
+        this.disconnect();
+
+        return;
+      }
+
+      // Kuzzle could not be asked: the socket was lost again, or the node
+      // that accepted it is shutting down. This says nothing about the token,
+      // so the session is kept. When the socket is gone, the next
+      // reconnection checks again; otherwise the next request or a
+      // "TokenExpired" notification tells whether the token is still valid.
+      if (session === "unverified" && !this.protocol.isReady()) {
+        return;
+      }
     }
 
     if (this.autoReplay) {
@@ -722,20 +744,50 @@ export class Kuzzle extends KuzzleEventEmitter {
   /**
    * Try to re-authenticate the SDK if the current token is invalid.
    *
-   * If the token is invalid, this method will return false and emit a
-   * "reconnectionError" event when:
+   * Returns true only when the token is valid or was renewed. If the token is
+   * invalid, this method will return false and emit a "reconnectionError"
+   * event when:
    *   - the SDK cannot re-authenticate using the authenticator function
    *   - the authenticator function is not set
+   *
+   * It also returns false, without any event, when the token could not be
+   * checked (see verifySession).
    *
    * This method never returns a rejected promise.
    */
   private async tryReAuthenticate(): Promise<boolean> {
+    return (await this.verifySession()) === "valid";
+  }
+
+  /**
+   * Check the session after a reconnection or a token expiration, and try to
+   * re-authenticate with the "authenticator" function if the token is invalid.
+   *
+   * A check that cannot reach Kuzzle (lost socket, node shutting down,
+   * timeout) is not a refused token: it resolves to "unverified" and leaves
+   * the session alone.
+   *
+   * Emits "reconnectionError" when the token is invalid and cannot be renewed.
+   * This method never returns a rejected promise.
+   */
+  private async verifySession(): Promise<SessionState> {
     this._reconnectInProgress = true;
     try {
-      const valid = await this.isAuthenticated();
+      let valid: boolean;
+
+      try {
+        valid = await this.isAuthenticated();
+      } catch (error) {
+        if (isTransientNetworkError(error)) {
+          debug("SESSION CHECK UNAVAILABLE", error);
+          return "unverified";
+        }
+
+        throw error;
+      }
 
       if (valid) {
-        return true;
+        return "valid";
       }
 
       /**
@@ -748,12 +800,12 @@ export class Kuzzle extends KuzzleEventEmitter {
             'Could not re-authenticate: "authenticator" property is not set.',
           ),
         });
-        return false;
+        return "invalid";
       }
 
       await this.authenticate();
 
-      return true;
+      return "valid";
     } catch (err) {
       this.emit("reconnectionError", {
         error: new Error(
@@ -761,7 +813,7 @@ export class Kuzzle extends KuzzleEventEmitter {
         ),
       });
 
-      return false;
+      return "invalid";
     } finally {
       this._reconnectInProgress = false;
     }
