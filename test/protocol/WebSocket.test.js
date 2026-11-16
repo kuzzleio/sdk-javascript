@@ -64,6 +64,14 @@ describe("WebSocket networking module", () => {
     should(clientStub.onmessage).not.be.undefined();
   });
 
+  it("should not pass a protocols argument to the browsers WebSocket API", () => {
+    clientStub.on = sinon.stub();
+
+    websocket.connect();
+
+    should(wsargs).eql(["ws://address:1234"]);
+  });
+
   it("should initialize a WS secure connection", () => {
     clientStub.on = sinon.stub();
     websocket = new WS("address", {

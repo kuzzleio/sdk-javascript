@@ -92,7 +92,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         this.lasturl = url;
       }
 
-      this.client = new this.WebSocketClient(url, this.options);
+      // Browsers only take (url, protocols): a `null` protocols argument is
+      // rejected by recent Chromium versions, so it is never passed there.
+      this.client =
+        this.options === null
+          ? new this.WebSocketClient(url)
+          : new this.WebSocketClient(url, this.options);
 
       /**
        * Defining behavior depending on the Websocket client type
