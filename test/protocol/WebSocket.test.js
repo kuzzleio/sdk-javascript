@@ -64,6 +64,14 @@ describe("WebSocket networking module", () => {
     should(clientStub.onmessage).not.be.undefined();
   });
 
+  it("should not pass a protocols argument to the browsers WebSocket API", () => {
+    clientStub.on = sinon.stub();
+
+    websocket.connect();
+
+    should(wsargs).eql(["ws://address:1234"]);
+  });
+
   it("should initialize a WS secure connection", () => {
     clientStub.on = sinon.stub();
     websocket = new WS("address", {
@@ -386,6 +394,87 @@ describe("WebSocket networking module", () => {
     should(websocket.waitForPong).be.false();
     should(cb).be.calledOnce().be.calledWithMatch(payload);
     should(cb2).be.calledOnce().be.calledWithMatch(expectedError, payload);
+  });
+
+  describe("on a node shutting down", () => {
+    const shuttingDownResponse = {
+      room: "request-id",
+      requestId: "request-id",
+      status: 503,
+      error: {
+        id: "network.entrypoint.shutting_down",
+        message: "Rejected: instance is shutting down",
+        status: 503,
+      },
+    };
+
+    beforeEach(() => {
+      clientStub.OPEN = 1;
+      clientStub.readyState = 1;
+    });
+
+    it("should deliver the response, then drop the socket and reconnect", () => {
+      const responseCB = sinon.stub();
+      const networkErrorCB = sinon.stub();
+      const disconnectCB = sinon.stub();
+
+      websocket.on("request-id", responseCB);
+      websocket.on("networkError", networkErrorCB);
+      websocket.on("disconnect", disconnectCB);
+
+      websocket.connect();
+      clientStub.onopen();
+      websocket.connect = sinon.stub().resolves();
+
+      clientStub.onmessage({ data: JSON.stringify(shuttingDownResponse) });
+
+      should(responseCB)
+        .be.calledOnce()
+        .and.calledWithMatch({
+          error: { id: "network.entrypoint.shutting_down" },
+        });
+      should(clientStub.close).be.calledOnce().and.calledWith(1000);
+      should(clientStub.onclose).be.undefined();
+      should(disconnectCB)
+        .be.calledOnce()
+        .and.be.calledWith({ origin: DisconnectionOrigin.NETWORK_ERROR });
+      should(networkErrorCB).be.calledOnce();
+      should(websocket.state).eql("offline");
+
+      clock.tick(10);
+      should(websocket.connect).be.calledOnce();
+    });
+
+    it("should leave the socket alone on other errors", () => {
+      websocket.connect();
+      clientStub.onopen();
+
+      clientStub.onmessage({
+        data: JSON.stringify({
+          room: "request-id",
+          error: { id: "api.process.overloaded", status: 503 },
+        }),
+      });
+
+      should(clientStub.close).not.be.called();
+      should(websocket.state).eql("connected");
+    });
+  });
+
+  describe("reconnection delay", () => {
+    it("should wait between half and the whole configured delay", () => {
+      const random = sinon.stub(Math, "random");
+
+      try {
+        random.returns(0);
+        should(websocket.nextReconnectionDelay()).eql(5);
+
+        random.returns(0.999);
+        should(websocket.nextReconnectionDelay()).eql(10);
+      } finally {
+        random.restore();
+      }
+    });
   });
 
   it("should set the waitForPong to false when receiving a pong message and return", () => {

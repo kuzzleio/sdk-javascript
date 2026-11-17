@@ -4,7 +4,8 @@ const should = require("should"),
   sinon = require("sinon"),
   ProtocolMock = require("../mocks/protocol.mock"),
   generateJwt = require("../mocks/generateJwt.mock"),
-  { Kuzzle } = require("../../src/Kuzzle");
+  { Kuzzle } = require("../../src/Kuzzle"),
+  { KuzzleError } = require("../../src/KuzzleError");
 
 let kuzzle;
 
@@ -354,6 +355,119 @@ describe("Kuzzle query management", () => {
       should(kuzzle.deprecationHandler.logDeprecation)
         .be.calledOnce()
         .be.calledWith(response);
+    });
+  });
+  describe("#query on a node shutting down", () => {
+    const shuttingDown = () =>
+      new KuzzleError({
+        id: "api.process.shutting_down",
+        message: "Rejected: this node is shutting down.",
+        status: 503,
+      });
+    const response = { result: { foo: "bar" } };
+
+    beforeEach(() => {
+      const protocol = new ProtocolMock("somewhere");
+
+      kuzzle = new Kuzzle(protocol);
+      kuzzle._timeoutRequest = sinon.stub();
+    });
+
+    it("should send the request again once the SDK has reconnected to another node", async () => {
+      kuzzle.protocol.isReady.returns(false);
+      kuzzle._timeoutRequest
+        .onFirstCall()
+        .rejects(shuttingDown())
+        .onSecondCall()
+        .resolves(response);
+
+      const promise = kuzzle.query({ controller: "server", action: "now" });
+
+      await new Promise((resolve) => setImmediate(resolve));
+      should(kuzzle._timeoutRequest).be.calledOnce();
+
+      kuzzle.emit("reconnected");
+
+      await should(promise).be.resolvedWith(response);
+      should(kuzzle._timeoutRequest).be.calledTwice();
+    });
+
+    it("should retry after the reconnection delay when the protocol is still ready (HTTP)", async () => {
+      kuzzle.protocol.isReady.returns(true);
+      kuzzle.protocol.reconnectionDelay = 1;
+      kuzzle._timeoutRequest
+        .onFirstCall()
+        .rejects(shuttingDown())
+        .onSecondCall()
+        .resolves(response);
+
+      await should(
+        kuzzle.query({ controller: "server", action: "now" }),
+      ).be.resolvedWith(response);
+      should(kuzzle._timeoutRequest).be.calledTwice();
+    });
+
+    it("should give up after 3 retries with the original error", async () => {
+      kuzzle.protocol.isReady.returns(true);
+      kuzzle.protocol.reconnectionDelay = 1;
+      kuzzle._timeoutRequest.callsFake(() => Promise.reject(shuttingDown()));
+
+      await should(
+        kuzzle.query({ controller: "server", action: "now" }),
+      ).be.rejectedWith({ id: "api.process.shutting_down" });
+      should(kuzzle._timeoutRequest).have.callCount(4);
+    });
+
+    it("should not retry a request that is not queuable", async () => {
+      kuzzle._timeoutRequest.rejects(shuttingDown());
+
+      await should(
+        kuzzle.query(
+          { controller: "server", action: "now" },
+          { queuable: false },
+        ),
+      ).be.rejectedWith({ id: "api.process.shutting_down" });
+      should(kuzzle._timeoutRequest).be.calledOnce();
+    });
+
+    it("should not retry other errors", async () => {
+      kuzzle._timeoutRequest.rejects(
+        new KuzzleError({
+          id: "api.process.overloaded",
+          message: "overloaded",
+          status: 503,
+        }),
+      );
+
+      await should(
+        kuzzle.query({ controller: "server", action: "now" }),
+      ).be.rejectedWith({ id: "api.process.overloaded" });
+      should(kuzzle._timeoutRequest).be.calledOnce();
+    });
+
+    it("should reject with the original error if no node is reached in time", async () => {
+      const clock = sinon.useFakeTimers();
+
+      try {
+        kuzzle.protocol.isReady.returns(false);
+        kuzzle._timeoutRequest.rejects(shuttingDown());
+        const connectedListeners = kuzzle.listeners("connected").length;
+        const reconnectedListeners = kuzzle.listeners("reconnected").length;
+
+        const assertion = should(
+          kuzzle.query({ controller: "server", action: "now" }),
+        ).be.rejectedWith({ id: "api.process.shutting_down" });
+        await clock.tickAsync(30000);
+
+        await assertion;
+        should(kuzzle._timeoutRequest).be.calledOnce();
+        should(kuzzle.listeners("connected")).have.length(connectedListeners);
+        should(kuzzle.listeners("reconnected")).have.length(
+          reconnectedListeners,
+        );
+      } finally {
+        clock.restore();
+      }
     });
   });
 });

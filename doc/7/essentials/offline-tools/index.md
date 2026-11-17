@@ -42,6 +42,19 @@ await kuzzle.realtime.subscribe('test', 'test', {}, () => {
 Note that the offline tools will use the current authentication token to replay the requests in the queue.
 :::
 
+If the token cannot be checked because Kuzzle does not answer (the socket is lost again, the node is shutting down, the check times out), the SDK keeps the session as it is: it does not call the `authenticator`, does not emit `reconnectionError` and does not disconnect. The next reconnection checks the token again.
+
+## Rolling restart of a Kuzzle cluster
+
+A Kuzzle node that stops rejects new requests with a `shutting_down` error (`api.process.shutting_down` or `network.entrypoint.shutting_down`, status `503`) until its process exits. These requests have not been executed.
+
+When it receives such an error, the SDK:
+
+- with the WebSocket protocol, closes the socket right away and reconnects (with `autoReconnect`), most likely to another node of the cluster;
+- sends the rejected request again once it has reached another node, up to 3 times, unless the request was sent with the `queuable: false` option. If no node is reached within 30 seconds, the request is rejected with the original error.
+
+Reconnection attempts wait a random delay between half the `reconnectionDelay` and the full delay, so that the clients of a stopped node do not all reconnect at the same instant.
+
 ## Contructor options and properties
 
 These properties can be set in the `options` object when [instantiating a new SDK](/sdk/js/7/core-classes/kuzzle/constructor#arguments).
@@ -104,13 +117,15 @@ Default value: `120000`
 
 ### reconnectionDelay
 
-A read-only `number` specifying the time in milliseconds between different reconnection attempts.
+A read-only `number` specifying the maximum time in milliseconds between different reconnection attempts. Each attempt waits a random delay between half this value and this value.
 
 Default value: *Depends on the Protocol*
 
 ### reconnectionError
 
-Emitted when the SDK reconnect to Kuzzle and does not have a valid authentication token or can't renew it with the [authenticator](/sdk/js/7/core-classes/kuzzle/properties#authenticator) function.
+Emitted when the SDK reconnect to Kuzzle and Kuzzle reports that the authentication token is not valid anymore, and it cannot be renewed with the [authenticator](/sdk/js/7/core-classes/kuzzle/properties#authenticator) function. The SDK is then disconnected.
+
+It is not emitted when the token could not be checked because Kuzzle did not answer: the session is kept and checked again on the next reconnection.
 
 ## Methods
 
