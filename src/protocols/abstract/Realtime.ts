@@ -102,8 +102,22 @@ export abstract class BaseProtocolRealtime extends KuzzleAbstractProtocol {
       setTimeout(() => {
         this.retrying = false;
         this.connect().catch((err) => this.clientNetworkError(err));
-      }, this.reconnectionDelay);
+      }, this.nextReconnectionDelay());
     }
+  }
+
+  /**
+   * Delay before the next reconnection attempt: a random value between half
+   * the configured `reconnectionDelay` and the full delay.
+   *
+   * When a Kuzzle node stops, all its clients lose their socket at the same
+   * instant. Spreading their reconnections keeps them from hitting the
+   * remaining nodes in a single burst, and never waits longer than configured.
+   */
+  protected nextReconnectionDelay(): number {
+    const delay = this.reconnectionDelay;
+
+    return Math.round(delay / 2 + Math.random() * (delay / 2));
   }
 
   isReady() {

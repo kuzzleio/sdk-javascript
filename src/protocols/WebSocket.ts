@@ -4,6 +4,7 @@ import { JSONObject } from "../types";
 import { RequestPayload } from "../types/RequestPayload";
 import HttpProtocol from "./Http";
 import { DisconnectionOrigin } from "./DisconnectionOrigin";
+import { isNodeShuttingDownError } from "../utils/networkErrors";
 
 /**
  * WebSocket protocol used to connect to a Kuzzle server.
@@ -91,7 +92,12 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
         this.lasturl = url;
       }
 
-      this.client = new this.WebSocketClient(url, this.options);
+      // Browsers only take (url, protocols): a `null` protocols argument is
+      // rejected by recent Chromium versions, so it is never passed there.
+      this.client =
+        this.options === null
+          ? new this.WebSocketClient(url)
+          : new this.WebSocketClient(url, this.options);
 
       /**
        * Defining behavior depending on the Websocket client type
@@ -185,6 +191,10 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
           this.emit("tokenExpired");
         } else if (data.room) {
           this.emit(data.room, data);
+
+          if (isNodeShuttingDownError(data.error)) {
+            this.leaveStoppingNode();
+          }
         } else {
           // @deprecated
           this.emit("discarded", data);
@@ -316,6 +326,28 @@ export default class WebSocketProtocol extends BaseProtocolRealtime {
     clearInterval(this.pingIntervalId);
     this.pingIntervalId = null;
     super.close();
+  }
+
+  /**
+   * The node behind this socket is stopping: it rejects every request with a
+   * "shutting_down" error but keeps the socket open until its process exits.
+   *
+   * Drop the socket now, as an abnormal closure, so that `autoReconnect`
+   * reaches a node that still serves instead of waiting for the exit.
+   */
+  private leaveStoppingNode() {
+    if (!this.client || this.client.readyState !== this.client.OPEN) {
+      return;
+    }
+
+    const error: any = new Error("Kuzzle node is shutting down.");
+    error.status = 503;
+
+    clearInterval(this.pingIntervalId);
+    this.client.onclose = undefined; // The closure is reported below, as a network error
+    this.client.close(1000);
+    this.waitForPong = false;
+    this.clientNetworkError(error);
   }
 
   private setupPingPong() {

@@ -56,6 +56,8 @@ kuzzle.authenticator = async () => {
 
 If the `authenticator` function fail to authenticate the SDK, then the `reconnected` event is never emitted and a `reconnectionError` event is emitted.
 
+The `authenticator` function is only called when Kuzzle reports that the token is not valid anymore. If the token cannot be checked because Kuzzle does not answer (lost socket, node shutting down, timeout), the session is kept and checked again on the next reconnection.
+
 ### offlineQueueLoader
 
 The `offlineQueueLoader` property must be set with a function of one of the following formats:
