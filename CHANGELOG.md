@@ -1,3 +1,15 @@
+## [7.19.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.19.0...v7.19.1) (2026-11-25)
+
+### Bug Fixes
+
+* **deps:** bump ws to 8.23.0 (GHSA-96hv-2xvq-fx4p, GHSA-58qx-3vcg-4xpx) ([a3aff9a](https://github.com/kuzzleio/sdk-javascript/commit/a3aff9a3e7f543d486403256194c5dc66f20a3cf))
+
+## [7.19.1-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.19.0...v7.19.1-beta.1) (2026-11-25)
+
+### Bug Fixes
+
+* **deps:** bump ws to 8.23.0 (GHSA-96hv-2xvq-fx4p, GHSA-58qx-3vcg-4xpx) ([a3aff9a](https://github.com/kuzzleio/sdk-javascript/commit/a3aff9a3e7f543d486403256194c5dc66f20a3cf))
+
 ## [7.19.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.18.0...v7.19.0) (2026-11-17)
 
 ### Features
