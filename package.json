@@ -44,7 +44,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "kuzzle-types": "^1.0.0",
-    "ws": "8.18.3"
+    "ws": "8.23.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "12.4.0",
