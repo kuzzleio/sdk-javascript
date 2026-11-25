@@ -1,3 +1,15 @@
+## [7.19.0](https://github.com/kuzzleio/sdk-javascript/compare/v7.18.0...v7.19.0) (2026-11-17)
+
+### Features
+
+* **protocol:** leave a stopping Kuzzle node and replay what it rejected ([ecb13cc](https://github.com/kuzzleio/sdk-javascript/commit/ecb13cc3de82c8e0e96fe26544e8a0e9f53df68d))
+* **protocol:** spread reconnection attempts over the reconnection delay ([383a70c](https://github.com/kuzzleio/sdk-javascript/commit/383a70cbd480482a06401a33366ee774af90f711))
+
+### Bug Fixes
+
+* **kuzzle:** keep the session when the token check cannot reach Kuzzle ([e3b5313](https://github.com/kuzzleio/sdk-javascript/commit/e3b5313da1431a36eb79c0b4b1321577750a1256))
+* **websocket:** do not pass a null protocols argument to the browser WebSocket ([8c70d32](https://github.com/kuzzleio/sdk-javascript/commit/8c70d32bae06ab074aea5eb97add92eab7e8f903))
+
 ## [7.19.0-beta.1](https://github.com/kuzzleio/sdk-javascript/compare/v7.18.0...v7.19.0-beta.1) (2026-11-17)
 
 ### Features
