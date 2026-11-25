@@ -1,6 +1,6 @@
 {
   "name": "kuzzle-sdk",
-  "version": "7.19.0",
+  "version": "7.19.1-beta.1",
   "description": "Official Javascript SDK for Kuzzle",
   "author": "The Kuzzle Team <support@kuzzle.io>",
   "repository": {
@@ -44,7 +44,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "kuzzle-types": "^1.0.0",
-    "ws": "8.18.3"
+    "ws": "8.23.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "12.4.0",
